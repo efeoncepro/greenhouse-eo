@@ -11,3 +11,16 @@ de recursos. TASK-2017 conserva evidencias económicas; no duplicar el canon TAS
 
 Rollback aditivo: retirar comandos/policy nueva; catálogos y artifacts anteriores intactos. Promocióncanónica
 se prepara con mapa de contracts/consumer/auth/rollout, sin reemplazo V2 o despliegue implícito.
+
+## Resultado y continuidad
+
+Plan local ejecutado y cerrado en
+[TASK-2022](../complete/TASK-2022-pricing-v3-operational-agent-workflow.md); la evidencia de cada slice y QA
+está allí. El alcance original sin subagentes describe aquella implementación; la posterior solicitud del
+operador autorizó subagentes sólo para sincronizar documentación/skills, no una nueva implementación o rollout.
+
+Catálogo monetario y policy/créditos versionados, discovery/plan/portfolio, cobertura cliente, cálculo,
+readiness, preview y mantenimiento están documentados en el
+[ADR operativo](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
+Pendientes económicos permanecen en TASK-2017 y la promoción canónica en su mapa de handoff; no se modifica
+V2 ni se activan API/UI/MCP al cerrar este plan.

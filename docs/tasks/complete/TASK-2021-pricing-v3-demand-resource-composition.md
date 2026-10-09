@@ -185,3 +185,15 @@ Operations/Finance completa valores/planes y asignaciones reales. No pedir otra 
 ## Open Questions
 
 Plan/base/fecha Adobe; actuales Notion/M365/SEMrush/ChatGPT; seats/tipos Claude; denominadores reales Vercel/GCP y permisos de reparto. Ejemplos simulan estos datos o los dejan pendientes, sin aprobarlos.
+
+## Continuidad documental tras TASK-2022
+
+La policy inicial de tres perfiles y los tres artifacts congelados se preservan. TASK-2022 añade una sucesora con reglas de revisión de 32 perfiles, cartera declarada, cobertura cliente por ventana, capacidad de bundle/Team y actualización versionada; no cambia los resultados de esta evidencia histórica.
+
+[Operación completa local](TASK-2022-pricing-v3-operational-agent-workflow.md),
+[ADR vigente](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten descubrir,
+planear, cotizar, explicar/replay, evaluar y obtener preview redactado por rol o fee de servicio.
+Los 26 recursos originales son 25 herramientas más fee genérico de plataforma; no sumar ese fee dos veces.
+La evidencia/AC de este cierre permanece histórica y su lifecycle no se reabre. TASK-2017 conserva economía
+parcial; API/UI/MCP siguen en el canon V2 hasta promoción gobernada.

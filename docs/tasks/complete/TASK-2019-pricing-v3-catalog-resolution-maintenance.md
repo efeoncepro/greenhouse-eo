@@ -203,3 +203,15 @@ Auditoría: `docs/audits/commercial/2026-10-09-pricing-v3-catalog-selection-main
 74/74 pruebas; tipos y lint focales PASS; CLI real verifica resolución, explicación, replay y actualización sin mutar padre.
 Documentación/contexto estrictos verificados durante el cierre. Divergencias globales de skills gráficas ajenas se preservan.
 Implementación local cerrada; costos operativos y API/UI/MCP no certificados. Sin push, deploy o cambio remoto.
+
+## Continuidad documental tras TASK-2022
+
+El catálogo monetario mantiene add/replace/retire y sus artifacts. TASK-2022 incorpora reemplazo versionado de policy/packs, guardas de evidencia y preview de impactos con digests del contexto; no editar los archivos anteriores in-place.
+
+[Operación completa local](TASK-2022-pricing-v3-operational-agent-workflow.md),
+[ADR vigente](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten descubrir,
+planear, cotizar, explicar/replay, evaluar y obtener preview redactado por rol o fee de servicio.
+Los 26 recursos originales son 25 herramientas más fee genérico de plataforma; no sumar ese fee dos veces.
+La evidencia/AC de este cierre permanece histórica y su lifecycle no se reabre. TASK-2017 conserva economía
+parcial; API/UI/MCP siguen en el canon V2 hasta promoción gobernada.

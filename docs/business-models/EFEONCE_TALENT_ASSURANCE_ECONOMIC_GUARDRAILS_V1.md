@@ -115,3 +115,22 @@ Una vacante con requisitos senior y un presupuesto no competitivo genera fricci�
 - `scale_constrained`: la capacidad existe, pero no permite escalar al precio/volumen solicitado;
 - `blocked_by_finance`: falta validación de costo, margen o cash;
 - `no_go`: la promesa no puede sostenerse bajo las condiciones actuales.
+
+## Aplicación local de los guardrails en Pricing V3
+
+El [ADR operativo V3](../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
+[Pricing Integrity Pack de capacidad](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) conectan estas capas
+al costeo local: humano, recursos, plataforma genérica, Assurance/operación, continuidad y setup mantienen
+identidad, cobertura, driver, moneda, vigencia y fuente. El catálogo no confirma una provisión por contener
+un trial; los importes históricos o de prueba permanecen hipótesis hasta medir actividades y costos.
+
+El compositor evita licencias duplicadas, valida usuarios/capacidad y atribuye pools e IA; el portfolio
+reconcilia cuentas, interno y no asignado. Es evidencia aritmética de inputs declarados, no disponibilidad
+real, recruitability, acceso contratado o continuidad financiada. Una licencia o precio público no demuestra
+el estándar de capability de la persona. El preview de fee gestionado no convierte un rol en pod suficiente.
+
+`compose assess` exige revisión económica/comercial aunque calcule, y reporta brechas con owner. Sus señales
+no sustituyen el feasibility gate de Talent Assurance ni implementan TASK-1607/EPIC-038. TASK-2022 está completa
+localmente; TASK-2017 conserva costos/asignaciones/terms pendientes. Cambios de salarios, licencias o reservas
+crean versiones con impactos y nueva evidencia, nunca alteran snapshots aprobados ni contratos en vigor por
+inferencia. [Manual de operación](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).

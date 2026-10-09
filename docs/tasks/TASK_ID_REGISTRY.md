@@ -2607,3 +2607,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex2026-10-09: TASK-2021 completa selección/asignación/IA al quote local,108 tests y replay verificados; TASK-2017 mantiene economics. Siguiente ID libre TASK-2022.
 
 > Registro Codex2026-10-09: TASK-2022 completa catálogo/reglas/plan/reparto/readiness local; dueño económico TASK-2017, canonTASK-1211/1212. Siguiente ID libre TASK-2023.
+
+> Consolidación documental Codex 2026-10-09: TASK-2016/2018/2019/2020/2021/2022 conservan cierre local y TASK-2017 conserva in-progress/Parcial. [Mapa de cobertura de docs y skills](../audits/commercial/2026-10-09-pricing-v3-docs-skills-consolidation.md); no nueva task, ID reservado, tarifa aprobada ni promoción runtime.

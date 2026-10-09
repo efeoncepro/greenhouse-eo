@@ -72,3 +72,13 @@ Es aritmética de costeo local sobre supuestos del operador, sin UI/DB. Los cost
 independientemente verificados. No persiste/importa al catálogo ni emite cotizaciones; el motor
 del portal conserva su contrato para transacciones gobernadas. Tres capas documentales explican
 esta alternativa usable y no supeditan el cálculo local a reparar la UI.
+
+## Relación vigente con Cotizador V3
+
+La consulta del libro conserva su alcance histórico. Para componer una cotización nueva se usa el
+[núcleo V3](GREENHOUSE_PRICING_V3_LOCAL_PROTOTYPE_DECISION_V1.md) y su
+[flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md), completos localmente en TASK-2022.
+V3 no lee XLSX ni la extracción para calcular: consume catálogos, policy y demanda estructurados versionados.
+Los valores históricos conservan su procedencia; registrar el costo mensual de un consultor no fusiona sus
+escalas ni acredita costo localizado vigente. El libro sigue intacto y sirve para investigar, no para operar
+como base mutable del cotizador. La autoridad canónica de emisión continúa en Quote API Parity.

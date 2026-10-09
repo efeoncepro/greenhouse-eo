@@ -1,7 +1,7 @@
 # V3 — Selección de herramientas por trabajo
 
 Fecha: 2026-10-09. Owner: Operations para necesidades/asignaciones; Finance para costos/reparto.
-Requisitos confirmados bajo TASK-2017; composición local implementada bajo TASK-2021. Valores operativos e inventario live pendientes.
+Requisitos confirmados bajo TASK-2017; composición local bajo TASK-2021y flujo operativo ampliado bajo TASK-2022. [Contrato funcional implementado](cotizador-v3-superficie-implementada.md). Evidencia comercial e inventario live pendientes.
 Se reutiliza el [ADR de catálogo y kits](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md).
 
 ## Necesidad antes de costo
@@ -13,17 +13,17 @@ una herramienta no implica cobrar una suscripción completa nueva a cada cliente
 Las [reglas legibles por agentes](../../../data/pricing/v3-pilot/economics/resource-inputs/tool-selection.operator-2026-10-09.json)
 son antecedentes confirmados de necesidades, no un schema ejecutable, catálogo monetario ni input CLI.
 
-| Recurso | Regla confirmada o pendiente |
-| --- | --- |
-| Notion | Requerido para todos los roles que participan: PMS de Efeonce |
-| Microsoft 365 | Requerido para todos los roles que participan: base común de trabajo |
-| SEMrush | Requerido en redacción SEO, según el ejemplo confirmado por el operador |
-| Adobe | Redacción SEO sola no lo requiere; una tarea de producción visual puede justificarlo |
-| Higgsfield y Magnific | Seleccionar por trabajo visual y presupuesto de consumo; asignaciones concretas pendientes |
+| Recurso               | Regla confirmada o pendiente                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| Notion                | Requerido para todos los roles que participan: PMS de Efeonce                                     |
+| Microsoft 365         | Requerido para todos los roles que participan: base común de trabajo                              |
+| SEMrush               | Requerido en redacción SEO, según el ejemplo confirmado por el operador                           |
+| Adobe                 | Redacción SEO sola no lo requiere; una tarea de producción visual puede justificarlo              |
+| Higgsfield y Magnific | Seleccionar por trabajo visual y presupuesto de consumo; asignaciones concretas pendientes        |
 | ChatGPT y Claude Team | Incluir licencia cuando el trabajo y la asignación la necesitan; planes y asignaciones pendientes |
-| Vercel y GCP | Reparto de plataforma según cobertura del servicio y driver aprobado; no seat por persona |
+| Vercel y GCP          | Reparto de plataforma según cobertura del servicio y driver aprobado; no seat por persona         |
 
-Sólo Notion/Microsoft365 quedaron confirmados como universales. El operador añadió Claude Team al conjunto
+Sólo Notion/Microsoft 365 quedaron confirmados como universales. El operador añadió Claude Team al conjunto
 de recursos que deben costearse; no definió uso universal, variante Standard/Premium ni que ChatGPT y Claude
 sean obligatorios simultáneamente. Si una tarea necesita ambos se costean ambos con justificación; si una
 alternativa cubre el requisito, la elección es explícita y no se decide sólo por el menor precio.
@@ -36,7 +36,7 @@ excepción a la base requiere decisión explícita y cobertura suficiente; las o
 
 Separar quién necesita acceso, qué suscripción/seat lo cubre y qué parte de su costo corresponde al trabajo.
 Las licencias nominativas se cuentan por usuarios distintos; no compartir identidades ni reducir un seat
-al50% por una dedicación parcial. Un mismo seat usado por una persona en varios servicios requiere reparto
+al 50% por una dedicación parcial. Un mismo seat usado por una persona en varios servicios requiere reparto
 documentado, no repetir su costo completo ni borrar todas las repeticiones por nombre del proveedor.
 Suscripción, periodo y asignación identifican el costo que se reconcilia; consumo IA y caja adicional tienen
 tratamiento separado. Una licencia existente mantiene costo atribuible aunque no exija comprar otra.
@@ -47,15 +47,15 @@ Ausencias de precio o reparto producen pendiente; no precio cero ni porcentaje i
 ya cubre otro componente no se suman de nuevo. En servicios se incluyen como costo interno, conservando
 la unidad comercial de alcance/cadencia; el consumo de herramientas no obliga a vender horas personales.
 
-Ejemplo de selección, sin precio: redactor SEO → Notion + Microsoft365 + SEMrush + IA elegida para el
+Ejemplo de selección, sin precio: redactor SEO → Notion + Microsoft 365 + SEMrush + IA elegida para el
 trabajo. Adobe se omite si sólo redacta; Higgsfield/Magnific se agregan si también produce imágenes que lo
 requieren. IA seleccionada aún necesita plan/asignación o créditos presupuestados explícitos.
 
 ## Claude Team: referencia pública
 
-[Precios oficiales](https://claude.com/pricing), consultados2026-10-09: Standard25USD/seat/mes con pago mensual,
-o equivalente20USD/mes con pago anual; Premium125USD/mes, o equivalente100USD/mes anual. Las anualidades
-derivadas son240/1200USD por seat, no pagos mensuales de20/100. La
+[Precios oficiales](https://claude.com/pricing), consultados 2026-10-09: Standard 25 USD/seat/mes con pago mensual,
+o equivalente 20 USD/mes con pago anual; Premium 125 USD/mes, o equivalente 100 USD/mes anual. Las anualidades
+derivadas son 240/1200 USD por seat, no pagos mensuales de 20/100. La
 [ayuda oficial vigente](https://support.claude.com/en/articles/9266767-what-is-the-team-plan) indica mínimo
 dos miembros y precios estadounidenses sin impuestos; precio/moneda regional pueden variar.
 
@@ -82,9 +82,9 @@ La composición de servicio es costeo/modelado interno y no certifica alcance, p
 Quote/prepare legacy conservan kits explícitos previos; el binding nuevo ocurre con `compose`, no mutando baseline.
 
 TASK-2022 agrega [flujo operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
-[policy sucesora](../../../data/pricing/v3-operating/README.md):32perfiles/25tools históricas más nuevos recursos,
+[policy sucesora](../../../data/pricing/v3-operating/README.md):32 perfiles/25 tools históricas más nuevos recursos,
 feeETG-017 separado, portfolio de capacidad declarada, cobertura cliente, readiness y preview seguro.
-Adobe180USD cubre3CC+3Express (operador confirmado),306 es escenario sin fecha conocida. Notion24/seat y
-créditos30USD tienen respaldo de factura por periodo; públicoM365/SEMrush/ChatGPT/Claude sigue separado de gasto
+Adobe 180 USD cubre 3 CC+3 Express (operador confirmado),306 es escenario sin fecha conocida. Notion 24/seat y
+créditos 30 USD tienen respaldo de factura por periodo; públicoM365/SEMrush/ChatGPT/Claude sigue separado de gasto
 real. EUR/FX referencial explícito permite simularMagnific. Planes, salarios, usuarios y cartera reales pendientes
 quedan en evaluación; no inventario live o integración canónica. Legacy permanece intacto y TASK-2017 parcial.

@@ -100,3 +100,13 @@ La skill funciona en Claude y Codex con `name` y `description` comunes. Los arch
 ## Metodología de deck ejecutivo mensual
 
 Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.
+
+## Informe o preview de una simulación Cotizador V3
+
+Si los importes vienen del prototipo local V3, cargar
+[contrato operativo](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+`compose preview` devuelve una simulación redactada local; `explain` y artifact contienen costos/márgenes y son
+internos. Report Studio no completa faltantes económicos ni cambia estado por maquetar PDF. Preservar moneda,
+neto/impuestos/plazo, fuente/snapshot y la marca de simulación hasta aprobación y emisión por el canal aplicable.
+La plantilla documental formal desde precio autorizado sigue siendo otro carril; un previewV3 no le otorga esa
+aprobación ni quoteId, emisión, factura, sincronización o envío. Verificar pixels del documento que se entregue.

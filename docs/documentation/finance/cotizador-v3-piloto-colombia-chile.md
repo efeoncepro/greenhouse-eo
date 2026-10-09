@@ -1,5 +1,7 @@
 # Piloto V3 — diseñador senior al 50%, Colombia → Chile
 
+[Flujo local vigente hasta TASK-2022](cotizador-v3-superficie-implementada.md) y [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Este documento conserva el caso/piloto y sus supuestos históricos: las nuevas herramientas, fuentes y reglas no recalculan sus artefactos ni habilitan una tarifa comercial. La propuesta genérica 40%/35% no reemplaza el piso creativo 45% aprobado por la práctica.
+
 Fecha: 2026-10-09. Dueños: Commercial / Finance / People / Creative Operations.
 Unidad: [TASK-2017](../../tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md).
 Estado: ficha y simulación histórica ejecutable preparadas; validación económica parcial. Precio comercial: pendiente.
@@ -10,17 +12,17 @@ El operador confirmó diseñador senior al 50%, talento en Colombia y mercado Ch
 También confirmó que sólo dispone del antecedente del Excel. Eso valida la elección del
 caso; no acredita un costo colombiano actual ni aprueba su tarifa.
 
-| Dimensión | Valor del input | Estado |
-|---|---|---|
-| Perfil | ECG-002, diseñador visual senior | Confirmado para piloto |
-| Dedicación solicitada | 0,5 FTE | Confirmada; horas y mínimo facturable pendientes |
-| País del talento / mercado | Colombia / Chile | Confirmados, roles separados |
-| Personas | 1 | Supuesto por confirmar |
-| Modalidad | Shared | Supuesto; 50% no determina por sí solo el compromiso de costo |
-| Plazo | 3 meses | Horizonte de análisis, sin mínimo contractual aprobado |
-| Moneda de cálculo / salida | USD / CLP | Supuestos; fuente FX pendiente |
-| Descuentos | Ninguno en la solicitud | No constituye política de descuentos |
-| Impuestos | Pendientes | No se asume cero ni precio final con impuestos |
+| Dimensión                  | Valor del input                  | Estado                                                        |
+| -------------------------- | -------------------------------- | ------------------------------------------------------------- |
+| Perfil                     | ECG-002, diseñador visual senior | Confirmado para piloto                                        |
+| Dedicación solicitada      | 0,5 FTE                          | Confirmada; horas y mínimo facturable pendientes              |
+| País del talento / mercado | Colombia / Chile                 | Confirmados, roles separados                                  |
+| Personas                   | 1                                | Supuesto por confirmar                                        |
+| Modalidad                  | Shared                           | Supuesto; 50% no determina por sí solo el compromiso de costo |
+| Plazo                      | 3 meses                          | Horizonte de análisis, sin mínimo contractual aprobado        |
+| Moneda de cálculo / salida | USD / CLP                        | Supuestos; fuente FX pendiente                                |
+| Descuentos                 | Ninguno en la solicitud          | No constituye política de descuentos                          |
+| Impuestos                  | Pendientes                       | No se asume cero ni precio final con impuestos                |
 
 El [input ejecutable](../../../data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json)
 conserva `cost=null`. El [ledger para agentes](../../../data/pricing/v3-pilot/economics/colombia-chile-review.json)
@@ -51,18 +53,18 @@ base y la localización; cambiar sólo la etiqueta del histórico no completa el
 
 ## Capas que debe completar el snapshot
 
-| Capa | Decisión y evidencia necesaria | Dueño |
-|---|---|---|
-| Costo humano | Mensual, moneda, fuente, vigencia, país y coberturas: honorarios/salario, bonos, cargas y beneficios aplicables | People + Finance |
-| Capacidad | Horas por FTE, mínimo facturable shared y compromiso dedicated; viabilidad de disponer 50% | Creative Operations |
-| Tools | Kit realmente necesario, precio/entitlement vigente y atribución por persona/equipo/cuenta | Creative Operations + Finance |
-| Fee de plataforma | Monto y unidad genéricos, proveedor/modalidad y quién lo absorbe | People + Finance |
-| Talent Assurance | Formación, seguimiento, reemplazo/ramp-up, continuidad y riesgo de bench; sin duplicar otras capas | People + Creative Operations + Finance |
-| Operación | Dirección, QA, coordinación, infraestructura y seguimiento atribuibles | Creative Operations + Finance |
-| Setup | Onboarding, accesos y contexto inicial, cobro único separado o no aplicación fundamentada | Creative Operations + Finance |
-| Tier/precio | Tier por criterio; markup o margen objetivo, base y piso; aprobación independiente del histórico | Commercial + Finance |
-| Mercado | Ajuste Chile del precio humano y evidencia de disposición de pago; no altera licencias | Commercial + Finance |
-| FX/fiscal/caja | Pares dirigidos con fuente/vigencia, tratamiento fiscal, entidad, pago y compromisos | Finance + Legal |
+| Capa              | Decisión y evidencia necesaria                                                                                  | Dueño                                  |
+| ----------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| Costo humano      | Mensual, moneda, fuente, vigencia, país y coberturas: honorarios/salario, bonos, cargas y beneficios aplicables | People + Finance                       |
+| Capacidad         | Horas por FTE, mínimo facturable shared y compromiso dedicated; viabilidad de disponer 50%                      | Creative Operations                    |
+| Tools             | Kit realmente necesario, precio/entitlement vigente y atribución por persona/equipo/cuenta                      | Creative Operations + Finance          |
+| Fee de plataforma | Monto y unidad genéricos, proveedor/modalidad y quién lo absorbe                                                | People + Finance                       |
+| Talent Assurance  | Formación, seguimiento, reemplazo/ramp-up, continuidad y riesgo de bench; sin duplicar otras capas              | People + Creative Operations + Finance |
+| Operación         | Dirección, QA, coordinación, infraestructura y seguimiento atribuibles                                          | Creative Operations + Finance          |
+| Setup             | Onboarding, accesos y contexto inicial, cobro único separado o no aplicación fundamentada                       | Creative Operations + Finance          |
+| Tier/precio       | Tier por criterio; markup o margen objetivo, base y piso; aprobación independiente del histórico                | Commercial + Finance                   |
+| Mercado           | Ajuste Chile del precio humano y evidencia de disposición de pago; no altera licencias                          | Commercial + Finance                   |
+| FX/fiscal/caja    | Pares dirigidos con fuente/vigencia, tratamiento fiscal, entidad, pago y compromisos                            | Finance + Legal                        |
 
 Para costo localizado `specific: CO`, no agregar factor salarial. Para `reference_adjusted`,
 identificar país de referencia y factor hacia Colombia. El mercado Chile opera sobre precio
@@ -99,12 +101,12 @@ no aprueban importes, porcentajes o pisos por sí solos.
 El ledger contiene patches de solicitud, sin fórmulas de precios alternativas. Se aplican
 sobre copias del mismo input revisado y se ejecuta cada copia con el núcleo V3.
 
-| Caso | Dedicación / modalidad | Plazo | Qué permite revisar |
-|---|---|---|---|
-| Base | 50%, shared | 3 meses | Caso confirmado en perfil/dedicación/países |
-| Capacidad completa | 100%, shared | 3 meses | Diferencia de humano sin asumir duplicación de todas las licencias/fees |
-| Capacidad reservada | 50%, dedicated | 3 meses | Compromiso real y mínimo de costo, con política dedicated por definir |
-| Mayor plazo | 50%, shared | 6 meses | Peso del setup, compromisos de caja y cobertura del horizonte |
+| Caso                | Dedicación / modalidad | Plazo   | Qué permite revisar                                                     |
+| ------------------- | ---------------------- | ------- | ----------------------------------------------------------------------- |
+| Base                | 50%, shared            | 3 meses | Caso confirmado en perfil/dedicación/países                             |
+| Capacidad completa  | 100%, shared           | 3 meses | Diferencia de humano sin asumir duplicación de todas las licencias/fees |
+| Capacidad reservada | 50%, dedicated         | 3 meses | Compromiso real y mínimo de costo, con política dedicated por definir   |
+| Mayor plazo         | 50%, shared            | 6 meses | Peso del setup, compromisos de caja y cobertura del horizonte           |
 
 Son hipótesis de análisis; 100%, dedicated y seis meses no están aprobados como términos.
 Una solicitud dedicated requiere además su política; no se elige 0,5 o 1 FTE facturable por
@@ -124,14 +126,14 @@ Eso no determina el país real del histórico ni acredita cargas laborales compl
 Chile se fija en 1 para aislar costos; no representa disposición de pago. La ventana de fechas
 en `source` es la fecha de evaluación del ensayo, no una vigencia acreditada del Excel.
 
-| Componente | Costo mensual USD en el ensayo | Procedencia / hipótesis |
-|---|---:|---|
-| Humano al 50% | 655,00 | Subtotal histórico 1.310 × 0,5, localización CO supuesta |
-| Herramientas | 65,00 | Adobe 20 + Notion 24 + Microsoft 365 16 + ChatGPT 5, atribuciones históricas |
-| Fee genérico | 49,00 | Histórico; atribución completa por persona supuesta |
-| Talent Assurance | 25,00 | Importe del fixture sintético, sólo para ejercitar el cálculo |
-| Gestión / operación | 25,00 | Importe del fixture sintético, sólo para ejercitar el cálculo |
-| **Costo mensual modelado** | **819,00** | Perímetro del ensayo; no loaded cost comercial completo |
+| Componente                 | Costo mensual USD en el ensayo | Procedencia / hipótesis                                                      |
+| -------------------------- | -----------------------------: | ---------------------------------------------------------------------------- |
+| Humano al 50%              |                         655,00 | Subtotal histórico 1.310 × 0,5, localización CO supuesta                     |
+| Herramientas               |                          65,00 | Adobe 20 + Notion 24 + Microsoft 365 16 + ChatGPT 5, atribuciones históricas |
+| Fee genérico               |                          49,00 | Histórico; atribución completa por persona supuesta                          |
+| Talent Assurance           |                          25,00 | Importe del fixture sintético, sólo para ejercitar el cálculo                |
+| Gestión / operación        |                          25,00 | Importe del fixture sintético, sólo para ejercitar el cálculo                |
+| **Costo mensual modelado** |                     **819,00** | Perímetro del ensayo; no loaded cost comercial completo                      |
 
 Onboarding: USD 100 de costo único del fixture sintético. Se aplica el markup histórico
 30% sobre costos modelados: mensualidad USD 1.064,70 y setup USD 130,00. Tres meses:
@@ -144,12 +146,12 @@ los convierte en permiso para compartir credenciales. Mantener esos USD 65 const
 variar dedicación también es una hipótesis explícita. Hay que sustituir esas atribuciones por
 planes/unidades/asignaciones reales antes de cotizar.
 
-| Escenario del ensayo | Mensual USD | Setup único USD | Neto del plazo USD |
-|---|---:|---:|---:|
-| 50% shared, 3 meses | 1.064,70 | 130,00 | 3.324,10 |
-| 100% shared, 3 meses | 1.916,20 | 130,00 | 5.878,60 |
-| 50% solicitado, dedicated con 1 FTE comprometido, 3 meses | 1.916,20 | 130,00 | 5.878,60 |
-| 50% shared, 6 meses | 1.064,70 | 130,00 | 6.518,20 |
+| Escenario del ensayo                                      | Mensual USD | Setup único USD | Neto del plazo USD |
+| --------------------------------------------------------- | ----------: | --------------: | -----------------: |
+| 50% shared, 3 meses                                       |    1.064,70 |          130,00 |           3.324,10 |
+| 100% shared, 3 meses                                      |    1.916,20 |          130,00 |           5.878,60 |
+| 50% solicitado, dedicated con 1 FTE comprometido, 3 meses |    1.916,20 |          130,00 |           5.878,60 |
+| 50% shared, 6 meses                                       |    1.064,70 |          130,00 |           6.518,20 |
 
 El caso dedicated prueba una política hipotética de reserva completa; no decide que toda
 venta al 50% deba cobrarse así. Los tres meses y los seis meses siguen como horizontes de ensayo.
@@ -203,4 +205,4 @@ siendo el Excel histórico; no hay costo salarial, tipo de cambio o precio vigen
 
 ## Propuesta económica preparada — siguiente carril
 
-[Pack de pricing](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), [componentes/provisiones](cotizador-v3-provisiones-y-costos.md), [borrador de alcance](cotizador-v3-borrador-alcance-piloto.md) y [artefactos de revisión](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/README.md). Seis sensibilidades calculadas con CLI, objetivo40% y piso35% propuestos; recursos públicos investigados y costos comerciales pendientes explícitos. No cambia ninguna tarifa anterior ni valida el salario colombiano. TASK-2017 conserva avance parcial.
+[Pack de pricing](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md), [componentes/provisiones](cotizador-v3-provisiones-y-costos.md), [borrador de alcance](cotizador-v3-borrador-alcance-piloto.md) y [artefactos de revisión](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/README.md). Seis sensibilidades calculadas con CLI, objetivo 40% y piso 35% propuestos; recursos públicos investigados y costos comerciales pendientes explícitos. No cambia ninguna tarifa anterior ni valida el salario colombiano. TASK-2017 conserva avance parcial.

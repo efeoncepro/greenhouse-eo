@@ -1,6 +1,6 @@
 # Cotizar con el prototipo V3 por CLI
 
-- Estado: prototipo local ejecutable de TASK-2016; tarifas operativas e integración canónica pendientes.
+- Estado: manual del núcleo/snapshot de TASK-2016, conservado como carril ejecutable. El [manual operativo actual](operar-cotizador-v3-con-agentes.md) cubre las extensiones hasta TASK-2022; tarifas operativas e integración canónica pendientes.
 - Motor: `pricing-v3-local/1.0.0`. Contrato: `1.0.0`. Artefacto: `pricing-v3-local-artifact/1`.
 - Decisión: [ADR local](../../architecture/GREENHOUSE_PRICING_V3_LOCAL_PROTOTYPE_DECISION_V1.md).
 - Alcance: Staffing mensual, núcleo compartido con CLI delgada; no crea Quote en Greenhouse/HubSpot ni aprueba o envía propuestas.
@@ -92,12 +92,12 @@ Los valores internos de componentes permanecen en `calculationCurrency` sin redo
 
 ## Estados y reproducción
 
-| Resultado | Exit | Interpretación |
-| --- | ---: | --- |
-| `calculated / within_policy` | 0 | Cálculo completo; puede preparar borrador local, sin aprobarlo |
-| `needs_input` o `invalid` | 2 | Ver diagnósticos; sin precio/margen total ni líneas facturables |
-| `calculated / requires_review` | 3 | Precio calculado retenido para revisión interna |
-| Fallo técnico/adaptador/exportación bloqueada | 1 | stderr sanitizado; no usar como resultado exitoso |
+| Resultado                                     | Exit | Interpretación                                                  |
+| --------------------------------------------- | ---: | --------------------------------------------------------------- |
+| `calculated / within_policy`                  |    0 | Cálculo completo; puede preparar borrador local, sin aprobarlo  |
+| `needs_input` o `invalid`                     |    2 | Ver diagnósticos; sin precio/margen total ni líneas facturables |
+| `calculated / requires_review`                |    3 | Precio calculado retenido para revisión interna                 |
+| Fallo técnico/adaptador/exportación bloqueada |    1 | stderr sanitizado; no usar como resultado exitoso               |
 
 `validate` evalúa contrato y readiness usando el mismo núcleo, sin guardar archivo. `calculate --out` guarda también resultados incompletos semánticamente válidos para explicar los pendientes. Una entrada que no cumple el schema no genera artefacto. `explain` y `replay` verifican hash/versión/contenido y recalculan con el motor exacto disponible, sin catálogo actual. Una versión no soportada o una modificación devuelve `REPLAY_MISMATCH`. El timestamp queda fuera del digest.
 
@@ -109,7 +109,7 @@ La proyección cliente usa allowlist. Excluye costos, márgenes, factores, fuent
 
 El [caso diseñador senior compartido Colombia→Chile](../../../data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json) prioriza la combinación confirmada por el operador. El operador confirmó diseñador senior al 50%; headcount/plazo/modalidad/moneda siguen como supuestos de análisis. [Ficha y ledger de economics](../../documentation/finance/cotizador-v3-piloto-colombia-chile.md) conservan fuentes pendientes, encaje creativo y sensibilidad, sin tarifa aprobada. Devuelve `needs_input`: costo colombiano vigente y sus coberturas, capacidad, kits, fees/Assurance/operación, política de precio/mercado y FX faltan. No localiza el histórico del Excel ni aplica tasas sintéticas.
 
-Esta vertical no implementa aún reader del catálogo canónico, autorización remota, cambios salariales por periodo, overrides en `request`, consumo AI medido, fees porcentuales sobre ingresos, rounding comercial adicional, setups amortizados, ajustes encadenados ni servicios compuestos. Esos campos no se aceptan silenciosamente. [Contrato objetivo y convergencia](../../documentation/finance/cotizador-v3-contrato-y-validacion.md) conserva esas extensiones y los gates productivos; [parámetros piloto](../../documentation/finance/cotizador-v3-parametros-piloto.md) conserva decisiones económicas pendientes.
+El núcleo de snapshot descrito aquí no implementa reader del catálogo canónico, autorización remota, cambios salariales por periodo, overrides en `request`, consumo AI medido, fees porcentuales sobre ingresos, rounding comercial adicional, setups amortizados ni ajustes encadenados. El flujo posterior `compose` sí agrega composición de costos para roles o unidad de servicio, con selección de tools y presupuesto IA; no certifica SOW o delivery comercial de servicios. Esos campos no se aceptan silenciosamente. [Contrato objetivo y convergencia](../../documentation/finance/cotizador-v3-contrato-y-validacion.md) conserva esas extensiones y los gates productivos; [parámetros piloto](../../documentation/finance/cotizador-v3-parametros-piloto.md) conserva decisiones económicas pendientes.
 
 Verificación: `pnpm pricing:v3:test`, `pnpm pricing:workbook:test`, lint focal y `pnpm typecheck`. Evidencia y límite del lint global en el [cierre local](../../audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
 

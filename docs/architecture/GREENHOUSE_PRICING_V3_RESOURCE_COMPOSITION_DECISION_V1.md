@@ -47,3 +47,23 @@ Tres escenarios de selección, asignación y costo (SEO, diseño y servicio mult
 regresiones legacy. Rechazado: sumar todas las tools a todos, fórmulas en CLI, actualizar baseline in-place,
 usar divisores históricos como permisos de compartir seats o facturas actuales. Reabrir para promoción
 comercial, inventario/portfolio live, contratos de licencias y consumers canónicos.
+
+## Operación vigente y guardas ampliadas
+
+La policy inicial de tres perfiles y sus artifacts se conservan inmutables. TASK-2022 añadió una sucesora de
+revisión con reglas para los 32 perfiles históricos: [flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
+Los 26 recursos originales se clasifican en 25 herramientas y un fee de plataforma genérico; ese fee permanece
+en el resolvedor monetario y no se duplica como herramienta ni depende de una marca como Deel.
+
+El compositor ahora verifica seats nominativos enteros, cantidad por usuarios únicos, capacidad de paquete y
+mínimo de contrato de Team; paquetes combinados no permiten sumar otra vez el componente incluido. Cobertura
+aportada por el cliente exige líneas, motivo y evidencia confirmada que abarque todo el período de actividad,
+no sólo el día de cotización. No sustituye Notion/Microsoft 365 internos ni el planner de créditos. Cobertura
+parcial excluye sólo sus consumidores; cobertura/asignación sobrante o duplicada se rechaza.
+
+Portfolio deriva cuotas desde unidades declaradas reconciliadas por recurso/período/cuenta y conserva la parte
+interna, no asignada y residual. El reparto dentro de la cotización continúa ponderando usuarios únicos de las
+funciones consumidoras; no inferir dedicación real a partir de esa distribución. Seat individual necesita
+asignación por usuario y no se convierte en pool de cartera. `assess` separa cálculo y preparación económica;
+`preview` proyecta únicamente datos comerciales allowlisted y estado de simulación. Nuevas versiones de policy
+no cambian quotes existentes y ninguna de estas guardas demuestra compra, acceso real o reserva global.

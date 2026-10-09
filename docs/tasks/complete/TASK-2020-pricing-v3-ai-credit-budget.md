@@ -185,3 +185,15 @@ Tests focales, ESLint, TypeScript, CLI y replay previo, task lint/ops lint, cier
 ## Open Questions
 
 Vigencia promocional, impuestos/entidad, repetibilidad real de compras, saldo disponible, uso a plazo y costo de sobrantes; asignaciones/Adobe/FX permanecen en TASK-2017.
+
+## Continuidad documental tras TASK-2022
+
+La operación independiente de presupuesto de créditos conserva contrato/evidencia. TASK-2021/2022 integraron esos resultados a quote local por proveedor/mes; el alcance original sin binding automático describe esta task, no un pendiente actual del compositor. Compra, inventario, saldo live y reservas continúan fuera de alcance.
+
+[Operación completa local](TASK-2022-pricing-v3-operational-agent-workflow.md),
+[ADR vigente](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten descubrir,
+planear, cotizar, explicar/replay, evaluar y obtener preview redactado por rol o fee de servicio.
+Los 26 recursos originales son 25 herramientas más fee genérico de plataforma; no sumar ese fee dos veces.
+La evidencia/AC de este cierre permanece histórica y su lifecycle no se reabre. TASK-2017 conserva economía
+parcial; API/UI/MCP siguen en el canon V2 hasta promoción gobernada.

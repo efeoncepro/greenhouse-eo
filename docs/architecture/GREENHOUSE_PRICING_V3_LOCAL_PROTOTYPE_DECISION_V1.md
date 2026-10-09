@@ -44,3 +44,18 @@ Antes de integración completar contraste V2/V3, compatibilidad de snapshots/lif
 ## Revisit
 
 Cuando el prototipo necesite otra modalidad, se validen parámetros comerciales o se decida integrarlo al canon. La promoción requiere una decisión y unidad de trabajo propias, con evidencia por capability/consumer.
+
+## Alcance vigente tras TASK-2019–TASK-2022
+
+El primer alcance anterior describe TASK-2016, no una limitación del flujo actual. El mismo kernel recibe
+snapshots resueltos por catálogo y por compositor; los incrementos siguientes añaden selección de perfiles,
+calendarios, recursos/IA, reparto declarado, mantenimiento y proyección `role_capacity | managed_service`.
+La segunda unidad agrupa el fee por período y setup en un preview local; no implementa SOW, receta comercial
+validada, facturación por entregable ni gobierno de delivery. La aritmética de roles sigue como costeo interno.
+
+El [ADR operativo vigente](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica módulos,
+fuentes y límites. [TASK-2022](../tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md) está completa
+localmente; [TASK-2017](../tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md) permanece parcial
+por evidencia económica. [Mapa de promoción](../documentation/finance/cotizador-v3-promocion-canonica.md):
+reusar capabilities, redacción por audiencia, commands/readers, autoridad y lifecycle canónicos; no replicar
+fórmulas en CLI/UI/API/MCP ni confundir el prototipo extraíble con un nuevo servicio productivo.

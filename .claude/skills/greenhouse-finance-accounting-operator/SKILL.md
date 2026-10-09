@@ -351,3 +351,24 @@ For execution work, also include:
 - `Changes Applied`: code, doc, task, or config changes made
 - `Rollout Notes`: what should happen before or after deploy/close
 - `Residual Risk`: what remains unresolved or intentionally provisional
+
+## Cotizador V3: atribución local y evidencia económica
+
+Para costear roles/servicios con licencias, plataforma o créditos, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+Finance conserva ownership de salario/coberturas, provisiones, impuestos, FX, caja y reconciliación;
+el kernel Decimal calcula desde fuentes versionadas. Factor del talento y factor del mercado son ejes distintos.
+No introducir cifras del expediente como costos centrales sin fuente/fecha/mantenimiento gobernado.
+
+Portfolio reconcilia cuentas + interno + sin asignar contra capacidad declarada; no inventa clientes ni reparte
+capacidad ociosa al comprador. Adobe180 es paquete3CC+3Express;306 es renovación condicional sin fecha efectiva.
+Seats nominativos no se reducen por FTE ni permiten compartir login. GCP/Vercel requieren escenario y denominador;
+créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y remanentes/validez separados.
+FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
+`trial-*` son costos no medidos y no provisiones aprobadas. Margen sobre venta y markup no son intercambiables;
+40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
+
+Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con
+preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca repricea artifacts. Este carril no
+registra ledger/payroll/pagos/CRM, no compra tools y no promueve automáticamente el motor al canon.

@@ -208,3 +208,11 @@ El catálogo es una base comercial para validación, no una autorización de ven
 - [Creative Practice — oferta](../../../.codex/skills/creative-practice/modules/03_OFERTA.md)
 - [Product Service Operating Model](../../business-models/EFEONCE_PRODUCT_SERVICE_OPERATING_MODEL_V1.md)
 - [Portfolio, brands and business lines](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
+
+## Costeo de capacidad y servicios compuestos
+
+El [modelo Embedded Creative Pod](EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md#14-costeo-local-reusable-y-presentación-del-fee)
+conecta el costeo local V3 con la venta por fee de servicio. [Manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md):
+selección de roles internos y herramientas por trabajo, atribución de paquetes/plataforma y packs IA,
+explicación/replay y preview allowlisted. Mantener lane, alcance, governance, derechos y piso de la práctica;
+una simulación de diseñador al 50% no certifica pod completo, precio público ni modalidad comercial nueva.

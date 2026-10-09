@@ -1,7 +1,9 @@
 # Cotizador Efeonce V3: prototipo del motor con primer consumidor CLI
 
+[Superficie implementada](cotizador-v3-superficie-implementada.md) y [manual operativo actual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Las propuestas de interfaz de este documento se conservan como diseño; consultar allí los comandos y límites ejecutables.
+
 - Fecha: 2026-10-09.
-- Estado: dirección funcional confirmada; primera vertical local de Staffing implementada y probada bajo ADR. Parámetros operativos e integración canónica pendientes.
+- Estado: dirección funcional confirmada; flujo local implementado hasta TASK-2022 con catálogo, composición, créditos, mantenimiento, portfolio, evaluación y preview. Parámetros operativos e integración canónica pendientes.
 - Objetivo inmediato: pedir a Codex o Claude una cotización, ejecutar un cálculo determinista mediante CLI y preparar el documento con su resultado.
 - Objetivo de evolución: validar el motor del cotizador V3 y después integrarlo al cotizador canónico, con Full API Parity y consumidores CLI, UI, API, Nexa y MCP sobre las mismas capacidades de dominio.
 - Antecedente: [análisis hoja por hoja](../../audits/commercial/2026-10-09-pricing-workbook-logic-analysis.md).
@@ -79,7 +81,7 @@ Asignación al trabajo → personas, cuentas, consumo o capacidad compartida
 Cotización → costo de herramientas necesario para ese trabajo
 ```
 
-Cada perfil tiene un kit predeterminado editable, con herramientas requeridas y opcionales. Por ejemplo, un diseñador puede necesitar suite de diseño, AI y revisión; un consultor CRM, acceso a entorno de trabajo/sandbox, automatización y AI. Son categorías ilustrativas. El operador confirmó [base común y selección por trabajo](cotizador-v3-seleccion-herramientas.md): Notion/Microsoft365 para todos, SEMrush para redactor SEO, Adobe/IA según tarea y Claude Team como recurso a costear cuando se asigna. La [composición local](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md) conecta esas reglas y costos al quote con asignaciones explícitas. Tarifas/planes actuales y repartos reales siguen pendientes; los kits históricos no se actualizan por esta declaración.
+Cada perfil tiene un kit predeterminado editable, con herramientas requeridas y opcionales. Por ejemplo, un diseñador puede necesitar suite de diseño, AI y revisión; un consultor CRM, acceso a entorno de trabajo/sandbox, automatización y AI. Son categorías ilustrativas. El operador confirmó [base común y selección por trabajo](cotizador-v3-seleccion-herramientas.md): Notion/Microsoft 365 para todos, SEMrush para redactor SEO, Adobe/IA según tarea y Claude Team como recurso a costear cuando se asigna. La [composición local](../../manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md) conecta esas reglas y costos al quote con asignaciones explícitas. Tarifas/planes actuales y repartos reales siguen pendientes; los kits históricos no se actualizan por esta declaración.
 
 La relación pertenece al perfil, pero la licencia se asigna a una persona, un equipo o una cuenta. No toda repetición de un rol requiere comprar una licencia nueva; tampoco se presupone que una licencia de usuario se pueda compartir.
 

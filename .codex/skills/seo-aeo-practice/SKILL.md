@@ -562,3 +562,13 @@ Para dimensionar un programa SEO/AEO, cargar
 [caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Sustentar duración,
 lotes y aceptación desde el corpus y las dependencias; contrastar requisitos comerciales con demanda
 curada y separar compromisos de entrega de resultados compartidos o fuera del control del equipo.
+
+## Cotizador V3: simulación local de Search Visibility
+
+Para cotizar sin UI con demanda/perfiles/tools versionados, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Este carril opt-in calcula hipótesis y las explica desde snapshot: no reemplaza cotizador canónico, emisión o
+aprobaciones de §2 y `modules/04_PRICING.md`. SEO→SEMrush, baseNotion/M365, IA/Adobe/plataforma según necesidad;
+conservar variante salarial, países, dedicación y fuente real. Reparto declarado no acredita inventario.
+`managed_service` agrega fee sin publicar costos/horas internos. Readiness40/35 son propuestas genéricas, **no
+reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.

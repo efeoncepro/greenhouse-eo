@@ -1,6 +1,8 @@
 # Pricing local para agentes
 
-[Flujo operativo V3 completo local](v3-operating/README.md): discovery/plan,32perfiles, recursos por trabajo, reparto de capacidad, mantenimiento con impacto, evaluación y preview; costos/asignaciones reales e integración canónica pendientes.
+[Superficie V3 implementada y frontera comercial](../../docs/documentation/finance/cotizador-v3-superficie-implementada.md). Este conjunto conserva su versión/caso original; las fuentes y la policy operativa sucesora se seleccionan explícitamente y no alteran resultados congelados.
+
+[Flujo operativo V3 completo local](v3-operating/README.md): discovery/plan,32 perfiles, recursos por trabajo, reparto de capacidad, mantenimiento con impacto, evaluación y preview; costos/asignaciones reales e integración canónica pendientes.
 
 - [Prototipo del motor del cotizador V3](../../docs/documentation/finance/cotizador-cli-modelo-propuesto.md): dirección confirmada; CLI como primer consumidor, motor reutilizable y futura integración al cotizador canónico con Full API Parity. País del talento y mercado separados, fee genérico, tiers y herramientas por perfil. Contrato definido abajo; parámetros comerciales e integración canónica pendientes; primera vertical local implementada bajo ADR.
 - [Contrato y pruebas/convergencia V3](../../docs/documentation/finance/cotizador-v3-contrato-y-validacion.md): bloques 2 y 3 definidos; baseline inicial de código, casos y gates de integración. Parámetros comerciales pendientes; alcance implementado y extensiones se distinguen en el manual V3.

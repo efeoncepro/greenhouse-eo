@@ -3,6 +3,8 @@
 TASK-2022, 2026-10-09. Prototipo local ejecutable. Entrada:
 [data y casos](../../../data/pricing/v3-operating/README.md),
 [ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
+[Referencia funcional de todo lo implementado](../../documentation/finance/cotizador-v3-superficie-implementada.md):
+contratos, fórmulas, periodos, selección, costos, evidencia, mantenimiento y límites.
 
 El operador puede pedir «cotiza un diseñador senior al 50%, talento Colombia, mercado Chile».
 El agente consulta perfiles y recursos, interpreta las tareas, completa una demanda explícita y usa la CLI.
@@ -19,7 +21,7 @@ pricing_policy=data/pricing/v3-operating/resources.review-v2.json
 pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
 
 pnpm --silent pricing:v3 resources inspect --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --date 2026-10-09 --query diseñador
+  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-09 --query diseñador
 
 pnpm --silent pricing:v3 compose scaffold --catalog "$pricing_catalog" \
   --policy "$pricing_policy" --input data/pricing/v3-operating/writer.brief.json
@@ -44,16 +46,42 @@ pnpm --silent pricing:v3 compose preview --input /tmp/cotizacion-v3-nueva.json \
 ```
 
 Las rutas `--out` deben ser nuevas; nunca sobrescriben un padre o artefacto. JSON en stdout es interfaz para agentes.
-Exit0: operación técnica verificada. Exit2: falta información. Exit3: preparado/calculado en revisión;
-**no es un error de cálculo ni una aprobación comercial**. Replay de una composición en revisión devuelve3.
-Exit1: entrada inválida, conflicto, overwrite o export comercial rechazado; error sanitizado en stderr.
-No concatenar una secuencia con `&&` esperando exit0 de una simulación: interpretar explícitamente estos estados.
+Exit 0: operación técnica verificada. Exit 2: falta información. Exit 3: preparado/calculado en revisión;
+**no es un error de cálculo ni una aprobación comercial**. Replay de una composición en revisión devuelve 3.
+Exit 1: entrada inválida, conflicto, overwrite o export comercial rechazado; error sanitizado en stderr.
+No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interpretar explícitamente estos estados.
+
+### Elegir el comando y su input
+
+| Comando                                                | Input/formato                                                      | Resultado y estado                                                                                           |
+| ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| `catalog search` / `catalog show` / `catalog validate` | Catálogo monetario, consulta/kind y fecha opcionales               | Registros con fuentes o digest validado; no vigencia comercial aprobada                                      |
+| `prepare` / `quote`                                    | Brief y catálogo                                                   | Selección / quote del carril de kits; no recibe demanda compuesta                                            |
+| `validate` / `calculate`                               | Request + snapshot resuelto                                        | Validación / artefacto del núcleo; no lee Excel ni descubre tools                                            |
+| `resources inspect`                                    | Catálogo + policy + fecha; créditos opcionales                     | Perfiles, tools, planes, fee separado, necesidades y hashes; precio vencido deja `needs_input` en su entrada |
+| `compose scaffold`                                     | Brief + policy + catálogo                                          | Demanda editable con slots y preguntas, siempre exit 2; completar planes/asignaciones/alcance                |
+| `resources portfolio`                                  | Portfolio + policy; fecha/catálogo para costos                     | Cuotas reconciliadas, interno/sin asignar y residual; exit 3 preparado o 2 pendiente                         |
+| `compose plan`                                         | Plan con demanda y portfolio opcional + las tres fuentes           | Demanda resuelta y cálculo de prueba; `--out` guarda la demanda, **no** el artefacto                         |
+| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Selección o resultado; ambos `--out` guardan artefacto compuesto completo                                    |
+| `resources budget`                                     | Request de créditos; `--catalog` es catálogo de packs              | Presupuesto independiente; no es input de quote/replay de cotizaciones                                       |
+| `explain` / `replay`                                   | Artefacto snapshot, catálogo o composición                         | Explica / reproduce y verifica con inputs congelados; no consulta sucesor                                    |
+| `compare`                                              | Dos artefactos compatibles de snapshot o catálogo                  | Diferencias internas; el CLI actual no compara artefactos de composición directamente                        |
+| `compose assess`                                       | Artefacto compuesto                                                | Gaps económicos/operativos y margen propuesto, siempre revisión; JSON                                        |
+| `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, sin emisión                                 |
+| `catalog preview` / `catalog apply`                    | Change-set monetario; impacto de briefs opcional                   | Preview / sucesor nuevo; apply exige digest confirmado y `--out`                                             |
+| `resources preview` / `resources apply`                | Replacement completo policy/créditos; impacto de demandas opcional | Preview / sucesor nuevo; mismo contexto/hash/impacto, sin selección automática                               |
+| `export`                                               | Artefacto completo dentro de policy                                | Gate propio de borrador: composiciones review-only actuales siguen bloqueadas                                |
+
+Los formatos no son intercambiables. `--out` contiene el artefacto completo en quote, mientras stdout puede
+ser un resumen; `explain/replay` deben leer el archivo congelado. Opciones ajenas al subcomando se rechazan,
+no se interpretan como ejecutadas. Para actualizar el catálogo monetario, obtener `digest` con `catalog validate`;
+para policy/créditos, usar `policyDigest`/`creditCatalogDigest` de inspect con las rutas explícitas.
 
 ## Selección y asignación
 
 1. Resolver la variante exacta del perfil: consultores HubSpot y otros niveles mantienen costos distintos.
 2. Confirmar tareas y alcance: Copywriter con tareaSEO requiere SEMrush; no cambia al salario de SEO Specialist.
-3. Base común Notion/Microsoft365; añadir Adobe, plataformas e IA sólo cuando el trabajo lo requiere.
+3. Base común Notion/Microsoft 365; añadir Adobe, plataformas e IA sólo cuando el trabajo lo requiere.
 4. Elegir `priceId`, frecuencia y plan explícitos. Público, operador, factura e histórico conservan fuente separada.
 5. Identificar usuarios con IDs estables sin PII. `planned-*` son slots, nunca personas contratadas ni seats existentes.
 6. Declarar cantidad, capacidad contractual, driver y parte atribuida por mes. No hay reparto automático por FTE.
@@ -73,10 +101,10 @@ internas y sin asignar. Las tres partes deben reconciliar exactamente. Cuota = u
 Decimal mantiene el residual explícito. Con fecha/catálogo, se presenta también costo mensual en moneda original.
 No convertir EUR a USD sin la referenciaFX explícita en demanda.
 
-Ejemplo **hipotético**: Adobe180, capacidad160, cliente40, interno80, sin asignar40 →45/90/45USD.
+Ejemplo **hipotético**: Adobe 180, capacidad 160, cliente 40, interno 80, sin asignar 40 →45/90/45 USD.
 El 25% deriva de las unidades del ejemplo; no se guarda como default de cartera. Vercel/GCP se reparten con el
-mismo contrato por capacidad de plataforma declarada. No inventar 10clientes ni aplicar el rango de Vercel como
-importe exacto: seleccionar mínimo60 o máximo100 explícitamente hasta contar con factura/consumo concreto.
+mismo contrato por capacidad de plataforma declarada. No inventar 10 clientes ni aplicar el rango de Vercel como
+importe exacto: seleccionar mínimo 60 o máximo 100 explícitamente hasta contar con factura/consumo concreto.
 
 Seats nominativos por usuario (`basis=seat`) se declaran en la demanda con cantidad entera, usuarios y driver;
 el portfolio de pools no los convierte en una suscripción compartida. Un paquete nominativo, como Adobe, puede
@@ -92,7 +120,7 @@ El costo del recurso Efeonce se omite sólo para esas líneas; el desglose regis
 BaseNotion/M365 y herramientas de créditos no se sustituyen por esta excepción. Sin evidencia, con vigencia
 insuficiente o cobertura de líneas desconocidas, el cálculo completo queda bloqueado.
 
-Higgsfield139USD/3000créditos y Magnific40EUR/45000créditos son bases reportadas. Se atribuye la parte de créditos
+Higgsfield 139 USD/3000 créditos y Magnific 40 EUR/45000 créditos son bases reportadas. Se atribuye la parte de créditos
 base presupuestada y se suma el costo completo del pack extra requerido. Se muestran caja extra, créditos
 sobrantes y vencimiento; no confundir costo atribuido con dinero nuevo por pagar. Remanentes no se descuentan
 de otra cotización sin un presupuesto/inventario explícito. Créditos de herramientas distintas no son fungibles.
@@ -101,7 +129,7 @@ de otra cotización sin un presupuesto/inventario explícito. Créditos de herra
 ## Actualizar valores sin alterar cotizaciones anteriores
 
 Salarios, cargos, factores país/mercado y FX: [mantenimiento del catálogo monetario](catalogo-v3-seleccion-y-actualizacion.md).
-Planes/reglas o packsIA: `resources preview|apply`. Change-set completo:
+Planes/reglas o packsIA: `resources preview` / `resources apply`. Change-set completo:
 
 ```json
 {
@@ -109,7 +137,7 @@ Planes/reglas o packsIA: `resources preview|apply`. Change-set completo:
   "kind": "policy",
   "baseDigest": "SHA256_DE_LA_POLICY_ACTUAL",
   "reason": "Factura, responsable, fecha y motivo de la revisión",
-  "replacement": {"schemaVersion": "pricing-v3-resource-policy/1", "version": "VERSION_NUEVA"}
+  "replacement": { "schemaVersion": "pricing-v3-resource-policy/1", "version": "VERSION_NUEVA" }
 }
 ```
 
@@ -139,6 +167,12 @@ replay de la vieja usa sus inputs congelados. Renovación Adobe sigue condiciona
 
 `compose assess` separa cálculo y evidencia: salario/localización, provisionesAssurance/operación/onboarding,
 planes actuales, acceso/usuarios, capacidad real, margen comercial, entidad/impuestos y alcance del servicio.
-Márgenes40%/35% son propuestas, no aprobaciones. El preview está redactado, local y marcado como simulación;
+Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Creative Practice mantiene 45% bruto aprobado; `assess` no sustituye ese piso ni aprueba una excepción. Consultar la práctica dueña antes de presentar precio. El preview está redactado, local y marcado como simulación;
 no es oferta emitida. La promoción futura tiene [mapa de integración](../../documentation/finance/cotizador-v3-promocion-canonica.md),
 con la autoridad y lifecycle del cotizador vigente. Este trabajo no despliega ni escribe API/DB/CRM.
+
+Para registrar una licencia nueva, pedir plan, moneda, frecuencia, importe, seats/capacidad, cobertura,
+acceso nominativo/compartido y evidencia/fecha. Primero registrar selección y costo en policy/catalog,
+luego la asignación en demanda/portfolio. No inferir usuarios habilitados desde una factura ni sustituir un
+contrato desconocido por una referencia pública. Las facturas privadas y enlaces firmados no se copian al repo:
+registrar referencia, hash y hechos financieros mínimos. [Ledger de pendientes por owner](../../../data/pricing/v3-operating/operational-gaps.json).

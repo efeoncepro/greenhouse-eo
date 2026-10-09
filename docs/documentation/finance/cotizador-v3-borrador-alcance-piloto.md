@@ -1,21 +1,23 @@
 # Borrador interno del alcance — piloto Colombia → Chile
 
+[Flujo local vigente hasta TASK-2022](cotizador-v3-superficie-implementada.md) y [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Este documento conserva el caso/piloto y sus supuestos históricos: las nuevas herramientas, fuentes y reglas no recalculan sus artefactos ni habilitan una tarifa comercial. La propuesta genérica 40%/35% no reemplaza el piso creativo 45% aprobado por la práctica.
+
 Estado: plantilla de revisión sin tarifa, contrato o envío; 2026-10-09, TASK-2017.
 [Pack económico](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md).
 No es una quote exportada ni habilita a ofrecer un diseñador como un pod completo.
 
 ## Datos base y decisión de delivery
 
-Diseñador visual senior, talento en Colombia, cliente en Chile, dedicación solicitada50%: confirmados por el operador para el caso de prueba.
+Diseñador visual senior, talento en Colombia, cliente en Chile, dedicación solicitada 50%: confirmados por el operador para el caso de prueba.
 Una persona, tres meses, capacidad compartida y USD: supuestos de análisis.
 Commercial/Creative Operations debe escoger con el cliente la configuración y dirección efectivas, dentro de la oferta aprobada:
 
-| Punto | Staff Augmentation (si corresponde) | Embedded/Managed Creative Pod |
-| --- | --- | --- |
-| Dirección diaria | Cliente, acordada expresamente | Efeonce; cliente prioriza, da contexto y aprueba marca |
-| Compromiso | Capacidad neta del perfil | Alcance, capacidad, coordinación y accountability del pod |
-| Calidad | Competencias verificadas y revisión pactada | QA/dirección/delivery de Efeonce dentro del SOW |
-| Cotizador actual | Simula economía staffing | Requiere composición/costeo y representación propios antes de propuesta |
+| Punto            | Staff Augmentation (si corresponde)         | Embedded/Managed Creative Pod                                           |
+| ---------------- | ------------------------------------------- | ----------------------------------------------------------------------- |
+| Dirección diaria | Cliente, acordada expresamente              | Efeonce; cliente prioriza, da contexto y aprueba marca                  |
+| Compromiso       | Capacidad neta del perfil                   | Alcance, capacidad, coordinación y accountability del pod               |
+| Calidad          | Competencias verificadas y revisión pactada | QA/dirección/delivery de Efeonce dentro del SOW                         |
+| Cotizador actual | Simula economía staffing                    | Requiere composición/costeo y representación propios antes de propuesta |
 
 No son dos ofertas simultáneas para la misma necesidad. El nombre «Staff Augmentation» en collateral creativo no cambia el delivery aprobado.
 

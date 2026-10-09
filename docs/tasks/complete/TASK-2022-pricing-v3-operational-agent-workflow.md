@@ -82,7 +82,7 @@ No reemplaza V2, DB ni consumers productivos. Follow-up de promoción requiere a
 
 ### Already exists
 
-Motor decimal, catálogo histórico32 perfiles/26 tools, planner IA, composer y replay. No inventario live.
+Motor decimal, catálogo histórico de 32 perfiles y 26 recursos (25 herramientas más fee genérico), planner IA, composer y replay. No inventario live.
 
 ### Gap
 
@@ -183,7 +183,7 @@ actualizar artifactsviejos o filtrar costos. Gates schema/Decimal/redacción/rep
 
 ## Acceptance Criteria
 
-- [x] Catálogo operativo cubre32 perfiles y26 tools históricas más recursos declarados, con fuentes y pendientes.
+- [x] Catálogo operativo cubre 32 perfiles y 26 recursos originales (25 herramientas + fee de plataforma genérico) más recursos declarados, con fuentes y pendientes.
 - [x] Adobe180 paquete combinado; alza306 condicional y sin fecha automática; noExpress duplicado.
 - [x] Reparto capacidad cartera + interno reconcilia; sobreasignación/duplicación rechazada; ningún porcentaje default.
 - [x] Discovery/plan/quote/explain/replay y evaluación/preview de rol/servicio funcionan por CLI con dominio puro.
@@ -213,3 +213,20 @@ PromociónV3 al canon depende de contrasteV2, authority/lifecycle, consumers y r
 
 FechaAdobe; planes/facturas actuales/seats; cartera/capacidad observada; salarios y política comercial. Tooling
 hace explícito cada dato requerido y acepta evidencia nueva versionada.
+
+## Handoff documental completo del flujo construido
+
+[ADR operativo](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica el
+único dominio de cálculo, catálogos, políticas, presupuestos, adapters y sus fronteras. Sus antecesores enlazan
+el alcance vigente sin alterar artifacts, cifras de evidencia o decisiones de cierre anteriores.
+[Business model de capacidad](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md),
+[guardrails Assurance](../../business-models/EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md),
+[CRM](../../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) y
+[Embedded Creative Pod](../../services/creative-services/EFEONCE_EMBEDDED_CREATIVE_POD_OPERATING_MODEL_V1.md)
+conectan costeo de rol/servicio con los gates de cada práctica. No introducen un SKU, nuevo margen o aprobación.
+
+Método de capacidad declarado está autorizado, cartera real sigue pendiente. Adobe cobertura combinada está
+confirmada; renovación sin fecha no se activa automáticamente. Factura Notion acredita su período/importe,
+no pago. Referencias públicas/históricas no confirman contrato, acceso ni salarios actuales.
+El piso de Creative permanece propio; 40%/35% es propuesta del piloto. Lifecycle complete local y economía
+parcial de TASK-2017 siguen siendo estados compatibles, sin inferir despliegue/canon a partir del cierre.

@@ -1,5 +1,7 @@
 # Presupuestar créditos IA con V3
 
+Para incorporar este presupuesto al precio de roles o servicios y conservar explicación/replay, usar el [flujo operativo de agentes](operar-cotizador-v3-con-agentes.md). La [referencia funcional](../../documentation/finance/cotizador-v3-superficie-implementada.md) distingue presupuesto independiente, composición y caja; el cálculo no compra ni reserva créditos.
+
 [Funcional y paquetes](../../documentation/finance/cotizador-v3-creditos-ia.md), [ADR](../../architecture/GREENHOUSE_PRICING_V3_AI_CREDIT_BUDGET_DECISION_V1.md). Operador local, sin acceso/cambio proveedor. Snapshot observado2026-10-09, revisión obligatoria.
 
 ## Antes de calcular

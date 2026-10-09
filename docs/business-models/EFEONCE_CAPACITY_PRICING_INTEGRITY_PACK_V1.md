@@ -27,7 +27,9 @@ Anti-fit: pide disponibilidad ilimitada, ausencia de owner, acceso inseguro, pre
 | Terceros / consumo extraordinario | Línea explícita autorizada | Sin uso ilimitado ni compra automática; derechos y responsabilidad definidos |
 
 Staffing/Staff Augmentation son delivery, no nuevas marcas. Talent Assurance es estándar costeado, no SKU para cobrar el mismo backup dos veces.
-El piloto diseñador verifica economía de un perfil; el kernel local sólo representa staffing. No exportarlo como oferta completa de pod.
+El piloto diseñador prueba aritmética de un perfil con antecedentes históricos. El flujo local ahora distingue
+`role_capacity` y `managed_service`; este último agrega un fee de servicio manteniendo roles como costeo interno.
+Ese preview no valida economía, capacidad, SOW ni oferta completa de pod.
 No cambiar el modelo creativo aprobado para poder emitir un archivo. CRM conserva su propia práctica/scorecard.
 
 ## 2. Unidad, tiers y plazo
@@ -123,3 +125,33 @@ No existe muestra de compra validada; no inventar un threshold de conversión o 
 Preparación ejecutada; economía comercial parcial. Review date propuesta: 2026-11-08, o antes ante evidencia nueva. No se creó recordatorio/cron.
 Actualizar según [contrato versionado](../documentation/finance/cotizador-v3-mantenimiento-catalogo.md), con fuente, vigencia, preview, confirmación técnica y sucesor explícito.
 Resolver cada unknown, usar change-set y volver a prepare/quote/explain/replay. Catalog/apply no firma ni aprueba tarifas. TASK-2017 sigue abierta; TASK-2019 conserva implementación local completa.
+
+## 11. Aplicación operativa con Cotizador V3
+
+El [flujo de agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) ya resuelve selección,
+atribución y cálculo local desde catálogos versionados; el [ADR operativo](../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md)
+fija sus fronteras. Expediente aporta demanda, el agente selecciona recursos justificables y la primitive calcula.
+No copiar honorarios del expediente a la rate card ni sumar todas las suites a todos los perfiles.
+
+La base Notion/Microsoft 365 es interna obligatoria. Perfiles/tareas y elecciones IA determinan el resto;
+planes, seats, cantidades, cuota y calendario se declaran. Paquete combinado evita duplicar Express con Adobe.
+Recursos específicos aportados por el cliente necesitan evidencia de acceso por líneas y período; ese caso
+no elimina la base interna ni acredita gratuidad global. La modalidad de venta se elige antes del preview:
+rol/capacidad o fee de servicio, con los mismos costos internos completos y el SOW de la práctica correspondiente.
+
+Portfolio reparte paquetes/pools por capacidad declarada: cuenta, uso interno y no asignado reconcilian con
+el denominador y el costo completo. El operador autorizó ese método, pero todavía no aportó cartera real.
+Seats nominativos requieren usuarios y capacidad, no reducción por FTE ni uso compartido de credenciales.
+En IA se separan suscripción atribuida, paquetes a demanda, compra mínima/caja, remanente y vencimiento.
+La reserva contable o laboral no se deriva de ese reparto; se mantiene el contrato de provisiones anterior.
+
+Evidencia incorporada: Adobe confirmado por operador como paquete mensual combinado, renovación condicional
+sin fecha; factura Notion por seat y créditos en su período, pago no comprobado; variantes oficiales públicas
+para planes que no acreditan contrato Efeonce. Valores ejecutables en
+[fuentes versionadas](../../data/pricing/v3-operating/README.md), sin replicar tablas como tarifas vigentes.
+
+`compose assess` enumera brechas económicas y `compose preview` muestra sólo conceptos comerciales y precios
+de simulación. Ninguno garantiza cierre de los gates de esta práctica; 40%/35% conserva estado propuesto.
+Actualizar catálogos/policy/packs usa preview de impacto y apply a sucesor, sin reprecificar quotes anteriores
+ni imponer cambios al cliente. [Brechas por owner](../../data/pricing/v3-operating/operational-gaps.json):
+economía parcial en TASK-2017; funcionamiento local completo en TASK-2022; integración canónica pendiente.

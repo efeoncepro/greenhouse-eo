@@ -145,3 +145,13 @@ Las familias anteriores son product services; el modelo de delivery se cotiza y 
 entregar mediante Productized Service, Managed Squad, Staff Augmentation, Implementation, Advisory o
 Platform-enabled Service, con engagements On-Going, On-Demand o Sample Sprint. Un proyecto puede combinar Wave con
 RevOps & CRM/Kortex, Creative Services/Globe, Media & Distribution (con Reach cuando aplique) o Greenhouse sin mezclar ownership.
+
+## Preparación de costos por agentes
+
+Las fichas mantienen promesa, alcance y responsabilidad; el
+[flujo local Cotizador V3](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) prepara su costo desde
+perfiles/tareas, herramientas, plataforma y consumo, con catálogos versionados y desglose reproducible.
+`role_capacity` y `managed_service` distinguen presentación de capacidad y fee de servicio; los roles no se
+convierten automáticamente en horas vendidas o receta de delivery suficiente. Selección y costeo no activan
+un servicio ni aprueban precio. [Guardrails económicos](../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md)
+y [pendientes por owner](../../data/pricing/v3-operating/operational-gaps.json) conservan los gates de cada práctica.

@@ -107,3 +107,21 @@ Dirección regional y Talent Assurance aprobados; perfiles, demanda, costos, SLA
 configuración pendientes de validación. Diseñar dos o tres pilotos pagados con alcance acotado, evaluar
 primer valor, calidad, supervisión, satisfacción y margen real. No se han contratado ni iniciado pilotos
 por esta documentación. Criterios y owners en el playbook.
+
+## Preparación económica y herramientas
+
+El [modelo CRM](../../business-models/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_BUSINESS_MODEL_V1.md) y el
+[flujo operativo del cotizador V3](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten
+costear esta modalidad como rol/capacidad o como servicio con fee por período. El segundo conserva personas,
+licencias, plataforma y consumo como costeo interno; no obliga a vender horas de cada persona ni acredita
+suficiencia del alcance. La responsabilidad de dirección sigue la modalidad y SOW anteriores.
+
+Tareas y entorno determinan herramientas: Notion/Microsoft 365 internos para todos, CRM/automatización e IA
+según alcance. Acceso del cliente se valida por recurso, líneas y período; licencias Team/nominativas mantienen
+capacidad y mínimo contratado. Pools se atribuyen con capacidad declarada y parte interna/no asignada visible;
+extras IA conservan paquetes, caja y remanente. No prometer software o uso ilimitados.
+
+La [evidencia de costos y brechas](../../../data/pricing/v3-operating/README.md) conserva histórico, público,
+operador y factura separados. Quote local, explicación y preview son simulaciones pendientes de revisión;
+contrato, capacidad real, impuestos y approval comercial siguen siendo requisitos de activación. La actualización
+versionada de valores no impone alzas retroactivas ni ejecuta compra, CRM, facturación o envío.

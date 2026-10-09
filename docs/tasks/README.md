@@ -1,9 +1,9 @@
 # Task Index
 
-- `TASK-2022` — [flujo operativo V3](complete/TASK-2022-pricing-v3-operational-agent-workflow.md), completa local; catálogo, reparto/mantenimiento/readiness y agentes; economía y canon pendientes.
+- `TASK-2022` — [flujo operativo V3](complete/TASK-2022-pricing-v3-operational-agent-workflow.md), completa local; catálogo, reparto/mantenimiento/readiness y agentes; economía y canon pendientes; [contratos y adopción documental](../documentation/finance/cotizador-v3-superficie-implementada.md).
 - `TASK-2021` — [composición de recursos V3](complete/TASK-2021-pricing-v3-demand-resource-composition.md), completa local; selección/asignación/IA al quote, explain/replay y108 tests verdes.
 
-- `TASK-2020` — [presupuesto IA y recargas V3](complete/TASK-2020-pricing-v3-ai-credit-budget.md), CLI local completa; packs/caja/remanente/vencimiento, binding automático a quote pendiente.
+- `TASK-2020` — [presupuesto IA y recargas V3](complete/TASK-2020-pricing-v3-ai-credit-budget.md), CLI local completa; packs/caja/remanente/vencimiento. Binding al quote entregado después por TASK-2021; compras y reservas live pendientes.
 
 - `TASK-2019` — [catálogo y actualización V3](complete/TASK-2019-pricing-v3-catalog-resolution-maintenance.md), implementación local completa; tarifas vigentes pendientes.
 

@@ -26,3 +26,18 @@ Rechazado: pricing en agente/CLI, seguir leyendo Excel en runtime, mutar catálo
 ## Verification / revisit
 
 Resolución ambigua/faltante, seats no lineales, compartidos sin doble cobro, calendarios, cambios efectivos, conflicto base y replay previo tras actualización. Reabrir para promoción runtime, permisos/persistencia, tarifas comerciales y facturación gestionada.
+
+## Mantenimiento completo del flujo local
+
+TASK-2022 extiende el mismo principio al resto del contexto de cálculo. El catálogo monetario mantiene sus
+change-sets `add/replace/retire`. Policy de composición y catálogo de créditos usan reemplazo íntegro con
+versión sucesora mediante `resources preview|apply`: `baseDigest` del objeto cambiado, digests del contexto
+monetario/policy/créditos y resultados before/after de demandas declaradas quedan en el preview confirmado.
+Cambiar cualquier contexto o demanda invalida esa confirmación. Apply exige ruta nueva y no activa el sucesor;
+la próxima cotización lo selecciona expresamente. Guardas rechazan referencias inconsistentes y cambios de
+precio/pack que intenten conservar indebidamente evidencia confirmada de la fuente anterior.
+
+La actualización técnica no aprueba tarifa, gasto o alza contractual. Conservar evidencia, dueño, motivo,
+ventana y versiones en cada familia; no reescribir artifacts o baseline. El
+[ADR operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
+[manual](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) gobiernan el recorrido completo.

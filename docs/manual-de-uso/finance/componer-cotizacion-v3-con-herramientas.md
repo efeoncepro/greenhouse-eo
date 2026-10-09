@@ -1,7 +1,7 @@
 # Cotizador V3: componer un pedido con herramientas
 
 Estado: local ejecutable,2026-10-09; siempre simulación con revisión. No registra quote comercial ni inventario.
-[Flujo operativo ampliado TASK-2022](operar-cotizador-v3-con-agentes.md) usa la policy sucesora para32perfiles y reparto/mantenimiento; este manual conserva los tres casos de baseline.
+[Flujo operativo ampliado TASK-2022](operar-cotizador-v3-con-agentes.md) usa la policy sucesora para 32 perfiles y reparto/mantenimiento; este manual conserva los tres casos de baseline.
 [Contrato técnico](../../architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md),
 [reglas funcionales](../../documentation/finance/cotizador-v3-seleccion-herramientas.md),
 [policy y casos](../../../data/pricing/v3-composition/README.md).
@@ -15,12 +15,12 @@ Estado: local ejecutable,2026-10-09; siempre simulación con revisión. No regis
 2. Crear demanda `pricing-v3-composition-demand/1`: brief humano, trabajo por línea, slots de personas,
    tareas, IA seleccionada con motivo y herramientas del servicio. `commercialUnit` conserva rol/capacidad
    o servicio gestionado; un servicio usa esfuerzo interno sin imponer venta de horas.
-3. Leer policy versionada. Notion/Microsoft365 son obligatorios; tareas de redacción SEO exigen SEMrush;
+3. Leer policy versionada. Notion/Microsoft 365 son obligatorios; tareas de redacción SEO exigen SEMrush;
    diseño visual exige Adobe; generación/upscale selecciona Higgsfield/Magnific. IA textual se elige
    explícitamente, sin cargar todos los proveedores ni elegir la variante barata por defecto.
 4. Para cada herramienta monetaria y mes activo, declarar `toolId`, `priceId`, cantidad de unidades del
    precio, `serviceShare`, driver (`unit`, `totalUnits`, `allocatedUnits`) y razón. La cuota debe equivaler
-   al driver, truncada a18decimales; el motor valida esa igualdad. Referencias históricas son opción de
+   al driver, truncada a 18 decimales; el motor valida esa igualdad. Referencias históricas son opción de
    simulación explícita. No copiar precios/salarios ni porcentajes inventados al brief.
 5. Declarar usuarios con IDs de slots, no nombres personales. Seat individual: cantidad = usuarios únicos
    que lo usan; paquete nominativo: `seatCapacity` suficiente. Claude requiere `contractSeatCount` que
@@ -32,7 +32,7 @@ Estado: local ejecutable,2026-10-09; siempre simulación con revisión. No regis
    El motor agrega demanda antes del planner. Cada mes necesita sus propios datos; no reserva saldo live
    ni supone carryover a otro cliente. Fechas pertenecen al mes presupuestado y no anteceden la cotización.
 7. Moneda adicional exige configuración de moneda y `fxRecordIds` con par/fuente en catálogo. Magnific
-   conserva EUR; baseline carece de EUR/FXEUR→USD y por eso bloquea su suma hasta actualizar catálogo.
+   conserva EUR; baseline carece de EUR/FX EUR→USD y por eso bloquea su suma hasta actualizar catálogo.
    Usar [mantenimiento](catalogo-v3-seleccion-y-actualizacion.md), nunca una tasa inventada inline.
 8. Preparar, corregir diagnósticos, cotizar y guardar artefacto nuevo. Explain/replay leen sólo el artefacto,
    sin consultar una licencia o precio nuevo. La policy, catálogos, demanda y resultados quedan congelados.
@@ -45,7 +45,7 @@ pnpm --silent pricing:v3 replay --input /tmp/redactor-seo-composed.json
 ```
 
 `compose prepare` evalúa selección/asignación y cálculo local, sin compra/reserva. `--out` guarda artefacto
-interno0600, sólo en ruta nueva. Código3=calculado/revisión;2=pendiente;1=schema/argumentos/adapter/conflicto.
+interno 0600, sólo en ruta nueva. Código 3=calculado/revisión;2=pendiente;1=schema/argumentos/adapter/conflicto.
 No usar el JSON de declaraciones del operador como policy: el formato ejecutable es `resources.review-v1.json`.
 Los comandos quote/prepare legacy siguen usando sus propios formatos; no reciben demanda de composición.
 
@@ -63,17 +63,14 @@ Suscripción ya contratada mantiene costo; un cálculo no acredita cobro, pago o
 
 `quote`: costo humano, fees/Assurance/operación/setup del catálogo, herramientas inyectadas, factores/FX,
 políticas de precio, periodos y totales. `explain.costBreakdown` permite reconciliar cada componente. Tarifas
-de ensayo conservan markup histórico, no objetivo40% aprobado. En el caso de servicio, el neto es simulación
+de ensayo conservan markup histórico, no objetivo 40% aprobado. En el caso de servicio, el neto es simulación
 de ese modelo de capacidad, no precio comercial validado del programa ni certificación de delivery.
 
 ## Mantenimiento y pendientes
 
-Valores en catálogo monetario usan preview/apply y versión nueva. Policy nueva cambia reglas/variantes en
-un archivo sucesor con versión/fuente nuevas; se valida ejecutando prepare y los casos afectados antes de
-elegirla explícitamente. Artefactos anteriores mantienen su policy. No promover valores o capacidades por
+Valores en catálogo monetario usan `catalog preview|apply` y versión nueva. Reglas/planes o packsIA usan `resources preview|apply`: replacement completo, base/contexto, evidencia y digest del impacto confirmados antes de escribir sucesor. [Contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md). Se valida con los casos afectados antes de elegirla explícitamente. Artefactos anteriores mantienen su policy. No promover valores o capacidades por
 cambiar etiquetas; no pasar `commercial_draft`: composición sigue review_only y export comercial bloqueado.
 
-Adobe actual conserva cobertura/base/fecha pendientes y bloquea si se elige `current`; el ejemplo de diseño
-elige `historical` expresamente. Precios públicos Claude no son factura real. Notion/M365/SEMrush/ChatGPT
+En la **baseline review-v1 de este manual**, Adobe conserva cobertura/base/fecha pendientes y bloquea si se elige `current`; el ejemplo de diseño elige `historical` expresamente. La [policy sucesora review-v2](../../../data/pricing/v3-operating/README.md) tiene 180 USD combinado confirmado y 306 condicional, Notion facturado y referencias públicas explícitas, sin modificar esta baseline ni sus resultados. Precios públicos Claude no son factura real. Notion/M365/SEMrush/ChatGPT
 actuales y reparto de plataforma aún requieren datos de Finance/Operations. Ejemplos tienen fracciones,
 usuarios, seats y saldos hipotéticos. No son defaults del agente ni autorización de compartir licencias.

@@ -34,3 +34,19 @@ Reproducible por catálogo+request congelados. Probar óptimo mixto vs pack mayo
 ## Revisit
 
 Al incorporar binding automático a quotes, presupuesto multi-cliente/período, reserva live, FX, cantidades mínimas/repetición verificadas, facturación o consumidores canónicos.
+
+## Integración vigente y mantenimiento
+
+La operación `resources budget` de TASK-2020 sigue independiente. TASK-2021 incorporó su resultado a
+`compose quote`, agregando demanda por proveedor/mes antes de planear packs y atribuyéndola a las funciones
+consumidoras; TASK-2022 añadió el flujo operativo y mantenimiento versionado de este catálogo. La falta de
+binding automático mencionada en el alcance inicial quedó resuelta **en el compositor local**. El planner
+no reserva saldos, no compra créditos ni transmite capacidad al proveedor.
+
+Suscripción atribuida, compra incremental, remanente y caja conservan sus dimensiones. El artefacto compuesto
+congela catálogo de créditos y resultado, con FX seleccionado explícitamente cuando corresponde. El operador
+declara disponibilidad normal y fecha de compra/consumo; no se infieren saldos desde la suscripción ni se
+reutiliza remanente entre clientes/períodos. Caducidad de créditos y vigencia de oferta/precio son distintas.
+El [ADR operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
+[ADR de mantenimiento](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md) conservan fuente/digest,
+impactos y sucesores; esta integración no habilita ledger, inventario o consumer canónico.

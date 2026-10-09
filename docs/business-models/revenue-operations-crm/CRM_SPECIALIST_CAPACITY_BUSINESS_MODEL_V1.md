@@ -115,3 +115,23 @@ comercial es evidencia adicional si existe atribución razonable, no aceptación
 Escalar sólo con fit y compra demostrados, costo/capacidad sostenibles, procedimientos reproducibles,
 verificación de competencias, evidencia de continuidad y configuración contractual habilitada. Empaquetar
 precios después de calibrar resultados. Oferta aprobada ≠ demanda validada ≠ contrato firmado ≠ entrega aceptada.
+
+## Costeo local por rol o servicio
+
+[Pricing V3 operativo](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) ya permite
+preparar perfiles, tareas, recursos y créditos, calcular y explicar sin depender de la UI ni del Excel.
+Las escalas de consultoría HubSpot/Salesforce conservan IDs y costos separados; elegir la variante adecuada
+no es fusionarlas por especialización o tomar la más barata. País de talento/costo y mercado de oferta/precio
+se modelan de forma independiente. Los costos históricos sólo sirven como hipótesis explícitas.
+
+`role_capacity` y `managed_service` distinguen presentación por capacidad y fee de servicio; roles siguen
+costeados internamente. La selección incluye base Notion/Microsoft 365, herramientas de CRM por trabajo y
+IA sólo si se justifica. CRM del cliente puede cubrir un recurso con evidencia vigente por líneas/período,
+sin asumir que compra todo el software ni sustituir la base operativa interna. Licencias Team, paquetes,
+API/consumo y plataforma tienen cantidad/asignación propias.
+
+El agente obtiene desglose/replay del artifact congelado y readiness antes de revisar precio. El preview
+allowlisted mantiene salario, país de talento, rates y margen internos. No crea Deal, Quote emitida o nueva
+familia de oferta HubSpot, ni aprueba tarifas, delivery, SLA o contrato regional. Fuentes y pendientes en
+[data operativo](../../../data/pricing/v3-operating/README.md); ejecución en el
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Mantener este modelo `Approved for validation`.

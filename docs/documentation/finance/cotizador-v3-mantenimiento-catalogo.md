@@ -1,5 +1,7 @@
 # Contrato de mantenimiento del catálogo V3
 
+[Superficie implementada y formatos](cotizador-v3-superficie-implementada.md) y [manual operativo completo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md): mantenimiento monetario y de policy/créditos son carriles separados, con versión y evidencia propias.
+
 Accepted para prototipo local, operador 2026-10-09. [ADR](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md).
 Código: `catalog/contracts.ts`, `catalog/catalog.ts`, `adapters/catalog-local.ts` bajo `src/lib/finance/pricing-v3`.
 [Manual y ejemplos](../../manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md).

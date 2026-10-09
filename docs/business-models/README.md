@@ -276,3 +276,17 @@ Todo business model debe separar al menos estas dimensiones:
   arquitectura de segmentos, distribución masiva, ventas B2B/enterprise, canales, packaging y validación; `Approved for validation`.
 
 [Pricing de capacidad especializada — propuesta](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md): drivers, margen/guardrails y validación del piloto V3; sin pricing comercial aprobado.
+
+## Cotizador V3 — soporte económico local transversal
+
+[Pricing Integrity Pack de capacidad](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) mantiene propuestas de
+unidad/margen y validación separadas de la implementación. [ADR operativo](../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md)
+y [manual de agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) cubren núcleo reusable,
+catálogos monetarios/policy/créditos, selección por trabajo, seats/pools/bundles, cartera declarada, explicación,
+preview de rol o fee gestionado y mantenimiento versionado. Es infraestructura de costeo local; no madura
+una oferta, valida disposición de pago ni aprueba condiciones comerciales por calcular.
+
+[Talent Assurance](EFEONCE_TALENT_ASSURANCE_ECONOMIC_GUARDRAILS_V1.md) conserva su gate;
+[fuentes y faltantes](../../data/pricing/v3-operating/README.md) distinguen precio público, operador,
+factura e histórico. TASK-2022 completa flujo local; TASK-2017 sigue parcial por economía real. API/UI/MCP
+canónicos mantienen V2 hasta promoción propia. No trasladar pisos de Creative/otros modelos al piloto.

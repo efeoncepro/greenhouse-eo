@@ -1,5 +1,17 @@
 # 04 — PRICING: capacidad, loaded cost, piso, descuentos
 
+## Carril local opt-in V3: simulación, no emisión
+
+Para composición reproducible de demanda + tools/plataforma/créditos, cargar
+[contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+La CLI V3 agrega licencias base/específicas, capacidad declarada y packs por proveedor/mes con fuente/FX,
+congela inputs y produce explain/replay/readiness/preview. Costos históricos y `trial-*` siguen hipótesis;
+no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
+canónica. **Las propuestas40/35 de readiness no reemplazan el piso45% de la práctica** ni precio/condiciones
+aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas.
+Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
+
 > **La regla que ordena todo el módulo:**
 > **Un precio sin loaded cost detrás no es un precio: es una corazonada con decimales.**
 

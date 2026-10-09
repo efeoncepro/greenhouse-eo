@@ -1,5 +1,7 @@
 # Prueba V3 — equipo para Pibank Perú con talento Perú/Chile
 
+[Flujo local vigente hasta TASK-2022](cotizador-v3-superficie-implementada.md) y [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Este documento conserva el caso/piloto y sus supuestos históricos: las nuevas herramientas, fuentes y reglas no recalculan sus artefactos ni habilitan una tarifa comercial.
+
 Fecha: 2026-10-09. Estado: prueba histórica local ejecutada; costos y precio comercial no validados.
 Unidad: [TASK-2018](../../tasks/complete/TASK-2018-pricing-v3-pibank-team-simulation.md).
 
@@ -23,18 +25,18 @@ revisión económica del 09-10. Horizonte anual y compromiso inicial se mantiene
 
 ## Equipo y atribución de costo
 
-| Función | País de simulación | Reserva/FTE medio de costo | Costo anual USD del ensayo |
-|---|---|---:|---:|
-| Redactor | Perú | 100.0% | 12420.00 |
-| Diseñador | Perú | 23.68% | 4216.32 |
-| Director de Arte | Chile | 5.0% | 1680.96 |
-| Account Manager / Project Manager | Chile | 3.33% | 1250.04 |
-| Especialista SEO/AEO | Chile | 100.0% | 28340.04 |
-| Desarrollador WordPress | Chile | 9.07% | 2581.20 |
-| Desarrollador Full Stack | Chile | 7.96% | 2986.20 |
-| Community Manager | Chile | 7.41% | 1851.48 |
-| Marketing Automation Specialist | Chile | 0.93% | 327.24 |
-| Periodista / PR digital | Chile | 7.04% | 2244.48 |
+| Función                           | País de simulación | Reserva/FTE medio de costo | Costo anual USD del ensayo |
+| --------------------------------- | ------------------ | -------------------------: | -------------------------: |
+| Redactor                          | Perú               |                     100.0% |                   12420.00 |
+| Diseñador                         | Perú               |                     23.68% |                    4216.32 |
+| Director de Arte                  | Chile              |                       5.0% |                    1680.96 |
+| Account Manager / Project Manager | Chile              |                      3.33% |                    1250.04 |
+| Especialista SEO/AEO              | Chile              |                     100.0% |                   28340.04 |
+| Desarrollador WordPress           | Chile              |                      9.07% |                    2581.20 |
+| Desarrollador Full Stack          | Chile              |                      7.96% |                    2986.20 |
+| Community Manager                 | Chile              |                      7.41% |                    1851.48 |
+| Marketing Automation Specialist   | Chile              |                      0.93% |                     327.24 |
+| Periodista / PR digital           | Chile              |                      7.04% |                    2244.48 |
 
 Los valores de la tabla son **promedios económicos** y costo del perímetro modelado,
 no un roster, dedicación contractual ofrecida ni comprobación de disponibilidad. Varias funciones
@@ -49,24 +51,24 @@ El diseñador usa USD 1.075 más provisión 20%; su 30% original se pondera por 
 120/152 del trabajo de diseño de referencia, resultando 23,68% medio de costo. Esto reemplaza
 el supuesto de diseñador al 50% de la prueba anterior; son casos de alcance distinto.
 
-Dirección tiene 108h de referencia anual (9h/mes en promedio), y coordinación 72h (6h/mes).
+Dirección tiene 108 h de referencia anual (9 h/mes en promedio), y coordinación 72 h (6 h/mes).
 El operador seleccionó Director de Arte: se vincula ECG-005 a esa función; el expediente antes
 usaba ECG-001 Creative Operations Lead. Ambos tienen el mismo costo histórico seed, pero eso
 no demuestra que un Director de Arte cubra toda la dirección estratégica del programa. Deben
-validarse RACI, carga real y seniority, al igual que la suficiencia de 6h promedio de Account Manager.
+validarse RACI, carga real y seniority, al igual que la suficiencia de 6 h promedio de Account Manager.
 No se añadió otra capa de gestión para duplicar la coordinación ya costeada.
 
 ## Resultado de la CLI
 
-| Comparación | USD |
-|---|---:|
-| Costo anual V3 del perímetro | 57.897,96 |
-| Costo medio mensual | 4.824,83 |
-| Precio documental anual existente | 79.200,00 |
-| Promedio mensual del precio documental | 6.600,00 |
-| Margen sobre ese precio y costo modelado | 26,90% |
+| Comparación                                        |       USD |
+| -------------------------------------------------- | --------: |
+| Costo anual V3 del perímetro                       | 57.897,96 |
+| Costo medio mensual                                |  4.824,83 |
+| Precio documental anual existente                  | 79.200,00 |
+| Promedio mensual del precio documental             |  6.600,00 |
+| Margen sobre ese precio y costo modelado           |    26,90% |
 | Precio anual del ensayo con objetivo de margen 40% | 96.496,32 |
-| Promedio mensual del ensayo al 40% | 8.041,36 |
+| Promedio mensual del ensayo al 40%                 |  8.041,36 |
 
 La aspiración de margen 40% aparece en los inputs originales y los acuerdos del expediente;
 se usa como **sensibilidad**, no como nuevo piso aprobado o recomendación de tarifa. El ensayo

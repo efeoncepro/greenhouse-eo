@@ -86,3 +86,15 @@ Al convertir discovery SEO/AEO en propuesta, cargar
 [caso de negocio y propuesta](../seo-aeo/references/caso-negocio-y-propuesta.md). Reconciliar producto,
 uso, etapa del outcome y periodo de la meta; registrar buying group, owners y alternativas de acceso,
 revisión e instrumentación. Una aspiración de contribución no es forecast ni presupuesto confirmado.
+
+## Demanda del comprador y Cotizador V3
+
+Al convertir necesidades de una cuenta en una simulación de precio, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Declarar mercado de oferta separadamente del país del talento; willingness-to-pay e ICP no se prueban con un
+factor histórico. Una búsqueda de persona/freelancer CRM es un trigger de problema, no intención de comprar
+Staff Augmentation o servicio gestionado. Confirmar dirección del trabajo, buying group, alcance y objeciones.
+Las tareas permiten seleccionar recursos (SEO→SEMrush, diseño→Adobe, IA por motivo) sin cambiar variante salarial.
+El agente interpreta demanda; pricing calcula. Tools del cliente exigen evidencia de acceso y vigencia; no
+asumirlas por nombre/partner. Base Notion/M365 sigue del equipo. Simulación, capacity declared y preview redactado
+no prueban roster real, presupuesto, aprobación comercial o contrato; conservar gaps/owner y validación del caso.

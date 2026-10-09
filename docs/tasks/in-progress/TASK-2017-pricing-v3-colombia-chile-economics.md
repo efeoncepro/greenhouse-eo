@@ -264,3 +264,19 @@ sin confirmar pago. Planes públicosM365/SEMrush/ChatGPT/Claude y FXECB se conse
 medidas, contratos/seats/acceso, capacidad declarada real, precio/margen/factores aprobados y SOW/entidad/impuestos.
 El operador no tiene salarios nuevos y autorizó método por capacidad; no inventar valores ni repetir la solicitud.
 TASK-2017 permaneceParcial por estas evidencias económicas, no por falta del flujoCLI. Promocióncanónica separada.
+
+## Continuidad de validación después del cierre local
+
+Los avances anteriores registran las incógnitas de cada etapa; el cierre de TASK-2022 resolvió normalización,
+reglas, binding al quote, reparto calculable y mantenimiento local. Quedan abiertas **evidencias económicas**,
+no funcionalidades pendientes del CLI. La confirmación posterior del operador resuelve cobertura Adobe:
+USD 180 por paquete combinado de 3 CC Teams + 3 Express; fecha de renovación pendiente y USD 306 condicional.
+El método de capacidad declarada está autorizado, sin cartera real aún. No volver a preguntar por nuevos
+salarios: el operador ya confirmó que sólo tiene el Excel. Fuentes/versiones en
+[data operativo](../../../data/pricing/v3-operating/README.md).
+
+[Readiness](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) explica por campo/owner los costos
+humanos localizados, provisiones medidas, contratos/acceso, asignaciones/capacidad, SOW/impuestos/entidad y
+aprobación pendientes. Este piloto propone 40%/35%; el piso 45% de Creative se conserva en su práctica y un
+preview `managed_service` no autoriza aplicar el piloto a un pod. Política de mercado y willingness-to-pay
+no se validan por un factor de país. Los AC económicos siguen sin tildar y Status real permanece Parcial.

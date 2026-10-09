@@ -65,6 +65,21 @@ requieren su propia revisión vigente. Registrar fuente, fecha, profesional resp
 - Reglas de aceptación/cambios, escalamiento, sustitución con equivalencia de capability/contexto, salida y
   eventual contratación directa. Plazos, tarifas y penalidades se negocian; no hay cifras aprobadas aquí.
 
+## Costeo local con agentes
+
+Para preparar el expediente económico usar el [workflow V3](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md)
+y su [contrato implementado](../documentation/finance/cotizador-v3-superficie-implementada.md). El agente conserva
+la escala exacta del consultor, separa país del talento de mercado de oferta y selecciona recursos base,
+plataforma, tareas e IA con motivo. Accesos aportados por el cliente requieren evidencia y ventana compatibles;
+no eliminan la base interna. Las provisiones de formación, respaldo y gestión requieren costo/capacidad
+explícitos, sin convertir estimaciones del prototipo en garantía de Talent Assurance.
+
+El reparto por capacidad declarada mantiene cliente, interno y sin asignar reconciliados; no acredita
+ocupación ni acceso reales. El desglose congelado y la evaluación de pendientes respaldan la revisión de
+Finance/Commercial. El preview es una simulación interna; contratos, emisión y aprobación conservan el
+[carril canónico](../documentation/finance/cotizador.md). Tarifa pública, factura y declaración del operador
+no son evidencias equivalentes de gasto o habilitación.
+
 ## Piloto pagado: diseño y scorecard
 
 Proponer dos o tres pilotos con un workflow o backlog priorizado y ventana acordada. Incluir baseline,

@@ -1,5 +1,7 @@
 # Cotizador V3: parámetros del catálogo piloto
 
+[Flujo local vigente hasta TASK-2022](cotizador-v3-superficie-implementada.md) y [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Este documento conserva el caso/piloto y sus supuestos históricos: las nuevas herramientas, fuentes y reglas no recalculan sus artefactos ni habilitan una tarifa comercial.
+
 - Fecha: 2026-10-09.
 - Estado: catálogo de revisión preparado; costos y políticas operativos pendientes. Motor local separado implementado; [manual](../../manual-de-uso/finance/cotizar-v3-por-cli.md).
 - Owner: Commercial/Finance, con Operations para capacidad, kits y Talent Assurance.
@@ -57,7 +59,7 @@ El costo humano histórico sin fee resulta de los componentes F:K; el fee L qued
 | Tier de perfil             | Cuatro niveles del antecedente                                              | Propuesta de nombres: Generalista, Especializado, Estratégico, Alta especialización; asignación y precio pendientes |
 | Recargo histórico por tier | 25%, 30%, 50%, 60%, Tier Datos!B2:B5                                        | Histórico, **markup sobre costo**, no margen objetivo; no adoptar automáticamente como política V3                  |
 | País del talento           | No está localizado en los costos de perfil                                  | Pendiente por perfil; USD no significa talento en EEUU                                                              |
-| Mercado de oferta          | Primer escenario: talento Colombia → mercado Chile                         | Combinación confirmada por operador; factores/tarifa pendientes, sin localizar históricos                           |
+| Mercado de oferta          | Primer escenario: talento Colombia → mercado Chile                          | Combinación confirmada por operador; factores/tarifa pendientes, sin localizar históricos                           |
 | Factor de costo            | Tabla separada o costo localizado específico                                | Pendiente; no convertir rangos de Factor País en factores salariales                                                |
 | Factor de venta            | Tabla por perfil/tier/mercado y base elegible                               | Pendiente; tabla histórica mezcla mercados con PYME/licitación/estratégico                                          |
 | Kits y planes              | Cuatro kits propuestos abajo                                                | Selección, unidad, tarifas y asignaciones pendientes de confirmar                                                   |

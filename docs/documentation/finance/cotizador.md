@@ -1,5 +1,7 @@
 # Cotizador — Builder de Cotizaciones con Pricing Engine Canónico
 
+El **prototipo local Cotizador V3** es una línea de evolución separada de este builder: [funcional implementado](cotizador-v3-superficie-implementada.md), [operación por agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y [promoción pendiente](cotizador-v3-promocion-canonica.md). Su cálculo/preview no reemplaza la UI/API/MCP vigente ni crea una quote, approval, emisión o sincronización HubSpot.
+
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 3.13
 > **Creado:** 2026-04-18 por Claude (TASK-464e close-out)

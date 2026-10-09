@@ -472,3 +472,19 @@ mensual integral por una capacity envelope definida y se despreocupa de esa comp
 No vender “llave en mano” como unlimited. Declarar lanes, capacidad, simultaneidad, rounds, derechos, exclusiones,
 escalamiento y pass-through. El modelo aplica en todos los países donde Efeonce opera, con payroll, impuestos, FX,
 privacidad, derechos laborales, proveedores, seguros y procurement parametrizados por jurisdicción.
+
+## Costeo creativo por el prototipo Cotizador V3
+
+Para simulación local sin UI de roles o servicios con Adobe/IA/plataforma, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+El kernel V3 opt-in complementa investigación/costeo; emisión y autoridad continúan en el cotizador canónico.
+Adobe180USD cubre paquete3CC Teams+3Express;306 es escenario de renovación sin fecha efectiva. No duplicar Express
+ni reducir seats nominativos por FTE. Higgsfield/Magnific/ChatGPT/Claude se eligen por necesidad; créditos por
+proveedor/mes y packs/caja/validez separados, nunca equivalencia automática con Studio Credits o piezas.
+Notion/M365 son base; GCP/Vercel se atribuyen desde capacidad declarada, dejando interno/sin asignar visibles.
+
+`managed_service` conserva funciones de diseño/dirección/cuenta como costos internos y preview agrega fee;
+no cambia la política de vender capacidad/lane ni SOW/rights/QA. **Los40/35 propuestos por readiness V3 no
+reemplazan el piso creativo45% aprobado en esta skill.** `assess` sólo reporta gaps, nunca aprueba excepción.
+No presentar simulación o costo histórico como tarifa vigente/entrega garantizada. Explain/replay internos y
+preview redactado son estados distintos de quote emitida. Aprobación/ejecución/publicación conservan sus gates.

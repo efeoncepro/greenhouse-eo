@@ -1,5 +1,7 @@
 # Costear y explorar precios sin la UI del cotizador
 
+Para cotizar sin leer el Excel y componer herramientas por trabajo, usar el [flujo local Cotizador V3](cotizador-v3-superficie-implementada.md) y su [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md). Este documento conserva el carril histórico `pricing:workbook`, con fórmulas/overrides propios; no sustituye el catálogo versionado V3 ni el lifecycle del cotizador canónico.
+
 La CLI local `pricing:workbook` permite trabajar desde el Excel de Julio sin depender de la UI,
 la DB o una sesión del portal. Sirve para revisar la base histórica, introducir costos actualizados,
 armar un equipo y comparar precios a distintos márgenes. Está disponible en el checkout local.

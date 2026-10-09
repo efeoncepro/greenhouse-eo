@@ -1037,3 +1037,19 @@ SCIM recovery lane. Verify all four closure layers and the actual payroll period
 an audited statement, not proof that Finance has reconciled its obligations. Keep that dependency explicit.
 Source case: `docs/audits/payroll/MAGGIE_MARIA_FERNANDA_OFFBOARDING_CLOSURE_2026-09-03.md` (dated evidence,
 not current status for future runs). Do not repeat the closed operation during docs/skills maintenance.
+
+## Handoff de capacidad al Cotizador V3
+
+Para simular una persona o squad con costos y herramientas, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Talent define perfil/variante/seniority, país del talento, % dedicación, headcount, tareas e IDs estables sin PII;
+Commercial conserva el mercado del comprador y Finance las cifras. Mantener escalas de consultoría separadas:
+una necesidad SEO o CRM no autoriza sustituir el salario de la variante elegida. `planned-*` son slots,
+no personas contratadas, licencias asignadas ni capacidad disponible. No promover demanda local a Hiring por inferencia.
+
+Notion/M365 son base; tools nominativas necesitan capacidad y acceso, no descuento automático por dedicación50%.
+Portfolio declarado separa clientes/interno/sin asignar; no certifica ICO ni inventario live. Talent Assurance
+aceptado implica respaldo/capacitación bajo su canon, pero `trial-*` no acredita costo de esas actividades ni
+permite garantías inéditas. Rol vendido y funciones internas para un servicio conservan unidades distintas:
+managed_service proyecta fee sin publicar equipo/costos internos; sigue requiriendo SOW y ownership de delivery.
+El blueprint no calcula precio ni altera payroll/contratos: usa CLI/snapshot y entrega sus gaps a Finance/Operations.

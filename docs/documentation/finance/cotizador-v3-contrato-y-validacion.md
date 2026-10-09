@@ -1,7 +1,9 @@
 # Cotizador V3: contrato del prototipo y plan de validación/convergencia
 
+[Readback vigente del código y contratos](cotizador-v3-superficie-implementada.md): 135 testsV3 y 78 V2, 26 smokesCLI de TASK-2022. La tabla objetivo y el readback de la primera vertical que siguen no limitan el flujo operativo actual a TASK-2016.
+
 - Fecha: 2026-10-09.
-- Estado: contrato objetivo de bloques 2 y 3; primera vertical local implementada en TASK-2016, con extensiones pendientes. Los valores comerciales del bloque 1 siguen pendientes.
+- Estado: contrato objetivo de bloques 2 y 3; núcleo y flujo local implementados en TASK-2016/2019/2020/2021/2022. La evidencia comercial y la integración canónica siguen pendientes.
 - Owner de cálculo y economics: Commercial/Finance. Owner técnico del contrato y transición: Platform/Architecture.
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
@@ -131,7 +133,7 @@ Mismas entradas/configuración y motor producen el mismo resultado y digest inde
 
 ### Casos mínimos del prototipo
 
-Todos los fixtures se marcan `synthetic_test` o `historical_reference`; nunca se publican como salarios/tarifas vigentes. Los resultados esperados se calculan de manera independiente y se revisan aritméticamente, no se copian del motor probado. Esta sección diseña pruebas futuras; no afirma que se hayan ejecutado.
+Todos los fixtures se marcan `synthetic_test` o `historical_reference`; nunca se publican como salarios/tarifas vigentes. Los resultados esperados se calculan de manera independiente y se revisan aritméticamente, no se copian del motor probado. La tabla expresa criterios del contrato objetivo; su evidencia ejecutada debe contrastarse con los tests y auditorías de cada unidad, sin dar por cubiertos todos los escenarios futuros por el total de pruebas locales.
 
 | ID    | Caso                                                      | Evidencia esperada                                                                  |
 | ----- | --------------------------------------------------------- | ----------------------------------------------------------------------------------- |
@@ -215,7 +217,7 @@ MCP externo sigue simulate-only según ADR vigente. La misma familia de capacida
 
 Cada fase registra versión de código/configuración, fixtures, resultados, diferencias, capacidades/consumidores probados, limitaciones y decisión de avance. Platform/Architecture valida contratos y aislamiento; Commercial/Finance valida economics; práctica/Operations valida herramientas, capacidad y Talent Assurance. La promoción canónica requiere la decisión del operador y evidencia de la fase, sin confundir diseño aprobado con deployment.
 
-Esta definición completa el contenido de los bloques 2 y 3. La decisión arquitectónica de V3 continúa propuesta para su formalización/indexado; antes de construir se vincula a su unidad de trabajo. Estado actual: documento definido, pruebas diseñadas, inspección inicial de código hecha; motor nuevo, tests V3, piloto e integración sin ejecutar.
+Esta definición conserva el contrato objetivo de los bloques 2 y 3. Los ADRs locales aceptados y las unidades TASK-2016/2019/2020/2021/2022 respaldan el prototipo ejecutable; la decisión de transición al cotizador canónico mantiene su gate propio. La [superficie implementada](cotizador-v3-superficie-implementada.md) distingue cálculo, catálogo, composición y operación ya probados de extensiones futuras; no se afirma integración API/UI/MCP por haber completado pruebas locales.
 
 ## Readback de primera vertical local — 2026-10-09
 

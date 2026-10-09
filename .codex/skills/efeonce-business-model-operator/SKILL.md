@@ -104,3 +104,19 @@ For SEO/AEO business cases, load
 [case-to-proposal decisions](../seo-aeo/references/caso-negocio-y-propuesta.md): separate customer outcomes,
 service duration, cohort value and complete delivery costs. Complementary growth mechanisms cannot
 count the same outcome twice. A prospect case does not create a new offer or approve price or capacity.
+
+## Cotizador V3 y unidad comercial
+
+Para modelar economics de una oferta con talento/tools/plataforma/IA, cargar `efeonce-pricing-operator` y su
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+El agente convierte alcance en demanda; el dominio calcula valores centrales versionados. La unidad
+`managed_service` agrega funciones internas como fee por período; `role_capacity` expresa capacidad de rol.
+Ninguna convierte por sí misma delivery model, compromiso, SOW o madurez de producto: roles/hours usados para
+costear un servicio no implican vender horas/personas. Talent Assurance sigue dirección aceptada; los costos de
+sus actividades y el caso comercial requieren evidencia. Herramientas base/específicas, crédito incremental,
+plataforma, setup, riesgos y límites deben estar en economics aunque la proyección comercial sea un fee.
+
+Portfolio usa capacidad declarada y separa cliente/interno/sin asignar; salario/factor talento/mercado no se
+validan por estar en Excel. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
+quote lifecycle ni integración API/UI/MCP; el [handoff de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
+conserva esos gates. No presentar los ejemplos o propuestas de margen como oferta aprobada.

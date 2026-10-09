@@ -1,5 +1,7 @@
 # Catálogo piloto V3 para revisión
 
+[Superficie V3 implementada y frontera comercial](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md). Este conjunto conserva su versión/caso original; las fuentes y la policy operativa sucesora se seleccionan explícitamente y no alteran resultados congelados.
+
 Preparado el 2026-10-09. Datos de revisión; motor local V3 implementado y probado aparte, sin tarifas comerciales aprobadas.
 
 - [Parámetros y catálogo limitado](parameters.json): seis perfiles, cuatro kits propuestos, doce referencias de herramientas y decisiones pendientes.
@@ -33,4 +35,4 @@ Los controles históricos están comprobados con aritmética decimal independien
 
 [Selección desde catálogo y mantenimiento](../v3-catalog/README.md): recorrido implementado después de los ensayos con snapshots. Pibank pasa a demanda; catálogo aporta costos.
 
-[Propuesta económica/provisiones del piloto](economics/commercial-policy-proposal/README.md): policy40%/35% por revisar, seis sensibilidades y fuentes oficiales; costo comercial pendiente.
+[Propuesta económica/provisiones del piloto](economics/commercial-policy-proposal/README.md): policy 40%/35% por revisar, seis sensibilidades y fuentes oficiales; costo comercial pendiente.

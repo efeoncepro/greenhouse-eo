@@ -198,3 +198,15 @@ Dos calculate/replay (código 3, revisión requerida), compare y exports bloquea
 `pnpm ops:lint --changed`: 0 errores; 19 advertencias ajenas al ensayo.
 QA focal: PASS para ensayo local; costos/viabilidad comercial no certificados. Sin cambio de
 kernel, pruebas runtime o gates Finance E2E no aplican a esta fixture. Artefactos locales incluidos en el cierre TASK-2019; sin push ni estado remoto.
+
+## Continuidad documental tras TASK-2022
+
+La prueba Pibank conserva demanda, hipótesis del expediente y artifacts originales. No es tarifa reutilizable ni fuente de precios para nuevos encargos: el flujo posterior toma valores de catálogos/policy y el expediente aporta perfiles, calendario y alcance. Costear roles no equivale a vender horas de personas ni modifica el precio documental presentado.
+
+[Operación completa local](TASK-2022-pricing-v3-operational-agent-workflow.md),
+[ADR vigente](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten descubrir,
+planear, cotizar, explicar/replay, evaluar y obtener preview redactado por rol o fee de servicio.
+Los 26 recursos originales son 25 herramientas más fee genérico de plataforma; no sumar ese fee dos veces.
+La evidencia/AC de este cierre permanece histórica y su lifecycle no se reabre. TASK-2017 conserva economía
+parcial; API/UI/MCP siguen en el canon V2 hasta promoción gobernada.

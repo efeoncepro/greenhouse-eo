@@ -238,3 +238,21 @@ Si la propuesta técnica de una licitación SEO/AEO se lee **sin presentador** (
 alternativa aprobada el 2026-10-07 (caso fuente: Pibank 2027) y pasar su checklist «Antes de entregar» antes de
 enviarla: [propuesta-tecnica-seo-sin-presentador.md](../deck-studio/references/propuesta-tecnica-seo-sin-presentador.md).
 No reemplaza al brochure ni a la propuesta compuesta con las recetas de La órbita.
+
+## Costeo reproducible de una demanda con Cotizador V3
+
+Si el operador pide una simulación local desde perfiles/alcance del expediente, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+El expediente aporta demanda, tareas, dedicación, países, plazo y supuestos explícitos; el catálogo versionado
+aporta salario/provisiones/tools/factores/FX. No reemplazar costos centrales con totales del deck ni inventar cero
+para faltantes. Mantener variantes/país del talento/mercado del cliente independientes. Seleccionar baseNotion/M365,
+tools específicas y presupuesto IA por proveedor/mes; repartir plataforma por capacidad declarada con interno y
+sin asignar separados. Plantilla o escenario Pibank no es rate card ni roster disponible.
+
+Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
+gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. managed_service proyecta fee,
+no vende por defecto las horas internas. Este carril no genera quotation_id remoto ni satisface GO de Proposal
+Studio: emisión, precio aprobado, garantías/caja y presentación del expediente conservan contratos propios.
+No adjuntar el artifact interno al cliente ni tratar exit3 como aprobación. Sólo promover al canon mediante
+[handoff formal](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

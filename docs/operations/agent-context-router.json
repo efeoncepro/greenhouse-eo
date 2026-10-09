@@ -675,6 +675,31 @@
       ]
     },
     {
+      "id": "pricing-v3-local",
+      "triggers": [
+        "Cotizador V3",
+        "pricing:v3",
+        "cotizar rol",
+        "cotizar servicio",
+        "licencias por perfil",
+        "créditos IA para cotización",
+        "capacidad declarada",
+        "mantenimiento de precios"
+      ],
+      "skills": [
+        "efeonce-pricing-operator",
+        "greenhouse-finance-accounting-operator"
+      ],
+      "sources": [
+        "docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md",
+        "docs/documentation/finance/cotizador-v3-superficie-implementada.md",
+        "docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md",
+        "data/pricing/v3-operating/README.md",
+        "docs/documentation/finance/cotizador-v3-promocion-canonica.md",
+        "docs/documentation/finance/cotizador.md"
+      ]
+    },
+    {
       "id": "business-models",
       "triggers": [
         "business model",

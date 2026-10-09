@@ -289,3 +289,23 @@ Antes de comercializarlo como `Commercially approved`:
 - demostrar que el fee único no oculta margen negativo de infraestructura, licencias o soporte.
 
 Estado: **Approved for validation**.
+
+## 14. Costeo local reusable y presentación del fee
+
+[Pricing V3](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) permite seleccionar
+el equipo interno y las herramientas necesarias, prorratear paquetes/plataforma por capacidad declarada y
+planear créditos IA adicionales. El expediente aporta demanda; el catálogo/policy aporta precios, unidades,
+variantes y reglas. Adobe se selecciona para trabajo visual, IA según necesidad; no todo perfil recibe toda suite.
+Notion/Microsoft 365 son base interna. La evidencia de Adobe combinado impide duplicar Express; capacidad
+nominativa y acceso contratado siguen verificándose.
+
+En `managed_service`, el preview muestra fee por período y setup cuando corresponde; personas, proveedores,
+rates, margen y país del talento quedan internos. Esa proyección respeta la unidad del pod; no convierte costo
+de equipo en suficiencia de delivery ni sustituye lane, RACI, derechos, aceptación o capacidad financiada.
+El piso bruto 45% de esta práctica se conserva: la propuesta 40%/35% del piloto de capacidad no lo reemplaza.
+
+Explicación/replay usan snapshots congelados. Readiness distingue cálculo de validación económica y aprobación.
+Portfolio declara clientes, interno y no asignado; no prueba inventario real. Cambios de salarios/licencias/packs
+crean sucesores con impacto, sin modificar quotes o contratos anteriores. Estado permanece `Approved for validation`;
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
+[pendientes](../../../data/pricing/v3-operating/operational-gaps.json) definen ejecución y owners.

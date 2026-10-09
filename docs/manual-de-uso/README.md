@@ -162,6 +162,8 @@ La diferencia con otras capas de documentacion:
 
 ### Finanzas
 
+- [Operar el Cotizador V3 con agentes](finance/operar-cotizador-v3-con-agentes.md) — descubrir perfiles/recursos, preparar y calcular roles o servicios, declarar capacidad, explicar/reproducir, evaluar y preparar una vista comercial interna; mantenimiento con preview/apply. [Referencia de contratos y límites](../documentation/finance/cotizador-v3-superficie-implementada.md).
+- [Consultar el prototipo Excel por CLI](finance/consultar-excel-pricing-por-cli.md) — investigar la fuente histórica; el workflow V3 usa catálogos versionados y conserva la procedencia.
 - [Registrar ingresos, egresos, pagos y ordenes de pago](finance/registrar-ingresos-egresos-y-ordenes-de-pago.md) — guia operador end-to-end para crear documentos de ingreso/egreso, registrar cobros/pagos reales, decidir pago directo vs orden de pago, aprobar/enviar/marcar pagado y conciliar.
 - [Caja, cobros, pagos y liquidaciones](finance/caja-cobros-pagos-y-liquidaciones.md) — operacion de caja real: registrar cobros/pagos, asignar instrumentos, entender `amount` vs `amountClp`, transferencias internas y settlement legs.
 - [Conciliacion bancaria operativa](finance/conciliacion-bancaria-operacion.md) — crear periodos, importar cartolas, revisar candidatos, usar auto-match/AI suggestions, hacer match/unmatch/exclude y cerrar solo cuando el banco cuadra.

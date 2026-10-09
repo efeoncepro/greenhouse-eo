@@ -1,6 +1,8 @@
 # Catálogo local V3: selección y mantenimiento
 
-Baseline [review-v1](catalog.review-v1.json): 32 perfiles históricos, 26 referencias de proveedores,
+[Superficie V3 implementada y frontera comercial](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md). Este conjunto conserva su versión/caso original; las fuentes y la policy operativa sucesora se seleccionan explícitamente y no alteran resultados congelados.
+
+Baseline [review-v1](catalog.review-v1.json):32 perfiles históricos,26 recursos originales (25 tools más fee genéricoETG-017),
 fees por perfil, kits y policies de simulación. No habilitado comercialmente ni conectado a V2/DB/API.
 
 - [Manual para Codex/Claude](../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md).

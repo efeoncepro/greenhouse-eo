@@ -139,53 +139,20 @@ Es una alternativa local usable sin UI/DB; no remitir al operador a una UI que n
 Sus resultados son hipótesis sobre costos históricos/declarados, no precios aprobados ni cotizaciones
 emitidas. No importar al catálogo, tocar payroll ni publicar costos internos por inferencia.
 
-## Cotizador V3: selección y mantenimiento del catálogo
+## Cotizador V3: flujo completo local para agentes
 
-Para cotizar desde un pedido con perfiles, países, dedicación y recursos, preferir `pnpm --silent pricing:v3`
-con catálogo local explícito: `catalog search/show/validate` → `prepare --input brief.json` →
-`quote --input brief.json [--catalog version.json] [--out artifact.json]` → `explain/replay`.
-[Manual de agentes](../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md) y
-[contrato de mantenimiento](../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
-No construir precios en el agente ni tomar costos/provisiones del expediente: éste aporta demanda.
-Mantener variante/seniority/tier, ambos países, headcount y duración; kits especifican recursos completos,
-asignación y alternativas. Faltantes/ambiguos se resuelven explícitamente, sin elegir el más barato ni cero.
-Baseline histórica/simulación; no afirmar salario vigente o licencia compartible. `trial-*` son placeholders.
-Códigos 2=pendiente, 3=calculado con revisión, 1=adapter/conflicto/export bloqueado. Explain toma el artefacto
-congelado e incluye componentes humanos, recursos, cantidades, factores y fuentes utilizados.
+Ante pedidos de cotizar roles o servicios sin UI, cargar
+[contrato operativo V3](references/cotizador-v3-agent-workflow.md) y
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+Cubre selección de variantes/países/tareas, catálogo monetario, licencias, cartera/capacidad declarada,
+créditos por proveedor/mes, provisiones, fuente/FX/vigencia, snapshots, explain/replay, readiness,
+preview redactado y mantenimiento con preview/apply/digests/impacto. La referencia enlaza fuentes
+canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
 
-Actualizaciones autorizadas usan change-set `add/replace/retire` con fuente nueva, vigencia, actor/motivo,
-`baseDigest` y `nextVersion`; `catalog preview --input change.json [--impact briefs.json]` y
-`catalog apply ... --confirm previewDigest --out new-version.json`. No editar baseline in-place ni
-reutilizar confirmación de otra propuesta/base/impacto. Apply local no es aprobación comercial ni promoción
-runtime; cotizar con el sucesor requiere `--catalog new-version.json`. Nunca reprecificar artefactos existentes.
-Snapshot `calculate` permanece como operación de bajo nivel. Excel/workbook CLI es investigación histórica,
-no dependencia del flujo V3. API/UI/MCP canónicos quedan fuera de la implementación local.
-
-## Cotizador V3: composición de herramientas por demanda
-
-Para pedidos con personas/servicio más licencias, plataforma o créditos, usar `pricing:v3 compose prepare|quote`
-con catálogo monetario, policy y catálogo de créditos explícitos. [Manual](../../../docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md).
-Interpretar perfil/tareas sin cambiar salario por especialidad inferida; base Notion/M365 obligatoria, SEO→SEMrush,
-Adobe/IA según trabajo. IA se elige con motivo; planes múltiples requieren priceId, no el más barato por defecto.
-Declarar slots/seatCapacity/contrato, cantidad, driver/parte atribuida y presupuesto por proveedor/mes. No inventar
-precios, denominadores ni permisos de compartir seats; dedicación parcial no reduce licencia automáticamente.
-Quote nuevo congela todos los inputs; explain/replay usan ese artefacto. Tres fixtures son hipótesis, no defaults
-operativos; baselineAdobe/EURsinFX/faltantes bloquean. Composición es simulation/requires_review y export bloqueado;
-servicios conservan unidad comercial, pricing de capacidad interno no valida fee/contrato del programa.
-
-
-## Cotizador V3: operación y mantenimiento completos locales
-
-Para nuevos pedidos preferir [flujo operativo](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md)
-y [policy sucesora](../../../data/pricing/v3-operating/README.md). `resources inspect` descubre perfiles/tasks/planes,
-fuentes/faltantes y digests; `compose scaffold|plan` prepara entradas/preguntas, no inventa asignaciones o variante.
-Portfolio calcula cuota desde capacidad declarada y reconcilia clientes/interno/sin asignar; seats por usuario
-continúan nominativos. Nunca confundir reparto de costo con permiso de compartir credenciales o inventario live.
-`clientProvidedTools` exige evidencia/ventana/líneas; no elimina la baseNotion/M365. Adobe180 es paquete3CC+3Express,
-306 condicional sin fecha; noExpress duplicado. FacturaNotion/públicos/operador/histórico se distinguen.
-`compose assess` separa evidencia económica de cálculo; `compose preview` genera simulación redactada local
-(rol o fee de servicio), no oferta emitida. Propuestas40/35 no están aprobadas. `resources preview|apply` versiona
-policy/packs con baseDigest/impacto/confirmación y ruta nueva. Fuente confirmada no se hereda a precio cambiado.
-Exit3 indica revisión; exit2 falta dato; exit1 rechazo. Explain/replay salen del snapshot, jamás recalcular mentalmente.
-El agente interpreta lenguaje, el motor calcula. [Promocióncanónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
-reutiliza autoridad/lifecycle/audienciasV2; no crear consumers productivos desde el prototipo por inferencia.
+El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
+`compose prepare|quote` → `explain|replay` → `compose assess|preview`. El sucesor operativo es opt-in;
+no cambiar defaults ni sobrescribir artifacts. Exit0=técnico,2=faltante,3=revisión,1=rechazo.
+Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
+validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
+no sustituyen pisos de práctica aprobados. Mantener la frontera de
+[promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

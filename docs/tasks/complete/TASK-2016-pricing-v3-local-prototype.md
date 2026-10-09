@@ -241,3 +241,15 @@ Sin coordinación externa para local; costos/margen y promoción requieren valid
 ## Follow-ups
 
 Completar economics operativos, contrastar V2/V3 e integrar por capability con ADR/unidad propias.
+
+## Continuidad documental tras TASK-2022
+
+El kernel continúa como único calculador Decimal. Catálogo monetario/resolvedor, planner IA, compositor y operación de recursos son incrementos posteriores; el alcance staffing inicial no describe toda la superficie actual.
+
+[Operación completa local](TASK-2022-pricing-v3-operational-agent-workflow.md),
+[ADR vigente](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) permiten descubrir,
+planear, cotizar, explicar/replay, evaluar y obtener preview redactado por rol o fee de servicio.
+Los 26 recursos originales son 25 herramientas más fee genérico de plataforma; no sumar ese fee dos veces.
+La evidencia/AC de este cierre permanece histórica y su lifecycle no se reabre. TASK-2017 conserva economía
+parcial; API/UI/MCP siguen en el canon V2 hasta promoción gobernada.

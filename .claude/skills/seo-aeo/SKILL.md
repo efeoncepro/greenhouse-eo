@@ -511,3 +511,13 @@ Al pasar de discovery o investigación a contribución comercial, cargar
 [caso de negocio y propuesta](references/caso-negocio-y-propuesta.md): elegibilidad desde competidores,
 modelo inverso como requisitos, mecanismos sin doble conteo, duración por maduración y PR con capacidad.
 El método enlazado conserva el canon; los datos y benchmarks del prospecto permanecen en su expediente.
+
+## Demanda SEO y cotización local V3
+
+Cuando el diagnóstico/alcance se traduzca a costos de roles/tools, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+La práctica declara tareas SEO, capacidad, plataformas y límites; el agente selecciona valores centrales y la
+CLI calcula. Copywriter+tareaSEO requiere SEMrush sin cambiar automáticamente su variante salarial. Adobe/IA se
+añaden sólo cuando el trabajo los necesita; Notion/M365 son base. Fuente pública no acredita plan/permisos reales.
+Costeo de servicio mantiene funciones internas y fee externo; explain interno y preview de simulación no prueban
+aprobación/SOW ni autorizan enviar precio. La política específica de `seo-aeo-practice` conserva sus pisos/gates.

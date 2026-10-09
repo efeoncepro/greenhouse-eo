@@ -5,12 +5,12 @@ Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; 
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
-Para un pedido con herramientas/consumo y costos compartidos, usar la [composición integrada](componer-cotizacion-v3-con-herramientas.md). Los pasos de este manual conservan el carril legacy de kits explícitos.
+Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales.
 
 ## Qué hace el agente
 
 Antes de preparar el brief, leer las [reglas de herramientas por trabajo](../../documentation/finance/cotizador-v3-seleccion-herramientas.md):
-base Notion/Microsoft365 para todos, SEMrush para redactor SEO y Adobe/IA según alcance. Consultar el kit
+base Notion/Microsoft 365 para todos, SEMrush para redactor SEO y Adobe/IA según alcance. Consultar el kit
 elegido y comprobar que cubre esas necesidades; si falta una, preparar actualización versionada antes de
 cotizar, sin dar por hecho que la CLI lee el registro del operador. Claude Team tiene referencia pública,
 no plan/cantidad de Efeonce confirmados. Conservar razón de inclusiones/omisiones y reparto explícito.
@@ -43,15 +43,15 @@ Archivos nuevos usan `wx` y `0600`; nunca sobrescriben. Repetir comandos con `--
 
 Los [antecedentes del operador](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md) completan costos actuales de herramientas y plataforma. Leerlos antes de normalizar: completar planes/asignaciones/fechas/FX y policy, convertir a registros y kit, luego preview/apply. No pasar ese JSON como brief o catálogo; el motor no lo importa. Adobe futuro sin fecha, rango Vercel y créditos AI requieren normalización explícita. Las cifras históricas de abajo describen sólo la baseline vigente de simulación.
 
-La baseline incluye 32 perfiles con nombre (omite filas vacías), 26 referencias de proveedores,
+La baseline incluye 32 perfiles con nombre (omite filas vacías),26 filas históricas de recursos —25 tools y ETG-017 fee genérico—,
 fees separados por perfil, kits propuestos, políticas, FX históricos y recursos de prueba. No lee Excel/CSV
 al ejecutar. Fuente/hashes quedan en `evidence`; cada registro conserva procedencia, note, revisión y vigencia.
 Las fechas de los registros históricos delimitan el uso de la simulación, no acreditan vigencia salarial/proveedor real.
 Los componentes humanos mantienen salario, bonos y previsionales separados en bindings; el kernel recibe su suma.
-Previsionales históricos cero no acreditan ausencia de cargas. Premium conserva fee ausente, sin heredar USD49.
+Previsionales históricos cero no acreditan ausencia de cargas. Premium conserva fee ausente, sin heredar USD 49.
 
 Se recuperan **montos completos históricos de paquetes**, sin tomar divisor «proyectos» como derecho de compartir seats.
-Ejemplo Adobe USD80, Notion USD144, Microsoft365 USD80, ChatGPT USD20: planes/unidades actuales pendientes.
+Ejemplo Adobe USD 80, Notion USD 144, Microsoft 365 USD 80, ChatGPT USD 20: planes/unidades actuales pendientes.
 Las reglas de kits son hipótesis: scope cuenta/equipo se reparte por consumidores cuando `equal_consumers` lo declara;
 scope persona conserva cantidad por headcount. `fte` sólo existe si una regla lo declara explícitamente.
 Ninguna regla certifica permiso contractual para compartir una licencia. Recursos del cliente requieren motivo y
@@ -62,7 +62,7 @@ Costo sin país sólo puede usarse con `mode=simulation` y `allowUnlocalizedCost
 Factores de mercado 1 son neutrales de prueba; no WTP aprobado. Las políticas por tier usan markup histórico, no
 margen objetivo 40%. El catálogo no hereda la aspiración de margen del expediente Pibank.
 
-Talent Assurance USD25/mes, operación USD25 y setup USD100 son **placeholders de la prueba anterior**,
+Talent Assurance USD 25/mes, operación USD 25 y setup USD 100 son **placeholders de la prueba anterior**,
 identificados `trial-*`; no costos medidos ni promesas de formación/reemplazo. Se actualizan como recursos explícitos.
 No hay bolsas del expediente, cargos laborales 20% ni reserva 15% implícitos en este catálogo.
 
@@ -79,11 +79,11 @@ Las fechas de catálogo se evalúan en `quoteDate` y se congelan para la cotizac
 ## Ejemplos verificados
 
 - [Diseñador CO→CL](../../../data/pricing/v3-catalog/examples/designer-co-cl.json): tres meses, 50%, paquetes históricos completos.
-  Costo USD3334, neto de simulación USD4334,20; mensual recurrente USD1401,40 y setup USD130.
-  Distinto del ensayo USD1064,70: éste atribuía paquetes mediante divisores históricos.
+  Costo USD 3334, neto de simulación USD 4334,20; mensual recurrente USD 1401,40 y setup USD 130.
+  Distinto del ensayo USD 1064,70: éste atribuía paquetes mediante divisores históricos.
 - [Demanda Pibank PE/CL](../../../data/pricing/v3-catalog/examples/pibank-demand-pe-cl.json): doce meses, diez funciones,
   SEO/redactor costo completo reservado; otros según horas de módulos distribuidas por activaciones.
-  Selección explícita SEMrush histórica. Costo USD61082,82 y neto USD87102,66, promedio USD7258,56.
+  Selección explícita SEMrush histórica. Costo USD 61082,82 y neto USD 87102,66, promedio USD 7258,56.
   No es precio nuevo de la propuesta: país/seniority/capacidad/planes pendientes; no se garantiza cobertura técnica AEO
   sólo por usar SEMrush. Si no se elige suite, devuelve alternativas; el recurso `pending-seo-suite` bloquea el cálculo.
 - [Evidencia CLI](../../../data/pricing/v3-catalog/examples/verification.json) y
@@ -103,8 +103,8 @@ pnpm --silent pricing:v3 quote --catalog /tmp/catalogo-v3-ejemplo-v2.json --inpu
 ```
 
 `DIGEST_DEL_PREVIEW` y `BRIEF_CON_FECHA_2026_10_10` son placeholders que el agente sustituye; no copiar literalmente.
-El fixture sólo ilustra alza de Adobe80→88 y salario base950→1045 desde 10-10. No afirma incremento real.
-Con los mismos supuestos cambia el neto de tres meses4334,20→4550,65; una quote del09-10 conserva el importe anterior.
+El fixture sólo ilustra alza de Adobe 80→88 y salario base 950→1045 desde 10-10. No afirma incremento real.
+Con los mismos supuestos cambia el neto de tres meses 4334,20→4550,65; una quote del 09-10 conserva el importe anterior.
 La versión nueva sólo se usa cuando se selecciona con `--catalog`; aplicar no publica, factura ni activa catálogo canónico.
 
 ## Límites y futuros consumers

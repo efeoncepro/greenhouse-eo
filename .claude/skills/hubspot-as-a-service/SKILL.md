@@ -195,3 +195,16 @@ For non-trivial engagements, leave:
 ## Completion gate
 
 Close only when the configured runtime was verified, documentation matches it, rollback or recovery is understood, and external dependencies such as licenses, credits, trial expiry, publication or human availability are explicit.
+
+## Costeo de especialistas CRM por Cotizador V3
+
+Para dimensionar la capacidad regional CRM/Talent Assurance aceptada, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Resolver variante de consultor, seniority, país del talento y mercado de oferta sin colapsar escalas del Excel;
+costo histórico mensual no es salario vigente. La práctica define tareas/acceso necesarios y el motor calcula
+salario, provisiones, tools/plataforma y margen. No exigir comprar HubSpot si el cliente dispone acceso válido:
+`clientProvidedTools` exige evidencia/ventana/líneas; acceso de partner o Solutions Partner no lo demuestra.
+Notion/M365 permanecen base del equipo y las IA se seleccionan por motivo. Preservar cliente-dirigido vs managed
+service; un fee con roles internos no crea nueva solución comercial ni garantía. Explain es interno, preview
+simulación redactada. La CLI V3 no crea leads/deals, modifica HubSpot, emite quotes, autoriza outreach o confirma
+capacidad real; esas operaciones conservan su canal y autorización propios.

@@ -1231,3 +1231,13 @@ Para crear o mejorar el informe completo, carga `report-studio`: narrativa, evid
 ## Metodología de deck ejecutivo mensual
 
 Para resumir una auditoría o informe en un deck para directorio, cargar `docs/operations/EFEONCE_EXECUTIVE_REPORT_DECK_METHOD_V1.md`: continuidad de evidencia, producción mensual frente a acumulada, On-time con denominadores, narrativa ejecutiva, selección visual antes de implementación, marcas/pie/contraportada, HTML como insumo del PDF A4 y verificación del archivo final. El caso Berel conserva sus decisiones y límites; las cifras no se reutilizan entre meses.
+
+## Cifras de propuesta desde Cotizador V3
+
+Para incorporar una simulación local de costos/precio, cargar
+[contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
+Usar preview redactado para cifras presentables pendientes de revisión; artifact/explain permanecen internos.
+No convertir el costo de las funciones de `managed_service` en horas o roles vendidos: conservar fee/plazo/setup
+y alcance de servicio. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
+SOW o aprobación comercial; seguir la autoridad del expediente y documentar estado de simulación cuando aplique.
+No borrar ese estado, emitir precio ni enviar propuesta por generar el deck. Mantener piso y contratos de la práctica.
