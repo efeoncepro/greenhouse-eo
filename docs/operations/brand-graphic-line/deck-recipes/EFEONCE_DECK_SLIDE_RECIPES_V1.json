@@ -5875,6 +5875,57 @@
             "panel": "Tu panel en Greenhouse"
           },
           "fit": "Aprobada tal cual por el operador. El máximo de answer se subió a 10 el 2026-09-30 (medido con el salto de línea, como lo mide validateDeckPlan), en la receta y en content-day-tools.slots.json. Los demás campos vienen del intent aprobado (renderSource) y se miden al componer (TASK-1949 Slice 2)."
+        },
+        {
+          "approvedAt": "2026-10-10",
+          "approvedBy": "operador, 2026-10-10 («Aprobado, y hay que canonizar, me gustó»; comentario en el canvas del deck de Marketing de Contenidos, lámina 25, https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph). Antes, sobre la misma lámina: «La interfaz debería mostrar algo más relacionado a social media desde Marketing Studio, constrúyelo no lo captures». Aprobación relatada por la sesión que armó el deck; esta sesión no leyó el comentario en el canvas.",
+          "deck": "Marketing de Contenidos (línea brand)",
+          "line": "brand",
+          "slide": "V0b-dia-tools-ms · lámina 25 del canvas",
+          "board": "canvas Deck Marketing de Contenidos (Design), lámina 25",
+          "document": "brochure",
+          "referenceSource": "ai-generations/2026-10-09_deck-contenidos/out/V0b-dia-tools-ms/01-deck-content-day.png",
+          "renderSource": {
+            "command": "pnpm brand:compose -- --intent ai-generations/2026-10-09_deck-contenidos/intents/V0b-dia-tools-ms.json --out <carpeta> --artifact-id <id>",
+            "intent": "ai-generations/2026-10-09_deck-contenidos/intents/V0b-dia-tools-ms.json",
+            "panel": "ai-generations/2026-10-09_deck-contenidos/ui/ms-social.png",
+            "panelSource": "ai-generations/2026-10-09_deck-contenidos/ui/ms-social.dc.html",
+            "panelGenerator": "ai-generations/2026-10-09_deck-contenidos/ui/ms-social.generador.py"
+          },
+          "content": {
+            "eyebrow": "Tu día a día con Efeonce",
+            "question": "¿Cómo trabajamos contigo?",
+            "answer": "Así",
+            "body": "Cada cosa en su herramienta y **todo** a la vista en Marketing Studio, sin esperar el informe.",
+            "tools": [
+              {
+                "name": "Metricool",
+                "label": "Publicamos"
+              },
+              {
+                "name": "Sprout Social",
+                "label": "Escuchamos y atendemos"
+              },
+              {
+                "name": "Favikon",
+                "label": "Elegimos creadores"
+              }
+            ],
+            "insights": {
+              "name": "Efeonce Insights",
+              "label": "Reportes automáticos"
+            },
+            "panel": "Tu plan en Marketing Studio",
+            "panelNote": "todo en un solo lugar, en vivo"
+          },
+          "fit": "Compuesta con la receta y el layout `tools` tal cual, en la línea Brand (anillo y esfera en naranja). Los largos caben en los slots (eyebrow 24 de 26, pregunta 25 de 30, respuesta 3 de 10, bajada dentro de 100, etiqueta más larga 22 de 22; medido el 2026-10-10). Lo que cambia es el panel: en vez de una captura lleva una vista social de Marketing Studio CONSTRUIDA en HTML y exportada a PNG de 2160×1290 (pedido del operador: «constrúyelo no lo captures»), con el lockup oficial «efeonce | Marketing Studio» y el isotipo `marketing-studio-isotype-negative.svg` de @efeoncepro/axis-brand-assets. Es una excepción aprobada a la regla de la receta «interfaces genéricas»: aquí la interfaz es de un producto propio y construida, no genérica.",
+          "conditions": [
+            "La interfaz es una maqueta de dirección, no una captura del producto: campaña ficticia «Lanzamiento Cold brew» de la marca ficticia Mareas Café. Nunca campañas propias ni de clientes reales (misma regla que las interfaces de Creative Studio del brochure Agencia Creativa).",
+            "Las pestañas Plan · Social · Creadores · Pauta · Resultados, la bandeja de mensajes y el bloque de creadores los propuso la sesión que armó la lámina y no se contrastaron con el producto real. Antes de enviar el deck a un prospecto, confirmar con el operador que la lámina no promete vistas que Marketing Studio no tiene.",
+            "Las cifras de la interfaz (14, 3, 94 %, 128 mil, +18 %) son de muestra y la lámina no las marca como tales.",
+            "Metricool, Sprout Social y Favikon aparecen con su logo como herramientas que Efeonce usa. Sin verificar en esta canonización: que Efeonce opere las tres y que el uso de sus logos esté autorizado (TASK-1937). Dentro de la interfaz hay además íconos de Instagram, TikTok, LinkedIn, YouTube y Facebook.",
+            "El par «¿Cómo trabajamos contigo? Así» es el ejemplo original de la receta. Con la regla de voz del 2026-10-06 (manual de la línea, §4) la pregunta la hace Efeonce y no el cliente, y «Así» no pasa la prueba de autonomía. El operador aprobó la lámina con ese par; cambiarlo es decisión suya."
+          ]
         }
       ]
     },

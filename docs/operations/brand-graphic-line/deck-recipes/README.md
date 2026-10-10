@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.15
+> **Versión:** 1.16
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-09 por Claude (1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-10 por Claude (1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -350,6 +350,24 @@ Recorrido, reglas y pendientes: [norma §4.6, «Deck Servicios web»](../EFEONCE
 - **Lámina nueva «Dónde construimos»** (plataformas con logo oficial en blanco): candidata a receta, sin promover.
 - **Dos casos con cifras sin respaldo** (Aguas Andinas con marcadores inventados; Berel con plazo por confirmar): el
   deck no se envía a un prospecto hasta resolverlos.
+
+## La lámina «Día a día» con Marketing Studio (aprobada el 2026-10-10)
+
+El operador aprobó y pidió canonizar la lámina 25 del deck de Marketing de Contenidos (línea `brand`): «Aprobado, y hay
+que canonizar, me gustó». Es un **uso aprobado de `content-day-tools`** (`approvedUses`, `deck: "Marketing de Contenidos
+(línea brand)"`), con el panel cambiado: en vez de una captura lleva una vista social de **Marketing Studio construida
+en HTML** y exportada a PNG («constrúyelo no lo captures»).
+
+- **Compone con la receta:** `pnpm brand:compose -- --intent ai-generations/2026-10-09_deck-contenidos/intents/V0b-dia-tools-ms.json --out <carpeta> --artifact-id <id>`.
+  Interfaz: `ai-generations/2026-10-09_deck-contenidos/ui/ms-social.png` (fuente `ms-social.dc.html`, generador
+  `ms-social.generador.py`).
+- **Excepción a «interfaces genéricas»:** la interfaz es de un producto propio y construida, con el lockup oficial
+  «efeonce | Marketing Studio». Campaña y marca **ficticias** (Lanzamiento Cold brew, Mareas Café).
+- **Sólo esta lámina está aprobada.** El resto del deck de Marketing de Contenidos sigue en revisión.
+- **Condiciones abiertas** (en `conditions` del uso): las pestañas, la bandeja y el bloque de creadores no se
+  contrastaron con el producto real; las cifras son de muestra sin marca; falta verificar que Efeonce opere Metricool,
+  Sprout Social y Favikon y la autorización de sus logos (TASK-1937); y el par «¿Cómo trabajamos contigo? Así» no pasa la
+  regla de voz del 2026-10-06 (la pregunta es de Efeonce y «Así» no dice nada sola). Las decide el operador.
 
 ## Anatomía de una receta (campos del JSON)
 
