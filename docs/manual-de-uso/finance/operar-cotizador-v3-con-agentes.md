@@ -48,7 +48,13 @@ pnpm --silent pricing:v3 compose preview --input /tmp/cotizacion-v3-nueva.json \
 Las rutas `--out` deben ser nuevas; nunca sobrescriben un padre o artefacto. JSON en stdout es interfaz para agentes.
 Exit 0: operación técnica verificada. Exit 2: falta información. Exit 3: preparado/calculado en revisión;
 **no es un error de cálculo ni una aprobación comercial**. Replay de una composición en revisión devuelve 3.
-Exit 1: entrada inválida, conflicto, overwrite o export comercial rechazado; error sanitizado en stderr.
+Exit 1: rechazo (entrada inválida, conflicto, overwrite o export comercial bloqueado). stdout queda vacío y stderr
+trae un único JSON: `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`. `code` nombra la
+causa y sale de un registro cerrado ([`errors.ts`](../../../src/lib/finance/pricing-v3/errors.ts)); `message` es un
+texto fijo que no describe el caso; `option` nombra la opción a corregir, sin su valor; `issues` lista hasta 20
+ubicaciones `{ "path", "rule" }` dentro del documento rechazado. El reporte nunca contiene un valor, una ruta de
+archivo ni el mensaje de un parser: decidir por `code`, no por el texto. Tabla en
+[Qué hacer con cada error](#qué-hacer-con-cada-error).
 No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interpretar explícitamente estos estados.
 
 ### Elegir el comando y su input
@@ -62,20 +68,56 @@ No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interp
 | `compose scaffold`                                     | Brief + policy + catálogo                                          | Demanda editable con slots y preguntas, siempre exit 2; completar planes/asignaciones/alcance                |
 | `resources portfolio`                                  | Portfolio + policy; fecha/catálogo para costos                     | Cuotas reconciliadas, interno/sin asignar y residual; exit 3 preparado o 2 pendiente                         |
 | `compose plan`                                         | Plan con demanda y portfolio opcional + las tres fuentes           | Demanda resuelta y cálculo de prueba; `--out` guarda la demanda, **no** el artefacto                         |
-| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Selección o resultado; ambos `--out` guardan artefacto compuesto completo                                    |
+| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Resumen derivado en stdout; `quote` añade `replayDigest`. Resultado completo sólo en el artefacto de `--out` |
 | `resources budget`                                     | Request de créditos; `--catalog` es catálogo de packs              | Presupuesto independiente; no es input de quote/replay de cotizaciones                                       |
-| `explain` / `replay`                                   | Artefacto snapshot, catálogo o composición                         | Explica / reproduce y verifica con inputs congelados; no consulta sucesor                                    |
+| `explain` / `replay`                                   | Artefacto snapshot, catálogo o composición                         | Detalle completo / verificación con inputs congelados, sin sucesor; replay de composición devuelve resumen   |
 | `compare`                                              | Dos artefactos compatibles de snapshot o catálogo                  | Diferencias internas; el CLI actual no compara artefactos de composición directamente                        |
-| `compose assess`                                       | Artefacto compuesto                                                | Gaps económicos/operativos y margen propuesto, siempre revisión; JSON                                        |
-| `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, sin emisión                                 |
+| `compose assess`                                       | Artefacto compuesto                                                | Gaps, margen propuesto y piso de la política por línea; siempre revisión, no aprueba excepciones; JSON       |
+| `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, importes en escala de moneda, sin emisión   |
 | `catalog preview` / `catalog apply`                    | Change-set monetario; impacto de briefs opcional                   | Preview / sucesor nuevo; apply exige digest confirmado y `--out`                                             |
 | `resources preview` / `resources apply`                | Replacement completo policy/créditos; impacto de demandas opcional | Preview / sucesor nuevo; mismo contexto/hash/impacto, sin selección automática                               |
 | `export`                                               | Artefacto completo dentro de policy                                | Gate propio de borrador: composiciones review-only actuales siguen bloqueadas                                |
 
-Los formatos no son intercambiables. `--out` contiene el artefacto completo en quote, mientras stdout puede
-ser un resumen; `explain/replay` deben leer el archivo congelado. Opciones ajenas al subcomando se rechazan,
-no se interpretan como ejecutadas. Para actualizar el catálogo monetario, obtener `digest` con `catalog validate`;
-para policy/créditos, usar `policyDigest`/`creditCatalogDigest` de inspect con las rutas explícitas.
+Los formatos no son intercambiables. `compose prepare` y `compose quote` imprimen el mismo resumen derivado
+([Leer el resumen](#leer-el-resumen)); el resultado completo existe **sólo** en el artefacto que escribe `--out`.
+Un `compose quote` sin `--out` no deja el detalle en ninguna parte: cotizar siempre con `--out` y leer el detalle
+con `explain` sobre ese archivo (salida grande; pedirla sólo cuando haga falta un componente). `replay` de una
+composición responde `{ verified, calculationId, summary }`: verifica el archivo y devuelve su resumen, no el
+resultado entero. `compose assess` añade un gap `MARGIN_BELOW_POLICY_FLOOR` por cada línea que el kernel marcó bajo
+el piso de su política y las lista en `margin.policyFloor.linesBelowFloor`; sus 40 %/35 % genéricos no cambian.
+`compose preview` imprime los importes derivados en la escala de la moneda (CLP sin decimales). Los carriles
+`prepare`/`quote` de catálogo y `calculate` del núcleo conservan su salida. Opciones ajenas al subcomando se rechazan
+con `INVALID_ARGUMENT` y el nombre de la opción; no se interpretan como ejecutadas. Para actualizar el catálogo
+monetario, obtener `digest` con `catalog validate`; para policy/créditos, usar `policyDigest`/`creditCatalogDigest`
+de inspect con las rutas explícitas.
+
+### Qué hacer con cada error
+
+Códigos del adaptador (argumentos, archivos y formatos). La lista completa y los códigos de dominio están en el
+[registro](../../../src/lib/finance/pricing-v3/errors.ts); si un código no aparece aquí, leerlo allí.
+
+| `code`                                   | Qué pasó                                                               | Qué corregir                                                                                      |
+| ---------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `UNKNOWN_COMMAND`                        | El comando no existe                                                   | Revisar con `pnpm --silent pricing:v3 help`                                                       |
+| `UNKNOWN_OPTION`                         | La opción en `option` no existe (ej. `--inptu`)                        | Corregir el nombre de la opción                                                                   |
+| `INVALID_ARGUMENT`                       | El subcomando no acepta la opción en `option`, o su valor no es válido | Quitar esa opción o corregir su valor; sin `option`, revisar comando/subcomando                   |
+| `MISSING_ARGUMENT`                       | Falta la opción en `option`, o llegó sin valor                         | Agregarla con su valor                                                                            |
+| `INVALID_FORMAT`                         | `--format` no admitido (`json` o `markdown`; `assess` sólo `json`)     | Usar un formato admitido                                                                          |
+| `INPUT_NOT_FOUND`                        | El archivo de la opción en `option` no existe o no se puede leer       | Corregir la ruta de esa opción                                                                    |
+| `INPUT_NOT_JSON`                         | El archivo de la opción en `option` no es JSON                         | Entregar el JSON correcto; un Markdown o un preview no son input                                  |
+| `SCHEMA_INVALID`                         | Un documento no cumple su schema; `issues` trae `path` y `rule`        | Corregir cada `path`. No indica qué archivo: revisar el que contiene esos campos                  |
+| `OUTPUT_EXISTS`                          | La ruta de `--out` ya existe                                           | Elegir un nombre nuevo; nunca borrar un artefacto congelado para reutilizar su ruta               |
+| `OUTPUT_NOT_WRITABLE`                    | La carpeta de `--out` no existe o no permite escribir                  | Crear la carpeta o elegir otra ruta                                                               |
+| `PLAN_REQUIRES_VALID_ALLOCATION`         | `compose plan --out` sin demanda resuelta                              | Correr sin `--out`, resolver lo que reporta el plan y repetir                                     |
+| `WORKLOAD_REQUIRES_VALID_DIMENSIONING`   | `compose workload --out` sin dimensionamiento listo                    | Correr sin `--out`, resolver lo pendiente y repetir                                               |
+| `EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY` | `export` sobre un cálculo en revisión o una composición                | No hay arreglo de argumentos: export bloqueado; en composición, revisar con `compose preview`     |
+| `ADAPTER_FAILURE`                        | Falla que nadie clasificó: es un hueco de la herramienta               | No es un error del pedido. No reintentar a ciegas: reportar el comando exacto a quien la mantiene |
+
+Los conflictos de dominio llegan con su propio código, sin `option`: `REPLAY_MISMATCH` (el artefacto fue modificado o
+su versión no está soportada: no editarlo, volver a cotizar), `CATALOG_BASE_CONFLICT` / `RESOURCE_BASE_CONFLICT` (el
+`baseDigest` del change-set no corresponde a la base entregada), `CATALOG_PREVIEW_CONFLICT` /
+`RESOURCE_PREVIEW_CONFLICT` (el `--confirm` no corresponde al preview vigente: repetir el preview). Un exit 2 o 3 no
+es un error: el motivo está en el JSON de stdout, no en stderr.
 
 ## Selección y asignación
 
@@ -210,6 +252,113 @@ En la demanda:
 
 El precio sale al piso de la práctica (margen objetivo 45 %, mínimo 45 %). Sigue siendo una simulación en revisión:
 las provisiones y el consumo de agentes son estimaciones declaradas, y los costos de las personas son históricos.
+
+## Leer el resumen
+
+`compose prepare` y `compose quote` imprimen el resumen `pricing-v3-composition-summary/1`; `replay` de una
+composición lo devuelve dentro de `summary`. Es una lectura derivada del resultado congelado: cuenta, agrupa y
+quita repeticiones, no decide nada. Con las tres variables de la sección anterior (`catalog.review-v3`,
+`resources.review-v5`, `ai-credits.review-v1`):
+
+```bash
+pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" --policy "$pricing_policy" \
+  --credits "$pricing_credits" --input data/pricing/v3-operating/managed-care.demand.json \
+  --out /tmp/servicio-gestionado.artifact.json > /tmp/servicio-gestionado.summary.json
+
+pnpm --silent pricing:v3 replay --input /tmp/servicio-gestionado.artifact.json
+pnpm --silent pricing:v3 explain --input /tmp/servicio-gestionado.artifact.json
+```
+
+Los tres devuelven exit 3 en este ejemplo. El resumen pesa unos 15 KB; `explain` del mismo artefacto, unos 234 KB.
+
+| Parte                                                                   | Qué dice                                                                                                                                                                               | Qué hacer                                                                                                                      |
+| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `calculationId`, `replayDigest`                                         | Identidad del cálculo. `replayDigest` sólo aparece en `quote` y en `replay`: es lo que una reproducción debe igualar                                                                   | Citarlos al registrar o compartir el caso                                                                                      |
+| `calculationStatus`, `diagnostics`                                      | `diagnostics` son los **bloqueos**, completos. Si no está vacío, el estado es `needs_input`, `totals` es `null` y el exit es 2                                                         | Resolver cada bloqueo en la demanda (su `path` dice dónde) y volver a correr. No presentar precio                              |
+| `reviewStatus`, `quoteReviewStatus`                                     | Revisión de la composición (siempre `requires_review`) y revisión que devuelve el kernel                                                                                               | Tratar el número como simulación; ninguno de los dos es una aprobación                                                         |
+| `totals`, `marginRateRoundedDown`                                       | Costo, precio sin descuento, descuento, neto, margen, impuestos y moneda del plazo. `marginRateRoundedDown` es el margen a 6 decimales, redondeado hacia abajo                         | Leer el margen de aquí, no recalcularlo. `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero               |
+| `periods[]`                                                             | Estado y totales de cada periodo                                                                                                                                                       | Revisar que ningún periodo quede sin calcular y si el neto varía entre meses                                                   |
+| `assumptions`                                                           | Supuestos con que se resolvió el pedido (ej. costo histórico asumido para un país)                                                                                                     | Declararlos al explicar el precio                                                                                              |
+| `reviewSignals[]`                                                       | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales                                     | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`…); `paths` dice qué dato lo origina |
+| `marginFloor.lines[]`                                                   | Líneas que el kernel marcó bajo el piso de su política: `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` y `marginAmountShortOfFloor` (margen que falta al neto actual) | Ver «Redondeo o incumplimiento» abajo                                                                                          |
+| `toolSelections`                                                        | `counts` y las herramientas incluidas, las que aporta el cliente y las excluidas con motivo                                                                                            | Confirmar que cada herramienta incluida corresponde al alcance y que cada exclusión tiene un motivo defendible                 |
+| `attributions`                                                          | Por herramienta y precio: estado de la fuente, cantidad, parte del servicio y costo mensual completo, atribuido y sin asignar                                                          | Revisar fuentes no confirmadas y el costo que queda sin asignar                                                                |
+| `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` | Presupuesto de créditos y caja. Costo atribuido no es dinero nuevo por pagar; `cashMeaning` lo explica                                                                                 | No presentar `cashCommitment` como factura ni como compra                                                                      |
+| `fullDetail`                                                            | Recuerda que el detalle vive en el artefacto, bajo `semantic.result`                                                                                                                   | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea               |
+
+Las filas que sólo difieren por periodo se agrupan en una con `periodIds`.
+
+**Redondeo o incumplimiento.** El kernel compara cada línea con el piso de su política y la marca; nunca sube el
+precio. En `creative-managed-service` el objetivo y el mínimo son ambos 0,45, y el costo y el precio se redondean a
+pesos enteros por separado: una línea cotizada exactamente al piso puede quedar bajo él por menos de un peso. En el
+ejemplo `managed-care` las seis líneas salen marcadas con `marginAmountShortOfFloor` entre 0,1 y 0,5.
+
+- Faltan **fracciones de peso** en una cotización sin descuento: es el redondeo del precio al piso. Decirlo así; no es
+  una excepción ni requiere decisión.
+- Faltan **miles de pesos**: el precio está de verdad bajo el piso. Requiere una decisión del operador antes de
+  presentarlo ([Registrar el precio acordado](#registrar-el-precio-acordado)).
+
+## Registrar el precio acordado
+
+El precio que el operador acuerda de verdad tiene que pasar por el motor. Si se anota sólo en la propuesta, el
+artefacto congelado sigue mostrando el precio al piso y nadie comprueba el piso contra el precio real.
+
+1. Cotizar sin descuento y leer `totals.undiscountedPrice` (precio al piso).
+2. Calcular la tasa: `1 − neto acordado ÷ undiscountedPrice`, con siete decimales.
+3. Copiar la demanda a un archivo nuevo y declarar el descuento dentro de `brief`:
+
+   ```json
+   "adjustments": [
+     {
+       "adjustmentId": "sky-precio-acordado",
+       "kind": "discount",
+       "rate": "0.0793605",
+       "lineIds": ["titular", "lider", "agentes"],
+       "reason": "Precio base acordado CLP 4.990.000 más IVA al mes, todo incluido. Excepción al piso de 45 % aprobada por el CEO el 2026-10-10 por ser cliente vigente."
+     }
+   ]
+   ```
+
+   Se admite un solo ajuste; `rate` es una cadena; `lineIds` son los IDs de las líneas del brief que reciben el
+   descuento; `reason` es obligatorio y debe decir qué se acordó, quién lo aprobó y cuándo. Sin `reason`, o con dos
+   ajustes, la CLI rechaza con `SCHEMA_INVALID`.
+
+4. Volver a correr y comprobar que `totals.net` es exactamente el monto acordado. Si difiere por pesos, faltan
+   decimales en la tasa: ajustarla y repetir (en el caso real, `0.07936` da 4.990.002 y `0.0793605` da 4.990.000).
+5. Congelar con `compose quote --out` en una ruta nueva, guardar el resumen y correr `compose assess` sobre el
+   artefacto. Conservar los cuatro archivos junto al expediente, con una nota de la decisión.
+6. Leer `marginRateRoundedDown` y `marginFloor.lines[]`: ese es el margen real y lo que falta para el piso.
+
+Caso real, SKY social care 2027: acordado CLP 4.990.000 al mes sobre un precio al piso de 5.420.145 → tasa
+0,0793605 → neto 4.990.000, margen 40,26 %, tres líneas marcadas y CLP 236.579 al mes de margen bajo el piso en
+total. Archivos en `docs/commercial/prospects/sky-social-care-2027/pricing/`: `acordado.demand.json`,
+`acordado.artifact.json`, `acordado.summary.json`, `acordado.assessment.json` y la
+[nota de la excepción](../../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+Con las mismas tres variables (los tres comandos devuelven exit 3):
+
+```bash
+pnpm --silent pricing:v3 compose prepare --catalog "$pricing_catalog" --policy "$pricing_policy" \
+  --credits "$pricing_credits" \
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.demand.json
+
+pnpm --silent pricing:v3 replay \
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json
+
+pnpm --silent pricing:v3 compose assess \
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json
+```
+
+**Quién decide.** Márgenes, pisos, precios y excepciones al piso son decisión del operador (CEO y dueño). El agente
+le lleva el margen real que entrega el motor y una recomendación; no aprueba, no «redondea» una excepción ni la da
+por implícita, y `compose assess` tampoco la aprueba. Aprobada la excepción, se registra con su motivo en `reason` y
+en una nota junto al artefacto. Confirmado el 2026-10-10: el piso de 45 % sigue siendo la norma para servicios
+gestionados de la práctica creativa; SKY social care es una excepción por ser cliente vigente; la política se
+mantiene en 45/45. No usar el precio de SKY como referencia de margen para otro cliente.
+
+Sin decidir, registrado en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json):
+una regla que redondee el precio hacia arriba (`FLOOR_PRICE_ROUNDS_UNDER_FLOOR`), un ajuste que reciba el neto
+acordado directamente (`AGREED_PRICE_OUTSIDE_ENGINE`) y si el piso de 45 % rige servicios gestionados fuera de la
+práctica creativa (`MARGIN_FLOOR_SCOPE`). No resolverlos por cuenta propia en una cotización.
 
 ## Pendientes que permanecen visibles
 

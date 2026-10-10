@@ -4,6 +4,8 @@ Estado verificado el 2026-10-09, TASK-2016/2019/2020/2021/2022. Este documento d
 ejecutable; el [contrato objetivo](cotizador-v3-contrato-y-validacion.md) conserva la dirección de evolución.
 El [manual operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) es la entrada para Codex y
 Claude. El [cotizador canónico](cotizador.md) conserva su API, permisos, lifecycle y consumidores actuales.
+Los párrafos fechados 2026-10-10 describen el endurecimiento posterior de la CLI (errores tipados, resumen
+derivado y veredicto de piso); el resto conserva el estado verificado del 2026-10-09.
 
 ## Las piezas y sus versiones
 
@@ -21,6 +23,8 @@ Claude. El [cotizador canónico](cotizador.md) conserva su API, permisos, lifecy
 | Mantenimiento de recursos | `pricing-v3-resource-change/1`                              | Replacement completo `policy` o `credits`; preview con impacto y sucesor nuevo                 |
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
+| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada       |
+| Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
 
 Fuentes ejecutables: [dominio](../../../src/lib/finance/pricing-v3/),
 [CLI](../../../scripts/commercial/pricing-v3.ts), [fixtures operativas](../../../data/pricing/v3-operating/README.md).
@@ -158,8 +162,20 @@ suscripciones/acceso/capacidad reales, asignación simulada, impuestos/entidad, 
 Siempre devuelve revisión. 40% objetivo/35% piso son propuesta, `approved=false`; no reemplazan la policy elegida ni pisos vigentes de la práctica. Creative Practice conserva 45% bruto aprobado: el aviso genérico de `assess` no certifica ese piso ni permite una excepción creativa. El agente debe calcular y verificar el piso de la oferta correspondiente.
 TrialAssurance 25/operación 25/setup 100 permanecen recursos de prueba, no estándares de Talent Assurance.
 
+Delta 2026-10-10: `assess` ya reporta el piso de la política de precio seleccionada, sin recalcularlo. Agrega una
+brecha `MARGIN_BELOW_POLICY_FLOOR` (owner Commercial/Finance) por cada línea que el kernel marcó
+`MARGIN_BELOW_FLOOR`, y `margin.policyFloor.linesBelowFloor` con neto, margen, `marginRateRoundedDown` y
+`marginAmountShortOfFloor` de cada una. `proposedTarget`/`proposedFloor` no cambian. El veredicto vale sólo si la
+oferta elegida codifica el piso de su práctica: con `creative-managed-service` (objetivo y mínimo 0,45) lo hace; una
+política con mínimo 0 no marca nada y `assess` no suple esa verificación. Con objetivo igual al mínimo, costo y precio
+se redondean a CLP enteros por separado y una línea al piso puede quedar bajo él por menos de 1 CLP: el kernel la
+marca y nunca sube el precio. En el ejemplo `managed-care.*` las seis líneas quedan cortas por 0,1 a 0,5 CLP;
+`marginAmountShortOfFloor` distingue esa brecha de redondeo de un incumplimiento real.
+
 `compose preview` admite simulación calculada en revisión y entrega JSON/Markdown con allowlist. Excluye
 costos, margen, IDs/fuentes privados, providers, drivers y países de talento. No autoriza publicación o envío.
+Desde el 2026-10-10, en `managed_service` los importes derivados (fee del período e implementación) conservan la
+escala con que el kernel formateó la moneda: CLP mostraba `9508946.00` en la línea y `9508946` en el total.
 `export` conserva el gate propio de cálculo completo dentro de policy; los ejemplos de composición en revisión
 no lo evaden mediante preview. Ninguna salida crea quote canónica, aprobación, documento emitido o CRM write.
 
@@ -167,7 +183,41 @@ CLI: JSON limpio por stdout con `pnpm --silent`; exit 0 técnico, exit 2 pendien
 schema/argumentos/conflicto/adaptador/export rechazado, error sanitizado en stderr. `--out` usa ruta nueva
 `wx`/0600; no sobrescribe. Códigos 2/3 exigen leer envelope, no concatenar pasos suponiendo exit 0.
 
+Delta 2026-10-10, qué imprime cada comando. Códigos de salida, flags, digests y el escritor `wx`/0600 no cambian.
+
+- `compose prepare` y `compose quote` imprimen el resumen `pricing-v3-composition-summary/1`
+  ([`resources/summary.ts`](../../../src/lib/finance/pricing-v3/resources/summary.ts)), no el resultado completo.
+  `quote` incluye `replayDigest`; `prepare` no. El resultado completo existe sólo en el artefacto escrito con `--out`
+  (bajo `semantic.result`) y se lee con `explain`, que no cambia. `prepare|quote` del carril de catálogo y `calculate`
+  del kernel tampoco cambian.
+- `replay` de un artefacto de composición imprime `{ verified, calculationId, summary }`; los artefactos de snapshot y
+  de quote de catálogo conservan `{ verified, calculationId, result }`.
+- El resumen sólo cuenta, agrupa y formatea. `diagnostics` trae los bloqueos completos (no vacío implica `totals` nulo
+  y `needs_input`); `reviewSignals` agrupa todo diagnóstico de período por código y severidad con conteo, períodos,
+  líneas y rutas; `marginFloor.lines` lista las líneas que el kernel marcó bajo su piso; `toolSelections` separa
+  incluidas, aportadas por el cliente y excluidas con motivo, y sólo cuenta las no requeridas; `attributions`,
+  `creditBudgets`, `resourceIncrementalCash`, `cashLedger` y `cashMeaning` mantienen separados costo atribuido y caja.
+  `marginRateRoundedDown` es la tasa a 6 decimales redondeada hacia abajo; `totals.marginRate` conserva la exacta.
+- Medido en `managed-care.*` (`catalog.review-v3` + `resources.review-v5`): stdout de `compose quote` pasó de 196 KB a
+  unos 15 KB; con 12 períodos el resumen crece cerca de 1,5× y el resultado completo cerca de 8,8×.
+- Exit 1 reporta en stderr `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`. `code` sale
+  del [registro cerrado](../../../src/lib/finance/pricing-v3/errors.ts) de `PricingV3Error`, sin lista propia en la
+  CLI; el registro es la fuente y este documento no copia su lista ni su conteo. Un documento que no pasa su schema
+  sale como `SCHEMA_INVALID` con hasta 20 `{ path, rule }`. Los códigos de adaptador distinguen `INPUT_NOT_FOUND`,
+  `INPUT_NOT_JSON`, `OUTPUT_EXISTS`, `OUTPUT_NOT_WRITABLE` y `UNKNOWN_OPTION`; `MISSING_ARGUMENT`, `INVALID_ARGUMENT`
+  e `INVALID_FORMAT` nombran la opción cuando la falla es de una opción. `message` es estático: nunca aparece un valor,
+  una ruta de archivo ni el mensaje de un parser o validador. `ADAPTER_FAILURE` significa «caso sin clasificar en el
+  adaptador», no «fallo técnico». Antes, diez códigos que el dominio lanzaba salían como `ADAPTER_FAILURE`.
+- Un precio realmente acordado se pasa por el motor como el único ajuste de descuento del brief
+  (`brief.adjustments[]`, `kind: "discount"`, con `rate`, `lineIds` y `reason`); así el artefacto lleva el neto, el
+  margen y el veredicto de piso reales. Decisiones, alternativas descartadas y el primer caso:
+  [delta del ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-10--endurecimiento-de-la-cli-errores-tipados-resumen-derivado-y-veredicto-de-piso).
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
+Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
+ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
+día bajo `data/pricing/` (16) y en la carpeta del caso SKY (13). Los conteos de TASK-2022 siguen siendo la evidencia
+fechada de ese cierre; `verification.cli.json` registra sólo operación y código de salida, así que sigue vigente.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
 vigentes, medición de provisiones, policy comercial y términos reales siguen en
 [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json). Cambios salariales por periodo,

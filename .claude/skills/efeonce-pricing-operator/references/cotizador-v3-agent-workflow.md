@@ -56,10 +56,27 @@ asignación manual. `prepare` diagnostica; `quote` congela entradas y resultado.
 sin resolver para presentar un precio completo. `calculate` es el kernel de bajo nivel con snapshot explícito;
 `prepare|quote` fuera de `compose` sigue disponible para casos de catálogo sin composición avanzada.
 
+Salida en stdout: `compose prepare` y `compose quote` imprimen el mismo resumen derivado
+`pricing-v3-composition-summary/1` (`quote` añade `replayDigest`). El resultado completo existe **sólo** en el
+artefacto de `--out`: un `compose quote` sin `--out` no deja el detalle en ninguna parte, así que quote siempre lleva
+`--out`. `replay` de composición devuelve `{ verified, calculationId, summary }`; `explain` no cambió y es la vista
+de detalle (grande: pedirla sólo para un componente). `prepare|quote` de catálogo y `calculate` conservan su salida.
+
 Códigos: **0** operación técnica verificada, **2** `needs_input`, **3** preparado/calculado en revisión, **1** rechazo
 por input/conflicto/overwrite/export bloqueado. Replay de composición puede devolver3. Leer JSON y estado;
 no encadenar con `&&` asumiendo que una simulación calculada devuelve0. Salidas nuevas son archivos exclusivos
 `wx`, modo0600; no sobrescribir padres, fixtures o artifacts. `export` comercial continúa bloqueado.
+
+Rechazo (exit 1): stdout vacío y en stderr `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`.
+`code` sale del registro cerrado [`errors.ts`](../../../../src/lib/finance/pricing-v3/errors.ts) (grupos de dominio y
+de adaptador); `message` es texto fijo; `option` nombra la opción a corregir sin su valor; `issues` trae hasta 20
+`{ path, rule }` y no dice qué archivo. Nunca viaja un valor, una ruta ni un mensaje de parser: decidir por `code`.
+Adaptador: `UNKNOWN_COMMAND`, `UNKNOWN_OPTION`, `INVALID_ARGUMENT`, `MISSING_ARGUMENT`, `INVALID_FORMAT`,
+`INPUT_NOT_FOUND`, `INPUT_NOT_JSON`, `SCHEMA_INVALID`, `OUTPUT_EXISTS`, `OUTPUT_NOT_WRITABLE`. Los conflictos de dominio
+llegan con su código (`REPLAY_MISMATCH`, `CATALOG_BASE_CONFLICT`, `RESOURCE_BASE_CONFLICT`,
+`RESOURCE_PREVIEW_CONFLICT`…). `ADAPTER_FAILURE` significa falla sin clasificar —un hueco de la herramienta, no un
+error del pedido—: reportarla, no reintentar a ciegas. Arreglo por código en el
+[manual](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error).
 
 ## Contratos de selección y recursos
 
@@ -137,11 +154,14 @@ interno y preview agrega fee por periodo más implementación. No vende horas au
 entregables, aceptación, límites, responsabilidades, resultados garantizados o renovación del servicio.
 `assess` añade gaps por salario/coberturas, provisiones, acceso/capacidad, usuario, impuestos/entidad, alcance y
 aprobación. Siempre `requires_review`, `binding=false`. Sus40%/35% son propuestas **no aprobadas**; nunca sustituyen
-el piso vigente de una práctica (Creative Studio mantiene45% aprobado) ni decisiones por caso.
+el piso vigente de una práctica (Creative Studio mantiene45% aprobado) ni decisiones por caso. Además reporta el
+veredicto del kernel sobre el piso de la política: un gap `MARGIN_BELOW_POLICY_FLOOR` por línea marcada y
+`margin.policyFloor.linesBelowFloor`. `assess` nunca aprueba una excepción.
 
 `explain` usa el artefacto interno congelado y expone componentes/fuentes: no se entrega al cliente tal cual.
 `preview` es proyección allowlist JSON/Markdown sin stack de costos/márgenes/providers/IDs internos/país del talento;
-permanece simulación local no vinculante. Replay primero verifica digest y equivalencia con motor registrado;
+sus importes derivados conservan la escala de la moneda (CLP sin decimales).
+Permanece simulación local no vinculante. Replay primero verifica digest y equivalencia con motor registrado;
 ninguna de esas operaciones emite cotización, maker-checker, CRMwrite, factura, contrato o mensaje.
 
 Mantenimiento monetario usa change-set `add/replace/retire`, fuente/vigencia/actor/motivo, `baseDigest`,
@@ -185,19 +205,58 @@ Para un servicio que se dimensiona por volumen (social care, soporte, producció
 - Brechas abiertas en `operational-gaps.json`: provisiones sin medir, consumo sin medidor, bandeja sin contratar,
   setup no paramétrico, alcance del piso de 45 % y costos salariales localizados.
 
+## Resumen, piso y precio acordado (delta 2026-10-10)
+
+Campos del resumen y qué hacer con cada uno: manual,
+[«Leer el resumen»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#leer-el-resumen). Aquí
+sólo las reglas de lectura.
+
+- **Bloqueo o señal:** `diagnostics` son los bloqueos, completos; si no está vacío → `needs_input`, `totals: null`,
+  exit 2, sin precio. `reviewSignals[]` agrupa los diagnósticos de periodo por código y severidad; no bloquean
+  totales, pero cada código presente se explica. `reviewStatus` de la composición siempre es `requires_review`.
+- **Margen:** leerlo de `totals` / `marginRateRoundedDown` (6 decimales, hacia abajo). No recalcularlo a mano.
+- **Redondeo o incumplimiento real:** `marginFloor.lines[]` lista las líneas que el kernel marcó bajo el piso, con
+  `marginAmountShortOfFloor`. Con objetivo y mínimo ambos 0,45, costo y precio se redondean a pesos enteros por
+  separado y una línea al piso puede quedar bajo él por menos de un peso; el kernel la marca y nunca sube el precio.
+  Faltan fracciones de peso sin descuento = redondeo del precio al piso (en `managed-care.demand.json`, seis líneas
+  entre 0,1 y 0,5): decirlo, no tratarlo como excepción. Faltan miles de pesos = incumplimiento: requiere decisión.
+- **Registrar el precio acordado:** el precio real pasa por el motor o el artefacto congelado muestra el precio al
+  piso y el piso nunca se comprueba. En `brief`, único ajuste admitido:
+  `"adjustments": [{ "adjustmentId", "kind": "discount", "rate", "lineIds": [líneas del brief], "reason" }]`;
+  `reason` obligatorio. `rate = 1 − neto acordado ÷ totals.undiscountedPrice`, con decimales suficientes para caer en
+  el monto exacto; volver a correr y comprobar `totals.net`. Después `compose quote --out` nuevo + resumen + `assess`
+  junto al expediente. Pasos y JSON en el manual
+  ([«Registrar el precio acordado»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#registrar-el-precio-acordado)).
+- **Caso SKY social care 2027:** acordado CLP 4.990.000/mes sobre precio al piso 5.420.145 → tasa 0,0793605 → neto
+  exacto, margen 40,26 %, tres líneas marcadas, CLP 236.579/mes bajo el piso. Archivos `acordado.*` y
+  [nota de la excepción](../../../../docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+  `final.artifact.json` de ese expediente contiene el precio al piso, no el acordado.
+- **Quién decide:** el operador es CEO y dueño; márgenes, pisos, precios y excepciones al piso son su decisión. El
+  agente le lleva el margen real del motor y una recomendación, y registra la excepción con su motivo junto al
+  artefacto; no la aprueba ni la da por implícita. Confirmado 2026-10-10: el piso de 45 % sigue siendo la norma para
+  servicios gestionados de la práctica creativa; SKY es excepción por ser cliente vigente; la política queda 45/45.
+  No usar el precio de SKY como referencia de margen para otro cliente.
+- **Sin decidir** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)): regla que
+  redondee el precio hacia arriba (`FLOOR_PRICE_ROUNDS_UNDER_FLOOR`), ajuste que reciba el neto acordado
+  (`AGREED_PRICE_OUTSIDE_ENGINE`), alcance del piso fuera de la práctica creativa (`MARGIN_FLOOR_SCOPE`) y evidencia de
+  costos (salarios históricos, provisiones estimadas, consumo de agentes sin medir). No resolverlos en una cotización.
+- Sin cambio: aritmética del kernel, versión de motor, digests, códigos de salida, flags y escritura exclusiva.
+
 ## Mapa de implementación y evidencia reusable
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
 | Kernel puro, markup/margen, factores, coberturas, FX, rounding | `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` |
+| Registro cerrado de rechazos (dominio y adaptador) | `src/lib/finance/pricing-v3/errors.ts` |
 | Registros/brief/resolución/quote/explicación | `src/lib/finance/pricing-v3/catalog/{contracts,catalog,resolve,quote,explain}.ts` |
 | Demanda/policy y atribuciones | `src/lib/finance/pricing-v3/resources/{composition-contracts,composition}.ts` |
 | Packs/costo base/caja/caducidad | `src/lib/finance/pricing-v3/resources/credit-budget.ts` |
 | Discovery/scaffold/portfolio/plan | `src/lib/finance/pricing-v3/resources/operating.ts` |
 | Volumen → dedicación (`compose workload`) | `src/lib/finance/pricing-v3/resources/workload.ts` |
-| Gaps económicos y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
+| Resumen derivado (`compose prepare`, `compose quote`, `replay`) y líneas bajo el piso | `src/lib/finance/pricing-v3/resources/summary.ts` |
+| Gaps económicos, veredicto del piso por línea y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
 | Snapshots/digests/IO/mantenimiento local | `src/lib/finance/pricing-v3/adapters/{local-snapshot,catalog-local,resource-composition,resource-maintenance}.ts` |
-| Adapter CLI, flags, exit y escritura exclusiva | `scripts/commercial/pricing-v3.ts` |
+| Adapter CLI, flags, exit, clasificación de errores y escritura exclusiva | `scripts/commercial/pricing-v3.ts` |
 | Regresiones y negativos | `src/lib/finance/pricing-v3/__tests__/`, `pnpm pricing:v3:test` |
 
 Versionar y conservar originales: `data/pricing/v3-catalog/` y `v3-composition/` son fixtures previas; sucesores y

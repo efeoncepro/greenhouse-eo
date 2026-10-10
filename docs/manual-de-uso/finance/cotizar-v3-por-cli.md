@@ -35,7 +35,7 @@ pnpm --silent pricing:v3 export --input /tmp/v3-prueba.json --format json --out 
 pnpm --silent pricing:v3 compare --left /tmp/v3-prueba.json --right /tmp/v3-prueba.json
 ```
 
-Elegir nombres nuevos al repetir: archivos con `wx`, sin sobreescritura, permisos `0600`. `--out` es un artefacto local interno o borrador; no un ID remoto. JSON va a stdout; errores técnicos sanitizados a stderr. Para otra carpeta, invocar `node_modules/.bin/tsx` y el script con rutas absolutas del checkout; las rutas de inputs/outputs siguen el cwd del caller. El catálogo integrado se resuelve respecto del script.
+Elegir nombres nuevos al repetir: archivos con `wx`, sin sobreescritura, permisos `0600`. `--out` es un artefacto local interno o borrador; no un ID remoto. JSON va a stdout. Un rechazo sale con código 1, deja stdout vacío y escribe en stderr `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`: `code` pertenece al [registro cerrado](../../../src/lib/finance/pricing-v3/errors.ts), `message` es un texto fijo, `option` nombra la opción a corregir e `issues` trae `path` y `rule` del documento rechazado; nunca viaja un valor, una ruta de archivo ni el mensaje de un parser. Repetir un `--out` existente devuelve `OUTPUT_EXISTS` con `option: "out"`. Para otra carpeta, invocar `node_modules/.bin/tsx` y el script con rutas absolutas del checkout; las rutas de inputs/outputs siguen el cwd del caller. El catálogo integrado se resuelve respecto del script.
 
 Control independiente del fixture: humano mensual `1000 ×0,5 ×0,8=400`; herramientas/fee/Assurance/operación `100+50+25+25=200`. Precio humano `400 ×1,5 ×1,2=720`, otros `200 ×1,5=300`. Tres meses más setup `100 ×1,5`: 3210 USD; descuento 321, neto 2889, costo normalizado 1900 y margen 989. Caja atribuida 2800 porque la licencia anual se paga al inicio. Son números sintéticos; no una tarifa Colombia→Chile. Impuestos pendientes producen `tax=null`, `grandTotal=null`.
 
@@ -92,12 +92,14 @@ Los valores internos de componentes permanecen en `calculationCurrency` sin redo
 
 ## Estados y reproducción
 
-| Resultado                                     | Exit | Interpretación                                                  |
-| --------------------------------------------- | ---: | --------------------------------------------------------------- |
-| `calculated / within_policy`                  |    0 | Cálculo completo; puede preparar borrador local, sin aprobarlo  |
-| `needs_input` o `invalid`                     |    2 | Ver diagnósticos; sin precio/margen total ni líneas facturables |
-| `calculated / requires_review`                |    3 | Precio calculado retenido para revisión interna                 |
-| Fallo técnico/adaptador/exportación bloqueada |    1 | stderr sanitizado; no usar como resultado exitoso               |
+| Resultado                                                        | Exit | Interpretación                                                       |
+| ---------------------------------------------------------------- | ---: | -------------------------------------------------------------------- |
+| `calculated / within_policy`                                     |    0 | Cálculo completo; puede preparar borrador local, sin aprobarlo       |
+| `needs_input` o `invalid`                                        |    2 | Ver diagnósticos; sin precio/margen total ni líneas facturables      |
+| `calculated / requires_review`                                   |    3 | Precio calculado retenido para revisión interna                      |
+| Rechazo: argumentos, archivos, conflicto o exportación bloqueada |    1 | stdout vacío; `error.code` en stderr; no usar como resultado exitoso |
+
+Códigos de rechazo y su arreglo: [tabla del manual operativo](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error). En este carril, una solicitud `{ request, snapshot }` que no cumple el schema no es un rechazo: `calculate`/`validate` devuelven `invalid` con el diagnóstico `INVALID_INPUT` y código 2. `SCHEMA_INVALID` corresponde a un catálogo o una demanda de composición que no cumple su schema. `ADAPTER_FAILURE` ya no significa «revisa tus argumentos»: es una falla que la herramienta no clasificó y se reporta a quien la mantiene. Exportar un cálculo en revisión devuelve `EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY`.
 
 `validate` evalúa contrato y readiness usando el mismo núcleo, sin guardar archivo. `calculate --out` guarda también resultados incompletos semánticamente válidos para explicar los pendientes. Una entrada que no cumple el schema no genera artefacto. `explain` y `replay` verifican hash/versión/contenido y recalculan con el motor exacto disponible, sin catálogo actual. Una versión no soportada o una modificación devuelve `REPLAY_MISMATCH`. El timestamp queda fuera del digest.
 

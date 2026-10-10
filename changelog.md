@@ -9,6 +9,8 @@
 
 ## 2026-10-10 — Brochure de servicios web y Product Design 360 aprobados
 
+- Cotizador V3 local: la CLI reporta cada rechazo con su código desde un registro cerrado (`src/lib/finance/pricing-v3/errors.ts`), `compose prepare|quote` y `replay` imprimen un resumen derivado en vez del resultado completo, y `assess` informa las líneas que el motor marcó bajo el piso de su política. Sin cambios en kernel, códigos de salida ni artefactos congelados. [Delta del ADR](docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md). El precio acordado de SKY social care queda registrado como [excepción al piso de 45 %](docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+
 - Brochure [«Marketing de Contenidos»](ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md) (línea Brand, 57 láminas + ruta corta de 21) aprobado y canonizado: fuente del canvas, PDF rasterizado, patrón «franjas de foto» y láminas a mano registradas en la [norma §4.6](docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md); deltas 2026-10-10 en los modelos de [Social Media](docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md) y [Media & Distribution](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md), con las diferencias entre el deck y el modelo como decisiones abiertas.
 
 - [Product Design 360](docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md): aprobada entera por el operador; ADR `Accepted`, [modelo](docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) `Approved`, Wave con seis familias en portfolio, catálogo de servicios, context pack e índice de decisiones; G1–G6 pasan a validación posterior. Sin precios nuevos.

@@ -69,3 +69,28 @@ Evidencia de TASK-2022:135 tests V3 +78 V2 =213, y 26 smokes de `verification.cl
 cierre de implementación, no una corrida nueva por editar este README. Regenerar un caso usa una ruta nueva
 `wx`/0600 y el mismo snapshot. Compartir el artefacto interno a un cliente expone costo/margen/fuentes; usar
 únicamente proyección allowlist revisada, y nunca inferir autorización de envío desde un preview.
+
+## Delta 2026-10-10 — resumen, veredicto de piso y errores
+
+Decisión y alternativas en el [ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
+Ningún artefacto de esta carpeta se regeneró: kernel, versión del motor y digests no cambiaron, y todos siguen
+respondiendo `verified: true` a `pricing:v3 replay`.
+
+- `designer.assessment.json` y `service.assessment.json` son evidencia fechada del 2026-10-09 y no traen el campo
+  aditivo `margin.policyFloor`. `compose assess` hoy lo agrega; para estos dos artefactos sale con
+  `linesBelowFloor: []` (el kernel no marcó ninguna línea en ellos) y el resto del contenido es idéntico.
+- `verification.cli.json` registra sólo operación y código de salida; los códigos no cambiaron, así que sigue vigente.
+- `operational-gaps.json` suma `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE`, y actualiza
+  `MARGIN_FLOOR_SCOPE` (owner CEO; el piso de 45 % sigue siendo la norma y SKY social care 2027 es excepción aprobada).
+- `compose prepare|quote` sobre una demanda de esta carpeta imprime el resumen `pricing-v3-composition-summary/1`
+  (`diagnostics`, `reviewSignals`, `marginFloor`, `toolSelections`, atribuciones y caja); el detalle completo queda en
+  el artefacto de `--out`. `replay` de una composición responde `{ verified, calculationId, summary }`.
+- `compose assess` agrega una brecha `MARGIN_BELOW_POLICY_FLOOR` por línea que el kernel marcó. En `managed-care.*`
+  (`catalog.review-v3` + `resources.review-v5`) son las seis líneas, cortas por 0,1 a 0,5 CLP: objetivo y mínimo son
+  0,45 y costo y precio se redondean a CLP enteros por separado. `marginAmountShortOfFloor` separa ese redondeo de un
+  incumplimiento real; el kernel nunca sube el precio.
+- Un precio acordado se registra como el descuento del brief (`brief.adjustments[]`), no editando un artefacto. Primer
+  caso, fuera de esta carpeta:
+  [excepción SKY](../../../docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+- Los rechazos de la CLI salen por stderr con un `code` del registro `src/lib/finance/pricing-v3/errors.ts`
+  (`INPUT_NOT_FOUND`, `OUTPUT_EXISTS`, `SCHEMA_INVALID`…); `ADAPTER_FAILURE` significa caso sin clasificar.

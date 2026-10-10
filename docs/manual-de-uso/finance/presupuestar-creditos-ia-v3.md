@@ -28,7 +28,7 @@ Los ejemplos son hipotéticos. Request lleva schemaVersion, mode=simulation, acc
 - `totalBudgetCost` y `incrementalCash`: costo atribuido más compra vs pago nuevo. No son precio ni margen.
 - Resultado guarda catálogo/request/método; para reproducir, extraer sus dos inputs y llamar el mismo primitive/CLI. No usar `pricing:v3 replay` de quotes: éste no es artefacto de cotización ni tiene su checksum.
 
-Exit3=calculado con revisión; exit2=needs_input con diagnóstico, sin breakdown; exit1=argumento/adapter/schema inválido, error sanitizado. `--out` exige archivo nuevo y escribe0600; no sobrescribe.
+Exit3=calculado con revisión; exit2=needs_input con diagnóstico, sin breakdown; exit1=rechazo con `error.code` en stderr ([qué hacer con cada error](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error)). `--out` exige archivo nuevo y escribe0600; no sobrescribe.
 
 Diagnósticos: proveedor desconocido, capacidad disponible fuera del paquete, suscripción requerida, normales fuera de mes, compra antes de observación/precio vencido, créditos vencidos antes de uso, capacidad discreta/límite de estados. Corregir input/fecha o confirmar nuevo catálogo; no convertir falta en cero ni inventar paquete.
 

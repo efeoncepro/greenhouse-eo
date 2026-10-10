@@ -108,14 +108,18 @@ El estado de autorización comercial pertenece a un registro/proceso separado. E
 
 Cada diagnóstico contiene `code`, `fieldPath`, `lineId`/`periodId` cuando aplique, `severity`, `message` y `resolution` con dato requerido/opciones seguras. Mensajes internos y comerciales se generan desde proyecciones permitidas; la prosa no filtra datos excluidos.
 
-Códigos mínimos: `MISSING_COST`, `MISSING_TALENT_COUNTRY`, `MISSING_OFFER_MARKET`, `MISSING_FX`, `MISSING_POLICY`, `AMBIGUOUS_PROFILE`, `STALE_SOURCE`, `INVALID_UNIT`, `CONFLICTING_DEDICATION`, `DUPLICATE_COVERAGE`, `POLICY_CYCLE`, `UNSUPPORTED_SCHEMA`, `MARGIN_BELOW_FLOOR`, `REPLAY_MISMATCH` y `ADAPTER_FAILURE`.
+Códigos mínimos de diagnóstico de resultado: `MISSING_COST`, `MISSING_TALENT_COUNTRY`, `MISSING_OFFER_MARKET`, `MISSING_FX`, `MISSING_POLICY`, `AMBIGUOUS_PROFILE`, `STALE_SOURCE`, `INVALID_UNIT`, `CONFLICTING_DEDICATION`, `DUPLICATE_COVERAGE`, `POLICY_CYCLE`, `UNSUPPORTED_SCHEMA` y `MARGIN_BELOW_FLOOR`.
 
-| CLI propuesta                          | Código de salida | Canal                                                                   |
-| -------------------------------------- | ---------------- | ----------------------------------------------------------------------- |
-| Cálculo completo dentro de política    | 0                | Envelope JSON en stdout                                                 |
-| Solicitud incompleta o inválida        | 2                | Envelope estructurado en stdout; stderr reservado a diagnóstico técnico |
-| Cálculo completo que requiere revisión | 3                | Envelope JSON con razones en stdout                                     |
-| Fallo técnico                          | 1                | Error técnico sanitizado en stderr; sin resultado exitoso               |
+Los rechazos son otra familia y no viajan en el envelope (delta 2026-10-10). Cada uno es un `PricingV3Error` con un código del [registro cerrado](../../../src/lib/finance/pricing-v3/errors.ts), en dos grupos: dominio —por ejemplo `REPLAY_MISMATCH` y los conflictos de mantenimiento— y adaptador —`INPUT_NOT_FOUND`, `INPUT_NOT_JSON`, `OUTPUT_EXISTS`, `OUTPUT_NOT_WRITABLE`, `UNKNOWN_OPTION`, `SCHEMA_INVALID`, `MISSING_ARGUMENT`, `INVALID_ARGUMENT`, `INVALID_FORMAT`, entre otros—. El registro es la fuente de la lista; este documento no la reproduce ni la cuenta. `ADAPTER_FAILURE` queda fuera del registro: se reporta sólo para un caso que nadie clasificó y señala un caso faltante en el adaptador, no un «fallo técnico» genérico ni un error de quien llama.
+
+| CLI propuesta                                                                     | Código de salida | Canal                                                                                                         |
+| --------------------------------------------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------- |
+| Cálculo completo dentro de política                                               | 0                | Envelope JSON en stdout                                                                                       |
+| Solicitud incompleta o inválida                                                   | 2                | Envelope estructurado en stdout; stderr reservado al reporte de rechazo                                       |
+| Cálculo completo que requiere revisión                                            | 3                | Envelope JSON con razones en stdout                                                                           |
+| Rechazo: argumentos, archivos, schema, conflicto de dominio o caso sin clasificar | 1                | `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }` en stderr; sin resultado exitoso |
+
+`message` es estático. `option` nombra la opción a corregir, sin su valor; `issues` trae hasta 20 pares `{ path, rule }` cuando un documento no pasa su schema. El reporte nunca contiene un valor, una ruta de archivo ni el mensaje de un parser o validador. En el flujo local, un documento que no pasa el schema estricto de un adaptador (brief, demanda, policy, catálogo o artefacto) es un rechazo `SCHEMA_INVALID` con código 1; el estado `invalid` del envelope del kernel conserva el código 2.
 
 El agente inspecciona el envelope incluso con códigos 2/3. Logs y progreso nunca se mezclan con JSON stdout. El transporte API/MCP mapea los mismos estados a su envelope gobernado; estos códigos CLI no imponen códigos HTTP.
 

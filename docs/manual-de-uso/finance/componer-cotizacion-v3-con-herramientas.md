@@ -51,6 +51,11 @@ Los comandos quote/prepare legacy siguen usando sus propios formatos; no reciben
 
 ## Leer el desglose
 
+Desde el 2026-10-10 `compose prepare` y `compose quote` imprimen un resumen agrupado
+([Leer el resumen](operar-cotizador-v3-con-agentes.md#leer-el-resumen)). Las filas completas que describe esta
+sección están en el artefacto que escribe `--out` y en `explain`; un rechazo (exit 1) llega con `error.code`
+([qué hacer con cada error](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error)).
+
 `selections`: incluido/omitido, línea, mes y razón. `attributions`: plan/precio elegido, fuente, unidad,
 usuarios, cantidad, driver, costo mensual total de las unidades seleccionadas, cuota del trabajo y parte no
 asignada; cada función conserva share/costo. La suma de funciones reconcilia con la cuota, no por nombre de

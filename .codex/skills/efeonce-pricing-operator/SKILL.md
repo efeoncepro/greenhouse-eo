@@ -152,7 +152,14 @@ canónicas y comandos exactos; leerla antes de completar demanda o actualizar pr
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
 `compose prepare|quote` → `explain|replay` → `compose assess|preview`. El sucesor operativo es opt-in;
 no cambiar defaults ni sobrescribir artifacts. Exit0=técnico,2=faltante,3=revisión,1=rechazo.
+`compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
+el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo
+deja stdout vacío y trae en stderr `error.code` de un registro cerrado, con `option`/`issues` para ubicar el
+arreglo; `ADAPTER_FAILURE` es una falla sin clasificar de la herramienta, no del pedido.
 Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
 validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
-no sustituyen pisos de práctica aprobados. Mantener la frontera de
+no sustituyen pisos de práctica aprobados. El precio que se acuerda se registra en la demanda como el
+descuento del brief, con motivo, y se vuelve a correr: el margen real y el veredicto del piso salen del motor.
+Faltar fracciones de peso al piso es redondeo; faltar miles es una excepción que decide el operador (CEO),
+nunca el agente. Mantener la frontera de
 [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

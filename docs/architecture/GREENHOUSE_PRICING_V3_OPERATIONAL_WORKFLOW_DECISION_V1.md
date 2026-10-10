@@ -21,6 +21,8 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 | Presupuesto discreto de créditos y caducidad | `resources/credit-budget.ts` |
 | Discovery, scaffold, portfolio y plan | `resources/operating.ts` |
 | Preparación comercial y preview allowlisted | `resources/readiness.ts` |
+| Resumen derivado de una composición y líneas que el kernel marcó bajo su piso | `resources/summary.ts` |
+| Registro cerrado de rechazos (dominio y adaptador) y el único detalle que pueden llevar | `errors.ts` |
 | Digests, artefactos, replay y mantenimiento local | `adapters/`; filesystem y hashing fuera de la aritmética |
 | Primer consumer local | `scripts/commercial/pricing-v3.ts` |
 
@@ -189,6 +191,130 @@ el motor** (el margen mínimo sale de la política; las herramientas excluidas, 
 **No decidido a propósito.** Setup paramétrico (hoy se cotiza fuera del kit); costos salariales localizados (siguen en
 `operational-gaps.json`); medición del consumo de agentes; si el piso de 45 % rige igual para toda oferta gestionada
 fuera de la práctica creativa; y la promoción de todo esto al canon de cotizaciones.
+
+## Delta 2026-10-10 — endurecimiento de la CLI: errores tipados, resumen derivado y veredicto de piso
+
+**Decisión.** Tres contratos salen del adaptador CLI y pasan al dominio, para que el próximo consumidor (API, MCP o
+UI) los reutilice en vez de redefinirlos. No cambian la aritmética del kernel, `ENGINE_VERSION`, los digests, los
+códigos de salida 0/2/3/1, los flags ni el escritor exclusivo `wx`/0600.
+
+1. **Rechazos tipados** ([`errors.ts`](../../src/lib/finance/pricing-v3/errors.ts)). Todo rechazo es un
+   `PricingV3Error` con un código de un registro cerrado en dos grupos: dominio (contenido de pricing) y adaptador
+   (argumentos, archivos, formatos). La CLI ya no mantiene lista propia: reporta el código de cualquier
+   `PricingV3Error`; un `ZodError` sale como `SCHEMA_INVALID` con hasta 20 pares `{ path, rule }`; lo que nadie
+   clasificó sale como `ADAPTER_FAILURE`, que deja de significar «fallo técnico» y pasa a significar «caso que el
+   adaptador no clasificó». Forma en stderr, con exit 1:
+   `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`. `message` es estático. El reporte
+   nombra la opción o la ruta del campo; nunca un valor, una ruta de archivo ni el mensaje de un parser o validador.
+   Los resultados con diagnósticos (`MISSING_COST`, `MARGIN_BELOW_FLOOR`…) no son rechazos y no viven en el registro.
+   Motivo: la lista a mano había derivado. Diez códigos que el dominio lanzaba salían como `ADAPTER_FAILURE` (entre
+   ellos `RESOURCE_BASE_CONFLICT`, `RESOURCE_PREVIEW_CONFLICT` y `RESOURCE_SOURCE_RECONFIRMATION_REQUIRED`) y dos
+   códigos listados no se lanzaban nunca. Una regla ESLint acotada (`no-restricted-syntax` en `eslint.config.mjs`)
+   prohíbe lanzar un `Error` suelto en `src/lib/finance/pricing-v3/**` (tests excluidos) y en el script de la CLI.
+2. **Resumen derivado** ([`resources/summary.ts`](../../src/lib/finance/pricing-v3/resources/summary.ts), contrato
+   `pricing-v3-composition-summary/1`). `compose prepare` y `compose quote` imprimen `summarizeComposition` en stdout
+   (`quote` incluye `replayDigest`; `prepare` no, porque no congela nada para replay); `replay` de un artefacto de
+   composición imprime `{ verified, calculationId, summary }`. El resultado completo existe sólo en el artefacto que
+   escribe `--out`. `explain` no cambia: es la vista de detalle. Tampoco cambian `prepare|quote` del carril de
+   catálogo ni `calculate` del kernel. El resumen no decide nada: cuenta, agrupa y formatea el resultado congelado.
+   - `diagnostics`: los bloqueos, completos. Lista no vacía implica `totals` nulo y `needs_input`.
+   - `reviewSignals`: todo diagnóstico de período agrupado por código y severidad, con conteo, períodos, líneas y
+     rutas. Una señal de revisión nunca anula totales.
+   - `marginFloor.lines`: las líneas que el kernel marcó `MARGIN_BELOW_FLOOR`, con `marginRateRoundedDown` y
+     `marginAmountShortOfFloor`.
+   - `toolSelections` (incluidas, aportadas por el cliente, excluidas con motivo, más conteos), `attributions`,
+     `creditBudgets`, `resourceIncrementalCash`, `cashLedger` y `cashMeaning`.
+3. **Veredicto de piso en `compose assess`.** `assessCompositionReadiness` agrega una brecha
+   `MARGIN_BELOW_POLICY_FLOOR` por cada línea que el kernel marcó y el campo `margin.policyFloor.linesBelowFloor`. No
+   repite la comparación: el kernel es el único dueño del control de piso. `proposedTarget` 0,40 y `proposedFloor`
+   0,35 siguen igual, como propuestas genéricas sin aprobar.
+4. **Escala de moneda en `compose preview`.** En `managed_service` los importes derivados usaban dos decimales fijos;
+   ahora conservan la escala con la que el kernel formateó el período (CLP mostraba `9508946.00` en la línea y
+   `9508946` en el total).
+5. **Precio acordado por el motor.** Un precio que el operador acuerda de verdad entra como el ajuste de descuento
+   del brief (`brief.adjustments[]`: a lo más uno, `kind: "discount"`, `rate`, `lineIds`, `reason`), para que el
+   artefacto congelado lleve el neto, el margen y el veredicto de piso reales. Primer caso: social care de SKY 2027,
+   CLP 4.990.000 al mes acordados → tasa 0,0793605 sobre el precio al piso de 5.420.145 → neto exacto de 4.990.000,
+   margen 40,26 %, tres líneas marcadas y CLP 236.579 al mes de margen faltante para llegar al piso
+   ([registro de la excepción](../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md)).
+
+**Comportamiento conocido que no se cambia.** `creative-managed-service` tiene margen objetivo 0,45 y mínimo 0,45.
+Costo y precio se redondean a CLP enteros por separado, así que una línea cotizada exactamente al piso puede quedar
+bajo él por menos de 1 CLP, y el kernel la marca, como dice su contrato: nunca sube el precio. En el ejemplo
+`managed-care.*` las seis líneas quedan cortas por 0,1 a 0,5 CLP. `marginAmountShortOfFloor` es lo que separa esa
+brecha de redondeo de un incumplimiento real (en el caso SKY, entre unos 24 mil y 175 mil CLP por línea).
+
+**Decisión comercial del operador (CEO, 2026-10-10).** El piso de 45 % sigue siendo la norma para servicios
+gestionados de la práctica creativa; el social care de SKY es una excepción aprobada por ser cliente vigente; la
+política de precio queda 45/45. Las cifras comerciales y las excepciones al piso las decide él.
+
+**Alternativas descartadas.**
+
+- *Cambiar el redondeo del kernel o la comparación de piso.* El kernel cumple su contrato escrito. Replay recalcula
+  con el motor actual y sólo acepta la versión actual del motor: tocar el kernel rompería el replay de todo artefacto
+  congelado. Requiere versión nueva del motor más replay multi-versión, es decir, un ADR propio.
+- *Subir los diagnósticos de período a `quote.diagnostics`.* Esa lista es de carga: cuando no está vacía,
+  `catalog/quote.ts` anula los totales y deja `needs_input`. Una señal de revisión bloquearía el cálculo.
+- *Cambiar el exit 3 a 0.* El exit distinto de cero es una compuerta fail-closed contra encadenar `quote && enviar`,
+  y está fijado en pruebas, manuales y las dos skills.
+- *Refactor de la CLI a una tabla de comandos.* Diferido: las allowlists de flags son un control de seguridad y el
+  adaptador CLI es desechable cuando existan los adaptadores canónicos.
+- *Subir el margen objetivo a 50 %.* Retirada: se apoyaba en una analogía con la propuesta 40/35 sin aprobar y
+  contradecía el único caso real.
+
+**Cuatro pilares.**
+
+- *Seguridad:* el reporte de error no puede citar contenido por construcción: el detalle admite sólo `option` e
+  `issues`. Una opción desconocida se repite sólo si tiene forma de nombre de flag. El exit 3 sigue impidiendo
+  encadenar un envío. Un resumen o un `assess` nunca aprueban: `binding=false` y `requires_review` se conservan.
+- *Robustez:* un código que no está en el registro no compila, de modo que registro y sitios de lanzamiento no pueden
+  derivar; la regla de lint cubre el `Error` suelto. El veredicto de piso tiene un solo dueño (el kernel) y dos
+  lectores (`summary` y `assess`) que comparten `linesBelowPolicyFloor`.
+- *Resiliencia:* nada se regeneró. Resumen y `assess` leen el resultado congelado sin alterarlo ni su digest, y los
+  artefactos previos siguen reproduciéndose. Volver atrás es revertir el adaptador; no hay dato que migrar.
+- *Escalabilidad:* el resumen agrupa por período en vez de repetir. En el ejemplo `managed-care.*` stdout pasó de
+  196 KB a unos 15 KB; con 12 períodos el resumen crece cerca de 1,5× y el resultado completo cerca de 8,8×.
+
+**Prueba del segundo consumidor.** `summarizeComposition` ya tiene tres llamadores (`compose prepare`,
+`compose quote` y `replay`) y `linesBelowPolicyFloor` dos (`summary` y `assess`). `pricing-v3-cli-summary.test.ts`
+exige que el stdout de la CLI sea exactamente el resumen que el dominio produce sobre el artefacto congelado;
+`pricing-v3-summary.test.ts` deriva las líneas esperadas de los diagnósticos del kernel, no de literales, y comprueba
+que sin el diagnóstico del kernel los mismos importes no reportan nada; `pricing-v3-errors.test.ts` ejercita los
+rechazos desde la CLI y verifica que no lleven contenido.
+
+**Reglas duras.**
+
+- **NUNCA** lanzar un `Error` suelto en el dominio V3 ni en su CLI: se lanza `PricingV3Error` con un código del
+  registro. Un rechazo nuevo se agrega primero a `errors.ts`.
+- **NUNCA** mantener en un consumidor una lista propia de códigos ni copiar el conteo del registro en documentos: la
+  fuente es `errors.ts`.
+- **NUNCA** poner en un reporte de error un valor, una ruta de archivo o el mensaje de un parser o validador.
+- **NUNCA** leer `ADAPTER_FAILURE` como error del usuario: es un caso que falta clasificar en el adaptador.
+- **NUNCA** recalcular el piso fuera del kernel ni decidir algo en el resumen: `summary` y `assess` sólo leen
+  `MARGIN_BELOW_FLOOR`.
+- **NUNCA** tratar el exit 3 como fallo ni encadenar pasos suponiendo exit 0.
+- **NUNCA** registrar un precio acordado sólo en prosa o en un documento aparte: sin pasar por el motor, el artefacto
+  conserva el precio al piso y un margen que no es el real.
+- **SIEMPRE** leer `marginAmountShortOfFloor` antes de calificar una línea marcada: menos de una unidad mínima de la
+  moneda es redondeo; más es una decisión de precio que necesita dueño.
+- **SIEMPRE** pasar el precio acordado como el descuento del brief, con su motivo, y conservar el artefacto resultante
+  junto a la decisión de excepción cuando cruce el piso.
+- **SIEMPRE** tomar el detalle completo del artefacto escrito con `--out` o de `explain`; el stdout de
+  `compose prepare|quote` ya no lo trae.
+
+**No decidido a propósito.** Una regla de redondeo comercial hacia arriba o un ajuste que reciba directamente el neto
+acordado (ambos son cambios de motor; hoy la tasa se calcula a mano con decimales suficientes); si el piso de 45 %
+rige para servicios gestionados fuera de la práctica creativa; y la evidencia de costo (sueldos históricos,
+provisiones estimadas, consumo de agentes sin medir). El ledger
+[operational-gaps.json](../../data/pricing/v3-operating/operational-gaps.json) registra los dos primeros como
+`FLOOR_PRICE_ROUNDS_UNDER_FLOOR`, `AGREED_PRICE_OUTSIDE_ENGINE` y `MARGIN_FLOOR_SCOPE`; la evidencia de costo conserva
+sus entradas anteriores (`LOCALIZED_TALENT_COSTS`, `MANAGED_SERVICE_PROVISIONS_UNMEASURED`,
+`AGENT_RUNTIME_USAGE_UNMETERED`). `designer.assessment.json` y `service.assessment.json` son evidencia fechada del
+2026-10-09 y no traen el campo aditivo `margin.policyFloor`; no se regeneraron.
+
+**Verificación (2026-10-10, local).** `pnpm pricing:v3:test`: 9 archivos y 179 pruebas; ESLint limpio en el módulo,
+el script y la configuración; `pnpm typecheck` limpio; `pricing:v3 replay` con `verified: true` sobre cada
+`*.artifact.json` presente bajo `data/pricing/` y en la carpeta del caso SKY. Esta evidencia es local.
 
 ## Evidencia y rutas de operación
 
