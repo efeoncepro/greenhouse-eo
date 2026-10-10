@@ -93,7 +93,7 @@ Cada etapa cierra con una decisión explícita antes de pasar a la siguiente.
 
 1. Confirmar cómo está configurada la captura de correo e incluir a los usuarios chilenos del piloto.
 2. Instalar el conector de Aircall, primero en ambiente de pruebas y luego en producción, con permisos asignados solo al grupo piloto.
-3. Autorizar la integración de WhatsApp: acceso por API con un usuario de integración que solo puede crear actividades.
+3. Autorizar la integración de WhatsApp: acceso por API con un usuario de integración de permisos mínimos: leer contactos y cuentas para asociar el mensaje, y crear actividades.
 4. Agregar un valor "WhatsApp" en el tipo de actividad.
 5. Crear un tipo de informe de cuentas con y sin actividades, y una carpeta compartida para los informes.
 
@@ -188,7 +188,7 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 - **Seguridad:** SGS debe aprobar a Aircall como proveedor antes de la etapa 2.
 - **Gobierno:** sin aprobación regional no hay etapa 3. Las etapas 1 y 2 conservan su valor aunque la 3 se demore.
 - **Cuenta de Meta:** WhatsApp de empresa requiere una cuenta de SGS verificada y una persona con permisos sobre ella para dar de alta cada número; puede depender de un área global.
-- **Integración de WhatsApp:** es un desarrollo a medida y la región puede revisarlo con más detalle que un paquete publicado. Por eso su acceso se limita a crear actividades.
+- **Integración de WhatsApp:** es un desarrollo a medida y la región puede revisarlo con más detalle que un paquete publicado. Por eso su acceso se limita a leer contactos y crear actividades.
 
 ### 15. Próximos pasos
 
