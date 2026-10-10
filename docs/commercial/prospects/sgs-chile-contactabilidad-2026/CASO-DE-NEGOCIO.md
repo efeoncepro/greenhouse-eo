@@ -1,10 +1,10 @@
 # Caso de negocio · Contactabilidad comercial en Salesforce · SGS Chile
 
-**Versión:** 2 (borrador de trabajo) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
+**Versión:** 3 (borrador de trabajo) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
 
 **Estado:** borrador para iterar con Bárbara Quiroga y José Pedro De Oliveira antes de llevarlo a la región. No enviado. Sin honorarios ni fechas comprometidas.
 
-**Cambio respecto de la versión 1:** la solución se diseña sobre Aircall para llamadas y WhatsApp, con Salesforce como registro. Los dos caminos genéricos de la versión 1 pasan a ser una arquitectura recomendada y una alternativa.
+**Cambios:** la versión 2 diseñó la solución sobre Aircall para llamadas y WhatsApp, con Salesforce como registro. La versión 3 fija el objetivo como trazabilidad completa de la relación con el cliente, con dos vistas: la de gestión comercial y la de quien lleva la cuenta.
 
 Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Parte B** son notas internas de Efeonce y no se entrega.
 
@@ -14,7 +14,9 @@ Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Pa
 
 ### 1. Qué se pide decidir
 
-Autorizar un piloto acotado en Chile para que los contactos comerciales por correo, llamada y WhatsApp queden registrados en Salesforce sin trabajo manual del vendedor, y para que la jefatura comercial pueda ver cuántas veces se intentó contactar a cada cliente, por qué canal y con qué resultado.
+Autorizar un piloto acotado en Chile para que SGS tenga trazabilidad completa de la relación con cada cliente: que todo contacto por correo, llamada, WhatsApp y reunión quede registrado en Salesforce sin trabajo manual, en un solo historial por cliente.
+
+Esa trazabilidad sirve a dos personas distintas. Quien lleva la cuenta ve todo lo conversado con su cliente, en orden. La jefatura comercial ve cuántas veces se intentó contactar a cada cliente, por qué canal y con qué resultado.
 
 El piloto se habilita solo para un grupo de usuarios de Chile. No cambia la experiencia del resto de los países ni la configuración común de la región. Efeonce diseña, construye, habilita y opera la solución bajo el gobierno del equipo regional de Salesforce.
 
@@ -34,7 +36,7 @@ Esta necesidad ya se había levantado antes desde otra unidad de negocio de SGS 
 
 ### 3. Alcance del caso
 
-**Incluye:** registro automático de correo, llamadas y WhatsApp; asociación de cada contacto a la cuenta, la persona y la oportunidad; un informe de intentos de contacto por cliente y por canal; habilitación del equipo que lo usa.
+**Incluye:** registro automático de correo, llamadas, WhatsApp y reuniones; asociación de cada contacto a la cuenta, la persona y la oportunidad; el historial completo en la ficha de cada cliente; un informe de intentos de contacto por cliente y por canal; habilitación del equipo que lo usa.
 
 **No incluye:** agentes de inteligencia artificial, campañas de marketing, rediseño del modelo de datos, ni despliegue en otros países durante el piloto.
 
@@ -57,6 +59,13 @@ Una sola herramienta de comunicación, Aircall, para llamadas y WhatsApp, conect
 | Informe de contactabilidad | La jefatura lo consulta en Salesforce | Intentos por cliente, por canal y por resultado, y clientes sin contacto en el período |
 
 Que las llamadas no contestadas también se registren es lo que permite contar intentos, no solo conversaciones.
+
+**Dos vistas de la misma trazabilidad:**
+
+- **Vista de cuenta**, para quien conversa con el cliente todo el día: la ficha del cliente muestra en un solo historial los correos, las llamadas, los mensajes y las reuniones, con fecha y responsable. Nadie tiene que anotar nada.
+- **Vista de gestión**, para excelencia comercial y las jefaturas: intentos por cliente, canal y resultado; clientes sin contacto en el período; cobertura por equipo.
+
+Las dos vistas leen los mismos registros. Lo que ve la jefatura es exactamente lo que ocurrió en las cuentas.
 
 ### 6. Cómo se llega: dos pasos
 
@@ -158,6 +167,12 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 
 En la reunión se dijo que llamadas y WhatsApp están "de forma nativa" en Salesforce y que el vendedor "no tiene que salirse de su teléfono" (minuto 19:30). Solo con Salesforce no se sostiene: el marcador clásico no opera en Chile y está en retiro, Salesforce Voice es de escritorio y la mensajería nativa no captura el WhatsApp personal. Con Aircall la promesa de fondo sí se cumple: el vendedor trabaja desde su celular y el registro ocurre solo. El texto para SGS presenta la solución sin aludir a la reunión.
 
+### B1b. Objetivo según Julio (2026-10-10)
+
+Que Bárbara tenga toda la trazabilidad, igual que José Pedro. Lo interpreto así: los dos deben quedar servidos, cada uno en su vista. José Pedro pidió en la reunión lo que tenía en HubSpot: que su correo con clientes quede registrado solo (21:22–22:00). Bárbara pidió el seguimiento de llamadas y WhatsApp (19:05–19:21). Si la frase quería decir otra cosa, por ejemplo que Bárbara vea lo mismo que ve José Pedro en sus cuentas, la sección 5 también lo cubre.
+
+Consecuencia para el plan: la vista de cuenta de José Pedro depende sobre todo del correo, y el correo depende de la configuración de Salesforce. Primera verificación con la región: si la captura de correo ya está activa y José Pedro solo necesita conectar su cuenta, o si hay que habilitarla.
+
 ### B2. Por qué este diseño lleva a que Efeonce construya
 
 - El paso 1 no depende de la región: podemos empezar con una decisión de SGS Chile.
@@ -185,7 +200,19 @@ Preguntas para Bárbara:
 - **Formato de entrega:** documento membretado o láminas, por decidir.
 - **Ricardo Valenzuela:** sin correo verificado; no recibió la minuta.
 
-### B4. Por confirmar en la demostración
+### B4. Disponibilidad de WhatsApp en Aircall para Chile
+
+Julio planteó el 2026-10-10 que Aircall no tendría WhatsApp para Latinoamérica. La documentación pública no muestra esa exclusión, pero tampoco confirma el caso de Chile:
+
+- El [centro de ayuda](https://support.aircall.io/en-gb/articles/26482846047901) dice que está disponible en todas las geografías, que todos los números de Aircall son elegibles y que se pueden conectar números externos.
+- La [página de producto](https://aircall.io/es/products/whatsapp-in-aircall/) lo limita a los números de Aircall de los países de su [lista de cobertura](https://aircall.io/countries/). Esa lista incluye Chile, México, Colombia y Perú; Brasil y Argentina no aparecen.
+- Ninguna página nombra a Chile de forma expresa para WhatsApp, y no hay matriz por país.
+
+Estado: sin exclusión encontrada, sin confirmación positiva. Se resuelve con una pregunta directa al contacto de partners de Aircall: si un número chileno comprado en Aircall puede activar el complemento de WhatsApp, y si una cuenta facturada en Chile puede contratarlo.
+
+Si la respuesta es no, el diseño se mantiene para llamadas y WhatsApp cambia de pieza: un proveedor de WhatsApp para empresas con conector a Salesforce, o la mensajería nativa de Salesforce. En ambos casos WhatsApp deja de poder empezar en el paso 1 y pasa a depender de la región.
+
+### B4b. Por confirmar en la demostración
 
 - Que las llamadas hechas desde la aplicación móvil de Aircall se registren igual que las del computador. La documentación dice que se registra "cada llamada hecha o recibida con Aircall", sin distinguir el dispositivo.
 - En qué objeto de Salesforce quedan los mensajes de WhatsApp y si entran en los informes estándar. La documentación solo dice que se registran.
