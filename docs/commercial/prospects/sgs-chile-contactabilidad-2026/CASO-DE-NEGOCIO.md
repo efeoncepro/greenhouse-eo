@@ -6,6 +6,8 @@
 
 **Cambios:** la versión 2 diseñó la solución sobre Aircall para llamadas y WhatsApp, con Salesforce como registro. La versión 3 fija el objetivo como trazabilidad completa de la relación con el cliente, con dos vistas: la de gestión comercial y la de quien lleva la cuenta.
 
+**En revisión (2026-10-10):** las secciones 5 a 8 de la Parte A describen la solución solo sobre Aircall y quedaron superadas por la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md). Dos correcciones de hecho pendientes de incorporar: Aircall no ofrece números móviles chilenos, solo fijos, nacionales y 800; y existe una variante que conserva el número y el WhatsApp del ejecutivo. No enviar esta versión; se reescribe cuando SGS responda la pregunta del número de empresa.
+
 Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Parte B** son notas internas de Efeonce y no se entrega.
 
 ---
