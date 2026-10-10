@@ -3,6 +3,7 @@
 > **Estado:** `hypothesis_only` — bandas internas de validación; no son tarifario público ni autorización de venta
 > **Owner:** Strategy + Commercial + Finance + Media & Distribution
 > **Versión:** V1 · 2026-09-10 · **Revisión:** después del primer piloto de cada motion
+> **Último delta:** 2026-10-10 — paid social en el deck «Marketing de Contenidos» (§13); sin cambio de bandas ni de veredicto
 > **Moneda de referencia:** USD; cotizar en moneda del contrato con snapshot FX aprobado (referencia de cálculo:
 > USD 1 = CLP 925,97, dólar observado 2026-09-10)
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
@@ -211,3 +212,49 @@ operations_review: pending
 
 **Verdict:** `hypothesis_only`. Pasa a `approved_for_validation` cuando Finance confirme el costo del Performance Lead,
 el overhead real y el piso de margen, y resuelva `EFG-003`.
+
+## 13. Delta 2026-10-10 — paid social en el deck «Marketing de Contenidos» (sin cambio de bandas)
+
+El operador aprobó el 2026-10-10 el deck comercial «Marketing de Contenidos» y pidió incorporar su contenido al modelo
+de negocio (cita y alcance en la [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md),
+sección «Paid social en el plan de contenidos»). Un precio no queda aprobado por aparecer en un deck: este delta **no
+cambia ninguna banda, piso, escala ni condición de pago**, y el veredicto sigue `hypothesis_only`.
+
+### 13.1 Lectura del «Cómo se compra» del deck
+
+| Línea del deck | Regla vigente de este pack | Coincide |
+|---|---|---|
+| Fee Efeonce · «fijo, por capacidad» | §1 y §3: fee por nivel de complejidad; métrica de valor = capacidad gobernada | sí, como default. El híbrido porcentual de la §5 sigue existiendo como alternativa contractual con piso (DA-03) |
+| Whitelisting y medios · «línea propia» | §1 y §9: la inversión en medios es pass-through y la paga el cliente a la plataforma. La licencia de whitelisting no es de este pack: es un costo de creadores | sí |
+| Comisión por resultado · «sólo si se acuerda» | §6: bono por pipeline, opcional, hasta 15% del fee base, sólo en el motion B, con baseline y definiciones de etapa firmadas. §8: no se ofrece performance-only | parcial: el acuerdo es necesario, no suficiente (DA-04) |
+| Derechos y uso pagado · «línea propia» | fuera de este pack; `excluded: derechos` en la §12 | sí |
+
+### 13.2 Cómo se cotiza hoy el «paid social» del plan de contenidos
+
+No existe una unidad de cobro llamada «paid social». Mientras no se decida otra cosa (DA-01):
+
+- se cotiza con el nivel de Managed Performance que corresponda a su complejidad, con su piso y su mínimo de tres
+  meses, o con Diagnostic y Sprint;
+- el «sprint de prueba» del deck no tiene banda propia: las bandas de Sprint de la §3 corresponden a 10 semanas de
+  remediación de señal y takeover de cuentas, que es un alcance mayor que «un frente acotado» (DA-05);
+- una lane más liviana, sólo para amplificar contenido, **no tiene costo medido ni precio**. Crearla exige costeo de
+  Finance con equipo, horas y piso propios; no se deriva recortando el nivel 1.
+
+### 13.3 Lo incorporado que no tiene precio en este pack
+
+- «Lo orgánico prueba, la pauta escala»: la lectura del orgánico y la selección de piezas consumen horas que el
+  cost-to-serve de la §3 no contempla. Se miden en el primer caso antes de asumir que caben en el nivel;
+- UGC patrocinado: sobre la misma amplificación pueden coincidir el fee de governance de Amplification & Whitelisting
+  (pack de creadores) y el fee por nivel de este pack. Falta la regla de no doble cobro entre ambos packs (DA-06);
+- Thought Leader Ads en LinkedIn: cuenta como parte del canal LinkedIn para el nivel; sin evidencia de costo;
+- social commerce y live shopping: sin banda. La operación de tienda, catálogo y checkout no es de este pack;
+- origen por red, pieza y creador en el CRM: la integración se cotiza en RevOps & CRM, como en la §6.
+
+### 13.4 Validación que se suma
+
+| Hipótesis | Experimento | Señal | Stop condition |
+|---|---|---|---|
+| El comprador de contenidos acepta pagar paid social como fee por nivel, separado del plan social | registrar la reacción en cada propuesta que componga ambos | el buyer acepta fee y medios separados del fee de social media | exige que la pauta venga «incluida» en el plan |
+| La selección por señal orgánica cabe en el cost-to-serve del nivel | medir horas reales del primer caso | el margen del nivel se sostiene | las horas de lectura y selección rompen el piso |
+
+Cada resultado entra al evidence ledger con fuente, fecha, owner, confidence y decisión.

@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-10-09 (programmatic: Basis + Real Audiences, submodelo y guía)
+> **Última actualización:** 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social) · 2026-10-09 (programmatic: Basis + Real Audiences, submodelo y guía)
 
 ## Propósito
 
@@ -69,6 +69,14 @@ conversiones a ejecución y willingness-to-pay.
 > [decisión](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md) y
 > [Pricing Integrity Pack](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
 > Esta sección conserva el resumen; la ficha manda en caso de diferencia.
+
+> **Delta 2026-10-10 — «Paid social» en el deck «Marketing de Contenidos».** El deck aprobado por el operador presenta
+> «Paid social» como frente de un squad de contenidos. Es el nombre de comprador para la cobertura de redes sociales de
+> esta solución, no un producto por canal. La ficha suma «lo orgánico prueba, la pauta escala», UGC patrocinado
+> (Partnership ads, Spark Ads y Thought Leader Ads), anuncios por canal, social commerce y la lectura del social al
+> CRM, cada uno con su estado; lo nuevo queda `por validar` y sin precio. Ver
+> [ficha, «Paid social en el plan de contenidos»](PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) y
+> [pricing pack, §13](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
 
 **Job del cliente:** “Cuando tengo inversión en adquisición o commerce pero no logro conectar eficiencia, cobertura y
 conversión, quiero una operación integrada que redistribuya inversión según evidencia.”
@@ -184,6 +192,13 @@ se compra acceso a la audiencia del creador, la oportunidad pertenece a esta sol
 
 La capability se documenta en el [modelo de negocio específico](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md), la [ficha de servicio](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md), la [arquitectura operativa](../../architecture/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_ARCHITECTURE_V1.md), la [documentación funcional](../../documentation/media-distribution/creator-influence-content.md) y el [manual de operación](../../manual-de-uso/media-distribution/operar-creator-influence-content.md). Estos documentos mantienen la separación entre audience access, content assets, rights, partnerships y paid amplification.
 
+> **Delta 2026-10-10 — deck «Marketing de Contenidos».** El deck aprobado por el operador nombra esta capability como
+> «Influencer marketing», «Creadores y UGC», «Programa de creadores» y «UGC patrocinado»; son las mismas cinco ofertas.
+> Se incorporan la selección por función y nivel de creador, el roster por mercado y audiencia con revisión trimestral
+> por creador, y composiciones con social commerce, lanzamientos y CRM. Thought Leader Ads en LinkedIn, el contenido
+> de clientes reales, el live shopping y el origen por creador en el CRM entran `por validar`. Equivalencias, estados
+> y decisiones abiertas: [modelo de negocio, §11](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md).
+
 Esta familia pertenece a Media & Distribution cuando el objetivo principal es acceder a la audiencia de terceros,
 activar influencia y distribuir el mensaje. Creative Services puede producir la idea, el sistema visual, el guion,
 el asset o la edición; Media & Distribution gobierna la selección, negociación, activación, amplificación y
@@ -235,6 +250,7 @@ propuesta debe adaptar el calendario al alcance, mercado y dependencias.
 | Capacidad relacionada | Boundary |
 |---|---|
 | **Creative Services / Globe** | Concepto, identidad, diseño, contenido, producción audiovisual y performance creative; no incluye compra de medios por defecto |
+| **Social Media (Creative Services)** | Social media management, listening y trendjacking, y la coordinación de social care; dueño del test orgánico y del contenido de social commerce. Creadores, UGC y paid social son de esta línea y se componen con fee, derechos y medios separados. Quedan sin dueño definido los canales cerrados (frente a Dark Channels & Organic Amplification, DA-14) y los programas de voz ejecutiva y embajadores (frente a PR & Communications, DA-15). Ver [catálogo de subservicios](../creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md) |
 | **Digital Services & Engineering / Wave** | Web, commerce, instrumentación, datos, automatización y superficies digitales; se integra cuando el resultado requiere infraestructura o conversión |
 | **RevOps & CRM / Kortex** | CRM, lifecycle, revenue operations y conexión con pipeline; puede recibir señales de campañas y audiencias |
 | **Growth Strategy & Measurement / Greenhouse y Verk** | Estrategia, medición, experimentación, intelligence y control plane según scope |
@@ -311,6 +327,11 @@ owner y economics.
 reales. Antes de declarar una familia `Commercially approved` faltan, según el caso, evidencia de demanda, pricing
 integrity pack, economics/cost-to-serve, contratos de derechos y proveedores, claims verificables, RACI y aprobación
 de Finance/Legal/Commercial.
+
+**Delta 2026-10-10.** El deck comercial «Marketing de Contenidos», aprobado por el operador el 2026-10-10, no cambia
+el estado de la línea ni el de ninguna solución. Las diferencias entre el deck y los modelos vigentes están numeradas
+(`DA-01`…`DA-15`) en el [modelo de la línea, §10](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas)
+y esperan decisión del operador.
 
 Fuentes relacionadas:
 

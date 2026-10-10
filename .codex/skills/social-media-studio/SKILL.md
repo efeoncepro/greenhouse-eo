@@ -42,6 +42,8 @@ Cuando el pedido sea para vender, diseñar o entregar el servicio de Efeonce, es
 - **Globe:** Globe no está disponible como dependencia del servicio actual. La operación debe funcionar sin Globe; cualquier referencia a Globe es un adaptador futuro y gated, nunca una promesa de rollout.
 - **Scope y gates:** toda entrega define owner y backup de aprobación, número de rondas, derechos/territorio/plazo, assets y claims autorizados, calendario, SLA, quality gates, evidencia y change order. Paid, creators, talentos, derechos, media spend, crisis, 24/7 y producción especial se cotizan separadamente.
 
+- **Brochure «Marketing de Contenidos» (2026-10-10):** la oferta se presenta en frentes, momentos y programas. Producción con IA, canales cerrados, social care con agentes, voz ejecutiva, embajadores y social conectado al CRM entran a la oferta por decisión del operador, sin precio ni capacidad validada. Antes de prometer cualquiera, leer el delta 2026-10-10 del [Business Model](../../../docs/business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md) y sus decisiones abiertas 8–20; para creadores, UGC y paid social, las `DA-01`…`DA-15` de [Media & Distribution](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md).
+
 La narrativa de venta es el sistema de autoridad y demanda; Trendjacking, reels, community, Social Search y Run & Gun son capacidades dentro de ese sistema, no sustitutos del posicionamiento.
 
 - 🔴 **Los gadgets de Nexa son identidad, no atrezzo** [operador, 2026-09-21]. Su reloj es un **SMARTWATCH**,

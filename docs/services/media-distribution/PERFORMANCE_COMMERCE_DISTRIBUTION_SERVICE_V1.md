@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce · **Product brand habilitadora:** Reach, cuando aporte método o tooling
 > **Estado:** `Proposed` — la solución sigue `Approved for validation` en el catálogo de la línea; esta ficha propone su
 > estructura V1 y no autoriza precios públicos, claims ni venta general
-> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
+> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
@@ -437,6 +437,162 @@ resultado.
 | No hacer nada | seguir con la agencia actual | el diagnóstico hace visible el desperdicio en su lenguaje |
 
 El detalle competitivo y de precios fechado vive en la investigación de mercado 2026-09-10.
+
+---
+
+# Paid social en el plan de contenidos — delta 2026-10-10
+
+El operador (Julio Reyes) aprobó el 2026-10-10 el deck comercial «Marketing de Contenidos» («Me encantó todo, queda
+aprobado») y pidió incorporar su contenido al modelo de negocio («…hay muchas cosas de acá que quiero incorporar al
+modelo de negocio, hazlo»). Texto fuente: `ai-generations/2026-10-09_deck-contenidos/deck/INVENTARIO-TEXTO.md` (ruta
+lógica). El deck presenta **«Paid social»** como el sexto frente de un squad de contenidos.
+
+Esa decisión define qué se ofrece. No acredita capacidad operando, costo, precio ni demanda, y varias piezas se
+aprobaron en conjunto con el deck, no una por una. Esta ficha sigue `Proposed`, su pricing pack sigue
+`hypothesis_only` y ningún invariante de la decisión de arquitectura cambia.
+
+## Qué es «Paid social» en esta ficha
+
+Es el nombre con que el comprador de contenidos pide la **cobertura de redes sociales** de esta solución: Meta
+(Instagram y Facebook), TikTok, LinkedIn y YouTube. No es un servicio nuevo ni un producto por canal: se entrega y
+se cotiza con los servicios 1–3 del catálogo, y los canales conservan su estado en «Cobertura de canales». Si debe
+existir una forma más liviana para amplificar contenido, con costeo propio, es una decisión abierta (DA-01).
+
+Las cuatro piezas con que el deck lo describe ya tienen módulo:
+
+| En el deck | Módulo de esta ficha | Quién hace qué |
+|---|---|---|
+| Estrategia, audiencias y estructura de campañas | Performance Media Operations | Performance |
+| Creatividad para performance y testing | Creative Performance System | Performance diseña el test y lee el aprendizaje; Creative Services / Social Media produce. La producción no entra en el fee |
+| Partnership ads con creadores | Performance Media Operations + composición con Creator Influence & Content | Performance compra los medios; derechos, whitelisting y gobierno del creador son de [Creator Influence & Content](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) |
+| Optimización y lectura de resultados | Performance Media Operations + reporting | Performance |
+
+## «Lo orgánico prueba, la pauta escala»
+
+Estado: `decisión del operador 2026-10-10` como parte de la oferta; **método `por validar`**, sin caso ejecutado.
+
+Qué es: una forma de alimentar el Creative Performance System con lo que ya se publicó en orgánico.
+
+1. Social Media publica varias versiones de cada idea (en el deck: cuatro ideas con tres ganchos, como muestra).
+2. Se lee cuál retiene, con guardados y comentarios como señales de apoyo.
+3. Performance pone presupuesto en las piezas elegidas y registra por qué se eligieron.
+4. Lo que aprende la pauta vuelve al calendario editorial.
+
+Es una **composición**: el test orgánico y el calendario son de
+[Social Media](../creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md) (Creative Services); la selección
+para pauta, la compra y la lectura son de esta ficha.
+
+Condiciones y límites, que el deck no detalla:
+
+- una pieza que retiene en orgánico es una **hipótesis** de buen anuncio, no una prueba: la audiencia orgánica y la
+  pagada no son la misma y el objetivo de la campaña puede ser otro. El resultado se confirma en pauta;
+- no reemplaza el testing propio de pauta ni la señal de negocio: «presupuesto sólo a las ganadoras» orienta el
+  arranque, no prohíbe probar creatividades que no pasaron por orgánico;
+- necesita volumen orgánico suficiente para leer algo; con cuentas pequeñas la lectura es direccional;
+- si la pieza incluye a un creador, promocionarla es uso pagado: se pauta sólo con ese derecho contratado
+  (Gate 6 del [Operating Control Pack](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_OPERATING_CONTROL_PACK_V1.md));
+- promocionar publicaciones orgánicas desde la cuenta de la marca usa la cuenta publicitaria del cliente, como toda
+  la operación de esta ficha.
+
+Cómo se valida: comparación controlada dentro de una misma campaña entre piezas elegidas por señal orgánica y piezas
+que no pasaron por orgánico, con la métrica primaria definida antes del test, período, fuente y owner.
+
+## UGC patrocinado
+
+El contenido de un creador amplificado como anuncio desde su propio perfil. Aquí vive la compra de medios; los
+permisos y derechos viven en Creator Influence & Content.
+
+| Formato | Plataforma | Estado en esta ficha |
+|---|---|---|
+| Partnership ads | Instagram y Facebook | dentro de Meta (`core` en el motion A, `selectivo` en el B) |
+| Spark Ads | TikTok | dentro de TikTok: `core` en el motion A sólo con capacidad creativa nativa; `no ofrecido` por defecto en el B |
+| Thought Leader Ads | LinkedIn | **`por validar`**. No estaba en esta ficha. Si se activa, aplica la regla de inversión mínima en LinkedIn del intake |
+
+Con Thought Leader Ads hay dos casos distintos: el perfil de un creador contratado, que sigue las reglas de creadores,
+y el perfil de un ejecutivo o empleado del cliente, que no tiene esas reglas y está sin dueño definido (DA-07). Ningún
+formato se activa sin el permiso de plataforma y el derecho contractual vigentes. Sobre la misma amplificación pueden
+coincidir el fee de governance de creadores y el fee por nivel de esta ficha: la regla para no cobrar dos veces la
+misma coordinación está pendiente (DA-06).
+
+## Anuncios por canal
+
+Cada anuncio se especifica para su red: formato, duración, gancho, zona segura y llamado a la acción propios, con
+variantes para testing. En el deck: Reels de Instagram, in-feed de TikTok, feed de LinkedIn y Shorts de YouTube.
+
+- La especificación —qué variantes, qué gancho, qué se compara— es parte de la matriz del Creative Performance System.
+- La producción de las piezas es de Creative Services / Social Media y se cotiza allá.
+- Los formatos dependen del estado del canal: YouTube Shorts entra con YouTube (`selectivo`); TikTok no se activa sin
+  producción nativa.
+- Mostrar un anuncio por red en el deck no convierte cada red en un producto: el canal sigue siendo cobertura.
+
+## Social commerce
+
+El deck lo presenta para «todos los frentes»: descubrimiento y recomendación, demostraciones y reseñas, unboxing y
+contenido con creadores, formatos comprables y live shopping, y aclara que «la operación de tienda, catálogo y
+checkout se cotiza aparte».
+
+| Parte | Dueño |
+|---|---|
+| Contenido de social commerce de la marca | [Social Media](../creative-services/EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md) (subservicio de contenido para social commerce) |
+| Creadores: unboxing, reseñas, vivo | [Creator Influence & Content](CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) |
+| Pauta sobre esos contenidos | esta ficha: Performance Media Operations. Commerce Media Operations cubre retail media y marketplaces; no cubre por sí solo la tienda nativa de una red social |
+| Tienda nativa de la red, catálogo, precios, stock y checkout | **fuera de esta ficha**; el deck dice que se cotiza aparte y no hay dueño nombrado (DA-09). Sitio y commerce propios son de [Wave](../wave/README.md); el punto de venta físico es de [Channel & Commerce](../channel-commerce/README.md) |
+
+Estado: `decisión del operador 2026-10-10`; **`por validar`**. Los formatos comprables y el live shopping dependen de
+que la plataforma los ofrezca en el mercado del cliente: esta misma ficha registra que TikTok Shop opera en México y
+Brasil y no tiene fecha oficial en Chile a 2026-08. No se proponen sin confirmar disponibilidad en la fecha de la
+campaña.
+
+## Del social al CRM
+
+El deck promete que cada contacto llega al CRM con su origen por red, pieza y creador, y que los resultados se leen
+por negocio ganado.
+
+- Es la señal del **motion B · B2B Pipeline** llevada a redes sociales: anuncios con formulario, enlaces con
+  seguimiento y, cuando el cliente lo opera, mensajes que crean el contacto. La métrica ya existe en esta ficha:
+  pipeline con fuente y costo por oportunidad calificada.
+- Vale la condición de entrada del motion B: sin CRM con etapas confiables, se degrada al motion A con objetivo de
+  lead, y la propuesta lo declara.
+- La integración —formularios al CRM, campos de origen, sync de etapas— la implementa y la cotiza RevOps & CRM
+  ([HubSpot](../hubspot-as-a-service/README.md) o [Salesforce](../salesforce/README.md)); la instrumentación web, Wave.
+  No entra en el fee de esta ficha.
+- El origen «por creador» necesita una convención de nombres y enlaces acordada con Creator Influence & Content antes
+  de publicar.
+- Recibir datos de formularios y enviar etapas a las plataformas es tratamiento de datos personales: requisito 4 del
+  intake.
+- «Origen» es atribución declarada. No se presenta como incrementalidad: aplica la escalera de medición.
+- Los mensajes directos que crean contactos dependen de social care, que coordina Social Media, y de la integración
+  del CRM.
+
+Estado: `decisión del operador 2026-10-10`; **`por validar`**: sin implementación de referencia para origen por pieza y
+creador (DA-11).
+
+## Cómo se compra y cómo se empieza
+
+Las líneas del deck se leen sobre esta ficha así, sin cambiar nada del pricing pack:
+
+| En el deck | En esta ficha |
+|---|---|
+| Fee Efeonce fijo, por capacidad | fee por nivel de complejidad; el híbrido porcentual sigue siendo alternativa contractual, nunca default |
+| Whitelisting y medios, línea propia | la inversión en medios es del cliente y se declara aparte; la licencia de whitelisting es un costo de creadores |
+| Comisión por resultado, sólo si se acuerda | en esta ficha la única figura es el bono por pipeline del motion B, con sus condiciones; nunca performance-only |
+| Diagnóstico → sprint de prueba → servicio continuo | Performance Diagnostic → Growth Activation Sprint → Managed Performance |
+
+Diferencias sin resolver: el Diagnostic de esta ficha es pagado y el Sprint dura 8–12 semanas, mientras el deck habla
+de «un frente acotado» para probar (DA-05). El detalle está en el
+[pricing pack, delta 2026-10-10](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
+
+## Operador y grupo de compra de este caso
+
+Quien pide «paid social» dentro de un plan de contenidos puede no ser el operador de las dos motions: es probable que
+sea quien lleva redes o marca, no un Performance Lead. Es una hipótesis sin evidencia (`hypothesis_only`): se confirma
+en cada cuenta quién opera, quién aprueba presupuesto de medios y quién es dueño de las cuentas publicitarias, antes
+de proponer.
+
+## Decisiones abiertas
+
+Numeradas en el [modelo de la línea, §10](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#10-riesgos-y-decisiones-abiertas).
+Tocan esta ficha: DA-01, DA-03, DA-04, DA-05, DA-06, DA-07, DA-09, DA-10 y DA-11.
 
 ---
 

@@ -6,6 +6,7 @@
 > **Date:** 2026-07-26
 > **Validated as of:** 2026-07-26
 > **Review cadence:** después de cada piloto pagado y, como mínimo, trimestral
+> **Último delta:** 2026-10-10 — incorporaciones del deck «Marketing de Contenidos» y decisiones abiertas `DA-01`…`DA-15` (§10); el estado no cambia
 > **Related service:** [`Media & Distribution — catálogo de servicios`](../../services/media-distribution/README.md)
 > **Related architecture:** [`Efeonce Portfolio, Brand and Business Line Architecture V1`](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 
@@ -258,6 +259,51 @@ hasta la revisión de Finance.
 Decisiones abiertas: beachhead vertical prioritario; mínimo de inversión o complejidad; modelo de fee por solución;
 capacidad y provider panel; stack real de Reach/Verk/Greenhouse; casos citables; rights playbook; y criterio para
 declarar una solución `Commercially approved`.
+
+### Delta 2026-10-10 — deck «Marketing de Contenidos»: qué entra y qué queda abierto
+
+**Origen.** El operador (Julio Reyes) aprobó el 2026-10-10 el deck/brochure comercial «Marketing de Contenidos»
+(57 láminas): «Me encantó todo, queda aprobado», y pidió incorporarlo: «Esto quedó aprobado, canonizalo, adicional hay
+muchas cosas de acá que quiero incorporar al modelo de negocio, hazlo». Texto fuente:
+`ai-generations/2026-10-09_deck-contenidos/deck/INVENTARIO-TEXTO.md` (ruta lógica).
+
+**Alcance de la decisión.** Los elementos entran a la oferta. La decisión no acredita capacidad operando, costo,
+precio, demanda ni revisión de Finance o Legal, y varias piezas se aprobaron en conjunto, no una por una. Esta línea
+sigue `Approved for validation`; ningún submodelo cambia de estado y ninguna banda cambia.
+
+**Qué parte del deck es de esta línea.** El deck vende «todo lo social, un solo squad» en seis frentes. Tres son de
+Media & Distribution; los otros tres son de [Social Media](../creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)
+(Creative Services) y no se redefinen aquí.
+
+| Frente del deck | Solución de esta línea | Dónde quedó el detalle |
+|---|---|---|
+| 02 · Influencer marketing | Influence, Earned & Partnership Distribution | [Creator Influence & Content, §11](CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md#11-delta-2026-10-10--incorporaciones-del-deck-marketing-de-contenidos) |
+| 03 · Creadores y UGC | Influence, Earned & Partnership Distribution | mismo submodelo, sus tres packs y su [ficha](../../services/media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md) |
+| 06 · Paid social | Performance & Commerce Distribution | [ficha](../../services/media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) y [pricing pack](PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md), delta 2026-10-10 |
+| 01 · Social media management · 04 · Listening y trendjacking · 05 · Social care | no es de esta línea | Social Media (Creative Services), que lleva su propia lista de decisiones abiertas sobre el mismo deck |
+
+Publicidad programática no cambia con este delta.
+
+**Decisiones abiertas.** Donde el deck difiere del modelo vigente, el modelo quedó como estaba. Cada diferencia
+necesita decisión del operador y, donde se indica, revisión de Finance o Legal.
+
+| ID | Qué dice el deck | Qué dice el modelo vigente | Qué hay que decidir |
+|---|---|---|---|
+| **DA-01** | «Paid social» es un frente con nombre propio que «se suma aparte» al plan | En Performance & Commerce el canal es cobertura, nunca producto; se vende Diagnostic, Sprint o Managed Performance por nivel de complejidad, con intake y mínimo de tres meses | Si «Paid social» es sólo el nombre público de esa operación en el plan de contenidos, o una lane liviana de amplificación de contenido con costeo propio (Finance) y qué objetivo optimiza |
+| **DA-02** | «Fees de creadores: a costo, aparte» | Además del pass-through, el Modelo B permite una comisión de coordinación de 10–15% del pass-through administrado, en línea separada; la lámina no la lista | Mantener la línea y mostrarla, retirarla y absorberla en el fee fijo (recosteo de Finance), o vender sólo el Modelo A |
+| **DA-03** | «Fee Efeonce: fijo, por capacidad» | El fee fijo es el default, pero existen alternativas porcentuales: 15% del creator/production spend en activaciones medias y un híbrido con piso en Performance | Si las alternativas porcentuales se retiran de la oferta de contenidos o siguen como excepción contractual |
+| **DA-04** | «Comisión por resultado: sólo si se acuerda» | Exige más que acuerdo: tracking, baseline, atribución, cap y fee base; nunca performance-only; no aplica a awareness. Hay tres figuras distintas (comisión de afiliado del creador, success fee de Efeonce, bono por pipeline del motion B) | Qué figura nombra el deck; las condiciones del modelo no se relajan |
+| **DA-05** | «Empiezas chico»: diagnóstico → sprint de prueba pagado → servicio continuo | Los diagnósticos de los modelos son pagados; en Performance el Sprint dura 8–12 semanas y Managed tiene mínimo de tres meses | Si el «diagnóstico de contenidos» del deck es una conversación comercial sin costo o el diagnóstico pagado, y qué es el sprint de prueba en cada frente |
+| **DA-06** | UGC patrocinado se vende dentro de paid social y dentro de creadores | Existen dos fees sobre la misma amplificación: governance de Amplification & Whitelisting y fee por nivel de Managed Performance | Regla para no cobrar dos veces la misma coordinación |
+| **DA-07** | «Thought Leader Ads en LinkedIn» como UGC patrocinado | No estaba en ningún documento; el overlay de plataformas de derechos cubre Meta, TikTok y YouTube. Si el perfil amplificado es de un ejecutivo o empleado del cliente, no hay creador contratado | Dueño, y si se ofrece antes de la revisión de Legal |
+| **DA-08** | Contenido de «clientes reales» y de la comunidad, usado y pautado | No existe lane ni política de derechos para contenido espontáneo de personas no contratadas | Si se ofrece y con qué licencia mínima |
+| **DA-09** | Social commerce con formatos comprables y live shopping; «tienda, catálogo y checkout se cotiza aparte» | El contenido es de Social Media; nadie figura como dueño de la tienda nativa de la red; la disponibilidad varía por mercado; en vivo no hay ronda de aprobación previa | Dueño de la operación de tienda y mercados donde se ofrece |
+| **DA-10** | «Seis frentes, un solo squad, un solo interlocutor» | Los frentes viven en dos prácticas con fees, mínimos y pisos de margen distintos; el overlap con Creative Services ya es un riesgo listado | Cómo se asignan fee, margen, mínimos y accountability entre prácticas |
+| **DA-11** | «Cada contacto llega al CRM con su origen por red, pieza y creador» | La integración de CRM se cotiza en RevOps & CRM; sin etapas confiables el motion B se degrada; subir o recibir datos personales exige base de licitud | Quién implementa y cobra, convención de identificación por creador, y revisión de Legal sobre datos |
+| **DA-12** | Claims: «puede usarlo, pautarlo o renovarlo sin sorpresas», «lo que nos diferencia», «audiencia real, no inflada» | Cierto sólo dentro de los derechos contratados; la diferenciación es hipótesis sin claim de superioridad; la verificación de audiencia se apoya en snapshots de herramientas | Cómo se acotan esos claims en propuestas y contratos |
+| **DA-13** | (no viene del deck) | El Operating Control Pack de creadores y su Pricing Integrity Pack publican bandas y mínimos distintos para Intelligence, gestión de campaña y mínimo de activación | Cuál rige; afecta la lectura de «empiezas chico» |
+| **DA-14** | «Canales cerrados»: canales de difusión en WhatsApp e Instagram y comunidades con moderación, dentro de Social media | El catálogo de esta línea tiene la familia Dark Channels & Organic Amplification (WhatsApp y mensajería, comunidades, referral, seeding) | Cuál de las dos prácticas es dueña, o cómo se reparten |
+| **DA-15** | Programas «Ejecutivos en LinkedIn» (con ghostwriting) y «Embajadores de marca» | El catálogo de esta línea lista vocería ejecutiva y ghostwriting en la familia PR & Communications; Social Media no tiene subservicio, unidad ni precio para esos programas | Dueño de cada programa; condiciona DA-07 |
 
 ## 11. Fuentes y trazabilidad
 

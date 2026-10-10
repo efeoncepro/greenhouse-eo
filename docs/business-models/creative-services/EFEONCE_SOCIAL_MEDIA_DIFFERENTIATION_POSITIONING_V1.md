@@ -2,8 +2,72 @@
 
 > **Status:** `Approved for validation`  
 > **Owner:** Strategy + Social Media Practice + Commercial  
-> **Version:** V1.0 · 2026-07-29  
+> **Version:** V1.1 · 2026-07-29 · [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos) (diferenciador, categoría, pilares y claims de §9 sin cambio)  
 > **Related model:** [`Social Media Business Model V1`](EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md)
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»
+
+La decisión del operador, sus citas y lo que cubre están en el [delta del Business Model](EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta). **El diferenciador central, la categoría, el beachhead, los seis pilares, el enemigo competitivo y las listas de claims de §9 no cambian.** Este delta agrega la tesis de contexto del brochure y contrasta sus frases con las reglas de este documento.
+
+### La tesis ampliada: por qué ahora
+
+El brochure abre con dos ideas sobre lo que cambió en redes. Entran a este documento como contexto de mercado, el «por qué ahora» que antecede al diferenciador. No lo reemplazan.
+
+1. **«Tu marca ya no habla sola».** De una marca se habla en tres lugares: sus canales, la voz de los creadores y lo que publica su propia comunidad. El contenido que funciona coordina los tres.
+2. **«Cada pieza compite sola».** Las redes recomiendan por interés, venga de quien venga, y no sólo a quien sigue la cuenta. De ahí salen cuatro consecuencias que el brochure nombra: los primeros segundos deciden; se gana por tema, no por tamaño de cuenta; conviene producir varias versiones de cada idea; y los seguidores son una señal, ya no la meta.
+
+Cómo se conectan con el diferenciador: la primera idea explica por qué hace falta un sistema que coordine y no un calendario; la segunda explica por qué importan el oficio nativo por plataforma, las series y la regla de no reportar seguidores como resultado (§4.1). Ninguna de las dos habla de autoridad ni de demanda, que siguen siendo la promesa.
+
+Estado de la tesis: es narrativa aprobada por el operador dentro del deck. La afirmación sobre cómo distribuyen las plataformas no tiene fuente fechada en este documento; antes de usarla fuera del brochure con datos o con el nombre de una plataforma hay que respaldarla con research.
+
+### Lo que el brochure pone al frente
+
+El brochure responde «¿Quién lleva mis redes?» con «Tu squad» y titula «Todo lo social, un solo squad». Pone al frente cobertura y equipo. Este documento pone al frente autoridad y demanda. Frente a la regla de consistencia de §11, la lectura de este delta es:
+
+| Pregunta de §11 | Cómo la responde el brochure |
+|---|---|
+| ¿Qué autoridad o demanda ayuda a construir? | De forma parcial: voz ejecutiva, social search y social conectado al CRM. El titular no la nombra |
+| ¿Qué sistema humano y operativo lo hace posible? | Con fuerza: squad, interlocutor único, ciclo de cinco pasos, control y derechos |
+| ¿Qué evidencia permite decidir el siguiente ciclo? | Sí: medición en tres niveles y «cada ciclo cierra con evidencia y una recomendación» |
+
+Si el brochure pasa a ser la pieza comercial principal de Social Media, la primera pregunta queda débil. Corregirlo es decisión del operador.
+
+### Piezas del brochure por pilar
+
+| Pilar | Pieza del brochure que lo demuestra |
+|---|---|
+| 4.1 Social conectado al negocio | Social conectado al CRM; medición en tres niveles |
+| 4.2 Autoridad experta | Voz ejecutiva; embajadores de marca; series que responden preguntas |
+| 4.3 Search + Social Visibility | Social search conectado con SEO y visibilidad en IA |
+| 4.4 Squad humano con operación gobernada | Squad con un interlocutor; «apruebas tú», voz por escrito, rondas pactadas |
+| 4.5 Transparencia y criterio | «Cada costo, a la vista»; el filtro de trendjacking («a tiempo, o mejor no») |
+| 4.6 Run & Gun profesional | Producción «pensada en vertical desde el guion» |
+| Sin pilar | Producción con IA, comunidad en canales cerrados y social care con agentes |
+
+Producción con IA no se suma como pilar. §1 dice que Efeonce no compite por usar más herramientas de IA, y el brochure la presenta como criterio («el criterio, la marca y la última palabra los pone una persona»), no como volumen. Se usa como prueba de gobierno, nunca como diferenciador.
+
+### Frases del brochure frente a los claims de §9
+
+| Frase del brochure | Lectura | Condición para usarla |
+|---|---|---|
+| «Seguidores: una señal, ya no la meta» | Compatible con §4.1 | Ninguna |
+| «Conexión con tu SEO y tu visibilidad en IA» | Es el claim permitido sobre Social Search y SEO/AEO | Mantener la frontera de §4.3 |
+| «Todo lo social, un solo squad» | Compatible sólo si las líneas van separadas | Sin esa separación equivale a «incluimos creators y producción en todos los planes», que §9 no permite |
+| «Nadie queda sin respuesta»; «cada DM y cada comentario se responde a tiempo» | Promesa de cobertura | Sólo dentro de la cobertura contratada; como frase universal choca con la separación entre community y customer care |
+| «Métricas en vivo»; resultados en Marketing Studio | Promesa de superficie | §9 no permite afirmar métricas en vivo completas para cada cliente sin evidencia específica; la misma regla vale para Marketing Studio e Insights |
+| «¿Producen con IA? Sí, pero lo hacemos bien» y sus cuatro compromisos | No es «la IA produce todo el contenido» | Los compromisos sobre derechos y sobre no inventar marca ni producto esperan contraste con Legal/IP |
+| «Especialistas en cada red», con nueve redes | Promesa de capacidad | La capacidad nativa por red no está evidenciada |
+| «¿Lo han hecho a escala? Sí, con Sky», con cifras de 12 meses | Caso real de producción creativa | No es resultado de este servicio; el uso del caso y del testimonio sigue las reglas de autorización del collateral |
+| «+85 expertos más en Latam» | Cifra del operador | No tiene fuente ni definición en el repo: falta decir qué cuenta y a qué fecha |
+| «Efeonce es partner de HubSpot y de Salesforce» | Respaldada por el [registro de partnerships](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md) | El nivel y la forma de nombrar cada partnership los gobierna ese registro |
+
+### Decisiones abiertas de posicionamiento
+
+Numeradas en el [Business Model §12](EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10): si «Marketing de Contenidos» es una composición o una oferta con dueño (10); si el brochure es collateral del beachhead B2B, del de consumo o de ambos (17); y las pruebas y cifras del brochure (19). Una más, propia de este documento: si la landing de §8 adopta la tesis ampliada y la estructura de frentes, momentos y programas, o conserva la narrativa de autoridad y demanda.
+
+---
 
 ## 1. Differentiator central
 

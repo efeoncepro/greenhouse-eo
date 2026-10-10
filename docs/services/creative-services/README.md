@@ -182,6 +182,19 @@ uso, adaptaciones incluidas, dependencias del cliente, derechos y change order.
   usarlo con prospectos** falta verificar si las cifras del caso SKY («25 % menos de tiempo de producción») y su
   testimonio requieren la misma autorización de cliente que el caso ANAM del brochure HubSpot. Uso comercial: skill
   `creative-practice`; armado: skill `deck-studio`.
+- **Brochure «Marketing de Contenidos»** (57 láminas, 16:9, línea Brand; aprobado por el operador el 2026-10-10):
+  collateral de Social Media y de sus composiciones con Media & Distribution. Organiza la oferta en seis frentes, tres
+  momentos y tres programas. PDF en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Marketing de Contenidos/Efeonce-Brochure-Marketing-de-Contenidos.pdf` (y una
+  ruta corta de 21 láminas para presentar); canvas privado en <https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph>;
+  fuente y pendientes en `ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md`. Lo que entra al modelo y lo que
+  choca con él está en el
+  [delta del Business Model](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta)
+  y, para creadores, UGC y paid social, en el
+  [§10 de Media & Distribution](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md).
+  **Antes de usarlo con prospectos** faltan: la fuente de la cifra «+85», la autorización del caso y testimonio de Sky,
+  verificar que Efeonce opere Metricool, Sprout Social y Favikon, y las frases «Nadie queda sin respuesta» y «métricas
+  en vivo», que hoy no tienen cobertura ni superficie verificadas.
 - **Talento embebido (lámina 19; decisión del operador, 2026-10-06).** Cuando el comprador pide «staff augmentation»,
   el brochure responde con talento creativo embebido con respaldo de Efeonce: la palabra del comprador va **sólo en el
   eyebrow** («Talento embebido · Staff augmentation») y la oferta es la del

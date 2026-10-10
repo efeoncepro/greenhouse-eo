@@ -84,6 +84,14 @@ Estado: `Approved for validation`. El servicio es humano y recurrente; Efeonce R
 componible, mientras Globe / Creative Studio no forma parte de la promesa base actual. `Approved for validation` habilita
 pilotos y SOW gobernados, no venta self-serve ni aprobación comercial definitiva.
 
+Delta 2026-10-10: el brochure «Marketing de Contenidos» (57 láminas), aprobado por el operador, entra a la oferta como
+forma de presentarla —frentes, momentos y programas— y suma piezas nuevas (producción con IA, comunidad en canales
+cerrados, social care con agentes, voz ejecutiva, embajadores, social conectado al CRM). El estado sigue
+`Approved for validation`: ninguna pieza nueva tiene costo, precio ni evidencia de capacidad, y trece decisiones
+quedaron abiertas en el [§12 del Business Model](creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10).
+Los frentes de creadores, UGC y paid social del mismo brochure son de Media & Distribution, con su propia lista
+(`DA-01`…`DA-15`).
+
 ## Creative Services offer architecture
 
 - [Decisiones de marca → ejecución escalable — decisión V1](../architecture/EFEONCE_BRAND_DECISIONS_SCALABLE_EXECUTION_DECISION_V1.md)
@@ -249,6 +257,8 @@ Todo business model debe separar al menos estas dimensiones:
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.
+  Delta 2026-10-10: incorpora lo que trae el deck «Marketing de Contenidos» en creadores, UGC y paid social; estado
+  sin cambio; decisiones abiertas `DA-01`…`DA-15` en su §10.
 - [Performance & Commerce Pricing Integrity Pack V1](media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) —
   `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
   híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
@@ -260,7 +270,9 @@ Todo business model debe separar al menos estas dimensiones:
   [guía comercial](../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
-  `Approved for validation`; no autoriza pricing público ni venta general.
+  `Approved for validation`; no autoriza pricing público ni venta general. Delta 2026-10-10 (§11): selección por
+  función y nivel, roster por mercado con revisión por creador y UGC patrocinado por plataforma; Thought Leader Ads,
+  contenido de comunidad, live shopping y origen por creador en el CRM entran `por validar` y sin precio.
 - [Creator Influence & Content Pricing Integrity Pack V1](media-distribution/CREATOR_INFLUENCE_CONTENT_PRICING_INTEGRITY_PACK_V1.md) —
   bandas de validación, fee fijo, pass-through, coordinación de terceros, performance fee, mínimos y condiciones de pago.
 - [Creator Influence & Content Market Research 2026-07-29](../audits/commercial/CREATOR_INFLUENCE_CONTENT_MARKET_RESEARCH_2026-07-29.md) —

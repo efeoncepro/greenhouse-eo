@@ -2,9 +2,108 @@
 
 > **Estado:** `Approved for validation`
 > **Owner:** Efeonce Social Media Practice + Strategy
-> **Versión:** V1.0 · 2026-07-29
+> **Versión:** V1.1 · 2026-07-29 · [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos) (entradas del brochure «Marketing de Contenidos»; mapa de §2 y matriz de §3 sin cambio)
 > **Documento relacionado:** [`Social Media Product Service Contract V1`](EFEONCE_SOCIAL_MEDIA_PRODUCT_SERVICE_CONTRACT_V1.md)
 > **Regla:** este catálogo define la arquitectura de la oferta; no autoriza precios públicos, alcance ilimitado ni venta self-serve.
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»
+
+La decisión del operador, sus citas y lo que cubre están en el [delta del Business Model](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta). Este catálogo recibe el inventario.
+
+El mapa de §2 y la matriz de §3 **no se modifican**. Las entradas nuevas llevan código provisional y quedan fuera de la matriz hasta que el operador cierre las [decisiones abiertas 8 a 20](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10) del modelo. Ninguna tiene precio, y ninguna prueba que la capacidad opere hoy.
+
+### Cómo se lee el brochure en este catálogo
+
+| Grupo del brochure | Elemento | Subservicios |
+|---|---|---|
+| Frentes | Social media management | A2–A4, B1–B7, C1–C2, F1–F3 |
+| | Influencer marketing · Creadores y UGC | Sección H: pertenecen a Media & Distribution ([ficha de servicio](../media-distribution/CREATOR_INFLUENCE_CONTENT_SERVICE_V1.md)). G5 coordina la parte social |
+| | Listening y trendjacking | E1–E5 |
+| | Social care | D1 para la conversación general y D3 para clasificar y derivar. Lo que el brochure agrega está en D7, abajo |
+| | Paid social | Sección H: pertenece a Media & Distribution ([ficha de servicio](../media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md)) |
+| Momentos | Lanzamientos | C3 y G1 |
+| | Cobertura en vivo | G3 |
+| | Crisis y reputación | D4. El «antes, durante y después» del brochure corresponde a crisis protocol, incident log y post-incident learning |
+| Programas | Programa de creadores | Sección H; lo define su dueño |
+| | Voz ejecutiva / Ejecutivos en LinkedIn | I1, abajo |
+| | Embajadores de marca | D5 e I2, abajo |
+| Otras láminas | Producción «pensada en vertical» | G2 |
+| | Social commerce | G4, con la misma frontera: tienda, catálogo y checkout se cotizan aparte |
+| | Redes que atendemos | B4. El brochure declara nueve redes (Instagram, TikTok, LinkedIn, Facebook, YouTube, Pinterest, Twitch, Threads y X). B4 nombra cinco y «otras plataformas acordadas»; la capacidad nativa por red está por validar |
+
+### Precisiones sobre subservicios existentes
+
+**B1 · Series.** El brochure precisa qué es una serie: un formato con nombre, día y formato fijos, y con gancho, estructura y cierre fijos. Son pocas y bien definidas. Agrega una forma de medir: cada episodio se compara con el anterior de la misma serie. Esa lectura por episodio es un entregable nuevo de B1 y F1, por validar en capacidad.
+
+**B7 · Probar y escalar.** El brochure describe el testing orgánico como laboratorio: varias versiones de cada idea, lectura de retención, guardados y comentarios, y presupuesto de pauta sólo para las piezas que ya funcionaron; lo que aprende la pauta vuelve al calendario. La parte orgánica es B7, que sigue siendo configurable o add-on. Poner presupuesto y leer la pauta es de Media & Distribution. Si las variantes pasan a ser parte del método de todos los niveles, cambia la capacidad de producción (decisión abierta 18).
+
+**E3 · Filtro de trendjacking.** El paso `qualify → decide` del flujo queda con tres preguntas: ¿tiene que ver con la marca?, ¿hay riesgo de tono o de derechos?, ¿llegamos antes del peak? Si alguna falla, la respuesta es abstenerse. La aprobación exprés con el equipo del cliente es parte del flujo, no una excepción a la aprobación.
+
+**E1 · Listening.** El brochure nombra como entregables el informe mensual con oportunidades, las alertas de alzas y riesgos y la participación en la conversación frente a la competencia. Ya estaban cubiertos por signal board, alerts e implications.
+
+**F4 · Social conectado al CRM.** El brochure concreta la medición social-a-negocio: formularios y mensajes que crean el contacto, origen por red, pieza y creador, seguimiento en HubSpot o Salesforce y resultados leídos por negocio ganado. Sigue siendo add-on y composición: la configuración del CRM, las propiedades de origen y el embudo pertenecen a RevOps & CRM ([HubSpot as a Service](../hubspot-as-a-service/README.md), [Salesforce](../salesforce/README.md)). Social Media entrega identificadores de pieza, enlaces con seguimiento y contexto. Requiere acceso al CRM del cliente, tracking acordado y un dueño comercial. Capacidad por validar.
+
+### Entradas nuevas (código provisional)
+
+#### B8. Producción con IA
+
+**Tipo:** por definir. Es una forma de producir dentro de B5 y G2, no un producto ni un acceso a plataforma.
+
+**Qué dice el brochure:** la IA da velocidad y escala; el criterio, la marca y la última palabra los pone una persona.
+
+**Compromisos del brochure:** dirección creativa de una persona en cada pieza; marca y producto reales, nunca inventados; derechos y uso comercial revisados; revisión humana antes de publicar.
+
+**No incluye:** Globe, Creative Studio Access ni Studio Credits, que siguen como en la sección H; publicación sin aprobación del cliente; derechos de imagen, voz o likeness de personas, que siguen fuera por defecto.
+
+**Frontera:** los compromisos sobre derechos y sobre no inventar marca ni producto dependen de Legal/IP y de la [decisión de gobierno de datos y derechos de IA](../../architecture/GREENHOUSE_AI_CREATIVE_DATA_GOVERNANCE_DECISION_V1.md), hoy `Proposed`. La doctrina de autoría humana es del [modelo de Creative Studio](../../business-models/creative-studio/EFEONCE_CREATIVE_STUDIO_BUSINESS_MODEL_V1.md).
+
+**Estado:** `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Economía: sin costear`. Decisión abierta 9.
+
+#### D6. Comunidad en canales cerrados
+
+**Tipo:** el brochure no lo define. Hasta que se decida, hereda el tratamiento de D5 (add-on).
+
+**Qué dice el brochure:** canales de difusión en WhatsApp e Instagram; comunidades con reglas y moderación; contenido y beneficios para miembros; piezas pensadas para compartirse por mensaje.
+
+**Entregables:** sin definir. Parten de los de D5: reglas de participación, mecánicas de reconocimiento y plan de medición.
+
+**No incluye (heredado de D5):** plataforma comunitaria ni incentivos financieros. La moderación opera en la ventana contratada, igual que D1.
+
+**Por definir antes de vender:** consentimiento y alta de miembros, política de cada plataforma, ventana de moderación y qué se mide en un canal donde casi nada es trazable.
+
+**Frontera:** Media & Distribution tiene la familia «Dark Channels & Organic Amplification» en su [catálogo](../media-distribution/README.md). Falta decidir cuál de las dos prácticas es dueña (decisión abierta 12).
+
+**Estado:** `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Precio: sin fijar`.
+
+#### D7. Social care con base de conocimiento y agentes
+
+**Tipo:** add-on y composición, igual que D3, hasta que se decida otra cosa (decisión abierta 8).
+
+**Qué dice el brochure:** se arma con el equipo del cliente una base de conocimiento (preguntas, políticas, tono y respuestas aprobadas); agentes de IA responden lo frecuente y clasifican el resto; las personas toman casos sensibles, ventas y crisis. Regla del brochure: reclamos y temas de salud siempre pasan por una persona. La autoridad del agente crece por tramos: leer y clasificar, proponer respuesta, responder lo frecuente y actuar con aprobación.
+
+**Requisitos que ya exige el Operating Model §7** para que Efeonce resuelva casos: base de conocimiento, sistema de tickets, autoridad, entrenamiento, privacidad, supervisor del cliente y cobertura explícita. El brochure cumple el primero y agrega los agentes; los demás siguen siendo condición.
+
+**No incluye:** lo que D3 excluye mientras el cliente no entregue equipo y autoridad; atención 24/7 sin add-on; resolver sin persona un caso sensible.
+
+**Frontera:** el diseño, las pruebas, la licencia y el consumo de un agente son de RevOps & CRM. Referencias: [Customer Agent gestionado en HubSpot](../hubspot-as-a-service/hubspot-customer-agent-managed-service.md) y [transformación de equipos humano-agente](../revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md), cuya progresión de autoridad es la misma que muestra el brochure.
+
+**Estado:** `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Economía: sin costear`.
+
+#### I. Programas
+
+**I1. Voz ejecutiva / Ejecutivos en LinkedIn.** El brochure lo describe así: estrategia y temas por ejecutivo, posicionamiento y perfil optimizado, plan editorial mensual por ejecutivo, entrevista y ghostwriting con su voz, publicación y respuesta a comentarios, y medición de alcance y conversaciones. Nada se publica sin la aprobación del ejecutivo. Tipo, unidad y exclusiones sin definir; como mínimo aplican las exclusiones de [`Executive / Interview Capture`](EFEONCE_RUN_AND_GUN_PRODUCTION_OFFER_V1.md) cuando el programa incluya captura. Frontera: vocería ejecutiva y ghostwriting figuran en la familia «PR & Communications» de [Media & Distribution](../media-distribution/README.md) (decisión abierta 13). Estado: `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Precio: sin fijar`.
+
+**I2. Embajadores de marca.** Programa para que las personas de la empresa cliente compartan la marca con su voz: selección y onboarding de embajadores, formación en LinkedIn y marca personal, kit mensual de contenidos para adaptar, comunidad interna con retos y reconocimiento, y medición de alcance y participación. Es la parte de D5 que el brochure concreta; hereda su tipo (add-on) y sus exclusiones (plataforma e incentivos financieros). Estado: `Oferta: operador 2026-10-10` · `Capacidad: por validar` · `Precio: sin fijar`.
+
+**Programa de creadores.** No es una entrada de este catálogo: es de [Creator Influence & Content](../../business-models/media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md).
+
+### Niveles del brochure frente a la matriz de §3
+
+Los tres niveles y la lista «se suman aparte» (paid social, creadores, producción especial, crisis 24/7 y tiempo real) coinciden con la matriz y con su columna Add-on. Hay una diferencia: el brochure pone «inteligencia cultural y social search» en Integrated, y la matriz incluye social search desde Foundation y trata la inteligencia cultural (E5) como add-on. Manda la matriz hasta que se resuelva la decisión abierta 14.
+
+---
 
 ## 1. Cómo leer el catálogo
 

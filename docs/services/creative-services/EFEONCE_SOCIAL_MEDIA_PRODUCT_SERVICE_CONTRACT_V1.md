@@ -2,12 +2,75 @@
 
 > **Status:** `Approved for validation`
 > **Owner:** Efeonce Social Media Practice + Strategy
-> **Version:** V1.0 · 2026-07-29
+> **Version:** V1.1 · 2026-07-29 · [delta 2026-10-10](#delta-2026-10-10--brochure-marketing-de-contenidos) (el contrato base no cambia)
 > **Cliente visible:** Efeonce
 > **Marca/producto habilitador:** Globe / Creative Studio sólo como capacidad futura no incluida por defecto
 > **Modelo:** `On-Going + Managed Squad + efeonce-managed`
 > **Subservices:** [`Social Media Subservices Catalog V1`](EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md)
 > **Operating model:** [`Social Media Operating Model V1`](EFEONCE_SOCIAL_MEDIA_OPERATING_MODEL_V1.md)
+
+---
+
+## Delta 2026-10-10 — brochure «Marketing de Contenidos»
+
+La decisión del operador, sus citas y lo que cubre están en el [delta del Business Model](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#delta-2026-10-10--brochure-marketing-de-contenidos-lo-que-entra-a-la-oferta). Este documento registra qué significa para el contrato de servicio. **El scope core, la lista «no incluye por defecto», los fences y el RACI no cambian.**
+
+### Dos «seis» distintos
+
+El brochure habla de **seis frentes** (social media management, influencer marketing, creadores y UGC, listening y trendjacking, social care, paid social). Este contrato habla de **seis bloques core** (§3). No son lo mismo: los seis bloques core se reparten entre el frente «social media management», el de listening y la parte de comunidad del frente «social care»; los demás frentes son composiciones o add-ons. En una propuesta, el frente se nombra como en el brochure y el alcance se escribe con los bloques y subservicios de este contrato.
+
+La lámina de Social media del brochure agrupa el frente en estrategia y canales, sistema editorial, producción nativa, operación de canales, comunidad, y listening y tendencias. La medición y el aprendizaje, que aquí son un bloque core, aparecen en el brochure como láminas propias («Cómo sabes si funciona»).
+
+### Qué queda dentro y qué queda fuera del contrato base
+
+| Elemento del brochure | Tratamiento en este contrato |
+|---|---|
+| Social media management; series; adaptación nativa por formato; listening; trendjacking dentro de la reserva reactiva; social search | Core, con profundidad por nivel (§4) |
+| Comunidad en canales (comentarios, menciones, mensajes) | Core dentro de la ventana contratada |
+| Social care (atender y resolver), crisis y reputación, cobertura en vivo, lanzamientos | No incluido por defecto: add-on o proyecto con scope y SLA propios (§3, §7) |
+| Influencer marketing, creadores y UGC, paid social, programa de creadores | No incluido: composición con Media & Distribution (§10) |
+| Producción «pensada en vertical» | No incluido por defecto: producción especial con SOW (§10, Run & Gun) |
+| Producción con IA | Entra a la oferta por decisión del operador; sin regla contractual todavía. Ver abajo |
+| Comunidad en canales cerrados, voz ejecutiva, embajadores de marca | Entran a la oferta por decisión del operador; fuera del contrato base y sin unidad ni precio. Ver [catálogo](EFEONCE_SOCIAL_MEDIA_SUBSERVICES_CATALOG_V1.md#entradas-nuevas-código-provisional) |
+| Social conectado al CRM | No incluido: composición con RevOps & CRM. Social entrega señales, identificadores y tráfico (§10) |
+
+### Producción con IA: candidatos a quality gate
+
+El brochure compromete cuatro cosas cuando una pieza se produce con IA. Si el operador y Legal/IP las confirman, pasan a §6 como gates de toda pieza que use IA generativa:
+
+1. una persona dirige creativamente la pieza;
+2. la marca y el producto que aparecen son los reales, nunca inventados;
+3. los derechos y el uso comercial están revisados;
+4. una persona revisa la pieza antes de publicar.
+
+El cuarto ya está cubierto por la aprobación formal del cliente y por la regla de no publicar sin aprobación humana (§3, §6). Los otros tres son compromisos de servicio que este delta no contrastó con lo que Efeonce puede garantizar. Mientras tanto, el gate de disponibilidad de §9 sigue igual: el servicio es operable sin Globe y sin IA generativa.
+
+### Composición humana: lo que muestra el brochure
+
+El brochure muestra ocho roles con un solo interlocutor. La composición de referencia de §5 no cambia.
+
+| Rol del brochure | Rol de §5 | Nota |
+|---|---|---|
+| Responsable de cuenta («tu único interlocutor») | Account / Delivery Lead | Mismo rol, nombre comercial |
+| Estratega social | Social Strategist / Editor | El brochure no muestra por separado al Social Lead |
+| Creativos de contenido (diseño, video y copy) | Copy / Content Specialist y Designer / Editor | |
+| Community y social care | Community Manager | Social care sólo con el add-on correspondiente |
+| Listening | Sin rol propio en §5; hoy es función de estrategia y community | |
+| Analista | Sin rol propio en §5; está en el Operating Model como Insights / Analytics | |
+| Especialista en creadores | No es de este servicio | Rol de Media & Distribution |
+| Paid social | No es de este servicio | Rol de Media & Distribution |
+
+Sigue valiendo que no se promete una persona full-time ni una cantidad de horas si el SOW no la define, y que el brochure dice lo mismo con otras palabras: «el equipo se dimensiona según tu plan».
+
+### Superficies que el brochure le muestra al cliente
+
+El brochure dice que el cliente ve su plan y sus resultados en Marketing Studio y que recibe el reporte de Efeonce Insights. Este contrato no los incluye como entregable. Se tratan con la misma regla que Globe en §9: el servicio debe poder operarse y reportarse sin ellos, y se declaran en el SOW sólo cuando el acceso de esa cuenta esté verificado. Arquitecturas dueñas: [Marketing Studio](../../architecture/marketing-studio/EFEONCE_MARKETING_STUDIO_ARCHITECTURE_V1.md) y [Efeonce Insights](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
+
+### Decisiones abiertas que tocan este contrato
+
+Numeradas en el [Business Model §12](../../business-models/creative-services/EFEONCE_SOCIAL_MEDIA_BUSINESS_MODEL_V1.md#decisiones-abiertas-del-delta-2026-10-10): 8 (social care), 9 (producción con IA), 10 (un solo squad con seis frentes), 11 (Marketing Studio y métricas en vivo), 13 (voz ejecutiva y embajadores), 14 (contenido de los niveles) y 15 (entrada).
+
+---
 
 ## 1. Qué compra el cliente
 
