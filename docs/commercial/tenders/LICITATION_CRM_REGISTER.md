@@ -1,5 +1,13 @@
 # Registro operativo CRM de licitaciones
 
+## Grupo Socopur — agencia digital 2027 — revisión completa 10-10-2026
+
+**Recuperación de ingreso tardío, HSP-0017.** [Expediente y cinco láminas](socopur-agencia-marketing-digital-2027/README.md): redes, pauta, audiovisual/diseño, SEO/web y analítica. Manifestación cerró 5/10; calendario prevé Q&A 8–13/10, preparación 14–30/10, presentaciones 2–6/11 y selección 9–13/11. Año 2026 contextual, sin hora/zona publicadas. **No hay reapertura ni ingreso tardío confirmados.** Nuevo detalle: equipo técnico/creativo exclusivo y discrepancia entre experiencia sectorial mínima (lámina) o preferida (post). Primer contacto: credencial/portafolio PDF; RFP completo pendiente.
+
+Company `59118554799`, Contact `254187252267` y nota `118330098975` existentes; nota ampliada y readback exacto verificado con autorización de Julio. **Actualización posterior autorizada:** [Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado, `default/qualifiedtobuy`, Strategic Bets, newbusiness, owner Julio; Company Primary, contacto y nota asociados y verificados. Sin amount; **closedate previsto 13-11-2026**, fin del período publicado de selección/comunicación, por instrucción de Julio. Lead automático `595727275161` conservado; correo enviado por Julio. [Auditoría y excepción de empresa duplicada por dominio](socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md). Próximo paso: esperar respuesta de Katherine sobre admisión y bases antes de finalizar Q&A; no hay autorización de seguimiento automático. Presupuesto, capacidad exclusiva, admisibilidad y GO pendientes.
+
+**Actualización de envío 10/10:** Julio confirmó que envió el correo a Katherine. Próximo paso vigente: esperar respuesta sobre ingreso tardío y bases. Envío declarado por remitente, sin inspección de Enviados ni recepción confirmada; sustituye indicaciones anteriores de envío pendiente. Sin seguimiento automático autorizado.
+
 ## Pierre Fabre Chile — licitación agencia integral 2027 — 09-10-2026
 
 **Aclaración del enlace y contacto de credenciales:** [expediente con formulario completo verificado y requisitos](pierre-fabre-agencia-integral-2027/README.md). La URL copiada que termina en «…» está truncada. Contacto de credenciales `254011713292` registrado y asociado a la misma Company/Deal; fuente: apartado 10 del formulario, sin cargo ni entregabilidad inferidos. Descripción y nota CRM actualizadas; sin envío.

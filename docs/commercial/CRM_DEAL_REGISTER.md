@@ -1,5 +1,13 @@
 # Registro operativo general de negocios CRM
 
+## Socopur — Agencia Digital 2027 — 10-10-2026
+
+[Deal 65871170058](https://app.hubspot.com/contacts/48713323/record/0-3/65871170058?utm_source=codex&utm_medium=ai_agent) creado por instrucción expresa de Julio, tras deduplicación por nombre y asociaciones. Dos lecturas: `default/qualifiedtobuy`, `Strategic Bets`, `newbusiness`, owner `75788512`, sin amount. **Cierre previsto actualizado por Julio: 13-11-2026**, final de la ventana de selección/comunicación 9–13/11; no adjudicación confirmada. USD es moneda predeterminada CRM, no negociación confirmada. Company `59118554799` Primary, Contact `254187252267` y Note `118330098975` asociados y releídos.
+
+**Estado real: recuperación de ingreso tardío**, bases/presupuesto/admisibilidad pendientes. No inferir calificación completa de la etapa administrativa. Próximo paso: esperar respuesta sobre admisión/bases; Q&A previsto 8–13/10. Correo enviado por Julio; sin oferta presentada. [Expediente](tenders/socopur-agencia-marketing-digital-2027/README.md) y [auditoría](tenders/socopur-agencia-marketing-digital-2027/research/hubspot-verificacion-2026-10-10-INTERNO.md).
+
+**Actualización de envío 10/10:** Julio confirmó que envió el correo a Katherine. Próximo paso vigente: esperar respuesta sobre ingreso tardío y bases. Envío declarado por remitente, sin inspección de Enviados ni recepción confirmada; sustituye indicaciones anteriores de envío pendiente. Sin seguimiento automático autorizado.
+
 ## SKY Social Care 2027 — solicitud y seguimiento — 09-10-2026
 
 [Deal 56549453888](https://app.hubspot.com/contacts/48713323/record/0-3/56549453888?utm_source=codex&utm_medium=ai_agent): Jaime solicitó cotización PPTO 2027 por 1.300 respuestas públicas mensuales en 13 cuentas. Nota `118298168622` y cuatro tareas nuevas en HubSpot/Notion verificadas; seguimiento principal reutilizado. Fechas internas 13–16/10; caso de negocio aún pendiente. [Expediente y enlaces](prospects/sky-social-care-2027/README.md). Monto CLP21.600.000 y etapa Sample Sprint / Validación históricos preservados; no fee mensual aprobado ni adjudicación.

@@ -48,6 +48,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Workspaces comerciales
 
+- [Socopur — Agencia Digital 2027](tenders/socopur-agencia-marketing-digital-2027/README.md): cinco láminas revisadas, calendario completo y matriz de admisibilidad; respuesta sobre ingreso tardío pendiente. Q&A previsto 8–13/10; empresa/contacto y nota asociados al Deal `65871170058`, creado por instrucción expresa y verificado; Julio confirmó envío manual el 10/10, respuesta pendiente.
+
 - [Oferta económica rápida para licitación / Compra Ágil](templates/cotizacion-a4/README.md): plantilla A4 derivada de UTEM, con slots, JSON y [presentación multimoneda/FX explícito](templates/cotizacion-a4/MULTIMONEDA.md); prepara HTML/PDF desde precio y alcance aprobados. Su guía distingue la emisión documental de una cotización persistida: no crea `quoteId`, no ejecuta pricing/costing ni actualiza CRM o Finance. Para operar el sistema de cotizaciones Greenhouse, seguir [pricing comercial](../documentation/finance/pricing-comercial.md) y el [canon de Finance](../architecture/GREENHOUSE_FINANCE_ARCHITECTURE_V1.md), verificando runtime vigente.
 - [Costeo V3 para roles y servicios con agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md): selección por demanda, recursos base/por tarea, presupuesto IA, capacidad declarada y desglose congelado. La [superficie local](../documentation/finance/cotizador-v3-superficie-implementada.md) y el [handoff canónico](../documentation/finance/cotizador-v3-promocion-canonica.md) separan simulación, revisión comercial y emisión/aprobación en Greenhouse.
 
