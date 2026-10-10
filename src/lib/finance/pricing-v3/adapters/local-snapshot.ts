@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto'
 import Decimal from 'decimal.js'
 
 import { calculatePricingV3 } from '../calculate'
+import { PricingV3Error } from '../errors'
 import { ENGINE_VERSION, pricingV3InputSchema } from '../schemas'
 import type { PricingV3Result } from '../calculate'
 import type { PricingV3Input } from '../schemas'
@@ -54,7 +55,7 @@ export function runPricingV3(input: unknown, createdAt = new Date().toISOString(
 
 /** Verify frozen content AND recompute with the exact supported engine; never load today's catalog. */
 export function replayPricingV3(raw: unknown): PricingV3Artifact {
-  if (!raw || typeof raw !== 'object') throw new Error('REPLAY_MISMATCH')
+  if (!raw || typeof raw !== 'object') throw new PricingV3Error('REPLAY_MISMATCH')
   const artifact = raw as PricingV3Artifact
 
   if (
@@ -62,7 +63,7 @@ export function replayPricingV3(raw: unknown): PricingV3Artifact {
     artifact.semantic?.engineVersion !== ENGINE_VERSION ||
     hash(artifact.semantic) !== artifact.replayDigest
   )
-    throw new Error('REPLAY_MISMATCH')
+    throw new PricingV3Error('REPLAY_MISMATCH')
   const recalculated = runPricingV3(artifact.semantic.input, artifact.execution?.createdAt)
 
   if (
@@ -70,7 +71,7 @@ export function replayPricingV3(raw: unknown): PricingV3Artifact {
     recalculated.artifact.replayDigest !== artifact.replayDigest ||
     recalculated.artifact.calculationId !== artifact.calculationId
   )
-    throw new Error('REPLAY_MISMATCH')
+    throw new PricingV3Error('REPLAY_MISMATCH')
 
   return recalculated.artifact
 }

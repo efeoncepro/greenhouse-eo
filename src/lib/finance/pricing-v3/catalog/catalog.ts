@@ -1,3 +1,4 @@
+import { PricingV3Error } from '../errors'
 import { catalogSchema, changeSetSchema } from './contracts'
 import type { Catalog, CatalogRecord } from './contracts'
 
@@ -5,20 +6,20 @@ export function validateCatalog(raw: unknown): Catalog {
   const catalog = catalogSchema.parse(raw)
 
   if (new Set(catalog.records.map(r => `${r.recordId}:${r.revision}`)).size !== catalog.records.length)
-    throw new Error('DUPLICATE_CATALOG_RECORD')
+    throw new PricingV3Error('DUPLICATE_CATALOG_RECORD')
   if (
     new Set(catalog.currencies.map(c => c.code)).size !== catalog.currencies.length ||
     new Set(catalog.countries).size !== catalog.countries.length
   )
-    throw new Error('DUPLICATE_CATALOG_DIMENSION')
+    throw new PricingV3Error('DUPLICATE_CATALOG_DIMENSION')
   const keys = new Set<string>()
 
   for (const row of catalog.records) {
     if (row.retiredAt && (row.retiredAt <= row.source.effectiveFrom || row.source.effectiveUntil >= row.retiredAt))
-      throw new Error('INVALID_RETIREMENT')
+      throw new PricingV3Error('INVALID_RETIREMENT')
     const key = `${row.recordId}:${row.revision}`
 
-    if (keys.has(key)) throw new Error('DUPLICATE_CATALOG_RECORD')
+    if (keys.has(key)) throw new PricingV3Error('DUPLICATE_CATALOG_RECORD')
     keys.add(key)
     const siblings = catalog.records.filter(r => r.recordId === row.recordId && r !== row)
 
@@ -29,14 +30,14 @@ export function validateCatalog(raw: unknown): Catalog {
           (r.source.effectiveFrom <= row.source.effectiveUntil && row.source.effectiveFrom <= r.source.effectiveUntil)
       )
     )
-      throw new Error('OVERLAPPING_CATALOG_RECORD')
+      throw new PricingV3Error('OVERLAPPING_CATALOG_RECORD')
     if (
       row.kind === 'kit' &&
       new Set(row.value.requirements.map(r => r.requirementId)).size !== row.value.requirements.length
     )
-      throw new Error('DUPLICATE_KIT_REQUIREMENT')
+      throw new PricingV3Error('DUPLICATE_KIT_REQUIREMENT')
     if (row.kind === 'cost' && new Set(row.value.components.map(c => c.coverage)).size !== row.value.components.length)
-      throw new Error('DUPLICATE_COST_COVERAGE')
+      throw new PricingV3Error('DUPLICATE_COST_COVERAGE')
   }
 
   return catalog
@@ -71,9 +72,10 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
   const current = validateCatalog(raw)
   const change = changeSetSchema.parse(changeRaw)
 
-  if (change.nextVersion === current.version) throw new Error('CATALOG_VERSION_REQUIRED')
-  if (current.audit.some(a => a.changeId === change.changeId)) throw new Error('CHANGE_ALREADY_APPLIED')
-  if (new Set(change.changes.map(c => c.recordId)).size !== change.changes.length) throw new Error('DUPLICATE_CHANGE')
+  if (change.nextVersion === current.version) throw new PricingV3Error('CATALOG_VERSION_REQUIRED')
+  if (current.audit.some(a => a.changeId === change.changeId)) throw new PricingV3Error('CHANGE_ALREADY_APPLIED')
+  if (new Set(change.changes.map(c => c.recordId)).size !== change.changes.length)
+    throw new PricingV3Error('DUPLICATE_CHANGE')
   const next = structuredClone(current)
 
   if (change.dimensions) {
@@ -81,7 +83,7 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
       change.dimensions.countriesAdd.some(c => next.countries.includes(c)) ||
       change.dimensions.currenciesAdd.some(c => next.currencies.some(old => old.code === c.code))
     )
-      throw new Error('CATALOG_DIMENSION_CONFLICT')
+      throw new PricingV3Error('CATALOG_DIMENSION_CONFLICT')
     next.countries.push(...change.dimensions.countriesAdd)
     next.currencies.push(...change.dimensions.currenciesAdd)
   }
@@ -91,15 +93,15 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
   for (const edit of change.changes) {
     const previous = next.records.filter(r => r.recordId === edit.recordId).sort((a, b) => b.revision - a.revision)[0]
 
-    if (edit.operation === 'add' ? Boolean(previous) : !previous) throw new Error('CATALOG_RECORD_CONFLICT')
+    if (edit.operation === 'add' ? Boolean(previous) : !previous) throw new PricingV3Error('CATALOG_RECORD_CONFLICT')
 
     if (previous) {
-      if (previous.retiredAt) throw new Error('RETIRED_CATALOG_RECORD')
+      if (previous.retiredAt) throw new PricingV3Error('RETIRED_CATALOG_RECORD')
       if (
         edit.effectiveFrom < previous.source.effectiveFrom ||
         (edit.operation === 'retire' && edit.effectiveFrom === previous.source.effectiveFrom)
       )
-        throw new Error('EFFECTIVE_DATE_CONFLICT')
+        throw new PricingV3Error('EFFECTIVE_DATE_CONFLICT')
 
       if (edit.effectiveFrom === previous.source.effectiveFrom) {
         // Same-day correction belongs to a new version. Parent and audited before-value preserve history.
@@ -112,7 +114,7 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
     }
 
     if (edit.operation === 'retire') {
-      if (edit.record) throw new Error('INVALID_CHANGE_RECORD')
+      if (edit.record) throw new PricingV3Error('INVALID_CHANGE_RECORD')
       previous!.retiredAt = edit.effectiveFrom
     } else {
       const candidate = edit.record
@@ -125,7 +127,7 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
         candidate.revision !== (previous ? previous.revision + 1 : 1) ||
         (previous && previous.kind !== candidate.kind)
       )
-        throw new Error('INVALID_CHANGE_RECORD')
+        throw new PricingV3Error('INVALID_CHANGE_RECORD')
 
       const identity = (r: CatalogRecord) => {
         switch (r.kind) {
@@ -150,9 +152,9 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
         }
       }
 
-      if (previous && identity(previous) !== identity(candidate)) throw new Error('CATALOG_IDENTITY_CONFLICT')
+      if (previous && identity(previous) !== identity(candidate)) throw new PricingV3Error('CATALOG_IDENTITY_CONFLICT')
       if (previous && candidate.source.reference === previous.source.reference)
-        throw new Error('UPDATED_SOURCE_REFERENCE_REQUIRED')
+        throw new PricingV3Error('UPDATED_SOURCE_REFERENCE_REQUIRED')
       next.records.push(candidate)
     }
 

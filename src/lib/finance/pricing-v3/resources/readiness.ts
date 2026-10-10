@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js'
 
+import { PricingV3Error } from '../errors'
 import type { composeResourceQuote } from './composition'
+import { linesBelowPolicyFloor } from './summary'
 
 type Composition = ReturnType<typeof composeResourceQuote>
 
@@ -82,6 +84,17 @@ export function assessCompositionReadiness(result: Composition) {
       'Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract.'
     )
 
+  // The floor verdict is the kernel's (MARGIN_BELOW_FLOOR per line); readiness only turns it into an owned decision.
+  const belowPolicyFloor = linesBelowPolicyFloor(result)
+
+  for (const line of belowPolicyFloor)
+    gap(
+      'MARGIN_BELOW_POLICY_FLOOR',
+      `periods.${line.periodId}.result.lines.${line.lineId}`,
+      'Commercial/Finance',
+      'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.'
+    )
+
   return {
     calculationStatus: result.quote.calculationStatus,
     commercialStatus: 'requires_review',
@@ -94,7 +107,10 @@ export function assessCompositionReadiness(result: Composition) {
           proposedFloor: '0.35',
           approved: false,
           belowProposedFloor:
-            result.quote.totals.marginRate === null ? null : new Decimal(result.quote.totals.marginRate).lt('0.35')
+            result.quote.totals.marginRate === null ? null : new Decimal(result.quote.totals.marginRate).lt('0.35'),
+          // Per-line floors of the pricing policy actually selected, as judged by the kernel. Independent of the
+          // generic proposals above, which stay unapproved references.
+          policyFloor: { source: 'kernel:MARGIN_BELOW_FLOOR', linesBelowFloor: belowPolicyFloor }
         }
       : null
   }
@@ -103,20 +119,27 @@ export function assessCompositionReadiness(result: Composition) {
 /** Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin. */
 export function projectCompositionPreview(result: Composition) {
   if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
-    throw new Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+    throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
   const D = Decimal.clone({ precision: 80 })
   const currency = result.quote.totals.currency
 
   const periods = result.quote.periods.map(p => {
-    if (!p.result.totals) throw new Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+    if (!p.result.totals) throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
     const lines = p.result.lines
     const setup = lines.filter(l => l.kind === 'setup').reduce((s, l) => s.plus(l.net), new D(0))
+
+    // The kernel already formatted this period at the currency's precision; an amount derived here keeps that scale
+    // instead of assuming two decimals (CLP has none).
+    const scale = p.result.totals.net.split('.')[1]?.length ?? 0
 
     const items =
       result.commercialUnit === 'managed_service'
         ? [
-            { label: 'Servicio gestionado — fee del periodo', net: new D(p.result.totals.net).minus(setup).toFixed(2) },
-            ...(setup.gt(0) ? [{ label: 'Implementación inicial', net: setup.toFixed(2) }] : [])
+            {
+              label: 'Servicio gestionado — fee del periodo',
+              net: new D(p.result.totals.net).minus(setup).toFixed(scale)
+            },
+            ...(setup.gt(0) ? [{ label: 'Implementación inicial', net: setup.toFixed(scale) }] : [])
           ]
         : lines.map(l => ({ label: l.kind === 'setup' ? 'Implementación inicial' : l.label, net: l.net }))
 

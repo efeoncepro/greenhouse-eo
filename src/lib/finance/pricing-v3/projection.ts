@@ -1,3 +1,4 @@
+import { PricingV3Error } from './errors'
 import type { PricingV3Artifact } from './adapters/local-snapshot'
 
 /** Internal caller supplies a verified artifact. This allowlist is not an authorization mechanism. */
@@ -5,7 +6,7 @@ export function projectPricingV3ForClient(artifact: PricingV3Artifact) {
   const { input, result } = artifact.semantic
 
   if (result.calculationStatus !== 'calculated' || result.reviewStatus !== 'within_policy' || !result.totals)
-    throw new Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
+    throw new PricingV3Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
 
   return {
     documentType: 'draft_estimate',

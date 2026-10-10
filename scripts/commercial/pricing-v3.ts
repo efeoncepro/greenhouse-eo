@@ -2,6 +2,8 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
+import { ZodError } from 'zod'
+
 import { validateCatalog, searchCatalog } from '../../src/lib/finance/pricing-v3/catalog/catalog'
 import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
 import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
@@ -19,6 +21,7 @@ import {
   projectCompositionPreview
 } from '../../src/lib/finance/pricing-v3/resources/readiness'
 import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
+import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
 import {
@@ -41,6 +44,12 @@ import {
   applyCatalogChange
 } from '../../src/lib/finance/pricing-v3/adapters/catalog-local'
 
+import {
+  PRICING_V3_UNCLASSIFIED_ERROR_CODE,
+  PricingV3Error,
+  isPricingV3Error
+} from '../../src/lib/finance/pricing-v3/errors'
+
 import type { calculatePricingV3 } from '../../src/lib/finance/pricing-v3'
 import { pricingV3ClientMarkdown, projectPricingV3ForClient } from '../../src/lib/finance/pricing-v3'
 import {
@@ -51,39 +60,103 @@ import {
 } from '../../src/lib/finance/pricing-v3/adapters/local-snapshot'
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
-const read = (path: string) => JSON.parse(readFileSync(path, 'utf8')) as unknown
 
-const required = (value: string | undefined) => {
-  if (!value) throw new Error('MISSING_ARGUMENT')
+const options = {
+  input: { type: 'string' },
+  out: { type: 'string' },
+  left: { type: 'string' },
+  right: { type: 'string' },
+  format: { type: 'string' },
+  query: { type: 'string' },
+  catalog: { type: 'string' },
+  policy: { type: 'string' },
+  credits: { type: 'string' },
+  brief: { type: 'string' },
+  kind: { type: 'string' },
+  date: { type: 'string' },
+  impact: { type: 'string' },
+  confirm: { type: 'string' },
+  help: { type: 'boolean' }
+} as const
 
-  return value
+type ValueOption = Exclude<keyof typeof options, 'help'>
+
+// An unknown flag is echoed only when it reads as a flag name, so a mistyped value cannot ride out as a "name".
+const named = (option: string) => (/^[a-z][a-z-]{0,31}$/i.test(option) ? { option } : {})
+
+const parseCli = () => {
+  // Non-strict on purpose: an unknown flag arrives as a token we can name, not as Node prose we would have to parse.
+  const { positionals, tokens } = parseArgs({ allowPositionals: true, strict: false, tokens: true, options })
+  const values: Partial<Record<ValueOption, string>> & { help?: boolean } = {}
+
+  for (const token of tokens) {
+    if (token.kind !== 'option') continue
+    if (!Object.keys(options).includes(token.name)) throw new PricingV3Error('UNKNOWN_OPTION', named(token.name))
+    const option = token.name as keyof typeof options
+
+    if (option === 'help') {
+      if (token.value !== undefined) throw new PricingV3Error('INVALID_ARGUMENT', { option })
+      values.help = true
+    } else {
+      // Strict mode refused a value shaped like the next flag; without this, `--input --out x` would read "--out".
+      if (token.value === undefined || (!token.inlineValue && token.value.startsWith('-')))
+        throw new PricingV3Error('MISSING_ARGUMENT', { option })
+      values[option] = token.value
+    }
+  }
+
+  return { positionals, values }
 }
+
+// Only the option name leaves here: a path or a parser message could quote what the caller keeps private.
+const readJson = (option: ValueOption, path: string): unknown => {
+  let text: string
+
+  try {
+    text = readFileSync(path, 'utf8')
+  } catch {
+    throw new PricingV3Error('INPUT_NOT_FOUND', { option })
+  }
+
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new PricingV3Error('INPUT_NOT_JSON', { option })
+  }
+}
+
+// The one writer for JSON and text alike: exclusive and private, so nothing this tool freezes is ever overwritten.
+const writeNew = (path: string, body: string) => {
+  try {
+    writeFileSync(path, body, { flag: 'wx', mode: 0o600 })
+  } catch (error) {
+    // Either way the caller fixes `--out`; the system reason (missing folder, permissions) is not echoed.
+    const exists = (error as NodeJS.ErrnoException).code === 'EEXIST'
+
+    throw new PricingV3Error(exists ? 'OUTPUT_EXISTS' : 'OUTPUT_NOT_WRITABLE', { option: 'out' })
+  }
+}
+
+const ISSUE_LIMIT = 20
+
+/**
+ * Derived, never listed: a registered rejection reports its own code. A schema failure contributes path and rule
+ * only, because the validator's message can quote the received value. Anything else stays unclassified.
+ */
+const classify = (error: unknown) =>
+  isPricingV3Error(error)
+    ? error
+    : error instanceof ZodError
+      ? new PricingV3Error('SCHEMA_INVALID', {
+          issues: error.issues.slice(0, ISSUE_LIMIT).map(issue => ({ path: issue.path.join('.'), rule: issue.code }))
+        })
+      : undefined
 
 const exitFor = (result: ReturnType<typeof calculatePricingV3>) =>
   result.calculationStatus !== 'calculated' ? 2 : result.reviewStatus === 'requires_review' ? 3 : 0
 
 try {
-  const { positionals, values } = parseArgs({
-    allowPositionals: true,
-    strict: true,
-    options: {
-      input: { type: 'string' },
-      out: { type: 'string' },
-      left: { type: 'string' },
-      right: { type: 'string' },
-      format: { type: 'string' },
-      query: { type: 'string' },
-      catalog: { type: 'string' },
-      policy: { type: 'string' },
-      credits: { type: 'string' },
-      brief: { type: 'string' },
-      kind: { type: 'string' },
-      date: { type: 'string' },
-      impact: { type: 'string' },
-      confirm: { type: 'string' },
-      help: { type: 'boolean' }
-    }
-  })
+  const { positionals, values } = parseCli()
 
   const [command, subcommand] = positionals
 
@@ -102,19 +175,34 @@ try {
     help: ['help']
   }
 
-  if (command && permitted[command] && Object.keys(values).some(key => !permitted[command].includes(key)))
-    throw new Error('INVALID_ARGUMENT')
+  // Names the first flag the (sub)command does not take, so the caller can drop exactly that one.
+  const permit = (allowed: readonly string[]) => {
+    const option = Object.keys(values).find(key => !allowed.includes(key))
+
+    if (option) throw new PricingV3Error('INVALID_ARGUMENT', { option })
+  }
+
+  const required = (option: ValueOption) => {
+    const value = values[option]
+
+    if (!value) throw new PricingV3Error('MISSING_ARGUMENT', { option })
+
+    return value
+  }
+
+  if (command && permitted[command]) permit(permitted[command])
 
   const catalogPath =
     values.catalog ?? fileURLToPath(new URL('../../data/pricing/v3-catalog/catalog.review-v1.json', import.meta.url))
 
-  const writeNew = (path: string, value: unknown) => writeFileSync(path, json(value), { flag: 'wx', mode: 0o600 })
+  const load = (option: ValueOption) => readJson(option, required(option))
+  const loadCatalog = () => readJson('catalog', catalogPath)
 
   const impacts = () => {
     if (!values.impact) return []
-    const list = read(values.impact)
+    const list = readJson('impact', values.impact)
 
-    if (!Array.isArray(list) || list.length > 100) throw new Error('INVALID_ARGUMENT')
+    if (!Array.isArray(list) || list.length > 100) throw new PricingV3Error('INVALID_ARGUMENT', { option: 'impact' })
 
     return list
   }
@@ -152,60 +240,51 @@ try {
       !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'workload'].includes(subcommand) ||
       positionals.length !== 2
     )
-      throw new Error('INVALID_ARGUMENT')
+      throw new PricingV3Error('INVALID_ARGUMENT')
 
     const allowed = ['assess', 'preview'].includes(subcommand)
       ? ['input', 'out', 'format', 'help']
       : subcommand === 'workload'
         ? ['input', 'brief', 'out', 'help']
         : subcommand === 'scaffold'
-        ? ['catalog', 'policy', 'input', 'out', 'help']
-        : ['catalog', 'policy', 'credits', 'input', 'out', 'help']
+          ? ['catalog', 'policy', 'input', 'out', 'help']
+          : ['catalog', 'policy', 'credits', 'input', 'out', 'help']
 
-    if (Object.keys(values).some(key => !allowed.includes(key))) throw new Error('INVALID_ARGUMENT')
+    permit(allowed)
 
     if (subcommand === 'workload') {
       // Volume → dedication. With --brief it writes a new dimensioned brief; it never edits the one it read.
-      if (values.out && !values.brief) throw new Error('INVALID_ARGUMENT')
+      if (values.out && !values.brief) throw new PricingV3Error('INVALID_ARGUMENT', { option: 'out' })
 
       const result = values.brief
-        ? applyWorkloadToBrief(read(values.brief), read(required(values.input)))
-        : dimensionWorkload(read(required(values.input)))
+        ? applyWorkloadToBrief(readJson('brief', values.brief), load('input'))
+        : dimensionWorkload(load('input'))
 
       if (values.out) {
-        if (!('brief' in result) || !result.brief) throw new Error('WORKLOAD_REQUIRES_VALID_DIMENSIONING')
-        writeNew(values.out, result.brief)
+        if (!('brief' in result) || !result.brief) throw new PricingV3Error('WORKLOAD_REQUIRES_VALID_DIMENSIONING')
+        writeNew(values.out, json(result.brief))
       }
 
       process.stdout.write(json(result))
       process.exitCode = result.status === 'prepared' ? 0 : 2
     } else if (subcommand === 'scaffold') {
-      const result = scaffoldResourceDemand(
-        read(catalogPath),
-        read(required(values.policy)),
-        read(required(values.input))
-      )
+      const result = scaffoldResourceDemand(loadCatalog(), load('policy'), load('input'))
 
-      if (values.out) writeNew(values.out, result.demand)
+      if (values.out) writeNew(values.out, json(result.demand))
       process.stdout.write(json(result))
       process.exitCode = 2
     } else if (subcommand === 'plan') {
-      const result = prepareOperatingPlan(
-        read(catalogPath),
-        read(required(values.policy)),
-        read(required(values.credits)),
-        read(required(values.input))
-      )
+      const result = prepareOperatingPlan(loadCatalog(), load('policy'), load('credits'), load('input'))
 
       if (values.out) {
-        if (!result.demand) throw new Error('PLAN_REQUIRES_VALID_ALLOCATION')
-        writeNew(values.out, result.demand)
+        if (!result.demand) throw new PricingV3Error('PLAN_REQUIRES_VALID_ALLOCATION')
+        writeNew(values.out, json(result.demand))
       }
 
       process.stdout.write(json(result))
       process.exitCode = result.status === 'calculated' ? 3 : 2
     } else if (subcommand === 'assess' || subcommand === 'preview') {
-      const artifact = replayResourceComposition(read(required(values.input)))
+      const artifact = replayResourceComposition(load('input'))
 
       const result =
         subcommand === 'assess'
@@ -215,43 +294,32 @@ try {
       const format = values.format ?? 'json'
 
       if (!['json', 'markdown'].includes(format) || (subcommand === 'assess' && format !== 'json'))
-        throw new Error('INVALID_FORMAT')
+        throw new PricingV3Error('INVALID_FORMAT', { option: 'format' })
       const output = format === 'markdown' ? compositionPreviewMarkdown(artifact.semantic.result) : json(result)
 
-      if (values.out) writeFileSync(values.out, output, { flag: 'wx', mode: 0o600 })
+      if (values.out) writeNew(values.out, output)
       process.stdout.write(output)
       process.exitCode = 3
     } else {
-      const artifact = runResourceComposition(
-        read(catalogPath),
-        read(required(values.policy)),
-        read(required(values.credits)),
-        read(required(values.input))
-      )
+      const artifact = runResourceComposition(loadCatalog(), load('policy'), load('credits'), load('input'))
 
       const result = artifact.semantic.result
 
-      if (values.out) writeNew(values.out, artifact)
+      if (values.out) writeNew(values.out, json(artifact))
+      // Both print the same derived summary; the complete result lives only in the artifact written by --out.
+      // `quote` is the one that freezes, so only it reports the digest a later replay must reproduce.
       process.stdout.write(
         json(
-          subcommand === 'prepare'
-            ? {
-                calculationId: artifact.calculationId,
-                selections: result.selections,
-                attributions: result.attributions,
-                creditBudgets: result.creditBudgets,
-                diagnostics: result.quote.diagnostics,
-                assumptions: result.quote.resolution.assumptions,
-                calculationStatus: result.quote.calculationStatus,
-                binding: false
-              }
-            : { calculationId: artifact.calculationId, replayDigest: artifact.replayDigest, ...result }
+          summarizeComposition(result, {
+            calculationId: artifact.calculationId,
+            ...(subcommand === 'quote' ? { replayDigest: artifact.replayDigest } : {})
+          })
         )
       )
       process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
     }
   } else if (command === 'resources') {
-    if (positionals.length !== 2) throw new Error('INVALID_ARGUMENT')
+    if (positionals.length !== 2) throw new PricingV3Error('INVALID_ARGUMENT')
 
     const allowed: Record<string, string[]> = {
       inspect: ['catalog', 'policy', 'credits', 'date', 'query', 'out', 'help'],
@@ -261,61 +329,51 @@ try {
       apply: ['catalog', 'policy', 'credits', 'input', 'impact', 'confirm', 'out', 'help']
     }
 
-    if (!allowed[subcommand] || Object.keys(values).some(key => !allowed[subcommand].includes(key)))
-      throw new Error('INVALID_ARGUMENT')
+    if (!allowed[subcommand]) throw new PricingV3Error('INVALID_ARGUMENT')
+    permit(allowed[subcommand])
 
     if (subcommand === 'preview' || subcommand === 'apply') {
-      const args = [
-        read(catalogPath),
-        read(required(values.policy)),
-        read(required(values.credits)),
-        read(required(values.input))
-      ] as const
+      const args = [loadCatalog(), load('policy'), load('credits'), load('input')] as const
 
       const result =
         subcommand === 'preview'
           ? previewResourceChange(...args, impacts())
-          : applyResourceChange(...args, required(values.confirm), impacts())
+          : applyResourceChange(...args, required('confirm'), impacts())
 
-      if (subcommand === 'apply') writeNew(required(values.out), result.successor)
-      else if (values.out) writeNew(values.out, result)
+      if (subcommand === 'apply') writeNew(required('out'), json(result.successor))
+      else if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
     } else if (subcommand === 'inspect') {
-      const policy = compositionPolicySchema.parse(read(required(values.policy)))
-      const discovery = inspectOperatingResources(read(catalogPath), policy, required(values.date), values.query)
+      const policy = compositionPolicySchema.parse(load('policy'))
+      const discovery = inspectOperatingResources(loadCatalog(), policy, required('date'), values.query)
 
       const result = {
         ...discovery,
         policyDigest: catalogDigest(policy),
         ...(values.credits
-          ? { creditCatalogDigest: catalogDigest(creditCatalogSchema.parse(read(values.credits))) }
+          ? { creditCatalogDigest: catalogDigest(creditCatalogSchema.parse(readJson('credits', values.credits))) }
           : {})
       }
 
-      if (values.out) writeNew(values.out, result)
+      if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
     } else if (subcommand === 'portfolio') {
-      const result = allocateResourcePortfolio(
-        read(required(values.input)),
-        read(required(values.policy)),
-        read(catalogPath),
-        values.date
-      )
+      const result = allocateResourcePortfolio(load('input'), load('policy'), loadCatalog(), values.date)
 
-      if (values.out) writeNew(values.out, result)
+      if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
       process.exitCode = result.status === 'prepared' ? 3 : 2
     } else {
-      if (subcommand !== 'budget') throw new Error('INVALID_ARGUMENT')
-      const result = planCreditBudget(read(required(values.catalog)), read(required(values.input)))
+      if (subcommand !== 'budget') throw new PricingV3Error('INVALID_ARGUMENT')
+      const result = planCreditBudget(load('catalog'), load('input'))
 
-      if (values.out) writeNew(values.out, result)
+      if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
       process.exitCode = result.calculationStatus === 'calculated' ? 3 : 2
     }
   } else if (command === 'catalog') {
     if (!['search', 'show', 'validate', 'preview', 'apply'].includes(subcommand) || positionals.length !== 2)
-      throw new Error('INVALID_ARGUMENT')
+      throw new PricingV3Error('INVALID_ARGUMENT')
 
     const permittedSub: Record<string, string[]> = {
       search: ['catalog', 'query', 'kind', 'date', 'help'],
@@ -325,8 +383,8 @@ try {
       apply: ['catalog', 'input', 'impact', 'confirm', 'out', 'help']
     }
 
-    if (Object.keys(values).some(key => !permittedSub[subcommand].includes(key))) throw new Error('INVALID_ARGUMENT')
-    const catalog = validateCatalog(read(catalogPath))
+    permit(permittedSub[subcommand])
+    const catalog = validateCatalog(loadCatalog())
 
     if (subcommand === 'validate')
       process.stdout.write(
@@ -339,16 +397,16 @@ try {
         })
       )
     else if (subcommand === 'preview')
-      process.stdout.write(json(previewCatalogChange(catalog, read(required(values.input)), impacts())))
+      process.stdout.write(json(previewCatalogChange(catalog, load('input'), impacts())))
     else if (subcommand === 'apply') {
-      const next = applyCatalogChange(catalog, read(required(values.input)), required(values.confirm), impacts())
+      const next = applyCatalogChange(catalog, load('input'), required('confirm'), impacts())
 
-      writeNew(required(values.out), next)
+      writeNew(required('out'), json(next))
       process.stdout.write(json({ updated: true, version: next.version, digest: catalogDigest(next), binding: false }))
     } else {
       if (values.date && !briefSchema.shape.quoteDate.safeParse(values.date).success)
-        throw new Error('INVALID_ARGUMENT')
-      if (subcommand === 'show') required(values.query)
+        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'date' })
+      if (subcommand === 'show') required('query')
 
       const kinds = [
         'profile',
@@ -362,7 +420,8 @@ try {
         'fx'
       ] as const
 
-      if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number])) throw new Error('INVALID_ARGUMENT')
+      if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number]))
+        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'kind' })
 
       const rows = searchCatalog(
         catalog,
@@ -376,7 +435,7 @@ try {
           ? rows
           : rows.filter(
               r =>
-                r.recordId === required(values.query) ||
+                r.recordId === required('query') ||
                 ('profileId' in r.value && r.value.profileId === values.query) ||
                 ('resourceId' in r.value && r.value.resourceId === values.query) ||
                 ('kitId' in r.value && r.value.kitId === values.query)
@@ -395,20 +454,20 @@ try {
       if (!candidates.length) process.exitCode = 2
     }
   } else if (command === 'prepare' || command === 'quote') {
-    if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
-    const catalog = validateCatalog(read(catalogPath))
-    const brief = read(required(values.input))
+    if (positionals.length !== 1) throw new PricingV3Error('INVALID_ARGUMENT')
+    const catalog = validateCatalog(loadCatalog())
+    const brief = load('input')
 
     if (command === 'prepare') {
       const selection = resolveBrief(catalog, brief)
 
-      if (values.out) writeNew(values.out, selection)
+      if (values.out) writeNew(values.out, json(selection))
       process.stdout.write(json(selection))
       process.exitCode = selection.status === 'resolved' ? 0 : 2
     } else {
       const artifact = runCatalogQuote(catalog, brief)
 
-      if (values.out) writeNew(values.out, artifact)
+      if (values.out) writeNew(values.out, json(artifact))
       const result = artifact.semantic.result
 
       process.stdout.write(
@@ -431,12 +490,12 @@ try {
         result.calculationStatus !== 'calculated' ? 2 : result.reviewStatus === 'requires_review' ? 3 : 0
     }
   } else if (command === 'calculate' || command === 'validate') {
-    if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
-    const input = read(required(values.input))
+    if (positionals.length !== 1) throw new PricingV3Error('INVALID_ARGUMENT')
+    const input = load('input')
     const { result, artifact } = runPricingV3(input)
 
     if (values.out && command === 'calculate') {
-      if (artifact) writeFileSync(values.out, json(artifact), { flag: 'wx', mode: 0o600 })
+      if (artifact) writeNew(values.out, json(artifact))
     }
 
     process.stdout.write(
@@ -444,28 +503,33 @@ try {
     )
     process.exitCode = exitFor(result)
   } else if (['explain', 'replay', 'compare', 'export'].includes(command)) {
-    if (positionals.length !== 1) throw new Error('INVALID_ARGUMENT')
+    if (positionals.length !== 1) throw new PricingV3Error('INVALID_ARGUMENT')
 
     if (command === 'compare') {
-      const left = read(required(values.left))
-      const right = read(required(values.right))
+      const left = load('left')
+      const right = load('right')
 
       const catalogQuote = (value: unknown) =>
         (value as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION
 
-      if (catalogQuote(left) !== catalogQuote(right)) throw new Error('INVALID_COMPARISON')
+      if (catalogQuote(left) !== catalogQuote(right)) throw new PricingV3Error('INVALID_COMPARISON')
       process.stdout.write(json(catalogQuote(left) ? compareCatalogQuotes(left, right) : comparePricingV3(left, right)))
     } else {
-      const raw = read(required(values.input))
+      const raw = load('input')
 
       if ((raw as { artifactVersion?: string })?.artifactVersion === COMPOSITION_VERSION) {
-        if (command === 'export') throw new Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
+        if (command === 'export') throw new PricingV3Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
         const artifact = replayResourceComposition(raw)
 
         process.stdout.write(
           json(
             command === 'replay'
-              ? { verified: true, calculationId: artifact.calculationId, result: artifact.semantic.result }
+              ? {
+                  verified: true,
+                  calculationId: artifact.calculationId,
+                  // The verified detail is the file the caller already holds; replay answers with its summary.
+                  summary: summarizeComposition(artifact.semantic.result, artifact)
+                }
               : explainResourceComposition(raw)
           )
         )
@@ -474,13 +538,11 @@ try {
         const frozen = replayCatalogQuote(raw)
 
         if (command === 'export') {
-          if (values.format && !['json', 'markdown'].includes(values.format)) throw new Error('INVALID_ARGUMENT')
+          if (values.format && !['json', 'markdown'].includes(values.format))
+            throw new PricingV3Error('INVALID_ARGUMENT', { option: 'format' })
           const view = projectCatalogQuote(frozen.semantic.result, frozen.calculationId)
 
-          writeFileSync(required(values.out), values.format === 'json' ? json(view) : catalogQuoteMarkdown(view), {
-            flag: 'wx',
-            mode: 0o600
-          })
+          writeNew(required('out'), values.format === 'json' ? json(view) : catalogQuoteMarkdown(view))
           process.stdout.write(
             json({
               exported: true,
@@ -508,11 +570,12 @@ try {
         const artifact = replayPricingV3(raw)
 
         if (command === 'export') {
-          if (values.format && !['json', 'markdown'].includes(values.format)) throw new Error('INVALID_ARGUMENT')
+          if (values.format && !['json', 'markdown'].includes(values.format))
+            throw new PricingV3Error('INVALID_ARGUMENT', { option: 'format' })
           const view = projectPricingV3ForClient(artifact)
           const body = values.format === 'json' ? json(view) : pricingV3ClientMarkdown(view)
 
-          writeFileSync(required(values.out), body, { flag: 'wx', mode: 0o600 })
+          writeNew(required('out'), body)
           process.stdout.write(
             json({
               documentType: 'draft_estimate',
@@ -533,44 +596,19 @@ try {
         }
       }
     }
-  } else throw new Error('UNKNOWN_COMMAND')
+  } else throw new PricingV3Error('UNKNOWN_COMMAND')
 } catch (error) {
-  const safeCodes = [
-    'REPLAY_MISMATCH',
-    'INVALID_COMPARISON',
-    'CATALOG_BASE_CONFLICT',
-    'CATALOG_PREVIEW_CONFLICT',
-    'CATALOG_RECORD_CONFLICT',
-    'CATALOG_VERSION_REQUIRED',
-    'DUPLICATE_CHANGE',
-    'UPDATED_SOURCE_REFERENCE_REQUIRED',
-    'CATALOG_DIMENSION_CONFLICT',
-    'INVALID_RETIREMENT',
-    'RETIRED_CATALOG_RECORD',
-    'CATALOG_IDENTITY_CONFLICT',
-    'DUPLICATE_CATALOG_DIMENSION',
-    'INVALID_CHANGE_RECORD',
-    'EFFECTIVE_DATE_CONFLICT',
-    'DUPLICATE_CATALOG_RECORD',
-    'OVERLAPPING_CATALOG_RECORD',
-    'DUPLICATE_KIT_REQUIREMENT',
-    'DUPLICATE_COST_COVERAGE',
-    'CHANGE_ALREADY_APPLIED',
-    'EXPORT_SELECTION_QUOTE_NOT_SUPPORTED',
-    'EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY',
-    'MISSING_ARGUMENT',
-    'INVALID_ARGUMENT',
-    'UNKNOWN_COMMAND',
-    'INVALID_INPUT_NO_ARTIFACT'
-  ]
-
-  const code = error instanceof Error && safeCodes.includes(error.message) ? error.message : 'ADAPTER_FAILURE'
+  const failure = classify(error)
+  const { option, issues } = failure?.detail ?? {}
 
   process.stderr.write(
     json({
       error: {
-        code,
-        message: 'Operation failed. Check arguments, readable JSON, frozen version and output availability.'
+        code: failure?.code ?? PRICING_V3_UNCLASSIFIED_ERROR_CODE,
+        // Static by contract: nothing an exception says is ever copied into the report.
+        message: 'Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it.',
+        ...(option ? { option } : {}),
+        ...(issues ? { issues } : {})
       },
       binding: false
     })

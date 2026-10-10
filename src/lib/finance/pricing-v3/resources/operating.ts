@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { activeRecords, validateCatalog } from '../catalog/catalog'
 import { briefSchema } from '../catalog/contracts'
+import { PricingV3Error } from '../errors'
 import { compositionDemandSchema, compositionPolicySchema } from './composition-contracts'
 import { composeResourceQuote } from './composition'
 
@@ -202,7 +203,7 @@ export function inspectOperatingResources(catalogRaw: unknown, policyRaw: unknow
     profiles: live
       .filter(r => r.kind === 'profile')
       .map(r => {
-        if (r.kind !== 'profile') throw new Error('INVALID_PROFILE')
+        if (r.kind !== 'profile') throw new PricingV3Error('INVALID_PROFILE')
         const rule = policy.profileTasks.find(p => p.profileId === r.value.profileId)
 
         return { ...r.value, resourceRuleStatus: rule ? 'review_rule' : 'missing', tasks: rule?.tasks ?? [] }

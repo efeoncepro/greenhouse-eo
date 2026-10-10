@@ -5,6 +5,7 @@ import { composeResourceQuote } from '../resources/composition'
 import { compositionPolicySchema } from '../resources/composition-contracts'
 import { creditCatalogSchema } from '../resources/credit-budget'
 import { validateCatalog } from '../catalog/catalog'
+import { PricingV3Error } from '../errors'
 
 export const resourceChangeSchema = z
   .object({
@@ -30,14 +31,14 @@ export function previewResourceChange(
   const change = resourceChangeSchema.parse(changeRaw)
   const base = change.kind === 'policy' ? policy : credits
 
-  if (catalogDigest(base) !== change.baseDigest) throw new Error('RESOURCE_BASE_CONFLICT')
+  if (catalogDigest(base) !== change.baseDigest) throw new PricingV3Error('RESOURCE_BASE_CONFLICT')
 
   const successor =
     change.kind === 'policy'
       ? compositionPolicySchema.parse(change.replacement)
       : creditCatalogSchema.parse(change.replacement)
 
-  if (successor.version === base.version) throw new Error('RESOURCE_NEW_VERSION_REQUIRED')
+  if (successor.version === base.version) throw new PricingV3Error('RESOURCE_NEW_VERSION_REQUIRED')
   const nextPolicy = change.kind === 'policy' ? compositionPolicySchema.parse(successor) : policy
   const nextCredits = change.kind === 'credits' ? creditCatalogSchema.parse(successor) : credits
 
@@ -56,7 +57,7 @@ export function previewResourceChange(
           previous.unit !== price.price.unit) &&
         previous.source.reference === price.price.source.reference
       )
-        throw new Error('RESOURCE_SOURCE_RECONFIRMATION_REQUIRED')
+        throw new PricingV3Error('RESOURCE_SOURCE_RECONFIRMATION_REQUIRED')
     }
   }
 
@@ -70,7 +71,7 @@ export function previewResourceChange(
       previous.source.sha256 === provider.source.sha256 &&
       previous.source.reference === provider.source.reference
     )
-      throw new Error('RESOURCE_SOURCE_RECONFIRMATION_REQUIRED')
+      throw new PricingV3Error('RESOURCE_SOURCE_RECONFIRMATION_REQUIRED')
   }
 
   const ids = nextPolicy.tools.map(t => t.toolId)
@@ -101,9 +102,9 @@ export function previewResourceChange(
         )
     )
   )
-    throw new Error('INVALID_RESOURCE_POLICY_REFERENCE')
+    throw new PricingV3Error('INVALID_RESOURCE_POLICY_REFERENCE')
   if (!unique(nextPolicy.tools.flatMap(t => (t.providerId ? [t.providerId] : []))))
-    throw new Error('INVALID_RESOURCE_POLICY_REFERENCE')
+    throw new PricingV3Error('INVALID_RESOURCE_POLICY_REFERENCE')
 
   const semantic = {
     contextDigests: {
@@ -136,7 +137,7 @@ export function applyResourceChange(
 ) {
   const preview = previewResourceChange(catalog, policy, credits, change, demands)
 
-  if (confirmation !== preview.previewDigest) throw new Error('RESOURCE_PREVIEW_CONFLICT')
+  if (confirmation !== preview.previewDigest) throw new PricingV3Error('RESOURCE_PREVIEW_CONFLICT')
 
   return preview
 }

@@ -4,6 +4,7 @@ import { compositionDemandSchema, compositionPolicySchema } from '../resources/c
 import { creditCatalogSchema } from '../resources/credit-budget'
 import { validateCatalog } from '../catalog/catalog'
 import { explainCostComponents } from '../catalog/explain'
+import { PricingV3Error } from '../errors'
 
 export const COMPOSITION_VERSION = 'pricing-v3-resource-composition/1'
 
@@ -46,12 +47,12 @@ export function replayResourceComposition(raw: unknown) {
     artifact.semantic?.version !== COMPOSITION_VERSION ||
     catalogDigest(artifact.semantic) !== artifact.replayDigest
   )
-    throw new Error('REPLAY_MISMATCH')
+    throw new PricingV3Error('REPLAY_MISMATCH')
   const s = artifact.semantic
   const replay = runResourceComposition(s.catalog, s.policy, s.credits, s.demand, artifact.execution?.createdAt)
 
   if (replay.replayDigest !== artifact.replayDigest || replay.calculationId !== artifact.calculationId)
-    throw new Error('REPLAY_MISMATCH')
+    throw new PricingV3Error('REPLAY_MISMATCH')
 
   return replay
 }
