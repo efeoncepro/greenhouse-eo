@@ -548,9 +548,9 @@ Además, dentro de piezas aprobadas ese día: la portada de propuesta comercial 
 foco.**», evidencia «Preparada para **[Cliente]** · Confidencial»; el nombre del cliente nunca como título), la
 contraportada de brochure («¿Conversamos? **Cuando quieras.**») y la lámina que abre la sección del equipo («¿Quién
 hace crecer tu marca? **Este equipo.**»). La portada general de brochure y la lámina que abre la sección de servicios
-usan «¿Qué genera Efeonce? **Crecimiento.**» (operador, 2026-10-09: «Efeonce GENERA crecimiento para nuestros
-clientes»; reemplaza a «¿Qué hace Efeonce? Crecer.», que ya no se usa en piezas nuevas; «Genera crecimiento» como
-respuesta no entra en los 12 caracteres del slot, por eso el verbo vive en la pregunta). Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
+usan «¿Qué gano con Efeonce? **Crecimiento.**» (operador, 2026-10-09: «Efeonce GENERA crecimiento para nuestros
+clientes»; reemplaza a «¿Qué hace Efeonce? Crecer.», que ya no se usa en piezas nuevas; la pregunta es del cliente
+en primera persona, regla del 2026-10-06, y «Genera crecimiento» no entra en los 12 caracteres de la respuesta). Cómo se escribe una portada: eyebrow · pregunta · respuesta de 1–3 palabras
 (≥ 3× la pregunta) · evidencia con una palabra en negrita; nunca un título suelto tipo «Servicios 2026». Si la
 pregunta o la evidencia cruzarían la órbita o al sujeto de la foto, **se acorta la frase** («¿Qué hacemos por tu
 marca?» → «¿Qué hace Efeonce?»; «¿Dónde pongo el presupuesto?» → «¿Dónde invierto?») o se parte la evidencia en 2–3

@@ -286,9 +286,8 @@ que justifique recortar el sentido.
 **Pares aprobados que fallan las pruebas** (pendientes de reemplazo por el operador; se usan hasta entonces y la tabla
 de abajo los marca):
 Portada general «¿Qué hace Efeonce? Crecer.» (Efeonce se pregunta a sí misma y responde con un abstracto; **reemplazado
-el 2026-10-09** por «¿Qué genera Efeonce? Crecimiento.»: el operador lo confirmó porque Efeonce genera crecimiento para
-sus clientes; la respuesta cabe en los 12 caracteres de la portada, y la pregunta sigue siendo de Efeonce, abierta a
-pasar a la voz del cliente si el operador lo pide) ·
+el 2026-10-09** por «¿Qué gano con Efeonce? Crecimiento.»: el operador lo confirmó porque Efeonce genera crecimiento para
+sus clientes; la pregunta es del cliente, en primera persona, y la respuesta cabe en los 12 caracteres de la portada) ·
 Portada de propuesta «¿Cómo crecemos en 2027? Con foco.» (falla sustitución: «Con foco» lo firma cualquiera) ·
 Engine «¿Te encuentra la IA? Visible.» (sí o no sin calce; candidato: «Ahora sí.») · Revenue «¿Y el reporte del
 viernes? Ya lo viste.» (acertijo; candidatos: «¿Tus números están al día? Siempre.» · «¿Cuándo ves tu pipeline? En
@@ -330,7 +329,7 @@ y se usan tal cual en las piezas que indica la tabla. Norma de uso, piezas y med
 
 | Pieza | Pregunta | Respuesta | Evidencia |
 |---|---|---|---|
-| Portada de brochure *(reemplazado por el operador el 2026-10-09: Efeonce genera crecimiento para sus clientes; antes «¿Qué hace Efeonce? Crecer.»)* | ¿Qué genera Efeonce? | **Crecimiento.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
+| Portada de brochure *(reemplazado por el operador el 2026-10-09: Efeonce genera crecimiento para sus clientes, y la pregunta es del cliente según la regla del 2026-10-06; antes «¿Qué hace Efeonce? Crecer.»)* | ¿Qué gano con Efeonce? | **Crecimiento.** | **Cinco** líneas de servicio: Growth · Brand · Engine · Voice · Revenue |
 | Portada de propuesta comercial *(reemplazo pendiente)* | ¿Cómo crecemos en 2027? | **Con foco.** | Preparada para **[Cliente]** · Confidencial |
 | Portada de brochure · Growth | ¿Lo medimos? | **Siempre.** | **Seis** capacidades: Estrategia · GTM · Revenue enablement · Analítica · Medición · Orquestación |
 | Portada de brochure · Brand | ¿Quién crea mi contenido? | **Tu squad.** | **Seis** capacidades: Squad creativo · Brand systems · Campañas · Contenido y social · Audiovisual · Run & Gun |
