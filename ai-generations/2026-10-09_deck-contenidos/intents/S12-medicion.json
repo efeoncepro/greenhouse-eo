@@ -1,0 +1,44 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Medición",
+    "question": "¿Cómo sé si funciona?",
+    "answer": [
+      "Lo medimos"
+    ]
+  },
+  "body": "Tres niveles, de lo entregado a lo que movió el negocio. Cada ciclo cierra con evidencia y una recomendación.",
+  "steps": [
+    {
+      "glyph": "biblioteca",
+      "kicker": "Cumplimiento",
+      "name": "Entrega"
+    },
+    {
+      "glyph": "like",
+      "kicker": "Engagement real",
+      "name": "Contenido"
+    },
+    {
+      "glyph": "trofeo",
+      "kicker": "Leads y ventas",
+      "name": "Negocio"
+    }
+  ],
+  "note": "Ventas atribuidas y ROAS sólo con tracking acordado.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT4-medicion.png",
+    "alt": "Una estratega de Efeonce con hoodie termina de trazar con el dedo una curva de luz que sube desde el fondo de un atrio y acaba en un punto naranja"
+  }
+}

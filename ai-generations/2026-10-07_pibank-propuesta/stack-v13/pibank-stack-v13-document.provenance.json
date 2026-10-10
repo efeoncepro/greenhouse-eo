@@ -1,0 +1,70 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "fb2756124e60d1472421a9c5829de1f94ef26fac0b4ccde2b42cc819313b27f9",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-stack",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:search-console-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/search-console-isotype.svg",
+      "sha256": "48e7554f55e8ce8ff8b14f842f4a305bb492f213efdd2e1d99dd7eb65c5234e2"
+    },
+    {
+      "ref": "asset-ref:file:google-analytics-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/google-analytics-isotype.svg",
+      "sha256": "2a1b04004c8d0e3415a500baaa796a95c795c63fe60fa9bb76a05067897cafb4"
+    },
+    {
+      "ref": "asset-ref:file:semrush-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/semrush-isotype.svg",
+      "sha256": "33abc1c944c83c6329c93269046e2c17c93b9e91459de8322b9d5d1d4f29d760"
+    },
+    {
+      "ref": "asset-ref:file:brand-visibility-grader-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/brand-visibility-grader-isotype.svg",
+      "sha256": "cd61d820d06937c1168f5b0312a5d61551b419ffcd088c1eb637686c602ee4bc"
+    },
+    {
+      "ref": "asset-ref:file:chatgpt-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/chatgpt-isotype.svg",
+      "sha256": "e9ac54ba467b201d531ec339ac7bfb2e4d86cd3582c5b000357f41e4c841fea2"
+    },
+    {
+      "ref": "asset-ref:file:gemini-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/gemini-isotype.svg",
+      "sha256": "9c33b09a7ca20bd8f9505f6e5883ed710478f11e07e1c63c1e6f4e656d1878b0"
+    },
+    {
+      "ref": "asset-ref:file:google-ai-overview-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/platforms/google-ai-overview-isotype.svg",
+      "sha256": "14f1a3a2ad6fe0079fe89d2f469648741373b6d55a3a1f3c42b0dd71b942450d"
+    },
+    {
+      "ref": "asset-ref:file:notion-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/notion-isotype.svg",
+      "sha256": "73e1972c42eeb5b337bbeb2b4a02a9315ddb1921e690725e89f1fcec96203816"
+    },
+    {
+      "ref": "asset-ref:file:frameio-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "sha256": "a1ba5e2f7c3eda6dca595eae3ce49b90a94417fc46fdb5762eb5aa9bf989add8"
+    },
+    {
+      "ref": "asset-ref:file:teams-isotype",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:insights-isotype-positive",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/insights-isotype-positive.svg",
+      "sha256": "921a34fa567d880a3e674259fc5d8c7bbdb892f2fd5618bd64cf8af622289c5f"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

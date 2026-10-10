@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "b319d833824efa4b469001b22f8a2fb308a0cc3ce19831047de807c851d95023",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT5-prisma-formatos",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT5-prisma-formatos.png",
+      "sha256": "8dc9ec307b9266f7ee5246f27c4e620f633b5c212e530b9bc0cf49234b83c9eb"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

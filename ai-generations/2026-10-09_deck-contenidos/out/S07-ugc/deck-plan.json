@@ -1,0 +1,73 @@
+{
+  "tenderId": "S07-ugc",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:CT3-ugc-cocina",
+          "alt": "Una creadora con hoodie de Efeonce se ríe mientras graba un video casero en su cocina; el mismo video se proyecta enorme en la pared, como una valla"
+        },
+        "voice": {
+          "question": "¿Quién lo cuenta mejor?",
+          "answer": "Personas reales",
+          "eyebrow": "Marketing de Contenidos · Creadores y UGC"
+        },
+        "body": "Contenido hecho por personas para tus canales y tus anuncios, con un brief claro y los derechos definidos antes de grabar.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:lapiz-brand-dark-44",
+            "kicker": "Concepto",
+            "name": "Guion"
+          },
+          {
+            "icon": "asset-ref:icon:camara-brand-dark-44",
+            "kicker": "Con creadores",
+            "name": "Producción"
+          },
+          {
+            "icon": "asset-ref:icon:tijeras-brand-dark-44",
+            "kicker": "Por formato",
+            "name": "Edición"
+          },
+          {
+            "icon": "asset-ref:icon:biblioteca-brand-dark-44",
+            "kicker": "Por escrito",
+            "name": "Derechos"
+          }
+        ],
+        "note": "Uso orgánico y pagado, definidos en el contrato.",
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

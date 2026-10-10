@@ -1,0 +1,52 @@
+{
+  "tenderId": "C01-portada",
+  "slides": [
+    {
+      "slideId": "deck-cover-brochure",
+      "contentType": "deck.cover-brochure",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=220px",
+          "eyebrowTop": 410,
+          "questionTop": 458,
+          "answerTop": 520,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 672,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:CT1-portada-squad",
+          "alt": "Una creadora de Efeonce con hoodie, en una azotea de noche, levanta el teléfono con el que acaba de publicar un video: un haz de luz sube al cielo y el mismo video se enciende en pantallas por toda la ciudad"
+        },
+        "voice": {
+          "question": "¿Quién crea mi contenido?",
+          "answer": "Tu squad",
+          "eyebrow": "Brochure · Marketing de Contenidos"
+        },
+        "evidence": "<strong>Seis</strong> frentes, un squad:<br>Social media · Influencers · Creadores y UGC<br>Listening · Social care · Paid social"
+      },
+      "template": "CoverBrochure"
+    }
+  ]
+}

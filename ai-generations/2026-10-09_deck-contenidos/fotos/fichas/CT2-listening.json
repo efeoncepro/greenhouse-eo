@@ -1,0 +1,42 @@
+{
+  "id": "CT2-listening",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic scale, a vast dark listening room at night, slight low camera angle): Sophia, the analytical strategist with thin gold-wire glasses, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; her left shoulder is at about 60 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about three meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Behind her, receding into the darkness on the right half of the frame, a towering curved wall of THOUSANDS of tiny live conversation bubbles and post thumbnails drifts slowly upward like a waterfall of social conversation, all dim cool azure, anonymous and softly out of focus. THE MOMENT: ONE single conversation bubble has just broken away from the wall and floats on the frame-right side of her face, between her and the right edge of the frame; she catches it with her left hand between two fingers at this exact instant and looks at it, not at the lens, with a contained, sharp smile. The caught bubble glows cool white and is the light on her face; at its center sits one small orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. A long dark matte listening console runs between the camera and her, its near edge just in front of the lens. The wall never enters the left 45% of the frame. The LEFT 45% is calm, deep dark space with faint haze only. Enormous contrast, no logos of any other brand, no readable text.",
+  "lecho": {
+    "objeto": "the dark matte edge of the listening console close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left 45% of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "AE2b",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "sophia"
+    }
+  ],
+  "llave": {
+    "fuente": "the cool-white glowing conversation bubble she catches",
+    "lado": "to the frame-right of her face, at cheek height",
+    "distancia": "about 30 cm from her face"
+  },
+  "fondo": "the far top of the curved wall of conversation melted into cold azure bokeh",
+  "fenomeno": {
+    "que": "out of thousands of drifting conversations, one becomes a bright idea she catches in time",
+    "esServicio": "Social listening y trendjacking: escuchar todo y actuar a tiempo sobre lo que importa"
+  },
+  "excepcion": "Operador 2026-10-09: elenco sin línea fija y con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38)"
+}

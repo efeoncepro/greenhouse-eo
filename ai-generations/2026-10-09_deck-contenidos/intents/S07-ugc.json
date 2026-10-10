@@ -1,0 +1,49 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "role": "proposal",
+  "use": "brochure",
+  "recipe": "proposal-cinematic",
+  "layout": "service",
+  "line": "brand",
+  "theme": "dark",
+  "voice": {
+    "eyebrow": "Marketing de Contenidos · Creadores y UGC",
+    "question": "¿Quién lo cuenta mejor?",
+    "answer": [
+      "Personas reales"
+    ]
+  },
+  "body": "Contenido hecho por personas para tus canales y tus anuncios, con un brief claro y los derechos definidos antes de grabar.",
+  "steps": [
+    {
+      "glyph": "lapiz",
+      "kicker": "Concepto",
+      "name": "Guion"
+    },
+    {
+      "glyph": "camara",
+      "kicker": "Con creadores",
+      "name": "Producción"
+    },
+    {
+      "glyph": "tijeras",
+      "kicker": "Por formato",
+      "name": "Edición"
+    },
+    {
+      "glyph": "biblioteca",
+      "kicker": "Por escrito",
+      "name": "Derechos"
+    }
+  ],
+  "note": "Uso orgánico y pagado, definidos en el contrato.",
+  "photo": {
+    "register": "cine",
+    "subject": "person",
+    "plateRef": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT3-ugc-cocina.png",
+    "alt": "Una creadora con hoodie de Efeonce se ríe mientras graba un video casero en su cocina; el mismo video se proyecta enorme en la pared, como una valla"
+  }
+}

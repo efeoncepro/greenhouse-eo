@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "3af618bc13014d4f3cbff98ad02d11393d32dbfa7819d4027793685863831fad",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:CT3-ugc-cocina",
+      "path": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT3-ugc-cocina.png",
+      "sha256": "fe9704c6f730899322474e6579683b47a46d0adba1c22767ab682d797c8c00ab"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}
