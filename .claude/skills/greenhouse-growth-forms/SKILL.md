@@ -388,6 +388,32 @@ each governed by a capability + tenant auth + audit).
 - HubSpot adapter: mapping + `formGuid` + portal stay server-only. Use `captureWithDomain` (never
   `Sentry.captureException` directly).
 
+### HubSpot destination registry (2026-10-09)
+
+Each public-site Growth Form has **its own HubSpot form**; destinations are never shared. The
+mapping lives in `scripts/growth/hubspot-destinations.registry.ts` and is applied with
+`pnpm growth:forms:activate-hubspot-destinations` (dry-run by default; flags `--apply-hubspot`,
+`--smoke`, `--apply-greenhouse`, `--only=<slug>`). Select options are derived from the published
+`field_schema`, so HubSpot cannot drift from the Greenhouse contract.
+
+- **`status='delivered'` does not prove HubSpot delivery.** Without an enabled `direct`
+  destination the dispatcher marks the submission as delivered *to the ledger*. Proof is a
+  `form_destination_attempt` row with `status=succeeded`, HTTP 200 and `external_id`.
+- **Three non-retryable 400s send a lead to dead-letter**, and the tool's contract check covers
+  all three: `FIELD_NOT_IN_FORM_DEFINITION` (mapped property missing from the HubSpot form),
+  `VALUE_NOT_IN_FIELD_DEFINITION` (option mismatch) and `REQUIRED_FIELD` (a HubSpot-required field
+  Greenhouse does not guarantee, e.g. `lastname` for a one-word name). HubSpot forms used as
+  destinations keep everything but `email` optional: Greenhouse owns validation.
+- **HubSpot forms built in the new editor (`embedType: V4`, e.g. "AEO - Lead Form") cannot be
+  modified through the Forms API** (403 "not allowlisted to perform an operation to v4 forms").
+  Add their fields in the HubSpot UI, then re-run the tool; it reports the gap instead of failing.
+  New forms are created as V3 by cloning "Contact Form - EO".
+- A PATCH with a field group of more than 3 fields is rejected even if the form already had it.
+- **`--apply-greenhouse` always checks the live HubSpot form**, never the dry-run projection.
+- The portal has non-HubSpot form capture on (`leadin`), so every `.ghf-form` submit is also
+  recorded as "<page title>: .ghf-form". The opt-out is the `data-hs-do-not-collect` attribute on
+  the form element (renderer change, needs a release).
+
 ### HubSpot form definition fields
 
 HubSpot secure-submit can reject fields that are not part of the destination form definition, even

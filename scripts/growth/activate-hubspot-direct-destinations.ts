@@ -77,6 +77,7 @@ const HUBSPOT_API = 'https://api.hubapi.com'
 const FORMS_API = '/marketing/forms/2026-09-beta'
 const SECURE_SUBMIT_BASE = 'https://api.hsforms.com/submissions/v3/integration/secure/submit'
 const CONTACT_OBJECT_TYPE_ID = '0-1'
+const MAX_FIELDS_PER_GROUP = 3
 const CREATED_BY = 'hubspot-direct-destinations-activation'
 const RETRY_POLICY = { backoff: 'exponential_jitter', maxAttempts: 5 }
 
@@ -469,9 +470,33 @@ const ensureHubSpotForm = async (
   }
 
   if (!changed) return current
-  if (!APPLY_HUBSPOT) return { ...current, fieldGroups }
 
-  return hsOrThrow<HsForm>('PATCH', `${FORMS_API}/${current.id}`, { fieldGroups })
+  // La Forms API rechaza un PATCH con grupos de más de 3 campos, aunque el formulario ya los
+  // tuviera así desde la UI. Un grupo excedido se reparte en filas de un campo, en el mismo orden.
+  const normalizedGroups = fieldGroups.flatMap(group =>
+    (group.fields ?? []).length > MAX_FIELDS_PER_GROUP
+      ? (group.fields ?? []).map(field => ({ ...group, fields: [field] }))
+      : [group],
+  )
+
+  if (normalizedGroups.length !== fieldGroups.length) {
+    plan.actions.push(`${APPLY_HUBSPOT ? 'split' : 'would_split'} grupos de más de ${MAX_FIELDS_PER_GROUP} campos de "${current.name}" en filas de un campo`)
+  }
+
+  if (!APPLY_HUBSPOT) return { ...current, fieldGroups: normalizedGroups }
+
+  const patched = await hs<HsForm & { message?: string }>('PATCH', `${FORMS_API}/${current.id}`, { fieldGroups: normalizedGroups })
+
+  if (patched.status >= 200 && patched.status < 300 && patched.data) return patched.data
+
+  // Los formularios del editor nuevo (embedType V4) no admiten cambios por API: se deja el
+  // formulario como está y el contract check reporta lo que falta agregar desde la UI de HubSpot.
+  plan.actions.push(
+    `NO APLICADO en "${current.name}" (HTTP ${patched.status}: ${patched.data?.message ?? 'sin detalle'}). ` +
+      'Agregar los campos desde la UI de HubSpot y volver a correr.',
+  )
+
+  return current
 }
 
 // ─── Fase 2 — contract check ──────────────────────────────────────────────────
@@ -665,8 +690,13 @@ const processSpec = async (spec: HubSpotDestinationSpec): Promise<Outcome> => {
   for (const action of plan.actions) console.log(`  · ${action}`)
   if (plan.actions.length === 0) console.log('  · HubSpot ya está alineado con el registro')
 
-  // Fase 2
-  outcome.violations = checkContract(spec, ghFields, form)
+  // Fase 2 — En dry-run de HubSpot `form` es una PROYECCIÓN de lo que se crearía. Activar
+  // `direct` contra una proyección publicaría un mapeo que HubSpot real rechaza con 400, así que
+  // con `--apply-greenhouse` el contract check siempre lee el formulario vivo.
+  const formToCheck =
+    APPLY_GREENHOUSE && !APPLY_HUBSPOT && form.id !== '(por crear)' ? await hsOrThrow<HsForm>('GET', `${FORMS_API}/${form.id}`) : form
+
+  outcome.violations = checkContract(spec, ghFields, formToCheck)
   console.log(`  Contract check: ${outcome.violations.length === 0 ? 'OK' : `${outcome.violations.length} violación(es)`}`)
   for (const violation of outcome.violations) console.log(`    ✗ ${violation}`)
 

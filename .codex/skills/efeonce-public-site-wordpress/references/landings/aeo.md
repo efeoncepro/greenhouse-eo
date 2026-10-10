@@ -1,5 +1,7 @@
 # Landing: AEO `/aeo-2/`
 
+> **Delta 2026-10-09 — entrega a HubSpot activa.** `efeonce-aeo-diagnostic` v17 entrega en `direct` al formulario HubSpot «AEO - Lead Form» (registro `scripts/growth/hubspot-destinations.registry.ts`, herramienta `pnpm growth:forms:activate-hubspot-destinations`). Toda mención posterior en este archivo a destino `disabled`, `greenhouse_only`, sombra o «hasta el cutover» es historia. Evidencia: `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+
 Canonical doc: `docs/documentation/public-site/aeo-landing-elementor.md`.
 
 ## Identity

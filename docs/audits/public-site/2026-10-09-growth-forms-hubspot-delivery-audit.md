@@ -2,7 +2,7 @@
 
 > **Fecha:** 2026-10-09 · **Autor:** Claude (sesión con Julio Reyes)
 > **Alcance:** todos los formularios de `efeoncepro.com`. Think, Careers y `efeonce-lead-gen-web` quedan fuera.
-> **Estado:** `code complete, rollout pendiente` — herramienta lista y validada en dry-run; falta aplicarla.
+> **Estado:** aplicado el 2026-10-09. Los 8 formularios entregan en `direct`. Falta un envío real desde el navegador por formulario.
 
 ## Qué se midió
 
@@ -45,11 +45,41 @@ Resultado esperado en HubSpot: 1 grupo de properties, 20 properties de contacto 
 nuevos («Lead Gen - Content Marketing», «- Servicios HubSpot», «- Influencer Marketing», «- Desarrollo Web»,
 «- SEO», «- Redes Sociales») y 2 formularios existentes ampliados (AEO y Contacto).
 
-## Rollout pendiente
+## Rollout aplicado (2026-10-09)
 
-1. `--apply-hubspot --smoke` (crea un contacto de prueba `greenhouse-smoke+forms-<fecha>@efeonce.org`).
-2. `--apply-greenhouse` con contract check limpio.
-3. Un envío real desde el navegador por formulario para cerrar el tramo navegador → ledger → HubSpot.
+| Formulario | Versión | Formulario HubSpot | Smoke secure-submit |
+| --- | --- | --- | --- |
+| `efeonce-aeo-diagnostic` | v16 → v17 | AEO - Lead Form (existente) | 200 / 200 |
+| `efeonce-contacto` | v3 → v4 | Contact Form - EO (existente) | 200 / 200 |
+| `efeonce-content-marketing` | v3 → v4 | Lead Gen - Content Marketing (nuevo) | 200 / 200 |
+| `efeonce-hubspot-scope` | v3 → v4 | Lead Gen - Servicios HubSpot (nuevo) | 200 / 200 |
+| `efeonce-creator-influence-brief` | v2 → v3 | Lead Gen - Influencer Marketing (nuevo) | 200 / 200 |
+| `efeonce-desarrollo-web-cotizacion` | v2 → v3 | Lead Gen - Desarrollo Web (nuevo) | 200 / 200 |
+| `efeonce-seo-diagnostic` | v3 → v4 | Lead Gen - SEO (nuevo) | 200 / 200 |
+| `efeonce-social-audit` | v1 → v2 | Lead Gen - Redes Sociales (nuevo) | 200 / 200 |
+
+Evidencia:
+
+- El contacto de prueba `greenhouse-smoke+forms-20261010@efeonce.org` recibió las 20 properties
+  `gh_form_*` y las estándar, leído desde HubSpot después del smoke.
+- El render contract público de los 8 quedó idéntico al de antes salvo `version` y `formVersionId`,
+  sin datos de destino en el payload.
+- Las 8 páginas se recargaron en Chromium (escritorio y 390 px): mismo número de campos, mismo CTA,
+  sin desborde.
+- La segunda corrida de la herramienta devuelve `idempotente` en los 8.
+- Las versiones publicadas duplicadas de Content Marketing, Servicios HubSpot y Desarrollo web
+  quedaron deprecadas.
+
+Desvíos respecto del plan:
+
+- «AEO - Lead Form» usa el editor nuevo de HubSpot (`embedType: V4`) y la API responde 403 al
+  modificarlo. Los campos «Nombre de la empresa» y «URL del sitio web» se agregaron y publicaron
+  desde la UI de HubSpot.
+- En «Contact Form - EO» quedaron como no obligatorios nombre, apellido y teléfono.
+- Los formularios nuevos clonan la configuración de «Contact Form - EO», incluidos los avisos.
+
+Pendiente: un envío real desde el navegador por formulario, para cerrar el tramo
+navegador → Turnstile → ledger → despachador → HubSpot. El smoke cubre sólo el tramo adapter → HubSpot.
 
 ## Fuera de esta entrega
 

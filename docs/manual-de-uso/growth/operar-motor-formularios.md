@@ -264,6 +264,11 @@ destino `direct` significa «entregada al ledger». La prueba es `form_destinati
 Para revertir un formulario: republicar la versión anterior o publicar una con el destino en
 `disabled`. Los attempts no se borran.
 
+Problema comun: si la corrida dice `NO APLICADO ... v4 forms`, ese formulario de HubSpot fue creado
+con el editor nuevo y no admite cambios por API («AEO - Lead Form» es el caso). Agregar los campos
+que lista el contract check desde HubSpot (Marketing → Formularios → editar → Propiedades →
+Revisar y actualizar) y volver a correr; la herramienta no activa `direct` mientras falten.
+
 ## Referencias tecnicas
 
 - Arquitectura: `docs/architecture/GREENHOUSE_GROWTH_PUBLIC_FORMS_ENGINE_ARCHITECTURE_V1.md` (§Delta 2026-06-25 + §22).

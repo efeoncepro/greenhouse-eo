@@ -1,5 +1,11 @@
 # TASK-1264 — Growth Forms: lanzamiento productivo (catálogo + selector + cutover del form)
 
+## Delta 2026-10-09
+
+- Los 8 Growth Forms incrustados en `efeoncepro.com` (AEO, Contacto, Content Marketing, Servicios HubSpot, Influencers, Desarrollo web, SEO, Redes Sociales) ya entregan a HubSpot en `direct`, cada uno a su propio formulario — cerrado por la auditoría `docs/audits/public-site/2026-10-09-growth-forms-hubspot-delivery-audit.md`.
+- El supuesto "el destino pasa a `direct` reusando el GUID de lead-gen" quedó invalidado para esos formularios: el mapeo de lead-gen no calzaba con sus campos. El camino canónico es el registro `scripts/growth/hubspot-destinations.registry.ts` + `pnpm growth:forms:activate-hubspot-destinations`.
+- Esta task conserva sólo su alcance original: `efeonce-lead-gen-web` (sigue en `disabled`, sin embed vivo), catálogo y selector WordPress.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      ═══════════════════════════════════════════════════════════ -->

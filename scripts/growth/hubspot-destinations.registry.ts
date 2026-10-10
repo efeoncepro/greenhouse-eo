@@ -22,8 +22,12 @@ export const HUBSPOT_PROPERTY_GROUP = {
   label: 'Formularios del Sitio (Greenhouse)',
 } as const
 
-/** Formulario HubSpot cuya configuración (idioma, avisos, display) se clona al crear uno nuevo. */
-export const HUBSPOT_REFERENCE_FORM_ID = '8649e76c-8b01-41f3-9b0c-5713d7b4dba6'
+/**
+ * Formulario HubSpot cuya configuración (idioma, avisos, display) se clona al crear uno nuevo.
+ * Debe ser un formulario `embedType: V3` («Contact Form - EO»): los del editor nuevo (V4, como
+ * «AEO - Lead Form») no se pueden crear ni modificar por API.
+ */
+export const HUBSPOT_REFERENCE_FORM_ID = '8bee8dca-27f2-4ca5-ac09-7606351c7e72'
 
 export type HubSpotDestinationFieldKind =
   /** Property que ya existe en el portal (estándar o custom previa). Nunca se crea ni se edita. */
