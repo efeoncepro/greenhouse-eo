@@ -7,9 +7,10 @@ aprobado» y luego «Esto quedó aprobado, canonizalo»).
 - **Canvas (privado):** <https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph> (Design, sistema «Efeonce — La órbita»),
   versión 65. Tres páginas: «Deck» (57), «Ruta corta · 21 láminas» (copias para presentar) e «Interfaces · Marketing
   Studio» (cinco vistas construidas).
-- **PDF (16:9, 57 páginas, rasterizado):** `Efeonce-Brochure-Marketing-de-Contenidos.pdf` en esta carpeta. La ruta
-  corta (`…-ruta-corta.pdf`, 21 páginas) se regenera con el mismo comando y no entra a git. **No hay copia en OneDrive
-  todavía:** el deck no se manda a un prospecto hasta cerrar los pendientes de abajo.
+- **PDF (16:9, 57 páginas, rasterizado):** `Efeonce-Brochure-Marketing-de-Contenidos.pdf` en esta carpeta; copia en OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Marketing de Contenidos/` (pedida por el operador el 2026-10-10), junto con
+  la ruta corta (`…-Ruta-corta.pdf`, 21 páginas), que se regenera con el mismo comando y no entra a git. El deck no
+  se manda a un prospecto hasta cerrar los pendientes de abajo.
 - **Fuente:** `project/*.dc.html` + `project/canvas.json` (copia exacta de lo publicado en el canvas, versión 65).
   `order.json` = orden de la página «Deck»; `order-ruta.json` = orden de la ruta corta (archivos `R-NN-*.dc.html`,
   copias de las láminas originales). `blobs/` = los assets del canvas (`/_blob/<id>`); los PNG/JPG no entran a git.
