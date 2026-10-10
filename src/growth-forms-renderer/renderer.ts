@@ -68,6 +68,9 @@ export interface FormRendererOptions {
   hosted?: boolean
 }
 
+/** Atributo que excluye un <form> de la captura de formularios no-HubSpot de HubSpot. */
+export const HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE = 'data-hs-do-not-collect'
+
 const el = <K extends keyof HTMLElementTagNameMap>(
   doc: Document,
   tag: K,
@@ -255,7 +258,13 @@ export class FormRenderer {
 
     root.replaceChildren()
 
-    const form = el(this.doc, 'form', { class: 'ghf-form', novalidate: 'novalidate' })
+    // `data-hs-do-not-collect`: el script de HubSpot para formularios que no son suyos
+    // (`collectedforms.js`, cargado por el plugin `leadin` del host) se engancha al `submit` de
+    // cualquier <form> y registra una conversión propia, incluso cuando la validación bloquea el
+    // envío. La entrega a HubSpot es del dispatcher (destino gobernado), así que el formulario
+    // se declara fuera de esa captura. HubSpot evalúa el atributo al descubrir el nodo: debe
+    // existir ANTES de insertarlo en el DOM.
+    const form = el(this.doc, 'form', { class: 'ghf-form', novalidate: 'novalidate', [HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE]: 'true' })
 
     form.addEventListener('submit', e => {
       e.preventDefault()

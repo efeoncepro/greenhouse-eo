@@ -81,9 +81,28 @@ Desvíos respecto del plan:
 Pendiente: un envío real desde el navegador por formulario, para cerrar el tramo
 navegador → Turnstile → ledger → despachador → HubSpot. El smoke cubre sólo el tramo adapter → HubSpot.
 
+## Doble conversión — corregida en código, release pendiente (2026-10-10)
+
+El renderer ahora emite `<form class="ghf-form" data-hs-do-not-collect="true">`. El script de HubSpot
+(`collectedforms.js`) ignora los formularios con ese atributo; se confirmó leyendo su predicado y hay
+un test que lo reproduce y falla si el atributo no está presente al insertar el nodo.
+
+Queda para el release:
+
+1. **Greenhouse (`develop → main`)** publica `renderer-latest.js`, que usan AEO, Contacto, Desarrollo
+   web, SEO, Redes Sociales e Influencers.
+2. **Plugin de WordPress**: Content Marketing y Servicios HubSpot cargan bundles fijados
+   (`content-marketing-forms.js`, `hubspot-forms.js`). Hay que reconstruirlos con
+   `scripts/public-website/build-content-marketing-package.cjs` y `build-hubspot-elementor-package.cjs`
+   y desplegar el plugin; el release de Greenhouse no los actualiza.
+3. **Verificación**: enviar un formulario y confirmar en el contacto de HubSpot que aparece sólo la
+   conversión con el nombre del formulario y ya no «título de la página: .ghf-form».
+
+No apagar la captura a nivel de portal: el newsletter del footer y el agendador (`.ghm-form`) dependen de ella.
+
 ## Fuera de esta entrega
 
-- Excluir `.ghf-form` del capturador genérico (`data-hs-do-not-collect` en el renderer) para terminar con
-  la doble conversión. Requiere release del renderer y sólo después de que los 8 entreguen en `direct`.
 - Formularios heredados rotos, destinatario del CF7 de `/blog/` y spam del newsletter del footer.
 - `efeonce-lead-gen-web` sigue en sombra bajo TASK-1264.
+- Los formularios de Think (ebooks y grader) no tienen destino HubSpot en el registro; no se midió
+  que el capturador los esté registrando hoy.

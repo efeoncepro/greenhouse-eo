@@ -410,9 +410,17 @@ mapping lives in `scripts/growth/hubspot-destinations.registry.ts` and is applie
   New forms are created as V3 by cloning "Contact Form - EO".
 - A PATCH with a field group of more than 3 fields is rejected even if the form already had it.
 - **`--apply-greenhouse` always checks the live HubSpot form**, never the dry-run projection.
-- The portal has non-HubSpot form capture on (`leadin`), so every `.ghf-form` submit is also
-  recorded as "<page title>: .ghf-form". The opt-out is the `data-hs-do-not-collect` attribute on
-  the form element (renderer change, needs a release).
+- The portal has non-HubSpot form capture on (`leadin`), which records every `<form>` submit as
+  "<page title>: <form class>" — a second conversion per lead, fired even when validation blocks
+  the submit. The renderer opts out by rendering `<form class="ghf-form" data-hs-do-not-collect>`
+  (`HUBSPOT_DO_NOT_COLLECT_ATTRIBUTE` in `renderer.ts`; HubSpot evaluates it when it discovers
+  the node, so it must exist before insertion). **Consequence: a Growth Form reaches HubSpot only
+  through its governed destination.** A form without an enabled `direct` destination no longer
+  shows up in HubSpot at all — add it to the registry instead of relying on the scraper.
+  Rollout is per bundle: `renderer-latest.js` ships with the Greenhouse release; the WordPress
+  plugin's pinned bundles (`content-marketing-forms.js`, `hubspot-forms.js`) need their own rebuild
+  and plugin rollout. Never switch the portal-level capture off: the footer newsletter (CF7) and
+  the meeting scheduler (`.ghm-form`) still depend on it.
 
 ### HubSpot form definition fields
 
