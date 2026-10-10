@@ -1,0 +1,266 @@
+{
+  "v": 3,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-10-09T19:40:00Z"
+  },
+  "title": "Deck Servicios Web Efeonce",
+  "launch": {
+    "view": "canvas"
+  },
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "01 · Portada"
+    },
+    "Tesis.dc.html": {
+      "x": 2000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "02 · Tesis"
+    },
+    "Mercado.dc.html": {
+      "x": 4000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "03 · El contexto"
+    },
+    "IARespuesta.dc.html": {
+      "x": 6000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "04 · Visibilidad en IA"
+    },
+    "Familias.dc.html": {
+      "x": 8000,
+      "y": 0,
+      "w": 1920,
+      "h": 1080,
+      "title": "05 · Qué hacemos"
+    },
+    "Propuesta.dc.html": {
+      "x": 0,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "06 · Web Experience 360"
+    },
+    "Plataformas.dc.html": {
+      "x": 2000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "07 · Dónde construimos"
+    },
+    "LaunchOps.dc.html": {
+      "x": 4000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "08 · Experience LaunchOps"
+    },
+    "Search.dc.html": {
+      "x": 6000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "09 · Search Visibility 360"
+    },
+    "Medicion.dc.html": {
+      "x": 8000,
+      "y": 1200,
+      "w": 1920,
+      "h": 1080,
+      "title": "10 · Measurement & Analytics"
+    },
+    "Agentes.dc.html": {
+      "x": 0,
+      "y": 2400,
+      "w": 1920,
+      "h": 1080,
+      "title": "11 · Agent Systems & Platforms"
+    },
+    "Automatizacion.dc.html": {
+      "x": 2000,
+      "y": 2400,
+      "w": 1920,
+      "h": 1080,
+      "title": "12 · Automation & Integrations"
+    },
+    "ProductDesign.dc.html": {
+      "x": 4000,
+      "y": 2400,
+      "w": 1920,
+      "h": 1080,
+      "title": "13 · Product Design 360"
+    },
+    "SeccionPorQue.dc.html": {
+      "x": 6000,
+      "y": 2400,
+      "w": 1920,
+      "h": 1080,
+      "title": "14 · Sección · Por qué Efeonce"
+    },
+    "Diferencia.dc.html": {
+      "x": 8000,
+      "y": 2400,
+      "w": 1920,
+      "h": 1080,
+      "title": "15 · La diferencia"
+    },
+    "Clientes.dc.html": {
+      "x": 0,
+      "y": 3600,
+      "w": 1920,
+      "h": 1080,
+      "title": "16 · Clientes y pruebas"
+    },
+    "CasoBerel.dc.html": {
+      "x": 2000,
+      "y": 3600,
+      "w": 1920,
+      "h": 1080,
+      "title": "17 · Caso Berel"
+    },
+    "CasoAguas.dc.html": {
+      "x": 4000,
+      "y": 3600,
+      "w": 1920,
+      "h": 1080,
+      "title": "18 · Caso Aguas Andinas"
+    },
+    "Partners.dc.html": {
+      "x": 6000,
+      "y": 3600,
+      "w": 1920,
+      "h": 1080,
+      "title": "19 · Partners"
+    },
+    "Equipo.dc.html": {
+      "x": 8000,
+      "y": 3600,
+      "w": 1920,
+      "h": 1080,
+      "title": "20 · Equipo"
+    },
+    "Mercados.dc.html": {
+      "x": 0,
+      "y": 4800,
+      "w": 1920,
+      "h": 1080,
+      "title": "21 · Mercados"
+    },
+    "SeccionComo.dc.html": {
+      "x": 2000,
+      "y": 4800,
+      "w": 1920,
+      "h": 1080,
+      "title": "22 · Sección · Cómo empezamos"
+    },
+    "EnVivo.dc.html": {
+      "x": 4000,
+      "y": 4800,
+      "w": 1920,
+      "h": 1080,
+      "title": "23 · Resultados en vivo"
+    },
+    "Puertas.dc.html": {
+      "x": 6000,
+      "y": 4800,
+      "w": 1920,
+      "h": 1080,
+      "title": "24 · Por dónde empezar"
+    },
+    "Plan.dc.html": {
+      "x": 8000,
+      "y": 4800,
+      "w": 1920,
+      "h": 1080,
+      "title": "25 · Plan de trabajo"
+    },
+    "Modelos.dc.html": {
+      "x": 0,
+      "y": 6000,
+      "w": 1920,
+      "h": 1080,
+      "title": "26 · Cómo contratar"
+    },
+    "Riesgos.dc.html": {
+      "x": 2000,
+      "y": 6000,
+      "w": 1920,
+      "h": 1080,
+      "title": "27 · Riesgos"
+    },
+    "Pasos.dc.html": {
+      "x": 4000,
+      "y": 6000,
+      "w": 1920,
+      "h": 1080,
+      "title": "28 · Próximos pasos"
+    },
+    "Cierre.dc.html": {
+      "x": 6000,
+      "y": 6000,
+      "w": 1920,
+      "h": 1080,
+      "title": "29 · Contraportada"
+    }
+  },
+  "order": [
+    "Main.dc.html",
+    "Tesis.dc.html",
+    "Mercado.dc.html",
+    "IARespuesta.dc.html",
+    "Familias.dc.html",
+    "Propuesta.dc.html",
+    "Plataformas.dc.html",
+    "LaunchOps.dc.html",
+    "Search.dc.html",
+    "Medicion.dc.html",
+    "Agentes.dc.html",
+    "Automatizacion.dc.html",
+    "ProductDesign.dc.html",
+    "SeccionPorQue.dc.html",
+    "Diferencia.dc.html",
+    "Clientes.dc.html",
+    "CasoBerel.dc.html",
+    "CasoAguas.dc.html",
+    "Partners.dc.html",
+    "Equipo.dc.html",
+    "Mercados.dc.html",
+    "SeccionComo.dc.html",
+    "EnVivo.dc.html",
+    "Puertas.dc.html",
+    "Plan.dc.html",
+    "Modelos.dc.html",
+    "Riesgos.dc.html",
+    "Pasos.dc.html",
+    "Cierre.dc.html"
+  ],
+  "notes": {
+    "titulo": {
+      "x": 0,
+      "y": -300,
+      "text": "Servicios web y digitales · línea Engine · brochure",
+      "kind": "title1",
+      "maxW": 9920
+    }
+  },
+  "designSystems": [
+    {
+      "title": "Efeonce — La órbita",
+      "namespace": "efeonce-la-orbita",
+      "artifact": "https://claude.ai/code/artifact/0f7107f2-2ef1-460c-af82-5bf59e2f8785",
+      "version": "1791045370-2874",
+      "copiedAt": "2026-10-09T19:40:00Z"
+    }
+  ]
+}

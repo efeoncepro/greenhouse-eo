@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Mercados</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#cfe4fa}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #001a33; color: #ffffff; font-family: 'Poppins', system-ui, sans-serif;">
+  <img src="/_blob/e5aa18a2ddad9853c8382b69410c9f9c" alt="La Tierra de noche desde el espacio, con las Américas iluminadas y cinco ciudades unidas por arcos de luz azul" style="position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; object-position: 50% 70%;">
+
+  <div style="position: absolute; left: 140px; top: 112px; font-size: 18px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff;">Mercados</div>
+  <div style="position: absolute; left: 136px; top: 170px; width: 620px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 112px; font-weight: 760; letter-spacing: -0.04em; line-height: 0.9; font-variation-settings: 'opsz' 96; white-space: pre-line;">Cinco países,
+un solo
+equipo<span aria-hidden="true" style="display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.04em; border-radius: 9999px; background: {{accent}};"></span></div>
+  <div style="position: absolute; left: 140px; top: 520px; width: 500px; font-size: 24px; font-weight: 300; line-height: 1.45; color: #cfe4fa;">Chile, Estados Unidos, Colombia, México y Perú, con un solo interlocutor.</div>
+
+  <div style="position: absolute; left: 1420px; top: 170px; display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 9999px; background: rgba(0, 26, 51, 0.78); border: 1px solid rgba(166, 205, 245, 0.5); font-size: 20px; font-weight: 600; white-space: nowrap;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 9999px; background: {{accent}}; flex: none;"></span>EE. UU. · Miami</div>
+  <div style="position: absolute; right: 755px; top: 236px; display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 9999px; background: rgba(0, 26, 51, 0.78); border: 1px solid rgba(166, 205, 245, 0.5); font-size: 20px; font-weight: 600; white-space: nowrap;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 9999px; background: {{accent}}; flex: none;"></span>México · Ciudad de México</div>
+  <div style="position: absolute; left: 1446px; top: 380px; display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 9999px; background: rgba(0, 26, 51, 0.78); border: 1px solid rgba(166, 205, 245, 0.5); font-size: 20px; font-weight: 600; white-space: nowrap;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 9999px; background: {{accent}}; flex: none;"></span>Colombia · Bogotá</div>
+  <div style="position: absolute; right: 575px; top: 560px; display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 9999px; background: rgba(0, 26, 51, 0.78); border: 1px solid rgba(166, 205, 245, 0.5); font-size: 20px; font-weight: 600; white-space: nowrap;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 9999px; background: {{accent}}; flex: none;"></span>Perú · Lima</div>
+  <div style="position: absolute; right: 474px; top: 775px; display: flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 9999px; background: rgba(0, 26, 51, 0.78); border: 1px solid rgba(166, 205, 245, 0.5); font-size: 20px; font-weight: 600; white-space: nowrap;"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 9999px; background: {{accent}}; flex: none;"></span>Chile · Santiago</div>
+
+  <img src="/_blob/a6c69b68160be2538955abce07cff3af" alt="efeoncepro.com" style="position: absolute; left: 140px; bottom: 40px; width: 200px; height: auto;">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0375db","options":["#0375db","#36c8bf","#ff6500","#f83902"]},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0375db' };
+  }
+}
+</script>
+</body>
+</html>

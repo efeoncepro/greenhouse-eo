@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Riesgo controlado</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800;1,900&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#cfe4fa}a:hover{color:#ffffff}
+</style>
+</helmet>
+<div style="width: 1920px; height: 1080px; position: relative; overflow: hidden; background: #001a33; color: #ffffff; font-family: 'Poppins', system-ui, sans-serif;">
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0;">
+    <defs>
+      <radialGradient id="stageR" cx="1100" cy="700" r="900" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="{{accent}}" stop-opacity="0.28"></stop>
+        <stop offset="0.35" stop-color="{{accent}}" stop-opacity="0.10"></stop>
+        <stop offset="1" stop-color="{{accent}}" stop-opacity="0"></stop>
+      </radialGradient>
+    </defs>
+    <rect x="0" y="0" width="1920" height="1080" fill="url(#stageR)"></rect>
+    <defs><linearGradient id="floorX" x1="0" y1="778" x2="0" y2="1080" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#000814" stop-opacity="0"></stop><stop offset="1" stop-color="#000814" stop-opacity="0.55"></stop></linearGradient></defs>
+    <rect x="0" y="778" width="1920" height="302" fill="url(#floorX)"></rect>
+  </svg>
+
+  <div style="position: absolute; left: 140px; top: 112px; font-size: 18px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff;">Riesgo controlado</div>
+  <div style="position: absolute; left: 140px; top: 166px; display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 300; line-height: 1.25;">
+    <span aria-hidden="true" style="width: 22px; height: 22px; border-radius: 9999px; border: 3px solid {{accent}}; box-sizing: border-box; flex: none;"></span>
+    <span>¿Y si no funciona?</span>
+  </div>
+  <div style="position: absolute; left: 136px; top: 228px; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 112px; font-weight: 760; letter-spacing: -0.04em; line-height: 0.9; font-variation-settings: 'opsz' 96; white-space: nowrap;">Empiezas chico<span aria-hidden="true" style="display: inline-block; width: 0.2em; height: 0.2em; margin-left: 0.04em; border-radius: 9999px; background: {{accent}};"></span></div>
+  <div style="position: absolute; left: 1080px; top: 250px; width: 700px; font-size: 24px; font-weight: 300; line-height: 1.45; color: #cfe4fa;">Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto, no un contrato largo.</div>
+
+  <div style="position: absolute; left: 140px; top: 436px; width: 1640px; display: flex; flex-direction: column;">
+    <div style="display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; padding: 0 24px 12px; font-size: 15px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #cfe4fa;">
+      <span></span><span>Riesgo</span><span></span><span>Cobertura</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; height: 80px; padding: 0 24px; border-top: 1px solid rgba(207, 228, 250, 0.22);">
+      <span style="font-size: 18px; font-weight: 300; color: #cfe4fa;">01</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.025em; line-height: 1;">Que se atrase</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true" focusable="false"><path d="M 2 10 L 32 10 M 24 3 L 32 10 L 24 17" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size: 22px; font-weight: 300; line-height: 1.35;">Plan de 90 días con hitos semanales, visibles en tu portal.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; height: 80px; padding: 0 24px; border-top: 1px solid rgba(207, 228, 250, 0.22);">
+      <span style="font-size: 18px; font-weight: 300; color: #cfe4fa;">02</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.025em; line-height: 1;">Perder lo ganado al migrar</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true" focusable="false"><path d="M 2 10 L 32 10 M 24 3 L 32 10 L 24 17" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size: 22px; font-weight: 300; line-height: 1.35;">Mapa de redirecciones y SEO revisado antes de publicar.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; height: 80px; padding: 0 24px; border-top: 1px solid rgba(207, 228, 250, 0.22);">
+      <span style="font-size: 18px; font-weight: 300; color: #cfe4fa;">03</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.025em; line-height: 1;">Quedar amarrado</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true" focusable="false"><path d="M 2 10 L 32 10 M 24 3 L 32 10 L 24 17" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size: 22px; font-weight: 300; line-height: 1.35;">La web, el dominio y los datos son tuyos desde el día uno.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; height: 80px; padding: 0 24px; border-top: 1px solid rgba(207, 228, 250, 0.22); border-bottom: 1px solid rgba(207, 228, 250, 0.22);">
+      <span style="font-size: 18px; font-weight: 300; color: #cfe4fa;">04</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 740; letter-spacing: -0.025em; line-height: 1;">Que no se pueda medir</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true" focusable="false"><path d="M 2 10 L 32 10 M 24 3 L 32 10 L 24 17" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size: 22px; font-weight: 300; line-height: 1.35;">Medición instrumentada antes del lanzamiento.</span>
+    </div>
+    <div style="position: relative; margin-top: 18px; display: grid; grid-template-columns: 72px 560px 72px minmax(0, 1fr); align-items: center; height: 88px; padding: 0 24px; border-radius: 14px; background: #f7f8f6; color: #023c70;">
+      <span style="font-size: 18px; font-weight: 400; color: #6d6777;">05</span>
+      <span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 34px; font-weight: 760; letter-spacing: -0.025em; line-height: 1;">Que no funcione</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="20" viewBox="0 0 36 20" aria-hidden="true" focusable="false"><path d="M 2 10 L 32 10 M 24 3 L 32 10 L 24 17" fill="none" stroke="{{accent}}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="font-size: 22px; font-weight: 600; line-height: 1.35;">Empiezas con un Sample Sprint acotado.</span>
+      <div aria-hidden="true" style="position: absolute; inset: -9px; border: 2px dashed #a6cdf5;"></div>
+      <span aria-hidden="true" style="position: absolute; left: -16px; top: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; left: calc(50% - 7px); top: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; right: -16px; top: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; left: -16px; top: calc(50% - 7px); width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; right: -16px; top: calc(50% - 7px); width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; left: -16px; bottom: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; left: calc(50% - 7px); bottom: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+      <span aria-hidden="true" style="position: absolute; right: -16px; bottom: -16px; width: 14px; height: 14px; box-sizing: border-box; background: #ffffff; border: 2px solid #a6cdf5;"></span>
+    </div>
+  </div>
+
+  <svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0; pointer-events: none;">
+    <g transform="translate(1480 912) scale(2.2)"><path d="M 0 0 L 32 13 L 19 18 L 14 33 Z" fill="#5d50ff" stroke="#ffffff" stroke-width="0.8" stroke-linejoin="round"></path></g>
+  </svg>
+  <div style="position: absolute; left: 1556px; top: 976px; padding: 8px 18px; border-radius: 12px; background: #5d50ff; border: 2px solid #ffffff; font-size: 24px; font-weight: 700;">Cliente</div>
+
+  <img src="/_blob/a6c69b68160be2538955abce07cff3af" alt="efeoncepro.com" style="position: absolute; left: 140px; bottom: 40px; width: 200px; height: auto;">
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#0375db","options":["#0375db","#36c8bf","#ff6500","#f83902"]},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#0375db' };
+  }
+}
+</script>
+</body>
+</html>

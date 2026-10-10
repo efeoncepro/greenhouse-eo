@@ -13,7 +13,7 @@ description: >-
   Triggers: "deck", "láminas", "slides", "presentación", "pitch", "propuesta visual",
   "keynote", "QBR", "board deck", "armar el deck", "diseñar una presentación", "storyline",
   "narrativa del deck", "action title", "PPT", "PowerPoint", "brochure", "portada",
-  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "deck SEO", "deck SV360". En marca
+  "contraportada", "recetas del deck", "qué lámina uso", "deck Salesforce", "deck HubSpot", "brochure HubSpot", "brochure Agencia Creativa", "brochure creativo", "brochure servicios web", "deck web", "deck SEO", "deck SV360". En marca
   propia Efeonce, elige láminas del catálogo de 100 recetas aprobadas (docs/operations/brand-graphic-line/deck-recipes/;
   incluye las nueve SEO/AEO, las 16 del deck de práctica Salesforce y las seis del deck SEO/AEO), valida el plan con
   pnpm brand:deck-plan (o pídele al agente que lo proponga con --propose), liga los datos reales de los slots con
@@ -240,6 +240,62 @@ Desde el 2026-09-27 la línea se compone **por superficie** y el deck es una de 
   - **Narrativa: el mapa antes de los capítulos.** En la pasada final, los capítulos Creative Velocity y Brand Systems
     iban antes de la lámina de las cuatro rutas que los presenta. Se movió el mapa a la 3 y los capítulos siguen el
     orden de las rutas; las seis capacidades cierran el «qué» y abren el «quién».
+- **Brochure «Servicios web y digitales» (aprobado 2026-10-09).** El collateral vigente para vender las familias de
+  Wave y Experience LaunchOps: todo lo que Efeonce vende en servicios web y digitales, **firmado por Efeonce** en la
+  línea Engine (acento `#0375db`, sin teal; fondo `#001A33`). 29 láminas 16:9 en cuatro actos: **apertura** (01–05:
+  portada, tesis «Humanos y agentes», el contexto con tres cifras con fuente, visibilidad en IA, qué hacemos) →
+  **servicios** (06–13: Web Experience 360, «Dónde construimos», Experience LaunchOps, Search Visibility 360,
+  Measurement & Analytics, Agent Systems & Platforms, Automation & Integrations y Product Design 360, que el operador
+  dio por aprobada y va como definitiva, sin «Próximamente») → **«¿Por qué con ustedes? Un solo equipo»** (14–21: la
+  diferencia, clientes, casos Berel y Aguas Andinas, partners, equipo, mercados) → **«¿Cómo empezamos? Contigo»**
+  (22–28: resultados en vivo con Efeonce Insights, puertas de entrada —AEO Assessment, Lista para agentes, Diagnóstico
+  de lanzamientos—, plan de 90 días, cómo contratar —Sample Sprint, On-Demand, On-Going—, riesgos, próximos pasos) →
+  contraportada (29). **Siguen una receta del catálogo:** `decision-ai-market` (03), `decision-ai-answer` (04),
+  `content-service-lanes` (05), `decision-difference` (15), `content-clients` (16), `decision-case` (17 y 18),
+  `content-partners` (19), `content-team` (20), `content-markets` (21), `content-day-live-results` (23),
+  `decision-plan` (25, tres tramos de 4 semanas: calza con el contrato de medición de SV360), `decision-risk` (27),
+  `decision-next-steps` (28), `cover-brochure-line-engine` (01) y `close-brochure-orbit` (29), más
+  `method-surround-cycle` y `content-text`. Se rehicieron en el canvas: **no hay intents en el repo ni
+  `approvedUses` en el catálogo**, así que no salen de `pnpm brand:compose`. **A mano, candidatas a receta, no
+  recetas:** la tesis y las láminas de servicio (06, 08–13), en registro 3D cinematográfico con Spark y Nexa en
+  PNG transparente, cursores multiplayer y selección AXIS; y la 07 «Dónde construimos», un muro 3D de plataformas con
+  su logo oficial en blanco (WordPress, Webflow, Lovable, Adobe Experience Manager, Astro, **HubSpot Content Hub** —
+  así se llama hoy, no «HubSpot CMS») y una tarjeta de papel «A la medida» (Next.js · React). **Canvas** (privado):
+  <https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7>. **PDF** (16:9, 29 páginas, ~14,9 MB, rasterizado): OneDrive
+  `Alineación/4. Comercial/Brochures/2026/Web/Efeonce-Brochure-Servicios-Web.pdf`, copia y fuente
+  (`project/*.dc.html`, `canvas.json`, `order.json`, `blobs/`) en `ai-generations/2026-10-09_deck-web-nexa-spark/deck/`
+  (`LEEME.md`: orden, assets y pendientes). Se rehace con el mismo render del brochure Agencia Creativa:
+  `node ai-generations/2026-10-09_deck-web-nexa-spark/deck/exp/render-pdf.mjs ai-generations/2026-10-09_deck-web-nexa-spark/deck <salida.pdf>`
+  (antes hay que traer `artifact-type/dc-runtime.js` del canvas a `project/`: no va en git). **Antes de enviarlo a un
+  prospecto:** las cifras del caso Aguas Andinas (18) son marcadores inventados a pedido del operador; el caso Berel
+  (17) dice «12 meses» y la cuenta se adjudicó en mayo de 2026; las láminas 26 y 27 repiten el titular «Empiezas
+  chico»; logos de clientes sólo con autorización (TASK-1937). Detalle: norma §4.6 «Deck Servicios web» y manual
+  «El brochure Servicios web y digitales». **Lecciones de oficio medidas en esta corrida** (todas, correcciones del
+  operador):
+  - **Fondo según quién firma.** Pieza de línea firmada por Efeonce = `#001A33` (norma §3, regla 1; manual de la línea
+    §2, «Oscuro Efeonce»). `#091951` es sólo de piezas de producto (Globe, Wave, Reach). El deck salió en `#091951` y
+    hubo que cambiar las 29 láminas: se decide antes de la primera lámina.
+  - **Halo de escenario en todas las láminas.** Radial de radio 900 (0.28 → 0.10 al 35 % → 0) más piso `#000814` de 0 a
+    0.55 desde y 778. Sin él, las láminas se leen planas.
+  - **Español primero.** El deck se rechazó por exceso de inglés: el nombre en español va grande y el producto en
+    inglés, como sublínea chica («Datos que viajan solos» / Data Pipeline).
+  - **Sin marcadores «[N]».** «N días no le dice nada al cliente»: «[N] días» pasó a ser el plan de 90 días. En un
+    tablero de muestra van números de muestra coherentes, marcados «Datos de muestra».
+  - **Logo donde se nombra la marca.** El logo de Efeonce en vez del texto «Efeonce» (La diferencia, chip «Con
+    Efeonce») y el lockup oficial de Efeonce Insights (`axis-brand-assets/insights-lockup-negative.svg`) en la
+    notificación de la 23. Un logo con el isotipo dentro de un cuadrado de color (Aguas Andinas) **no** se pasa a un
+    tono con máscara, porque queda un bloque: sobre papel va el oficial a color. Una marca sin logo propio usa el de su
+    casa (AEM, el corporativo de Adobe); el de Lovable sale de Iconify (`logos:lovable`).
+  - **Caso de éxito = `decision-case`** (split de papel + visual bajo la curva), no una composición propia: el operador
+    la pidió por nombre. **Variante medida sin foto del caso:** el lado derecho puede ser una interfaz en HTML con
+    perspectiva 3D sobre el escenario oscuro (aquí, una bandeja de Service Hub); Berel reutiliza la foto CS3b del deck
+    SEO/AEO.
+  - **Imágenes.** El rótulo «Imagen ilustrativa» sobra; una imagen protagonista que se corta sangra hasta el borde;
+    el warp es sutil (pocas estelas); Nexa y Spark, en PNG transparente con
+    `pnpm ai:image --model gpt-image-2.5-sunburst --background transparent`.
+  - **Titular de equipo.** «Expertos multidisciplinarios», no «Personas reales, un solo interlocutor».
+  - **PDF rasterizado, no `page.pdf` por lámina.** El vectorial deja borde blanco y aplana el 3D (Partners,
+    Plataformas, Resultados en vivo, Caso Aguas Andinas).
 - **Contrato 0.1.2 y el brochure (2026-09-27).** Guía AXIS `docs/agent-composition/surfaces/deck.md` (§«Dos usos»,
   §`proposal-cinematic`, §«El documento») y ejemplo `docs/examples/surfaces/deck-brochure-servicios-document.json`.
   **Integrado en Greenhouse** (TASK-1927 y TASK-1928, ambas `complete` y en `origin/develop`): `pnpm brand:compose`

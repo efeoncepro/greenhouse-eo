@@ -1,9 +1,9 @@
 # Composición de decks y brochures de marca propia
 
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
-> **Version:** 2.8
+> **Version:** 2.9
 > **Creado:** 2026-09-27 por Claude
-> **Ultima actualizacion:** 2026-09-30 por Claude (2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
+> **Ultima actualizacion:** 2026-10-09 por Claude (2.9: el brochure de servicios web y digitales aprobado el 2026-10-09 — qué cubre, que sus láminas se armaron a mano en el lienzo de diseño y las reglas que dejó: el fondo de una pieza firmada por Efeonce, los casos de éxito siempre con la misma lámina, el logo donde se nombra una marca, nada de marcadores «[N]» y el español primero; pendientes antes de enviarlo. Antes, 2026-09-30, 2.8: el deck SEO/AEO (Search Visibility 360) aprobado en tres documentos — seis láminas nuevas que todavía no se componen solas, logos de submarca opcionales, logos de clientes que esperan autorización y los datos del deck tal cual por decisión del operador, que asume la responsabilidad (TASK-1949). Antes, 2.7: el operador aprobó todo el deck Salesforce, incluida la contraportada de brochure; la insignia «Salesforce Partner» está autorizada por Salesforce y va por defecto. Antes, 2.6: las 94 láminas se componen solas, incluidas las dieciséis del deck Salesforce; la contraportada de brochure Salesforce ya está compuesta y espera el visto bueno; la propuesta Salesforce existe como PDF sin insignia de partner (TASK-1942). Antes, 2.5: decisiones del operador al canonizar el deck Salesforce — las cuatro láminas que no cabían en recetas existentes pasan a tener la suya (94 recetas), el deck tiene dos cierres según se entregue como brochure o como propuesta, el logo grande de la contraportada es sólo de Salesforce y el servicio del CRM en Claude se llama «Enablement conversacional». Antes, 2.4: el deck de la práctica Salesforce aprobado — 19 láminas, doce recetas nuevas que todavía no se componen solas y ocho que usan recetas existentes; marcas de terceros con condición y el deck HubSpot pendiente (TASK-1942, TASK-1943). Antes, 2.3: sección «Ligar los datos reales de cada lámina» — las casillas de datos nunca se escriben a mano, de dónde sale cada una, evidencia interna prohibida en todo deck, muro de nueve logos, rastro por casilla y el comando `--bind` (TASK-1930). Antes, 2.2: las nueve láminas de SEO y AEO aprobadas el 2026-09-28 — cuándo usar cada una, las reglas nuevas (cifras con fuente, datos de muestra marcados, interfaz de IA genérica) y que dos versiones de una lámina nunca van en el mismo deck (TASK-1934). Antes, 2.1: sección «Validar y proponer el plan antes de componer» — qué revisa, AXIS y catálogo, errores y avisos, el agente propone recetas por id y la persona confirma, qué falta (TASK-1929). Antes, 2.0: las 69 láminas aprobadas del deck se componen solas — TASK-1928; la portada de brochure con la selección de Nexa; familias, reglas que el sistema hace cumplir y lo que falta)
 > **Documentacion tecnica:** [Arquitectura de la composición de piezas de marca](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) · [Norma de composición por superficie](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md)
 > **Manual de uso:** [Componer un deck con las recetas por lámina](../../manual-de-uso/creative/componer-deck-con-recetas.md) · [Componer una pieza por superficie con AXIS](../../manual-de-uso/creative/componer-por-superficie-con-axis.md)
 
@@ -163,6 +163,61 @@ la edición mensual (Efeonce Insights). Se entrega de tres formas: **completo** 
 > [catálogo de recetas](../../operations/brand-graphic-line/deck-recipes/README.md) ·
 > [manual, «El deck SEO/AEO»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
 > [TASK-1949](../../tasks/in-progress/TASK-1949-seo-aeo-deck-recipes-canonization.md).
+
+## El brochure de servicios web y digitales
+
+El 2026-10-09 el operador aprobó el brochure que presenta **todo lo que Efeonce vende en servicios web y digitales**.
+Son 29 láminas horizontales, firmadas por Efeonce, con el azul de la línea Engine como color de acento. Es el material
+vigente para vender esos servicios.
+
+**Qué cubre**, en cuatro partes:
+
+- **La apertura:** la tesis del brochure (hoy un sitio lo usan personas y también agentes de IA), el contexto con tres
+  cifras y su fuente, cómo se ve una marca en las respuestas de la IA y qué hace Efeonce.
+- **Los servicios:** Web Experience 360 (el sitio), las plataformas donde construimos (WordPress, Webflow, Lovable,
+  Adobe Experience Manager, Astro, HubSpot Content Hub o un desarrollo a la medida), Experience LaunchOps (los
+  lanzamientos), Search Visibility 360 (buscadores e IA), Measurement & Analytics (medición), Agent Systems & Platforms
+  (agentes), Automation & Integrations (automatización) y Product Design 360 (diseño de producto), que el operador
+  confirmó como servicio aprobado.
+- **Por qué con Efeonce:** un solo equipo, en qué se diferencia, los clientes, dos casos de éxito (Berel y Aguas
+  Andinas), los partners, el equipo y los mercados.
+- **Cómo empezar:** los resultados que se ven en vivo, tres diagnósticos de entrada (AEO Assessment, Lista para
+  agentes y Diagnóstico de lanzamientos), un plan de 90 días, las tres formas de contratar (Sample Sprint, On-Demand y
+  On-Going), los riesgos y los próximos pasos.
+
+**Cómo se armó.** A diferencia de los decks anteriores, sus láminas **no se componen solas**: se armaron en el lienzo
+de diseño. Varias siguen una lámina que ya existía en el catálogo (el contexto, los casos, los clientes, los partners,
+el equipo, los mercados, el plan, los riesgos); la portada, la tesis, las de cada servicio y la de plataformas se
+hicieron a mano y quedan como **candidatas** a entrar al catálogo, sin haber entrado todavía. El PDF se entrega como
+imagen por página, porque el otro formato deja un borde blanco y aplana las láminas con perspectiva; por eso su texto
+no se puede seleccionar.
+
+**Las reglas que dejó** (correcciones del operador que valen para cualquier deck):
+
+- **El fondo depende de quién firma la pieza.** Una pieza de una línea de servicio firmada por Efeonce usa el oscuro de
+  Efeonce (`#001A33`). El otro azul oscuro (`#091951`) es sólo para piezas de producto, como Globe, Wave o Reach. El
+  brochure salió primero con el fondo equivocado y hubo que corregir las 29 láminas.
+- **Los casos de éxito usan siempre la misma lámina de caso** (`decision-case`): papel a un lado e imagen al otro. Si no
+  hay una foto del caso, en el lado de la imagen puede ir una pantalla del trabajo hecho.
+- **Donde se nombra una marca, va su logo**, no su nombre escrito: el de Efeonce, el de Efeonce Insights, el de cada
+  plataforma. Un logo que trae su símbolo dentro de un cuadro de color se usa a color, no se pasa a un solo tono.
+- **Sin marcadores «[N]».** Una lámina no puede decir «[N] días» ni mostrar «[N]» en un tablero: al cliente no le dice
+  nada. Va el plazo real o números de muestra que tengan sentido, marcados como datos de muestra.
+- **Español primero.** El nombre de cada servicio va grande en español y el nombre del producto en inglés, chico,
+  debajo.
+- **Todas las láminas llevan un halo de luz de fondo;** sin él se ven planas.
+
+**Pendientes antes de enviarlo a un prospecto:**
+
+- Las cifras del caso Aguas Andinas son de relleno, puestas a pedido del operador mientras llegan las reales.
+- El caso Berel habla de «12 meses» y la cuenta se ganó en mayo de 2026: hay que confirmar el plazo o la fuente.
+- Dos láminas seguidas repiten el mismo titular.
+- Los logos de clientes dependen de la autorización de cada uno (TASK-1937).
+
+> Detalle técnico: [norma §4.6, «Deck Servicios web»](../../operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck) ·
+> [catálogo de recetas, «El deck Servicios web»](../../operations/brand-graphic-line/deck-recipes/README.md) ·
+> [manual, «El brochure Servicios web y digitales»](../../manual-de-uso/creative/componer-deck-con-recetas.md) ·
+> fuente y `LEEME.md` en `ai-generations/2026-10-09_deck-web-nexa-spark/deck/`.
 
 ## La portada con la selección de Nexa
 
