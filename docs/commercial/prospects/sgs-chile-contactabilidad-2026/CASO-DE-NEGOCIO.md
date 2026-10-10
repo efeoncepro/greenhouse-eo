@@ -1,10 +1,12 @@
 # Caso de negocio · Trazabilidad comercial en Salesforce · SGS Chile
 
-**Versión:** 4 (borrador de trabajo) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
+**Versión:** 5 (borrador de trabajo, consolidado) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
 
 **Estado:** borrador para iterar con Bárbara Quiroga y José Pedro De Oliveira antes de llevarlo a la región. No enviado. Sin honorarios ni fechas comprometidas.
 
 **Decisión que fija esta versión:** Julio aprobó el 2026-10-10 proponer la solución con número de empresa en Aircall. La alternativa que conserva el número del ejecutivo queda documentada como respaldo en la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md).
+
+**Consolidación (versión 5):** incorpora lo investigado el 2026-10-10: números geográficos, registro de WhatsApp en Salesforce mediante una integración que construye Efeonce, y resultado del contacto tomado del estado de la llamada.
 
 Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Parte B** son notas internas de Efeonce y no se entrega.
 
@@ -60,12 +62,18 @@ Las dos vistas leen los mismos registros.
 | --- | --- | --- |
 | Correo y reuniones | Como hoy, desde Outlook | Cada correo con un cliente y cada reunión, en la ficha |
 | Llamadas | Desde la aplicación de Aircall en su celular o computador, con un número de empresa | Cada llamada, incluidas las no contestadas y las perdidas |
-| WhatsApp | Desde la misma aplicación, con el mismo número de empresa | Cada conversación con el cliente |
+| WhatsApp | Desde la misma aplicación, con el mismo número de empresa | Cada mensaje enviado y recibido, como actividad en la ficha del cliente |
 | Informe | La jefatura lo consulta en Salesforce | Intentos por cliente, canal y resultado; clientes sin contacto |
 
-Una sola herramienta de comunicación para llamadas y WhatsApp, y un solo conector en Salesforce. El correo y las reuniones usan lo que Salesforce ya incluye.
+Una sola herramienta de comunicación para llamadas y WhatsApp. El correo y las reuniones usan lo que Salesforce ya incluye.
 
-Que las llamadas no contestadas también se registren es lo que permite contar intentos y no solo conversaciones.
+Cómo llega cada canal a Salesforce:
+
+- **Correo y reuniones:** la captura de actividad incluida en Salesforce.
+- **Llamadas:** el conector de Aircall para Salesforce, un paquete publicado y revisado.
+- **WhatsApp:** una integración que construye Efeonce. Recibe de Aircall cada mensaje y lo escribe como actividad en Salesforce.
+
+Que las llamadas no contestadas también se registren es lo que permite contar intentos y no solo conversaciones. El resultado de cada llamada (contestada, no contestada, buzón de voz) se toma de la propia llamada; el ejecutivo no tiene que clasificarla.
 
 ### 6. Etapas
 
@@ -74,7 +82,7 @@ Que las llamadas no contestadas también se registren es lo que permite contar i
 | 0. Diagnóstico | Revisar cómo está el correo en Salesforce, levantar teléfonos y canales del equipo, revisar seguridad | Plan ajustado a la operación real | No |
 | 1. Correo y reuniones | Dejar activa la captura de correo para el equipo piloto | Historial de correo en la ficha del cliente | Poco o nada |
 | 2. Piloto de llamadas y WhatsApp | Entregar números de empresa, configurar la aplicación, formar al equipo y medir | El equipo trabajando con trazabilidad y la línea base medida | No |
-| 3. Conexión a Salesforce | Instalar el conector, construir el informe y validar con usuarios | Todo el historial y el informe dentro de Salesforce | Sí |
+| 3. Conexión a Salesforce | Instalar el conector de llamadas, construir la integración de WhatsApp y el informe, y validar con usuarios | Todo el historial y el informe dentro de Salesforce | Sí |
 | 4. Operación y extensión | Sostener, medir y preparar otros equipos o países | Continuidad y decisión de extensión | Sí, para extender |
 
 La etapa 2 funciona antes de la etapa 3: la aplicación ya muestra los intentos por canal y por ejecutivo. Así la solicitud a la región llega respaldada con datos del propio equipo.
@@ -85,17 +93,17 @@ Cada etapa cierra con una decisión explícita antes de pasar a la siguiente.
 
 1. Confirmar cómo está configurada la captura de correo e incluir a los usuarios chilenos del piloto.
 2. Instalar el conector de Aircall, primero en ambiente de pruebas y luego en producción, con permisos asignados solo al grupo piloto.
-3. Un usuario de integración, si el conector lo requiere.
-4. Para WhatsApp: una integración por API con un usuario de integración, que registra cada conversación como actividad, y un valor "WhatsApp" en el tipo de actividad.
-5. Un tipo de informe de cuentas con y sin actividades, y una carpeta compartida para los informes.
+3. Autorizar la integración de WhatsApp: acceso por API con un usuario de integración que solo puede crear actividades.
+4. Agregar un valor "WhatsApp" en el tipo de actividad.
+5. Crear un tipo de informe de cuentas con y sin actividades, y una carpeta compartida para los informes.
 
-Es reversible: el conector se desinstala desde la configuración de Salesforce y elimina sus componentes. Las actividades ya registradas permanecen.
+Es reversible: el conector se desinstala desde la configuración de Salesforce y la integración se apaga revocando su acceso. Las actividades ya registradas permanecen.
 
 Para la revisión regional, este caso entrega: métricas de éxito definidas de antemano, descripción de la arquitectura, evaluación de seguridad del proveedor, impacto en los datos y un responsable local del proceso.
 
 ### 8. Qué cambia para el equipo
 
-- Cada ejecutivo pasa a usar un número de empresa para llamadas y WhatsApp. Es un número fijo o nacional, no un número móvil.
+- Cada ejecutivo pasa a usar un número de empresa para llamadas y WhatsApp. Es un número fijo de su ciudad, no un número móvil.
 - WhatsApp de empresa tiene reglas: para iniciar una conversación se usa un mensaje aprobado previamente; después de que el cliente responde, se escribe con libertad durante 24 horas.
 - No admite grupos, y el historial de WhatsApp anterior no se traslada.
 
@@ -160,7 +168,7 @@ Datos que necesitamos de SGS para dimensionar:
 | 0. Diagnóstico | Conduce y documenta | Define el equipo y entrega los datos | Informa el estado de la plataforma |
 | 1. Correo | Configura lo que corresponde y forma | Reconecta cuentas y valida | Confirma la configuración |
 | 2. Piloto | Configura, forma y mide | Gestiona seguridad y compras; usa | Recibe los resultados |
-| 3. Conexión | Configura, prueba y construye el informe | Valida con usuarios | Aprueba y despliega |
+| 3. Conexión | Configura el conector, construye la integración de WhatsApp y el informe, y prueba | Valida con usuarios | Aprueba y despliega |
 | 4. Operación | Opera y reporta | Usa y prioriza | Decide la extensión |
 
 ### 13. Estructura de la inversión
@@ -170,8 +178,8 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 1. Licencias de Aircall por usuario, incluido el complemento de WhatsApp.
 2. Consumo variable: minutos de llamada y mensajes de WhatsApp.
 3. Licencias de Salesforce: ninguna nueva en este esquema.
-4. Servicios de Efeonce por etapa: diagnóstico, configuración, conexión, informe y habilitación.
-5. Operación continua de Efeonce, si SGS la contrata.
+4. Servicios de Efeonce por etapa: diagnóstico, configuración, integración de WhatsApp, informe y habilitación.
+5. Operación continua de Efeonce, que incluye el mantenimiento de la integración.
 
 ### 14. Riesgos
 
@@ -179,7 +187,8 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 - **Número fijo:** algunos clientes pueden no reconocer el número nuevo. Se atiende con el aviso previo y el período de convivencia.
 - **Seguridad:** SGS debe aprobar a Aircall como proveedor antes de la etapa 2.
 - **Gobierno:** sin aprobación regional no hay etapa 3. Las etapas 1 y 2 conservan su valor aunque la 3 se demore.
-- **Cuenta de Meta:** WhatsApp de empresa requiere una cuenta de SGS verificada; puede depender de un área global.
+- **Cuenta de Meta:** WhatsApp de empresa requiere una cuenta de SGS verificada y una persona con permisos sobre ella para dar de alta cada número; puede depender de un área global.
+- **Integración de WhatsApp:** es un desarrollo a medida y la región puede revisarlo con más detalle que un paquete publicado. Por eso su acceso se limita a crear actividades.
 
 ### 15. Próximos pasos
 
