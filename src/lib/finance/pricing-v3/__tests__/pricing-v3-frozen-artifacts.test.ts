@@ -13,11 +13,17 @@ import { describe, expect, it } from 'vitest'
 import { replayCatalogQuote } from '../adapters/catalog-local'
 import { replayPricingV3 } from '../adapters/local-snapshot'
 import { replayResourceComposition } from '../adapters/resource-composition'
+import { PRICING_V3_ENGINES } from '../schemas'
 
 const root = resolve('.')
 
-// Committed outside data/pricing: the agreed SKY social care offer, a real commercial artifact.
-const COMMITTED_ELSEWHERE = ['docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json']
+// Committed outside data/pricing: the agreed SKY social care offer, a real commercial case frozen under each
+// contract. `acordado` is the rate discount on contract 1.0.0; `acordado-neto` is the same agreement as an agreed
+// net with commercial rounding, the first artifact signed by engine 1.1.0.
+const COMMITTED_ELSEWHERE = [
+  'docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json',
+  'docs/commercial/prospects/sky-social-care-2027/pricing/acordado-neto.artifact.json'
+]
 
 type Replayed = { replayDigest: string; calculationId: string }
 
@@ -47,6 +53,17 @@ describe('Pricing V3 frozen artifacts still verify with the engine that signed t
     // 16 under data/pricing when this guard was written; the walk must never silently shrink to a trivial set.
     expect(discovered.length).toBeGreaterThanOrEqual(17)
     expect([...versions].sort()).toEqual(Object.keys(REPLAY_BY_ARTIFACT_VERSION).sort())
+  })
+
+  it('the corpus holds at least one artifact signed by every registered engine', () => {
+    // Read from the frozen files themselves: a registered engine with no frozen artifact has nothing guarding it.
+    const signed = new Set(
+      discovered.flatMap(path =>
+        [...readFileSync(resolve(root, path), 'utf8').matchAll(/"engineVersion":\s*"([^"]+)"/g)].map(match => match[1])
+      )
+    )
+
+    expect([...signed].sort()).toEqual(Object.values(PRICING_V3_ENGINES).sort())
   })
 
   it.each(discovered)('%s', path => {

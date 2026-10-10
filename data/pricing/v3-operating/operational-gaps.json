@@ -24,8 +24,8 @@
     {
       "code": "LOCALIZED_TALENT_COSTS",
       "owner": "People/Finance",
-      "required": "Current salary/honorarium, location, burden, bonus and cost coverage by profile variant",
-      "known": "Only historicalExcel values supplied; not request same data again or assert local salary. On 2026-10-10 the CEO, author of the pricing workbook, confirmed its salary values are valid; country and effective date per record remain unpopulated in the catalog"
+      "required": "The country each workbook salary corresponds to (localization per cost record) and its effective date; then burden, bonus and coverage by profile variant where they differ",
+      "known": "The CEO, author of the pricing workbook, confirmed its salary values on 2026-10-10 and catalog v4 records them as confirmed. The resolver still reports each cost as ESTIMATED_SOURCE with the assumption UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY because no record declares its country; one declaration of the country per record closes it. Component check: Community Manager is salary 900 + bonuses 500 + employer charges 0 (USD per month)"
     },
     {
       "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
@@ -82,16 +82,16 @@
       "known": "Decided by the CEO on 2026-10-10: 45% is the margin floor for managed services, and a service where more can be earned raises its target, not the floor. creative-managed-service encodes target and minimum 0.45 from the floor approved 2026-07-13. SKY social care 2027 (CLP 4,990,000 per month, 40.26% modeled margin) is an approved exception because SKY is an existing client"
     },
     {
-      "code": "FLOOR_PRICE_ROUNDS_UNDER_FLOOR",
-      "owner": "CEO/Architecture",
-      "required": "Either a target margin above the floor, or a commercial rounding rule that raises the price to a declared multiple as a separate, versioned adjustment",
-      "known": "With target and minimum both 0.45, cost and price are rounded to whole CLP independently and each line can end under the floor by less than 1 CLP; the kernel reports MARGIN_BELOW_FLOOR as designed and never raises the price. marginAmountShortOfFloor in the compose summary separates this rounding gap from a real breach. Changing the kernel requires a new engine version and multi-version replay, so it is not done here"
+      "code": "QUOTE_FX_REVIEW",
+      "owner": "CEO",
+      "required": "Review the quote FX when the market moves beyond its margin, and decide CLF and the EUR reference, which were not part of this decision",
+      "known": "Catalog v4 holds quote FX as CEO policy from 2026-10-10: USD to CLP 1000 (spot ~937), COP 3650 (~3219), MXN 19.25 (~17.98), PEN 3.70 (~3.435). USD is the reference currency. USD to CLF 0.024 stays an estimated 2025 value, and the ECB EUR to USD reference is dated 2026-10-09 only, so a quote dated later that needs EUR has no effective rate"
     },
     {
-      "code": "AGREED_PRICE_OUTSIDE_ENGINE",
-      "owner": "Commercial",
-      "required": "Every price actually agreed is run through the engine as the brief discount adjustment, with its reason, so the frozen artifact carries the real net, margin and floor verdict",
-      "known": "The discount adjustment is rate-based: reaching an exact agreed amount needs the rate computed by hand with enough decimals. An adjustment that takes the agreed net directly would need an engine change. First case recorded this way: docs/commercial/prospects/sky-social-care-2027/pricing/acordado.*"
+      "code": "COMMERCIAL_ROUNDING_SCOPE",
+      "owner": "CEO",
+      "required": "Multiples for any further quote currency (CLF, EUR) and any offer that should round differently from its currency",
+      "known": "Catalog v4 rounds every offer per currency by CEO decision of 2026-10-10: CLP 10000, USD 10, PEN 50, COP 50000, MXN 100. A currency without a rule is not rounded. Rounding is per billable row; rounding on the period total or to commercial endings such as 990000 is expressed as an agreed net"
     }
   ]
 }

@@ -36,3 +36,23 @@ margen real es la de `acordado.*`.
 El margen está calculado sobre un costo modelado, no medido: sueldos históricos sin cargas confirmadas, reemplazos y
 guardia como hipótesis, consumo de agentes sin medidor, dólar fijo a 1.000 y puesta en marcha obsequiada fuera del
 costo. Si el costo real de las personas sale 15 % más alto, el margen baja a cerca de 34 %.
+
+## Mismo acuerdo con el motor 1.1 (10/10/2026, más tarde)
+
+Desde el motor 1.1 el precio pactado se declara directo, sin calcular una tasa: `acordado-neto.demand.json` lleva un
+ajuste `agreed_net` de 4.990.000 mensuales sobre las tres líneas, y se cotiza con el catálogo `catalog.review-v4.json`
+(redondeo comercial de CLP 10.000 por línea). El resultado económico es el mismo:
+
+| Concepto | CLP al mes |
+| --- | --- |
+| Costo modelado | 2.981.079 |
+| Precio al piso, redondeado | 5.430.000 |
+| Descuento que calcula el motor | 440.000 |
+| Precio acordado (neto) | 4.990.000 |
+| Margen sobre el total | 40,26 % |
+
+`acordado-neto.artifact.json` se reproduce con `pricing:v3 replay`. Los archivos `acordado.*` anteriores (descuento por
+tasa, catálogo v3) siguen siendo válidos y reproducibles; quedan como registro de cómo se hizo antes.
+
+Ese mismo día el operador confirmó como válidos los sueldos del Excel de pricing, que él construyó. Siguen siendo
+hipótesis los reemplazos, la guardia y el consumo de agentes.

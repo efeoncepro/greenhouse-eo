@@ -1,0 +1,1771 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-rounding-fx-confirmed-costs-2026-10-10",
+  "baseDigest": "e206613304bcd0b2155481da788c33313f372010995250b1e6601fbd83a0de5e",
+  "nextVersion": "operating-review-2026-10-10-v4",
+  "actor": "operator-authorized-agent",
+  "reason": "CEO decisions of 2026-10-10: commercial rounding per currency for every offer (CLP 10000, USD 10, PEN 50, COP 50000, MXN 100); quote FX with a prudential margin (CLP 1000 kept, COP 3650, MXN 19.25, PEN 3.70); and the workbook salaries confirmed by their author. No amount of any cost record changes.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "rounding:CLP",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "rounding:CLP",
+        "revision": 1,
+        "kind": "price_rounding",
+        "source": {
+          "reference": "policy:ceo-commercial-rounding-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Commercial rounding decided by the CEO on 2026-10-10: every billable price in CLP is raised to the next multiple of 10000. General rule for the currency; it applies to every offer.",
+        "value": {
+          "currency": "CLP",
+          "multiple": "10000"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "rounding:USD",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "rounding:USD",
+        "revision": 1,
+        "kind": "price_rounding",
+        "source": {
+          "reference": "policy:ceo-commercial-rounding-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Commercial rounding decided by the CEO on 2026-10-10: every billable price in USD is raised to the next multiple of 10. General rule for the currency; it applies to every offer.",
+        "value": {
+          "currency": "USD",
+          "multiple": "10"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "rounding:PEN",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "rounding:PEN",
+        "revision": 1,
+        "kind": "price_rounding",
+        "source": {
+          "reference": "policy:ceo-commercial-rounding-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Commercial rounding decided by the CEO on 2026-10-10: every billable price in PEN is raised to the next multiple of 50. General rule for the currency; it applies to every offer.",
+        "value": {
+          "currency": "PEN",
+          "multiple": "50"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "rounding:COP",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "rounding:COP",
+        "revision": 1,
+        "kind": "price_rounding",
+        "source": {
+          "reference": "policy:ceo-commercial-rounding-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Commercial rounding decided by the CEO on 2026-10-10: every billable price in COP is raised to the next multiple of 50000. General rule for the currency; it applies to every offer.",
+        "value": {
+          "currency": "COP",
+          "multiple": "50000"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "rounding:MXN",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "rounding:MXN",
+        "revision": 1,
+        "kind": "price_rounding",
+        "source": {
+          "reference": "policy:ceo-commercial-rounding-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Commercial rounding decided by the CEO on 2026-10-10: every billable price in MXN is raised to the next multiple of 100. General rule for the currency; it applies to every offer.",
+        "value": {
+          "currency": "MXN",
+          "multiple": "100"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "fx:USD:CLP",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "fx:USD:CLP",
+        "revision": 2,
+        "kind": "fx",
+        "source": {
+          "reference": "policy:ceo-quote-fx-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Quote FX kept at 1000 by CEO decision on 2026-10-10 as a conservative rate for twelve-month fees (observed ~937 on 2026-09-11). A policy value, not a market observation.",
+        "value": {
+          "from": "USD",
+          "to": "CLP",
+          "rate": "1000"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "fx:USD:COP",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "fx:USD:COP",
+        "revision": 2,
+        "kind": "fx",
+        "source": {
+          "reference": "policy:ceo-quote-fx-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Quote FX set on 2026-10-10 by CEO decision: 3650, about 13% above the TRM of ~3219 (2026-10-09), to cover a return to mid-2026 levels. Replaces 4200, a 2025 value about 30% above spot. A policy value, not a market observation.",
+        "value": {
+          "from": "USD",
+          "to": "COP",
+          "rate": "3650"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "fx:USD:MXN",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "fx:USD:MXN",
+        "revision": 2,
+        "kind": "fx",
+        "source": {
+          "reference": "policy:ceo-quote-fx-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Quote FX set on 2026-10-10 under the CEO instruction of a prudential margin: 19.25, about 7% above the FIX of ~17.98 (2026-10-07). A policy value, not a market observation.",
+        "value": {
+          "from": "USD",
+          "to": "MXN",
+          "rate": "19.25"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "fx:USD:PEN",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "fx:USD:PEN",
+        "revision": 2,
+        "kind": "fx",
+        "source": {
+          "reference": "policy:ceo-quote-fx-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Quote FX set on 2026-10-10 under the CEO instruction of a prudential margin: 3.70, about 8% above the BCRP close of ~3.435 (2026-10-06). A policy value, not a market observation.",
+        "value": {
+          "from": "USD",
+          "to": "PEN",
+          "rate": "3.70"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-001:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-001:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-001",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-002:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-002:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-002",
+          "seniorityCode": "senior",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "950"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-003:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-003:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-003",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "675"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-004:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-004:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-004",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "550"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "150"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-005:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-005:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-005",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-006:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-006:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-006",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-007:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-007:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-007",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "900"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-008:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-008:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-008",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "2500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-009:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-009:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-009",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-010:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-010:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-010",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-011:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-011:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-011",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-012:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-012:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-012",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-013:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-013:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-013",
+          "seniorityCode": "junior",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "900"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-014:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-014:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-014",
+          "seniorityCode": "mid",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-015:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-015:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-015",
+          "seniorityCode": "senior",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-016:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-016:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-016",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-017:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-017:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-017",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-018:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-018:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-018",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-019:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-019:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-019",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-020:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-020:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-020",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-021:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-021:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-021",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-022:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-022:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-022",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-023:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-023:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-023",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-024:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-024:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-024",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-025:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-025:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-025",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "7200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-026:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-026:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-026",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "3000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-027:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-027:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-027",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "10400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "300"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-028:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-028:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-028",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-029:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-029:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-029",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-030:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-030:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-030",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-031:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-031:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-031",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-032:unknown",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "cost:ECG-032:unknown",
+        "revision": 2,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Values from the pricing workbook, confirmed as valid on 2026-10-10 by the CEO, who authored it. Amounts unchanged. Country and effective salary date remain unpopulated.",
+        "value": {
+          "profileId": "ECG-032",
+          "seniorityCode": "not_specified",
+          "localization": null,
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "23140"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

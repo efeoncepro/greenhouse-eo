@@ -1,0 +1,444 @@
+{
+  "schemaVersion": "pricing-v3-composition-summary/1",
+  "version": "pricing-v3-resource-composition/1",
+  "binding": false,
+  "commercialUnit": "managed_service",
+  "calculationId": "composition-50fba6eba7183422c0c1274e",
+  "replayDigest": "50fba6eba7183422c0c1274e06ba517105163c6bfdf10240e67f9bed5400be21",
+  "calculationStatus": "calculated",
+  "reviewStatus": "requires_review",
+  "quoteReviewStatus": "requires_review",
+  "engineVersion": "pricing-v3-local/1.1.0",
+  "totals": {
+    "cost": "2981079",
+    "undiscountedPrice": "5430000",
+    "roundingAdjustment": "9855",
+    "discount": "440000",
+    "uplift": "0",
+    "net": "4990000",
+    "marginAmount": "2008921",
+    "marginRate": "0.40258937875751503006012024048096192384769539078156312625250501002004008016032064",
+    "tax": null,
+    "grandTotal": null,
+    "cashCommitment": "7370079",
+    "averageMonthlyNet": "4990000",
+    "currency": "CLP"
+  },
+  "commercialAdjustments": [
+    {
+      "adjustmentId": "sky-precio-acordado",
+      "kind": "agreed_net",
+      "amount": "4990000",
+      "billing": "monthly",
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "reason": "Precio base acordado CLP 4.990.000 más IVA al mes, todo incluido. Excepción al piso de 45 % aprobada por el CEO el 2026-10-10 por ser cliente vigente."
+    }
+  ],
+  "priceRounding": {
+    "currency": "CLP",
+    "multiple": "10000",
+    "scope": "general",
+    "offerId": null,
+    "recordId": "rounding:CLP",
+    "revision": 1,
+    "sourceStatus": "confirmed"
+  },
+  "marginRateRoundedDown": "0.402589",
+  "diagnostics": [],
+  "assumptions": [
+    {
+      "code": "UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY",
+      "path": "lines.titular",
+      "detail": "Historical cost assumed for CL; not verified localized salary."
+    },
+    {
+      "code": "UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY",
+      "path": "lines.lider",
+      "detail": "Historical cost assumed for CL; not verified localized salary."
+    },
+    {
+      "code": "UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY",
+      "path": "lines.agentes",
+      "detail": "Historical cost assumed for CL; not verified localized salary."
+    }
+  ],
+  "periods": [
+    {
+      "periodId": 1,
+      "calculationStatus": "calculated",
+      "totals": {
+        "cost": "2981079",
+        "undiscountedPrice": "5430000",
+        "roundingAdjustment": "9855",
+        "discount": "440000",
+        "uplift": "0",
+        "net": "4990000",
+        "marginAmount": "2008921",
+        "marginRate": "0.40258937875751503006012024048096192384769539078156312625250501002004008016032064",
+        "tax": null,
+        "grandTotal": null,
+        "cashCommitment": "7370079",
+        "uniformMonthlyNet": "4990000"
+      }
+    }
+  ],
+  "reviewSignals": [
+    {
+      "code": "ESTIMATED_SOURCE",
+      "severity": "review",
+      "count": 22,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "paths": [
+        "snapshot.marketFactors",
+        "request.lines.0.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-0",
+        "snapshot.profiles.selected-profile-0.cost",
+        "snapshot.resources.fee:ECG-007",
+        "snapshot.resources.provision-backfill-coverage",
+        "snapshot.resources.provision-on-call-alert-guard",
+        "snapshot.resources.composed:microsoft-365",
+        "snapshot.resources.composed:social-inbox",
+        "snapshot.resources.composed:agent-runtime-usage",
+        "request.lines.1.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-1",
+        "snapshot.profiles.selected-profile-1.cost",
+        "snapshot.resources.fee:ECG-001",
+        "request.lines.2.allocationPolicyRef",
+        "snapshot.pricingPolicies.selected-profile-2",
+        "snapshot.profiles.selected-profile-2.cost",
+        "snapshot.resources.fee:ECG-021"
+      ]
+    },
+    {
+      "code": "HISTORICAL_ONLY",
+      "severity": "review",
+      "count": 1,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [],
+      "paths": [
+        "snapshot.mode"
+      ]
+    },
+    {
+      "code": "MARGIN_BELOW_FLOOR",
+      "severity": "review",
+      "count": 3,
+      "periodIds": [
+        1
+      ],
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "paths": [
+        "result.lines.titular:1:monthly",
+        "result.lines.lider:1:monthly",
+        "result.lines.agentes:1:monthly"
+      ]
+    }
+  ],
+  "marginFloor": {
+    "source": "kernel:MARGIN_BELOW_FLOOR",
+    "flaggedLinePeriods": 3,
+    "lines": [
+      {
+        "lineId": "titular:1:monthly",
+        "parentLineId": "titular",
+        "kind": "monthly",
+        "label": "Community Manager",
+        "minimumMargin": "0.45",
+        "net": "3675875",
+        "marginAmount": "1476182",
+        "marginRateRoundedDown": "0.401586",
+        "marginAmountShortOfFloor": "177961.75",
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lider:1:monthly",
+        "parentLineId": "lider",
+        "kind": "monthly",
+        "label": "Creative Operations Lead",
+        "minimumMargin": "0.45",
+        "net": "808692",
+        "marginAmount": "327999",
+        "marginRateRoundedDown": "0.405591",
+        "marginAmountShortOfFloor": "35912.4",
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "agentes:1:monthly",
+        "parentLineId": "agentes",
+        "kind": "monthly",
+        "label": "Marketing Automation Specialist",
+        "minimumMargin": "0.45",
+        "net": "505433",
+        "marginAmount": "204740",
+        "marginRateRoundedDown": "0.405078",
+        "marginAmountShortOfFloor": "22704.85",
+        "periodIds": [
+          1
+        ]
+      }
+    ]
+  },
+  "toolSelections": {
+    "counts": {
+      "rows": 99,
+      "included": 10,
+      "clientProvided": 0,
+      "explicitlyExcluded": 2,
+      "notRequiredForWork": 87
+    },
+    "included": [
+      {
+        "lineId": "titular",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "titular",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "titular",
+        "toolId": "social-inbox",
+        "reasons": [
+          "task:social-care"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "titular",
+        "toolId": "agent-runtime-usage",
+        "reasons": [
+          "explicit-service-requirement"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lider",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lider",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "lider",
+        "toolId": "agent-runtime-usage",
+        "reasons": [
+          "explicit-service-requirement"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "agentes",
+        "toolId": "notion",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "agentes",
+        "toolId": "microsoft-365",
+        "reasons": [
+          "common-base"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "agentes",
+        "toolId": "agent-runtime-usage",
+        "reasons": [
+          "explicit-service-requirement"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ],
+    "clientProvided": [],
+    "explicitlyExcluded": [
+      {
+        "lineId": "titular",
+        "toolId": "metricool",
+        "reasons": [
+          "profile-task-excluded:social-publishing:Este rol responde comentarios; no programa ni publica contenido.",
+          "not-required-for-work"
+        ],
+        "periodIds": [
+          1
+        ]
+      },
+      {
+        "lineId": "agentes",
+        "toolId": "zapier",
+        "reasons": [
+          "profile-task-excluded:crm-automation:Este rol mantiene los agentes y la base de conocimiento; sin automatización de CRM en el alcance.",
+          "not-required-for-work"
+        ],
+        "periodIds": [
+          1
+        ]
+      }
+    ]
+  },
+  "attributions": [
+    {
+      "toolId": "notion",
+      "priceId": "current",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "confirmed",
+      "quantity": "3",
+      "serviceShare": "0.45",
+      "fullMonthlyCost": "72",
+      "attributedMonthlyCost": "32.4",
+      "unallocatedMonthlyCost": "39.6",
+      "consumerCount": 3,
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "microsoft-365",
+      "priceId": "public-standard-teams-monthly",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "3",
+      "serviceShare": "0.45",
+      "fullMonthlyCost": "50.4",
+      "attributedMonthlyCost": "22.68",
+      "unallocatedMonthlyCost": "27.72",
+      "consumerCount": 3,
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "social-inbox",
+      "priceId": "sprout-advanced-annual",
+      "currency": "USD",
+      "unit": "year",
+      "sourceStatus": "estimated",
+      "quantity": "1",
+      "serviceShare": "1",
+      "fullMonthlyCost": "399",
+      "attributedMonthlyCost": "399",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 1,
+      "lineIds": [
+        "titular"
+      ],
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "currency": "USD",
+      "unit": "month",
+      "sourceStatus": "estimated",
+      "quantity": "10",
+      "serviceShare": "1",
+      "fullMonthlyCost": "100",
+      "attributedMonthlyCost": "100",
+      "unallocatedMonthlyCost": "0",
+      "consumerCount": 3,
+      "lineIds": [
+        "titular",
+        "lider",
+        "agentes"
+      ],
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "creditBudgets": [],
+  "resourceIncrementalCash": [],
+  "cashLedger": [
+    {
+      "key": "human-monthly-and-once",
+      "amount": "2582079",
+      "currency": "CLP",
+      "periodIds": [
+        1
+      ]
+    },
+    {
+      "key": "composed:social-inbox:account:sky-airline-simulation",
+      "amount": "4788000",
+      "currency": "CLP",
+      "periodIds": [
+        1
+      ]
+    }
+  ],
+  "cashMeaning": "Kernel cashCommitment is attributed modeled commitment, not incremental purchase or an invoice. Incremental cash here covers only declared credit top-ups; seat procurement is not inferred.",
+  "fullDetail": "Derived from the frozen composition artifact. Every selection row, attribution assignment, kernel line with its cost components, per-period diagnostic and credit plan lives in that file under semantic.result."
+}

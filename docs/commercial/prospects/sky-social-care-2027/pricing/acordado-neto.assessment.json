@@ -1,0 +1,157 @@
+{
+  "calculationStatus": "calculated",
+  "commercialStatus": "requires_review",
+  "binding": false,
+  "gaps": [
+    {
+      "code": "COMMERCIAL_APPROVAL_REQUIRED",
+      "path": "quote",
+      "owner": "Commercial/Finance",
+      "action": "Review scope, complete costs, terms and the selling policy before issuing a quote."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "titular",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "PROVISION_COST_EVIDENCE_REQUIRED",
+      "path": "titular",
+      "owner": "Operations/Finance",
+      "action": "Measure Assurance, operations and onboarding activities and cost."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "lider",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "HUMAN_COST_EVIDENCE_REQUIRED",
+      "path": "agentes",
+      "owner": "People/Finance",
+      "action": "Validate localized compensation and its cost coverages; the historical value remains a reference."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:notion",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:microsoft-365",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:microsoft-365",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:social-inbox",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:social-inbox",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "RESOURCE_ACCESS_AND_CAPACITY_REQUIRED",
+      "path": "1:agent-runtime-usage",
+      "owner": "Operations",
+      "action": "Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory."
+    },
+    {
+      "code": "TOOL_COST_EVIDENCE_REVIEW",
+      "path": "1:agent-runtime-usage",
+      "owner": "Operations/Finance",
+      "action": "Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable."
+    },
+    {
+      "code": "TAX_AND_ENTITY_REQUIRED",
+      "path": "quote",
+      "owner": "Finance",
+      "action": "Resolve contractual entity, currency and applicable tax treatment."
+    },
+    {
+      "code": "SERVICE_SCOPE_AND_DELIVERY_REQUIRED",
+      "path": "commercialUnit",
+      "owner": "Practice/Commercial",
+      "action": "Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract."
+    },
+    {
+      "code": "MARGIN_BELOW_POLICY_FLOOR",
+      "path": "periods.1.result.lines.titular:1:monthly",
+      "owner": "Commercial/Finance",
+      "action": "The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price."
+    },
+    {
+      "code": "MARGIN_BELOW_POLICY_FLOOR",
+      "path": "periods.1.result.lines.lider:1:monthly",
+      "owner": "Commercial/Finance",
+      "action": "The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price."
+    },
+    {
+      "code": "MARGIN_BELOW_POLICY_FLOOR",
+      "path": "periods.1.result.lines.agentes:1:monthly",
+      "owner": "Commercial/Finance",
+      "action": "The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price."
+    }
+  ],
+  "margin": {
+    "modeledRate": "0.40258937875751503006012024048096192384769539078156312625250501002004008016032064",
+    "proposedTarget": "0.40",
+    "proposedFloor": "0.35",
+    "approved": false,
+    "belowProposedFloor": false,
+    "policyFloor": {
+      "source": "kernel:MARGIN_BELOW_FLOOR",
+      "linesBelowFloor": [
+        {
+          "periodId": 1,
+          "lineId": "titular:1:monthly",
+          "parentLineId": "titular",
+          "kind": "monthly",
+          "label": "Community Manager",
+          "minimumMargin": "0.45",
+          "net": "3675875",
+          "marginAmount": "1476182",
+          "marginRateRoundedDown": "0.401586",
+          "marginAmountShortOfFloor": "177961.75"
+        },
+        {
+          "periodId": 1,
+          "lineId": "lider:1:monthly",
+          "parentLineId": "lider",
+          "kind": "monthly",
+          "label": "Creative Operations Lead",
+          "minimumMargin": "0.45",
+          "net": "808692",
+          "marginAmount": "327999",
+          "marginRateRoundedDown": "0.405591",
+          "marginAmountShortOfFloor": "35912.4"
+        },
+        {
+          "periodId": 1,
+          "lineId": "agentes:1:monthly",
+          "parentLineId": "agentes",
+          "kind": "monthly",
+          "label": "Marketing Automation Specialist",
+          "minimumMargin": "0.45",
+          "net": "505433",
+          "marginAmount": "204740",
+          "marginRateRoundedDown": "0.405078",
+          "marginAmountShortOfFloor": "22704.85"
+        }
+      ]
+    }
+  }
+}
