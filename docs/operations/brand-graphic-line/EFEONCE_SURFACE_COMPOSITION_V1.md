@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.23
+> **Versión:** 1.24
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-10-10 por Claude (1.23: la lámina «Producción con IA» aprobada, a mano, con la foto de cine `CT24`; delta del 2026-10-10 (b). Antes, el mismo día, 1.22: la lámina «Día a día» con una vista social de Marketing Studio construida, aprobada como uso de `content-day-tools`; delta del 2026-10-10. Antes, 2026-10-09, 1.21: el deck «Servicios web y digitales» aprobado por el operador — brochure de 29 láminas, línea Engine, fondo Efeonce `#001A33`; variante de `decision-case` sin foto del caso, lámina «Dónde construimos», logo con isotipo en cuadro de color y PDF raster; delta del 2026-10-09 y §4.6 «Deck Servicios web». Antes, 2026-10-06, 1.20: el brochure Agencia Creativa aprobado por el operador — 27 láminas, 7 de recetas existentes y 20 a mano (candidatas a receta, TASK-2013); dónde vive, el PDF rasterizado desde el runtime del canvas y por qué; orden final de la narrativa, voz medida (8 de 27 pares), acento Brand, talento embebido con la palabra del comprador sólo en el eyebrow, interfaces de Creative Studio con campañas ficticias, ocho fotos cine; límites medidos (perspectiva 3D de la lámina 17, foto corrida con borde fundido); pendientes; delta del 2026-10-06, §4.6 «Brochure Agencia Creativa» y §7. Antes, el mismo día, 1.19: el deck HubSpot aprobado por el operador — brochure de 27 láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes; dónde vive y el PDF; siete láminas en registro cine; reglas de marca de HubSpot (insignia Gold con readback, sprocket 3D interno, sin mascotas), cifras y voz; límites medidos por receta (respuesta de `section-cine`, hero de `proposal-cinematic` y `decision-ai-market`), recetas sólo claras como láminas de Efeonce y `content-markets` con nodos medidos; pendientes (autorización de ANAM, sprocket, lámina de equipo); delta del 2026-10-06, §4.6 «Deck HubSpot» y §7 (TASK-1943). Antes, 2026-10-01, 1.18: §5 remite a los perfiles sociales de Efeonce aprobados el 2026-10-01 (portadas, avatar y destacados de Instagram), que viven en el canal `social` y se describen con sus medidas en el [manual §10.1.1](./EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01); esta norma no los duplica. Antes, 2026-09-30, 1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, logos con autorización) y la decisión del operador de dejar tal cual las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler («asumo la responsabilidad»); delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-10-10 por Claude (1.24: el patrón «franjas de foto» aprobado por el operador en sus dos variantes (seis y tres franjas), con sus medidas y sus tres excepciones; delta del 2026-10-10 (c) y §4.6 «Franjas de foto». Antes, el mismo día, 1.23: la lámina «Producción con IA» aprobada, a mano, con la foto de cine `CT24`; delta del 2026-10-10 (b). Antes, el mismo día, 1.22: la lámina «Día a día» con una vista social de Marketing Studio construida, aprobada como uso de `content-day-tools`; delta del 2026-10-10. Antes, 2026-10-09, 1.21: el deck «Servicios web y digitales» aprobado por el operador — brochure de 29 láminas, línea Engine, fondo Efeonce `#001A33`; variante de `decision-case` sin foto del caso, lámina «Dónde construimos», logo con isotipo en cuadro de color y PDF raster; delta del 2026-10-09 y §4.6 «Deck Servicios web». Antes, 2026-10-06, 1.20: el brochure Agencia Creativa aprobado por el operador — 27 láminas, 7 de recetas existentes y 20 a mano (candidatas a receta, TASK-2013); dónde vive, el PDF rasterizado desde el runtime del canvas y por qué; orden final de la narrativa, voz medida (8 de 27 pares), acento Brand, talento embebido con la palabra del comprador sólo en el eyebrow, interfaces de Creative Studio con campañas ficticias, ocho fotos cine; límites medidos (perspectiva 3D de la lámina 17, foto corrida con borde fundido); pendientes; delta del 2026-10-06, §4.6 «Brochure Agencia Creativa» y §7. Antes, el mismo día, 1.19: el deck HubSpot aprobado por el operador — brochure de 27 láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes; dónde vive y el PDF; siete láminas en registro cine; reglas de marca de HubSpot (insignia Gold con readback, sprocket 3D interno, sin mascotas), cifras y voz; límites medidos por receta (respuesta de `section-cine`, hero de `proposal-cinematic` y `decision-ai-market`), recetas sólo claras como láminas de Efeonce y `content-markets` con nodos medidos; pendientes (autorización de ANAM, sprocket, lámina de equipo); delta del 2026-10-06, §4.6 «Deck HubSpot» y §7 (TASK-1943). Antes, 2026-10-01, 1.18: §5 remite a los perfiles sociales de Efeonce aprobados el 2026-10-01 (portadas, avatar y destacados de Instagram), que viven en el canal `social` y se describen con sus medidas en el [manual §10.1.1](./EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01); esta norma no los duplica. Antes, 2026-09-30, 1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, logos con autorización) y la decisión del operador de dejar tal cual las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler («asumo la responsabilidad»); delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -51,6 +51,20 @@
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
 
+## Delta 2026-10-10 (c) — el patrón «franjas de foto», aprobado **[decisión del operador, 2026-10-10]**
+
+El operador, textual (comentarios en el canvas del deck de Marketing de Contenidos; relatados por la sesión que armó el
+deck): sobre «Programas», «Este estilo y donde lo haz usado en las demás láminas me encanta, canoniza este estilo»;
+sobre «Seis frentes», «Canonica este también» y antes «Aprobadísima, me encantó».
+
+- **Patrón aprobado en dos variantes:** seis franjas («Seis frentes») y tres franjas («Momentos», «Programas»). Medidas
+  y reglas en §4.6, «Franjas de foto».
+- **Tres excepciones que el operador pidió o aprobó, sólo para este patrón:** una esfera por franja además de la del
+  titular; la foto de cine recortada en vertical; y un degradado navy sobre la foto para apoyar el título.
+- **A mano, sin receta ni plantilla.** Promoverlo al catálogo y a AXIS queda pendiente.
+- La misma sesión relata que el operador aprobó el deck completo («Me encantó todo, queda aprobado»). El registro del
+  deck (láminas, PDF, canvas) no se ha hecho: falta que la sesión entregue los hechos.
+
 ## Delta 2026-10-10 (b) — «Producción con IA», aprobada **[decisión del operador, 2026-10-10]**
 
 El operador, textual (comentario en el canvas del deck de Marketing de Contenidos; relatado por la sesión que armó el
@@ -76,7 +90,7 @@ social media desde Marketing Studio, constrúyelo no lo captures».
   [catálogo de recetas](./deck-recipes/README.md), sección «La lámina "Día a día" con Marketing Studio».
 - **Regla que deja:** una interfaz de producto propio en una lámina se **construye** con campaña y marca ficticias y el
   lockup oficial del producto. Es la misma regla de las interfaces de Creative Studio del brochure Agencia Creativa.
-- **Sólo esa lámina.** El deck de Marketing de Contenidos no está aprobado.
+- **Este delta registra sólo esa lámina.** Sobre la aprobación posterior del deck, ver el delta (c).
 - **Abierto, lo decide el operador:** vistas de la interfaz sin contrastar con el producto, cifras de muestra sin marca,
   herramientas de terceros sin verificar y un par de voz que no pasa la regla del 2026-10-06.
 
@@ -1684,6 +1698,54 @@ aprobó el 2026-10-09 («este deck está listo»). Orden de las láminas, comand
   decisión para este deck; la receta `content-service-lanes` sigue con la plataforma vacía o con la mascota del partner.
 
 Las láminas nuevas no tienen receta ni plantilla: para reutilizarlas se parte de la fuente del canvas.
+
+#### Franjas de foto (patrón aprobado el 2026-10-10) **[decisión del operador, 2026-10-10]**
+
+Una lámina que presenta de tres a seis frentes, momentos o programas, cada uno con su foto: voz a la izquierda y, a la
+derecha, franjas verticales escalonadas, cada una un recorte de una foto de cine ya aprobada. Nació en el deck de
+Marketing de Contenidos (línea `brand`) y el operador pidió canonizarlo en sus dos variantes.
+
+| | Seis franjas | Tres franjas |
+|---|---|---|
+| Lámina de origen | «Seis frentes» | «Momentos» y «Programas» |
+| Franja | 182 × 820 px, separación 14, desde x = 694 | 372 × 820 px, separación 22, desde x = 704 |
+| Radio | 26 px | 30 px |
+| Índice | 01–06, Poppins 600 de 15 px, tracking 0,08 em | A–C, Poppins 600 de 16 px, tracking 0,08 em |
+| Título | Bricolage 760 de 23 px | Bricolage 760 de 38 px |
+| Degradado navy sobre la foto | 50 % arriba → 0 al 20 % → 0 hasta el 50 % → 90 % al 72 % → sólido al 100 % | igual, con los cortes en 54 % y 76 % |
+
+**Común a las dos:**
+
+- **Voz a la izquierda** en left 140, top 120, ancho 520–530: eyebrow, pregunta con anillo, respuesta en Bricolage 760
+  con esfera y una bajada corta. Sin filas de íconos y sin indicador de navegación (la lámina lleva foto). Burbuja URL al
+  pie.
+- **Franjas escalonadas:** alternan top 96 y top 150. Sombra `0 30px 60px rgba(0,8,20,.5)` y filete de 1 px
+  `rgba(114,222,216,.22)`.
+- **Cada franja** es un recorte vertical de un plate de cine 16:9 aprobado, centrado en un foco horizontal que se elige
+  por foto, mirando el render. Arriba a la izquierda, el índice; abajo, el título y una línea de descripción en Poppins
+  300. El título cierra con una esfera en el acento, de 0,3 em, pegada a la última palabra.
+- **Variante de foto baja:** cuando el sujeto y su objeto no caben en el recorte, la foto ocupa menos alto dentro de la
+  franja (600 de 820) y el degradado se adelanta («Cobertura en vivo»).
+- **No se generan fotos para este patrón:** usa plates que el deck ya tiene.
+
+**Excepciones aprobadas sólo para este patrón** (no cambian la regla general):
+
+1. **Varias esferas en una lámina.** «Seis frentes» lleva siete (una por franja y la del titular) y las de tres franjas,
+   cuatro. El operador las pidió («puedes ponerle a cada título un punto (esfera) al final?»). En el resto de la línea
+   sigue una esfera por pieza y nunca como viñeta.
+2. **Foto de cine recortada.** El recorte vertical deja fuera parte de la escena y a veces corta caras de extras. Fuera
+   de este patrón, la foto de cine va a sangre con la voz en su reserva.
+3. **Degradado sobre la foto.** El navy bajo el título es parte de la franja. No autoriza un velo sobre una foto a
+   sangre: ahí sigue «nunca un scrim».
+
+**Pendientes:**
+
+- **Sin receta ni plantilla.** Vive en el generador del deck (`ai-generations/2026-10-09_deck-contenidos/laminas/`:
+  `frentes.generador.py` para seis franjas, `strips()` en `nuevas.py` para tres, con `lib.py` y `ui.py`). Promoverlo al
+  catálogo de recetas y a AXIS es trabajo aparte.
+- **El filete de las franjas es teal** en una lámina Brand: se revisa con los tokens de escenario (TASK-2012).
+- **El copy de las franjas** de «Momentos» y «Programas» lo redactó la sesión; el operador aprobó el deck en conjunto.
+- **Revisar cada recorte al 100 %:** una cara de extra cortada por el borde de la franja se corrige moviendo el foco.
 
 ---
 

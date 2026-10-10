@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.17
+> **Versión:** 1.18
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-10 por Claude (1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-10 por Claude (1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -363,7 +363,7 @@ en HTML** y exportada a PNG («constrúyelo no lo captures»).
   `ms-social.generador.py`).
 - **Excepción a «interfaces genéricas»:** la interfaz es de un producto propio y construida, con el lockup oficial
   «efeonce | Marketing Studio». Campaña y marca **ficticias** (Lanzamiento Cold brew, Mareas Café).
-- **Sólo esta lámina está aprobada.** El resto del deck de Marketing de Contenidos sigue en revisión.
+- **Registro del deck:** la sesión que lo armó relata que el operador aprobó después el deck completo (2026-10-10). Las láminas registradas una por una son ésta, «Producción con IA» y el patrón de franjas; el deck completo no está registrado.
 - **Condiciones abiertas** (en `conditions` del uso): las pestañas, la bandeja y el bloque de creadores no se
   contrastaron con el producto real; las cifras son de muestra sin marca; falta verificar que Efeonce opere Metricool,
   Sprout Social y Favikon y la autorización de sus logos (TASK-1937); y el par «¿Cómo trabajamos contigo? Así» no pasa la
@@ -388,6 +388,22 @@ con la voz a la izquierda y cuatro filas con ícono Plastilina plano.
     en conjunto, no cada promesa: falta contrastarlos con lo que Efeonce garantiza (skill
     `greenhouse-ai-creative-rights-governance`).
   - La respuesta tiene cinco palabras; la voz de la línea pide de una a tres.
+
+## El patrón «franjas de foto» (aprobado el 2026-10-10)
+
+El operador pidió canonizar el estilo de franjas de foto del deck de Marketing de Contenidos (línea `brand`), en sus dos
+variantes: **seis franjas** («Seis frentes») y **tres franjas** («Momentos», «Programas»). Medidas, reglas, las tres
+excepciones aprobadas (varias esferas, foto de cine recortada, degradado bajo el título) y pendientes:
+[norma §4.6, «Franjas de foto»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+
+- **Cuándo usarlo:** de tres a seis frentes, momentos o programas, cada uno con una foto de cine que el deck ya tiene.
+  No se generan fotos para llenar franjas.
+- **Estado en el catálogo:** patrón aprobado, **candidato a receta sin promover**. No tiene id, slots ni plantilla en
+  el compositor. Fuente: `ai-generations/2026-10-09_deck-contenidos/laminas/` (`seis-frentes.dc.html`,
+  `momentos.dc.html`, `programas.dc.html`, `frentes.generador.py`, `nuevas.py`, `lib.py`, `ui.py`).
+- **Plates:** CT10, CT8, CT3, CT2, CT6 y CT7 en «Seis frentes»; CT18, CT22 y CT23 en «Momentos»; CT17, CT15 y CT14 en
+  «Programas» (según la sesión que armó el deck). De esos, sólo `CT24` está hoy en el índice de recetas de cine, y no
+  pertenece a estas láminas.
 
 ## Anatomía de una receta (campos del JSON)
 
