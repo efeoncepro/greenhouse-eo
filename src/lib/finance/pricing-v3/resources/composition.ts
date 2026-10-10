@@ -68,6 +68,11 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
       issue('INVALID_ASSIGNEE_SLOTS', w.lineId)
     if (!unique(w.tasks) || !unique(w.aiToolIds) || w.tasks.some(t => !policy.taskCodes.includes(t)))
       issue('UNKNOWN_OR_DUPLICATE_TASK', w.lineId)
+
+    const excludedTasks = (w.excludedProfileTasks ?? []).map(e => e.task)
+
+    if (!unique(excludedTasks) || excludedTasks.some(t => w.tasks.includes(t)))
+      issue('CONFLICTING_PROFILE_TASK_EXCLUSION', w.lineId)
     if (w.aiToolIds.some(id => !policy.tools.some(t => t.toolId === id && t.ai))) issue('UNKNOWN_AI_TOOL', w.lineId)
     if (w.aiToolIds.length && !w.aiSelectionReason) issue('AI_SELECTION_REASON_REQUIRED', w.lineId)
     if (
@@ -183,12 +188,19 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
       if (profile?.kind === 'profile' && !policy.profileTasks.some(p => p.profileId === profile.value.profileId))
         issue('PROFILE_RESOURCE_RULES_REQUIRED', line.lineId)
 
-      const tasks = [
-        ...(w?.tasks ?? []),
-        ...(profile?.kind === 'profile'
+      const profileTasks =
+        profile?.kind === 'profile'
           ? (policy.profileTasks.find(p => p.profileId === profile.value.profileId)?.tasks ?? [])
-          : [])
-      ]
+          : []
+
+      const exclusions = w?.excludedProfileTasks ?? []
+
+      // Only a task the profile recipe actually adds can be excluded; anything else is a typo or stale demand.
+      for (const e of exclusions)
+        if (profile?.kind === 'profile' && !profileTasks.includes(e.task))
+          issue('UNKNOWN_PROFILE_TASK_EXCLUSION', `${line.lineId}:${e.task}`)
+
+      const tasks = [...(w?.tasks ?? []), ...profileTasks.filter(t => !exclusions.some(e => e.task === t))]
 
       for (const tool of policy.tools) {
         const reasons = [
@@ -203,7 +215,14 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           lineId: line.lineId,
           toolId: tool.toolId,
           included: reasons.length > 0,
-          reasons: reasons.length ? reasons : ['not-required-for-work']
+          reasons: reasons.length
+            ? reasons
+            : [
+                ...exclusions
+                  .filter(e => tool.tasks.includes(e.task))
+                  .map(e => `profile-task-excluded:${e.task}:${e.reason}`),
+                'not-required-for-work'
+              ]
         })
         if (!reasons.length) continue
         const coverage = clientCoverages.find(c => c.periodId === period.periodId && c.toolId === tool.toolId)

@@ -19,6 +19,7 @@ import {
   projectCompositionPreview
 } from '../../src/lib/finance/pricing-v3/resources/readiness'
 import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
+import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
 import {
   previewResourceChange,
@@ -75,6 +76,7 @@ try {
       catalog: { type: 'string' },
       policy: { type: 'string' },
       credits: { type: 'string' },
+      brief: { type: 'string' },
       kind: { type: 'string' },
       date: { type: 'string' },
       impact: { type: 'string' },
@@ -96,7 +98,7 @@ try {
     prepare: ['catalog', 'input', 'out', 'help'],
     quote: ['catalog', 'input', 'out', 'help'],
     resources: ['catalog', 'policy', 'credits', 'date', 'query', 'input', 'out', 'impact', 'confirm', 'help'],
-    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'format', 'help'],
+    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'format', 'brief', 'help'],
     help: ['help']
   }
 
@@ -134,7 +136,7 @@ try {
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md]',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
         },
@@ -146,18 +148,38 @@ try {
       })
     )
   } else if (command === 'compose') {
-    if (!['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview'].includes(subcommand) || positionals.length !== 2)
+    if (
+      !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'workload'].includes(subcommand) ||
+      positionals.length !== 2
+    )
       throw new Error('INVALID_ARGUMENT')
 
     const allowed = ['assess', 'preview'].includes(subcommand)
       ? ['input', 'out', 'format', 'help']
-      : subcommand === 'scaffold'
+      : subcommand === 'workload'
+        ? ['input', 'brief', 'out', 'help']
+        : subcommand === 'scaffold'
         ? ['catalog', 'policy', 'input', 'out', 'help']
         : ['catalog', 'policy', 'credits', 'input', 'out', 'help']
 
     if (Object.keys(values).some(key => !allowed.includes(key))) throw new Error('INVALID_ARGUMENT')
 
-    if (subcommand === 'scaffold') {
+    if (subcommand === 'workload') {
+      // Volume → dedication. With --brief it writes a new dimensioned brief; it never edits the one it read.
+      if (values.out && !values.brief) throw new Error('INVALID_ARGUMENT')
+
+      const result = values.brief
+        ? applyWorkloadToBrief(read(values.brief), read(required(values.input)))
+        : dimensionWorkload(read(required(values.input)))
+
+      if (values.out) {
+        if (!('brief' in result) || !result.brief) throw new Error('WORKLOAD_REQUIRES_VALID_DIMENSIONING')
+        writeNew(values.out, result.brief)
+      }
+
+      process.stdout.write(json(result))
+      process.exitCode = result.status === 'prepared' ? 0 : 2
+    } else if (subcommand === 'scaffold') {
       const result = scaffoldResourceDemand(
         read(catalogPath),
         read(required(values.policy)),

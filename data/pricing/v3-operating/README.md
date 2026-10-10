@@ -20,6 +20,18 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
   base/SEMrush/Claude y portfolio de Vercel/GCP declarado para simulación.
 - `crm-client-tools.demand.json` → `crm-client-tools.artifact.json`: varianteHubSpot histórica con acceso cliente
   **sintético** documentado; no prueba de cliente real, partner entitlement ni CRM write.
+- `catalog.review-v3.json` (change-set `creative-managed-service.change.json`): política de precio
+  `creative-managed-service` con margen objetivo y mínimo 45 % para los 32 perfiles, kit `managed-service-core` sin
+  herramientas y dos provisiones declaradas como estimación. v2 se conserva; nada se activa por defecto.
+- `resources.review-v3.json` (cambio `managed-service-resources.change.json`): tarea `social-care` con `social-inbox`
+  (precios reportados, plan vigente pendiente) y `agent-runtime-usage` por cada 1.000 ítems (hipótesis sin medir).
+- `resources.review-v4.json` (cambio `sprout-social-inbox.change.json`): `social-inbox` pasa a ser Sprout Social
+  Advanced con asientos nominativos: USD 399 por asiento al mes con facturación anual (página oficial, leída el
+  10/10/2026) y USD 499 con facturación mensual (guías de terceros). El plan contratado sigue pendiente.
+- `resources.review-v5.json` (cambio `sprout-professional-plan.change.json`): agrega Sprout Professional (USD 299 por
+  asiento, perfiles ilimitados, sin API ni informes de atención). Es la versión vigente para servicios gestionados.
+- `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
+  dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
 - `*.assessment.json`, `*.preview.json`: pendientes y precio de simulación redactado; no export comercial autorizado.
 - `writer.brief.json`: entrada para scaffold; tareaSEO debe confirmarse, no inferir salario distinto.

@@ -163,6 +163,54 @@ y owners sigue el [contrato](../../documentation/finance/cotizador-v3-mantenimie
 No es monitor automático ni contrato de reajuste al cliente. Seleccionar sucesor explícito para una nueva quote;
 replay de la vieja usa sus inputs congelados. Renovación Adobe sigue condicional hasta conocer la fecha real.
 
+## Cotizar un servicio gestionado por volumen
+
+Para un servicio que se vende por capacidad y se dimensiona por volumen (social care, soporte, producción recurrente),
+usar las versiones `catalog.review-v3.json` y `resources.review-v5.json` y la oferta `creative-managed-service`.
+
+```bash
+pricing_catalog=data/pricing/v3-operating/catalog.review-v3.json
+pricing_policy=data/pricing/v3-operating/resources.review-v5.json
+pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
+
+# 1. Volumen → dedicación. Sin --brief sólo calcula; con --brief escribe un brief nuevo.
+pnpm --silent pricing:v3 compose workload --input data/pricing/v3-operating/managed-care.workload.json \
+  --brief data/pricing/v3-operating/managed-care.brief.json --out /ruta/nueva/brief-dimensionado.json
+
+# 2. Completar la demanda sobre el brief dimensionado y cotizar.
+pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" --policy "$pricing_policy" \
+  --credits "$pricing_credits" --input data/pricing/v3-operating/managed-care.demand.json --out /ruta/nueva/artefacto.json
+```
+
+Qué declarar en el workload (`pricing-v3-workload/1`):
+
+- `capacity`: horas productivas y horas contratadas de un mes a tiempo completo, con su fuente.
+- `drivers`: unidades al mes y minutos por unidad. La unidad es un nombre libre.
+- `fixedWork`: horas fijas al mes que no dependen del volumen.
+- `lines`: qué parte de cada driver y de cada bloque fijo toma cada línea del brief, y las horas de presencia que
+  debe cubrir aunque no haya volumen. Las cuotas de cada driver y de cada bloque deben sumar 1.
+- `rounding.fteStep`: paso al que se redondea la dedicación, siempre hacia arriba.
+
+`compose workload` devuelve exit 0 con el cálculo listo y exit 2 si falta algo. Los casos que pide resolver a una
+persona: horas sin dueño, una línea que no existe en el brief, y una línea que necesita más de lo que su dotación
+declarada puede dar (`LINE_OVER_CAPACITY`: se sube la dotación o se reparte el trabajo, no se redondea).
+
+En la demanda:
+
+- Las líneas usan `kitId: "managed-service-core"`. Las provisiones (`assurance`, `operations`) son opcionales y se
+  eligen en `choices`; basta declararlas en una línea para cargarlas una vez.
+- Si la receta del perfil trae una tarea que este servicio no hace, se excluye con motivo:
+  `"excludedProfileTasks": [{ "task": "social-publishing", "reason": "…" }]`. No se edita la receta.
+- La bandeja de social care (`social-inbox`) es Sprout Social Advanced con asientos nominativos: un asiento por
+  persona que trabaja la bandeja, con `priceId: "sprout-advanced-annual"` (USD 399 por asiento al mes, precio
+  público con facturación anual). Alternativa más barata: `sprout-professional-annual` (USD 299; perfiles ilimitados,
+  sin API, integraciones ni informes de atención). El plan Standard no sirve con más de cinco perfiles. Un asiento se paga completo aunque la persona dedique una fracción de su tiempo.
+- El consumo de agentes se declara en `serviceToolIds: ["agent-runtime-usage"]` con una asignación cuya cantidad es
+  el número de bloques de 1.000 ítems procesados al mes.
+
+El precio sale al piso de la práctica (margen objetivo 45 %, mínimo 45 %). Sigue siendo una simulación en revisión:
+las provisiones y el consumo de agentes son estimaciones declaradas, y los costos de las personas son históricos.
+
 ## Pendientes que permanecen visibles
 
 `compose assess` separa cálculo y evidencia: salario/localización, provisionesAssurance/operación/onboarding,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "pricing-v3-operational-gaps/1",
-  "asOf": "2026-10-09",
+  "asOf": "2026-10-10",
   "commercialStatus": "requires_review",
   "items": [
     {
@@ -50,6 +50,36 @@
       "owner": "Platform/Finance",
       "required": "Accepted integrationunit, V2/V3 parity, tenant/auth/audience/snapshot/lifecycle and rollout verification",
       "known": "Promotion handoff prepared; no API/UI/MCP migration or deploy."
+    },
+    {
+      "code": "MANAGED_SERVICE_PROVISIONS_UNMEASURED",
+      "owner": "Operations/Finance",
+      "required": "Measured monthly cost of replacement hours (vacations, leave, turnover) and of the out-of-hours alert guard",
+      "known": "provision-backfill-coverage 200USD and provision-on-call-alert-guard 100USD are declared estimates added 2026-10-10"
+    },
+    {
+      "code": "AGENT_RUNTIME_USAGE_UNMETERED",
+      "owner": "Operations/Finance",
+      "required": "Metered model cost per processed item and the monthly item volume per service",
+      "known": "agent-runtime-usage 10USD per 1,000 items is a hypothesis added 2026-10-10; no meter exists"
+    },
+    {
+      "code": "SOCIAL_INBOX_NOT_CONTRACTED",
+      "owner": "Operations/Commercial",
+      "required": "Chosen inbox, plan, seats, profiles covered and who pays the license",
+      "known": "Operator confirmed Sprout Social Advanced on 2026-10-10. Policy v4 carries the public price: 399USD per seat per month on annual billing (sproutsocial.com/pricing, read 2026-10-10) and 499USD on monthly billing (third-party guides). Contracted plan, seat count, billing term and who pays remain unconfirmed"
+    },
+    {
+      "code": "MANAGED_SERVICE_SETUP_NOT_PARAMETRIC",
+      "owner": "Finance/Architecture",
+      "required": "A setup that scales with onboarding weeks and people instead of a fixed catalog amount",
+      "known": "managed-service-core carries no setup; setup is quoted outside the V3 flow"
+    },
+    {
+      "code": "MARGIN_FLOOR_SCOPE",
+      "owner": "Commercial/Finance",
+      "required": "Confirmation that the 45% Creative practice floor governs every managed service offer",
+      "known": "creative-managed-service encodes target and minimum margin 0.45 from the floor approved 2026-07-13"
     }
   ]
 }

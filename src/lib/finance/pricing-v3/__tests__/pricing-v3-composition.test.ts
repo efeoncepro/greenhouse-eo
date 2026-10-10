@@ -131,6 +131,49 @@ describe('demand-based resource composition', () => {
     expect(codes(r)).toContain('UNKNOWN_OR_DUPLICATE_TASK')
   })
 
+  it('lets a demand exclude a profile recipe task with a reason, and explains the tool it drops', () => {
+    const base = run(demand('seo-service'))
+    const d = demand('seo-service')
+
+    // The SEO profile recipe adds seo-writing (SEMrush). This engagement does not use it on that line.
+    d.work[1].excludedProfileTasks = [{ task: 'seo-writing', reason: 'Scope without keyword research for this role.' }]
+    const r = run(d)
+
+    expect(r.quote.calculationStatus).toBe('calculated')
+    expect(attribution(base, 'semrush').assignments).toHaveLength(2)
+    expect(attribution(r, 'semrush').assignments.map(a => a.lineId)).toEqual(['writer'])
+    expect(r.selections.find(s => s.lineId === 'seo' && s.toolId === 'semrush')).toMatchObject({
+      included: false,
+      reasons: ['profile-task-excluded:seo-writing:Scope without keyword research for this role.', 'not-required-for-work']
+    })
+    // The declared allocation is untouched: the same attributed cost now has a single consumer.
+    expect(attribution(r, 'semrush').assignments.map(a => a.attributedCost)).toEqual(['12'])
+    expect(attribution(r, 'semrush').attributedMonthlyCost).toBe(attribution(base, 'semrush').attributedMonthlyCost)
+  })
+
+  it('rejects exclusions that are not in the profile recipe or contradict the declared work', () => {
+    const unknown = demand('seo-service')
+
+    unknown.work[0].excludedProfileTasks = [{ task: 'seo-writing', reason: 'Writer recipe has no such default.' }]
+    unknown.work[0].tasks = []
+    expect(codes(run(unknown))).toContain('UNKNOWN_PROFILE_TASK_EXCLUSION')
+
+    const conflicting = demand('seo-service')
+
+    conflicting.work[1].tasks = ['seo-writing']
+    conflicting.work[1].excludedProfileTasks = [{ task: 'seo-writing', reason: 'Declared and excluded at once.' }]
+    expect(codes(run(conflicting))).toContain('CONFLICTING_PROFILE_TASK_EXCLUSION')
+  })
+
+  it('keeps a frozen composition with exclusions replayable', () => {
+    const d = demand('seo-service')
+
+    d.work[1].excludedProfileTasks = [{ task: 'seo-writing', reason: 'Scope without keyword research for this role.' }]
+    const artifact = runResourceComposition(catalog, policy, credits, d)
+
+    expect(replayResourceComposition(artifact).replayDigest).toBe(artifact.replayDigest)
+  })
+
   it('pools credit demand across roles before purchasing packs once', () => {
     const d = demand('seo-service')
     const designer = demand('designer')

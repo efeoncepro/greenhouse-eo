@@ -80,6 +80,12 @@ export const compositionDemandSchema = z
             lineId: id,
             assigneeIds: z.array(id).min(1).max(100),
             tasks: z.array(id).max(30),
+            // Profile task rules are review recipes, not the scope of every engagement. An exclusion is explicit,
+            // justified and travels with the frozen demand; it never deletes the recipe from the policy.
+            excludedProfileTasks: z
+              .array(z.object({ task: id, reason: z.string().min(1).max(1000) }).strict())
+              .max(30)
+              .optional(),
             aiToolIds: z.array(id).max(30),
             aiSelectionReason: z.string().min(1).max(1000).optional(),
             creditDemand: z

@@ -1,0 +1,990 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-creative-managed-service-2026-10-10",
+  "baseDigest": "a4303c79234c08234f9931be5588d9156c57cef04e8cbe0c9ffd5caeeddc4eb9",
+  "nextVersion": "operating-review-2026-10-10-v3",
+  "actor": "operator-authorized-agent",
+  "reason": "Add a pricing policy for managed services of the Creative practice at its 45% margin floor, a managed-service kit without tool requirements, and two declared provision estimates. Staffing policies and historical records are preserved.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-001:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-001:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-001",
+          "tierCode": "historical-tier-3",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-002:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-002:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-003:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-003:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-003",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-004:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-004:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-004",
+          "tierCode": "historical-tier-3",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-005:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-005:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-005",
+          "tierCode": "historical-tier-3",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-006:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-006:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-006",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-007:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-007:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-007",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-008:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-008:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-008",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-009:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-009:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-009",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-010:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-010:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-010",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-011:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-011:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-011",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-012:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-012:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-012",
+          "tierCode": "historical-tier-3",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-013:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-013:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-013",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-014:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-014:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-014",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-015:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-015:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-015",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-016:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-016:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-016",
+          "tierCode": "historical-tier-3",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-017:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-017:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-017",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-018:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-018:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-018",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-019:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-019:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-019",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-020:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-020:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-020",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-021:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-021:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-021",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-022:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-022:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-022",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-023:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-023:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-023",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-024:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-024:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-024",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-025:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-025:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-025",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-026:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-026:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-026",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-027:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-027:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-027",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-028:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-028:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-028",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-029:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-029:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-029",
+          "tierCode": "historical-tier-1",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-030:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-030:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-030",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-031:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-031:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-031",
+          "tierCode": "historical-tier-2",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "pricing:ECG-032:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "pricing:ECG-032:creative-managed-service",
+        "revision": 1,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-032",
+          "tierCode": "historical-tier-4",
+          "offerId": "creative-managed-service",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.45",
+          "basis": "all_costs",
+          "minimumMargin": "0.45"
+        },
+        "source": {
+          "reference": "policy:creative-practice-margin-floor-2026-07-13",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Managed service of the Creative practice priced at its margin floor: target margin 45% on all costs, never below 45%. The floor was approved on 2026-07-13; applying it to a given engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "provision-backfill-coverage",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "provision-backfill-coverage",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "amount": "200",
+          "currency": "USD",
+          "resourceId": "provision-backfill-coverage",
+          "label": "Backfill coverage reserve (vacations, leave, turnover) — hypothesis, not measured",
+          "kind": "talent_assurance",
+          "unit": "month",
+          "scope": "account",
+          "covers": [
+            "talent_assurance"
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:provision-backfill-coverage-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Monthly reserve so a trained replacement covers vacations, leave and turnover of a small always-on squad. Declared estimate for simulation; replace with the measured cost of the replacement hours before any commitment."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "provision-on-call-alert-guard",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "provision-on-call-alert-guard",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "amount": "100",
+          "currency": "USD",
+          "resourceId": "provision-on-call-alert-guard",
+          "label": "Out-of-hours alert guard — hypothesis, not measured",
+          "kind": "operations",
+          "unit": "month",
+          "scope": "account",
+          "covers": [
+            "operations"
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:provision-on-call-alert-guard-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Monthly stipend for the person who takes critical alerts outside staffed hours. Declared estimate for simulation; it does not establish an on-call roster, a labor arrangement or a response-time commitment."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "managed-service-core",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "managed-service-core",
+        "revision": 1,
+        "kind": "kit",
+        "value": {
+          "kitId": "managed-service-core",
+          "label": "Proposed managed-service-core",
+          "requirements": [
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-backfill-coverage",
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-on-call-alert-guard",
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-managed-service-core-2026-10-10",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Kit for lines of a managed service. Tools come from the resource policy and the declared work, never from the kit. Provisions are optional and chosen per engagement; a line that selects none carries no provision. Setup is quoted outside the kit until a parametric setup exists."
+      }
+    }
+  ]
+}

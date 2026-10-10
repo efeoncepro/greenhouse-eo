@@ -160,6 +160,31 @@ sucesor operativo. Promoción API/UI/MCP requiere ADR/cutover, datos aprobados, 
 tenancy, audiencias, snapshots/lifecycle/idempotencia, prueba de paridad, rollout/readback y rollback propios.
 No crear fórmulas o autoridad independientes en cada consumer ni dar por desplegado el prototipo local.
 
+## Servicio gestionado por volumen (delta 2026-10-10)
+
+Para un servicio que se dimensiona por volumen (social care, soporte, producción recurrente) usar los sucesores
+`catalog.review-v3.json` + `resources.review-v5.json` (bandeja = Sprout Social Advanced por asiento) y la oferta `creative-managed-service`; ejemplo completo en
+`data/pricing/v3-operating/managed-care.*` y pasos en el manual («Cotizar un servicio gestionado por volumen»).
+
+- **Dedicación desde el volumen:** `pricing:v3 compose workload --input workload.json [--brief brief.json --out nuevo.json]`
+  (`pricing-v3-workload/1`). Driver = unidades/mes × minutos; más horas fijas y horas de presencia por línea. La
+  dedicación es el mayor entre trabajo/horas productivas y presencia/horas contratadas, redondeada hacia arriba.
+  Cuotas de cada driver y bloque fijo suman 1. Exit 0 listo, 2 falta input (`LINE_OVER_CAPACITY` pide decidir dotación).
+  No escribir la dedicación a mano si hay volumen declarado; no leer el resultado como dotación comprometida.
+- **Receta del perfil que no aplica:** `work[].excludedProfileTasks: [{ task, reason }]`. Nunca editar la receta ni
+  declarar una herramienta que el servicio no usa para «pasar» la validación. Sólo se excluye lo que la receta agrega.
+- **Piso de margen:** la política `creative-managed-service` usa `target_margin` 0,45 y `minimumMargin` 0,45 en los
+  32 perfiles. `talent-assurance-staffing` sigue con el recargo histórico (margen ~25 %): no usarla para un servicio
+  gestionado. `assess` mantiene sus 40/35 como propuestas no aprobadas.
+- **Kit y provisiones:** `kitId: "managed-service-core"` en cada línea; provisiones opcionales por `choices`
+  (`provision-backfill-coverage`, `provision-on-call-alert-guard`), declaradas en una sola línea. Son estimaciones.
+- **Consumo de agentes:** `serviceToolIds: ["agent-runtime-usage"]` + asignación con cantidad = bloques de 1.000 ítems
+  al mes. Hipótesis sin medir. La bandeja (`social-inbox`) tiene precios reportados y plan vigente pendiente.
+- **Lo que la CLI aporta y un cálculo a mano no:** herramientas base y licencias mínimas con su costo (Notion,
+  Microsoft 365), fee de contratación completo por persona y FX registrado. Por eso el precio se saca de la CLI.
+- Brechas abiertas en `operational-gaps.json`: provisiones sin medir, consumo sin medidor, bandeja sin contratar,
+  setup no paramétrico, alcance del piso de 45 % y costos salariales localizados.
+
 ## Mapa de implementación y evidencia reusable
 
 | Responsabilidad | Fuente vigente |
@@ -169,6 +194,7 @@ No crear fórmulas o autoridad independientes en cada consumer ni dar por desple
 | Demanda/policy y atribuciones | `src/lib/finance/pricing-v3/resources/{composition-contracts,composition}.ts` |
 | Packs/costo base/caja/caducidad | `src/lib/finance/pricing-v3/resources/credit-budget.ts` |
 | Discovery/scaffold/portfolio/plan | `src/lib/finance/pricing-v3/resources/operating.ts` |
+| Volumen → dedicación (`compose workload`) | `src/lib/finance/pricing-v3/resources/workload.ts` |
 | Gaps económicos y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
 | Snapshots/digests/IO/mantenimiento local | `src/lib/finance/pricing-v3/adapters/{local-snapshot,catalog-local,resource-composition,resource-maintenance}.ts` |
 | Adapter CLI, flags, exit y escritura exclusiva | `scripts/commercial/pricing-v3.ts` |

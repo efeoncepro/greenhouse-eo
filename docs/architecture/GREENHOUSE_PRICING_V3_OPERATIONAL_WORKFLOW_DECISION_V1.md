@@ -131,6 +131,65 @@ Quote API Parity y TASK-1211/1212 conservan la autoridad productiva V2. Promoci�
 contraste V2/V3, auth/tenancy/audiencias, snapshots/lifecycle y cutover/rollback. UI/API/MCP no pueden eludir esos
 commands/readers ni ampliar permisos externos por inferencia. La documentación prepara la integración, no la despliega.
 
+## Delta 2026-10-10 — servicio gestionado: volumen a dedicación, exclusión de recetas y piso de margen
+
+**Decisión.** Cotizar un servicio gestionado (primer caso: social care para SKY 2027) se resuelve con dos capacidades
+nuevas de código, ambas domain-free, y el resto como datos por el flujo de mantenimiento existente.
+
+1. **Volumen → dedicación** (`resources/workload.ts`, contrato `pricing-v3-workload/1`, comando
+   `pricing:v3 compose workload`). Un driver es «N unidades al mes, M minutos cada una»; la unidad es dato y nunca una
+   rama del código. La dedicación de una línea es el mayor entre el trabajo declarado sobre horas productivas y la
+   presencia exigida sobre horas contratadas, redondeada **hacia arriba** al paso declarado. Cada hora declarada tiene
+   exactamente un dueño: las cuotas de un driver o de un bloque fijo suman 1 o el resultado es `needs_input`.
+   Con `--brief` escribe un brief nuevo dimensionado; nunca edita el que leyó.
+2. **Exclusión explícita de tareas de receta** (`work[].excludedProfileTasks` en `pricing-v3-composition-demand/1`).
+   Las reglas de perfil son recetas de revisión, no el alcance de todo engagement. Una exclusión lleva motivo, viaja
+   con la demanda congelada, y la selección de la herramienta que deja fuera lo dice
+   (`profile-task-excluded:<tarea>:<motivo>`). Sólo se excluye una tarea que la receta del perfil realmente agrega.
+3. **Datos** (sucesores `catalog.review-v3.json` y `resources.review-v3.json`, generados con preview/apply; el mismo día `resources.review-v4.json` registró la bandeja como Sprout Social Advanced por asiento):
+   política de precio `creative-managed-service` con `target_margin` 0,45 y `minimumMargin` 0,45 para los 32 perfiles;
+   kit `managed-service-core` sin herramientas y con provisiones opcionales; dos provisiones declaradas como estimación;
+   tarea `social-care` con la herramienta `social-inbox`; y `agent-runtime-usage`, un recurso por uso (paquete por
+   cada 1.000 ítems procesados).
+
+**Alternativas descartadas.**
+
+- *Editar la receta del perfil para quitarle la tarea.* Cambia a todos los consumidores para arreglar un caso.
+- *Derivar la dedicación dentro del brief con una fórmula por servicio.* Es un `if (servicio === 'x')` escrito en datos.
+- *Un valor nuevo `usage` en `basis`.* El paquete con cantidad decimal ya expresa precio por bloque de unidades.
+- *Una política de precio por cliente.* El piso es de la práctica; la oferta es el eje correcto.
+
+**Cuatro pilares.**
+
+- *Seguridad:* nada cambia fuera del prototipo local; sin DB, API ni escritura externa. Una exclusión no puede ocultar
+  un costo en silencio: exige motivo y queda en la selección. Las cifras nuevas del catálogo se declaran `estimated`
+  con referencia `hypothesis-only:`; el estado sigue siendo `requires_review` y `binding=false`.
+- *Robustez:* validación con diagnósticos y sin resultado parcial (horas sin dueño, driver desconocido, exclusión que
+  no está en la receta o que contradice el trabajo declarado, línea sobre su capacidad). El redondeo nunca deja la
+  dedicación por debajo del trabajo. El campo nuevo es opcional: las demandas y artefactos anteriores no cambian.
+- *Resiliencia:* los sucesores se escriben en rutas nuevas y los padres se conservan; volver atrás es elegir v2. El
+  replay de un artefacto con exclusiones reproduce su digest (probado).
+- *Escalabilidad:* un segundo servicio (contenido, soporte, auditorías) reutiliza el driver sin tocar código; la
+  política de precio cubre los 32 perfiles, así que un caso nuevo no exige otro change-set.
+
+**Prueba del segundo consumidor.** `pricing-v3-workload.test.ts` corre el mismo cálculo con otra unidad y exige el
+mismo resultado. El ejemplo `managed-care.*` valida el flujo completo y **deriva sus expectativas del catálogo que lee
+el motor** (el margen mínimo sale de la política; las herramientas excluidas, de la demanda), no de literales.
+
+**Reglas duras.**
+
+- **NUNCA** quitar una tarea de la receta de un perfil para resolver un engagement: se excluye en la demanda, con motivo.
+- **NUNCA** escribir la dedicación a mano cuando existe un volumen declarado: se dimensiona con `compose workload` y el
+  brief dimensionado se conserva junto al workload que lo produjo.
+- **NUNCA** leer el resultado de `compose workload` como dotación comprometida, disponibilidad o productividad medida.
+- **NUNCA** tratar `provision-*` ni `agent-runtime-usage` como costos medidos: son estimaciones declaradas.
+- **SIEMPRE** cotizar un servicio gestionado de la práctica creativa con la oferta `creative-managed-service`; su
+  `minimumMargin` es el piso y un descuento que lo cruce deja la cotización fuera de política.
+
+**No decidido a propósito.** Setup paramétrico (hoy se cotiza fuera del kit); costos salariales localizados (siguen en
+`operational-gaps.json`); medición del consumo de agentes; si el piso de 45 % rige igual para toda oferta gestionada
+fuera de la práctica creativa; y la promoción de todo esto al canon de cotizaciones.
+
 ## Evidencia y rutas de operación
 
 - [Manual para agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
