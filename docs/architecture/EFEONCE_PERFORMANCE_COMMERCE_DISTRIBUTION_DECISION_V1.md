@@ -3,6 +3,8 @@
 ## Architecture Decision 2026-09-10 — Performance como capability única con dos motions por comprador
 
 - **Status:** Proposed
+- **Enmienda acotada aceptada 2026-10-09:** [Basis + Real Audiences](EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md)
+  reemplaza la restricción de proveedor único del punto 6 y aprueba servicio/tarifa/cobro programáticos. Los demás gates de este ADR siguen abiertos.
 - **Date:** 2026-09-10
 - **Owner:** Efeonce Strategy + Media & Distribution (owner comercial por confirmar)
 - **Required partners:** Finance (cost-to-serve, piso de margen, retiro del SKU `EFG-003`, pass-through) · Legal/Privacy
@@ -82,7 +84,8 @@ Al 2026-09-10 la solución tenía cinco huecos:
    es dueño del lado CRM (etapas, calidad de datos, sync). Con un solo cliente y un solo engagement, la propuesta nombra
    owner por lane.
 
-6. **Programmatic se compra vía Real Audiences.** El partner programático seleccionado por el CEO el 2026-09-10 es
+6. **Texto histórico de proveedor único, reemplazado por la [decisión dual aceptada](EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).**
+   **Programmatic se compra vía Real Audiences.** El partner programático seleccionado por el CEO el 2026-09-10 es
    **Real Audiences**, un DSP con operación en los cinco países de Efeonce. Se usa en dos modos y en secuencia: primero
    **managed por briefing** (Real Audiences opera; Efeonce define objetivo, audiencias y exclusiones, audita y lee
    resultados) y después **autogestionado**, con un trader de Efeonce certificado por Real Audiences, una vez pasado el
@@ -167,7 +170,9 @@ Pasa a `Accepted` cuando se cumplan:
 2. **Finance:** cost-to-serve por nivel de complejidad medido en el primer piloto, piso de margen fijado y `EFG-003`
    resuelto.
 3. **Legal/Privacy:** posición sobre envío de datos first-party a plataformas bajo la Ley 21.719, con plantilla de DPA.
-4. **Programmatic:** cláusula de transparencia firmada con Real Audiences y primera campaña managed auditada contra ella.
+4. **Programmatic:** cláusula de transparencia firmada con cada proveedor que se active y primera campaña managed
+   auditada contra ella. La [decisión dual](EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md) selecciona ambos proveedores,
+   sin sustituir la homologación por campaña ni aprobar los demás gates de este ADR.
 
 Si G1 falla sólo en el motion B, se retira el motion B y el resto se mantiene.
 

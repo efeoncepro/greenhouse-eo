@@ -30,8 +30,16 @@ ni el contratista principal. Efeonce mantiene la relación comercial, la account
 
 El modelo no está aprobado para venta general. `Approved for validation` permite pilotos y SOW gobernados mientras se
 validan demanda, cost-to-serve, rights management, proveedores, pricing, evidencia y repetibilidad.
+La [oferta programática](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) tiene aprobación comercial acotada
+del operador el 2026-10-09 para servicio, tarifario y cobro; no promueve automáticamente el resto de esta línea.
 
 ## 2. Problema, ICP, buyer y JTBD
+
+**Servicio aprobado 2026-10-09 — publicidad programática:** Efeonce ofrece esta capacidad con **Basis y Real
+Audiences** seleccionados, con activación por campaña y términos aún pendientes. Se conserva la taxonomía de tres
+soluciones. El [submodelo de programmatic](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) define cliente,
+packaging, operación y economía; su [pricing pack](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md)
+separa fee propio, medios y proveedores. [Decisión acotada](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
 
 ### Beachhead
 

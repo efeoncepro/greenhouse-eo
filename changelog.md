@@ -9,6 +9,8 @@
 
 ## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
 
+- [Publicidad programática aprobada](docs/architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md): modelo V1.4, pricing V1.3, ficha y manual con tarifario USD y cobro estándar; setup único, fee fijo, externos al costo, margen mínimo/objetivo 45%/55%, honorarios a 30 días y liquidación a 15. Catálogo/registry y evidencia sincronizados. PDF previo desactualizado; contratación externa y costos observados por campaña. Sin integración/runtime ni facturas/cotizaciones emitidas.
+
 - Cotizador V3: tres subagentes consolidaron arquitectura, modelos, manuales, contratos y skills Codex/Claude contra el código; routers e índices llevan a la [superficie completa](docs/documentation/finance/cotizador-v3-superficie-implementada.md). [Cobertura y cierre](docs/audits/commercial/2026-10-09-pricing-v3-docs-skills-consolidation.md); simulación local, datos económicos y promoción canónica conservan su revisión pendiente.
 
 - [Pibank](docs/commercial/prospects/banco-pichincha-peru-seo-2026/README.md): propuesta técnica v13 (49 láminas) y cotización USD/PEN enviadas a Jesús Vargas Serpa; compromiso inicial de seis meses y renovación trimestral sobre el plan anual de US$79.200; deal en Presentación de soluciones. [Deck v13](docs/commercial/prospects/banco-pichincha-peru-seo-2026/reconstruccion-2027/deck-propuesta/README.md), [región de filtros SVG](docs/architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md) en `method-surround-cycle` y [manual: `content-stack` y empalme](docs/manual-de-uso/creative/componer-deck-con-recetas.md).

@@ -74,6 +74,8 @@ modelo `Approved for validation`, sin precio público ni capacidad runtime nueva
 - [Media & Distribution](media-distribution/README.md) — incluye la ficha propia de
   [Performance & Commerce Distribution](media-distribution/PERFORMANCE_COMMERCE_DISTRIBUTION_SERVICE_V1.md) (`Proposed`):
   paid media con dos motions (Demand & Commerce · B2B Pipeline), canales como cobertura y programmatic vía partner.
+  [Publicidad programática](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md): servicio, tarifa base y
+  cobro `Commercially approved` el 2026-10-09; Basis + Real Audiences seleccionados, habilitación externa por campaña.
 - [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
   (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
   `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).

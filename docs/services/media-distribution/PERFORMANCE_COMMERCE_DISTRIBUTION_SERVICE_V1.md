@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce · **Product brand habilitadora:** Reach, cuando aporte método o tooling
 > **Estado:** `Proposed` — la solución sigue `Approved for validation` en el catálogo de la línea; esta ficha propone su
 > estructura V1 y no autoriza precios públicos, claims ni venta general
-> **Fecha:** 2026-09-10 · **Última actualización:** 2026-09-19 (programmatic: respuesta de Real Audiences y Basis en evaluación) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
+> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
@@ -44,7 +44,7 @@ de asignación para el siguiente ciclo.
 | 2 | **Growth Activation Sprint** | señal remediada, cuentas reestructuradas o tomadas, primera matriz creativa, línea base | 8–12 semanas, precio fijo | `Proposed` |
 | 3 | **Managed Performance** | operación mensual de los canales del motion, testing, reporting y gobierno trimestral | mensual por nivel, mínimo 3 meses | `Proposed` |
 | 4 | **Incrementality & Media Investment Architecture** | experimentos y MMM para una pregunta de asignación | por estudio | `Proposed`, sólo con madurez |
-| 5 | **Programmatic vía partner DSP** (Real Audiences seleccionado; Basis en evaluación) | display, video, audio, pDOOH y push dentro del mix | canal dentro de 2 o 3; managed y luego autogestionado | pendiente de términos; demo RA 2026-09-22 |
+| 5 | **Programmatic vía partner DSP** (Basis y Real Audiences seleccionados) | display, video, audio, pDOOH y push dentro del mix | campaña o mensual, managed inicialmente; autogestión con gate | servicio/tarifa/cobro aprobados 2026-10-09; activación por caso |
 | 6 | **ChatGPT Ads** | campañas donde OpenAI lo habilita (MX, BR, EE.UU., España…) | canal selectivo dentro de 3 | `Proposed` |
 | 7 | **Preparación para anuncios en IA** | intents, landings y medición listos para cuando ChatGPT Ads llegue a Chile | dentro de 1 o con Search Visibility 360 | `Proposed` |
 | 8 | **Staff Augmentation** | perfil de performance dirigido por el cliente | tarifa de rol del catálogo | vigente en catálogo |
@@ -127,13 +127,13 @@ y su fuente vive en la [investigación de mercado 2026-09-10](../../audits/comme
 | TikTok | `core` si hay capacidad creativa nativa | `no ofrecido` por defecto | cuenta del cliente | sin producción nativa, no se activa. TikTok Shop y GMV Max operan en México y Brasil; en Chile sin fecha oficial a 2026-08 |
 | LinkedIn | `selectivo` | `core` | Campaign Manager del cliente | caro por diseño: se justifica por la calidad de la cuenta alcanzada |
 | Microsoft Advertising | `selectivo` | `selectivo` | cuenta del cliente | búsqueda incremental en audiencias corporativas |
-| Programmatic display, video, rich media e interstitials | `vía partner` | `vía partner` (ABM por confirmar) | Real Audiences, managed o autogestionado (Basis en evaluación) | cláusula de transparencia obligatoria |
-| pDOOH (pantallas digitales en vía pública) | `selectivo` vía partner | `no ofrecido` por defecto | Real Audiences (sin CPM cotizado a 2026-09-19) | se compone con la capacidad ATL, OOH & DOOH de la línea y con Channel & Commerce cuando la pantalla está cerca del punto de venta |
+| Programmatic display, video, rich media e interstitials | `vía partner` | `vía partner` (ABM por confirmar) | Basis o Real Audiences, según brief y términos | cláusula de transparencia obligatoria |
+| pDOOH (pantallas digitales públicas/comerciales, interiores o exteriores) | `selectivo` vía partner | `no ofrecido` por defecto | Basis o Real Audiences; inventario y precio por campaña | se compone con la capacidad ATL, OOH & DOOH de la línea y con Channel & Commerce cuando la pantalla está cerca del punto de venta |
 | Notificaciones push | `selectivo` vía partner | `no ofrecido` | Real Audiences | sólo con revisión de calidad del inventario |
-| CTV / OTT | `vía partner` | `no ofrecido` por defecto | por confirmar con Real Audiences; si no lo cubre, alternativa | sólo con escala y objetivo de alcance |
+| CTV / OTT | `vía partner` | `no ofrecido` por defecto | Basis lo declara en su deck; validar disponibilidad y términos; RA por confirmar | sólo con escala y objetivo de alcance |
 | Retail media (redes de cadenas, marketplaces) | `core` cuando hay commerce | `no ofrecido` | cuenta del cliente en cada red | requiere acceso a venta y catálogo. En Chile: Mercado Ads, Walmart Connect, Cencosud Media, Fmedia, Sodimac Media, Ripley Media |
 | Amazon Ads | `selectivo` sólo en México | `no ofrecido` | cuenta del cliente | Amazon no opera su programa de partners en Chile |
-| Audio digital | `vía partner` | `no ofrecido` | Real Audiences | selectivo |
+| Audio digital | `vía partner` | `no ofrecido` | Basis o Real Audiences según mercado | selectivo |
 | **ChatGPT Ads** | `selectivo` donde existe | `selectivo` donde existe | Ads Manager del cliente | self-service en 52 países; en LATAM sólo Brasil y México. **En Chile no hay anuncios ni self-service** a 2026-09-10 |
 | Anuncios en AI Overviews / AI Mode de Google | vía Search/PMax/AI Max | vía Search/AI Max | cuenta Google del cliente | no se compra aparte; hoy sólo en inglés y en 12 países, Chile no incluido |
 | **X Ads** | `selectivo` bajo pedido | `selectivo` bajo pedido | cuenta del cliente | sólo con revisión de brand safety y verificación de terceros |
@@ -144,39 +144,31 @@ Estados: `core` = lo operamos con equipo propio; `selectivo` = lo operamos cuand
 = un partner opera el seat y Efeonce planifica, gobierna y audita; `no ofrecido` = no entra en propuesta sin decisión
 explícita.
 
-## Programmatic vía Real Audiences
+## Programmatic con Basis y Real Audiences
 
-Efeonce no tiene seat propio en un DSP. El partner programático seleccionado por el CEO el 2026-09-10 es **Real
-Audiences**, un DSP con sede en Miami y oficinas en Chile, México, Colombia, Ecuador, Argentina, Uruguay y Reino Unido.
-Declara inventario y campañas activas en los cinco países de Efeonce: Chile, Colombia, México, Perú y EE.UU. Formatos
-declarados: display, video, rich media, audio, interstitials, pDOOH y notificaciones push, con segmentación
-geolocalizada.
+**Servicio aprobado 2026-10-09:** oferta, tarifario base y política de cobro para clientes de Efeonce con **ambos proveedores
+seleccionados**. Efeonce mantiene la estrategia, relación comercial y rendición de cuentas; el proveedor opera la
+compra conforme al contrato de cada campaña. La aprobación comercial no acredita partnership oficial, precios externos
+ni crédito concedido por proveedores; el tarifario y cobro Efeonce sí están aprobados en su pack específico.
 
-Se usan dos modos, en secuencia:
+La regla vigente reemplaza el proveedor único y a Basis como segunda opción de septiembre. Una campaña usa uno o
+ambos según inventario, calidad, medición, costo total, caja y soporte; no se reparte 50/50 por defecto.
 
-| Modo | Quién opera | Cuándo |
-|---|---|---|
-| **Managed por briefing** | Real Audiences opera; Efeonce define y audita | primeras campañas, hasta pasar el gate |
-| **Autogestionado** | un trader de Efeonce certificado por Real Audiences (4 sesiones: campañas, tags y tracking, audiencias y listas, formatos, reportes) | después del gate: más control, aprendizaje propio y sin fee de servicio del partner |
+- [Decisión acotada aceptada](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
+- [Ficha programmatic: cómo presentarlo, alcance y métricas](PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md).
+- [Modelo de negocio y operación](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md).
+- [Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md).
+- [Manual para preparar propuestas](../../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 
-En modo managed, la división del trabajo es:
+**Cláusula de transparencia obligatoria para cada proveedor antes de comprar:** fees de tecnología, datos y
+servicio separados; ningún markup no declarado; reporte por dominio/app/placement o ubicación/pantalla/horario
+según canal; controles auditables de brand safety, fraude y MFA; derechos de acceso, exportación y custodia de
+información del cliente explícitos. En pDOOH, proof of play y método de audiencia. No confundir reporte disponible
+con garantía de métricas causales o de datos personales portables.
 
-| Efeonce | Real Audiences |
-|---|---|
-| objetivo, audiencias, listas de cuentas, exclusiones, frecuencia, brand safety | operación del seat, trafficking, optimización táctica |
-| auditoría del supply path y de los reportes por dominio, app y placement | reporte a nivel de dominio, app y placement |
-| lectura de resultados junto al resto del mix | fees de tecnología y de servicio declarados |
-
-**Cláusula de transparencia — sin esto no se compra:**
-
-1. fee de tecnología, fee de datos y fee de servicio del partner declarados por separado;
-2. ningún markup no declarado sobre el costo del inventario;
-3. reporte por dominio, app y placement con acceso para el cliente;
-4. listas de exclusión de brand safety y de sitios hechos para arbitraje publicitario (MFA) aplicadas y auditables;
-5. derecho del cliente a auditar y a llevarse listas, audiencias y aprendizajes al terminar.
-
-**Gate para pasar a autogestionado:** dos campañas managed entregadas y auditadas contra la cláusula, un trader
-certificado con backup y un checklist de brand safety y reporte aprobado.
+**Operación recomendada:** primeras campañas managed con Efeonce definiendo y auditando; autogestión sólo después
+de dos campañas auditadas en ese proveedor, capacitación/trader con backup, permisos, soporte y economics del seat
+validados. Un seat del proveedor no equivale automáticamente a una cuenta propiedad del cliente.
 
 ### Lo que Real Audiences declaró por escrito — 2026-09-19
 
@@ -186,7 +178,7 @@ palabra del partner, no un término firmado:
 | Tema | Declarado |
 |---|---|
 | Cobertura | inventario premium en los cinco países de Efeonce |
-| Modelo para agencias | **rebates, devoluciones o comisiones de agencia según la inversión en la plataforma**; sin porcentajes ni tramos todavía |
+| Modelo para agencias | **rebates, devoluciones o comisiones de agencia según la inversión en la plataforma**; al corte histórico sin porcentajes ni tramos |
 | Mínimos | sin mínimos por formato ni por país; recomiendan presupuesto por objetivo |
 | Facturación | invoice desde su LLC en EE.UU. hacia cada país de LATAM (Chile, México…); detalle pendiente |
 | Material recibido | presentación general y deck de formatos con CPM estimado |
@@ -206,50 +198,39 @@ CPM estimados en USD de su deck de formatos (2026-09):
 Especificaciones pDOOH declaradas: JPG a 72–150 DPI o MP4 a 30 fps y 6–10 Mbps en las dimensiones de cada pantalla;
 aprobación de contenido del dueño de la pantalla, por lo que la campaña se carga al menos 2 días hábiles antes del inicio.
 
-**Alertas abiertas.** Un CPM de display de USD 0,20–0,25 corresponde a inventario remanente o de cola larga, no a
-medios premium; se vuelve usable sólo con el reporte por dominio, app y placement y la verificación de terceros de la
-cláusula. Las notificaciones push tienen historial de tráfico de baja calidad. La facturación desde EE.UU. tiene efectos
-tributarios en Chile (retención de impuesto adicional o IVA según calificación del servicio) que Finance debe revisar
-antes de firmar.
+**Alertas abiertas.** Esos CPM son estimaciones históricas del proveedor, no cotizaciones vigentes ni evidencia de
+calidad. Antes de usarlos, validar inventario, alcance y fees; exigir reporte y verificación. Push requiere revisión
+específica de tráfico y condiciones de uso. Finance debe validar el tratamiento tributario de la factura extranjera
+según entidad, jurisdicción y calificación del servicio antes de firmar.
 
 **Rebates: decisión pendiente de CEO + Finance.** Un rebate por inversión del cliente es dinero que el partner paga a
 Efeonce sobre medios del cliente. Mientras no haya decisión, rige la cláusula 2: **ningún rebate se retiene sin
 declararlo al cliente por escrito**. Las dos salidas posibles son traspasarlo al cliente como descuento o declararlo como
 ingreso de Efeonce en la propuesta y en el contrato. Nunca queda oculto dentro del CPM.
 
-**Por confirmar con Real Audiences antes de la primera campaña:** porcentaje, tramos y liquidación del rebate; fees de
+**Pendientes del snapshot de septiembre; actualización debajo:** base contractual, tramos y liquidación del rebate; fees de
 plataforma, datos y servicio por separado; CPM de referencia pDOOH en Santiago, Bogotá, CDMX y Lima y qué dueños de
 pantallas usan; lista de dominios y apps del inventario de display y video; verificación de terceros (IAS, DoubleVerify
 u otra) y control de fraude; medición de exposición pDOOH (proof of play y metodología de audiencia); moneda, plazo y
 entidad de facturación; aceptación de la cláusula de transparencia; si cubre CTV y targeting B2B por cuenta; duración de
 la certificación y usuarios del seat. Sin acuerdo firmado: no se comunica como partnership.
 
-### Basis — segunda opción en evaluación
+### Actualización comercial — 2026-10-09
 
-**Basis** se presenta en su firma de correo como "Buy-Side Programmatic Platform" (premio Adweek Tech Stack). Por
-conocimiento general, no verificado todavía con ellos: es la antigua Centro, con sede en EE.UU., y vende un DSP
-autogestionado con capa de flujo de trabajo para agencias. Contacto: Manuel Ramos Bernard, VP LATAM, en CDMX. Él escribió el
-2026-09-17 pidiendo horarios; avisó que estará fuera del 22 al 24 de septiembre. **La reunión está por agendar.** Sobre
-Basis no hay nada verificado todavía: modelo, fees, inventario LATAM, pDOOH, CTV, B2B y mínimos se preguntan en esa
-reunión.
+**Real Audiences:** ofreció por escrito el 2026-09-23 comisión flat del **10% hasta 2026-12-31**, sobre inversión
+en plataforma y formatos disponibles; faltan definición contractual de base, exclusiones y liquidación. Efeonce
+mantiene **30 días sin anticipo, también primera campaña**. Bautista pidió el 2026-10-08 monto y fechas para evaluar
+crédito; todavía no aceptó esas condiciones. No se cuenta el rebate como margen base ni como acuerdo 2027.
 
-Real Audiences y Basis responden a dos modelos distintos, y la comparación debe hacerse con la misma lista:
+**Basis:** seleccionado junto a Real Audiences por instrucción del operador. Manuel Ramos Bernard envió el
+**Basis - DSP Deck LATAM.pdf** y agendó reunión para el **2026-10-12, 14:30–14:45 Chile**. El deck sí muestra presencia
+en México, Guatemala, Colombia, Perú, Chile y Argentina (p. 5), formatos omnicanales incluidos DOOH y CTV (p. 9), y
+tres modos de operación, incluido managed (p. 27). Presencia no es inventario cotizado. Costos, mínimos, crédito,
+entidad, soporte y derechos siguen pendientes; brand lift/footfall se presentan vía partners (p. 24).
 
-| Criterio | Real Audiences | Basis |
-|---|---|---|
-| Modelo | DSP con equipo que opera por briefing, y después seat autogestionado | por confirmar; se presenta como plataforma autogestionada |
-| Cómo gana la agencia | rebate según inversión (declarado) | por confirmar |
-| pDOOH en los 5 países | declarado, sin precio | por confirmar |
-| Transparencia por dominio/app y verificación de terceros | por confirmar | por confirmar |
-| CTV y ABM B2B | por confirmar | por confirmar |
-| Facturación | LLC EE.UU. → LATAM | por confirmar |
-| Mínimos | ninguno | por confirmar |
-
-**Regla de selección:** gana quien firme la cláusula de transparencia y cubra pDOOH en los mercados de Efeonce al menor
-costo total declarado (fees + CPM), no quien ofrezca el rebate más alto. No se usan dos DSP sin demanda que lo justifique.
-
-**Otras alternativas:** MiQ (compró Adsmovil LATAM) y TenX (DV360). El DSP de Microsoft (ex Xandr) cerró su compra en
-febrero de 2026. Estado vigente en el [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
+Fuentes, páginas y condiciones en el [ledger fechado](../../audits/commercial/PROGRAMMATIC_PROVIDER_EVIDENCE_2026-10-09.md).
+Otras alternativas sólo se reabren si ambos no pueden cumplir el brief o los términos; estado vigente en el
+[Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 
 ## Anuncios en respuestas de IA
 

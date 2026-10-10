@@ -252,6 +252,11 @@ Todo business model debe separar al menos estas dimensiones:
   `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
   híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
   [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md).
+- [Publicidad programática — Business Model V1](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) —
+  `Commercially approved` por el operador 2026-10-09 para servicio, tarifario base y condiciones estándar.
+  Fee propio, setup y medios separados; dos proveedores seleccionados, habilitación externa por campaña.
+  [Pricing Integrity Pack](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md) y
+  [guía comercial](../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —
   submodelo de Influencers, Creators & UGC; separa intelligence, activation, content, partnerships y whitelisting.
   `Approved for validation`; no autoriza pricing público ni venta general.

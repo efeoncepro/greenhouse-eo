@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-09-10 (Performance & Commerce: ficha, decisión y pricing propios)
+> **Última actualización:** 2026-10-09 (programmatic: Basis + Real Audiences, submodelo y guía)
 
 ## Propósito
 
@@ -83,6 +83,19 @@ inventario, fees de marketplaces ni garantías de CAC, ROAS, revenue o pipeline.
 **Hipótesis de packaging:** fee de operación mensual por complejidad y capacidad gobernada, separado del pass-through
 de inversión y proveedores, con compromiso inicial de un ciclo suficiente para aprender. La inversión gestionada puede
 ser un input de segmentación o guardrail, pero no debe ser la única métrica pública de valor.
+
+#### Publicidad programática
+
+**Servicio comercialmente aprobado 2026-10-09:** oferta Efeonce, tarifario base y política de cobro; **Basis y Real Audiences** seleccionados.
+Es capacidad dentro de Performance & Commerce, con campaña acotada u operación continua; Efeonce conserva plan,
+coordinación y accountability. Fee propio y medios/costos externos separados, sin depender de rebates.
+Honorarios USD netos: diseño 750; campaña/mensual focal 1.500; mensual ampliada 2.500 y regional 4.000; setup
+500 / 750 / 1.000 si aplica. Activación por caso; términos, crédito y costos de proveedores siguen pendientes.
+
+[Ficha comercial](PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md) ·
+[Modelo de negocio](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) ·
+[Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md) ·
+[Guía para ofrecerlo](../../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 
 #### Evolución del servicio: Performance & Commerce moderno
 
