@@ -1,0 +1,109 @@
+<!doctype html><html lang="es-CL"><head><meta charset="utf-8"><title>Publicidad programática · Modelo de negocio · Efeonce</title><style>
+{{FONTS}}
+@page { size: A4; margin: 0; }
+:root{--navy:#023c70;--midnight:#022a4e;--blue:#0375d9;--ink:#1d1f36;--text:#2f3349;--muted:#4c4b5b;--line:#e1e1ea;--soft:#f3f3ff;--gray:#848484}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Geist',system-ui,sans-serif;color:var(--text);font-size:10.5pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:210mm;height:297mm;position:relative;overflow:hidden;break-after:page;background:#fff}
+.sheet:last-child{break-after:auto}
+.body{position:absolute;top:27mm;bottom:24mm;left:18mm;right:18mm;overflow:hidden}
+.hdr{position:absolute;top:0;left:18mm;right:18mm;height:19mm;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:3mm;border-bottom:.6pt solid var(--line)}
+.hdr img{height:6.4mm;display:block}
+.hdr .r{text-align:right;font-size:7.4pt;line-height:1.35;color:var(--muted)}
+.hdr .r b{display:block;color:var(--midnight);font-weight:600}
+.ftr{position:absolute;bottom:0;left:0;right:0;height:17mm;padding:0 18mm 7mm;display:flex;align-items:flex-end;gap:5mm;font-size:7.3pt;color:var(--muted)}
+.ftr .rule{position:absolute;left:18mm;right:18mm;top:4mm;border-top:.6pt solid var(--line)}
+.ftr a{color:var(--muted);text-decoration:none}
+.ftr .bubble img{height:5.6mm;display:block}
+.ftr .pn{margin-left:auto;white-space:nowrap}
+.kicker{font:600 8pt 'Geist';letter-spacing:.08em;color:var(--blue);margin:0 0 1.5mm}
+h1{font-family:'Poppins';font-weight:700;font-size:21pt;line-height:1.15;color:var(--midnight);margin:0 0 3.5mm;letter-spacing:-.01em}
+h2{font-family:'Poppins';font-weight:600;font-size:12pt;line-height:1.25;color:var(--midnight);margin:5.5mm 0 2mm}
+h3{font:600 9.8pt/1.3 'Geist';color:var(--ink);margin:2.5mm 0 1mm}
+p{margin:0 0 2.4mm}
+.lead{font-size:11.6pt;line-height:1.45;color:var(--ink);margin:0 0 4.5mm}
+ul,ol{margin:0 0 3mm;padding-left:4.6mm}
+li{margin:0 0 1.1mm}
+b,strong{font-weight:600;color:var(--ink)}
+table.t{width:100%;border-collapse:collapse;font-size:8.6pt;line-height:1.35;margin:1mm 0 3.5mm}
+.t th{text-align:left;font-weight:600;color:var(--midnight);border-bottom:1.1pt solid var(--navy);padding:1.5mm 2.4mm 1.5mm 0;vertical-align:bottom}
+.t td{border-bottom:.5pt solid var(--line);padding:1.5mm 2.4mm 1.5mm 0;vertical-align:top}
+.t .n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.t tr.hl td{background:var(--soft)}
+.note{background:var(--soft);border-left:2.4pt solid var(--blue);padding:2.8mm 4mm;font-size:9pt;line-height:1.45;margin:3mm 0}
+.note p:last-child{margin:0}
+.src{font-size:7.4pt;line-height:1.4;color:var(--muted);margin:1mm 0 3mm}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:4mm 8mm}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0 6mm}
+.col h3{margin-top:0}
+.col p{font-size:9.2pt}
+.idx{font:600 7.4pt 'Geist';color:var(--blue);margin-bottom:.6mm;letter-spacing:.04em}
+.svcg{margin:0 0 3mm}
+.svcg h3{font-family:'Poppins';font-weight:600;font-size:10pt;color:var(--blue);margin:2.6mm 0 1mm}
+.svc{display:grid;grid-template-columns:8.5mm 1fr;gap:0 1mm;margin:0 0 1.5mm;font-size:9.1pt;line-height:1.4}
+.svc .c{font:600 7.6pt/1.9 'Geist';color:var(--muted)}
+.big{font-family:'Poppins';font-weight:700;font-size:15pt;color:var(--midnight);line-height:1.1}
+.quote{font-family:'Poppins';font-weight:600;font-size:11.4pt;line-height:1.4;color:var(--midnight);border-left:2.4pt solid var(--blue);padding:1mm 0 1mm 4mm;margin:3mm 0 4mm}
+.pill{display:inline-block;font:600 7.4pt 'Geist';color:var(--blue);border:.8pt solid var(--blue);border-radius:10pt;padding:.6mm 2.4mm}
+.toc{list-style:none;padding:0;margin:4mm 0 6mm}
+.toc li{display:flex;align-items:baseline;gap:3mm;padding:2.3mm 0;border-bottom:.5pt solid var(--line);margin:0;font-size:10.6pt}
+.toc .k{font:600 8pt 'Geist';color:var(--blue);width:7mm}
+.toc a{color:var(--ink);text-decoration:none;flex:1}
+.toc .num{font-variant-numeric:tabular-nums;color:var(--muted);font-size:9.4pt}
+/* portada */
+.cover{background:var(--midnight)}
+.cover .in{position:absolute;top:0;left:0;right:0;bottom:17mm;padding:22mm 20mm 18mm;color:#fff;display:flex;flex-direction:column}
+.cover .logo{height:11mm;width:auto;align-self:flex-start}
+.cover .eyebrow{margin-top:auto;font:600 9pt 'Geist';letter-spacing:.08em;color:#9fd3ff}
+.cover h1.cv{font-size:40pt;line-height:1.02;color:#fff;margin:3mm 0 5mm;letter-spacing:-.02em}
+.cover .sub{font-size:14pt;line-height:1.4;color:#dfe9f5;max-width:150mm;margin:0 0 9mm}
+.cover .meta{display:flex;gap:6mm;align-items:center;font-size:9.4pt;color:#c9d8ea}
+.cover .conf{border:.8pt solid #9fd3ff;color:#9fd3ff;border-radius:10pt;padding:.8mm 3mm;font-weight:600;font-size:8pt}
+.cover .line{margin-top:12mm;padding-top:5mm;border-top:.6pt solid rgba(255,255,255,.28);font-family:'Poppins';font-weight:600;font-size:12pt;color:#fff;max-width:160mm;line-height:1.35}
+.cover .ftr,.back .ftr{background:#fff}
+/* contraportada */
+.back .in{position:absolute;top:0;left:0;right:0;bottom:17mm;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 24mm}
+.back .logo{height:15mm;margin-bottom:9mm}
+.slogan{font-family:'Poppins';color:var(--gray);font-size:17pt;letter-spacing:-.01em;margin-bottom:12mm}
+.slogan .e{font-weight:800;font-style:italic}.slogan .y{font-weight:800}.slogan .g{font-weight:900;font-style:italic}
+.back .in .bubble img{height:9mm}
+.back .contact{margin-top:8mm;font-size:9.6pt;line-height:1.7;color:var(--muted)}
+.back .contact a{color:var(--midnight);text-decoration:none}
+svg text{font-family:'Geist'}
+</style></head><body><section class="sheet" id="decisión"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 01</p><h1>Publicidad programática</h1><p class="lead">Una oferta de Efeonce, con Basis y Real Audiences como proveedores de ejecución.</p>
+<div class="note"><h3>Sobre este documento</h3><p>La decisión de ofrecer el servicio y trabajar con ambos proveedores está aceptada. El modelo está en validación; contratos, precios, crédito y capacidad por campaña siguen pendientes. Información al 9 de octubre de 2026. Confidencial · Uso interno.</p></div>
+<h2>Qué vamos a ofrecer</h2><p>Planificación y operación de campañas para ampliar la distribución hacia audiencias y contextos relevantes, con control de inversión, inventario y medición. Efeonce decide el plan, coordina la compra, supervisa la entrega y convierte la evidencia en la siguiente decisión de medios.</p>
+<h2>Cómo vamos a ganar</h2><p>Con un fee explícito por diseño, coordinación, control y aprendizaje. El cliente ve por separado nuestro trabajo, la inversión en medios y los costos del proveedor. La rentabilidad base debe sostenerse sin comisiones o rebates.</p>
+<h2>Cómo vamos a comenzar</h2><p>Venta cruzada en clientes actuales con una campaña acotada y una pregunta de negocio. Ampliar a operación mensual cuando exista necesidad sostenida y evidencia de ejecución, adopción y economía sanas.</p>
+<h2>Qué significa elegir a los dos</h2><p>Ambos forman parte de la oferta. Cada campaña utiliza uno o ambos según inventario, calidad, costo total, medición, operación y crédito. No dividimos todos los presupuestos por mitades ni cobramos dos veces el mismo trabajo.</p>
+<ul class="toc"><li><a href="#cliente" data-toc="cliente">Cliente y decisión de compra</a><span class="num"></span></li><li><a href="#oferta" data-toc="oferta">Oferta y alcance</a><span class="num"></span></li><li><a href="#proveedores" data-toc="proveedores">Uso de los dos proveedores</a><span class="num"></span></li><li><a href="#economía" data-toc="economía">Ingresos, margen y caja</a><span class="num"></span></li><li><a href="#operación" data-toc="operación">Operación, validación y fuentes</a><span class="num"></span></li></ul></main></section><section class="sheet" id="cliente"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 02</p><h1>El primer cliente ya tiene un problema de distribución</h1><p class="lead">Priorizar la cartera existente con campañas, presupuesto y un responsable capaz de aprobar y utilizar el plan.</p>
+<table class="t"><thead><tr><th>Situación</th><th>Qué quiere resolver</th></tr></thead><tbody><tr><td>Lanzamiento o expansión de mercado</td><td>Explorar cobertura adicional conservando control de presupuesto y calidad.</td></tr><tr><td>Red de tiendas o sucursales</td><td>Llegar a contextos próximos a ubicaciones relevantes con pantallas y horarios definidos.</td></tr><tr><td>Varios proveedores y reportes</td><td>Una decisión coherente de inversión, responsables claros y conciliación.</td></tr><tr><td>Empresa B2B con CRM confiable</td><td>Apoyar demanda en cuentas prioritarias; confirmar targeting y trazabilidad antes de ofrecerlo.</td></tr></tbody></table>
+<h2>El operador y quienes compran</h2><p>El Media Manager o Performance Lead utiliza el plan y consolida inversión y proveedores. El CMO, Growth o Brand Lead patrocina según el objetivo. Identificar por cuenta al aprobador de presupuesto; no asumir que es el operador. Finance, Legal, IT y Procurement gobiernan sus restricciones.</p>
+<h2>Primer valor y adopción</h2><p>Antes de gastar, el operador recibe un plan con costos, inventario y responsabilidades explícitos. La adopción se demuestra cuando lo utiliza para proponer una decisión al sponsor. Medir horas de reconciliación y tiempo desde brief completo a plan aprobado frente a un punto de partida.</p>
+<h2>Dos procesos que deben avanzar</h2><p><strong>Decisión:</strong> problema, alternativas, criterio de prueba y continuidad. <strong>Contratación:</strong> orden de compra, alcance, pagos, permisos de datos, crédito y aceptación de proveedor. Cada proceso necesita responsable y siguiente paso.</p>
+<h2>Cuándo no tiene encaje</h2><p>Cuando se exige venta garantizada, no hay responsable ni aprobación, faltan permisos para los datos, el presupuesto no permite una prueba útil o la caja obliga a financiar medios sin límite. El tamaño de la cuenta por sí solo no decide el encaje.</p>
+<div class="note"><p>El cliente conserva brief, presupuesto, reportes y aprendizajes dentro de los derechos pactados. La continuidad debe aumentar su capacidad, no depender de información oculta.</p></div></main></section><section class="sheet" id="oferta"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 03</p><h1>Vender el objetivo y acordar una campaña operable</h1><p class="quote">“Podemos ampliar tu campaña a medios digitales y pantallas relevantes para tu audiencia. Diseñamos el plan, coordinamos la compra programática y controlamos presupuesto, inventario y resultados. Te presentamos los medios y nuestro fee por separado.”</p>
+<table class="t"><thead><tr><th>Forma de contratar</th><th>Alcance y cobro recomendado</th></tr></thead><tbody><tr><td>Diseño de distribución</td><td>Fee fijo cuando hay trabajo sustancial de arquitectura. No imponer diagnóstico si el brief existente basta.</td></tr><tr><td>Campaña acotada</td><td>Setup más operación del flight. Objetivo, territorio, fechas, presupuesto y medición definidos.</td></tr><tr><td>Operación continua</td><td>Fee mensual por capacidad y complejidad; órdenes de medios por período. Plazo pactado por caso.</td></tr></tbody></table>
+<h2>Qué incluye nuestro trabajo</h2><p>Brief y plan; selección de proveedor e inventario; exclusiones y seguridad de marca; coordinación de materiales y revisión de configuración; control de entrega y presupuesto; reporte reconciliado y recomendación del siguiente ciclo.</p>
+<h2>Qué se cotiza aparte</h2><p>Medios; tecnología, datos y trading del proveedor; verificación y estudios; creatividad y adaptaciones; implementación de medición o CRM; nuevas geografías y cambios materiales. Con un retainer existente, cobrar sólo la capacidad incremental y declarar lo ya incluido.</p>
+<h2>Elegir formatos según la necesidad</h2><p>Display, video, native, audio, CTV y pDOOH son cobertura posible, no paquetes obligatorios. Disponibilidad, costo, materiales y medición se confirman por campaña. La vía inicial de 4–6 semanas es una hipótesis de prueba, no un mínimo universal.</p>
+<div class="note"><p><strong>OOH</strong> es publicidad fuera del hogar; <strong>DOOH</strong> es su parte digital en pantallas públicas o comerciales, también interiores; <strong>pDOOH</strong> es la compra programática de esas pantallas. La impresión física pertenece a otro alcance.</p></div>
+<p>No garantizar ventas, visitas, retorno publicitario ni alcance incremental. La aceptación de entrega y el criterio de éxito se pactan por escrito.</p></main></section><section class="sheet" id="proveedores"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 04</p><h1>Ambos seleccionados; la ejecución se decide por campaña</h1><table class="t"><thead><tr><th>Proveedor</th><th>Evidencia al 9 de octubre</th><th>Pendiente</th></tr></thead><tbody><tr><td><strong>Real Audiences</strong></td><td>Managed y autogestión declarados. Oferta de comisión 10% hasta 31 de diciembre de 2026.</td><td>Base contractual, liquidación, costos completos, inventario y crédito sin anticipo.</td></tr><tr><td><strong>Basis</strong></td><td>Deck regional; DOOH, CTV y otros formatos. Self-service, instancia con buyers y managed.</td><td>Precios, mínimos, crédito, entidad, soporte y derechos de cuenta/datos.</td></tr></tbody></table>
+<h2>Presencia regional de Basis</h2><p>El deck muestra Ciudad de México, Ciudad de Guatemala, Bogotá, Lima, Santiago y Buenos Aires. Esa presencia y los logos de inventario no sustituyen una cotización de pantallas o medios disponibles para la campaña.</p>
+<h2>Criterios de elección</h2><ol><li>Condiciones contractuales, datos y caja elegibles.</li><li>Inventario pertinente y controles de calidad verificables.</li><li>Medición y reporte adecuados al objetivo.</li><li>Costo total desglosado, operación y soporte.</li></ol>
+<h2>Cuando usamos ambos</h2><p>Justificar la función de cada uno, separar inversión y evitar compras redundantes. Un reporte integrado no deduplica personas: no sumar alcance único entre DSP ni prometer un límite global de frecuencia sin medición validada.</p>
+<h2>Responsabilidad de Efeonce</h2><p>Efeonce conserva la estrategia, aprobación de inversión, auditoría y lectura del resultado. El proveedor ejecuta la compra pactada. No comunicar partnership oficial ni vender licencias o seats al cliente sin derechos comprobados.</p>
+<div class="note"><p>Inicio recomendado: operación managed cuando los términos lo permitan. Autogestión sólo tras dos campañas auditadas en ese proveedor, capacitación, trader con backup, permisos, soporte y costos comprobados.</p></div>
+<p class="src">Fuente: correos de Bautista y Manuel; deck Basis LATAM, páginas 5, 9, 24 y 27. Declaraciones de proveedor; no contratos firmados.</p></main></section><section class="sheet" id="economía"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 05</p><h1>La gestión propia debe sostener el margen y la caja</h1><p class="lead">Separar remuneración por nuestro trabajo de inversión del cliente y beneficios del proveedor.</p>
+<table class="t"><thead><tr><th>Línea de propuesta</th><th>Qué cubre</th></tr></thead><tbody><tr><td>Diseño / setup, si aplica</td><td>Plan y preparación no recurrente; se cobra una vez salvo cambio material.</td></tr><tr><td>Fee de operación</td><td>Trabajo de Efeonce por campaña o mes según alcance y complejidad.</td></tr><tr><td>Medios y costos externos</td><td>Inventario, tecnología, datos, trading, verificación y estudios autorizados.</td></tr><tr><td>Composiciones e impuestos</td><td>Creatividad, instrumentación/CRM y tributos aplicables, separados.</td></tr></tbody></table>
+<h2>Precio sostenible</h2><p>Costear horas por rol con costo cargado, herramientas, QA, coordinación y overhead aplicables. Los mercados, formatos, flights, medición y proveedores activos determinan complejidad. No hay tarifa pública ni fee concreto aprobado todavía.</p>
+<div class="note"><p><strong>Fee piso = costo propio completo ÷ (1 − margen piso).</strong><br>Conservar el piso interno de validación de 45% del modelo Performance. Es un criterio interno, no margen comprobado. Finance valida costos y excepciones.</p></div>
+<h2>Comisión y rebate</h2><p>Real Audiences ofreció 10% hasta fin de 2026 y declaró inversión en plataforma como base. Faltan definición contractual y liquidación. El caso base utiliza comisión cero. Cualquier beneficio se traslada al cliente o se declara como remuneración de Efeonce; no se oculta dentro del CPM ni se presupone para 2027.</p>
+<h2>Crédito y pagos</h2><p>Preferir pago directo del cliente al proveedor cuando sea viable. Si Efeonce administra medios, aprobar límites de exposición y calendarios de cobro/pago antes de comprar. La posición es 30 días sin anticipo, también en la primera campaña. Real Audiences está evaluando crédito; Basis debe negociarlo.</p>
+<p>Moneda, conversión y tributos se definen por contrato. No comprometer un anticipo al proveedor para resolver la negociación pendiente.</p></main></section><section class="sheet" id="operación"><main class="body"><p class="kicker">MEDIA &amp; DISTRIBUTION · MODELO DE NEGOCIO · 06</p><h1>Validar entrega, aprendizaje y economía antes de escalar</h1><table class="t"><thead><tr><th>Momento</th><th>Responsable y evidencia</th></tr></thead><tbody><tr><td>Preparar</td><td>Commercial: necesidad y aprobador. Media: brief comparable y plan. Finance/Legal: costos, caja y condiciones.</td></tr><tr><td>Activar</td><td>Cliente autoriza inversión y materiales/datos. Efeonce revisa configuración. Proveedor opera conforme al alcance.</td></tr><tr><td>Controlar</td><td>Media: entrega, pacing y calidad. Cambios de presupuesto o proveedor requieren autorización.</td></tr><tr><td>Cerrar</td><td>Conciliar gasto, fees y remanentes; conservar reportes originales; acordar una decisión con el operador.</td></tr></tbody></table>
+<h2>Medir lo que cada canal permite</h2><p>En digital: entrega, calidad, frecuencia y respuesta según señal y ventana. En pDOOH: ubicaciones, horarios, reproducción y metodología de audiencia. Reproducciones no son personas únicas. Brand lift, visitas a tienda e incrementalidad requieren estudios adicionales; exposición no prueba ventas causales.</p>
+<h2>Próximos pasos con dueño</h2><ol><li><strong>Julio:</strong> cerrar costos, transparencia, modalidades y crédito de cada proveedor. Basis: reunión del 12 de octubre, 14:30 Chile. Real Audiences: presupuesto y fechas de un brief autorizado para evaluación de crédito.</li><li><strong>Commercial y Media:</strong> calificar dos oportunidades de cartera actual y preparar campañas pagadas con criterio de decisión, sin inventar compromisos de clientes.</li><li><strong>Finance y Media:</strong> medir horas, margen y caja; auditar dos campañas iniciales y validar ambos proveedores cuando exista encaje.</li></ol>
+<p>Escalar cuando haya capacidad con backup, ejecución repetible, información útil para el cliente y economía sana. No comprar seats o capacidad fija por la sola recepción de un deck.</p>
+<h2>Fuentes y estado</h2><p class="src">Instrucción de Julio Reyes, 9 de octubre de 2026: ofrecer el servicio y trabajar con ambos. Hilo Real Audiences: oferta del 23 de septiembre y crédito del 8 de octubre, releído el 9 de octubre. Correo de Manuel y Basis - DSP Deck LATAM.pdf, 9 de octubre. Modelo Media & Distribution y pricing Performance: referencias internas de julio/septiembre; costos actuales por validar. Definición DOOH de IAB, diciembre de 2024.</p>
+<p class="src">Documento interno derivado del modelo de negocio y la ficha vigentes. Sin acuerdos firmados, tarifa aprobada ni evidencia de campañas propias en este expediente. No compartir con clientes o proveedores: contiene negociación interna.</p></main></section></body></html>
