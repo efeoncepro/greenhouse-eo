@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.19
+> **Versión:** 1.20
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-10 por Claude (1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-10 por Claude (1.20: el deck Marketing de Contenidos aprobado por el operador — 57 láminas, línea Brand, 14 de receta y 43 a mano; sección «El deck Marketing de Contenidos». Antes, el mismo día, 1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -363,7 +363,7 @@ en HTML** y exportada a PNG («constrúyelo no lo captures»).
   `ms-social.generador.py`).
 - **Excepción a «interfaces genéricas»:** la interfaz es de un producto propio y construida, con el lockup oficial
   «efeonce | Marketing Studio». Campaña y marca **ficticias** (Lanzamiento Cold brew, Mareas Café).
-- **Registro del deck:** la sesión que lo armó relata que el operador aprobó después el deck completo (2026-10-10). Las láminas registradas una por una son ésta, «Producción con IA» y el patrón de franjas; el deck completo no está registrado.
+- **Registro del deck:** el operador aprobó después el deck completo; ver «El deck Marketing de Contenidos».
 - **Condiciones abiertas** (en `conditions` del uso): las pestañas, la bandeja y el bloque de creadores no se
   contrastaron con el producto real; las cifras son de muestra sin marca; falta verificar que Efeonce opere Metricool,
   Sprout Social y Favikon y la autorización de sus logos (TASK-1937); y el par «¿Cómo trabajamos contigo? Así» no pasa la
@@ -433,6 +433,25 @@ también con los +85 expertos me interesa canonizar». Es una **variante a mano 
     deck en conjunto.
   - El acento aparece cuatro veces (esfera, «+», filete de la ficha central y arco de la órbita). No rompe la regla: es
     un solo color de acento y una sola esfera.
+
+## El deck Marketing de Contenidos (aprobado el 2026-10-10)
+
+El brochure de Marketing de Contenidos (línea `brand`, **57 láminas** y una ruta corta de 21), aprobado por el operador
+el 2026-10-10 («Me encantó todo, queda aprobado»), en el canvas
+[https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph](https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph). Recorrido, lo
+que fija y pendientes: [norma §4.6, «Deck Marketing de Contenidos»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck).
+Fuente: `ai-generations/2026-10-09_deck-contenidos/deck/` (`LEEME.md`, con el orden de las 57).
+
+- **14 láminas de receta:** `cover-brochure`, `decision-case` (caso Sky), `method-hybrid-workforce` (social care, con un
+  Spark compuesto encima), stack, `content-day` en sus layouts `tools`, `live-progress` y `live-results`, control,
+  testimonio, clientes, partners, mercados, próximos pasos y contraportada. Sólo «Día a día» quedó registrada como
+  `approvedUses`; las otras trece tienen su intent en la carpeta del deck y no están en el JSON del catálogo.
+- **43 láminas a mano**, sin receta ni plantilla. Cuatro tienen registro propio en este README: las tres de franjas de
+  foto, «Producción con IA» y «Expertos multidisciplinarios». El resto son candidatas sin promover.
+- **Numeración vigente:** «Seis frentes» es la 4, «Producción con IA» la 10, «Momentos» la 28, «Programas» la 32, «Día a
+  día» la 40 y «Expertos multidisciplinarios» la 45. Las secciones de arriba citan los números que tenían al aprobarse.
+- **No se envía a un prospecto** hasta cerrar los pendientes de la norma: compromisos de servicio sin contrastar, «+85»
+  sin fuente, datos de muestra sin rótulo en «Día a día» y logos de terceros sin verificar.
 
 ## Anatomía de una receta (campos del JSON)
 

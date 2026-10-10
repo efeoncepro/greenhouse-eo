@@ -1,9 +1,9 @@
 # Línea gráfica Efeonce — Composición por superficie V1
 
 > **Tipo de documento:** Norma de marca (composición por superficie)
-> **Versión:** 1.25
+> **Versión:** 1.26
 > **Creado:** 2026-09-27 por Claude, con la dirección del operador (Julio Reyes)
-> **Última actualización:** 2026-10-10 por Claude (1.25: la lámina de equipo «Expertos multidisciplinarios» con el bloque «+85 expertos más en Latam», variante a mano de `content-team`; delta del 2026-10-10 (d). Antes, el mismo día, 1.24: el patrón «franjas de foto» aprobado por el operador en sus dos variantes (seis y tres franjas), con sus medidas y sus tres excepciones; delta del 2026-10-10 (c) y §4.6 «Franjas de foto». Antes, el mismo día, 1.23: la lámina «Producción con IA» aprobada, a mano, con la foto de cine `CT24`; delta del 2026-10-10 (b). Antes, el mismo día, 1.22: la lámina «Día a día» con una vista social de Marketing Studio construida, aprobada como uso de `content-day-tools`; delta del 2026-10-10. Antes, 2026-10-09, 1.21: el deck «Servicios web y digitales» aprobado por el operador — brochure de 29 láminas, línea Engine, fondo Efeonce `#001A33`; variante de `decision-case` sin foto del caso, lámina «Dónde construimos», logo con isotipo en cuadro de color y PDF raster; delta del 2026-10-09 y §4.6 «Deck Servicios web». Antes, 2026-10-06, 1.20: el brochure Agencia Creativa aprobado por el operador — 27 láminas, 7 de recetas existentes y 20 a mano (candidatas a receta, TASK-2013); dónde vive, el PDF rasterizado desde el runtime del canvas y por qué; orden final de la narrativa, voz medida (8 de 27 pares), acento Brand, talento embebido con la palabra del comprador sólo en el eyebrow, interfaces de Creative Studio con campañas ficticias, ocho fotos cine; límites medidos (perspectiva 3D de la lámina 17, foto corrida con borde fundido); pendientes; delta del 2026-10-06, §4.6 «Brochure Agencia Creativa» y §7. Antes, el mismo día, 1.19: el deck HubSpot aprobado por el operador — brochure de 27 láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes; dónde vive y el PDF; siete láminas en registro cine; reglas de marca de HubSpot (insignia Gold con readback, sprocket 3D interno, sin mascotas), cifras y voz; límites medidos por receta (respuesta de `section-cine`, hero de `proposal-cinematic` y `decision-ai-market`), recetas sólo claras como láminas de Efeonce y `content-markets` con nodos medidos; pendientes (autorización de ANAM, sprocket, lámina de equipo); delta del 2026-10-06, §4.6 «Deck HubSpot» y §7 (TASK-1943). Antes, 2026-10-01, 1.18: §5 remite a los perfiles sociales de Efeonce aprobados el 2026-10-01 (portadas, avatar y destacados de Instagram), que viven en el canal `social` y se describen con sus medidas en el [manual §10.1.1](./EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01); esta norma no los duplica. Antes, 2026-09-30, 1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, logos con autorización) y la decisión del operador de dejar tal cual las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler («asumo la responsabilidad»); delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
+> **Última actualización:** 2026-10-10 por Claude (1.26: el deck «Marketing de Contenidos» aprobado por el operador — brochure de 57 láminas, línea Brand, con ruta corta de 21; 14 láminas de receta y 43 a mano; pendientes antes de enviarlo; delta del 2026-10-10 (e) y §4.6 «Deck Marketing de Contenidos». Antes, el mismo día, 1.25: la lámina de equipo «Expertos multidisciplinarios» con el bloque «+85 expertos más en Latam», variante a mano de `content-team`; delta del 2026-10-10 (d). Antes, el mismo día, 1.24: el patrón «franjas de foto» aprobado por el operador en sus dos variantes (seis y tres franjas), con sus medidas y sus tres excepciones; delta del 2026-10-10 (c) y §4.6 «Franjas de foto». Antes, el mismo día, 1.23: la lámina «Producción con IA» aprobada, a mano, con la foto de cine `CT24`; delta del 2026-10-10 (b). Antes, el mismo día, 1.22: la lámina «Día a día» con una vista social de Marketing Studio construida, aprobada como uso de `content-day-tools`; delta del 2026-10-10. Antes, 2026-10-09, 1.21: el deck «Servicios web y digitales» aprobado por el operador — brochure de 29 láminas, línea Engine, fondo Efeonce `#001A33`; variante de `decision-case` sin foto del caso, lámina «Dónde construimos», logo con isotipo en cuadro de color y PDF raster; delta del 2026-10-09 y §4.6 «Deck Servicios web». Antes, 2026-10-06, 1.20: el brochure Agencia Creativa aprobado por el operador — 27 láminas, 7 de recetas existentes y 20 a mano (candidatas a receta, TASK-2013); dónde vive, el PDF rasterizado desde el runtime del canvas y por qué; orden final de la narrativa, voz medida (8 de 27 pares), acento Brand, talento embebido con la palabra del comprador sólo en el eyebrow, interfaces de Creative Studio con campañas ficticias, ocho fotos cine; límites medidos (perspectiva 3D de la lámina 17, foto corrida con borde fundido); pendientes; delta del 2026-10-06, §4.6 «Brochure Agencia Creativa» y §7. Antes, el mismo día, 1.19: el deck HubSpot aprobado por el operador — brochure de 27 láminas y propuesta de 31, sin recetas nuevas: 33 usos aprobados en 28 recetas existentes; dónde vive y el PDF; siete láminas en registro cine; reglas de marca de HubSpot (insignia Gold con readback, sprocket 3D interno, sin mascotas), cifras y voz; límites medidos por receta (respuesta de `section-cine`, hero de `proposal-cinematic` y `decision-ai-market`), recetas sólo claras como láminas de Efeonce y `content-markets` con nodos medidos; pendientes (autorización de ANAM, sprocket, lámina de equipo); delta del 2026-10-06, §4.6 «Deck HubSpot» y §7 (TASK-1943). Antes, 2026-10-01, 1.18: §5 remite a los perfiles sociales de Efeonce aprobados el 2026-10-01 (portadas, avatar y destacados de Instagram), que viven en el canal `social` y se describen con sus medidas en el [manual §10.1.1](./EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01); esta norma no los duplica. Antes, 2026-09-30, 1.17: el deck SEO/AEO (Search Visibility 360) aprobado por el operador — tres documentos (completo 33, brochure 24, propuesta 29) en cinco capítulos, seis recetas nuevas sin plantilla todavía (100 en el catálogo, 94 con plantilla), `productMark` opcional con los lockups de submarca, el eyebrow de `proposal-cinematic-seo`/`-aeo` con `requiredUnless: productMark`, `section-cine-team.body` opcional, 27 usos aprobados y tres planes validados; reglas de casos (imagen de ambiente puesta en escena, logo compuesto, logos con autorización) y la decisión del operador de dejar tal cual las cifras de los casos, su fuente, los formatos de Insights, las industrias y la cifra de Bresler («asumo la responsabilidad»); delta del 2026-09-30, §4.6 «Deck SEO/AEO» y §7 (TASK-1949). Antes, 1.16: la insignia «Salesforce Partner» está autorizada por Salesforce y el deck Salesforce la lleva por defecto; SF20 aprobada como cierre de brochure; largos de SF6 y SF7 aprobados (máximos subidos); costo de color de los íconos de producto aprobado; delta (d). Antes, 1.15: las 94 recetas del deck tienen plantilla — las dieciséis del deck Salesforce componen sobre AXIS 0.3.33 y el baseline `graphic-line` quedó sellado (sección (s)); SF20 compuesta y pendiente del visto bueno; los dos planes validan sin avisos; PDF de la propuesta sin insignia; §4.6. Antes, 1.14: decisiones del operador al canonizar el deck Salesforce — cuatro recetas nuevas más para las láminas que no cabían (`decision-diagnosis-verdict`, `method-waves`, `content-day-live-console`, `content-day-live-approval`; 94 en el catálogo, 78 con plantilla), los dos cierres y sus planes (brochure con `close-brochure-orbit` en la línea `revenue-salesforce`; propuesta con SF19), el logo de 700 px sólo en la contraportada Salesforce, la columna de la portada en 190 con reserva propia de la línea en AXIS `v0.3.32` y el servicio de la lámina 10 como «Enablement conversacional»; §4.6. Antes, 1.13: el deck de práctica Salesforce aprobado — 12 recetas nuevas y 8 usos de recetas existentes (90 en el catálogo, 78 con plantilla), cinco actos, marcas de terceros con condición, badge como claim bloqueante, eslogan en bloque en `close-proposal-horizon` y el deck HubSpot pendiente (TASK-1942, TASK-1943); §4.6. Antes, 1.12: TASK-1930 — §4.6 dice de dónde salen los datos reales de un deck (logo del cliente, cifras, prueba de terceros, montos, equipo y datos de muestra) y la decisión del operador: ningún deck usa evidencia interna, ni siquiera uno interno; §7 al día. Antes, 1.11: la portada de brochure de Creative Services («Tu squad.») pasa a su plate propio `CR4` y deja de repetir `CR2b` con la lámina de servicio creativa, §4.6. Antes, 1.10: TASK-1934 — las nueve láminas SEO/AEO aprobadas el 2026-09-28 entran al catálogo del deck (69 → 78 recetas, todas con plantilla); §2.1, §4.6 (cuándo usarlas y sus reglas: cifras con fuente, datos de muestra marcados, interfaz de IA genérica, 3×; alternativas nunca juntas con `variant-both-in-deck`, cifra sin fuente con `figure-source-missing`) y §7; AXIS fijado en `axis-tokens` 0.3.23 y `axis-ui-contracts` 0.3.21. Antes, 1.9: §4.6 dice qué reglas del deck verifica a máquina `validateDeckPlan` y con qué código (TASK-1929, code complete); la norma sigue siendo la fuente; §4.6 «Pendientes de QA» y §7 al día. Antes, 1.8: §7 al día — TASK-1927 y TASK-1928 ya están en `origin/develop`; enlace a la spec técnica del lado Greenhouse [`GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md`](../../architecture/GREENHOUSE_BRAND_SURFACE_COMPOSITION_V1.md). Antes, 1.7: la portada con selección `cover-brochure-cine-lines-selection`
 > compone con el layout `document-selection` de `cover-brochure` (el operador relajó la regla «sin selección en
 > cover-brochure»); **69 de 69** recetas del deck con plantilla; AXIS fijado en `axis-tokens` 0.3.21 y
 > `axis-ui-contracts` 0.3.19 (tag `v0.3.21`, delta (l)). Antes, 1.6: TASK-1928 — las recetas de deck aprobadas componen desde el
@@ -51,6 +51,18 @@
 > [documentación funcional](../../documentation/creative/linea-grafica-efeonce.md) ·
 > [recetas por lámina del deck](./deck-recipes/README.md)
 
+## Delta 2026-10-10 (e) — el deck «Marketing de Contenidos», aprobado **[decisión del operador, 2026-10-10]**
+
+El operador, textual (relatado por la sesión que armó el deck): «Me encantó todo, queda aprobado» y luego «Esto quedó
+aprobado, canonizalo».
+
+- **Brochure de 57 láminas**, línea `brand`, 16:9, con una **ruta corta de 21** para presentar. PDF rasterizado y fuente
+  en `ai-generations/2026-10-09_deck-contenidos/deck/` (`LEEME.md`). **Sin copia en OneDrive:** no se envía a un
+  prospecto hasta cerrar sus pendientes.
+- **14 láminas salen de una receta** del compositor y **43 son a mano**.
+- Los cuatro registros de este mismo día (deltas a–d) son parte de este deck; sus láminas cambiaron de número.
+- Detalle, lo que fija el deck y pendientes: §4.6, «Deck Marketing de Contenidos».
+
 ## Delta 2026-10-10 (d) — «Expertos multidisciplinarios» con «+85», aprobada **[decisión del operador, 2026-10-10]**
 
 El operador, textual (comentario en el canvas del deck de Marketing de Contenidos, sobre la ficha «Responsable de
@@ -77,8 +89,7 @@ sobre «Seis frentes», «Canonica este también» y antes «Aprobadísima, me e
 - **Tres excepciones que el operador pidió o aprobó, sólo para este patrón:** una esfera por franja además de la del
   titular; la foto de cine recortada en vertical; y un degradado navy sobre la foto para apoyar el título.
 - **A mano, sin receta ni plantilla.** Promoverlo al catálogo y a AXIS queda pendiente.
-- La misma sesión relata que el operador aprobó el deck completo («Me encantó todo, queda aprobado»). El registro del
-  deck (láminas, PDF, canvas) no se ha hecho: falta que la sesión entregue los hechos.
+- El operador aprobó además el deck completo: ver el delta (e).
 
 ## Delta 2026-10-10 (b) — «Producción con IA», aprobada **[decisión del operador, 2026-10-10]**
 
@@ -1761,6 +1772,64 @@ Marketing de Contenidos (línea `brand`) y el operador pidió canonizarlo en sus
 - **El filete de las franjas es teal** en una lámina Brand: se revisa con los tokens de escenario (TASK-2012).
 - **El copy de las franjas** de «Momentos» y «Programas» lo redactó la sesión; el operador aprobó el deck en conjunto.
 - **Revisar cada recorte al 100 %:** una cara de extra cortada por el borde de la franja se corrige moviendo el foco.
+
+#### Deck Marketing de Contenidos (aprobado el 2026-10-10) **[decisión del operador, 2026-10-10]**
+
+El brochure de todo lo que Efeonce vende en social media, influencer marketing, creadores y UGC, listening y
+trendjacking, social care y paid social, línea `brand`: **57 láminas**, en el canvas
+[https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph](https://claude.ai/artifact/De7FU2Z7YuZLx561KJ16Ph) (página «Deck»;
+además «Ruta corta · 21 láminas», que son copias, e «Interfaces · Marketing Studio»). El operador lo aprobó el
+2026-10-10 («Me encantó todo, queda aprobado»). Orden completo, comando para rehacer el PDF, generadores y assets:
+`ai-generations/2026-10-09_deck-contenidos/deck/LEEME.md`.
+
+**Estructura:** Apertura (1–5) · Frentes (6–27) · Momentos (28–31) · Programas (32–36) · Cómo trabajamos (37–47) ·
+Medición y prueba (48–53) · Cierre (54–57).
+
+**De dónde sale cada lámina:**
+
+- **14 de receta** (`pnpm brand:compose`, intents en `ai-generations/2026-10-09_deck-contenidos/intents/`): portada,
+  caso Sky, social care con personas y agentes, stack, «Día a día», «Vívelo» 1 y 2, control, testimonio, clientes,
+  partners, mercados, próximos pasos y contraportada.
+- **43 a mano** en el canvas, con generadores en `ai-generations/2026-10-09_deck-contenidos/laminas/`. No tienen receta
+  ni plantilla.
+
+**Lo que fija este deck** (cada punto con su registro propio del 2026-10-10):
+
+| Lámina (número en el deck) | Qué quedó | Dónde |
+|---|---|---|
+| «Seis frentes» (4), «Momentos» (28), «Programas» (32) | patrón «franjas de foto», seis y tres franjas | «Franjas de foto», arriba |
+| «Producción con IA» (10) | lámina a mano; foto `CT24` en el índice de cine | catálogo de recetas |
+| «Día a día» (40) | uso aprobado de `content-day-tools` con la interfaz de Marketing Studio construida | catálogo de recetas |
+| «Expertos multidisciplinarios» (45) | variante a mano de `content-team` con «+85» | catálogo de recetas |
+
+Además:
+
+- **Interfaces de producto construidas, no capturadas.** «Vívelo 2» (42) sigue el criterio de «Día a día»: su panel es
+  una vista «Resultados» de Marketing Studio hecha en HTML (`ui/ms-resultados.*`), con marca y datos ficticios. El
+  operador la vio dentro del deck aprobado; no la comentó aparte.
+- **El color entra por el contenido.** El pedido fue un deck «súper colorido y cinemático»: el color vive en las piezas
+  de la marca ficticia y dentro de las fotos; el acento de la línea sigue siendo uno, el naranja Brand.
+- **PDF raster**, con el mismo render de los brochures Agencia Creativa y Servicios web.
+
+**Pendientes antes de enviarlo a un prospecto** (del `LEEME.md` del deck; la aprobación no los resuelve):
+
+- **Compromisos de servicio redactados por la sesión** y aprobados en conjunto, no uno por uno: comunidad en canales
+  cerrados (11), series (8), «lo orgánico prueba, la pauta escala» (23), social conectado al CRM (49), resultados en
+  Marketing Studio (42), los cuatro compromisos de «Producción con IA» (10), Thought Leader Ads (24) y las promesas de
+  los agentes de IA en social care (20–21). Se contrastan con lo que Efeonce opera y garantiza hoy.
+- **«+85 expertos más en Latam» (45):** cifra del operador, sin fuente en el repo.
+- **Marca y datos de muestra:** las interfaces y los anuncios usan la marca ficticia Mareas Café. En «Día a día» (40)
+  las cifras del panel no llevan rótulo de muestra.
+- **Logos de terceros:** Metricool, Sprout Social y Favikon en «Stack» (39) y «Día a día» (40). Falta verificar que
+  Efeonce los opere y la autorización de uso (TASK-1937). Logos de clientes, sólo con autorización.
+- **Caso Sky (5):** el avión es un montaje del PNG oficial de Sky sobre un cielo generado; revisar las restricciones de
+  marca de Sky.
+- **Voz:** «¿Cómo trabajamos contigo? Así» (40) no pasa la regla del 2026-10-06 y «Sí, pero lo hacemos bien» (10) tiene
+  cinco palabras. Aprobadas así.
+- **Fotos:** Nexa aparece con anillos en dos tomas (6 y 31); en las franjas, revisar al 100 % las caras de extras
+  cortadas por el recorte. No se compararon los rostros del elenco contra sus referencias.
+- **Sellos de partner (49):** HubSpot y Salesforce van como PNG del SVG oficial, porque el canvas pintaba el SVG en
+  negro.
 
 ---
 
