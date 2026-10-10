@@ -1,0 +1,42 @@
+{
+  "id": "CT24-ia-universo",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact, monumental-scale editorial photograph, a vast dark hall at night, as large as an aircraft hangar, with thin haze): Isabella, wearing the ROYAL-BLUE EFEONCE HOODIE, stands just right of the centre of the frame, small against the scale of the hall, framed from the knees up with a full third of the frame free above her head; her head is about one eighth of the frame height; the shoulder nearest the left edge of the frame is at about 54 % of the frame width; camera about eight meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Behind and above her, filling the right half of the frame and receding for hundreds of meters into the dark, turns an immense slow SPIRAL of floating pieces of content, like a galaxy: thousands of thin frameless frames of light in many formats, vertical 9:16, square and wide, each glowing with its own vivid full-colour image, like a wall of finished campaign artwork: magenta, violet, teal, green and yellow colour fields, abstract shapes and landscapes, never orange, with no text, no logos and no close-up faces; the nearest dozen are large and sharp, the size of posters, a few meters behind her; farther away they shrink into hundreds of small bright rectangles and, at the far core of the spiral, into a dense cloud of tiny points of light. The centre of the spiral is at about 82 % of the frame width and 30 % of the frame height; the whole spiral stays between 55 % and 100 % of the frame width, and no frame is on the left of her body. The colours live only inside the frames: the light on her, the haze and the hall stay cool white and deep navy, with no coloured glow and no colour grade. THE MOMENT: she conducts the spiral like the conductor of an orchestra: the arm on the frame-right side of her body is raised high and almost fully extended, up and to the frame-right, hand open a little above the height of her head at about 72 % of the frame width; her other arm hangs relaxed at her side; nothing crosses her chest, so the mark on her hoodie stays fully visible; the nearest frames curve around her raised hand and follow it; on the one frame closest to her fingertips sits one small crisp orange (#FF6500) dot, the only orange in the frame, which lights nothing around it. Her head is turned slightly toward the frame-right and her chin lifted only a little, eyes on the nearest frames above her hand: both eyes, both brows and both cheeks stay visible and the underside of her jaw is not seen, with a sure, delighted half-smile; she does not look toward the dark left side of the frame. The nearest large frame beside her hand is the only key light and lights her face from the frame-right and slightly above, clean cool white with an azure-blue (#0375DB) edge; both eyes stay readable, with a catchlight. Her whole arm is visible; the hand is no longer from wrist to fingertips than her face from chin to hairline. A long dark matte console runs between the camera and her, its near edge just in front of the lens; its top is one plain matte black slab, non-reflective, with no knobs, no faders, no screens and no lights. The spiral and everything lit stay inside the RIGHT half of the frame. The left half of the frame is one towering matte black wall of the hall, unlit, that ends in a clean vertical edge at about 48 % of the frame width, just behind her; the hall opens only beyond that edge, to the right, and the spiral lives entirely in that opening: the wall hides whatever would reach farther left, and no frame, no glow, no lamp and no point of light is on the wall. The floor of the hall is matte and dark and reflects nothing. No warm light on her or in the hall, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte console edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the nearest large frame of light beside her raised hand",
+    "lado": "above and to the frame-right of her face, just beyond her raised hand",
+    "distancia": "about 70 cm from her face"
+  },
+  "fondo": "the far core of the spiral of frames, hundreds of meters away, melted into a dense cloud of tiny cool and colored points of light",
+  "fenomeno": {
+    "que": "an immense spiral galaxy of thousands of content pieces turns behind her and follows her hand",
+    "esServicio": "Producción con IA: escala de piezas con una persona que dirige"
+  }
+}

@@ -394,6 +394,16 @@
       "protagonista": "Karo (elenco ficticio) con el hoodie Efeonce, sentada en la mesa del cliente, junto a dos extras del equipo del cliente (una mujer y un hombre, ficticios)",
       "porque": "Talento creativo embebido: la campaña del cliente se arma en su propia mesa, entre las manos de su equipo y de Karo; una hoja baja de piezas de luz sobre la mesa es la llave y la pieza con el punto naranja es el aporte de Efeonce. El hoodie royal es lo único azul y lo único que dice quién viene de afuera. Lámina «Tu equipo, con talento de Efeonce adentro.» del brochure Agencia Creativa, con el texto a la izquierda. Parte de CR4. Aprobada por el operador el 2026-10-06 («Pero la 19 se ve muy bien, quiero mantenerla»).",
       "ojo": "Precedente acotado, no regla general (casebook, falla 40): sólo vale con extras del cliente ficticios, sin marca, en gris y carbón, nada azul, en positivo (colaborando, nunca en su dolor), junto a una protagonista del roster con su prenda y con el hoodie como único azul; la regla general del §2 del registro cine la lleva la sesión de línea gráfica. La llave es la hoja de piezas de luz sobre la mesa del cliente, nunca un monitor: con `luz-motivada` un monitor anula la palanca y deja el acento de espaldas (falla 39). La mirada va a la pieza que se encaja, no al texto, para no repetir el tic de mirada de la serie (falla 37)."
+    },
+    {
+      "id": "CT24",
+      "ficha": "ai-generations/2026-10-09_deck-contenidos/fotos/fichas/CT24-ia-universo.json",
+      "plate": "ai-generations/2026-10-09_deck-contenidos/fotos/plates/CT24-ia-universo.png",
+      "formato": "16:9",
+      "alcance": "deck-seccion",
+      "protagonista": "Isabella (elenco ficticio) con el hoodie Efeonce, de rodillas hacia arriba, con un brazo extendido dirigiendo una espiral inmensa de piezas de contenido",
+      "porque": "Producción con IA: miles de piezas giran en una galaxia que sigue su mano; la escala la da la IA y la dirige una persona. Cámara a unos 8 m y persona chica frente a un espacio enorme. El color vive sólo dentro de los marcos de las piezas; la luz sobre ella, la bruma y la sala quedan en blanco frío y navy, y el naranja es un solo punto junto a su mano (acento como puntuación, regla del 2026-10-06). Un muro negro mate hasta el 48 % del ancho da la reserva de texto a la izquierda. Lámina «¿Producen con IA? Sí, pero lo hacemos bien» del deck de Marketing de Contenidos. Parte de CR4. Aprobada por el operador el 2026-10-10 («Buenísimo, esta también hay que canonizarla»).",
+      "ojo": "El sujeto queda a la derecha del centro y chico: `foto:emblema` recorta zonas fijas y no encuentra el isotipo, hay que recortar el pecho a mano para mirarlo al 100 % (en esta toma salió con nave, tres ventanas, órbita y esfera). Elenco con el hoodie Brand por excepción del operador para este deck (precedente HB2, falla 38). Si las piezas de los marcos van a mostrar marcas o personas, se componen aparte: el modelo no dibuja marcas (falla 41)."
     }
   ]
 }

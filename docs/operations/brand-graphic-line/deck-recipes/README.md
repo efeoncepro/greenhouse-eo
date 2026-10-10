@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.16
+> **Versión:** 1.17
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-10 por Claude (1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-10 por Claude (1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -368,6 +368,26 @@ en HTML** y exportada a PNG («constrúyelo no lo captures»).
   contrastaron con el producto real; las cifras son de muestra sin marca; falta verificar que Efeonce opere Metricool,
   Sprout Social y Favikon y la autorización de sus logos (TASK-1937); y el par «¿Cómo trabajamos contigo? Así» no pasa la
   regla de voz del 2026-10-06 (la pregunta es de Efeonce y «Así» no dice nada sola). Las decide el operador.
+
+## La lámina «Producción con IA» (aprobada el 2026-10-10)
+
+El operador aprobó y pidió canonizar otra lámina del deck de Marketing de Contenidos (línea `brand`): «Buenísimo, esta
+también hay que canonizarla». Es una **lámina a mano**, sin receta ni plantilla en el compositor: foto de cine a sangre
+con la voz a la izquierda y cuatro filas con ícono Plastilina plano.
+
+- **Texto:** eyebrow «Producción con IA» · pregunta «¿Producen con IA?» · respuesta «Sí, pero lo hacemos bien» · bajada
+  «La IA nos da velocidad y escala. El criterio, la marca y la última palabra los pone una persona.» · cuatro filas:
+  dirección creativa de una persona en cada pieza · tu marca y tu producto reales, nunca inventados · derechos y uso
+  comercial revisados · revisión humana antes de publicar. Burbuja URL al pie; sin indicador de navegación (lleva foto).
+- **Foto:** `CT24`, registrada como receta de cine en `scripts/foto/cine-recetas.json` (parte de CR4; ficha y prompt
+  en `ai-generations/2026-10-09_deck-contenidos/fotos/`). Se reutiliza con `pnpm foto:cine:nueva --desde CT24`.
+- **Estado en el catálogo:** candidata a receta, sin promover (como las láminas a mano del brochure Agencia Creativa,
+  TASK-2013). El generador de la lámina no está en el repo: para reutilizarla se parte del canvas del deck.
+- **Condiciones abiertas, las decide el operador:**
+  - «Nunca inventados» y «derechos y uso comercial revisados» son compromisos de servicio. El operador aprobó la lámina
+    en conjunto, no cada promesa: falta contrastarlos con lo que Efeonce garantiza (skill
+    `greenhouse-ai-creative-rights-governance`).
+  - La respuesta tiene cinco palabras; la voz de la línea pide de una a tres.
 
 ## Anatomía de una receta (campos del JSON)
 
