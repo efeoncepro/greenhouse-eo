@@ -1,6 +1,6 @@
 # Caso de negocio · Trazabilidad comercial en Salesforce · SGS Chile
 
-**Versión:** 6 (borrador de trabajo, consolidado) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
+**Versión:** 7 (borrador de trabajo, consolidado) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
 
 **Estado:** borrador para iterar con Bárbara Quiroga y José Pedro De Oliveira antes de llevarlo a la región. No enviado. Sin honorarios ni fechas comprometidas.
 
@@ -9,6 +9,8 @@
 **Consolidación (versión 5):** incorpora lo investigado el 2026-10-10: números geográficos, registro de WhatsApp en Salesforce mediante una integración que construye Efeonce, y resultado del contacto tomado del estado de la llamada.
 
 **Versión 6:** la vista de gestión pasa de informes de Salesforce a un panel de contactabilidad de Efeonce Insights, en tiempo real para llamadas y WhatsApp, más un informe mensual. Julio aprobó el 2026-10-10 extender Efeonce Insights para esto.
+
+**Versión 7:** la sección 8 pasa a ser un frente completo de adopción: alineación de procesos, capacitación por rol a los equipos comerciales, implementación y mejora continua.
 
 Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Parte B** son notas internas de Efeonce y no se entrega.
 
@@ -90,11 +92,11 @@ Que las llamadas no contestadas también se registren es lo que permite contar i
 
 | Etapa | Qué se hace | Qué entrega | Requiere a la región |
 | --- | --- | --- | --- |
-| 0. Diagnóstico | Revisar cómo está el correo en Salesforce, levantar teléfonos y canales del equipo, revisar seguridad | Plan ajustado a la operación real | No |
+| 0. Diagnóstico y procesos | Revisar cómo está el correo en Salesforce, levantar teléfonos y canales del equipo, revisar seguridad y acordar definiciones y reglas de seguimiento | Plan ajustado a la operación real y guía de contactabilidad | No |
 | 1. Correo y reuniones | Dejar activa la captura de correo para el equipo piloto | Historial de correo en la ficha del cliente | Poco o nada |
-| 2. Piloto de llamadas y WhatsApp | Entregar números de empresa, configurar la aplicación, poner en marcha el panel, formar al equipo y medir | El equipo trabajando con trazabilidad, el panel en uso y la línea base medida | No |
+| 2. Piloto de llamadas y WhatsApp | Entregar números de empresa, configurar la aplicación, poner en marcha el panel, capacitar por rol y medir | El equipo trabajando con trazabilidad, el panel en uso y la línea base medida | No |
 | 3. Conexión a Salesforce | Instalar el conector de llamadas, construir la integración de WhatsApp, sumar el correo al panel y validar con usuarios | Todo el historial en la ficha del cliente y el panel con los cuatro canales | Sí |
-| 4. Operación y extensión | Sostener, medir, emitir el informe mensual y preparar otros equipos o países | Continuidad y decisión de extensión | Sí, para extender |
+| 4. Operación y extensión | Sostener, medir, emitir el informe mensual, mantener la capacitación y preparar otros equipos o países | Continuidad y decisión de extensión | Sí, para extender |
 
 La etapa 2 funciona antes de la etapa 3: el panel ya muestra los intentos por canal y por ejecutivo. Así la solicitud a la región llega respaldada con datos del propio equipo. Hasta la etapa 3, el panel identifica a los clientes por su número; después, por su cuenta.
 
@@ -112,20 +114,54 @@ Es reversible: el conector se desinstala desde la configuración de Salesforce y
 
 Para la revisión regional, este caso entrega: métricas de éxito definidas de antemano, descripción de la arquitectura, evaluación de seguridad del proveedor, impacto en los datos y un responsable local del proceso.
 
-### 8. Qué cambia para el equipo
+### 8. Adopción: procesos, capacitación e implementación
+
+La herramienta registra; el provecho viene de cómo trabaja el equipo con ella. Por eso la propuesta incluye cuatro frentes de adopción, a cargo de Efeonce, además de la configuración técnica.
+
+**Qué cambia para el equipo**
 
 - Cada ejecutivo pasa a usar un número de empresa para llamadas y WhatsApp. Es un número fijo de su ciudad, no un número móvil.
 - WhatsApp de empresa tiene reglas: para iniciar una conversación se usa un mensaje aprobado previamente; después de que el cliente responde, se escribe con libertad durante 24 horas.
 - No admite grupos, y el historial de WhatsApp anterior no se traslada.
 
-La habilitación es parte de la solución:
+**Frente 1 · Alineación de procesos**
+
+Antes de configurar, se acuerda con excelencia comercial y las jefaturas cómo se va a trabajar:
+
+- **Definiciones comunes:** qué cuenta como intento de contacto, qué es un contacto efectivo y cómo se nombra cada resultado.
+- **Reglas de seguimiento:** cada cuánto se contacta a un cliente según su tipo y la etapa del negocio, y qué se hace después de varios intentos sin respuesta.
+- **Contacto y negocio:** cuándo un contacto debe quedar asociado a un negocio y cuál es el próximo paso mínimo que se registra.
+- **Mensajes de WhatsApp:** qué mensajes de inicio se aprueban y para qué situaciones.
+- **Roles y rutinas:** quién es dueño del proceso, y cómo se usa el panel en la reunión semanal de cada jefatura y el informe en la revisión mensual.
+
+Entregable: una guía de contactabilidad breve, acordada por SGS, que es la base de la configuración y de la capacitación.
+
+**Frente 2 · Capacitación por rol**
+
+| Rol | Qué aprende | Formato |
+| --- | --- | --- |
+| Ejecutivos comerciales | Llamar y escribir desde la aplicación, usar los mensajes aprobados, dejar el correo conectado, presentar el número nuevo a sus clientes | Sesión práctica en vivo, tutoriales breves en video y guía rápida |
+| Jefaturas comerciales | Leer el panel, conducir la revisión semanal y dar seguimiento a cuentas sin convertirlo en control individual | Sesión en vivo y pauta de reunión |
+| Excelencia comercial | Administrar usuarios y mensajes aprobados, leer el informe mensual y preparar los resultados para la región | Sesión en vivo y manual de operación |
+| Quienes administran contratos y cuentas | Usar el historial de la ficha del cliente y el registro de correo | Sesión breve y tutoriales en video |
+
+Los tutoriales en video permiten avanzar al ritmo de cada persona y sirven para incorporar a quienes se sumen después. Durante el piloto hay un espacio semanal de consultas.
+
+**Frente 3 · Implementación**
 
 1. **Codiseño con los ejecutivos:** qué se registra y qué no.
 2. **Acuerdo de uso:** quién ve qué.
-3. **Entrega:** números, firma de correo, tarjeta de contacto y aviso a los clientes.
-4. **Convivencia** de cuatro a ocho semanas, con respuesta automática y desvío en el número anterior.
-5. **Acompañamiento semanal,** con un tablero que el ejecutivo ve antes que su jefatura.
-6. **Cierre** con datos comparados contra la línea base.
+3. **Configuración:** números, horarios y flujos de llamada, mensajes aprobados, nombres visibles, panel.
+4. **Pruebas con usuarios** antes de la puesta en marcha.
+5. **Entrega por tandas:** números, firma de correo, tarjeta de contacto y aviso a los clientes. El alta de WhatsApp se hace de a pocos números por día.
+6. **Convivencia** de cuatro a ocho semanas, con respuesta automática y desvío en el número anterior, y soporte reforzado.
+
+**Frente 4 · Mejora continua**
+
+- Acompañamiento semanal durante el piloto, con un tablero que el ejecutivo ve antes que su jefatura.
+- Medición de adopción y lista priorizada de mejoras.
+- Incorporación de nuevos ejecutivos con el mismo material.
+- Cierre del piloto con datos comparados contra la línea base, y revisión periódica en la etapa de operación.
 
 ### 9. Condiciones de privacidad y laborales
 
@@ -178,9 +214,9 @@ Datos que necesitamos de SGS para dimensionar:
 
 | Etapa | Efeonce | SGS Chile | Región |
 | --- | --- | --- | --- |
-| 0. Diagnóstico | Conduce y documenta | Define el equipo y entrega los datos | Informa el estado de la plataforma |
+| 0. Diagnóstico y procesos | Conduce, documenta y facilita los acuerdos de proceso | Define el equipo, entrega los datos y aprueba la guía | Informa el estado de la plataforma |
 | 1. Correo | Configura lo que corresponde y forma | Reconecta cuentas y valida | Confirma la configuración |
-| 2. Piloto | Configura Aircall, pone en marcha el panel, forma y mide | Gestiona seguridad y compras; usa | Recibe los resultados |
+| 2. Piloto | Configura Aircall, pone en marcha el panel, capacita por rol y mide | Gestiona seguridad y compras; libera tiempo del equipo para capacitarse; usa | Recibe los resultados |
 | 3. Conexión | Configura el conector, construye la integración de WhatsApp, suma el correo al panel y prueba | Valida con usuarios | Aprueba y despliega |
 | 4. Operación | Opera, emite el informe mensual y reporta | Usa y prioriza | Decide la extensión |
 
@@ -191,13 +227,13 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 1. Licencias de Aircall por usuario, incluido el complemento de WhatsApp.
 2. Consumo variable: minutos de llamada y mensajes de WhatsApp.
 3. Licencias de Salesforce: ninguna nueva en este esquema.
-4. Servicios de Efeonce por etapa: diagnóstico, configuración, integración de WhatsApp y habilitación.
+4. Servicios de Efeonce por etapa: diagnóstico, alineación de procesos, configuración, integración de WhatsApp, capacitación por rol y acompañamiento del piloto.
 5. Panel de contactabilidad e informe mensual de Efeonce Insights, como servicio recurrente.
 6. Operación continua de Efeonce, que incluye el mantenimiento de la integración.
 
 ### 14. Riesgos
 
-- **Adopción:** si los ejecutivos siguen usando su número personal en paralelo, el registro queda incompleto. Es el riesgo principal y por eso la habilitación tiene seis pasos.
+- **Adopción:** si los ejecutivos siguen usando su número personal en paralelo, el registro queda incompleto. Es el riesgo principal y por eso la propuesta incluye los cuatro frentes de la sección 8.
 - **Número fijo:** algunos clientes pueden no reconocer el número nuevo. Se atiende con el aviso previo y el período de convivencia.
 - **Seguridad:** SGS debe aprobar a Aircall como proveedor antes de la etapa 2, y a Efeonce como encargado de los datos del panel.
 - **Gobierno:** sin aprobación regional no hay etapa 3. Las etapas 1 y 2 conservan su valor aunque la 3 se demore.
@@ -256,6 +292,17 @@ Pendiente antes de comprometer plazo o precio con SGS:
 - **Transferencia internacional.** Greenhouse corre fuera de Chile; va en el acuerdo de tratamiento de datos.
 
 Valor más allá de SGS: el módulo sirve a cualquier cliente con Aircall, con Salesforce o con HubSpot.
+
+### B1c. Frente de adopción (pedido de Julio, 2026-10-10)
+
+Julio pidió incorporar capacitación a los equipos Go-to-Market, alineación de procesos e implementación. Quedó en la sección 8 como cuatro frentes.
+
+- **Cuidado con el alcance.** Bárbara pidió ir con poco para que la región apruebe. El frente de adopción está escrito como parte del mismo caso de uso, no como funcionalidades nuevas, y casi todo ocurre en Chile sin la región. Presentarlo así.
+- **Qué equipos son.** En la reunión aparecieron ejecutivos comerciales, jefaturas de zona, excelencia comercial y quienes administran contratos. Falta confirmar con Bárbara si hay otros, por ejemplo servicio al cliente.
+- **Lo ofrecido en la reunión.** Julio mencionó tutoriales en video y transferencia de conocimiento (22:34–23:10). El frente 2 lo recoge.
+- **Sin duraciones ni número de sesiones.** Se definen al conocer el tamaño del equipo; forman parte de la cotización.
+- **Material reutilizable.** La capacitación de HubSpot hecha para ANAM en agosto de 2026 (`docs/commercial/trainings/anam-hubspot-2026-08-12/`) sirve de referencia de formato.
+- **Camino de ampliación.** Si el piloto funciona, la alineación de procesos puede extenderse al registro de negocios, que José Pedro mencionó como manual. Hoy está fuera de alcance.
 
 ### B2. Respecto de la reunión del 29-09
 
