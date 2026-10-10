@@ -1,0 +1,41 @@
+{
+  "id": "CT15-ejecutivos-sesion",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark executive lounge at night with thin haze): Sophia, the analytical strategist with thin gold-wire glasses, wearing the ROYAL-BLUE EFEONCE HOODIE, sits on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Just behind her chair and on her frame-right, between 74 % and 92 % of the frame width, STANDS a company executive of the client, an illustrative person: a Latin American woman in her early fifties with shoulder-length dark hair with a few grey strands, in her own charcoal blazer over a light grey top, no logos and nothing blue; her head clearly higher in the frame than Sophia's, fully inside the frame with air above it; she is a little softer in focus than Sophia. THE MOMENT: the executive is speaking, mid-sentence, with an easy smile and one open hand, and her words leave her as a loose ribbon of small cool white and azure-blue (#0375DB) sparks that drifts down toward Sophia; Sophia catches the ribbon with her raised left hand, and in her palm the sparks settle into ONE small, neat, upright page of cool white light with a few hair-thin unreadable lines: the executive's own voice, written. The strategist listens with a contained smile. Neither looks at the other and neither looks at the lens; both heads almost frontal, only their eyes turn toward the small page of light in Sophia's hand. That small page of light is the only key light and lights both faces from the side, cool white; both pairs of eyes stay readable, with a catchlight. A long dark matte low table runs between the camera and them, its near edge just in front of the lens; its top is matte black and non-reflective and its near half stays black. The ribbon, the page and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain dark wall of the lounge, unlit: no windows, no lamps and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte low table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "sophia"
+    }
+  ],
+  "llave": {
+    "fuente": "the small upright page of cool white light in Sophia's raised palm",
+    "lado": "to the frame-right of her face, at shoulder height",
+    "distancia": "about 35 cm from her face"
+  },
+  "fondo": "the dark lounge wall far behind them on the right, with two or three cold bokeh points",
+  "fenomeno": {
+    "que": "an executive's spoken words drift as sparks and settle into a written page in the strategist's hand",
+    "esServicio": "Ghostwriting ejecutivo: lo dice el ejecutivo, lo escribimos con su voz"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38). Extra del cliente según el precedente acotado de SA1: ficticios, sin marca, en gris y carbón, en positivo, junto a una protagonista del equipo.",
+  "atmosfera": "bruma"
+}

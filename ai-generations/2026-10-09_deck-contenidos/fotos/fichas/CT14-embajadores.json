@@ -1,0 +1,41 @@
+{
+  "id": "CT14-embajadores",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark company atrium at night with thin haze): Isabella, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 56 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about five meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Beside her stand TWO employees of the client, illustrative people, a little softer in focus than her, in their own clothes, no logos and nothing blue: ONE man in his thirties in a charcoal sweater immediately on her frame-right and half a step behind her, his head at about 74 % of the frame width; ONE woman in her forties in a light grey blazer farther back and farther frame-right, her head at about 88 % of the frame width, her far shoulder cut by the right edge of the frame. Nobody else is in the frame. Each of the two holds a plain matte black phone at chest height, its screen turned away from the camera and never visible, its back blank, with no logo. THE MOMENT: from each of the two phones one thin thread of cool white light with an azure-blue (#0375DB) core rises, and a third identical thread arrives from beyond the right edge of the frame, from a colleague outside the picture; the three threads braid together at shoulder height, in front of the group and between Isabella and the man, into ONE single brighter beam that climbs steeply, almost vertical, passes between their two heads and leaves the frame at the top; Isabella raises her left hand and points at the exact place where the three threads join, her whole arm visible and clear of her chest; all three smile, proud and at ease. Nobody looks at anybody else, at the lens or toward the dark left side of the frame; heads almost frontal, only their eyes turn slightly down toward the place where the threads join. That bright braid point is the only key light and lights the three faces from the front and from the side, cool white; every pair of eyes stays readable, with a catchlight. A long dark matte reception counter runs between the camera and them, its near edge just in front of the lens; its top is matte black and non-reflective. The threads, the beam and everything lit stay inside the RIGHT half of the frame. The left half of the frame is one tall unlit matte charcoal wall of the atrium: no windows, no railings, no lamps and no bokeh points on it; the upper floors and their few cold bokeh points are only behind the group, between 62 % and 100 % of the frame width. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte reception counter edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "isabella"
+    }
+  ],
+  "llave": {
+    "fuente": "the bright point where the three threads of light braid into one beam",
+    "lado": "to the frame-right of her face, at shoulder height, in front of the group",
+    "distancia": "about 45 cm from her face"
+  },
+  "fondo": "the dark upper floors of the atrium far behind the group on the right, with a few cold bokeh points",
+  "fenomeno": {
+    "que": "three voices, two from the phones in the frame and one arriving from outside it, braid into one beam",
+    "esServicio": "Embajadores de marca: las voces de tu equipo suman a una sola marca"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38). Extras del cliente según el precedente acotado de SA1: ficticios, sin marca, en gris y carbón, en positivo, junto a una protagonista del equipo.",
+  "atmosfera": "bruma"
+}

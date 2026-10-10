@@ -1,0 +1,41 @@
+{
+  "id": "CT17-programa-creadores",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark creative studio at night with thin haze): Antonio, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and his body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. Facing him, on his frame-right and at the same distance from the camera, between 76 % and 96 % of the frame width, stands a content creator, an illustrative person: a Latin American woman in her early thirties with a dark low ponytail, in her own light grey knit sweater, no logos and nothing blue; she is seen in three-quarter view and is a little softer in focus than Antonio. THE MOMENT: Antonio's body is turned three-quarters toward the creator, the mark on his hoodie still facing the camera, and the two shake RIGHT hands at lower-chest height at about 74 % of the frame width, below the mark on his hoodie: Antonio's right arm, the one nearer the camera, reaches straight forward, and the two hands meet as ONE compact grip seen from the side, palms together, thumbs on top; their left hands hang relaxed at their sides and stay out of the grip: only two hands touch; around their joined hands turns ONE thin ring of cool white light with an azure-blue (#0375DB) core, about 40 cm across, tilted toward the camera like the ring of a planet so it reads as a clear ellipse: its near arc passes just below and in front of their hands, its far arc just above and behind them; exactly FOUR small beads of cool white light sit on that ring, TWO on the near arc and TWO on the far arc, evenly spaced; on one of the four beads sits one tiny orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. Both smile, warm and relaxed. Neither looks at the lens; both heads are turned only slightly, and both look down at the ring around their hands. The ring of light is the only key light and lights both faces from below and from the front, cool white; both pairs of eyes stay readable, with a catchlight. Both forearms are fully visible from elbow to hand. A long dark matte worktable runs between the camera and them, its near edge just in front of the lens; its top is matte black and non-reflective and its near half stays black. The ring and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain unlit black backdrop of the studio: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte worktable edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "SA1",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "llave": {
+    "fuente": "the thin ring of light turning around their joined hands",
+    "lado": "below and to the frame-right of his face, at lower-chest height",
+    "distancia": "about 50 cm from his face"
+  },
+  "fondo": "dark studio shelves far behind them on the right, every lamp switched off, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "a small orbit of light with four beads turns around a handshake: a relationship that repeats every quarter",
+    "esServicio": "Programa de creadores: un roster continuo en vez de campañas sueltas"
+  },
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38). Extra ilustrativo: una creadora de contenido ficticia (tercera, no cliente), por analogía con el precedente acotado de SA1: sin marca, en gris, en positivo, junto a un protagonista del equipo.",
+  "atmosfera": "bruma"
+}

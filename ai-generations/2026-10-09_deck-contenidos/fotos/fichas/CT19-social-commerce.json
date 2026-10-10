@@ -1,0 +1,42 @@
+{
+  "id": "CT19-social-commerce",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark product studio at night with thin haze): Sophia, the analytical strategist with thin gold-wire glasses, wearing the ROYAL-BLUE EFEONCE HOODIE, stands behind a dark table on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. On the table on her frame-right, at about 88 % of the frame width, stands a plain matte black phone upright on a small black tripod, its screen turned toward her and away from the camera, its back blank, with no logo. THE MOMENT: with the hand on the frame-right side of her body she holds ONE plain matte white cosmetic jar with a lid, the size of her palm, with no label, no logo and no print, up toward the phone at lower-chest height, at about 76 % of the frame width, clear of her chest so the mark on her hoodie stays fully visible; from just above the jar rises a short loose column of exactly FIVE small blank tags of cool white light, each the shape of a price tag with a hair-thin azure-blue (#0375DB) edge and nothing on it: no currency sign, no numbers, no barcode, plain even light inside, drifting up and to the frame-right, the nearest sharp and the farthest soft; on the nearest tag sits one small crisp orange (#FF6500) dot, the only accent in the frame, which lights nothing around it. She shows the jar with a natural, friendly half-smile, as if presenting it to people watching; head almost frontal, only her eyes turn toward the phone on the frame-right; she does not look toward the dark left side of the frame. The nearest glowing tag just above the jar is the only key light and lights her face from the frame-right and slightly below, cool white; both eyes stay readable, with a catchlight; the phone throws no light. Her whole arm is visible; the hand is no longer from wrist to fingertips than her face from chin to hairline. The table top is matte black and non-reflective; its near edge runs just in front of the lens and its near half stays black. The jar, the tags and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain unlit black backdrop of the studio: no lamps, no screens and no bokeh points on it. Nobody looks toward the dark left side of the frame. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "sophia"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the nearest blank tag of light just above the jar",
+    "lado": "to the frame-right of her face and slightly below, at chest height",
+    "distancia": "about 45 cm from her face"
+  },
+  "fondo": "the dark depth of the product studio far behind her on the right, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "blank price tags of light rise from the product she shows to the phone",
+    "esServicio": "Social commerce: el producto se muestra y se compra en la misma red"
+  }
+}

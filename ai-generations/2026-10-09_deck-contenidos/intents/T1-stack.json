@@ -1,0 +1,92 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "brand",
+  "theme": "dark",
+  "role": "content",
+  "recipe": "content-stack",
+  "voice": {
+    "eyebrow": "Nuestro stack",
+    "question": "¿Con qué trabajamos?",
+    "answer": [
+      "Con lo",
+      "mejor"
+    ]
+  },
+  "body": "{count} herramientas en tres capas, conectadas en Efeonce: así cada pieza sale con calidad y se mide.",
+  "layers": [
+    {
+      "name": "Gestionar",
+      "note": "lo que se publica",
+      "tools": [
+        {
+          "path": "ai-generations/2026-10-09_deck-contenidos/logos/metricool-on-black.svg",
+          "name": "Metricool"
+        },
+        {
+          "path": "ai-generations/2026-10-09_deck-contenidos/logos/sprout-social-isotype.svg",
+          "name": "Sprout Social"
+        },
+        {
+          "path": "ai-generations/2026-10-09_deck-contenidos/logos/favikon-isotype.png",
+          "name": "Favikon"
+        }
+      ]
+    },
+    {
+      "name": "Coordinar",
+      "note": "lo que se aprueba",
+      "tools": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+          "name": "Notion"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+          "name": "Teams"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+          "name": "Frame.io"
+        }
+      ]
+    },
+    {
+      "name": "Crear",
+      "note": "lo que se produce",
+      "tools": [
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-photoshop-isotype.svg",
+          "name": "Photoshop"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-premiere-isotype.svg",
+          "name": "Premiere"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-after-effects-isotype.svg",
+          "name": "After Effects"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-firefly-isotype.svg",
+          "name": "Firefly"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/higgsfield-isotype.svg",
+          "name": "Higgsfield"
+        },
+        {
+          "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/magnific-isotype.svg",
+          "name": "Magnific"
+        }
+      ]
+    }
+  ],
+  "base": {
+    "lead": "Todo se conecta en",
+    "note": "donde cada pieza se mide"
+  }
+}

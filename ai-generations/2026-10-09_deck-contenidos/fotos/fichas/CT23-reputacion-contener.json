@@ -1,0 +1,42 @@
+{
+  "id": "CT23-reputacion-contener",
+  "formato": "16:9",
+  "impacto": true,
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a dark control room at night with thin haze): Nexa, wearing the ROYAL-BLUE EFEONCE HOODIE, stands behind a dark table on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 58 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and her body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. On the table on her frame-right, at about 80 % of the frame width, lies ONE thin perfectly circular ring of cool white light with an azure-blue (#0375DB) core, about 30 cm across, flat on the table top. THE MOMENT: with the hand on the frame-right side of her body she has just set a clear glass dome down onto that ring, and her hand still rests lightly on the small glass knob on top: a plain modern bell jar of thin clear glass, about 30 cm tall, with no base, no engraving and no markings, exactly fitting the ring. Inside the dome, hovering at its centre, is ONE small crisp orange (#FF6500) dot of light the size of a pea, round and steady, the only accent in the frame: not a flame, no flying sparks, no smoke; it lights nothing around it, and no orange light reaches the glass, her hand or her face. She is calm and sure: she looks straight into the lens, at the viewer, both irises centred in her eyes, with a contained half-smile, head almost frontal; she does NOT look down at the dome or toward the dark left side of the frame. The ring of light on the table is the only key light and lights her face from below and from the frame-right, cool white; both eyes stay readable, with a catchlight; the glass shows only thin clean cool reflections of the ring: no window-shaped or softbox highlights, no reflected room, no text. Her whole arm is visible; the hoodie cuff covers her wrist down to the base of the palm: no watch and no bracelet; the fingers of that hand are bare; her other hand rests inside the hoodie pocket; the hand is no longer from wrist to fingertips than her face from chin to hairline; the dome and her hand stay clear of her chest so the mark on her hoodie stays fully visible. The table top is matte black and non-reflective; its near edge runs just in front of the lens and its near half stays black. The dome, the ring and everything lit stay inside the RIGHT half of the frame. The left half of the frame is the plain unlit black wall of the room: no screens, no lamps and no bokeh points on it. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "CR4",
+  "alcance": "deck-seccion",
+  "identidad": [
+    {
+      "persona": "nexa",
+      "expresion": "orgullo-sereno"
+    }
+  ],
+  "excepcion": "Operador 2026-10-09: elenco y Nexa con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the thin circular ring of cool white light lying on the table under the glass dome",
+    "lado": "below and to the frame-right of her face, at table height",
+    "distancia": "about 60 cm from her face"
+  },
+  "fondo": "the dark depth of the control room far behind her on the right, every screen switched off, with two or three small cold bokeh points",
+  "fenomeno": {
+    "que": "a glass dome has just come down over one small orange point, held inside a ring of light before it can spread",
+    "esServicio": "Reputación de marca: contener una crisis a tiempo, con protocolo"
+  }
+}

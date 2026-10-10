@@ -1,0 +1,83 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "growth",
+  "theme": "light",
+  "role": "content",
+  "recipe": "content-clients",
+  "voice": {
+    "eyebrow": "Clientes",
+    "question": "¿Quién confía en nosotros?",
+    "answer": [
+      "Marcas",
+      "líderes"
+    ]
+  },
+  "progress": {
+    "sections": 4,
+    "current": 3
+  },
+  "figures": [
+    {
+      "value": "+2.000",
+      "label": "piezas aprobadas para Sky en 12 meses",
+      "source": "caso publicado de Sky Airlines"
+    },
+    {
+      "value": "88 %",
+      "label": "entregas a tiempo para Sky",
+      "source": "caso publicado de Sky Airlines"
+    }
+  ],
+  "selected": 1,
+  "clients": [
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky.svg",
+      "alt": "Sky Airline"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/berel.svg",
+      "alt": "Berel"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/bresler.svg",
+      "alt": "Bresler"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/carozzi.svg",
+      "alt": "Carozzi"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/aguas-andinas.svg",
+      "alt": "Aguas Andinas"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/anam.svg",
+      "alt": "ANAM"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/marca-chile.svg",
+      "alt": "Marca Chile"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/gobierno-santiago.svg",
+      "alt": "Gobierno de Santiago"
+    },
+    {
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/universidad-temuco.svg",
+      "alt": "Universidad Católica de Temuco"
+    }
+  ],
+  "selection": {
+    "target": "object",
+    "label": "Growth",
+    "participantKind": "department"
+  },
+  "markets": {
+    "title": "Operamos en",
+    "text": "Chile, EE. UU., Colombia, México y Perú"
+  }
+}

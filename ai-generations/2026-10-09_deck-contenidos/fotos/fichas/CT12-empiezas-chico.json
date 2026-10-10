@@ -1,0 +1,42 @@
+{
+  "id": "CT12-empiezas-chico",
+  "formato": "16:9",
+  "impacto": true,
+  "identidad": [
+    {
+      "persona": "antonio"
+    }
+  ],
+  "objetos": [
+    {
+      "objeto": "hoodie-efeonce"
+    }
+  ],
+  "palanca": "luz-motivada",
+  "atmosfera": "bruma",
+  "escena": "SCENE (cinematic, epic, high-impact editorial photograph, a vast dark hangar-like hall at night, its far end many meters behind him, with thin haze): Antonio, wearing the ROYAL-BLUE EFEONCE HOODIE, stands on the RIGHT side of the frame, framed from the waist up; the shoulder nearest the left edge of the frame is at about 60 % of the frame width and a wide band of empty darkness runs between the left edge of the frame and his body; camera about four meters away at chest height, 85mm f/2, REALISTIC ADULT PROPORTIONS. THE MOMENT: he holds his left hand open, palm up, out to the frame-right side of his body at lower-chest height, clear of his chest so the mark on his hoodie stays fully visible, and ONE small bead of cool white light, about the size of a marble, hovers a few centimetres above the palm; he shows it with a knowing, inviting half-smile; head almost frontal, only his eyes turn slightly down toward the bead, never toward the dark left side of the frame; his upper eyelids stay above the irises and both irises are visible as full circles. His whole left arm is visible; the hand is at the same distance from the camera as his body, never closer to the lens, no longer from wrist to fingertips than his face from chin to hairline; the hoodie cuff covers his left wrist down to the base of the palm: no watch, no bracelet and no ring on that hand. At the very centre of the bead sits one crisp orange (#FF6500) dot, the only accent in the frame; the glow around it is cool white and it lights nothing around it. Far behind him, deep in the hall, stands ONE very large, thin, perfectly circular ring of azure-blue (#0375DB) light, many meters across, soft but clearly visible: its leftmost point is behind his head at about 62 % of the frame width and it runs out of the frame at the top and at the right edge; no part of it is on the left of his body. The bead is the only key light and lights his face from below and from the frame-right, cool white; both eyes stay readable, with a catchlight. A long dark matte table runs between the camera and him, its near edge just in front of the lens; its top is matte black and non-reflective. The bead, the ring and everything lit stay inside the RIGHT half of the frame. The left half of the frame is calm, deep dark space with faint haze only. No warm light, no readable text, no logos of any other brand.",
+  "lecho": {
+    "objeto": "the dark matte table edge close to the lens, outside every light",
+    "tono": "DARK near black"
+  },
+  "reservas": {
+    "texto": {
+      "muro": "the calm, deep dark space on the left of the frame",
+      "tinta": "blanca"
+    }
+  },
+  "registro": "cine",
+  "desde": "NX6b",
+  "alcance": "deck-seccion",
+  "excepcion": "Operador 2026-10-09: elenco con el hoodie Brand en el brochure Marketing de Contenidos (precedente HB2, falla 38).",
+  "llave": {
+    "fuente": "the small bead of cool white light hovering above his open left palm",
+    "lado": "below and to the frame-right of his face, at chest height",
+    "distancia": "about 40 cm from his face"
+  },
+  "fondo": "one very large thin ring of azure light far behind him on the right, soft but clearly visible, and beyond it a few small cold practical lights of the hall melted into round bokeh",
+  "fenomeno": {
+    "que": "a small bead of light above his palm, with a huge ring behind: it starts small",
+    "esServicio": "Cómo empezar: un sprint acotado antes de sumar frentes"
+  }
+}
