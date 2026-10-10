@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.14
+> **Versión:** 1.15
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-09 por Claude (1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-09 por Claude (1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -333,6 +333,23 @@ de los ocho pares pregunta–respuesta del brochure; el octavo es la lámina 17,
 `build-canvas-v7.py` y **quedan como candidatas** a receta del catálogo, **sin promoverlas ahora** (decisión del
 operador); las registra TASK-2013. Mientras no lo sean, no tienen id en este catálogo ni plantilla en el Artifact Composer:
 para reutilizarlas se parte del builder y del canvas.
+
+## El deck Servicios web (aprobado el 2026-10-09)
+
+El brochure de servicios web y digitales (línea `engine`, 29 láminas), aprobado por el operador el 2026-10-09 («este deck
+está listo»), en el canvas [https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7](https://claude.ai/artifact/SnJS7zHHPTBPwcJvv7e9t7).
+Recorrido, reglas y pendientes: [norma §4.6, «Deck Servicios web»](../EFEONCE_SURFACE_COMPOSITION_V1.md#46-deck). Fuente:
+`ai-generations/2026-10-09_deck-web-nexa-spark/deck/` (`LEEME.md`).
+
+- **Sin recetas nuevas en el catálogo.** Las láminas se hicieron en el canvas. Según la sesión que armó el deck, siguen
+  una receta la portada (`cover-brochure-line-engine`), `content-service-lanes`, `method-surround-cycle`,
+  `decision-case`, `decision-plan`, `decision-next-steps` y `close-brochure-orbit`. Ninguna quedó registrada como
+  `approvedUses` y no hay intents en el repo (verificado el 2026-10-09).
+- **Variante de `decision-case` sin foto del caso:** maqueta de interfaz en HTML con perspectiva 3D a la derecha. No está
+  en la plantilla del compositor.
+- **Lámina nueva «Dónde construimos»** (plataformas con logo oficial en blanco): candidata a receta, sin promover.
+- **Dos casos con cifras sin respaldo** (Aguas Andinas con marcadores inventados; Berel con plazo por confirmar): el
+  deck no se envía a un prospecto hasta resolverlos.
 
 ## Anatomía de una receta (campos del JSON)
 
