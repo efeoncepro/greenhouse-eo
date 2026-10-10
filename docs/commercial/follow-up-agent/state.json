@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "observed_at": "2026-10-09T12:13:03.495646+00:00",
+  "observed_at": "2026-10-09T19:09:39.197666+00:00",
   "timezone": "America/Santiago",
   "automation": {
     "id": "seguimiento-comercial-plazos-y-pr-ximos-pasos",
@@ -20,30 +20,26 @@
   "notion_task_data_source_id": "2a539c2f-efe7-8177-a02d-000b4e8604c0",
   "owner_notion_id": "98be6859-4b84-4dee-a8f2-5546d770c44b",
   "coverage": {
-    "crm_total": 254,
+    "crm_total": 256,
     "crm_open": 44,
-    "crm_closed": 207,
+    "crm_closed": 209,
     "test_without_state": 3,
-    "email": "282 messages since 2026-10-06T19:11:48Z; 3 pages exhausted; latest received 2026-10-09T11:37:38Z; 9 additional focused WIN/Norseg/Basis results since 25 Sep",
-    "official_tender_revalidation": "33 live LicitaLAB records; FUCOA/SENADIS dates changed. Direct Mercado Publico FUCOA/ProChile/SANNA inaccessible. Wherex credential check failed; not reviewed in portal.",
+    "email": "301 messages since 2026-10-07T12:13:03Z, 4 pages exhausted; latest received 2026-10-09T18:54:53Z; focused UCSH all-time email search zero results before draft creation",
+    "official_tender_revalidation": "21 LicitaLAB live records. Valparaiso changed to 13 Oct 09:00 Chile; ProChile/SENADIS closed. Mercado Publico direct pages inaccessible; Wherex check-only missing credential, portal not reviewed.",
     "crm_pagination_complete": true,
     "crm_pipelines_reviewed": 2,
     "leads_recent_modified_since": "2026-09-25T00:00:00Z",
-    "leads_recent": 213,
+    "leads_recent": 216,
     "leads_recent_pagination_complete": true,
-    "leads_total_portal": 2194,
-    "leads_scope": "213 modified since 2026-09-25; complete bounded pagination, not all historical leads",
-    "drafts": "12 existing drafts since 2026-09-25 reviewed and preserved; zero Outlook drafts created this run",
-    "notion_followup_tasks": 41,
-    "notion_deduplication": "31 existing followup tasks including submitted/held; two additional all-status prospective title/code queries returned no matches. Ten new tasks, six updated; all independently fetched.",
+    "leads_total_portal": 2196,
+    "leads_scope": "216 leads modified since 2026-09-25; 100+100+16 results; not all historical leads",
+    "drafts": "13 existing drafts since 2026-09-25 read and preserved; one new UCSH draft created and independently verified",
+    "notion_followup_tasks": 45,
+    "notion_deduplication": "41 existing state-linked tasks queried including completed/cancelled; all-status Pierre/UCSH/SKY and Pibank queries. Three new tasks; seven updated including reuse of existing Pierre Fabre. All writes independently fetched.",
     "lead_stage_counts": {
-      "new-stage-id": 200,
-      "attempting-stage-id": 9,
-      "connected-stage-id": 2,
-      "qualified-stage-id": 1,
-      "unqualified-stage-id": 1
+      "unknown": 216
     },
-    "leads_total_portal_scope": "Fresh count-only query; 2194 historical leads not fully audited"
+    "leads_total_portal_scope": "Count-only query, not a full audit of 2196 leads"
   },
   "actions": [
     {
@@ -175,7 +171,7 @@
         "source": "docs/commercial/tenders/utem-seo-aeo-2026/hubspot-presentacion-2026-10-08.json"
       },
       "external_deadline": "2026-10-08T21:00:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Cerrada",
       "notion_status": "Enviada",
       "tender_source_is_closed": true
@@ -250,35 +246,48 @@
       "key": "followup:65678232118:prochile",
       "deal_id": "65678232118",
       "tender_id": "1138297-11-LE26",
-      "title": "ProChile Atacama — cerrar respaldos, campo y oferta",
-      "internal_due": "2026-10-09T10:00:00-03:00",
+      "title": "ProChile Atacama — no presentada por falta de tiempo",
+      "internal_due": "2026-10-09T13:00:00.000Z",
       "notion_task_id": "3f339c2f-efe7-81ea-a3fa-d61fce34be66",
       "notion_url": "https://app.notion.com/p/3f339c2fefe781eaa3fad61fce34be66?pvs=204",
-      "status": "todo",
+      "status": "cancelled",
       "write_status": "verified",
       "draft_location": null,
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
+      "last_task_status_readback_at": "2026-10-09T19:13:43.561917+00:00",
       "external_deadline": "2026-10-09T16:00:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
-      "tender_source_status": "Publicada",
-      "notion_status": "Sin empezar",
-      "tender_source_is_closed": false
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Cerrada",
+      "notion_status": "Cancelada",
+      "tender_source_is_closed": true,
+      "last_followup_summary": "No se presentó oferta dentro del plazo por falta de tiempo. Confirmado por Julio el 09/10/2026. No reiterar preparación ni conciliación.",
+      "external_status": "Cancelada",
+      "completed_on": "2026-10-09",
+      "completion_reason": "No se presentó oferta dentro del plazo por falta de tiempo. Confirmado por Julio el 09/10/2026.",
+      "next_action": "Ninguna acción comercial: proceso descartado.",
+      "hubspot_closure": {
+        "status": "closedlost",
+        "verified": true
+      }
     },
     {
       "key": "followup:65352884246:pibank-seo",
       "deal_id": "65352884246",
       "tender_id": null,
-      "title": "Pibank — revisar y enviar paquete SEO/GEO/AEO solicitado",
-      "internal_due": "2026-10-08T18:00:00-03:00",
+      "title": "Pibank — paquete SEO/GEO/AEO enviado; entrega completada",
+      "internal_due": "2026-10-08T21:00:00.000Z",
       "notion_task_id": "3f339c2f-efe7-81c7-8a1e-ecffb5fd4859",
       "notion_url": "https://app.notion.com/p/3f339c2fefe781c78a1eecffb5fd4859?pvs=204",
-      "status": "todo",
+      "status": "done",
       "write_status": "verified",
       "draft_location": "notion_task",
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
-      "last_followup_summary": "Hoy09/10 es revisión solicitada por comprador, sin hora fijada. Cotizaciones detalladas USD/PEN de19p listas localmente junto al deck; no envío observado. Julio debe revisar versión, económica/alcance, adjuntos y responder en cadena existente.",
-      "notion_status": "Sin empezar",
-      "last_updated_at": "2026-10-09T12:13:03.495646+00:00"
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Propuesta enviada09/10 13:41Chile a Jesús Vargas. Técnica v13 y cotizaciones USD/PEN, compromiso inicial6meses. Lectura Outlook y CRM verificadas. No reenviar; seguimiento comercial en tarea posterior, no adjudicación.",
+      "notion_status": "Enviada",
+      "last_updated_at": "2026-10-09T12:13:03.495646+00:00",
+      "external_status": "Enviada",
+      "completed_on": "2026-10-09",
+      "completion_reason": "Outlook sent message independently read; proposal delivered, not won",
+      "next_action": "See followup:65352884246:proposal-followup; no duplicate send"
     },
     {
       "key": "followup:65718071655:pibank-crm",
@@ -307,7 +316,7 @@
       "draft_location": null,
       "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
       "external_deadline": "2026-10-12T15:30:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Publicada",
       "notion_status": "Sin empezar",
       "tender_source_is_closed": false
@@ -325,7 +334,7 @@
       "draft_location": null,
       "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
       "external_deadline": "2026-10-13T14:00:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Publicada",
       "notion_status": "Sin empezar",
       "tender_source_is_closed": false
@@ -343,7 +352,7 @@
       "draft_location": null,
       "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
       "external_deadline": "2026-10-13T18:20:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Publicada",
       "notion_status": "Sin empezar",
       "tender_source_is_closed": false
@@ -361,7 +370,7 @@
       "draft_location": null,
       "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
       "external_deadline": "2026-10-15T18:30:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Publicada",
       "notion_status": "Sin empezar",
       "last_followup_summary": "LicitaLAB ahora indica cierre15/10 15:30Chile; antes14/10 y CRM continúa14/10. Verificar modificación en plataforma al preparar. Mantener preparación12/10, respaldos, SSO, garantía y costo; sin GO inferido.",
@@ -381,7 +390,7 @@
       "draft_location": null,
       "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
       "external_deadline": "2026-10-14T13:00:00.000Z",
-      "deadline_source": "LicitaLAB live readback 2026-10-09 morning; buyer direct page not verified this run",
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
       "tender_source_status": "Publicada",
       "notion_status": "Sin empezar",
       "tender_source_is_closed": false
@@ -411,8 +420,9 @@
       "status": "hold",
       "write_status": "verified",
       "draft_location": null,
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
-      "notion_status": "Detenido"
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "notion_status": "Detenido",
+      "last_followup_summary": "HOLD vigente. Nuevo recordatorio Wherex09/10 dice16/10 4pm sin zona; antes14:00UTCCST y ficha19:00sin zona. No convertir horas ni desarrollar propuesta. Portal inaccesible; verificar horario/canal al levantar HOLD."
     },
     {
       "key": "followup:65472322064:sgs",
@@ -578,14 +588,14 @@
       "deal_id": null,
       "tender_id": null,
       "title": "Conciliar vencimientos y decisiones de negocios antiguos",
-      "internal_due": "2026-10-09T10:00:00-03:00",
+      "internal_due": "2026-10-09T13:00:00.000Z",
       "notion_task_id": "3f339c2f-efe7-8101-b4d9-ee7731d3685a",
       "notion_url": "https://app.notion.com/p/3f339c2fefe78101b4d9ee7731d3685a?pvs=204",
       "status": "todo",
       "write_status": "verified",
       "draft_location": null,
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
-      "last_followup_summary": "Conciliar vencidas sin resultado y MetrogasLIC1507, cuyo correo prorroga09/10 16:00Chile pero no está mapeado a los dosDeals. UTEM/TVN tienen next-stepCRMstale; no ejecutar esos pasos. Sin cambiosCRM.",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Metrogas1561 fue prorrogada de09/10 16h a19/10 16hChile por correo. Es otro ID respecto de1507, aún no conciliado. SANNA/UNAP resueltas como no presentadas, UTEMpresentada; no reabrir.",
       "notion_status": "Sin empezar"
     },
     {
@@ -729,41 +739,55 @@
     },
     {
       "key": "followup:lead:2427-1134-COT26",
-      "title": "Valparaíso — decidir créditos OpenAI y Anthropic hoy",
-      "internal_due": "2026-10-09T10:00:00-03:00",
+      "title": "Valparaíso — decidir créditos IA antes del martes09:00",
+      "internal_due": "2026-10-12T19:00:00.000Z",
       "notion_task_id": "3f439c2f-efe7-81d4-a41d-ca1ca1cb4a2f",
       "notion_url": "https://app.notion.com/p/3f439c2fefe781d4a41dca1ca1cb4a2f?pvs=204",
       "status": "todo",
       "notion_status": "Sin empezar",
       "write_status": "verified",
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
       "created_at": "2026-10-09T12:13:03.495646+00:00",
-      "last_followup_summary": "USD500 de presupuesto para USD200 OpenAI+USD200 Anthropic. Revisar canal permitido, impuestos, costos y margen; patente municipal y cotización formal. Son créditos API, no suscripciones ChatGPT/Claude. No prometer administración ni transferencia fuera de condiciones oficiales.",
+      "last_followup_summary": "LicitaLAB cambió cierre de09/10 11:30 a13/10 09:00Chile. Preparar y decidir lunes12/10; no esperar al corte del martes. USD500 frente a400de créditos, revisar margen/canal/patente. Fuente comprador directa no accesible.",
       "lead_id": "595416937910",
-      "external_deadline": "2026-10-09T11:30:00-03:00",
+      "external_deadline": "2026-10-13T12:00:00.000Z",
       "draft_location": null,
       "tender_id": "2427-1134-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:857-61-COT26",
-      "title": "SENADIS — verificar elegibilidad GCP antes del cierre",
-      "internal_due": "2026-10-09T10:00:00-03:00",
+      "title": "SENADIS GCP — no presentada por falta de tiempo",
+      "internal_due": "2026-10-09T13:00:00.000Z",
       "notion_task_id": "3f439c2f-efe7-81fa-b5a5-eb9f6e4e1f47",
       "notion_url": "https://app.notion.com/p/3f439c2fefe781fab5a5eb9f6e4e1f47?pvs=204",
-      "status": "todo",
-      "notion_status": "Sin empezar",
+      "status": "cancelled",
+      "notion_status": "Cancelada",
       "write_status": "verified",
-      "last_task_status_readback_at": "2026-10-09T12:13:03.495646+00:00",
+      "last_task_status_readback_at": "2026-10-09T19:13:43.561917+00:00",
       "created_at": "2026-10-09T12:13:03.495646+00:00",
-      "last_followup_summary": "CLP6,6M. Exige Google Partner/Premier y tres certificaciones; Member no acredita cumplimiento. Ficha ahora11:00 frente a08:39 en investigación anterior; plataforma oficial no revalidada directamente. Verificar acreditación real antes de invertir. No convertir a GO por el plazo nuevo.",
+      "last_followup_summary": "No se presentó oferta dentro del plazo por falta de tiempo. Confirmado por Julio el 09/10/2026. No reiterar preparación ni conciliación.",
       "lead_id": "595416937988",
-      "external_deadline": "2026-10-09T11:00:00-03:00",
+      "external_deadline": "2026-10-09T14:00:00.000Z",
       "draft_location": null,
       "tender_id": "857-61-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Cerrada",
+      "tender_source_is_closed": true,
+      "external_status": "Cancelada",
+      "completed_on": "2026-10-09",
+      "completion_reason": "No se presentó oferta dentro del plazo por falta de tiempo. Confirmado por Julio el 09/10/2026.",
+      "next_action": "Ninguna acción comercial: proceso descartado.",
+      "hubspot_closure": {
+        "status": "stage_change_blocked_reauthentication",
+        "target_stage": "unqualified-stage-id",
+        "target_reason": "BAD_TIMING",
+        "note_id": "118299111982",
+        "note_verified": true,
+        "decision": "discarded_no_submission"
+      }
     },
     {
       "key": "followup:lead:5423-170-COT26",
@@ -778,11 +802,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP934.415 estimados; dos Claude Pro y dos Overleaf Standard o equivalente. Leer adjuntos para vigencia exacta, titularidad, equivalencia, formalidades e IVA; verificar canal y margen. Cotización final y autorización pendientes.",
       "lead_id": "595416937909",
-      "external_deadline": "2026-10-09T17:15:00-03:00",
+      "external_deadline": "2026-10-09T20:15:00.000Z",
       "draft_location": null,
       "tender_id": "5423-170-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:5709-48-COT26",
@@ -797,11 +822,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP1,65M. Claude Max individual con correo institucional; precisar modalidad y uso. No confundir con licencias corporativas ni ofrecer plan incompatible. Preparar el viernes por cierre del lunes.",
       "lead_id": "595416937990",
-      "external_deadline": "2026-10-12T11:00:00-03:00",
+      "external_deadline": "2026-10-12T14:00:00.000Z",
       "draft_location": null,
       "tender_id": "5709-48-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:5872-54-COT26",
@@ -816,11 +842,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP5,5M, 250mil contactos y cuatro millones de emails/mes, datacenter en Chile y soporte telefónico local. No asumir que HubSpot cumple residencia ni que licencias cubren volumen. Verificar proveedor y costo o recomendar no participar; no hacer mutación CRM.",
       "lead_id": "595416937991",
-      "external_deadline": "2026-10-12T10:00:00-03:00",
+      "external_deadline": "2026-10-12T13:00:00.000Z",
       "draft_location": null,
       "tender_id": "5872-54-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:94-37-COT26",
@@ -835,11 +862,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP3M impuestos incluidos; 400páginas y30artículos. Aclarar dentro de documentación30vs35días, horas, correcciones y experiencia exigida. Fit creativo no prueba rentabilidad. No exigir contacto previo si no existe canal de consultas.",
       "lead_id": "595416937985",
-      "external_deadline": "2026-10-13T15:00:00-03:00",
+      "external_deadline": "2026-10-13T18:00:00.000Z",
       "draft_location": null,
       "tender_id": "94-37-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:797305-60-COT26",
@@ -854,11 +882,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP7M estimados: dos cursos autoinstruccionales; organismo aporta contenido técnico y relatores. Incluye materiales, plantillas, recursos y fuentes editables reutilizables. Ficha leída; adjuntos aún no auditados en esta corrida. Revisar duración, interactividad, LMS/SCORM, accesibilidad, derechos, QA y capacidad antes de GO.",
       "lead_id": null,
-      "external_deadline": "2026-10-13T15:00:00-03:00",
+      "external_deadline": "2026-10-13T18:00:00.000Z",
       "draft_location": null,
       "tender_id": "797305-60-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:1147293-193-COT26",
@@ -873,11 +902,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP6.262.000 impuestos incluidos, 12meses, diez Claude (siete estándar y tres premium) y dos ChatGPT. Rótulo premium no basta para SKU/plan; confirmar en bases, calcular moneda/impuestos/canal y soporte. No prometer reventa sin canal válido.",
       "lead_id": "595416937908",
-      "external_deadline": "2026-10-14T11:00:00-03:00",
+      "external_deadline": "2026-10-14T14:00:00.000Z",
       "draft_location": null,
       "tender_id": "1147293-193-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:707420-70-COT26",
@@ -892,11 +922,12 @@
       "created_at": "2026-10-09T12:13:03.495646+00:00",
       "last_followup_summary": "CLP2M impuestos incluidos. Campaña19/10–30/11;50% de evaluación depende de inversión en medios. Separar presupuesto de pauta, fee, impuestos, seguimiento y caja. No usar total como ingreso neto de agencia.",
       "lead_id": "595416937912",
-      "external_deadline": "2026-10-14T15:30:00-03:00",
+      "external_deadline": "2026-10-14T18:30:00.000Z",
       "draft_location": null,
       "tender_id": "707420-70-COT26",
-      "deadline_source": "LicitaLAB 2026-10-09; independent buyer direct access unavailable",
-      "tender_source_status": "Publicada"
+      "deadline_source": "LicitaLAB live readback 2026-10-09 16h; direct buyer page not verified",
+      "tender_source_status": "Publicada",
+      "tender_source_is_closed": false
     },
     {
       "key": "followup:lead:win-fitness",
@@ -913,10 +944,70 @@
       "lead_id": "595399388523",
       "external_deadline": null,
       "draft_location": "https://app.notion.com/p/3f439c2fefe781b7beb6f96e19deec0a?pvs=204"
+    },
+    {
+      "key": "followup:65352884246:proposal-followup",
+      "deal_id": "65352884246",
+      "title": "Pibank — seguir evaluación de la propuesta enviada",
+      "internal_due": "2026-10-19T10:00:00-03:00",
+      "notion_task_id": "3f439c2f-efe7-81da-ad5f-f10858ddabfb",
+      "notion_url": "https://app.notion.com/p/3f439c2fefe781daad5ff10858ddabfb?pvs=204",
+      "status": "todo",
+      "notion_status": "Sin empezar",
+      "write_status": "verified",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Propuesta enviada el 09/10 a las 13:41 Chile. Revisar respuestas y coordinar siguiente conversación durante evaluación gerencial; no reenviar ahora.",
+      "external_deadline": null
+    },
+    {
+      "key": "followup:delivery:sky-blog-access",
+      "deal_id": null,
+      "title": "SKY Blog — confirmar usuarios y justificar accesos",
+      "internal_due": "2026-10-09T17:00:00-03:00",
+      "notion_task_id": "3f439c2f-efe7-81f1-973d-cb2c31c12e82",
+      "notion_url": "https://app.notion.com/p/3f439c2fefe781f1973dcb2c31c12e82?pvs=204",
+      "status": "todo",
+      "notion_status": "Sin empezar",
+      "write_status": "verified",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Dianesty pidió los correos de las personas y la justificación de accesos a plataformas. Confirmar identidades reales y alcance antes de responder; fecha interna, no deadline del cliente.",
+      "external_deadline": null
+    },
+    {
+      "key": "followup:lead:ucsh-web",
+      "deal_id": null,
+      "title": "UCSH — revisar borrador para Octavia y calificar ecosistema web",
+      "internal_due": "2026-10-12T12:00:00-03:00",
+      "notion_task_id": "3f439c2f-efe7-8131-a6ce-e500c01761ab",
+      "notion_url": "https://app.notion.com/p/3f439c2fefe78131a6cee500c01761ab?pvs=204",
+      "status": "todo",
+      "notion_status": "Sin empezar",
+      "write_status": "verified",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Lead 595617208748, sin Deal. Borrador Outlook preparado y verificado, sin envío. Confirmar si la búsqueda es para UCSH y calificar alcance antes de tratarla como oportunidad.",
+      "external_deadline": null,
+      "lead_id": "595617208748",
+      "draft_location": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEPAAAR61VaBWh6QqphZWDfIIRIAAQFkBMnAAA%3D&exvsurl=1&viewmodel=ReadMessageItem"
+    },
+    {
+      "key": "followup:65843869022:pierre-fabre",
+      "deal_id": "65843869022",
+      "title": "Preparar credenciales y preinscripción — Pierre Fabre 2027",
+      "internal_due": "2026-10-23T12:00:00.000Z",
+      "external_deadline": "2026-10-30",
+      "external_deadline_precision": "date_only; time and timezone not published",
+      "notion_task_id": "3f439c2f-efe7-81a2-b3ef-f936bfeb392f",
+      "notion_url": "https://app.notion.com/p/3f439c2fefe781a2b3eff936bfeb392f",
+      "status": "todo",
+      "notion_status": "Sin empezar",
+      "write_status": "verified",
+      "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
+      "last_followup_summary": "Clave: followup:65843869022:pierre-fabre. Armar credenciales, casos, certificaciones, estructura y cobertura. Revisión interna 23/10; meta de envío 28/10; cierre 30/10/2026 sin hora publicada. Formulario y destinatario verificados en el expediente y cuerpo de esta tarea. No es una postulación enviada ni un GO final.",
+      "reused_existing_task": true
     }
   ],
   "outlook_drafts": {
-    "created": 1,
+    "created": 2,
     "status": "draft_email_verified",
     "attempted_at": "2026-10-08T19:04:59Z",
     "preserve_human_drafts": true,
@@ -927,6 +1018,18 @@
         "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEPAAAR61VaBWh6QqphZWDfIIRIAAQFkBMcAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
         "verified": true,
         "created_at": "2026-10-08T19:04:59Z"
+      },
+      {
+        "id": "AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEPAAAR61VaBWh6QqphZWDfIIRIAAQFkBMnAAA=",
+        "url": "https://outlook.office365.com/owa/?ItemID=AAMkAGZlMmI1M2U1LTIyZWQtNDFkNC05MTJjLTE3ZWU2ZDM0NWFiNQBGAAAAAADxl4bkLvSfSYZqEzxL3EY1BwAR61VaBWh6QqphZWDfIIRIAAAAAAEPAAAR61VaBWh6QqphZWDfIIRIAAQFkBMnAAA%3D&exvsurl=1&viewmodel=ReadMessageItem",
+        "subject": "Sitios corporativos y ecosistema web | Efeonce",
+        "verified": true,
+        "created_at": "2026-10-09T19:09:39.197666+00:00",
+        "key": "followup:lead:ucsh-web",
+        "is_draft": true,
+        "signature_verified": true,
+        "hubspot_bcc_verified": true,
+        "sent": false
       }
     ],
     "previous_observation": {
@@ -941,7 +1044,8 @@
     "fallback": "Basis/DDSoft texts and conditional Real Audiences template in Notion; human SKY drafts preserved",
     "last_rechecked_at": "2026-10-09T12:13:03.495646+00:00",
     "last_run_created": 0,
-    "last_run_note": "Momentum existing draft preserved; new WIN email text and SKY partner message text saved in Notion only. No permission probes needed; 403 reply limitation not retested."
+    "last_run_note": "Momentum existing draft preserved; new WIN email text and SKY partner message text saved in Notion only. No permission probes needed; 403 reply limitation not retested.",
+    "last_success_at": "2026-10-09T19:09:39.197666+00:00"
   },
   "mail_sources": [
     {
@@ -1103,7 +1207,7 @@
   ],
   "decisions": {
     "tvn": "late registration rejected 2026-10-06; no repeat outreach",
-    "sika1169": "HOLD",
+    "sika1169": "HOLD. Reminder09Oct says16Oct4pm without timezone; conflicts with earlier14UTCCST/ficha19. No reactivation.",
     "sika1164": "discarded technical proposal; new direction required",
     "sky_social_care": "2027 budget only; no service 2026",
     "isp_design": "NO-BID",
@@ -1116,7 +1220,14 @@
     "chazki_out_of_office": "Renzo OOO through 2026-10-09; avoid early duplicate outreach. Review 13 Oct if relevant; separate prospecting radar unchanged.",
     "fucoa_deadline": "LicitaLAB 09 Oct now 15 Oct 15:30 Chile; prior 14 Oct remains in CRM. No CRM mutation; verify buyer final platform during preparation.",
     "sanna": "Closed lost authorized by Julio 2026-10-09: did not submit before deadline due to lack of time. No preparation/submission reconciliation reminders.",
-    "unap": "Closed lost authorized by Julio 2026-10-09: did not submit before deadline due to lack of time. No preparation/submission reconciliation reminders."
+    "unap": "Closed lost authorized by Julio 2026-10-09: did not submit before deadline due to lack of time. No preparation/submission reconciliation reminders.",
+    "valparaiso_deadline": "LicitaLAB 09 Oct afternoon: 13 Oct 09:00 Chile; internal preparation 12 Oct 16h, do not wait for Tuesday cut",
+    "pibank_seo": "Sent 09 Oct 13:41:28 Chile with six-month initial commitment; task Enviada; follow-up review19Oct, no resend now",
+    "ucsh_web": "Lead 595617208748; corporate email previously verified; new draft only, no Deal or send. Confirm institution and qualify scope.",
+    "metrogas_1561": "Email09Oct extends LIC1561 to19Oct16Chile. Separate from LIC1507 whose mapping remains unresolved; do not change historical Deals by name.",
+    "utem_result_code": "Adjudication notification 5251-64-LP26 is not our 5251-1060-COT26; our result remains unconfirmed.",
+    "prochile": "Closed lost verified; Julio confirmed no submission due to lack of time on09Oct. No preparation or reconciliation reminders.",
+    "senadis": "Discarded by Julio09Oct: no submission due to lack of time. Notion cancelled; CRM note118299111982. Lead stage mutation requires renewed authentication, not completed. Do not reopen commercial followup."
   },
   "documentation_update": {
     "date": "2026-10-08",
@@ -1131,24 +1242,23 @@
     ]
   },
   "last_run": {
-    "triggered_at": "2026-10-09T11:58:16.827Z",
-    "completed_at": "2026-10-09T12:13:03.495646+00:00",
-    "report": "docs/commercial/follow-up-agent/runs/2026-10-09-0900.md",
-    "notion_created": 10,
-    "notion_updated": 6,
+    "triggered_at": "2026-10-09T18:57:32.715Z",
+    "completed_at": "2026-10-09T19:09:39.197666+00:00",
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-09-1600.md",
+    "notion_created": 3,
+    "notion_updated": 7,
+    "notion_existing_reused": 1,
     "writes_independently_verified": true,
-    "outlook_drafts_created": 0,
-    "notion_email_drafts_created": 1,
-    "notion_partner_message_texts_created": 1,
+    "outlook_drafts_created": 1,
+    "notion_partial_email_drafts_created": 1,
     "emails_sent": 0,
     "crm_writes": 0,
     "submissions": 0,
     "commit_push_deploy": false,
-    "mail_window_start": "2026-10-06T19:11:48Z",
-    "mail_latest_received": "2026-10-09T11:37:38Z",
-    "mail_latest_received_precision": "second",
-    "next_run": "2026-10-09T16:00:00-03:00",
-    "next_run_policy": "Reconcile ProChile/Valparaiso/SENADIS and other morning closes. Metrogas LIC1507 deadline is at16h (old email; Wherex blocked), Los Lagos17:15; prepare Saturday Zoom and Monday licenses before weekend only if fit/margin supports GO. Preserve holds and manual outreach review13Oct."
+    "mail_window_start": "2026-10-07T12:13:03Z",
+    "mail_latest_received": "2026-10-09T18:54:53Z",
+    "next_run": "2026-10-12T09:00:00-03:00",
+    "next_run_policy": "Reconcile Los Lagos/Saturday Zoom, verify Monday 10/11/12:30/18:30 deadlines, prepare Valparaiso Tuesday09 before that cut. Repeat Momentum and SKY access only if unresolved; no Pibank resend. Preserve SANNA/UNAP cancelled and all holds."
   },
   "utem_submission_update": {
     "at": "2026-10-08T18:01:38.577483+00:00",
@@ -1637,22 +1747,24 @@
     }
   ],
   "previous_run": {
-    "triggered_at": "2026-10-08T18:58:09.509Z",
-    "completed_at": "2026-10-08T19:11:48.326178+00:00",
-    "report": "docs/commercial/follow-up-agent/runs/2026-10-08-1600.md",
-    "notion_created": 4,
-    "notion_updated": 10,
+    "triggered_at": "2026-10-09T11:58:16.827Z",
+    "completed_at": "2026-10-09T12:13:03.495646+00:00",
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-09-0900.md",
+    "notion_created": 10,
+    "notion_updated": 6,
     "writes_independently_verified": true,
-    "outlook_drafts_created": 1,
+    "outlook_drafts_created": 0,
+    "notion_email_drafts_created": 1,
+    "notion_partner_message_texts_created": 1,
     "emails_sent": 0,
     "crm_writes": 0,
     "submissions": 0,
     "commit_push_deploy": false,
-    "mail_window_start": "2026-10-06T12:08:01Z",
-    "mail_latest_received": "2026-10-08T19:04:59Z",
+    "mail_window_start": "2026-10-06T19:11:48Z",
+    "mail_latest_received": "2026-10-09T11:37:38Z",
     "mail_latest_received_precision": "second",
-    "next_run": "2026-10-09T09:00:00-03:00",
-    "next_run_policy": "Re-read overlapping mail and drafts. SANNA closes at next cut: preparation/decision needed 08 Oct. Preserve UTEM presented and all other holds."
+    "next_run": "2026-10-09T16:00:00-03:00",
+    "next_run_policy": "Reconcile ProChile/Valparaiso/SENADIS and other morning closes. Metrogas LIC1507 deadline is at16h (old email; Wherex blocked), Los Lagos17:15; prepare Saturday Zoom and Monday licenses before weekend only if fit/margin supports GO. Preserve holds and manual outreach review13Oct."
   },
   "manual_closure_update": {
     "observed_at": "2026-10-09T12:19:29.835850+00:00",
@@ -1679,5 +1791,228 @@
     "independent_readback": true,
     "note": "Focal update, not new global pipeline audit; heartbeat coverage retained as historical. Native HubSpot assigned closedate on stage change; not an external submission deadline.",
     "record": "docs/commercial/follow-up-agent/runs/2026-10-09-sanna-unap-no-presentadas.md"
+  },
+  "deadline_readbacks_2026_10_09_1600": [
+    {
+      "code": "1051178-3-COT26",
+      "name": "Suscripción de Licencias Digitales",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-12T21:30:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 947000,
+      "closes_at_local": "12/10 18:30"
+    },
+    {
+      "code": "1108660-10-LE26",
+      "name": "SERVICIO DE REDISEÑO DEL PORTAL INSTITUCIONAL",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-15T18:30:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 13000000,
+      "closes_at_local": "15/10 15:30"
+    },
+    {
+      "code": "1138297-11-LE26",
+      "name": "Servicios de implementación integral para el diseño y producción de material promocional y la optimización del sitio web del Catálogo Digital de las Industrias Creativas de la Región de Atacama",
+      "status": "Cerrada",
+      "is_closed": true,
+      "closes_at": "2026-10-09T16:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 21000000,
+      "closes_at_local": "09/10 13:00"
+    },
+    {
+      "code": "1147293-193-COT26",
+      "name": "ADQUISICIÓN LICENCIAS IA ",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-14T14:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 6262000,
+      "closes_at_local": "14/10 11:00"
+    },
+    {
+      "code": "1591-138-COT26",
+      "name": "ASESORIA Y GESTIÓN DE CAMPAÑA REDES SOCIALES PARA SELLOS Q y S",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-15T15:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 980000,
+      "closes_at_local": "15/10 12:00"
+    },
+    {
+      "code": "2403-72-LP26",
+      "name": "Servicios Cloud",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-15T18:30:00.000Z",
+      "currency": "USD",
+      "estimated_amount": 320000,
+      "closes_at_local": "15/10 15:30"
+    },
+    {
+      "code": "2427-1134-COT26",
+      "name": "SERVICIO DE ABONO DE CRÉDITOS EN CUENTAS OPENAI Y ANTHROPIC, SECPLA",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-13T12:00:00.000Z",
+      "currency": "USD",
+      "estimated_amount": 500,
+      "closes_at_local": "13/10 09:00"
+    },
+    {
+      "code": "2432-31-LE26",
+      "name": "SERVICIO INTEGRAL DE CONTINUIDAD PAGINA WEB",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-13T18:20:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 0,
+      "closes_at_local": "13/10 15:20"
+    },
+    {
+      "code": "4841-91-COT26",
+      "name": "LICENCIA ZOOM PRO PARA EL CNCR",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-10T15:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 200000,
+      "closes_at_local": "10/10 12:00"
+    },
+    {
+      "code": "5251-1060-COT26",
+      "name": "Servicio de posicionamiento digital SEO, GEO y AEO ",
+      "status": "Cerrada",
+      "is_closed": true,
+      "closes_at": "2026-10-08T21:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 6800000,
+      "closes_at_local": "08/10 18:00"
+    },
+    {
+      "code": "5251-64-LP26",
+      "name": "Campaña Plan de Medios Digitales - Admisión 2027",
+      "status": "Adjudicada",
+      "is_closed": true,
+      "closes_at": "2026-08-28T00:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 281000000,
+      "closes_at_local": "27/08 20:00"
+    },
+    {
+      "code": "5423-170-COT26",
+      "name": "LICENCIAS (SASERVI 84275)",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-09T20:15:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 934415,
+      "closes_at_local": "09/10 17:15"
+    },
+    {
+      "code": "5586-155-LE26",
+      "name": "BC SERVICIO DE PUBLICIDAD Y DIFUSIÓN PARA SU CAMPAÑA DE ADMISIÓN DE PREGRADO 2027",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-14T13:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": null,
+      "closes_at_local": "14/10 10:00"
+    },
+    {
+      "code": "5709-48-COT26",
+      "name": "WD 4930 Licencia Claude MAX de Anthropic",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-12T14:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 1650000,
+      "closes_at_local": "12/10 11:00"
+    },
+    {
+      "code": "5872-54-COT26",
+      "name": "WD 4929 Servicio de Plataforma de Email Marketing",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-12T13:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 5500000,
+      "closes_at_local": "12/10 10:00"
+    },
+    {
+      "code": "707420-70-COT26",
+      "name": "servicio integral de campaña de publicidad digital en Meta Ads ",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-14T18:30:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 2000000,
+      "closes_at_local": "14/10 15:30"
+    },
+    {
+      "code": "757-429-COT26",
+      "name": "DIPOL Edición de material de zoonosis pecuarias y hantavirus",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-13T14:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 4000000,
+      "closes_at_local": "13/10 11:00"
+    },
+    {
+      "code": "797305-60-COT26",
+      "name": "Diseño instruccional y desarrollo de cursos e-learning autoinstruccional",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-13T18:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 7000000,
+      "closes_at_local": "13/10 15:00"
+    },
+    {
+      "code": "857-61-COT26",
+      "name": "Servicios Google Cloud Platform",
+      "status": "Cerrada",
+      "is_closed": true,
+      "closes_at": "2026-10-09T14:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 6600000,
+      "closes_at_local": "09/10 11:00"
+    },
+    {
+      "code": "918434-271-COT26",
+      "name": "D5077 Adquisición de dos licencias anuales de Claude Team, modalidad Premium, para el equipo de desarrollo de software, Informática",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-12T15:30:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 3000000,
+      "closes_at_local": "12/10 12:30"
+    },
+    {
+      "code": "94-37-COT26",
+      "name": "Servicio de  Diagramación  y Diseño  Gráfico de la  Publicación del  Estudio  Exploratorio  sobre  Patrimonio  Marítimo 2026",
+      "status": "Publicada",
+      "is_closed": false,
+      "closes_at": "2026-10-13T18:00:00.000Z",
+      "currency": "CLP",
+      "estimated_amount": 3000000,
+      "closes_at_local": "13/10 15:00"
+    }
+  ],
+  "manual_prochile_senadis_closure_update": {
+    "at": "2026-10-09T19:13:43.561917+00:00",
+    "reason": "No se presentó oferta dentro del plazo por falta de tiempo. Confirmado por Julio el 09/10/2026.",
+    "source": "direct operator instruction in this chat",
+    "report": "docs/commercial/follow-up-agent/runs/2026-10-09-prochile-senadis-no-presentadas.md",
+    "deal_updated": "65678232118",
+    "lead_note_created": "118299111982",
+    "lead_stage_pending": "595416937988",
+    "notion_cancelled": 2,
+    "readbacks_verified": true
   }
 }

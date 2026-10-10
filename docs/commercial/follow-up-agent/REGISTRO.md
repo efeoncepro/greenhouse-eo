@@ -1,8 +1,10 @@
 # Registro de seguimiento comercial
 
+**Delta posterior al corte 16:00 · 09/10:** ProChile y SENADIS no se presentaron por falta de tiempo, confirmado por Julio. ProChile en Cierre perdido; SENADIS descartada con nota CRM, cambio de etapa del Lead pendiente por reautenticación. Ambas tareas Canceladas; sin nuevas alertas de preparación/conciliación. [Decisión y evidencia](runs/2026-10-09-prochile-senadis-no-presentadas.md).
+
 **Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).
 
-**Corte vigente: 09/10, 09:00 Chile.** [Reporte completo](runs/2026-10-09-0900.md):254 Deals/44 abiertos;213 leads recientes;282 correos y12borradores;33 fichas LicitaLAB. Diez tareas nuevas y seis actualizadas con readback;41 claves. **Momentum y Pibank requieren acción esta mañana; ProChile cierra13:00; Valparaíso11:30; SENADIS11:00 condicionado a acreditación; Los Lagos17:15. SANNA y UNAP: no presentadas por tiempo, cierre perdido confirmado por Julio; sin conciliación pendiente.** FUCOA ahora15/10 15:30 según LicitaLAB, no verificación directa del comprador. UTEM presentada; outreach Yanbal/Lotus/Olivos se revisa13/10. Nuevo borrador WIN en Notion, sin envío. Wherex no accesible. Este corte prevalece sobre la historia inferior.
+**Corte vigente: 09/10, 16:00 Chile.** [Reporte completo](runs/2026-10-09-1600.md): 256 Deals/44 abiertos; 216 leads recientes; 301 correos y13 borradores previos; 21 fichas LicitaLAB. **Pibank enviado13:41, no reenviar. Los Lagos cierra17:15 hoy; Momentum sigue pendiente. Valparaíso se movió al13/10 09:00: preparar lunes. ProChile y SENADIS descartadas por falta de tiempo; ver delta posterior al corte.** Tres tareas nuevas y siete actualizadas (Pierre Fabre reutilizada); 45 claves con readback. Borrador UCSH guardado sin envío; SKY accesos requiere correos reales. SANNA/UNAP perdidas y canceladas, UTEM presentada sin resultado confirmado. Wherex portal inaccesible. Este corte prevalece sobre la historia inferior.
 
 **Delta focalizado 08/10, outreach manual:** tres mensajes verificados en Enviados, tres notas CRM asociadas a seis contactos y tres tareas Notion con borradores (una nueva, dos reutilizadas). Próximo seguimiento interno 13/10 10:00 Chile; 19/10 y 26/10 tentativos. [IDs, evidencia y reglas](runs/2026-10-08-outreach-manual.md). Sustituye la preparación inicial pendiente de Yanbal/Olivos; no renueva el corte global de abajo.
 
@@ -257,3 +259,8 @@ Julio aportó la captura de Mercado Público «Cotización enviada correctamente
 ## 09/10/2026 — cierre manual autorizado de SANNA y UNAP
 
 **Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).
+
+
+## Bitácora · 09/10/2026 · 16:00 Chile
+
+Revisión completa descrita en [corte16h](runs/2026-10-09-1600.md). Tres tareas creadas, siete actualizadas y borrador UCSH guardado; todas las escrituras leídas de vuelta. Cero cambios CRM/envíos/postulaciones. Pibank Enviada, nuevo seguimiento19/10; Valparaíso13/10 09h; Sika1169 HOLD y Metrogas1561 separado de1507. Continuidad persistida en state.json. Sin commit.
