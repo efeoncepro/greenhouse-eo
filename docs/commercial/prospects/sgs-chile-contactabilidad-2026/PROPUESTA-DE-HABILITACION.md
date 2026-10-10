@@ -112,7 +112,7 @@ Cinco cosas, todas acotadas:
 1. Confirmar el estado de la captura de correo e incluir a los usuarios chilenos del piloto.
 2. Instalar el paquete del conector, primero en ambiente de pruebas y luego en producción en modo "solo administradores", con permisos asignados únicamente al grupo piloto.
 3. Un usuario de integración, si el conector lo requiere. Las ediciones Enterprise y Unlimited incluyen cinco.
-4. Un valor "WhatsApp" en el tipo de actividad, si el conector no trae campo propio.
+4. Para WhatsApp: una integración por API con usuario de integración, si el conector de Aircall no lo registra, y un valor "WhatsApp" en el tipo de actividad.
 5. Un tipo de informe "cuentas con o sin actividades" y una carpeta compartida para los informes.
 
 Argumento de reversibilidad: el paquete se desinstala desde la configuración y elimina sus componentes; las actividades estándar ya creadas permanecen.
@@ -224,10 +224,26 @@ Reportado por los investigadores con fuente leída, sin segundo contraste:
 - [Salesforce State of Sales 2026](https://www.salesforce.com/news/stories/state-of-sales-report-announcement-2026/).
 - [Ley 21.719 en la Biblioteca del Congreso](https://www.bcn.cl/leychile/navegar?idNorma=1209272).
 
+Investigado a fondo el 2026-10-10 (segunda pasada, solo documentación de Aircall):
+
+- [WhatsApp en Aircall, primeros pasos y uso](https://support.aircall.io/hc/en-gb/articles/26799936028061-Using-WhatsApp-in-Aircall): todos los números de Aircall son elegibles; verificación por llamada de voz de Meta, una por número; máximo dos o tres números por día; exige cuenta de Meta verificada y un administrador con permisos completos sobre ella.
+- [Preguntas frecuentes de WhatsApp en Aircall](https://support.aircall.io/en-gb/articles/35702375618205): los nombres visibles individuales suelen rechazarse, se recomienda "Nombre de Marca"; Aircall no gestiona el consentimiento, debe llevarse en el CRM; sin grupos.
+- [Objeto de registro de Aircall en Salesforce](https://support.aircall.io/en-gb/articles/34359598228765): un registro por "llamada, SMS o MMS"; reportable; no menciona WhatsApp.
+- Notas de versión de [abril](https://support.aircall.io/en-gb/articles/35392109205661), [junio](https://support.aircall.io/en-gb/articles/37223099328797) y [julio](https://support.aircall.io/en-gb/articles/38012648519325) de 2026: registro de WhatsApp agregado para Jobber y Zoho; para Salesforce solo cambios de registro de llamadas.
+- [Captura de actividad de WhatsApp por API](https://developer.aircall.io/docs/capture-whatsapp-activity): eventos `message.received`, `message.sent` y `message.status_updated` con canal `whatsapp`; sin consulta de historial; solo líneas en modo nativo.
+- [Registro de llamadas en Salesforce](https://support.aircall.io/en-gb/articles/10375396027805): "cada llamada hecha o recibida con Aircall" se registra según la configuración de la integración.
+- [Mensajería en Aircall](https://support.aircall.io/hc/en-gb/articles/10375395914781-SMS-Business-Text-Messaging): registro automático en Salesforce; disponible en escritorio, web, iOS y Android. El SMS no está disponible para números chilenos; es un canal distinto de WhatsApp.
+
+Conclusiones de esa pasada, detalladas en la sección B1 del [caso de negocio](CASO-DE-NEGOCIO.md):
+
+- WhatsApp en Chile: probable que sí; usar números geográficos y evitar el rango +56 44 por la llamada de verificación de Meta.
+- WhatsApp en Salesforce: el conector probablemente no lo registra; la vía segura es un servicio nuestro sobre la API de Aircall.
+- Llamadas desde el móvil: sí, con confianza alta.
+
 Sin verificar:
 
-- WhatsApp de Aircall para cuentas y números chilenos.
-- Objeto de Salesforce donde Aircall registra WhatsApp.
+- Frase de Aircall que confirme a Chile para WhatsApp.
+- Si el registro nativo de WhatsApp en Salesforce existe o está en la hoja de ruta de Aircall.
+- Notas de versión de agosto a octubre de 2026, que no aparecieron en la búsqueda.
 - Coexistencia de Meta disponible en Chile.
-- Registro de llamadas desde la aplicación móvil de Aircall, que solo aparece en material comercial.
 - Alcance de Salestrail en iPhone.

@@ -86,7 +86,7 @@ Cada etapa cierra con una decisión explícita antes de pasar a la siguiente.
 1. Confirmar cómo está configurada la captura de correo e incluir a los usuarios chilenos del piloto.
 2. Instalar el conector de Aircall, primero en ambiente de pruebas y luego en producción, con permisos asignados solo al grupo piloto.
 3. Un usuario de integración, si el conector lo requiere.
-4. Un valor "WhatsApp" en el tipo de actividad, si el conector no trae un campo propio.
+4. Para WhatsApp: una integración por API con un usuario de integración, que registra cada conversación como actividad, y un valor "WhatsApp" en el tipo de actividad.
 5. Un tipo de informe de cuentas con y sin actividades, y una carpeta compartida para los informes.
 
 Es reversible: el conector se desinstala desde la configuración de Salesforce y elimina sus componentes. Las actividades ya registradas permanecen.
@@ -192,17 +192,21 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 
 ## Parte B · Notas internas (no entregar)
 
-### B1. Qué no se puede afirmar todavía
+### B1. Estado de los tres puntos que no se podían afirmar (investigados el 2026-10-10)
 
-El texto para SGS describe la solución como diseñada. Tres piezas dependen de respuestas de Aircall que aún no tenemos, y **el documento no se envía hasta tenerlas por escrito**:
+**1. WhatsApp de Aircall en Chile: probable que sí, con una condición sobre el número.** La documentación dice que cualquier número de Aircall es elegible y no contiene ninguna restricción por país. La condición práctica: Meta verifica cada número con una llamada de voz desde el extranjero, y Aircall advierte que los números chilenos del rango +56 44 pueden no ser alcanzables desde números no chilenos. Hay que pedir números geográficos, por ejemplo de Santiago, y no nacionales. Sigue faltando una frase de Aircall que nombre a Chile.
 
-1. Que una cuenta en Chile pueda contratar el complemento de WhatsApp y activarlo en un número chileno.
-2. En qué objeto de Salesforce quedan los mensajes de WhatsApp. De eso depende la fila de WhatsApp de la sección 5 y el punto 4 de la sección 7.
-3. Que las llamadas desde la aplicación móvil se registren en Salesforce igual que las de escritorio. Solo aparece en material comercial.
+**2. Registro de WhatsApp en Salesforce: lo más probable es que el conector no lo haga, y hay una vía segura que construimos nosotros.** El objeto de registro de Aircall en Salesforce guarda "llamada, SMS o MMS"; WhatsApp no figura. Las notas de versión agregan el registro de WhatsApp integración por integración (HubSpot, Zendesk, Intercom, Jobber, Zoho) y Salesforce no aparece hasta julio de 2026. La vía segura: la API pública de Aircall entrega cada mensaje de WhatsApp, enviado o recibido, con texto, número del cliente, línea, ejecutivo y hora. Efeonce construye el servicio que los escribe como actividades en Salesforce. Consecuencias:
 
-Las siete preguntas completas están en la sección 9 de la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md).
+- La solicitud a la región suma una integración por API, además del paquete de Aircall. Ya está reflejado en el punto 4 de la sección 7.
+- No existe forma de recuperar mensajes anteriores: hay que escuchar desde el primer día del piloto.
+- Las líneas deben estar en el modo estándar de Aircall, no en el modo de envío por API.
 
-Si la respuesta a la primera es no, WhatsApp sale de la etapa 2 y pasa a un proveedor distinto con conector, lo que agrega un paquete a la solicitud regional.
+**3. Llamadas desde la aplicación móvil: sí, con confianza alta.** El registro se configura por número en el panel de Aircall y ocurre en sus servidores, no en el dispositivo; la documentación dice que se registra "cada llamada hecha o recibida con Aircall". La tabla de diferencias entre móvil y escritorio no incluye el registro en CRM. Queda como comprobación de la demostración, no como duda.
+
+Efecto en el diseño: en el móvil el etiquetado de llamadas no se puede hacer obligatorio. El "resultado" del informe debe salir del estado de la llamada (contestada, no contestada, buzón), no de una etiqueta manual.
+
+Preguntas que siguen abiertas para Aircall: confirmación expresa de Chile, y si el registro nativo de WhatsApp en Salesforce existe o está en su hoja de ruta. Lista completa en la sección 9 de la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md).
 
 ### B2. Respecto de la reunión del 29-09
 
