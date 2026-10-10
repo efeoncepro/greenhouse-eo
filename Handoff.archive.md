@@ -17,6 +17,8 @@ verificado.
 
 - [Studio: contexto previo a consolidación 2026-10-04, con hashes](docs/operations/agent-context-history/2026-10-04-studio-closure/README.md)
 
+- [2026-10](docs/operations/agent-context-history/handoff/2026-10.md)
+
 No volver a pegar historia completa en este índice.
 
 ## Entradas archivadas desde Handoff activo

@@ -7,6 +7,12 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-10 — Brochure de servicios web y Product Design 360 aprobados
+
+- [Product Design 360](docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md): aprobada entera por el operador; ADR `Accepted`, [modelo](docs/business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) `Approved`, Wave con seis familias en portfolio, catálogo de servicios, context pack e índice de decisiones; G1–G6 pasan a validación posterior. Sin precios nuevos.
+
+- Brochure [«Servicios web y digitales»](ai-generations/2026-10-09_deck-web-nexa-spark/deck/LEEME.md) (línea Engine, 29 láminas) aprobado y canonizado: fuente del canvas, PDF rasterizado y render; `deck-studio`, [manual](docs/manual-de-uso/creative/componer-deck-con-recetas.md), doc funcional, norma §4.6 y [collateral de Wave](docs/services/wave/README.md). Pendientes de contenido antes de enviarlo a prospectos.
+
 ## 2026-10-09 — Capacidad CRM regional y Talent Assurance aprobados
 
 - [Publicidad programática aprobada](docs/architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md): modelo V1.4, pricing V1.3, ficha y manual con tarifario USD y cobro estándar; setup único, fee fijo, externos al costo, margen mínimo/objetivo 45%/55%, honorarios a 30 días y liquidación a 15. Catálogo/registry y evidencia sincronizados. PDF previo desactualizado; contratación externa y costos observados por campaña. Sin integración/runtime ni facturas/cotizaciones emitidas.
@@ -467,11 +473,3 @@ El operador reconoce «hacer que el cliente experimente nuestra capacidad antes 
 - 37 pruebas del plano de control; sync simulado sobre `main` y sobre el PR #3: 11 rutas entregadas sin borrar y tests
   del harness de Codex iguales antes y después. Decisión: §8 de
   [EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md](docs/architecture/EFEONCE_CREATIVE_WORKBENCH_DECISION_V1.md).
-
-## 2026-09-29 — Glitch y Marketing con Manzanitas estables como sub-líneas de La órbita (AXIS `v0.3.37`)
-
-- El operador aprobó Manzanitas para usar y fijó su lugar: «no sustituye a la orbita es una sublinea dentro del design
-  system de la orbita igual que glitch». Con su autorización, AXIS `v0.3.37` pasa `glitchLine` y `manzanitasRegister` a
-  `canonical` y los contratos `efeonce.glitch-line` 0.2.0 y `efeonce.manzanitas-register` 0.3.0 a `stable`, sin cambio de
-  valores ni render. Greenhouse fija `axis-tokens` y `axis-ui-contracts` 0.3.37 y regenera los tokens compilados; los
-  catálogos del Artifact Composer siguen `candidate` hasta la ruta productiva (TASK-1921).
