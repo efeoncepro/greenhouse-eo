@@ -1,12 +1,14 @@
 # Caso de negocio · Trazabilidad comercial en Salesforce · SGS Chile
 
-**Versión:** 5 (borrador de trabajo, consolidado) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
+**Versión:** 6 (borrador de trabajo, consolidado) · **Corte:** 10 de octubre de 2026 · **Responsable:** Julio Reyes.
 
 **Estado:** borrador para iterar con Bárbara Quiroga y José Pedro De Oliveira antes de llevarlo a la región. No enviado. Sin honorarios ni fechas comprometidas.
 
 **Decisión que fija esta versión:** Julio aprobó el 2026-10-10 proponer la solución con número de empresa en Aircall. La alternativa que conserva el número del ejecutivo queda documentada como respaldo en la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md).
 
 **Consolidación (versión 5):** incorpora lo investigado el 2026-10-10: números geográficos, registro de WhatsApp en Salesforce mediante una integración que construye Efeonce, y resultado del contacto tomado del estado de la llamada.
+
+**Versión 6:** la vista de gestión pasa de informes de Salesforce a un panel de contactabilidad de Efeonce Insights, en tiempo real para llamadas y WhatsApp, más un informe mensual. Julio aprobó el 2026-10-10 extender Efeonce Insights para esto.
 
 Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Parte B** son notas internas de Efeonce y no se entrega.
 
@@ -19,7 +21,7 @@ Este archivo tiene dos partes. La **Parte A** es el texto que verá SGS. La **Pa
 Dos decisiones, en este orden:
 
 1. **SGS Chile:** iniciar un piloto con un equipo comercial para que todo contacto con clientes por correo, llamada, WhatsApp y reunión quede registrado sin trabajo manual.
-2. **Equipo regional de Salesforce:** autorizar cinco habilitaciones acotadas para que esos registros vivan en Salesforce, solo para los usuarios del piloto.
+2. **Equipo regional de Salesforce:** autorizar cinco habilitaciones acotadas para que esos registros vivan también en Salesforce, solo para los usuarios del piloto.
 
 El piloto no cambia la experiencia del resto de los países ni la configuración común de la región. Efeonce diseña, construye, habilita y opera la solución.
 
@@ -42,9 +44,9 @@ Esta necesidad ya se había levantado antes desde otra unidad de negocio de SGS 
 Trazabilidad completa de la relación con cada cliente, en un solo historial y en dos vistas:
 
 - **Vista de cuenta:** quien conversa con el cliente ve en la ficha todos los correos, llamadas, mensajes y reuniones, con fecha y responsable.
-- **Vista de gestión:** excelencia comercial y las jefaturas ven intentos por cliente, canal y resultado; clientes sin contacto en el período; cobertura por equipo.
+- **Vista de gestión:** excelencia comercial y las jefaturas ven, en un panel que se actualiza solo, intentos por cliente, canal y resultado; clientes sin contacto en el período; cobertura por equipo.
 
-Las dos vistas leen los mismos registros.
+Las dos vistas parten de los mismos contactos.
 
 **Fuera de alcance:** agentes de inteligencia artificial, campañas de marketing, rediseño del modelo de datos y despliegue en otros países durante el piloto.
 
@@ -63,9 +65,18 @@ Las dos vistas leen los mismos registros.
 | Correo y reuniones | Como hoy, desde Outlook | Cada correo con un cliente y cada reunión, en la ficha |
 | Llamadas | Desde la aplicación de Aircall en su celular o computador, con un número de empresa | Cada llamada, incluidas las no contestadas y las perdidas |
 | WhatsApp | Desde la misma aplicación, con el mismo número de empresa | Cada mensaje enviado y recibido, como actividad en la ficha del cliente |
-| Informe | La jefatura lo consulta en Salesforce | Intentos por cliente, canal y resultado; clientes sin contacto |
 
 Una sola herramienta de comunicación para llamadas y WhatsApp. El correo y las reuniones usan lo que Salesforce ya incluye.
+
+**La vista de gestión: panel de contactabilidad de Efeonce Insights.**
+
+- Muestra intentos por cliente, canal, ejecutivo y resultado, y los clientes sin contacto en el período.
+- Las llamadas y los WhatsApp aparecen en el momento en que ocurren, porque llegan directo desde Aircall.
+- Funciona desde el piloto, antes de la conexión a Salesforce.
+- Guarda el contacto, no el contenido: quién, cuándo, canal, resultado y cuenta. No guarda el texto de los mensajes ni audio.
+- Cada mes entrega un informe con los hallazgos del período, que se comparte por enlace. Es el documento para llevar los resultados a la región.
+
+Se propone un panel propio y no los paneles de Salesforce porque estos se refrescan a mano o una o dos veces por hora, tienen un tope por edición y sus versiones avanzadas requieren una licencia adicional.
 
 Cómo llega cada canal a Salesforce:
 
@@ -81,11 +92,11 @@ Que las llamadas no contestadas también se registren es lo que permite contar i
 | --- | --- | --- | --- |
 | 0. Diagnóstico | Revisar cómo está el correo en Salesforce, levantar teléfonos y canales del equipo, revisar seguridad | Plan ajustado a la operación real | No |
 | 1. Correo y reuniones | Dejar activa la captura de correo para el equipo piloto | Historial de correo en la ficha del cliente | Poco o nada |
-| 2. Piloto de llamadas y WhatsApp | Entregar números de empresa, configurar la aplicación, formar al equipo y medir | El equipo trabajando con trazabilidad y la línea base medida | No |
-| 3. Conexión a Salesforce | Instalar el conector de llamadas, construir la integración de WhatsApp y el informe, y validar con usuarios | Todo el historial y el informe dentro de Salesforce | Sí |
-| 4. Operación y extensión | Sostener, medir y preparar otros equipos o países | Continuidad y decisión de extensión | Sí, para extender |
+| 2. Piloto de llamadas y WhatsApp | Entregar números de empresa, configurar la aplicación, poner en marcha el panel, formar al equipo y medir | El equipo trabajando con trazabilidad, el panel en uso y la línea base medida | No |
+| 3. Conexión a Salesforce | Instalar el conector de llamadas, construir la integración de WhatsApp, sumar el correo al panel y validar con usuarios | Todo el historial en la ficha del cliente y el panel con los cuatro canales | Sí |
+| 4. Operación y extensión | Sostener, medir, emitir el informe mensual y preparar otros equipos o países | Continuidad y decisión de extensión | Sí, para extender |
 
-La etapa 2 funciona antes de la etapa 3: la aplicación ya muestra los intentos por canal y por ejecutivo. Así la solicitud a la región llega respaldada con datos del propio equipo.
+La etapa 2 funciona antes de la etapa 3: el panel ya muestra los intentos por canal y por ejecutivo. Así la solicitud a la región llega respaldada con datos del propio equipo. Hasta la etapa 3, el panel identifica a los clientes por su número; después, por su cuenta.
 
 Cada etapa cierra con una decisión explícita antes de pasar a la siguiente.
 
@@ -95,7 +106,7 @@ Cada etapa cierra con una decisión explícita antes de pasar a la siguiente.
 2. Instalar el conector de Aircall, primero en ambiente de pruebas y luego en producción, con permisos asignados solo al grupo piloto.
 3. Autorizar la integración de WhatsApp: acceso por API con un usuario de integración de permisos mínimos: leer contactos y cuentas para asociar el mensaje, y crear actividades.
 4. Agregar un valor "WhatsApp" en el tipo de actividad.
-5. Crear un tipo de informe de cuentas con y sin actividades, y una carpeta compartida para los informes.
+5. Permitir a esa misma integración leer el conteo de actividades de correo, para sumar el correo al panel.
 
 Es reversible: el conector se desinstala desde la configuración de Salesforce y la integración se apaga revocando su acceso. Las actividades ya registradas permanecen.
 
@@ -125,6 +136,7 @@ Aplican desde el primer día del piloto y deben validarse con el área legal de 
 3. La medida consta en el reglamento interno o en un anexo de contrato: general, impersonal y sin uso disciplinario individual.
 4. Número y aplicación de empresa separados de lo personal. Si se usa el celular propio, acuerdo escrito y costos a cargo de SGS.
 5. Consentimiento del cliente para recibir mensajes de WhatsApp, registrado por contacto.
+6. Acuerdo de tratamiento de datos con Efeonce por el panel: qué datos guarda, dónde, por cuánto tiempo y cómo se eliminan.
 
 La nueva ley chilena de protección de datos personales rige desde el 1 de diciembre de 2026, salvo que se apruebe la postergación que hoy se tramita.
 
@@ -158,6 +170,7 @@ Datos que necesitamos de SGS para dimensionar:
 | Alternativa | Por qué no es la propuesta |
 | --- | --- |
 | Solo capacidades de Salesforce | La telefonía de Salesforce funciona en el escritorio, no en el celular, y exige licencias nuevas y más configuración regional. No permite empezar sin la región |
+| Paneles de Salesforce para la vista de gestión | Refresco manual o programado, tope de paneles por edición, licencia adicional para análisis avanzado, y cada ajuste pasa por la región |
 | Conservar el número y el WhatsApp de cada ejecutivo | Requiere una integración a medida, más difícil de aprobar, y no resuelve bien las llamadas |
 | Herramientas que leen el WhatsApp personal | Incumplen las reglas de WhatsApp y no son aceptables para la seguridad de SGS |
 
@@ -167,9 +180,9 @@ Datos que necesitamos de SGS para dimensionar:
 | --- | --- | --- | --- |
 | 0. Diagnóstico | Conduce y documenta | Define el equipo y entrega los datos | Informa el estado de la plataforma |
 | 1. Correo | Configura lo que corresponde y forma | Reconecta cuentas y valida | Confirma la configuración |
-| 2. Piloto | Configura, forma y mide | Gestiona seguridad y compras; usa | Recibe los resultados |
-| 3. Conexión | Configura el conector, construye la integración de WhatsApp y el informe, y prueba | Valida con usuarios | Aprueba y despliega |
-| 4. Operación | Opera y reporta | Usa y prioriza | Decide la extensión |
+| 2. Piloto | Configura Aircall, pone en marcha el panel, forma y mide | Gestiona seguridad y compras; usa | Recibe los resultados |
+| 3. Conexión | Configura el conector, construye la integración de WhatsApp, suma el correo al panel y prueba | Valida con usuarios | Aprueba y despliega |
+| 4. Operación | Opera, emite el informe mensual y reporta | Usa y prioriza | Decide la extensión |
 
 ### 13. Estructura de la inversión
 
@@ -178,14 +191,15 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 1. Licencias de Aircall por usuario, incluido el complemento de WhatsApp.
 2. Consumo variable: minutos de llamada y mensajes de WhatsApp.
 3. Licencias de Salesforce: ninguna nueva en este esquema.
-4. Servicios de Efeonce por etapa: diagnóstico, configuración, integración de WhatsApp, informe y habilitación.
-5. Operación continua de Efeonce, que incluye el mantenimiento de la integración.
+4. Servicios de Efeonce por etapa: diagnóstico, configuración, integración de WhatsApp y habilitación.
+5. Panel de contactabilidad e informe mensual de Efeonce Insights, como servicio recurrente.
+6. Operación continua de Efeonce, que incluye el mantenimiento de la integración.
 
 ### 14. Riesgos
 
 - **Adopción:** si los ejecutivos siguen usando su número personal en paralelo, el registro queda incompleto. Es el riesgo principal y por eso la habilitación tiene seis pasos.
 - **Número fijo:** algunos clientes pueden no reconocer el número nuevo. Se atiende con el aviso previo y el período de convivencia.
-- **Seguridad:** SGS debe aprobar a Aircall como proveedor antes de la etapa 2.
+- **Seguridad:** SGS debe aprobar a Aircall como proveedor antes de la etapa 2, y a Efeonce como encargado de los datos del panel.
 - **Gobierno:** sin aprobación regional no hay etapa 3. Las etapas 1 y 2 conservan su valor aunque la 3 se demore.
 - **Cuenta de Meta:** WhatsApp de empresa requiere una cuenta de SGS verificada y una persona con permisos sobre ella para dar de alta cada número; puede depender de un área global.
 - **Integración de WhatsApp:** es un desarrollo a medida y la región puede revisarlo con más detalle que un paquete publicado. Por eso su acceso se limita a leer contactos y crear actividades.
@@ -216,6 +230,32 @@ Los montos se completan al conocer el tamaño del equipo piloto.
 Efecto en el diseño: en el móvil el etiquetado de llamadas no se puede hacer obligatorio. El "resultado" del informe debe salir del estado de la llamada (contestada, no contestada, buzón), no de una etiqueta manual.
 
 Preguntas que siguen abiertas para Aircall: confirmación expresa de Chile, y si el registro nativo de WhatsApp en Salesforce existe o está en su hoja de ruta. Lista completa en la sección 9 de la [propuesta de habilitación](PROPUESTA-DE-HABILITACION.md).
+
+### B1b. Panel e informe sobre Efeonce Insights: qué implica para nosotros
+
+Decisión de Julio (2026-10-10): la vista de gestión es un panel externo y se extiende Efeonce Insights para sostenerlo.
+
+Cómo se alimenta, sin leer el CRM completo:
+
+- Llamadas y WhatsApp: del mismo servicio que recibe los eventos de Aircall para escribirlos en Salesforce.
+- Cuenta de cada contacto: del vínculo que la integración ya resuelve al registrar el mensaje. Solo para contactos efectivamente contactados.
+- Correo: conteo de actividades leído de Salesforce, en la etapa 3.
+
+Qué es desarrollo nuevo en Greenhouse:
+
+- Un módulo dueño de las métricas de contactabilidad, del que Insights lea. Hoy Insights solo lee de SEO, AEO e ICO.
+- La ingesta de eventos de Aircall y su almacenamiento por organización.
+- Una superficie de panel vivo. El motor de Insights produce ediciones selladas por ventana de fechas; el panel reutiliza su sistema visual, no su ciclo de ediciones.
+- El alta de SGS como organización con el módulo de Insights, para el informe mensual.
+
+Pendiente antes de comprometer plazo o precio con SGS:
+
+- **Decisión de arquitectura.** Dominio, esquema y frontera del módulo nuevo, y dónde vive el panel. Corresponde un ADR y luego tareas bajo el programa de Insights.
+- **Revisión de seguridad.** SGS evaluará a Efeonce como proveedor que guarda datos de contacto de sus clientes. No sé qué certificaciones tenemos; hay que saberlo antes de la reunión.
+- **Respaldo.** Si seguridad no aprueba datos en nuestra infraestructura, montar el panel dentro del entorno de SGS. No usaría nuestro motor.
+- **Transferencia internacional.** Greenhouse corre fuera de Chile; va en el acuerdo de tratamiento de datos.
+
+Valor más allá de SGS: el módulo sirve a cualquier cliente con Aircall, con Salesforce o con HubSpot.
 
 ### B2. Respecto de la reunión del 29-09
 
