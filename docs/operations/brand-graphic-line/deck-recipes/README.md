@@ -1,9 +1,9 @@
 # Recetas por lámina del deck Efeonce «La órbita»
 
 > **Tipo de documento:** Catálogo operativo (índice humano de un catálogo en JSON)
-> **Versión:** 1.18
+> **Versión:** 1.19
 > **Creado:** 2026-09-27 por Claude
-> **Última actualización:** 2026-10-10 por Claude (1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
+> **Última actualización:** 2026-10-10 por Claude (1.19: la lámina de equipo «Expertos multidisciplinarios» con «+85», variante a mano de `content-team`. Antes, el mismo día, 1.18: el patrón «franjas de foto» aprobado por el operador en dos variantes, candidato a receta. Antes, el mismo día, 1.17: la lámina «Producción con IA» aprobada por el operador — lámina a mano, candidata a receta, con la foto `CT24` en el índice de recetas de cine. Antes, el mismo día, 1.16: la lámina «Día a día» con Marketing Studio aprobada por el operador — uso aprobado de `content-day-tools` en la línea Brand, con la interfaz construida y sus condiciones abiertas. Antes, 2026-10-09, 1.15: el deck Servicios web aprobado por el operador — 29 láminas, línea Engine, sin recetas nuevas ni `approvedUses`; sección «El deck Servicios web». Antes, el mismo día, 1.14: halo del ciclo `method-surround-cycle` recortado en un
 > cuadrado, resuelto en la receta; fila en «Abiertos de las nueve SEO/AEO».
 > Antes, 2026-10-06, 1.13: el brochure Agencia Creativa aprobado por el operador — 27
 > láminas: 7 usos aprobados de recetas existentes, cada uno con su `fit`, y 20 láminas a mano que quedan como candidatas
@@ -404,6 +404,35 @@ excepciones aprobadas (varias esferas, foto de cine recortada, degradado bajo el
 - **Plates:** CT10, CT8, CT3, CT2, CT6 y CT7 en «Seis frentes»; CT18, CT22 y CT23 en «Momentos»; CT17, CT15 y CT14 en
   «Programas» (según la sesión que armó el deck). De esos, sólo `CT24` está hoy en el índice de recetas de cine, y no
   pertenece a estas láminas.
+
+## La lámina de equipo «Expertos multidisciplinarios» (aprobada el 2026-10-10)
+
+El operador pidió canonizar la lámina de equipo del deck de Marketing de Contenidos (línea `brand`) con su cifra: «Esto
+también con los +85 expertos me interesa canonizar». Es una **variante a mano de `content-team`**, no una receta nueva.
+
+- **Qué cambia frente a la receta:** el titular es «Expertos multidisciplinarios» (Bricolage 760 a 80 px, para que la
+  palabra larga no toque las fichas) en vez de «Personas reales», que el operador descartó; hay tres filas con ícono
+  Plastilina plano; y se suma un bloque de cifra, «+85» a 176 px con el «+» en el acento, junto a «expertos más en
+  Latam» y la línea «La red de Efeonce detrás de tu squad.».
+- **Lo que conserva:** eyebrow «Tu equipo», pregunta «¿Quién trabaja en mi marca?», la bajada del interlocutor único,
+  cinco fichas con retratos del catálogo (`deck-axis/assets/squad/`), la ficha central más grande y la órbita con «Tu
+  marca al centro de todo».
+- **Personas y cargos:** Andrés y Melkin (Senior Visual Designer), Valentina (Content Lead), Daniela (Creative
+  Operations Lead) y Julio al centro como «Responsable de Cuenta». Los cargos coinciden con los del
+  [roster](../../brand-photography/EFEONCE_TEAM_ROSTER_V1.md) (verificado el 2026-10-10); «Responsable de Cuenta» es el
+  rol de Julio en la cuenta, no su cargo (Managing & GTM Director).
+- **Estado en el catálogo:** variante aprobada, sin plantilla. Fuente:
+  `ai-generations/2026-10-09_deck-contenidos/laminas/expertos-multidisciplinarios.dc.html` y `equipo.generador.py`. Para
+  promoverla, `content-team` tendría que admitir un titular más largo a menor tamaño y un bloque de cifra.
+- **Condiciones abiertas, las decide el operador:**
+  - **La cifra 85 viene del operador y no tiene fuente en el repo.** La lámina no dice qué cuenta (personas del equipo,
+    red de colaboradores) ni a qué fecha. Si cambia, se actualiza en la lámina.
+  - El titular mide 80 px y la pregunta 38 px: no llega a las tres veces que pide la voz. En esta lámina el elemento
+    dominante es la cifra.
+  - La bajada, las tres filas y «La red de Efeonce detrás de tu squad.» los redactó la sesión; el operador aprobó el
+    deck en conjunto.
+  - El acento aparece cuatro veces (esfera, «+», filete de la ficha central y arco de la órbita). No rompe la regla: es
+    un solo color de acento y una sola esfera.
 
 ## Anatomía de una receta (campos del JSON)
 
