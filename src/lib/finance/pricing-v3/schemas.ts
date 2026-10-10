@@ -39,6 +39,17 @@ export const sourceSchema = z
   .strict()
   .refine(value => value.effectiveFrom <= value.effectiveUntil, 'Invalid validity interval')
 
+const discountAdjustmentSchema = z
+  .object({
+    adjustmentId: id,
+    kind: z.literal('discount'),
+    rate: fraction,
+    lineIds: z.array(id).min(1),
+    reason: z.string().min(1)
+  })
+  .strict()
+
+/** Contract 1.0.0. Frozen: artifacts signed by `pricing-v3-local/1.0.0` replay through it byte for byte. */
 export const pricingV3RequestSchema = z
   .object({
     schemaVersion: z.literal('1.0.0'),
@@ -91,19 +102,7 @@ export const pricingV3RequestSchema = z
       )
       .min(1)
       .max(100),
-    adjustments: z
-      .array(
-        z
-          .object({
-            adjustmentId: id,
-            kind: z.literal('discount'),
-            rate: fraction,
-            lineIds: z.array(id).min(1),
-            reason: z.string().min(1)
-          })
-          .strict()
-      )
-      .max(1),
+    adjustments: z.array(discountAdjustmentSchema).max(1),
     taxTreatment: z.union([
       z.object({ kind: z.literal('not_resolved') }).strict(),
       z.object({ kind: z.literal('not_applicable'), reason: z.string().min(1) }).strict(),
@@ -221,8 +220,84 @@ export const pricingV3InputSchema = z
   })
   .strict()
 
+// Contract 1.1.0 extends 1.0.0; it never replaces it. A behaviour change is a new contract plus a new engine in the
+// registry below, so a frozen artifact keeps replaying with the engine that signed it.
+const agreedNetAdjustmentSchema = z
+  .object({
+    adjustmentId: id,
+    kind: z.literal('agreed_net'),
+    // Agreed net in the output currency for the rows of `billing` class of `lineIds`, per period.
+    amount: decimal,
+    billing: z.enum(['monthly', 'setup']),
+    lineIds: z.array(id).min(1),
+    reason: z.string().min(1)
+  })
+  .strict()
+
+export const pricingV3AdjustmentSchemaV11 = z.discriminatedUnion('kind', [
+  discountAdjustmentSchema,
+  agreedNetAdjustmentSchema
+])
+
+export const PRICING_V3_MAX_ADJUSTMENTS_V11 = 10
+
+/** Commercial rounding rule, in the output currency: every priced row is raised to the next `multiple`. */
+export const pricingV3PriceRoundingSchema = z.object({ multiple: positive, source: sourceSchema }).strict()
+
+export const pricingV3RequestSchemaV11 = pricingV3RequestSchema
+  .extend({
+    schemaVersion: z.literal('1.1.0'),
+    adjustments: z.array(pricingV3AdjustmentSchemaV11).max(PRICING_V3_MAX_ADJUSTMENTS_V11)
+  })
+  .strict()
+
+export const pricingV3SnapshotSchemaV11 = pricingV3SnapshotSchema
+  .extend({ schemaVersion: z.literal('1.1.0'), priceRounding: pricingV3PriceRoundingSchema.optional() })
+  .strict()
+
+export const pricingV3InputSchemaV11 = z
+  .object({
+    request: pricingV3RequestSchemaV11,
+    snapshot: pricingV3SnapshotSchemaV11
+  })
+  .strict()
+
+/** `PricingV3Input`, `PricingV3Request` and `PricingV3Snapshot` are contract 1.0.0, as every existing consumer types them. */
 export type PricingV3Input = z.infer<typeof pricingV3InputSchema>
 export type PricingV3Request = PricingV3Input['request']
 export type PricingV3Snapshot = PricingV3Input['snapshot']
+export type PricingV3InputV11 = z.infer<typeof pricingV3InputSchemaV11>
+export type PricingV3RequestV11 = PricingV3InputV11['request']
+export type PricingV3SnapshotV11 = PricingV3InputV11['snapshot']
+export type PricingV3AdjustmentV11 = PricingV3RequestV11['adjustments'][number]
+export type PricingV3PriceRounding = z.infer<typeof pricingV3PriceRoundingSchema>
+export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11
 export type PricingV3Source = z.infer<typeof sourceSchema>
-export const ENGINE_VERSION = 'pricing-v3-local/1.0.0'
+
+/**
+ * Closed registry: input contract version -> engine that signs its result. Request and snapshot declare the same
+ * version; the engine never infers or upgrades it. Replay accepts exactly the engines listed here.
+ */
+export const PRICING_V3_ENGINES = {
+  '1.0.0': 'pricing-v3-local/1.0.0',
+  '1.1.0': 'pricing-v3-local/1.1.0'
+} as const
+
+export type PricingV3ContractVersion = keyof typeof PRICING_V3_ENGINES
+export type PricingV3EngineVersion = (typeof PRICING_V3_ENGINES)[PricingV3ContractVersion]
+
+export const isPricingV3EngineVersion = (value: unknown): value is PricingV3EngineVersion =>
+  Object.values(PRICING_V3_ENGINES).some(engine => engine === value)
+
+/**
+ * Parse with the schema of the version the request declares. Anything that does not declare a later registered
+ * contract (1.0.0, an unknown version, no version, not an object) is judged by contract 1.0.0, so its diagnostics
+ * stay what they always were. A union of both schemas would bury them under `invalid_union`.
+ */
+export function parsePricingV3Input(raw: unknown) {
+  const declared = (raw as { request?: { schemaVersion?: unknown } } | null | undefined)?.request?.schemaVersion
+
+  return declared === '1.1.0'
+    ? { contract: '1.1.0' as const, parsed: pricingV3InputSchemaV11.safeParse(raw) }
+    : { contract: '1.0.0' as const, parsed: pricingV3InputSchema.safeParse(raw) }
+}

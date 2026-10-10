@@ -1,7 +1,12 @@
 import { PricingV3Error } from './errors'
 import type { PricingV3Artifact } from './adapters/local-snapshot'
 
-/** Internal caller supplies a verified artifact. This allowlist is not an authorization mechanism. */
+/**
+ * Internal caller supplies a verified artifact. This allowlist is not an authorization mechanism.
+ *
+ * It serves every contract unchanged: the client sees `net`, which is the final net (after commercial rounding,
+ * discount and uplift). Rounding, uplift and discount breakdowns are internal and are never listed here.
+ */
 export function projectPricingV3ForClient(artifact: PricingV3Artifact) {
   const { input, result } = artifact.semantic
 

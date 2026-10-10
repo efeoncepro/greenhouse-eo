@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 
 import { stableJson } from './local-snapshot'
 import { changeCatalog, validateCatalog } from '../catalog/catalog'
-import { explainCostComponents } from '../catalog/explain'
+import { explainCommercialAdjustments, explainCostComponents } from '../catalog/explain'
 import { calculateCatalogQuote, QUOTE_VERSION } from '../catalog/quote'
 import { changeSetSchema } from '../catalog/contracts'
 import { PricingV3Error } from '../errors'
@@ -57,7 +57,8 @@ export function explainCatalogQuote(raw: unknown) {
     factorAndFxReferences: result.resolution.bindings.filter(b =>
       ['talent_factor', 'market_factor', 'fx'].includes(b.purpose)
     ),
-    costBreakdown: explainCostComponents(result)
+    costBreakdown: explainCostComponents(result),
+    commercialAdjustments: explainCommercialAdjustments(result)
   }
 }
 

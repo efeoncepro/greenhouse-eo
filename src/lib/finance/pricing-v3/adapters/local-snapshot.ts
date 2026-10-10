@@ -4,9 +4,9 @@ import Decimal from 'decimal.js'
 
 import { calculatePricingV3 } from '../calculate'
 import { PricingV3Error } from '../errors'
-import { ENGINE_VERSION, pricingV3InputSchema } from '../schemas'
+import { isPricingV3EngineVersion, parsePricingV3Input } from '../schemas'
 import type { PricingV3Result } from '../calculate'
-import type { PricingV3Input } from '../schemas'
+import type { PricingV3AnyInput } from '../schemas'
 
 export function stableJson(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`
@@ -26,20 +26,24 @@ const ExactDecimal = Decimal.clone({ precision: 80 })
 
 const hash = (value: unknown) => createHash('sha256').update(stableJson(value)).digest('hex')
 
+type Amounts = Partial<Record<'roundingAdjustment' | 'uplift', string>> &
+  Record<'cost' | 'undiscountedPrice' | 'discount' | 'net' | 'marginAmount', string>
+
 export type PricingV3Artifact = {
   artifactVersion: 'pricing-v3-local-artifact/1'
   calculationId: string
   replayDigest: string
-  semantic: { engineVersion: string; input: PricingV3Input; result: PricingV3Result }
+  semantic: { engineVersion: string; input: PricingV3AnyInput; result: PricingV3Result }
   execution: { createdAt: string }
 }
 
 export function runPricingV3(input: unknown, createdAt = new Date().toISOString()) {
   const result = calculatePricingV3(input)
-  const parsed = pricingV3InputSchema.safeParse(input)
+  const { parsed } = parsePricingV3Input(input)
 
   if (!parsed.success) return { result, artifact: null }
-  const semantic = { engineVersion: ENGINE_VERSION, input: parsed.data, result }
+  // The engine is the one of the input's contract, as signed on the result; there is no "current" engine.
+  const semantic = { engineVersion: result.engineVersion, input: parsed.data, result }
   const replayDigest = hash(semantic)
 
   const artifact: PricingV3Artifact = {
@@ -53,14 +57,14 @@ export function runPricingV3(input: unknown, createdAt = new Date().toISOString(
   return { result, artifact }
 }
 
-/** Verify frozen content AND recompute with the exact supported engine; never load today's catalog. */
+/** Verify frozen content AND recompute with the registered engine that signed it; never load today's catalog. */
 export function replayPricingV3(raw: unknown): PricingV3Artifact {
   if (!raw || typeof raw !== 'object') throw new PricingV3Error('REPLAY_MISMATCH')
   const artifact = raw as PricingV3Artifact
 
   if (
     artifact.artifactVersion !== 'pricing-v3-local-artifact/1' ||
-    artifact.semantic?.engineVersion !== ENGINE_VERSION ||
+    !isPricingV3EngineVersion(artifact.semantic?.engineVersion) ||
     hash(artifact.semantic) !== artifact.replayDigest
   )
     throw new PricingV3Error('REPLAY_MISMATCH')
@@ -98,10 +102,14 @@ export function comparePricingV3(left: unknown, right: unknown) {
   const differences =
     matchingCurrency && totalsA && totalsB
       ? Object.fromEntries(
-          (['cost', 'undiscountedPrice', 'discount', 'net', 'marginAmount'] as const).map(key => [
-            key,
-            new ExactDecimal(totalsB[key]).minus(totalsA[key]).toString()
-          ])
+          // 1.1.0 amounts are compared only when both sides carry them; a 1.0.0 comparison keeps its shape.
+          (['cost', 'undiscountedPrice', 'roundingAdjustment', 'discount', 'uplift', 'net', 'marginAmount'] as const)
+            .map(key => [key, (totalsA as Amounts)[key], (totalsB as Amounts)[key]] as const)
+            .flatMap(([key, before, after]) =>
+              before === undefined || after === undefined
+                ? []
+                : [[key, new ExactDecimal(after).minus(before).toString()]]
+            )
         )
       : null
 

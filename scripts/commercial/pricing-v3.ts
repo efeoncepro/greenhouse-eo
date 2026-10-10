@@ -417,7 +417,8 @@ try {
         'pricing',
         'talent_factor',
         'market_factor',
-        'fx'
+        'fx',
+        'price_rounding'
       ] as const
 
       if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number]))

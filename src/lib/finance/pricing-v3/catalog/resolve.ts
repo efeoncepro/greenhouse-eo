@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 
-import type { PricingV3Input } from '../schemas'
+import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV11 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
 import { briefSchema } from './contracts'
 import type { CatalogRecord, Diagnostic } from './contracts'
@@ -8,6 +8,11 @@ import type { CatalogRecord, Diagnostic } from './contracts'
 const D = Decimal.clone({ precision: 80 })
 
 type Row<K extends CatalogRecord['kind']> = Extract<CatalogRecord, { kind: K }>
+
+// Built as the widest contract; `schemaVersion` says which one each quote declares and the kernel parses it as such.
+type KernelSnapshot = Omit<PricingV3InputV11['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+type KernelRequest = Omit<PricingV3InputV11['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+
 type KitAssignment = {
   requirement: Row<'kit'>['value']['requirements'][number]
   resource: Row<'resource'> | undefined
@@ -20,7 +25,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   const diagnostics: Diagnostic[] = []
   const assumptions: Diagnostic[] = []
   const bindings: { lineId: string; purpose: string; record: CatalogRecord }[] = []
-  const inputs: { periodId: number; input: PricingV3Input }[] = []
+  const inputs: { periodId: number; input: PricingV3AnyInput }[] = []
 
   if (!parsed.success)
     return {
@@ -79,6 +84,32 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   )
 
   if (market) bind('*', 'market_factor', market)
+
+  // Commercial rounding is per output currency; the rule of the offer prevails over the general one. No rule, no
+  // rounding. Two rules of the prevailing level cannot be ranked, so they block instead of picking one.
+  const roundingRules = kind('price_rounding').filter(r => r.value.currency === brief.outputCurrency)
+  const offerRules = roundingRules.filter(r => r.value.offerId === brief.offerId)
+  const applicableRules = offerRules.length ? offerRules : roundingRules.filter(r => !r.value.offerId)
+  const rounding = applicableRules.length === 1 ? applicableRules[0] : undefined
+
+  if (applicableRules.length > 1)
+    diagnostics.push({
+      code: 'AMBIGUOUS_PRICE_ROUNDING',
+      path: 'priceRounding',
+      candidates: applicableRules.map(r => r.recordId)
+    })
+
+  if (rounding) {
+    if (rounding.source.status === 'pending') diagnostics.push({ code: 'PENDING_CATALOG_VALUE', path: 'priceRounding' })
+    bind('*', 'price_rounding', rounding)
+  }
+
+  // Contract 1.1.0 only when the frozen inputs use what 1.0.0 cannot express; everything else stays 1.0.0, so a quote
+  // frozen before 1.1.0 existed resolves to the contract and digest it was signed with. Same answer for every period.
+  const contract: PricingV3ContractVersion =
+    applicableRules.length > 0 || brief.adjustments.length > 1 || brief.adjustments.some(a => a.kind !== 'discount')
+      ? '1.1.0'
+      : '1.0.0'
 
   const selected = brief.lines.flatMap(line => {
     const path = `lines.${line.lineId}`
@@ -279,14 +310,16 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   if (brief.mode === 'commercial_draft' && bindings.some(b => b.record.source.status !== 'confirmed'))
     diagnostics.push({ code: 'UNCONFIRMED_COMMERCIAL_SELECTION', path: 'bindings' })
   const chargedOnce = new Set<string>()
+  const setupAgreed = brief.adjustments.filter(a => a.kind === 'agreed_net' && a.billing === 'setup')
+  const landed = new Set<string>()
 
   for (let periodId = 1; periodId <= brief.periods; periodId++) {
     const active = selected.filter(s => s.periods.includes(periodId))
 
     if (!active.length) continue
 
-    const snapshot: PricingV3Input['snapshot'] = {
-      schemaVersion: '1.0.0',
+    const snapshot: KernelSnapshot = {
+      schemaVersion: contract,
       snapshotId: `selection-period-${periodId}`,
       version: catalog.version,
       mode: catalog.mode,
@@ -299,11 +332,12 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       resources: [],
       talentFactors: talentFactors.map(r => ({ ...r.value, source: r.source })),
       marketFactors: market ? [{ ...market.value, source: market.source }] : [],
-      fx: fx.map(r => ({ ...r.value, source: r.source }))
+      fx: fx.map(r => ({ ...r.value, source: r.source })),
+      ...(rounding ? { priceRounding: { multiple: rounding.value.multiple, source: rounding.source } } : {})
     }
 
-    const request: PricingV3Input['request'] = {
-      schemaVersion: '1.0.0',
+    const request: KernelRequest = {
+      schemaVersion: contract,
       quoteDate: brief.quoteDate,
       offerId: brief.offerId,
       deliveryModel: 'staffing',
@@ -347,6 +381,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     }
 
     const newlyCharged = new Set<string>()
+    const setupLines = new Set<string>()
 
     for (const s of active) {
       const profileId = `selected-profile-${active.indexOf(s)}`
@@ -376,7 +411,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
         snapshot.allocationPolicies.push({ ...s.allocation.value, source: s.allocation.source })
       snapshot.pricingPolicies.push({ ...s.pricing.value, profileId, source: s.pricing.source })
 
-      const line: PricingV3Input['request']['lines'][number] = {
+      const line: KernelRequest['lines'][number] = {
         lineId: s.line.lineId,
         profileId,
         seniorityCode: s.profile.value.seniorityCode,
@@ -445,15 +480,31 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
           share,
           cashTiming: resource.value.unit === 'month' ? 'monthly' : 'start'
         })
-        if (resource.value.unit === 'once') newlyCharged.add(onceKey)
+
+        if (resource.value.unit === 'once') {
+          newlyCharged.add(onceKey)
+          setupLines.add(s.line.lineId)
+        }
       }
 
       request.lines.push(line)
     }
 
+    // Each period is its own kernel input and setup rows exist only where a one-time resource is charged: an agreed
+    // setup net goes to those periods alone. Anywhere else the kernel would have no row to apply it to.
+    request.adjustments = request.adjustments.filter(
+      a => a.kind !== 'agreed_net' || a.billing !== 'setup' || a.lineIds.some(id => setupLines.has(id))
+    )
+    request.adjustments.forEach(a => landed.add(a.adjustmentId))
     newlyCharged.forEach(k => chargedOnce.add(k))
-    inputs.push({ periodId, input: { request, snapshot } })
+    inputs.push({ periodId, input: { request, snapshot } as PricingV3AnyInput })
   }
+
+  // Same condition the kernel names, seen across the whole term: no period has a setup row for this agreed net.
+  if (selected.length === brief.lines.length)
+    for (const a of setupAgreed)
+      if (!landed.has(a.adjustmentId))
+        diagnostics.push({ code: 'AGREED_NET_WITHOUT_BASE', path: `adjustments.${a.adjustmentId}` })
 
   return {
     status: diagnostics.length ? ('needs_input' as const) : ('resolved' as const),

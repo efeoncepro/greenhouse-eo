@@ -1,9 +1,26 @@
 import Decimal from 'decimal.js'
 
-import { ENGINE_VERSION, pricingV3InputSchema } from './schemas'
-import type { PricingV3Input, PricingV3Source } from './schemas'
+import { PRICING_V3_ENGINES, parsePricingV3Input } from './schemas'
+import type {
+  PricingV3AdjustmentV11,
+  PricingV3ContractVersion,
+  PricingV3Input,
+  PricingV3PriceRounding,
+  PricingV3Source
+} from './schemas'
 
 const D = Decimal.clone({ precision: 80, rounding: Decimal.ROUND_HALF_UP })
+
+/** Each contract names its own arithmetic; a result is never relabelled with the policy of another version. */
+export const PRICING_V3_PRECISION_POLICIES = {
+  '1.0.0': 'decimal-80-half-up-final-line-largest-remainder-v1',
+  '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2'
+} as const
+
+// "Met the floor before rounding" is read on the unrounded amounts, whose last digits are division noise: a price
+// built as cost / (1 - floor) lands a hair above or below the floor by chance. Reading the rate at 60 of the 80
+// working digits makes that case deterministic. MARGIN_BELOW_FLOOR itself keeps comparing without any tolerance.
+const UNROUNDED_COMPLIANCE_DIGITS = 60
 
 type Diagnostic = {
   code: string
@@ -40,8 +57,28 @@ type Billable = {
   minimumMargin: string
 }
 
-export type PricingV3Result = {
-  engineVersion: string
+type Totals = {
+  cost: string
+  undiscountedPrice: string
+  discount: string
+  net: string
+  marginAmount: string
+  marginRate: string | null
+  tax: string | null
+  grandTotal: string | null
+  cashCommitment: string
+  uniformMonthlyNet: string | null
+}
+
+/** Contract 1.1.0 only. Identity per row and in totals: net = undiscountedPrice + uplift - discount. */
+type CommercialAmounts = {
+  /** Already included in `undiscountedPrice`: the policy price is `undiscountedPrice - roundingAdjustment`. */
+  roundingAdjustment: string
+  uplift: string
+}
+
+type Envelope<Contract extends PricingV3ContractVersion, Line, Sum> = {
+  engineVersion: (typeof PRICING_V3_ENGINES)[Contract]
   binding: false
   calculationStatus: 'calculated' | 'needs_input' | 'invalid'
   reviewStatus: 'within_policy' | 'requires_review' | 'not_evaluated'
@@ -49,30 +86,36 @@ export type PricingV3Result = {
   calculationCurrency: string | null
   outputCurrency: string | null
   diagnostics: Diagnostic[]
-  lines: Billable[]
-  totals: null | {
-    cost: string
-    undiscountedPrice: string
-    discount: string
-    net: string
-    marginAmount: string
-    marginRate: string | null
-    tax: string | null
-    grandTotal: string | null
-    cashCommitment: string
-    uniformMonthlyNet: string | null
-  }
-  precisionPolicy: 'decimal-80-half-up-final-line-largest-remainder-v1'
+  lines: Line[]
+  totals: null | Sum
+  precisionPolicy: (typeof PRICING_V3_PRECISION_POLICIES)[Contract]
 }
+
+export type PricingV3ResultV10 = Envelope<'1.0.0', Billable, Totals>
+export type PricingV3LineV11 = Billable & CommercialAmounts
+export type PricingV3TotalsV11 = Totals & CommercialAmounts
+export type PricingV3ResultV11 = Envelope<'1.1.0', PricingV3LineV11, PricingV3TotalsV11>
+
+/** A 1.0.0 result has no 1.1.0 keys at all (absent, not zero): adding one would change its frozen digest. */
+export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11
+
+type Row = Billable & Partial<CommercialAmounts>
+type Draft = Envelope<PricingV3ContractVersion, Row, Totals & Partial<CommercialAmounts>>
 
 /** Pure calculation: all costs, country policies and FX are supplied, never fetched. */
 export function calculatePricingV3(raw: unknown): PricingV3Result {
-  const parsed = pricingV3InputSchema.safeParse(raw)
-  const diagnostics: Diagnostic[] = []
-  const lines: Billable[] = []
+  return calculate(raw) as PricingV3Result
+}
 
-  const base = (status: PricingV3Result['calculationStatus']): PricingV3Result => ({
-    engineVersion: ENGINE_VERSION,
+// One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys.
+function calculate(raw: unknown): Draft {
+  const { contract, parsed } = parsePricingV3Input(raw)
+  const v11 = contract === '1.1.0'
+  const diagnostics: Diagnostic[] = []
+  const lines: Row[] = []
+
+  const base = (status: PricingV3Result['calculationStatus']): Draft => ({
+    engineVersion: PRICING_V3_ENGINES[contract],
     binding: false,
     calculationStatus: status,
     reviewStatus: 'not_evaluated',
@@ -82,7 +125,7 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
     diagnostics,
     lines: status === 'calculated' ? lines : [],
     totals: null,
-    precisionPolicy: 'decimal-80-half-up-final-line-largest-remainder-v1'
+    precisionPolicy: PRICING_V3_PRECISION_POLICIES[contract]
   })
 
   const report = (code: string, fieldPath: string, severity: Diagnostic['severity'], lineId?: string) => {
@@ -109,6 +152,8 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
   }
 
   const { request: req, snapshot: config } = parsed.data
+  const adjustments: PricingV3AdjustmentV11[] = req.adjustments
+  const rounding: PricingV3PriceRounding | undefined = 'priceRounding' in config ? config.priceRounding : undefined
   const currency = config.currencies.find(item => item.code === req.outputCurrency)
   const baseCurrency = config.currencies.find(item => item.code === config.calculationCurrency)
 
@@ -195,7 +240,7 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
 
   const allocatedCoverage = new Map<string, Decimal>()
   const allocationIds = new Set<string>()
-  const pendingRows: { line: Billable; rawCost: Decimal; rawPrice: Decimal; rawCash: Decimal }[] = []
+  const pendingRows: { line: Row; rawCost: Decimal; rawPrice: Decimal; rawCash: Decimal }[] = []
 
   for (const [index, line] of req.lines.entries()) {
     const path = `request.lines.${index}`
@@ -432,7 +477,9 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
             label: profile.label,
             cost: '',
             undiscountedPrice: '',
+            ...(v11 ? { roundingAdjustment: '' } : {}),
             discount: '',
+            ...(v11 ? { uplift: '' } : {}),
             net: '',
             marginAmount: '',
             components: group,
@@ -443,10 +490,36 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
     }
   }
 
-  for (const adjustment of req.adjustments) {
+  for (const adjustment of adjustments) {
     duplicate(adjustment.lineIds, 'request.adjustments.lineIds')
     if (adjustment.lineIds.some(id => !req.lines.some(line => line.lineId === id)))
       report('UNKNOWN_ADJUSTMENT_LINE', 'request.adjustments', 'error')
+  }
+
+  if (v11) {
+    duplicate(
+      adjustments.map(item => item.adjustmentId),
+      'request.adjustments'
+    )
+
+    // A row is a (line, billing class) pair in every period; a discount claims both classes of its lines.
+    const targets = adjustments.flatMap(item =>
+      [...new Set(item.lineIds)].flatMap(lineId =>
+        (item.kind === 'discount' ? (['monthly', 'setup'] as const) : [item.billing]).map(kind => `${kind}:${lineId}`)
+      )
+    )
+
+    if (new Set(targets).size !== targets.length) report('OVERLAPPING_ADJUSTMENTS', 'request.adjustments', 'error')
+
+    for (const [index, item] of adjustments.entries())
+      if (item.kind === 'agreed_net' && currency && new D(item.amount).decimalPlaces() > currency.precision)
+        report('INVALID_AGREED_AMOUNT', `request.adjustments.${index}.amount`, 'error')
+
+    if (rounding) {
+      sourceOk(rounding.source, 'snapshot.priceRounding')
+      if (currency && !new D(rounding.multiple).mod(new D(10).pow(-currency.precision)).isZero())
+        report('INVALID_PRICE_ROUNDING', 'snapshot.priceRounding.multiple', 'error')
+    }
   }
 
   if (req.taxTreatment.kind === 'exclusive') sourceOk(req.taxTreatment.source, 'request.taxTreatment.source')
@@ -458,9 +531,48 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
   const unit = new D(10).pow(-precision)
   const money = (value: Decimal) => value.toFixed(precision, D.ROUND_HALF_UP)
 
+  // Exact count of multiples covering `value`: integer division plus one correction, never ceil(a / b).
+  const ceilDiv = (value: Decimal, by: Decimal) => {
+    const whole = value.divToInt(by)
+
+    return whole.mul(by).lt(value) ? whole.plus(1) : whole
+  }
+
   for (const { line, rawCost, rawPrice } of pendingRows) {
     line.cost = money(rawCost.mul(outputFx))
     line.undiscountedPrice = money(rawPrice.mul(outputFx))
+
+    if (v11) {
+      const policyPrice = new D(line.undiscountedPrice)
+      let rounded = policyPrice
+
+      if (rounding && policyPrice.gt(0)) {
+        const multiple = new D(rounding.multiple)
+        const unroundedPrice = rawPrice.mul(outputFx)
+
+        const compliant = !unroundedPrice
+          .minus(rawCost.mul(outputFx))
+          .div(unroundedPrice)
+          .toSignificantDigits(UNROUNDED_COMPLIANCE_DIGITS)
+          .lt(line.minimumMargin)
+
+        // Floor conservation: a row that met its floor is raised to the smallest multiple that still meets it on the
+        // presented cost. A row that did not is only raised to the next multiple; rounding never repairs a policy.
+        rounded = (
+          compliant
+            ? D.max(
+                ceilDiv(policyPrice, multiple),
+                ceilDiv(new D(line.cost), multiple.mul(new D(1).minus(line.minimumMargin)))
+              )
+            : ceilDiv(policyPrice, multiple)
+        ).mul(multiple)
+      }
+
+      line.roundingAdjustment = money(rounded.minus(policyPrice))
+      line.undiscountedPrice = money(rounded)
+      line.uplift = money(new D(0))
+    }
+
     line.net = line.undiscountedPrice
     line.discount = money(new D(0))
     line.components = line.components.map(component => ({
@@ -470,14 +582,10 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
     lines.push(line)
   }
 
-  const adjustment = req.adjustments[0]
-
-  if (adjustment) {
-    const eligible = lines.filter(line => adjustment.lineIds.includes(line.parentLineId))
-    const gross = eligible.reduce((sum, line) => sum.plus(line.net), new D(0))
-    const total = new D(money(gross.mul(adjustment.rate)))
-
-    const parts = eligible
+  // Proportional split of `total` over `rows` by largest remainder at the currency unit; ties resolve by row id, so
+  // the split never depends on input order. The same routine serves discounts and uplifts.
+  const allocate = (rows: Row[], gross: Decimal, total: Decimal) => {
+    const parts = rows
       .map(line => {
         const raw = gross.isZero() ? new D(0) : total.mul(line.net).div(gross)
         const floor = raw.div(unit).floor().mul(unit)
@@ -491,14 +599,56 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
 
     let residue = total.minus(parts.reduce((sum, part) => sum.plus(part.floor), new D(0)))
 
-    for (const part of parts) {
+    return parts.map(part => {
       const allocated = part.floor.plus(residue.gt(0) ? unit : 0)
 
       if (residue.gt(0)) residue = residue.minus(unit)
-      part.line.discount = money(allocated)
-      part.line.net = money(new D(part.line.net).minus(allocated))
+
+      return { line: part.line, allocated }
+    })
+  }
+
+  const gross = (rows: Row[]) => rows.reduce((sum, line) => sum.plus(line.net), new D(0))
+
+  for (const [index, adjustment] of adjustments.entries()) {
+    const targeted = lines.filter(line => adjustment.lineIds.includes(line.parentLineId))
+
+    if (adjustment.kind === 'discount') {
+      const price = gross(targeted)
+
+      for (const { line, allocated } of allocate(targeted, price, new D(money(price.mul(adjustment.rate))))) {
+        line.discount = money(allocated)
+        line.net = money(new D(line.net).minus(allocated))
+      }
+
+      continue
+    }
+
+    // The agreed net is per period: each period's rows of that billing class must add up to exactly `amount`.
+    const groups = Array.from({ length: req.duration.periods }, (_, i) =>
+      targeted.filter(line => line.kind === adjustment.billing && line.periodId === i + 1)
+    ).filter(rows => rows.length > 0)
+
+    const amount = new D(adjustment.amount)
+
+    if (groups.length === 0 || groups.some(rows => gross(rows).isZero() && amount.gt(0))) {
+      report('AGREED_NET_WITHOUT_BASE', `request.adjustments.${index}`, 'error')
+      continue
+    }
+
+    for (const rows of groups) {
+      const price = gross(rows)
+      const gap = amount.minus(price)
+
+      for (const { line, allocated } of allocate(rows, price, gap.abs())) {
+        if (gap.lt(0)) line.discount = money(allocated)
+        else line.uplift = money(allocated)
+        line.net = money(new D(line.net).plus(gap.lt(0) ? allocated.neg() : allocated))
+      }
     }
   }
+
+  if (diagnostics.some(item => item.severity === 'error')) return base('invalid')
 
   for (const line of lines) {
     line.marginAmount = money(new D(line.net).minus(line.cost))
@@ -506,8 +656,9 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
       report('MARGIN_BELOW_FLOOR', `result.lines.${line.lineId}`, 'review', line.parentLineId)
   }
 
-  const sumLines = (key: 'cost' | 'undiscountedPrice' | 'discount' | 'net' | 'marginAmount') =>
-    lines.reduce((sum, line) => sum.plus(line[key]), new D(0))
+  const sumLines = (
+    key: 'cost' | 'undiscountedPrice' | 'roundingAdjustment' | 'discount' | 'uplift' | 'net' | 'marginAmount'
+  ) => lines.reduce((sum, line) => sum.plus(line[key] ?? 0), new D(0))
 
   const net = sumLines('net')
   const margin = sumLines('marginAmount')
@@ -532,7 +683,9 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
   result.totals = {
     cost: money(sumLines('cost')),
     undiscountedPrice: money(sumLines('undiscountedPrice')),
+    ...(v11 ? { roundingAdjustment: money(sumLines('roundingAdjustment')) } : {}),
     discount: money(sumLines('discount')),
+    ...(v11 ? { uplift: money(sumLines('uplift')) } : {}),
     net: money(net),
     marginAmount: money(margin),
     marginRate: net.isZero() ? null : margin.div(net).toString(),

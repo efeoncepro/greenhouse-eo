@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js'
 
 import { calculatePricingV3 } from '../calculate'
+import type { PricingV3TotalsV11 } from '../calculate'
+import { PRICING_V3_ENGINES } from '../schemas'
 import { resolveBrief } from './resolve'
 import type { Diagnostic } from './contracts'
 
@@ -43,6 +45,13 @@ export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrie
 
     const sums = (key: 'cost' | 'net' | 'undiscountedPrice' | 'discount' | 'marginAmount') =>
       periods.reduce((sum, p) => sum.plus(p.result.totals![key]), new D(0))
+
+    // Resolution declares one contract per quote. The 1.1.0 amounts are summed only for a 1.1.0 quote; a 1.0.0 quote
+    // keeps the key set its artifacts were frozen with (absent, not zero).
+    const v11 = periods.every(p => p.result.engineVersion === PRICING_V3_ENGINES['1.1.0'])
+
+    const commercial = (key: 'roundingAdjustment' | 'uplift') =>
+      periods.reduce((sum, p) => sum.plus((p.result.totals as Partial<PricingV3TotalsV11>)[key] ?? 0), new D(0))
 
     const annual = new Map<string, { first: number; last: number; amount: string }>()
 
@@ -108,7 +117,9 @@ export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrie
     totals = {
       cost: money(cost),
       undiscountedPrice: money(sums('undiscountedPrice')),
+      ...(v11 ? { roundingAdjustment: money(commercial('roundingAdjustment')) } : {}),
       discount: money(sums('discount')),
+      ...(v11 ? { uplift: money(commercial('uplift')) } : {}),
       net: money(net),
       marginAmount: money(margin),
       marginRate: net.gt(0) ? margin.div(net).toString() : null,

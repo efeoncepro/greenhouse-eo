@@ -116,7 +116,10 @@ export function assessCompositionReadiness(result: Composition) {
   }
 }
 
-/** Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin. */
+/**
+ * Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin.
+ * Every amount is a final net (after commercial rounding, discount and uplift); none of those is itemized.
+ */
 export function projectCompositionPreview(result: Composition) {
   if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
     throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')

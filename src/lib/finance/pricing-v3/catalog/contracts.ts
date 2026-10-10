@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
-import { pricingV3RequestSchema, pricingV3SnapshotSchema, sourceSchema } from '../schemas'
+import {
+  pricingV3PriceRoundingSchema,
+  pricingV3RequestSchema,
+  pricingV3RequestSchemaV11,
+  pricingV3SnapshotSchema,
+  sourceSchema
+} from '../schemas'
 
 const id = z.string().min(1).max(120)
 const decimal = z.string().regex(/^(0|[1-9]\d{0,23})(\.\d{1,18})?$/)
@@ -74,7 +80,18 @@ export const catalogRecordSchema = z.union([
   record('pricing', snapshot.pricingPolicies.element.omit({ source: true })),
   record('talent_factor', snapshot.talentFactors.element.omit({ source: true })),
   record('market_factor', snapshot.marketFactors.element.omit({ source: true })),
-  record('fx', snapshot.fx.element.omit({ source: true }))
+  record('fx', snapshot.fx.element.omit({ source: true })),
+  // Commercial rounding, per quoting currency. With `offerId` it governs that offer and prevails over the general rule.
+  record(
+    'price_rounding',
+    z
+      .object({
+        currency: z.string().regex(/^[A-Z]{3}$/),
+        multiple: pricingV3PriceRoundingSchema.shape.multiple,
+        offerId: id.optional()
+      })
+      .strict()
+  )
 ])
 
 export const catalogSchema = z
@@ -165,7 +182,9 @@ export const briefSchema = z
       )
       .min(1)
       .max(100),
-    adjustments: pricingV3RequestSchema.shape.adjustments.default([]),
+    // The 1.1.0 union is a superset: a brief with no adjustment or one discount parses to what it always did, and
+    // resolution only declares contract 1.1.0 when the brief uses more than that.
+    adjustments: pricingV3RequestSchemaV11.shape.adjustments.default([]),
     taxTreatment: pricingV3RequestSchema.shape.taxTreatment.default({ kind: 'not_resolved' })
   })
   .strict()

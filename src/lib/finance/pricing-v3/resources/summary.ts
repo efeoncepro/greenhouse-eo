@@ -1,5 +1,6 @@
 import Decimal from 'decimal.js'
 
+import { describeCommercialTerms } from '../catalog/explain'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -111,7 +112,12 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     calculationStatus: quote.calculationStatus,
     reviewStatus: result.reviewStatus,
     quoteReviewStatus: quote.reviewStatus,
+    // Contract the kernel calculated with: 1.1.0 only when the demand or the catalog uses agreed nets or rounding.
+    engineVersion: quote.periods[0]?.result.engineVersion ?? null,
+    // 1.1.0 totals add `roundingAdjustment` (already inside `undiscountedPrice`) and `uplift`.
     totals: quote.totals,
+    // Adjustments as the frozen demand declares them and the rounding rule in force for the output currency.
+    ...describeCommercialTerms(quote.resolution),
     // `totals.marginRate` keeps the exact stored ratio; this is the same ratio at reading precision.
     marginRateRoundedDown: quote.totals?.marginRate ? ratioForReading(new D(quote.totals.marginRate)) : null,
     // Blockers: complete and in the result's order. A non-empty list is why `totals` is null.

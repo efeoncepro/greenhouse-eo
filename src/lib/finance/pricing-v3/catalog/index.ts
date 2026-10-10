@@ -3,5 +3,5 @@ export type { Catalog, CatalogRecord, Brief, ChangeSet, Diagnostic } from './con
 export { validateCatalog, activeRecords, searchCatalog, changeCatalog } from './catalog'
 export { resolveBrief } from './resolve'
 export { calculateCatalogQuote, QUOTE_VERSION } from './quote'
-export { explainCostComponents } from './explain'
+export { describeCommercialTerms, explainCommercialAdjustments, explainCostComponents } from './explain'
 export { projectCatalogQuote, catalogQuoteMarkdown } from './client'

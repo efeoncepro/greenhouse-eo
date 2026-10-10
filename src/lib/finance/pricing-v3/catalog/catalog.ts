@@ -1,6 +1,10 @@
+import Decimal from 'decimal.js'
+
 import { PricingV3Error } from '../errors'
 import { catalogSchema, changeSetSchema } from './contracts'
 import type { Catalog, CatalogRecord } from './contracts'
+
+const D = Decimal.clone({ precision: 80 })
 
 export function validateCatalog(raw: unknown): Catalog {
   const catalog = catalogSchema.parse(raw)
@@ -38,6 +42,15 @@ export function validateCatalog(raw: unknown): Catalog {
       throw new PricingV3Error('DUPLICATE_KIT_REQUIREMENT')
     if (row.kind === 'cost' && new Set(row.value.components.map(c => c.coverage)).size !== row.value.components.length)
       throw new PricingV3Error('DUPLICATE_COST_COVERAGE')
+
+    if (row.kind === 'price_rounding') {
+      const currency = catalog.currencies.find(c => c.code === row.value.currency)
+
+      if (!currency) throw new PricingV3Error('PRICE_ROUNDING_CURRENCY_NOT_REGISTERED')
+      // A whole number of the currency's minimum unit; the kernel would refuse anything else as INVALID_PRICE_ROUNDING.
+      if (!new D(row.value.multiple).mod(new D(10).pow(-currency.precision)).isZero())
+        throw new PricingV3Error('INVALID_PRICE_ROUNDING_MULTIPLE')
+    }
   }
 
   return catalog
@@ -149,6 +162,8 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
             return r.value.country
           case 'fx':
             return `${r.value.from}:${r.value.to}`
+          case 'price_rounding':
+            return `${r.value.currency}:${r.value.offerId ?? '*'}`
         }
       }
 

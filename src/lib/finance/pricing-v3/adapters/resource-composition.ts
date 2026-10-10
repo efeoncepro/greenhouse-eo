@@ -3,7 +3,7 @@ import { composeResourceQuote } from '../resources/composition'
 import { compositionDemandSchema, compositionPolicySchema } from '../resources/composition-contracts'
 import { creditCatalogSchema } from '../resources/credit-budget'
 import { validateCatalog } from '../catalog/catalog'
-import { explainCostComponents } from '../catalog/explain'
+import { explainCommercialAdjustments, explainCostComponents } from '../catalog/explain'
 import { PricingV3Error } from '../errors'
 
 export const COMPOSITION_VERSION = 'pricing-v3-resource-composition/1'
@@ -65,6 +65,7 @@ export function explainResourceComposition(raw: unknown) {
     calculationId: artifact.calculationId,
     ...result,
     costBreakdown: explainCostComponents(result.quote),
+    commercialAdjustments: explainCommercialAdjustments(result.quote),
     maintenance: 'Frozen policy, demand and catalogs. New prices require a new composition.',
     inventoryStatus: 'Declared simulation; no live assignment or reservation.'
   }

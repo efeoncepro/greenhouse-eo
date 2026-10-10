@@ -1,6 +1,10 @@
 import { PricingV3Error } from '../errors'
 import type { calculateCatalogQuote } from './quote'
 
+/**
+ * Client allowlist. `amount` and `totals.net` are the final net of every contract (after commercial rounding,
+ * discount and uplift). How that net was reached (rounding, uplift, discount) is internal and is never listed here.
+ */
 export function projectCatalogQuote(result: ReturnType<typeof calculateCatalogQuote>, calculationId: string) {
   if (result.calculationStatus !== 'calculated' || result.reviewStatus !== 'within_policy' || !result.totals)
     throw new PricingV3Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')

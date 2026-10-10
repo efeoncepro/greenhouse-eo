@@ -25,7 +25,7 @@
       "code": "LOCALIZED_TALENT_COSTS",
       "owner": "People/Finance",
       "required": "Current salary/honorarium, location, burden, bonus and cost coverage by profile variant",
-      "known": "Only historicalExcel values supplied; not request same data again or assert local salary."
+      "known": "Only historicalExcel values supplied; not request same data again or assert local salary. On 2026-10-10 the CEO, author of the pricing workbook, confirmed its salary values are valid; country and effective date per record remain unpopulated in the catalog"
     },
     {
       "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
@@ -78,8 +78,8 @@
     {
       "code": "MARGIN_FLOOR_SCOPE",
       "owner": "CEO",
-      "required": "Confirmation that the 45% Creative practice floor governs every managed service offer",
-      "known": "creative-managed-service encodes target and minimum margin 0.45 from the floor approved 2026-07-13. On 2026-10-10 the CEO confirmed the floor stays the norm and that SKY social care 2027 (CLP 4,990,000 per month, 40.26% modeled margin) is an approved exception because SKY is an existing client. Whether the floor governs managed services outside the Creative practice is still open"
+      "required": "Nothing further: decided. A managed service whose target should sit above the floor gets a higher target in its own pricing policy",
+      "known": "Decided by the CEO on 2026-10-10: 45% is the margin floor for managed services, and a service where more can be earned raises its target, not the floor. creative-managed-service encodes target and minimum 0.45 from the floor approved 2026-07-13. SKY social care 2027 (CLP 4,990,000 per month, 40.26% modeled margin) is an approved exception because SKY is an existing client"
     },
     {
       "code": "FLOOR_PRICE_ROUNDS_UNDER_FLOOR",
