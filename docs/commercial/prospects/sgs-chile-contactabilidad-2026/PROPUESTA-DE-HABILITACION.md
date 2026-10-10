@@ -4,6 +4,8 @@
 
 **Estado:** propuesta de trabajo de Efeonce, resultado de cuatro investigaciones de mercado con verificación de los puntos decisivos. No enviada. Alimenta la próxima versión del [caso de negocio](CASO-DE-NEGOCIO.md).
 
+**Decisión (2026-10-10):** Julio aprobó proponer la variante A, número de empresa en Aircall. El [caso de negocio](CASO-DE-NEGOCIO.md) versión 4 ya la recoge. La variante B queda como respaldo para WhatsApp.
+
 ## 1. Qué proponemos
 
 Un programa de trazabilidad comercial en cuatro capas. Cada capa entrega algo útil por sí sola y deja preparada la siguiente.
