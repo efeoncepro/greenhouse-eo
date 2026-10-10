@@ -1,14 +1,14 @@
 # Product Design 360 — ficha de servicio
 
-> **Familia:** Wave · sexta familia, **aprobada por el operador el 2026-10-09**
-> **Estado:** **Aprobada por el operador el 2026-10-09** («Si, incluyela como algo definitivo por qué está aprobado»). Hasta esa fecha figuraba como `Proposed` (sólo pilotos gobernados por SOW). La aprobación cubre el estatus de la familia y su presentación como definitiva en el collateral; precios, piso de margen por lane y posición de Legal siguen los gates del modelo económico
+> **Familia:** Wave · sexta familia, **aprobada por el operador** (2026-10-09; aprobación total el 2026-10-10)
+> **Estado:** **Aprobada por el operador.** El 2026-10-09 la aprobó como sexta familia («Si, incluyela como algo definitivo por qué está aprobado») y el 2026-10-10 extendió la aprobación a todo («Todo product design hay que ponerlo aprobado»): la familia, su ADR propio, su modelo de negocio, esta ficha, el nombre público «Product Design 360» y su venta. Hasta el 2026-10-09 figuraba como `Proposed` (sólo pilotos gobernados por SOW); eso ya no rige. Los gates G1–G6 del modelo quedan como validación posterior a la aprobación. Lo aprobó el operador: no hay precios publicados en esta ficha ni una revisión de Legal o de Finance registrada
 > **Owner:** Wave + Design
 > **Versión:** 1.1 — reorganizada por cómo se compra, no por disciplina
-> **Fecha:** 2026-09-10 · estado actualizado el 2026-10-09
-> **Modelo económico:** [`Product Design 360 — Business Model V1.1`](../../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md)
-> **Decisión propia:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (su encabezado todavía dice `Proposed`; falta sincronizarlo con la aprobación del 2026-10-09)
+> **Fecha:** 2026-09-10 · estado actualizado el 2026-10-09 y el 2026-10-10
+> **Modelo económico:** [`Product Design 360 — Business Model V1.1`](../../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Approved` por el operador el 2026-10-10)
+> **Decisión propia:** [`EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md`](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Accepted` — aprobada por el operador el 2026-10-10)
 > **Landing pública:** [`TASK-1859`](../../tasks/to-do/TASK-1859-landing-product-design-360.md) — superficie de producto; la de sitio público es `TASK-1345`
-> **Decisión de portfolio:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) — [delta 2026-10-09](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-09--product-design-360-aprobada): la sexta familia queda **aprobada**
+> **Decisión de portfolio:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md) — [delta 2026-10-09](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-09--product-design-360-aprobada): la sexta familia queda **aprobada** · [delta 2026-10-10](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-10--aprobación-total-de-product-design-360): aprobación total
 > **Collateral:** lámina 13 del brochure «Servicios web y digitales» — ver [Collateral comercial](README.md#collateral-comercial)
 
 ---

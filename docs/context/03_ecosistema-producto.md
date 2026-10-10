@@ -14,7 +14,7 @@ Ver [`Efeonce Content-to-Capability Loop V1`](../strategy/EFEONCE_CONTENT_TO_CAP
 
 Efeonce tiene cinco plataformas/product houses de software propietario, en distinta madurez:
 
-> **Nota de portfolio:** Wave es la product house de la capa de producto de sus Product Services digitales. Sus cinco familias base pueden componerse en Product Services como **Experience LaunchOps** y **Agentic Readiness**. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo, boundaries y separación administrativa con Greenhouse viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el [ADR de Wave Product Platform](../architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).
+> **Nota de portfolio:** Wave es la product house de la capa de producto de sus Product Services digitales. Sus seis familias base —Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms, Digital Automation & Integrations y **Product Design 360** (sexta familia, aprobada por el operador el 2026-10-09 y el 2026-10-10)— pueden componerse en Product Services como **Experience LaunchOps** y **Agentic Readiness**. Puede nombrarse como producto frente al cliente, siempre bajo la relación Efeonce. Su modelo, boundaries y separación administrativa con Greenhouse viven en [`Wave Business Model V1`](../business-models/wave/WAVE_BUSINESS_MODEL_V1.md) y el [ADR de Wave Product Platform](../architecture/EFEONCE_WAVE_PRODUCT_PLATFORM_GREENHOUSE_ADMINISTRATION_DECISION_V1.md).
 
 | Plataforma | Territorio | ICP | GTM | Estado |
 |---|---|---|---|---|

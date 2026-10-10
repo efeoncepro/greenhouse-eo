@@ -88,6 +88,11 @@ Los estados del scheduler los define Growth Meetings; esta tabla fija lo que la 
 
 La navegación y la indexación dependen del estado del business model (ver Publication Gate del wireframe).
 
+> **Delta 2026-10-10 — gate de estado cumplido.** El business model de Product Design 360 está `Approved` por
+> decisión del operador («Todo product design hay que ponerlo aprobado») y su escalera de estados quedó superada:
+> donde la tabla pide `Approved for validation` o `Commercially approved`, léase `Approved`. Las fases se conservan
+> como orden de salida; las abre el trabajo propio de la task y la autorización del operador para publicar.
+
 | Fase | Business model | Cómo se llega | Robots / sitemap | Menú y enlaces | Scheduler |
 |---|---|---|---|---|---|
 | A | `Proposed` | preview privada | no pública | ninguno | `not-promoted` |

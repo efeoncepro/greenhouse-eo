@@ -108,7 +108,7 @@ Las capas 2 y 3 son oficio que se ejecuta con rigor (módulo 10 del oficio).
 | Eventos de app, atribución, SDK de medición | Measurement & Analytics (Wave) | La extensión define qué hay que medir |
 | App Intents, deep links, Engage SDK, Smart App Banner | Ingeniería del cliente o Web Experience 360 | La extensión especifica; no programa |
 | App o plugin dentro de ChatGPT | Agent Systems & Platforms (Wave) | No es ASO |
-| Producto y UX de la app | Cliente o Product Design 360 (propuesta) | Los temas de las reseñas alimentan su backlog |
+| Producto y UX de la app | Cliente o Product Design 360 | Los temas de las reseñas alimentan su backlog |
 
 ## 6. Delivery y operating mode
 

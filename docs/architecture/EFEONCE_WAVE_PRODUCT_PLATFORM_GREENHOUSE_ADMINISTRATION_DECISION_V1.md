@@ -83,7 +83,10 @@ La decisión aplica a:
 5. Digital Automation & Integrations.
 
 Sobre estas familias, Wave puede construir Product Services compuestos. **Experience LaunchOps** y **Agentic Readiness**
-son los primeros ejemplos documentados; ninguno crea una sexta familia. Experience LaunchOps integra web, Search/AEO,
+son los primeros ejemplos documentados; ninguno crea una familia nueva (la sexta familia de Wave es Product Design 360,
+aprobada por el operador el 2026-10-09 y el 2026-10-10; ver el
+[ADR de boundaries](EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-10--aprobación-total-de-product-design-360)).
+Experience LaunchOps integra web, Search/AEO,
 measurement, agentes, automatización, governance y release. Agentic Readiness funciona como diagnóstico/wedge y puede
 abrir esas mismas rutas de expansión.
 

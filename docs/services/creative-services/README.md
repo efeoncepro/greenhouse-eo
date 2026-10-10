@@ -150,7 +150,8 @@ Antes de convertir un servicio en `Commercially approved`, su ficha debe declara
 - **Media & Distribution:** performance creative, distribución y medios. Reach puede habilitar la capacidad; el laboratorio creativo puede
   componer esta línea, pero no sustituye su ownership.
 - **Wave:** ownership de Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems &
-  Platforms y Digital Automation & Integrations. Creative Services puede aportar assets, pero no asume esas familias.
+  Platforms, Digital Automation & Integrations y Product Design 360 (sexta familia, aprobada por el operador en
+  octubre de 2026). Creative Services puede aportar assets, pero no asume esas familias.
 - **Media & Distribution:** distribución, pauta y medios. Reach puede habilitarla. Una campaña creativa no incluye media buying por
   defecto.
 - **RevOps & CRM / Kortex:** CRM, lifecycle y RevOps. El trabajo creativo puede producir contenido para esas

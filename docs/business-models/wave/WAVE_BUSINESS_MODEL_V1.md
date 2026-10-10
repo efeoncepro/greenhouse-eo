@@ -28,23 +28,32 @@ pero no se presenta como una agencia o proveedor contractual separado.
 diseño de superficies operables —web y producto digital— separando *decidir la experiencia* de *construirla y
 operarla*, que permanece en Web Experience 360. Hasta el 2026-09-10 figuraba como propuesta, atada al gate G1; el
 operador la aprobó el 2026-10-09 («Si, incluyela como algo definitivo por qué está aprobado») y se presenta como
-definitiva en el brochure «Servicios web y digitales». La aprobación fue decisión del operador, no cierre de G1:
-su modelo económico sigue `Proposed` y sus precios y gates no se dan por aprobados aquí. Las cinco familias de la
-tabla no cambian. Delta 2026-10-09 en el
+definitiva en el brochure «Servicios web y digitales». La aprobación fue decisión del operador, no cierre de G1.
+Las cinco familias de la tabla no cambian. Delta 2026-10-09 en el
 [`ADR de boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-09--product-design-360-aprobada).
+
+**Delta 2026-10-10 — aprobación total.** Ayer este párrafo decía que el modelo económico de Product Design 360
+seguía `Proposed` y que sus precios y gates no se daban por aprobados. El operador lo corrigió el 2026-10-10: «Todo
+product design hay que ponerlo aprobado». La aprobación cubre la familia, su
+[ADR propio](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Accepted`), su
+[modelo de negocio](../product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Approved`), su
+[ficha de servicio](../../services/wave/product-design-360.md), el nombre público «Product Design 360» y su venta.
+Los gates G1–G6 de ese modelo quedan como validación posterior, no como condición. No se fijan precios aquí y no
+hay evidencia nueva de demanda: eso sigue en el modelo. Detalle en el
+[delta 2026-10-10 del ADR](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-10--aprobación-total-de-product-design-360).
 
 ## Wedge prioritario para validación
 
 **Agentic Readiness Audit** es el wedge de entrada propuesto para Wave. Evalúa si la capa digital de una organización
 puede ser descubierta, interpretada y operada por agentes, y entrega un baseline priorizado de remediación.
 
-No crea una sexta familia: cruza **Search Visibility 360** y **Web Experience 360** como entrada, y puede expandirse
+No crea una familia nueva: cruza **Search Visibility 360** y **Web Experience 360** como entrada, y puede expandirse
 hacia **Agent Systems & Platforms**, **Measurement & Analytics** y **Digital Automation & Integrations** según los gaps
 encontrados. Lighthouse es un componente técnico del diagnóstico, no una oferta independiente.
 
 ## Product Services compuestos
 
-Las cinco familias anteriores son las capabilities base de Wave. Sobre ellas Wave puede construir **Product Services
+Las cinco familias de la tabla y Product Design 360 son las capabilities base de Wave. Sobre ellas Wave puede construir **Product Services
 compuestos**, con una experiencia, método, contracts, evidence y outcome propios:
 
 | Product Service | Composición principal | Rol en Wave |
@@ -86,13 +95,13 @@ conversión a Product Service, pipeline contribution, costo por diagnóstico, ti
 
 ## Offer versus delivery
 
-Las cinco familias de Wave describen las **capabilities base** que el cliente puede comprar o que componen un Product
+Las seis familias de Wave describen las **capabilities base** que el cliente puede comprar o que componen un Product
 Service. Los Product Services compuestos describen un resultado integrado. Ninguna de estas capas fija por sí sola cómo
 se entrega. La misma familia puede contratarse bajo distintos modelos de delivery:
 
 | Capa | Opciones Wave | Pregunta que responde |
 |---|---|---|
-| **Capability / familia base** | Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms, Digital Automation & Integrations | ¿Qué capability aporta Wave? |
+| **Capability / familia base** | Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms, Digital Automation & Integrations, Product Design 360 | ¿Qué capability aporta Wave? |
 | **Product service / oferta** | Experience LaunchOps, Agentic Readiness u otra composición aprobada | ¿Qué problema y resultado integrado compra el cliente? |
 | **Delivery model** | **Productized Service**, **Managed Squad**, **Staff Augmentation**, **Implementation**, **Advisory**, **Platform-enabled Service** | ¿Quién aporta capacidad, cómo se gobierna y quién responde por el delivery? |
 | **Engagement** | **On-Going**, **On-Demand**, **Sample Sprint** | ¿Cuál es la duración y cadencia comercial? |

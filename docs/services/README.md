@@ -109,7 +109,7 @@ que diseña, construye y opera la capa digital inteligente. El catálogo económ
 | **Measurement & Analytics** | Measurement Audit · Tagging/Data Layer · GTM/GA4 Implementation · Dashboard & Attribution · Analytics Operations |
 | **Agent Systems & Platforms** | Agent Strategy & Architecture · Custom Agent System · Managed Agent Deployment · Agent Integrations · Agent Evaluation & Operations |
 | **Digital Automation & Integrations** | API/Workflow Sprint · Data Pipeline · Automation Build · Integration Operations |
-| **Product Design 360** *(propuesta)* | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
+| **Product Design 360** | **Capability de oficio** consumida por dos superficies. Lanes: Accesibilidad · Design system y tokens · Research y validación · Entrega de diseño (UI/UX) · Deuda de diseño · Design ops · Endurecer lo generado con IA. Entradas: Diagnóstico de Capacidad y Sample Sprint |
 
 La puerta de entrada de visibilidad en IA se presenta como **Efeonce AEO** (capacidad),
 **Efeonce AEO Assessment** (diagnóstico público) y **Efeonce AI Visibility Report** (entregable).
@@ -117,7 +117,9 @@ La familia más amplia sigue siendo **Search Visibility 360**. Este naming no a�
 contratable ni aprueba el [modelo comercial AEO](../business-models/aeo/EFEONCE_AEO_BUSINESS_MODEL_V1.md),
 que permanece `Draft`. [ADR de naming](../architecture/EFEONCE_AEO_BRAND_NAMING_DECISION_V1.md).
 
-**Product Design 360** es una **sexta familia propuesta**, todavía no aceptada en el ADR de boundaries. Su motion
+**Product Design 360** es la **sexta familia de Wave, aprobada por el operador**: el 2026-10-09 la aprobó como
+familia y el 2026-10-10 extendió la aprobación a su ADR propio, su modelo de negocio, su ficha, el nombre público y
+su venta («Todo product design hay que ponerlo aprobado»). Hasta el 2026-09-10 figuraba como propuesta. Su motion
 primario es **extender la capacidad de un equipo de product design in-house**, no reemplazarlo: se venden lanes de
 capacidad gobernada, no diseñadores. Cubre superficies operables —web y producto digital— y separa *decidir cómo
 debe ser la experiencia* de *construirla y operarla*, que sigue siendo de Web Experience 360. Ficha:

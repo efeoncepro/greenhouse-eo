@@ -2,12 +2,12 @@
 
 ## Architecture Decision 2026-09-10 — Product Design 360 como capability de oficio con dos ofertas
 
-- **Status:** Proposed
-- **Date:** 2026-09-10
+- **Status:** Accepted — aprobada por el operador el 2026-10-10 (ver [Delta 2026-10-10](#delta-2026-10-10--aceptada-por-decisión-del-operador))
+- **Date:** 2026-09-10 · aceptada el 2026-10-10
 - **Owner:** Efeonce Strategy + Wave + Design (owner comercial por confirmar)
 - **Required partners:** Finance (piso de margen por lane, loaded cost local) · Legal/IP (IP del design system, datos de research, portfolio rights) · Commercial (validación G1) · Web Experience 360 (composición de la superficie de sitio público)
 - **Scope:** ubicación de Product Design / UI-UX en el portfolio, separación capability ↔ oferta, las dos superficies y sus compradores, la arquitectura de lanes, las reglas de composición con Web Experience 360 y Creative Services, y los invariantes comerciales
-- **Reversibility:** two-way — documental; no hay runtime, schema ni contrato firmado. Revertir = retirar la sexta familia y replegar la capability dentro de Web Experience 360 (salida prevista si falla G1)
+- **Reversibility:** two-way — documental; no hay runtime, schema ni contrato firmado. Revertir = retirar la sexta familia y replegar la capability dentro de Web Experience 360 (opción que el operador conserva si la validación posterior G1 falla)
 - **Confidence:** high para boundaries, taxonomía y la separación capability/oferta · medium para posicionamiento competitivo · **low para demanda, willingness-to-pay y cost-to-serve** · **nula para mid-market y LATAM** (la evidencia es enterprise NA/EU)
 - **Validated as of:** 2026-09-10
 - **Canonical model:** [`Product Design 360 — Business Model V1.1`](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md)
@@ -37,8 +37,9 @@ La investigación de mercado agregó tres hechos que condicionan la forma de la 
 
 ### Decisión
 
-1. **Product Design 360 se propone como sexta familia de Wave**, modelada como **capability**: posee el oficio
-   —método, gente, quality gates, práctica de design system, telemetría— en todas las superficies.
+1. **Product Design 360 es la sexta familia de Wave** (propuesta el 2026-09-10; aprobada por el operador el
+   2026-10-09 y aceptada en este ADR el 2026-10-10), modelada como **capability**: posee el oficio —método, gente,
+   quality gates, práctica de design system, telemetría— en todas las superficies.
 
 2. **Dos ofertas consumen la misma capability**, separadas por comprador, no por oficio:
 
@@ -86,33 +87,81 @@ Product Design 360 diseña **la interfaz y el sistema con el que alguien opera a
 marca y piezas**. *Un brandbook no es un design system.* Cuando un engagement necesita ambas, se declara
 composición con owner por lane.
 
-### Lo que esta decisión NO hace
+### Qué cubre la aprobación — y qué sigue siendo hipótesis
 
-- No aprueba la sexta familia en el ADR de Wave: la deja registrada como propuesta.
-- No autoriza precios, tarifario, claims públicos, venta general ni el nombre público "Product Design 360"
-  (decisión abierta D1 del modelo: puede leerse como diseño industrial en LATAM).
-- No convierte el moat de *accountability medida* en diferenciador probado: la investigación encontró un hueco de
-  **oferta**, no una demanda articulada. Queda como hipótesis a validar.
+Texto vigente desde el 2026-10-10. Reemplaza a la sección «Lo que esta decisión NO hace» del 2026-09-10, que decía
+que este ADR no aprobaba la sexta familia y que no autorizaba precios, tarifario, claims públicos, venta general ni
+el nombre público.
+
+**La aprobación del operador cubre:**
+
+- **La sexta familia**: Product Design 360 queda aceptada en el portfolio de Wave y en el
+  [ADR de boundaries](EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md).
+- **Este ADR**: capability única, dos ofertas por comprador, siete lanes e invariantes pasan de propuesta a decisión
+  vigente, sin cambios de contenido.
+- **El modelo de negocio** ([Business Model V1.1](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md))
+  y **la ficha de servicio** ([`product-design-360.md`](../services/wave/product-design-360.md)).
+- **El nombre público «Product Design 360»**: la decisión abierta D1 del modelo queda resuelta. La advertencia de
+  que en LATAM «product design» puede leerse como diseño industrial sigue siendo una nota de copy, no un bloqueo.
+- **La venta**: la oferta se vende como oferta aprobada; ya no está limitada a pilotos gobernados por SOW.
+
+**Lo que la aprobación no convierte en hecho** (son advertencias de evidencia, no de estado):
+
+- No hay cifras nuevas: este ADR no fija precios ni tarifario, y ningún documento de la familia publica uno.
+- El moat de *accountability medida* sigue siendo hipótesis: la investigación encontró un hueco de **oferta**, no
+  una demanda articulada.
+- Los claims de resultado siguen la lista de «Claims prohibidos» del modelo y los invariantes de arriba: sin
+  evidencia no se afirman, con o sin aprobación.
 - No cambia el ownership de ninguna capability existente.
 
-### Condición de aceptación
+### Validación posterior a la aprobación
 
-Pasa a `Accepted` cuando se cumplan, en orden:
+Hasta el 2026-10-09 esta sección se llamaba «Condición de aceptación» y ataba el paso a `Accepted` a cuatro puntos,
+en orden. La aceptación llegó por **decisión explícita del operador**, no por cumplirlos. Los cuatro siguen
+abiertos como trabajo de validación y de evidencia, ya no como condición de existencia:
 
 1. **G1** — demanda externa verificada: ≥3 Sample Sprints vendidos a 2 clientes distintos en 90 días, o su
    equivalente vía la Calculadora de Capacidad de Diseño si se adopta como experimento de G1.
-2. **Posición de Legal** sobre IP del design system, datos de research y portfolio rights.
-3. **Piso de margen por lane** fijado por Finance, con loaded cost local verificado (decisión abierta D7).
+2. **Posición de Legal** sobre IP del design system, datos de research y portfolio rights. Sigue pendiente: lo
+   aprobado lo aprobó el operador.
+3. **Piso de margen por lane** con loaded cost local verificado (decisión abierta D7). Sigue pendiente; mientras
+   tanto rige el piso transversal del modelo.
 4. **Marco legal chileno de accesibilidad** verificado, antes de usar el argumento legal con clientes locales.
 
-Si G1 falla, la salida prevista es **replegar la capability dentro de Web Experience 360** — decisión correcta, no
-fracaso.
+Si G1 falla, replegar la capability dentro de Web Experience 360 sigue siendo una decisión disponible para el
+operador — decisión correcta, no fracaso.
 
 ### Alternativas rechazadas
 
 | Alternativa | Por qué se rechaza |
 |---|---|
-| Capability dentro de Web Experience 360 | Subordina el diseño a "la web" e impide venderlo a quien tiene producto sin sitio nuevo. **Es la salida si G1 falla** |
+| Capability dentro de Web Experience 360 | Subordina el diseño a "la web" e impide venderlo a quien tiene producto sin sitio nuevo. **Es el repliegue disponible si la validación G1 falla** |
 | Capability transversal de Efeonce, sin familia | Sin dueño comercial que la venda |
 | Una sola oferta para producto y sitio público | Mismo oficio, dos comités y dos presupuestos: una familia con dos compradores es el error de empaquetado que la investigación diagnosticó |
 | Vender diseñadores dedicados | Es el único comparable directo existente; competir en su forma es competir por tarifa sin gobierno, sin memoria y sin margen defendible |
+
+### Delta 2026-10-10 — aceptada por decisión del operador
+
+**Estado: `Accepted`.** El operador aprobó Product Design 360 en dos pasos, y ambos se citan textual:
+
+- 2026-10-09, al cerrar el brochure «Servicios web y digitales»: «Si, incluyela como algo definitivo por qué está
+  aprobado».
+- 2026-10-10, al ver que varios documentos seguían en `Proposed` o decían que la aprobación no cubría el modelo:
+  «Todo product design hay que ponerlo aprobado».
+
+**Qué cambia.** Este ADR pasa de `Proposed` a `Accepted`. La aprobación cubre la familia, este ADR, el modelo de
+negocio, la ficha de servicio, el nombre público «Product Design 360» y su venta. Ya no es «sólo pilotos gobernados
+por SOW».
+
+**Qué no cambia.** El contenido de la decisión —capability única, dos ofertas, lanes, invariantes y frontera con
+Globe— es el del 2026-09-10. Tampoco cambia la evidencia: la confianza sigue siendo baja para demanda,
+willingness-to-pay y cost-to-serve, y nula para mid-market y LATAM. La aprobación es una decisión del operador; este
+delta no registra una revisión de Legal ni de Finance, y no fija precios.
+
+**Gates.** G1–G6 del modelo pasan a ser validación posterior a la aprobación. Miden si la oferta funciona; ya no
+deciden si existe.
+
+**Sincronizado el mismo día:** [modelo de negocio](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md),
+[ficha de servicio](../services/wave/product-design-360.md),
+[ADR de boundaries de Wave](EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-10--aprobación-total-de-product-design-360)
+y las filas de Wave y de Product Design 360 en [`DECISIONS_INDEX.md`](DECISIONS_INDEX.md).

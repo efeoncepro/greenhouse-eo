@@ -235,16 +235,17 @@ Todo business model debe separar al menos estas dimensiones:
 - [Search Visibility 360 Business Model V1](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_V1.md) + [Business Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_BUSINESS_MODEL_INTEGRITY_PACK_V1.md) + [Customer Model Integrity Pack](search-visibility-360/SEARCH_VISIBILITY_360_CUSTOMER_MODEL_INTEGRITY_PACK_V1.md) —
   draft de capability en construcción; alcance comercial mid-market y enterprise.
 - [Search + Social Visibility Composition V1](search-visibility-360/SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md) — composición propuesta entre Search Visibility 360 y Social Media; no es una tercera línea contractual.
-- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con cinco familias y
+- [Wave Business Model V1](wave/WAVE_BUSINESS_MODEL_V1.md) — `Proposed`; productora/capability con seis familias y
   Agentic Readiness Audit como wedge prioritario de validación:
-  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms y Digital
-  Automation & Integrations.
-- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Proposed`;
-  **sexta familia propuesta de Wave**, todavía no aceptada en el ADR de boundaries. Motion primario: **extender la
+  Search Visibility 360, Web Experience 360, Measurement & Analytics, Agent Systems & Platforms, Digital
+  Automation & Integrations y Product Design 360 (sexta familia, aprobada por el operador; modelo propio abajo).
+- [Product Design 360 Business Model V1.1](product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) — `Approved`
+  por el operador el 2026-10-10; **sexta familia de Wave**, aceptada en el ADR de boundaries. Motion primario: **extender la
   capacidad de un equipo de product design in-house** vendiendo lanes de capacidad gobernada (feature delivery,
   research, design system, accesibilidad, deuda de diseño, design ops), nunca diseñadores por hora. Incluye contrato
   anti-desplazamiento y la distinción dura Managed Squad ≠ Staff Augmentation. Separa *decidir la experiencia* de
-  *construirla*, que permanece en Web Experience 360. No autoriza pricing ni venta general.
+  *construirla*, que permanece en Web Experience 360. La aprobación cubre el modelo, el nombre público «Product
+  Design 360» y la venta; no publica un tarifario y deja los gates G1–G6 como validación posterior.
 - [Media & Distribution Business Model V1](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) —
   `Approved for validation`; tres soluciones comerciales, siete capacidades de delivery y Reach como product brand
   habilitadora. No autoriza pricing público ni venta general.

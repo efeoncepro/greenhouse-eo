@@ -3,7 +3,7 @@
 > **Marca de producto:** Wave, de Efeonce Group
 > **Catálogo económico canónico:** [`Wave Business Model V1`](../../business-models/wave/WAVE_BUSINESS_MODEL_V1.md)
 > **Boundary de ownership:** [`ADR Wave Portfolio Boundaries`](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md)
-> **Última actualización:** 2026-10-09
+> **Última actualización:** 2026-10-10
 
 ## Propósito
 
@@ -22,7 +22,7 @@ Globe, Reach y Efeonce Digital no se presentan como agencias o proveedores contr
 | Measurement & Analytics | Aceptada | Pendiente |
 | Agent Systems & Platforms | Aceptada | Pendiente |
 | Digital Automation & Integrations | Aceptada | Pendiente |
-| **Product Design 360** | **Aprobada** por el operador el 2026-10-09 — sexta familia ([delta del ADR](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-09--product-design-360-aprobada)) | [`product-design-360.md`](product-design-360.md) |
+| **Product Design 360** | **Aprobada** por el operador el 2026-10-09 — sexta familia ([delta del ADR](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-09--product-design-360-aprobada)); aprobación extendida a ADR propio, modelo, ficha, nombre público y venta el 2026-10-10 ([delta](../../architecture/EFEONCE_WAVE_PORTFOLIO_BOUNDARIES_DECISION_V1.md#delta-2026-10-10--aprobación-total-de-product-design-360)) | [`product-design-360.md`](product-design-360.md) |
 
 **Efeonce AEO** nombra la capacidad de entrada a visibilidad de marca en respuestas de IA;
 **Efeonce AEO Assessment** es su diagnóstico público y **Efeonce AI Visibility Report** su
@@ -36,10 +36,18 @@ documentación, no una diferencia de estatus en el portfolio.
 
 **Delta 2026-10-09 — Product Design 360 aprobada.** El operador la aprobó como sexta familia y pidió presentarla
 como definitiva en el brochure de servicios web («Si, incluyela como algo definitivo por qué está aprobado»). Hasta
-el 2026-09-10 figuraba como `Proposed`. La aprobación cubre el estatus de la familia en el portfolio; precios, piso
-de margen por lane y posición de Legal siguen los gates del
+el 2026-09-10 figuraba como `Proposed`. *(Lectura del 2026-10-09, superada al día siguiente:)* la aprobación cubre
+el estatus de la familia en el portfolio; precios, piso de margen por lane y posición de Legal siguen los gates del
 [modelo económico](../../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md), que no se
 dieron por cerrados con esta decisión.
+
+**Delta 2026-10-10 — aprobación total.** El operador corrigió esa lectura: «Todo product design hay que ponerlo
+aprobado». La aprobación cubre la familia, su
+[ADR propio](../../architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md) (`Accepted`), su
+[modelo de negocio](../../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Approved`),
+su [ficha de servicio](product-design-360.md), el nombre público «Product Design 360» y su venta. Ya no es «sólo
+pilotos gobernados por SOW». Los gates G1–G6 del modelo quedan como validación posterior a la aprobación. Lo aprobó
+el operador: no hay precios nuevos ni una revisión de Legal o de Finance registrada.
 
 ## Product Services compuestos
 

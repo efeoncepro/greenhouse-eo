@@ -109,7 +109,9 @@ tenancy agencia→cliente final, confidencialidad, derechos, aprobación de marc
 ### Persona candidata — líder de diseño in-house (BP9 · Product Design 360)
 
 > **Estado:** `hypothesis_only` · **Owner:** Strategy + Commercial, con Wave + Design · **Fecha:** 2026-09-10 ·
-> **Confidence:** baja · **Oferta:** [Product Design 360](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Proposed`)
+> **Confidence:** baja · **Oferta:** [Product Design 360](../business-models/product-design-360/PRODUCT_DESIGN_360_BUSINESS_MODEL_V1.md) (`Approved` — aprobada por el operador el 2026-10-10)
+>
+> **Delta 2026-10-10:** la **oferta** quedó aprobada por el operador («Todo product design hay que ponerlo aprobado»): familia, modelo, ficha, nombre público y venta. La **persona** sigue en `hypothesis_only`: lo que falta es evidencia de compradores, no aprobación de la oferta.
 
 No se suma a los buyer personas vigentes hasta pasar su plan de validación. Nace del business model y de
 investigación de escritorio, **no de conversaciones con este comprador**. Los roles son roles, no cargos: una misma
@@ -212,7 +214,7 @@ Formato del doc: Situación/Trigger → Job Statement → Resultado Esperado. Aq
 
 > Media & Distribution y Digital Services & Engineering tienen sus propios JTBD en el doc fuente (vocería/PR, distribución integrada, velocidad web, infra, datos). Para producto son secundarios hoy porque Greenhouse modela sobre todo operación creativa, métricas y CRM.
 
-> **Product Design 360 (candidato):** su JTBD vive en la sección de la persona candidata BP9; no se mezcla con los vigentes hasta validarse.
+> **Product Design 360 (oferta aprobada; persona candidata):** su JTBD vive en la sección de la persona candidata BP9; no se mezcla con los vigentes hasta validarse con compradores.
 
 ---
 
@@ -254,3 +256,6 @@ alineados al business model V1.1 sin modificar los 12 ICPs vigentes.*
 
 *2026-09-10 — se agrega BP9 como persona candidata (`hypothesis_only`) para Product Design 360; no modifica los 8
 buyer personas ni los 12 ICPs vigentes.*
+
+*2026-10-10 — la oferta Product Design 360 pasa a `Approved` por decisión del operador. BP9 sigue en
+`hypothesis_only`: la aprobación es de la oferta, no evidencia de compradores.*
