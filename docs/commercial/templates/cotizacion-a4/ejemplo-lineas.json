@@ -61,7 +61,6 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Mes 1",
@@ -132,8 +131,8 @@
     ],
     "rows": [
       {
-        "title": "Plazo e inicio",
-        "text": "Tres meses desde la fecha acordada. La dedicación de cada perfil se distribuye en la semana según el plan de trabajo."
+        "title": "Dedicación",
+        "text": "La dedicación de cada perfil se distribuye en la semana según el plan de trabajo acordado con la contraparte del cliente."
       },
       {
         "title": "Facturación y pago",

@@ -61,7 +61,6 @@
   },
   "schedule": {
     "title": "Calendario de doce meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Mes 1",
@@ -155,8 +154,8 @@
     ],
     "rows": [
       {
-        "title": "Plazo e inicio",
-        "text": "Doce meses desde la fecha acordada. Las semanas de refuerzo se confirman con la contraparte del cliente antes de cada campaña."
+        "title": "Semanas de refuerzo",
+        "text": "Las semanas de refuerzo se confirman con la contraparte del cliente antes de cada campaña."
       },
       {
         "title": "Facturación y pago",

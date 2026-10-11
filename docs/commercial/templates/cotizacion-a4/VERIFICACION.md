@@ -124,3 +124,72 @@ Dos veces se versionó un ejemplo cuya portada no cabía: el título pasaba la v
 
 Lo que queda fuera: la página de inversión de la versión 1, que sólo cubre el render; una portada cuyo logo no declara dimensiones; y el desborde horizontal en la versión 1, que su render tampoco comprueba. Recalibrar si cambian `template.css`, las fuentes de marca, el logo o el pie: `checks.fixedPages` de cada manifiesto guarda estimación y medida, y una medida mayor que la estimación es la señal.
 
+
+## Encabezado interior, textos opcionales e impuesto por hito · 11/10/2026
+
+Seis cambios en la versión 2: el encabezado de las páginas interiores, `buyer.unit`, `schedule.note` y `paymentSchedule.note` opcionales, `cover.netLabel`, el impuesto y el total de cada hito del calendario de pagos, y `taxPeriods`. La versión 1 no cambia. Los renders de esta revisión se generaron en una carpeta de trabajo fuera del repositorio; `vista-previa/` no se regeneró.
+
+- **Versión 1 sin cambios.** `template.html` y `template.css` no se tocaron. El HTML de `ejemplo.json`, `ejemplo-pen.json` y `ejemplo-usd-pen.json` conserva su SHA-256 (`623988f8…`, `3bebc250…`, `d5ce5915…`), igual que el de `vista-previa/datos.json` y el de la cotización de precio único ya entregada. `ejemplo.json` se renderizó de principio a fin: cuatro páginas.
+- **Pruebas.** 40 pruebas Node PASS (36 del generador, 4 de dinero). Las cinco nuevas cubren el encabezado interior (marcado, sin unidad, referencia de una, dos y tres líneas, palabra que no cabe, versión 1 intacta); las claves opcionales, el rechazo de claves mal escritas en `buyer`, `cover` y `schedule`, y su efecto en la estimación de las páginas fijas; la tabla del calendario con impuesto por hito, sus estilos condicionales y su altura estimada; cada regla de validación de `tax` y `total`; y `taxPeriods`.
+- **`taxPeriods`.** La tolerancia de `taxAmount` contaba las cantidades de las líneas, así que la misma cotización se aceptaba con sus meses plegados («3 meses») y se rechazaba impresa como un solo precio («1 programa»). Con `taxPeriods` la tolerancia son los periodos tributados que la cotización declara; sin la clave rige la regla anterior, y ningún documento que la omite cambia. La clave no se imprime: el HTML de un documento es el mismo con ella y sin ella.
+- **Ejemplo nuevo.** `ejemplo-lineas-proyecto.json`, cuatro páginas: un proyecto de precio fijo en una línea de cantidad 1, sin unidad del cliente ni nota de calendario, con rótulo de portada propio y un calendario de dos pagos con su IVA. Las cuatro páginas se revisaron en captura del navegador; PDF A4 de cuatro páginas, etiquetado, sin JavaScript, fuentes incrustadas y texto extraíble (encabezado, importes e hitos). A 390 px, sin desborde: cada hito apila su valor neto, su impuesto y su total con su rótulo.
+- **Documentos renderizados y leídos.** Los cuatro ejemplos de la versión 2, los tres de la versión 1 y los seis documentos emitidos por el puente de Pricing V3 que existían al cierre (uno de ellos, con precio de programa, usa todas las claves nuevas). Los trece se componen; estimación menos medida, entre 0,02 y 0,44 px, nunca por debajo.
+
+### Qué cambia en un documento que no usa nada nuevo
+
+Sólo el encabezado de sus páginas interiores. Medido sobre los doce documentos de la versión 2 que existían antes del cambio (tres ejemplos, cinco del puente y cuatro `datos.json` de una cotización entregada), comparando el HTML del generador anterior con el nuevo, elemento por elemento y regla por regla: las únicas diferencias son el marcado de los encabezados (42 en total) y las reglas de estilo del encabezado. Portada, alcance, inversión, condiciones y pie salen byte a byte iguales. El HTML de los doce cambia de SHA-256 por esa razón y sólo por ella.
+
+| Documento (datos anteriores al cambio) | Antes | Después |
+| --- | --- | --- |
+| `ejemplo-lineas.json` | `9cab83ed…` | `ad7f0005…` |
+| `ejemplo-lineas-terceros.json` | `433ee479…` | `7acecf16…` |
+| `ejemplo-lineas-opcionales.json` | `4665361c…` | `8690c5f5…` |
+| Puente: `designer-on-demand` | `c29e3688…` | `4db28b15…` |
+| Puente: `designer-startup-courtesy` | `04b12c11…` | `60b076fa…` |
+| Puente: `designer-three-months-iva` | `076891f8…` | `2d4914ef…` |
+| Puente: `managed-addon-increment` | `62318e40…` | `9e75eb33…` |
+| Puente: `managed-on-demand-third-party` | `aff31c17…` | `b7cc7848…` |
+
+Después de medir eso, los tres ejemplos de la versión 2 dejaron de declarar la nota «Desde el inicio acordado» y la condición «Plazo e inicio», que no decían nada; con sus datos actuales, `ejemplo-lineas.json` y `ejemplo-lineas-terceros.json` quedan fijados como prueba permanente en `d92402cb…` y `e7734761…`. Las cotizaciones de la versión 2 ya entregadas conservan sus archivos; si se regeneran desde sus datos, saldrán con el encabezado nuevo.
+
+### Encabezado interior: qué se midió
+
+Con el marcado anterior, la referencia era un elemento de bloque dentro de la línea de la sección: siempre saltaba a su propia línea y dejaba el «·» colgando al final de la anterior, con cualquier referencia, corta o larga. Ahora la unidad del cliente, la sección y la referencia son tres líneas hermanas, sin separador.
+
+| Magnitud | Valor |
+| --- | --- |
+| Ancho del bloque de texto del encabezado | 527,6 px: el ancho útil menos el logo (110 px) y su separación (20 px) |
+| Alto de línea | 18,47 px (7,7 pt × 1,8) |
+| Líneas que admite | 3: con una cuarta, el borde del encabezado queda a 3,8 px del contenido y el render lo rechaza (exige 6 px) |
+| Borde del encabezado, con y sin unidad | a 121,34 px del borde de la página: el bloque reserva siempre tres líneas y centra las que tenga con el logo |
+| Aire entre el encabezado y el contenido | 22,27 px en todos los casos (antes, 22,30 px con tres líneas) |
+| Referencia de dos líneas con unidad (cuatro líneas) | Antes pasaba la validación y fallaba en el navegador con el mensaje genérico; ahora falla al validar, en 0,15 s, y dice qué acortar |
+
+En pantallas de menos de 820 px el encabezado pasa a formar parte del flujo de la página. Antes era un bloque superpuesto de alto fijo, y una referencia que se partía en esa anchura quedaba encima del contenido (medido en un documento del puente: el encabezado terminaba 13 px por debajo del inicio del contenido). No afecta a la impresión.
+
+### Calendario de pagos con impuesto por hito
+
+La tabla tiene cuatro columnas: el hito con su fecha o condición debajo (como el concepto y su detalle en la tabla de líneas), el valor neto, el impuesto y el total. Las tres columnas de importes parten del 15 %, 13 % y 17 % del ancho y sólo crecen si su cabecera o su importe mayor lo exige; el hito recibe el resto y nunca baja del 40 %. Una primera versión con cinco columnas (hito y condición separados) se descartó tras verla renderizada: la condición se partía en dos líneas junto a una columna de hito casi vacía, y un importe de millones con decimales dejaba la tabla sin sitio.
+
+| Magnitud | Valor |
+| --- | --- |
+| Bloque del calendario en el ejemplo nuevo (estimado − medido) | 0,44 px en la página de inversión; 192,33 px estimados para el bloque |
+| Importes que admite la tabla | Los que admite la portada: en CLP, USD y PEN la caja de inversión de la portada rechaza antes un importe demasiado ancho |
+| Fila de un hito | 24 px de relleno, 1 px de borde y una línea de 17,25 px por cada línea del hito y de su condición |
+
+### Barrido contra Chromium
+
+400 documentos aleatorios de la versión 2 (dos semillas), con y sin unidad del cliente, referencias de 1 a 16 palabras, con y sin nota de calendario, con y sin rótulo de portada, tres monedas, cinco tasas y un calendario de 1 a 12 hitos, cuatro de cada cinco con impuesto por hito repartido sobre el total acumulado.
+
+| Resultado | Valor |
+| --- | --- |
+| Compuestos | 233 documentos, 1.149 páginas: 0 desbordes, 0 páginas subestimadas, 0 textos fuera de su caja |
+| Encabezado: líneas estimadas frente a las del navegador | Iguales en los 233 (94 de dos líneas, 98 de tres con unidad, 41 de tres con la referencia en dos) |
+| Bloque del calendario de pagos (estimado − medido), 233 bloques, 184 con impuesto | entre 0,33 y 18,5 px; nunca por debajo |
+| Páginas fijas (estimado − medido) | entre 0,03 y 70,2 px; la mayor sobrestimación es la cota de la fila del calendario con una nota larga |
+| Aire mínimo sobre el pie; bajo el encabezado | 18,4 px; 22,27 px |
+| Rechazados por el plan, con mensaje | 167: 39 por el encabezado, 53 por importes del calendario demasiado anchos, 26 por importes que no caben en la portada y 49 por un calendario más alto que una página |
+
+Lo que el barrido encontró y no es de este cambio: 13 de los documentos compuestos desbordan a 390 px, todos por el importe de la portada (millones de dólares o miles de millones de soles a 32 pt), con el rótulo fijo o con uno propio. El generador ya los rechaza en el render con «El documento desborda en móvil».
+
+Las reglas de recalibración de las secciones anteriores valen también para `template-lineas-hitos.css` y para el encabezado: `checks.interiorHeader` de cada manifiesto guarda las líneas estimadas, y `checks.layout[].headerGapPx`, el aire real bajo el encabezado.

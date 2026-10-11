@@ -32,8 +32,8 @@ Ejemplos de ruteo para agentes:
 - [Vista previa HTML](vista-previa/cotizacion.html), autónoma y lista para imprimir.
 - [Vista previa PDF](vista-previa/cotizacion.pdf), cuatro páginas A4 verificadas.
 - [Datos de ejemplo](ejemplo.json): copiar y editar para una nueva cotización de un único precio (versión 1).
-- Datos de ejemplo de la versión 2: [dos perfiles por dedicación y una puesta en marcha](ejemplo-lineas.json); [servicio gestionado con costos de terceros, calendario de pagos y un costo que paga el cliente](ejemplo-lineas-terceros.json); [servicio de doce meses con la puesta en marcha bonificada y opciones adicionales](ejemplo-lineas-opcionales.json).
-- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño. La versión 2 usa [su propio HTML](template-lineas.html) y añade [sus estilos](template-lineas.css) a los comunes; portada, alcance y condiciones son idénticos en ambos HTML y una prueba lo comprueba. Los estilos de la línea bonificada y del bloque de opciones viven en [un archivo aparte](template-lineas-opciones.css), que el generador incluye sólo en el documento que usa alguno de los dos: los demás conservan su HTML byte a byte.
+- Datos de ejemplo de la versión 2: [dos perfiles por dedicación y una puesta en marcha](ejemplo-lineas.json); [servicio gestionado con costos de terceros, calendario de pagos y un costo que paga el cliente](ejemplo-lineas-terceros.json); [servicio de doce meses con la puesta en marcha bonificada y opciones adicionales](ejemplo-lineas-opcionales.json); [proyecto de precio fijo, con un rótulo de portada propio y un calendario de pagos con el IVA de cada hito](ejemplo-lineas-proyecto.json).
+- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño. La versión 2 usa [su propio HTML](template-lineas.html) y añade [sus estilos](template-lineas.css) a los comunes; portada, alcance y condiciones son idénticos en ambos HTML, salvo el rótulo del valor neto de la portada y la nota del calendario, que en la versión 2 escribe el generador, y una prueba lo comprueba. Los estilos de cada capacidad opcional viven en un archivo aparte, que el generador incluye sólo en el documento que la usa: [la línea bonificada y el bloque de opciones](template-lineas-opciones.css) y [el calendario de pagos con impuesto por hito](template-lineas-hitos.css). Los demás documentos conservan su HTML byte a byte.
 - [Generador](../../../../scripts/documents/render-cotizacion-a4.mjs): resuelve slots, incrusta recursos y exporta HTML/PDF.
 
 ## Uso rápido
@@ -71,11 +71,11 @@ Los atributos `data-slot` permiten localizar los campos en el HTML generado. La 
 | `version`, `status` | `1` (un único precio) o `2` (varias líneas); `example` o `draft`. Un documento firmado/presentado no se regenera. |
 | `date`, `reference` | Fecha `YYYY-MM-DD`; número de cotización o proceso. |
 | `supplier` | Razón social, identificación fiscal con etiqueta, responsable, correo y teléfono. |
-| `buyer` | Nombre, unidad, identificación fiscal con etiqueta y logo oficial opcional. |
-| `cover` | Etiqueta, título de hasta tres líneas y bajada. |
+| `buyer` | Nombre, unidad, identificación fiscal con etiqueta y logo oficial opcional. En la versión 2 la unidad (`unit`) es opcional. |
+| `cover` | Etiqueta, título de hasta tres líneas y bajada. En la versión 2, además, `netLabel` opcional. |
 | `service` | Nombre y detalle del servicio completo. Una unidad por cotización. En la versión 2 sólo se usa `name` (título y descripción del documento); el detalle vive en cada línea. |
 | `scope` | Título, introducción y hasta siete componentes con título/texto. |
-| `schedule` | Título, nota de inicio y entre una y tres fases con etiqueta/título/texto. |
+| `schedule` | Título, nota y entre una y tres fases con etiqueta/título/texto. En la versión 2 la nota (`note`) es opcional. |
 | `currency`, `locale`, `net` | Moneda ISO 4217 del precio base; locale opcional (`es-CL`, `es-PE`); neto **total** con los decimales propios de la moneda (CLP: 0; USD/PEN: 2). Número o string decimal sin separadores. |
 | `vatRate`, `pricing.taxLabel` | Tasa explícita (`0.19` = 19 %), `0` si corresponde y está confirmado, o `null` para impuestos/total facturable por confirmar. Etiqueta opcional (`IVA`, `IGV`, `Impuestos`); elegirla no asigna una tasa. |
 | `presentation` | Opcional: moneda/locale de salida y snapshot FX explícito. Ver [contrato multimoneda](MULTIMONEDA.md). |
@@ -104,8 +104,12 @@ Usar `"version": 2` cuando la cotización tiene más de un concepto con precio: 
 | `net` | Opcional. Si se declara, debe ser exactamente igual a la suma de `lines[].net`. El subtotal neto siempre es esa suma. |
 | `vatRate`, `taxStatus` | `vatRate` como en la versión 1. Con `vatRate: null`, `taxStatus` distingue `pending` (por defecto: «Por confirmar» y «Total facturable») de `not_applicable` («No aplica»; el total es igual al neto y se rotula «Total»). |
 | `taxAmount` | Opcional, sólo con una tasa explícita. Declara el impuesto de la cotización cuando difiere en unidades del calculado sobre el subtotal. Ver más abajo. |
+| `taxPeriods` | Opcional, sólo junto a `taxAmount`: entero de 1 a 120, el número de periodos sobre los que se redondeó ese impuesto. Fija su tolerancia. |
+| `buyer.unit` | Opcional. Unidad o área del cliente; se imprime en el encabezado de las páginas interiores. Sin ella, el encabezado lleva sólo la sección y la referencia. |
+| `cover.netLabel` | Opcional. Rótulo del valor neto en la portada; sustituye a «Valor neto del servicio completo» («Valor neto del proyecto», «Valor neto del programa»). |
+| `schedule.note` | Opcional. Nota a la derecha del título del calendario. Sin ella, el título ocupa la fila. |
 | `clientPaidDirectly` | Opcional, de 1 a 8 entradas: `label`, `amount`, `currency` y `detail` opcional. Costos que el cliente contrata y paga a su proveedor. |
-| `paymentSchedule` | Opcional: `title`, `note` y de 1 a 12 `milestones` con `label`, `when` y `net`. La suma de los hitos debe ser exactamente igual al neto. |
+| `paymentSchedule` | Opcional: `title`, `note` opcional y de 1 a 12 `milestones` con `label`, `when` y `net`. La suma de los hitos debe ser exactamente igual al neto. Cada hito puede declarar además `tax` y `total`: ver más abajo. |
 | `options` | Opcional: `title` y `note` (ambos opcionales) y de 1 a 8 `items` con `label`, `detail` opcional, `net` y `unit` (texto: `al mes`, `pago único`). Opciones que el cliente puede contratar aparte; no entran en ningún total. |
 | `source` | Opcional: objeto plano de textos con el origen de los datos (`system`, `calculationId`, `digest`…). Se copia al manifiesto y nunca se imprime. |
 | `pricing.monthly` | Como en la versión 1; lo decide el operador. |
@@ -118,20 +122,45 @@ Reglas que el generador hace cumplir:
 - **Costos que paga el cliente.** `clientPaidDirectly` se imprime en un bloque aparte, «Pagado directamente por el cliente a su proveedor», que declara que no forma parte de la cotización ni de su valor neto o total. Cada importe conserva su propia moneda: no se convierte ni se suma.
 - **Línea bonificada.** Una línea con `"net": "0"` y `referenceNet` es una cortesía: en su columna de valor neto se lee «Bonificado» y, debajo, «Valor de referencia» con ese importe. No suma al subtotal, al impuesto ni al total. `referenceNet` es un importe positivo en la moneda del documento y sólo se admite con `net` cero y sin `unitNet`; en la columna de valor unitario, si existe, la línea muestra una raya. Una línea a cero sin `referenceNet` sigue imprimiendo su importe en cero.
 - **Opciones adicionales.** `options` se imprime en un bloque aparte, el último de la sección de inversión, bajo el rótulo «Opcional · Fuera de esta cotización». La plantilla declara siempre que las opciones no forman parte de la cotización ni de su valor neto o total y que cada valor es neto, sin impuestos; ese texto no se edita. Cada opción muestra su valor neto y, debajo, su unidad. `title` es el título del bloque («Opciones adicionales» si se omite) y `note`, un texto del operador que se imprime después de la advertencia. Los valores van en la moneda del documento.
-- **Campos desconocidos.** En la versión 2 se rechazan las claves que el contrato no define, en la raíz y en `lines`, `quantity`, `clientPaidDirectly`, `paymentSchedule`, hitos, `options` y sus entradas. Un bloque mal escrito no se omite en silencio.
+- **Campos desconocidos.** En la versión 2 se rechazan las claves que el contrato no define, en la raíz y en `buyer`, `cover`, `schedule`, `lines`, `quantity`, `clientPaidDirectly`, `paymentSchedule`, hitos, `options` y sus entradas. Un bloque o una clave opcional mal escritos no se omiten en silencio.
+- **Textos opcionales.** `buyer.unit`, `schedule.note`, `cover.netLabel` y `paymentSchedule.note` se declaran sólo cuando dicen algo. Un texto de relleno («Desde el inicio acordado», el nombre del cliente repetido como unidad) no se escribe para cumplir: se omite la clave y la página se compone sin ella, sin dejar un hueco. Una clave presente debe ser texto no vacío; `null` equivale a omitirla.
 - **Una sola moneda.** El documento se emite en `currency`. `presentation` con otra moneda o con tipo de cambio se rechaza; ver [MULTIMONEDA.md](MULTIMONEDA.md).
 
-**Impuesto declarado (`taxAmount`).** El documento calcula el impuesto una vez, sobre el subtotal. Una cotización que tributa mes a mes y suma los resultados redondeados puede diferir en unidades: tres meses de 3.333.333 al 19 % suman 1.899.999, y el cálculo sobre 9.999.999 da 1.900.000. Con `"taxAmount": "1899999"` el documento imprime el impuesto de la cotización, nunca una segunda cifra; el total es subtotal más ese impuesto, la etiqueta de la tasa no cambia y el equivalente mensual, si existe, deriva de él. Se acepta sólo si corresponde a la tasa: puede diferir del impuesto calculado en tantas unidades menores como sume `lines[].quantity.value` (cada mes aporta como máximo una unidad de redondeo); más allá se rechaza. No se admite con `vatRate: null` ni en la versión 1. El manifiesto registra en `amounts.taxSource` si el impuesto fue declarado (`stated`), calculado (`computed`), está por confirmar (`pending`) o no aplica (`not_applicable`).
+**Impuesto declarado (`taxAmount`).** El documento calcula el impuesto una vez, sobre el subtotal. Una cotización que tributa mes a mes y suma los resultados redondeados puede diferir en unidades: tres meses de 3.333.333 al 19 % suman 1.899.999, y el cálculo sobre 9.999.999 da 1.900.000. Con `"taxAmount": "1899999"` el documento imprime el impuesto de la cotización, nunca una segunda cifra; el total es subtotal más ese impuesto, la etiqueta de la tasa no cambia y el equivalente mensual, si existe, deriva de él. Se acepta sólo si corresponde a la tasa: puede diferir del impuesto calculado en tantas unidades menores como sume `lines[].quantity.value` (cada mes aporta como máximo una unidad de redondeo); más allá se rechaza. Una línea que imprime varios meses como un solo precio («1 programa») cuenta una sola vez, así que la cotización que tributó mes a mes declara en `taxPeriods` los periodos sobre los que redondeó: con esa clave la tolerancia es `taxPeriods` unidades menores, se presenten las líneas como se presenten, y la del impuesto de cada hito sigue la misma cuenta. No se admite con `vatRate: null` ni en la versión 1. El manifiesto registra en `amounts.taxSource` si el impuesto fue declarado (`stated`), calculado (`computed`), está por confirmar (`pending`) o no aplica (`not_applicable`).
+
+**Calendario de pagos con impuesto por hito (`tax` y `total`).** Sin esas dos claves, la tabla del calendario tiene tres columnas: hito, fecha o condición y valor neto. Cuando cada hito declara su impuesto y su total, la tabla imprime lo que el cliente paga en cada uno: el hito con su fecha o condición debajo, su valor neto, su impuesto y su total, con la etiqueta de impuesto de la cotización en las cabeceras («IVA», «Total con IVA»).
+
+```json
+"paymentSchedule": {
+  "title": "Calendario de pagos",
+  "milestones": [
+    { "label": "Anticipo", "when": "A la aceptación de la cotización", "net": "1175000", "tax": "223250", "total": "1398250" },
+    { "label": "Saldo", "when": "Contra la aprobación final", "net": "1175000", "tax": "223250", "total": "1398250" }
+  ]
+}
+```
+
+El generador no calcula estas cifras: comprueba que cuadran. `tax` y `total` se declaran juntos y en todos los hitos, o en ninguno. En cada hito, `total` es exactamente `net` más `tax`. Los totales de los hitos suman exactamente el total de la cotización (el neto más su impuesto, el calculado o el de `taxAmount`), de modo que los impuestos de los hitos suman el impuesto de la cotización. El impuesto de cada hito debe corresponder a la tasa: puede diferir del calculado sobre su neto en las unidades menores que admite `taxAmount` (la suma de `lines[].quantity.value` o, si se declara, `taxPeriods`) más una, la del reparto del impuesto entre los hitos; más allá se rechaza, aunque las sumas cuadren. Sólo se admiten con una tasa explícita en `vatRate` (también `0`): con el impuesto por confirmar o no aplicable, los hitos llevan sólo `net`. Los estilos de esta tabla viajan en `template-lineas-hitos.css`, que se incluye sólo en estos documentos.
+
+**Encabezado de las páginas interiores.** En la versión 2 cada dato ocupa su propia línea, alineado a la derecha: la unidad del cliente (si se declara), el nombre de la sección y la referencia. No hay separador entre la sección y la referencia, así que nada queda colgando cuando la referencia es larga. El encabezado admite tres líneas: sin `buyer.unit`, la referencia puede ocupar dos; con ella, una. Si no cabe, el generador falla antes de abrir el navegador y dice qué acortar. La versión 1 conserva su encabezado.
 
 **Paginación.** La sección de inversión ocupa las páginas que necesita, sin reducir la tipografía. La tabla continúa en la página siguiente con su cabecera repetida y, si corta un grupo, lo vuelve a anunciar con «(continuación)»; un encabezado de grupo nunca queda solo al pie. Los totales con su nota tributaria, el calendario de pagos, el bloque de costos pagados por el cliente, el equivalente mensual y el bloque de opciones son bloques enteros, en ese orden: el que no cabe pasa completo a la página siguiente. Hay una excepción, para que los totales no se separen de una tabla que les deja sitio: si bajo la tabla caben los totales pero no su nota tributaria, los totales quedan con la tabla y la nota abre la página siguiente, siempre que el bloque que sigue quepa allí con ella. Una nota nunca queda sola en una página: sin bloque siguiente, totales y nota pasan juntos. Folios, anclas de la barra, capturas de `qa/` y manifiesto siguen el número real de páginas. Portada, alcance y condiciones siguen siendo de una página cada una, con los límites de la versión 1.
 
 El reparto se decide sin navegador, con un presupuesto de altura calculado desde las fuentes incrustadas y las medidas de los estilos; después, la comprobación del render lo verifica en Chromium. Si un contenido no puede componerse —una línea o un bloque más altos que una página, importes que no caben en su columna—, el generador falla con «Contenido fuera del A4» y dice qué acortar. No recorta ni omite. El manifiesto guarda en `checks.pagination` la altura estimada y la medida de cada página de inversión; el [registro de revisión](VERIFICACION.md) explica cómo se calibró.
 
-Límites de la versión 2: una sola moneda por documento; hasta 40 líneas, 8 costos pagados por el cliente, 12 hitos y 8 opciones; cada bloque debe caber en una página; el generador no calcula precios, márgenes ni calendarios, sólo comprueba que lo declarado suma.
+Límites de la versión 2: una sola moneda por documento; hasta 40 líneas, 8 costos pagados por el cliente, 12 hitos y 8 opciones; cada bloque debe caber en una página; en el calendario con impuesto por hito, los tres importes deben dejar al menos el 40 % del ancho al hito y a su condición; el generador no calcula precios, márgenes, impuestos por hito ni calendarios, sólo comprueba que lo declarado suma.
 
 ```sh
 node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-terceros.json --out .captures/cotizacion-a4-lineas-nueva
 node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-opcionales.json --out .captures/cotizacion-a4-opcionales-nueva
+node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-proyecto.json --out .captures/cotizacion-a4-proyecto-nueva
+```
+
+Un precio por el trabajo completo se declara como una línea de cantidad 1 con su unidad en texto y sin valor unitario; `cover.netLabel` nombra ese precio en la portada:
+
+```json
+"cover": { "label": "Borrador", "title": ["Sitio web", "corporativo."], "subtitle": "…", "netLabel": "Valor neto del proyecto" },
+"lines": [{ "label": "Sitio web corporativo", "quantity": { "value": 1, "unit": "proyecto" }, "net": "2350000" }]
 ```
 
 Una línea bonificada y un bloque de opciones se declaran así:
@@ -150,18 +179,19 @@ Una línea bonificada y un bloque de opciones se declaran así:
 }
 ```
 
-`options` no existe en la versión 1: declararlo allí se rechaza, porque el bloque no se imprimiría.
+`options` y `cover.netLabel` no existen en la versión 1: declararlos allí se rechaza, porque no se imprimirían. En la versión 1, `buyer.unit` y `schedule.note` siguen siendo obligatorios.
 
 ## Páginas fijas: portada, alcance y condiciones
 
 Estas tres páginas no paginan: su contenido cabe en una hoja o el documento no puede componerse. El generador lo comprueba **antes de abrir el navegador**, en las dos versiones del contrato, con las mismas fuentes que incrusta y las medidas de `template.css`. Así, un título de portada demasiado largo falla al validar los datos (en una fracción de segundo, y también en las pruebas) y no al renderizar. El mensaje empieza por «Contenido fuera del A4» y dice qué acortar:
 
 - **Portada.** «El título de portada no cabe: «…» no entra en una línea a su tamaño y el título ocupa N líneas. Acórtalo (cover.title).» Cada entrada de `cover.title` es una línea del diseño: la que no entra en el ancho del título (550 px a 47 pt) se parte en dos y empuja todo lo demás. Si ninguna entrada se parte, el mensaje nombra el título y la bajada con sus líneas, y los demás textos que ocupan más de una (`cover.label`, `reference`, `buyer.name`, `pricing.summary`) o el alto del logo del cliente. Como orientación, sin logo y con los demás textos en una línea, caben un título de tres líneas con una bajada de hasta cinco, o uno de cuatro con una bajada de hasta tres.
-- **Alcance y calendario.** Nombra la fila más larga de `scope.rows`; también cuentan el título, la introducción y las fases.
+- **Alcance y calendario.** Nombra la fila más larga de `scope.rows`; también cuentan el título, la introducción, las fases y, si se declara, la nota del calendario, que comparte la fila con su título.
 - **Condiciones.** Nombra la condición más larga de `conditions.rows`.
+- **Versión 2: encabezado interior.** «El encabezado de las páginas interiores no cabe: la referencia ocupa N líneas…». Admite tres líneas entre la unidad del cliente, la sección y la referencia. Acortar `reference` o `buyer.unit`, o quitar `buyer.unit`. Antes, una referencia de dos líneas con unidad pasaba la validación y sólo fallaba en el render, sin decir la causa.
 - **Versión 2: una palabra más ancha que su bloque.** Estas páginas no parten palabras. Una que no cabe en su caja (un título de una sola palabra muy larga, importes de portada enormes) se saldría de ella y el render la rechaza; la comprobación dice cuál es. La versión 1 no hace esa comprobación en el render y aquí tampoco.
 
-La estimación es conservadora: nunca da menos altura que el navegador, y por eso puede rechazar una página que cabía por muy poco (una línea que entra en su ancho por menos del 1 %). La comprobación del render sigue siendo la segunda guarda. El manifiesto guarda en `checks.fixedPages` la altura estimada, la medida y la disponible de cada una de estas páginas. Si el logo del cliente no declara dimensiones legibles (un SVG sin `viewBox` ni medidas), la portada no se estima y queda a cargo del render. La página de inversión de la versión 1 tampoco se estima: la cubre sólo el render.
+La estimación es conservadora: nunca da menos altura que el navegador, y por eso puede rechazar una página que cabía por muy poco (una línea que entra en su ancho por menos del 1 %). La comprobación del render sigue siendo la segunda guarda. El manifiesto guarda en `checks.fixedPages` la altura estimada, la medida y la disponible de cada una de estas páginas y, en la versión 2, en `checks.interiorHeader` las líneas del encabezado interior y las que admite. Si el logo del cliente no declara dimensiones legibles (un SVG sin `viewBox` ni medidas), la portada no se estima y queda a cargo del render. La página de inversión de la versión 1 tampoco se estima: la cubre sólo el render.
 
 Una prueba permanente compone, sin navegador, todos los `ejemplo*.json` de esta carpeta y todos los `data/pricing/v3-operating/*.document.json`: un ejemplo que no puede componerse hace fallar la suite con su causa. Calibración y márgenes: [registro de revisión](VERIFICACION.md).
 

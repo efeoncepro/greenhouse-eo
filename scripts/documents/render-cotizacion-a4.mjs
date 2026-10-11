@@ -28,9 +28,12 @@ const TEMPLATES = {
   2: {
     html: 'template-lineas.html',
     css: ['template.css', 'template-lineas.css'],
-    // Estilos de la línea bonificada y del bloque de opciones. Se añaden sólo al documento que usa alguno de
-    // los dos: los que no los usan conservan su HTML byte a byte.
-    extrasCss: 'template-lineas-opciones.css'
+    // Estilos que se añaden sólo al documento que usa la capacidad: los demás conservan su HTML byte a byte.
+    // En orden: la línea bonificada y el bloque de opciones; el calendario de pagos con impuesto por hito.
+    extras: [
+      { css: 'template-lineas-opciones.css', when: q => usesExtras(q) },
+      { css: 'template-lineas-hitos.css', when: q => hasMilestoneTax(q) }
+    ]
   }
 }
 
@@ -55,6 +58,7 @@ const V2_KEYS = new Set([
   'vatRate',
   'taxStatus',
   'taxAmount',
+  'taxPeriods',
   'supplier',
   'buyer',
   'cover',
@@ -71,10 +75,21 @@ const V2_KEYS = new Set([
   'source'
 ])
 
-const V2_LIMITS = { lines: 40, quantity: 9999, clientPaidDirectly: 8, milestones: 12, options: 8 }
+const V2_LIMITS = { lines: 40, quantity: 9999, clientPaidDirectly: 8, milestones: 12, options: 8, taxPeriods: 120 }
+
+// Registros comunes a las dos versiones que en la versión 2 tienen claves opcionales (buyer.unit,
+// cover.netLabel, schedule.note): ahí también se rechazan las claves que el contrato no define.
+const V2_RECORDS = {
+  buyer: ['name', 'unit', 'taxId', 'logo'],
+  cover: ['label', 'title', 'subtitle', 'netLabel'],
+  schedule: ['title', 'note', 'phases']
+}
 
 // Una línea bonificada (net 0 con referenceNet) o el bloque de opciones: lo que añade estilos propios.
 const usesExtras = q => q.options != null || q.lines.some(line => line.referenceNet != null)
+
+// Calendario de pagos cuyos hitos declaran su impuesto y su total: la tabla imprime neto, impuesto y total.
+const hasMilestoneTax = q => q.paymentSchedule?.milestones?.some(milestone => milestone?.tax != null) === true
 
 const OWN_CURRENCY_ONLY =
   'La versión 2 se emite en la moneda de la cotización (currency): no admite presentation con otra moneda ni tipo de cambio. Quita presentation.currency y presentation.fx.'
@@ -92,11 +107,34 @@ function linesNetMinor(q) {
   return q.lines.reduce((sum, line) => sum + toMinor(line?.net, q.currency), 0n)
 }
 
+// Cuántas unidades menores puede diferir un impuesto declarado del calculado una vez sobre su neto: una por cada
+// periodo sobre el que se redondeó. Sin taxPeriods, los periodos se leen de las líneas (cada unidad de cantidad
+// es un mes o un pago). Una línea que imprime varios meses como un solo precio («1 programa») cuenta una vez,
+// así que la cotización declara en taxPeriods los periodos sobre los que redondeó: la tolerancia sigue a los
+// meses tributados, no a cómo se presentan las líneas.
+function taxTolerance(q) {
+  return q.taxPeriods != null
+    ? { units: BigInt(q.taxPeriods), basis: 'taxPeriods, los periodos sobre los que se redondeó el impuesto' }
+    : {
+        units: q.lines.reduce((sum, line) => sum + BigInt(line.quantity.value), 0n),
+        basis: 'la suma de lines[].quantity.value'
+      }
+}
+
 // Impuesto de la versión 2, en unidades menores. Una cotización que tributa mes a mes y suma los redondeos
 // puede diferir en unidades del impuesto calculado una vez sobre el subtotal: taxAmount declara esa cifra y el
 // documento imprime la de la cotización, nunca una segunda. Se acepta sólo si corresponde a la tasa: cada
 // unidad de cantidad (cada mes) aporta como máximo una unidad menor de redondeo.
 function taxOf(q, netMinor) {
+  if (q.taxPeriods != null) {
+    if (q.taxAmount == null)
+      throw new Error(
+        'taxPeriods sólo se declara junto a taxAmount: es el número de periodos sobre los que se redondeó ese impuesto.'
+      )
+    if (!Number.isSafeInteger(q.taxPeriods) || q.taxPeriods < 1 || q.taxPeriods > V2_LIMITS.taxPeriods)
+      throw new Error(`taxPeriods: entero de 1 a ${V2_LIMITS.taxPeriods}.`)
+  }
+
   if (q.vatRate === null) {
     if (q.taxAmount != null)
       throw new Error(
@@ -117,15 +155,46 @@ function taxOf(q, netMinor) {
     throw new Error(`taxAmount: ${error.message}.`)
   }
 
-  const tolerance = q.lines.reduce((sum, line) => sum + BigInt(line.quantity.value), 0n)
+  const tolerance = taxTolerance(q)
   const gap = stated > computed ? stated - computed : computed - stated
 
-  if (gap > tolerance)
+  if (gap > tolerance.units)
     throw new Error(
-      `taxAmount no corresponde a la tasa: declara ${fromMinor(stated, q.currency)} y el impuesto de vatRate sobre el subtotal es ${fromMinor(computed, q.currency)}. Se admite una diferencia de redondeo de hasta ${tolerance} unidades menores (la suma de lines[].quantity.value).`
+      `taxAmount no corresponde a la tasa: declara ${fromMinor(stated, q.currency)} y el impuesto de vatRate sobre el subtotal es ${fromMinor(computed, q.currency)}. Se admite una diferencia de redondeo de hasta ${tolerance.units} unidades menores (${tolerance.basis}).`
     )
 
   return { minor: stated, source: 'stated' }
+}
+
+// Hitos con impuesto (versión 2), contra la cotización. La validación de cada hito ya comprobó que su total es
+// neto más impuesto y que los netos suman el neto; aquí, que los totales suman el total de la cotización (y con
+// ello los impuestos, su impuesto) y que el impuesto de cada hito corresponde a la tasa. Un calendario reparte el
+// impuesto de la cotización entre sus hitos: cada uno puede diferir del impuesto calculado sobre su neto en lo
+// que admite taxAmount para la cotización, más una unidad menor por el redondeo del reparto.
+function assertMilestoneTax(q, netMinor, tax) {
+  if (!hasMilestoneTax(q)) return
+  const milestones = q.paymentSchedule.milestones
+  const totalMinor = netMinor + tax.minor
+  const scheduled = milestones.reduce((sum, milestone) => sum + toMinor(milestone.total, q.currency), 0n)
+
+  if (scheduled !== totalMinor)
+    throw new Error(
+      `paymentSchedule: la suma de milestones[].total debe ser exactamente igual al total de la cotización (${fromMinor(totalMinor, q.currency)}); los hitos suman ${fromMinor(scheduled, q.currency)}.`
+    )
+
+  const tolerance = taxTolerance(q)
+  const allowed = tolerance.units + 1n
+
+  milestones.forEach((milestone, i) => {
+    const stated = toMinor(milestone.tax, q.currency)
+    const computed = taxMinor(toMinor(milestone.net, q.currency), q.vatRate)
+    const gap = stated > computed ? stated - computed : computed - stated
+
+    if (gap > allowed)
+      throw new Error(
+        `paymentSchedule.milestones.${i}.tax no corresponde a la tasa: declara ${fromMinor(stated, q.currency)} y el impuesto de vatRate sobre su neto es ${fromMinor(computed, q.currency)}. Se admite una diferencia de redondeo de hasta ${allowed} unidades menores (${tolerance.basis}, más una por el reparto entre hitos).`
+      )
+  })
 }
 
 // Reglas propias de la versión 2. Devuelve el neto (suma de líneas) en unidades menores.
@@ -162,6 +231,10 @@ function validateLines(q, fail, string) {
   const list = (value, name, max) => {
     if (!Array.isArray(value) || !value.length || value.length > max) fail(`${name}: entre 1 y ${max} entradas.`)
   }
+
+  // Registros con claves opcionales: una clave mal escrita se omitiría en silencio, así que se rechaza. Si el
+  // registro falta, lo dice la validación común con el nombre de su primer campo.
+  for (const [name, allowed] of Object.entries(V2_RECORDS)) if (isRecord(q[name])) record(q[name], name, allowed)
 
   list(q.lines, 'lines', V2_LIMITS.lines)
   let net = 0n
@@ -247,23 +320,45 @@ function validateLines(q, fail, string) {
   if (q.paymentSchedule != null) {
     record(q.paymentSchedule, 'paymentSchedule', ['title', 'note', 'milestones'])
     string(q.paymentSchedule.title, 'paymentSchedule.title')
-    string(q.paymentSchedule.note, 'paymentSchedule.note')
+    if (q.paymentSchedule.note != null) string(q.paymentSchedule.note, 'paymentSchedule.note')
     list(q.paymentSchedule.milestones, 'paymentSchedule.milestones', V2_LIMITS.milestones)
     let scheduled = 0n
+    const taxed = []
 
     q.paymentSchedule.milestones.forEach((milestone, i) => {
       const at = `paymentSchedule.milestones.${i}`
 
-      record(milestone, at, ['label', 'when', 'net'])
+      record(milestone, at, ['label', 'when', 'net', 'tax', 'total'])
       string(milestone.label, `${at}.label`)
       string(milestone.when, `${at}.when`)
       const milestoneNet = amount(milestone.net, q.currency, `${at}.net`)
 
       if (milestoneNet <= 0n) fail(`${at}.net debe ser positivo.`)
       scheduled += milestoneNet
+
+      // Impuesto y total del hito: los dos o ninguno, y el total es exactamente neto más impuesto.
+      if ((milestone.tax != null) !== (milestone.total != null))
+        fail(`${at}: tax y total se declaran juntos; falta ${milestone.tax != null ? 'total' : 'tax'}.`)
+
+      if (milestone.tax != null) {
+        const milestoneTax = amount(milestone.tax, q.currency, `${at}.tax`)
+
+        if (milestoneNet + milestoneTax !== amount(milestone.total, q.currency, `${at}.total`))
+          fail(`${at}: total debe ser exactamente igual a net más tax.`)
+        taxed.push(i)
+      }
     })
     if (scheduled !== net)
       fail('paymentSchedule: la suma de milestones[].net debe ser exactamente igual al neto de la cotización.')
+
+    if (taxed.length && taxed.length !== q.paymentSchedule.milestones.length)
+      fail(
+        `paymentSchedule.milestones.${q.paymentSchedule.milestones.findIndex(milestone => milestone.tax == null)}: tax y total se declaran en todos los hitos o en ninguno; una tabla con hitos sin impuesto no suma el total de la cotización.`
+      )
+    if (taxed.length && q.vatRate == null)
+      fail(
+        'paymentSchedule.milestones: tax y total sólo se declaran con una tasa explícita en vatRate; con el impuesto por confirmar o no aplicable los hitos llevan sólo net.'
+      )
   }
 
   if (q.options != null) {
@@ -311,10 +406,16 @@ export function validateQuote(q) {
   if (netMinor <= 0n) fail('net debe ser positivo para el servicio completo.')
   if (!v2 && q.taxAmount != null)
     fail('taxAmount sólo existe en la versión 2; en la versión 1 el impuesto se calcula desde vatRate.')
+  if (!v2 && q.taxPeriods != null)
+    fail(
+      'taxPeriods sólo existe en la versión 2, junto a taxAmount; en la versión 1 el impuesto se calcula desde vatRate.'
+    )
   if (!v2 && q.options != null)
     fail('options sólo existe en la versión 2; en la versión 1 el bloque no se imprimiría. Usa version: 2 con lines.')
+  if (!v2 && q.cover?.netLabel != null)
+    fail('cover.netLabel sólo existe en la versión 2; en la versión 1 el rótulo de la portada es fijo.')
   if (q.vatRate !== null) taxMinor(netMinor, q.vatRate)
-  if (v2) taxOf(q, netMinor)
+  if (v2) assertMilestoneTax(q, netMinor, taxOf(q, netMinor))
   if (
     !/^\d{4}-\d{2}-\d{2}$/.test(q.date ?? '') ||
     !Number.isFinite(Date.parse(q.date)) ||
@@ -335,7 +436,9 @@ export function validateQuote(q) {
   if (!/^[^\s@<>"?&#]+@[^\s@<>"?&#]+\.[^\s@<>"?&#]+$/.test(q.supplier.email))
     fail('supplier.email debe ser un correo válido.')
   if (!/^\+?[\d ()-]{6,}$/.test(q.supplier.phone)) fail('supplier.phone debe ser un teléfono válido.')
-  for (const key of ['name', 'unit', 'taxId']) string(q.buyer?.[key], `buyer.${key}`)
+  // Versión 2: la unidad del cliente es opcional; sin ella el encabezado interior no la imprime.
+  for (const key of v2 ? ['name', 'taxId'] : ['name', 'unit', 'taxId']) string(q.buyer?.[key], `buyer.${key}`)
+  if (v2 && q.buyer.unit != null) string(q.buyer.unit, 'buyer.unit')
 
   if (q.buyer.logo != null) {
     string(q.buyer.logo.path, 'buyer.logo.path')
@@ -349,6 +452,7 @@ export function validateQuote(q) {
   string(q.cover?.label, 'cover.label')
   title(q.cover?.title, 'cover.title')
   string(q.cover?.subtitle, 'cover.subtitle')
+  if (q.cover.netLabel != null) string(q.cover.netLabel, 'cover.netLabel')
   // En la versión 2 cada línea lleva su propio detalle: service.detail no se imprime y es opcional.
   for (const key of v2 ? ['name'] : ['name', 'detail']) string(q.service?.[key], `service.${key}`)
   if (v2 && q.service.detail != null) string(q.service.detail, 'service.detail')
@@ -365,7 +469,8 @@ export function validateQuote(q) {
 
   rows(q.scope?.rows, 'scope.rows', 7)
   string(q.schedule?.title, 'schedule.title')
-  string(q.schedule?.note, 'schedule.note')
+  // Versión 2: la nota del calendario es opcional; sin ella el título ocupa la fila.
+  if (!v2 || q.schedule.note != null) string(q.schedule?.note, 'schedule.note')
   rows(q.schedule?.phases, 'schedule.phases', 3)
   q.schedule.phases.forEach((p, i) => string(p.label, `schedule.phases.${i}.label`))
   title(q.pricing?.title, 'pricing.title')
@@ -892,7 +997,13 @@ const FIXED = {
   // Holgura del ancho de línea de Poppins, cuyos avances coinciden con Chromium (±0,05 %). Medido en 76.000
   // párrafos: ninguno cuenta de menos ni siquiera sin holgura. Aquí importa no contar de más: una línea de
   // sobra rechaza una página que cabe.
-  wrapSlack: 0.999
+  wrapSlack: 0.999,
+  // Encabezado de las páginas interiores (template.css): empieza a 14 mm, el contenido a 38 mm; el logo mide
+  // 110 px y lo separan 20 px del bloque de texto, que va a 7,7 pt con interlineado 1,8. Bajo el texto, 12 px
+  // de relleno y 1 px de borde, y la comprobación del render exige 6 px libres antes del contenido.
+  headerWidth: FLOW.width - 110 - 20,
+  headerLine: 7.7 * PX_PER_PT * 1.8,
+  headerRoom: (38 - 14) * PX_PER_MM - 12 - 1 - 6
 }
 
 const COVER_NET_LABEL = 'Valor neto del servicio completo'
@@ -1038,9 +1149,12 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
   const totalFont = body(19, semibold, { scale: FLOW.amountScale })
   const divider = 25
 
+  // Versión 2: cover.netLabel sustituye al rótulo fijo; uno largo se parte y suma altura a la caja.
+  const netLabel = q.cover.netLabel ?? COVER_NET_LABEL
+
   const boxItems = [
     flexItem([
-      [COVER_NET_LABEL, small],
+      [netLabel, small],
       [netText, netFont],
       [q.pricing.summary, summaryFont]
     ]),
@@ -1061,7 +1175,7 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
   const investment =
     46 +
     Math.max(
-      flexLines(COVER_NET_LABEL, small, leftWidth, boxItems[0].max) * pt(7.6) * 1.5 +
+      flexLines(netLabel, small, leftWidth, boxItems[0].max) * pt(7.6) * 1.5 +
         14 +
         flexLines(netText, netFont, leftWidth, boxItems[0].max) * pt(32) * 1.2 +
         summaryLines * pt(10.5) * 1.5,
@@ -1135,12 +1249,19 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
   const h3 = heading(14)
   const noteFont = body(7.5)
 
-  const headingItems = [flexItem([[q.schedule.title, h3]]), flexItem([[q.schedule.note, noteFont]])]
-  const headingRow = flexRow(headingItems, W - 14)
+  // Título y nota comparten una fila; sin nota (versión 2), el título la ocupa entera.
+  const headingTexts = [
+    [q.schedule.title, h3, pt(14) * 1.25],
+    ...(q.schedule.note == null ? [] : [[q.schedule.note, noteFont, pt(7.5) * 1.5]])
+  ]
+
+  const headingItems = headingTexts.map(([value, font]) => flexItem([[value, font]]))
+  const headingRow = flexRow(headingItems, W - 14 * (headingItems.length - 1))
 
   const scheduleHeading = Math.max(
-    flexLines(q.schedule.title, h3, headingRow.widths[0], headingItems[0].max) * pt(14) * 1.25,
-    flexLines(q.schedule.note, noteFont, headingRow.widths[1], headingItems[1].max) * pt(7.5) * 1.5
+    ...headingTexts.map(
+      ([value, font, lineHeight], i) => flexLines(value, font, headingRow.widths[i], headingItems[i].max) * lineHeight
+    )
   )
 
   if (headingRow.overflow) tooWide.push({ field: 'schedule.title', word: q.schedule.title })
@@ -1217,6 +1338,20 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
     { key: 'contact', gap: 22, height: 16 + contactLines * pt(8.3) * 1.5 }
   ]
 
+  // ── Encabezado de las páginas interiores (versión 2) ──
+  // Tres líneas como máximo: la unidad del cliente (si se declara), el nombre de la sección y la referencia.
+  // Una referencia que se parte baja el borde del encabezado sobre el contenido y el render la rechaza.
+  const headerFont = body(7.7, semibold)
+  const headerLimit = Math.floor(FIXED.headerRoom / FIXED.headerLine)
+
+  const interiorLines = strict
+    ? {
+        unit: q.buyer.unit == null ? 0 : lines(q.buyer.unit, FIXED.headerWidth, headerFont, 'buyer.unit'),
+        section: 1,
+        reference: lines(q.reference, FIXED.headerWidth, headerFont, 'reference')
+      }
+    : null
+
   const total = blocks => sum(blocks.map(block => block.gap + block.height))
   const px = value => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(Math.ceil(value))
 
@@ -1254,6 +1389,13 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
     const tallest = conditionRows.reduce((worst, row) => (row.height > worst.height ? row : worst))
 
     failure = `La página de condiciones no cabe: acorta los textos de conditions.rows (el más largo es «${tallest.title}») o reduce sus entradas. ${room('Su contenido', total(conditions), FIXED.interior)}`
+  } else if (strict && interiorLines.unit + interiorLines.section + interiorLines.reference > headerLimit) {
+    const plural = count => `${count} ${count === 1 ? 'línea' : 'líneas'}`
+
+    failure =
+      q.buyer.unit == null
+        ? `El encabezado de las páginas interiores no cabe: la referencia ocupa ${plural(interiorLines.reference)} y, con el nombre de la sección, el encabezado admite ${headerLimit} en total. Acorta reference.`
+        : `El encabezado de las páginas interiores no cabe: la referencia ocupa ${plural(interiorLines.reference)} y la unidad del cliente, ${plural(interiorLines.unit)}; con el nombre de la sección, el encabezado admite ${headerLimit} en total. Acorta reference o buyer.unit, o quita buyer.unit.`
   } else if (strict && tooWide.length) {
     // Versión 2: el render rechaza un texto que se sale de su caja; aquí se dice cuál.
     failure = tooWide[0].cause
@@ -1271,6 +1413,8 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
 
   return {
     failure,
+    // Versión 2: líneas del encabezado interior y cuántas admite.
+    ...(interiorLines ? { header: { ...interiorLines, limit: headerLimit } } : {}),
     pages: [
       ...(coverKnown ? [report(1, 'portada', cover, coverCapacity)] : []),
       report(2, 'alcance', scope, FIXED.interior),
@@ -1309,7 +1453,7 @@ const OPTIONS_NOTE =
 
 // Reparte la sección de precios de la versión 2 en páginas. Devuelve, por página, los bloques en el orden
 // del documento con su separación y altura estimadas. No imprime nada: renderPricingPages usa este plan.
-async function planPricing(q, { money, locale, monthlyTexts }) {
+async function planPricing(q, { money, locale, monthlyTexts, taxLabel, taxTotalLabel }) {
   const [regular, semibold, display] = await Promise.all(
     ['poppins-400.ttf', 'poppins-600.ttf', 'bricolage-grotesque-variable.ttf'].map(file =>
       fontAdvance(path.join(fontDir, file))
@@ -1341,7 +1485,10 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
     cellStrong: { advance: semibold, size: pt(8.8) },
     amount: { advance: semibold, size: pt(10), scale: FLOW.amountScale },
     unitAmount: { advance: regular, size: pt(10), scale: FLOW.amountScale },
-    cellAmount: { advance: semibold, size: pt(8.8), scale: FLOW.amountScale }
+    cellAmount: { advance: semibold, size: pt(8.8), scale: FLOW.amountScale },
+    cellPlainAmount: { advance: regular, size: pt(8.8), scale: FLOW.amountScale },
+    // Cabecera de tabla (template.css): 8 pt en mayúsculas, peso 600 y espaciado de .04em.
+    head: { advance: semibold, size: pt(8), tracking: 0.04, upper: true }
   }
 
   // Alto de una línea de texto por estilo: tamaño × interlineado de la hoja de estilos.
@@ -1456,30 +1603,76 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
 
   if (q.paymentSchedule != null) {
     const schedule = q.paymentSchedule
+    const taxed = hasMilestoneTax(q)
+    const pad = 13
+
+    const texts = schedule.milestones.map(milestone => ({
+      netText: money(milestone.net),
+      ...(taxed ? { taxText: money(milestone.tax), totalText: money(milestone.total) } : {})
+    }))
+
+    // Sin impuesto por hito: las tres columnas del diseño (hito, fecha o condición y valor neto). Con él, cuatro:
+    // el hito con su fecha o condición debajo, como el concepto y su detalle en la tabla de líneas, y neto,
+    // impuesto y total, cada columna al ancho de su cabecera o de su importe mayor.
+    let columns = null
+    let textWidthOf = null
+
+    if (taxed) {
+      const widest = (key, amountFont) => Math.max(...texts.map(text => textWidth(text[key], amountFont)))
+      const share = px => Math.ceil((px / FLOW.width) * 1e5) / 1e3
+      const headWidth = ['Valor neto', taxLabel, taxTotalLabel].map(text => textWidth(text, font.head) + 2 * pad + 2)
+
+      // Las columnas de importes parten del ancho del diseño y sólo crecen si una cabecera o un importe lo exige.
+      // La última no tiene relleno derecho en sus celdas, pero su cabecera sí.
+      const amountShares = [
+        Math.max(15, share(Math.max(headWidth[0], widest('netText', font.cellPlainAmount) + 2 * pad + 2))),
+        Math.max(13, share(Math.max(headWidth[1], widest('taxText', font.cellPlainAmount) + 2 * pad + 2))),
+        Math.max(17, share(Math.max(headWidth[2], widest('totalText', font.cellAmount) + pad + 2)))
+      ]
+
+      const textShare = Math.round((100 - amountShares.reduce((sum, value) => sum + value, 0)) * 1e3) / 1e3
+
+      if (textShare < 40)
+        fail(
+          'Los importes del calendario de pagos son demasiado anchos para la tabla: no dejan espacio al hito y a su condición.'
+        )
+      columns = [textShare, ...amountShares]
+      textWidthOf = (FLOW.width * textShare) / 100 - pad
+    }
+
     let height =
       countLines(schedule.title, FLOW.width, font.heading) * line.heading +
-      step +
-      countLines(schedule.note, FLOW.width, font.note) * line.note +
+      (schedule.note == null ? 0 : step + countLines(schedule.note, FLOW.width, font.note) * line.note) +
       step * 3 +
       head
 
     const milestones = schedule.milestones.map((milestone, index) => {
-      const netText = money(milestone.net)
-
-      amountFits(netText, FLOW.width * 0.22 - 13, font.cellAmount, `paymentSchedule.milestones.${index}.net`)
+      if (!taxed)
+        amountFits(
+          texts[index].netText,
+          FLOW.width * 0.22 - pad,
+          font.cellAmount,
+          `paymentSchedule.milestones.${index}.net`
+        )
       height +=
         step * 6 +
         1 +
-        Math.max(
-          countLines(milestone.label, FLOW.width * 0.38 - 13, font.cellStrong),
-          countLines(milestone.when, FLOW.width * 0.4 - 26, font.cell)
-        ) *
+        (taxed
+          ? countLines(milestone.label, textWidthOf, font.cellStrong) +
+            countLines(milestone.when, textWidthOf, font.cell)
+          : Math.max(
+              countLines(milestone.label, FLOW.width * 0.38 - pad, font.cellStrong),
+              countLines(milestone.when, FLOW.width * 0.4 - 2 * pad, font.cell)
+            )) *
           line.cell
 
-      return { netText }
+      return texts[index]
     })
 
-    blocks.push({ name: 'el calendario de pagos', items: [{ key: 'schedule', gap: step * 6, height, milestones }] })
+    blocks.push({
+      name: 'el calendario de pagos',
+      items: [{ key: 'schedule', gap: step * 6, height, milestones, ...(columns ? { columns } : {}) }]
+    })
   }
 
   if (q.clientPaidDirectly != null) {
@@ -1719,13 +1912,30 @@ function renderPricingPages(q, plan, parts) {
     },
     totals: () => parts.totals,
     taxNote: () => parts.taxNote,
-    schedule: item =>
-      `<div class="pay-schedule" data-slot="paymentSchedule"><h3 data-slot="paymentSchedule.title">${esc(q.paymentSchedule.title)}</h3><p data-slot="paymentSchedule.note">${esc(q.paymentSchedule.note)}</p><table class="milestones-table"><caption class="sr-only">Calendario de pagos</caption><thead><tr><th scope="col">Hito</th><th scope="col">Fecha o condición</th><th scope="col">Valor neto</th></tr></thead><tbody>${q.paymentSchedule.milestones
-        .map(
-          (milestone, i) =>
-            `<tr><th scope="row" data-slot="paymentSchedule.milestones.${i}.label">${esc(milestone.label)}</th><td data-slot="paymentSchedule.milestones.${i}.when">${esc(milestone.when)}</td><td data-slot="paymentSchedule.milestones.${i}.net">${item.milestones[i].netText}</td></tr>`
-        )
-        .join('')}</tbody></table></div>`,
+    schedule: item => {
+      const at = i => `paymentSchedule.milestones.${i}`
+      // Con impuesto por hito (item.columns): el hito con su condición debajo, y neto, impuesto y total.
+      // data-label rotula cada importe en pantallas estrechas, donde la tabla se apila.
+      const taxed = item.columns != null
+      const amounts = taxed ? ['Valor neto', parts.taxLabel, parts.taxTotalLabel] : ['Valor neto']
+      const headers = taxed ? ['Hito', ...amounts] : ['Hito', 'Fecha o condición', ...amounts]
+
+      const row = (milestone, i) =>
+        taxed
+          ? `<tr><th scope="row"><span data-slot="${at(i)}.label">${esc(milestone.label)}</span><span data-slot="${at(i)}.when">${esc(milestone.when)}</span></th>${[
+              'net',
+              'tax',
+              'total'
+            ]
+              .map(
+                (key, k) =>
+                  `<td data-slot="${at(i)}.${key}" data-label="${amounts[k]}">${item.milestones[i][`${key}Text`]}</td>`
+              )
+              .join('')}</tr>`
+          : `<tr><th scope="row" data-slot="${at(i)}.label">${esc(milestone.label)}</th><td data-slot="${at(i)}.when">${esc(milestone.when)}</td><td data-slot="${at(i)}.net">${item.milestones[i].netText}</td></tr>`
+
+      return `<div class="pay-schedule" data-slot="paymentSchedule"><h3 data-slot="paymentSchedule.title">${esc(q.paymentSchedule.title)}</h3>${q.paymentSchedule.note == null ? '' : `<p data-slot="paymentSchedule.note">${esc(q.paymentSchedule.note)}</p>`}<table class="milestones-table${taxed ? ' milestones-taxed' : ''}"><caption class="sr-only">Calendario de pagos</caption>${taxed ? `<colgroup>${item.columns.map(share => `<col style="width:${share}%">`).join('')}</colgroup>` : ''}<thead><tr>${headers.map(text => `<th scope="col">${text}</th>`).join('')}</tr></thead><tbody>${q.paymentSchedule.milestones.map(row).join('')}</tbody></table></div>`
+    },
     clientPaid: item =>
       `<div class="client-paid" data-slot="clientPaidDirectly"><p class="overline">Fuera de esta cotización</p><h3>${esc(CLIENT_PAID_TITLE)}</h3><p>${esc(CLIENT_PAID_NOTE)}</p><div class="client-paid-rows">${q.clientPaidDirectly
         .map(
@@ -1826,7 +2036,8 @@ export async function buildHtml(q, dataPath) {
       '.webp': 'image/webp'
     }[path.extname(file).toLowerCase()]
 
-    clientLogo = `<img data-slot="buyer.logo" src="${await asset(file, mime, q.buyer.logo.source)}" alt="${esc(q.buyer.unit)}">`
+    // Versión 2 sin unidad del cliente: el texto alternativo del logo es su nombre.
+    clientLogo = `<img data-slot="buyer.logo" src="${await asset(file, mime, q.buyer.logo.source)}" alt="${esc(q.buyer.unit ?? q.buyer.name)}">`
   }
 
   let fonts = ''
@@ -1874,12 +2085,15 @@ export async function buildHtml(q, dataPath) {
     'brand.tracking': gl.type.answer.tracking
   }
 
-  const cssFiles = [...template.css, ...(v2 && usesExtras(q) ? [template.extrasCss] : [])]
+  const cssFiles = [...template.css, ...(template.extras ?? []).filter(extra => extra.when(q)).map(extra => extra.css)]
   let css = ''
 
   for (const name of cssFiles) css += fillSlots(await fs.readFile(path.join(templateDir, name), 'utf8'), brandSlots)
 
-  const pricingPlan = v2 ? await planPricing(q, { money, locale: presentation.locale, monthlyTexts }) : null
+  const pricingPlan = v2
+    ? await planPricing(q, { money, locale: presentation.locale, monthlyTexts, taxLabel, taxTotalLabel })
+    : null
+
   const pageTotal = v2 ? 3 + pricingPlan.pages.length : 4
   const folio = n => String(n).padStart(2, '0')
 
@@ -1898,8 +2112,14 @@ export async function buildHtml(q, dataPath) {
   if (fixed.failure)
     throw new Error(`Contenido fuera del A4. ${fixed.failure} No se reduce la tipografía ni se recorta el contenido.`)
 
-  const header = label =>
-    `<header class="page-header"><img class="header-logo" src="${logo}" alt="Efeonce"><div class="header-meta"><span data-slot="buyer.unit">${esc(q.buyer.unit)}</span><span>${esc(label)} · <span data-slot="reference">${esc(q.reference)}</span></span></div></header>`
+  // Encabezado de las páginas interiores. La versión 1 conserva el suyo. En la versión 2 cada dato ocupa su
+  // línea, sin separador que pueda quedar colgando: la unidad del cliente (si se declara), la sección y la
+  // referencia. Sin unidad son dos líneas; el bloque se centra con el logo y no deja hueco.
+  const header = v2
+    ? label =>
+        `<header class="page-header"><img class="header-logo" src="${logo}" alt="Efeonce"><div class="header-meta header-stack">${q.buyer.unit == null ? '' : `<span class="header-unit" data-slot="buyer.unit">${esc(q.buyer.unit)}</span>`}<span class="header-section">${esc(label)}</span><span class="header-reference" data-slot="reference">${esc(q.reference)}</span></div></header>`
+    : label =>
+        `<header class="page-header"><img class="header-logo" src="${logo}" alt="Efeonce"><div class="header-meta"><span data-slot="buyer.unit">${esc(q.buyer.unit)}</span><span>${esc(label)} · <span data-slot="reference">${esc(q.reference)}</span></span></div></header>`
 
   const footer = n =>
     `<footer class="page-footer">${n === 1 ? '<div class="plain-divider"></div>' : `<div class="brand-divider">${divider}</div>`}<div class="footer-body"><div class="footer-contact"><span>${esc(contact.address)}</span><a href="tel:${esc(contact.chilePhone.replaceAll(' ', ''))}">${esc(contact.chilePhone)}</a></div><a class="url-bubble" href="https://efeoncepro.com/" aria-label="Sitio web de Efeonce"><img src="${bubble}" alt="efeoncepro.com"></a><span class="folio">${folio(n)} / ${folio(pageTotal)}</span></div></footer>`
@@ -1942,7 +2162,7 @@ export async function buildHtml(q, dataPath) {
       )
       .join(''),
     'schedule.title': esc(q.schedule.title),
-    'schedule.note': esc(q.schedule.note),
+    'schedule.note': q.schedule.note == null ? '' : esc(q.schedule.note),
     'schedule.count': q.schedule.phases.length,
     'schedule.phases': q.schedule.phases
       .map(
@@ -1982,6 +2202,14 @@ export async function buildHtml(q, dataPath) {
   for (let n = 1; n <= 4; n++) slots[`footer.${n}`] = footer(n)
 
   if (v2) {
+    // Rótulo del valor neto en la portada: el fijo, o cover.netLabel con su slot.
+    slots['cover.netLabelBlock'] =
+      q.cover.netLabel == null
+        ? `<span class="label">${COVER_NET_LABEL}</span>`
+        : `<span class="label" data-slot="cover.netLabel">${esc(q.cover.netLabel)}</span>`
+    // Nota del calendario: sin ella no se imprime su elemento y el título ocupa la fila.
+    slots['schedule.noteBlock'] =
+      q.schedule.note == null ? '' : `<span data-slot="schedule.note">${slots['schedule.note']}</span>`
     slots['conditions.page'] = pageTotal
     slots['header.conditions'] = header('Condiciones de ejecución')
     slots['footer.conditions'] = footer(pageTotal)
@@ -1991,7 +2219,9 @@ export async function buildHtml(q, dataPath) {
       locale: presentation.locale,
       totals: `<div class="totals"><div><span>Subtotal neto</span><strong data-slot="amount.net">${slots['amount.net']}</strong></div><div><span><span data-slot="tax.label">${slots['tax.label']}</span>${slots['tax.rateSuffix']}</span><strong data-slot="amount.vat">${slots['amount.vat']}</strong></div><div class="grand-total"><span>${slots['tax.totalLabel']}</span><strong data-slot="amount.total">${slots['amount.total']}</strong></div></div>`,
       taxNote: `<p class="tax-note" data-slot="pricing.taxNote">${slots['pricing.taxNote']}</p>`,
-      monthly: slots['pricing.monthly']
+      monthly: slots['pricing.monthly'],
+      taxLabel: slots['tax.label'],
+      taxTotalLabel: slots['tax.totalLabel']
     })
   }
 
@@ -2003,6 +2233,8 @@ export async function buildHtml(q, dataPath) {
     pageCount: pageTotal,
     templateFiles: [template.html, ...cssFiles],
     fixedPages: fixed.pages,
+    // Versión 2: líneas del encabezado interior (unidad, sección, referencia) y las que admite.
+    ...(fixed.header ? { interiorHeader: fixed.header } : {}),
     pagination: pricingPlan
       ? pricingPlan.pages.map((page, i) => ({
           page: 3 + i,
@@ -2044,6 +2276,7 @@ async function main(args) {
     pageCount,
     templateFiles: templateNames,
     fixedPages,
+    interiorHeader,
     pagination
   } = await buildHtml(q, dataPath)
 
@@ -2203,6 +2436,7 @@ async function main(args) {
       checks: {
         layout,
         fixedPages: fixedPagesCheck,
+        ...(interiorHeader ? { interiorHeader } : {}),
         ...(paginationCheck ? { pagination: paginationCheck } : {}),
         mobile: mobileCheck,
         browserErrors: errors,

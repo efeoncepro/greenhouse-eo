@@ -52,11 +52,14 @@ Los costos de `clientPaidDirectly` no son una conversión: cada uno se imprime e
 
 El valor de referencia de una línea bonificada (`lines[].referenceNet`) y los valores del bloque de opciones (`options.items[].net`) se expresan en la moneda del documento, con sus decimales: no declaran moneda propia ni se convierten. Ninguno entra en el neto, el impuesto o el total.
 
+El impuesto y el total de cada hito del calendario de pagos (`paymentSchedule.milestones[].tax` y `.total`) también van en la moneda del documento, con sus decimales, y sólo con una tasa explícita en `vatRate`. No son un segundo cálculo: reparten el impuesto de la cotización, y el generador comprueba que sus totales suman el total del documento.
+
 ## Impuestos, precisión y redondeo
 
 - `vatRate` es explícito e independiente de la moneda. `null` mantiene impuesto y total facturable pendientes; `0` declara una tasa cero confirmada. Nunca transformar desconocido en cero ni asignar IVA/IGV al elegir PEN.
 - El neto fuente debe respetar la unidad menor ISO. Conversión e impuestos usan ratios decimales y BigInt; el redondeo es half-up a la precisión destino. Se rechazan importes fuera de la precisión segura de representación.
-- En la versión 2 el neto es la suma exacta de las líneas y el impuesto se calcula una vez sobre ella, no línea por línea; `taxAmount` permite declarar el impuesto de la cotización de origen cuando difiere en unidades de redondeo.
+- En la versión 2 el neto es la suma exacta de las líneas y el impuesto se calcula una vez sobre ella, no línea por línea; `taxAmount` permite declarar el impuesto de la cotización de origen cuando difiere en unidades de redondeo, y `taxPeriods`, los periodos sobre los que se redondeó cuando las líneas no los muestran.
+- El impuesto de un hito puede diferir del calculado sobre su neto en esas mismas unidades más una, la del reparto entre hitos. Las sumas no admiten diferencia: los netos suman el neto y los totales, el total.
 - El documento A4 calcula impuestos sobre el neto convertido. Las referencias mensuales dividen los importes totales de salida antes del redondeo de visualización; no son cuotas. En el renderer Pibank, promedios y hitos dividen el importe fuente antes de convertir/redondear, evitando convertir un promedio USD previamente redondeado.
 - Sumar importes redondeados puede introducir diferencias respecto del total convertido. Revisar subtotales, hitos y calendarios en cada versión; documentar cualquier ajuste explícito. Pibank con la tasa registrada concilia sin ajuste.
 

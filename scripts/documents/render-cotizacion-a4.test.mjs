@@ -158,8 +158,27 @@ test('las dos plantillas comparten portada, alcance y condiciones', async () => 
 
   const section = (html, id) => html.slice(html.indexOf(`<section id="${id}"`)).split('</section>')[0]
 
-  assert.equal(section(v2, 'pagina-1'), section(v1, 'pagina-1'))
-  assert.equal(section(v2, 'pagina-2'), section(v1, 'pagina-2'))
+  // La versión 2 deja en manos del generador dos elementos que en ella son opcionales o editables: el rótulo
+  // del valor neto de la portada (cover.netLabel) y la nota del calendario (schedule.note). Con los datos de
+  // siempre, el generador escribe exactamente el elemento de la versión 1.
+  const same = (html, slot, element) => {
+    assert.equal(html.split(slot).length, 2, slot)
+
+    return html.replace(slot, element)
+  }
+
+  assert.equal(
+    same(
+      section(v2, 'pagina-1'),
+      '{{cover.netLabelBlock}}',
+      '<span class="label">Valor neto del servicio completo</span>'
+    ),
+    section(v1, 'pagina-1')
+  )
+  assert.equal(
+    same(section(v2, 'pagina-2'), '{{schedule.noteBlock}}', '<span data-slot="schedule.note">{{schedule.note}}</span>'),
+    section(v1, 'pagina-2')
+  )
   assert.equal(
     section(v2, 'pagina-{{conditions.page}}')
       .replaceAll('{{conditions.page}}', '4')
@@ -374,12 +393,13 @@ test('versión 2: cada regla del contrato se valida con un mensaje propio', () =
   rejects(q => (q.paymentSchedule.milestones = []), /paymentSchedule\.milestones: entre 1 y 12/)
   rejects(q => (q.paymentSchedule.milestones = Array(13).fill(q.paymentSchedule.milestones[0])), /entre 1 y 12/)
   rejects(q => delete q.paymentSchedule.title, /paymentSchedule\.title debe ser texto/)
-  rejects(q => delete q.paymentSchedule.note, /paymentSchedule\.note debe ser texto/)
+  rejects(q => (q.paymentSchedule.note = ' '), /paymentSchedule\.note debe ser texto/)
+  rejects(q => (q.paymentSchedule.notes = 'Nota'), /paymentSchedule: campos no reconocidos \(notes\)/)
   rejects(q => delete q.paymentSchedule.milestones[1].when, /paymentSchedule\.milestones\.1\.when debe ser texto/)
   rejects(q => (q.paymentSchedule.milestones[1].net = '0'), /paymentSchedule\.milestones\.1\.net debe ser positivo/)
   rejects(
-    q => (q.paymentSchedule.milestones[1].tax = '1'),
-    /paymentSchedule\.milestones\.1: campos no reconocidos \(tax\)/
+    q => (q.paymentSchedule.milestones[1].vat = '1'),
+    /paymentSchedule\.milestones\.1: campos no reconocidos \(vat\)/
   )
   rejects(q => (q.source = ['pricing-v3']), /source debe ser un objeto plano de textos/)
   rejects(q => (q.source = { system: 'pricing-v3', totals: { net: '1' } }), /source\.totals debe ser texto/)
@@ -608,12 +628,18 @@ test('versión 2: bloques opcionales, importes en su moneda y origen de datos fu
 })
 
 // ── Versión 2: línea bonificada, opciones y posición de los totales ───────────────────────────────────────
-// SHA-256 del HTML de los ejemplos de la versión 2 que no usan línea bonificada ni opciones, medido antes de
-// añadirlas. Un documento que no usa una capacidad nueva debe salir byte a byte como antes: sus estilos viajan
-// en un archivo aparte que sólo se incluye cuando hace falta. Vale la misma salvedad que en la versión 1.
+// SHA-256 del HTML de los ejemplos de la versión 2 que no usan línea bonificada, opciones ni impuesto por hito.
+// Un documento que no usa una capacidad nueva debe salir byte a byte como antes: sus estilos viajan en un
+// archivo aparte que sólo se incluye cuando hace falta. Vale la misma salvedad que en la versión 1.
+//
+// Referencias fijadas de nuevo, a propósito, el 11/10/2026 (antes: 9cab83ed… y 433ee479…), por dos cambios que
+// se midieron por separado. Uno, el encabezado de las páginas interiores de la versión 2: ya no deja un «·»
+// colgando tras el nombre de la sección; con los datos de entonces el HTML pasó a ad7f0005… y 7acecf16…, y la
+// única diferencia es el marcado del encabezado y sus estilos. Dos, los ejemplos dejaron de declarar la nota
+// «Desde el inicio acordado» y la condición «Plazo e inicio», que no decían nada: de ahí los valores de abajo.
 const V2_BASELINE = {
-  'ejemplo-lineas.json': '9cab83eda0620ef833cb143d2fcfe971bbdf5ce6e21a7558aa2d1e8f0f339d40',
-  'ejemplo-lineas-terceros.json': '433ee4798736af5e13818fd91998985b445c4386897a5ccc0f39465670e8553c'
+  'ejemplo-lineas.json': 'd92402cb59ea914abb3bb216ad7b02dec5972c362b0038fc60f8726bda379a9e',
+  'ejemplo-lineas-terceros.json': 'e77347610645ec82c39f7737980810dd842171854430d17951d8cefafeede546'
 }
 
 const optionalExample = await load('ejemplo-lineas-opcionales.json')
@@ -1014,10 +1040,12 @@ test('páginas fijas: cada página estima sus bloques y dice qué acortar cuando
     q.reference = 'Referencia del proceso de compra con su código completo y su descripción. '.repeat(3)
   }, /La portada no cabe: .* También ocupan más de una línea: reference \(\d líneas\)\./)
 
-  // Una referencia de varias líneas baja el inicio de la portada: admite menos.
+  // Una referencia de varias líneas baja el inicio de la portada: admite menos. En la versión 2 cabe además en
+  // el encabezado interior, que admite tres líneas, porque el documento no declara la unidad del cliente.
   const longReference = structuredClone(linesExample)
 
   longReference.reference = 'Referencia del proceso de compra con su código completo y su descripción. '.repeat(2)
+  delete longReference.buyer.unit
   assert.equal(coverOf(await build(longReference)).capacityPx, 802.75 - 18)
 
   await rejects(
@@ -1202,4 +1230,484 @@ test('medición de texto: nunca cuenta menos líneas de las que caben en el anch
   // Una palabra más ancha que la línea se parte; no desborda ni se cuenta como una sola línea.
   assert.ok(countLines('electroencefalografista', textWidth('electroen', font), font) >= 3)
   assert.equal(countLines('  texto   con   espacios  ', 1000, font), 1)
+})
+
+// ── Versión 2: encabezado interior, claves opcionales e impuesto por hito ────────────────────────────────
+const projectExample = await load('ejemplo-lineas-proyecto.json')
+const MILESTONES_CSS = 'template-lineas-hitos.css'
+
+const headerOf = (unit, section, reference) =>
+  `<div class="header-meta header-stack">${unit == null ? '' : `<span class="header-unit" data-slot="buyer.unit">${unit}</span>`}<span class="header-section">${section}</span><span class="header-reference" data-slot="reference">${reference}</span></div>`
+
+test('versión 2: el encabezado interior apila unidad, sección y referencia, sin separador colgante', async () => {
+  const reference = 'Ejemplo · Sin validez comercial'
+  const withUnit = await build(linesExample)
+
+  // Cada dato en su línea: ningún «·» queda colgando tras el nombre de la sección.
+  for (const section of ['Alcance y calendario', 'Detalle de la cotización', 'Condiciones de ejecución'])
+    assert.equal(count(withUnit.html, headerOf('Equipo de producto digital', section, reference)), 1, section)
+  assert.ok(!withUnit.html.includes(' · <span data-slot="reference">'))
+  assert.ok(withUnit.html.includes('.header-stack{'))
+  assert.deepEqual(withUnit.interiorHeader, { unit: 1, section: 1, reference: 1, limit: 3 })
+
+  // Una tabla en varias páginas repite el encabezado de su sección en cada una.
+  const long = await build(withLines(plainLines(30)))
+
+  assert.ok(long.pagination.length > 1)
+  assert.equal(count(long.html, '<span class="header-section">Detalle de la cotización</span>'), long.pagination.length)
+
+  // Sin unidad del cliente: dos líneas, sin elemento vacío y sin repetir el nombre del cliente.
+  const noUnit = structuredClone(linesExample)
+
+  delete noUnit.buyer.unit
+  const withoutUnit = await build(noUnit)
+
+  assert.equal(count(withoutUnit.html, headerOf(null, 'Alcance y calendario', reference)), 1)
+  assert.ok(!withoutUnit.html.includes('data-slot="buyer.unit"') && !withoutUnit.html.includes('header-unit"'))
+  assert.equal(count(withoutUnit.html, '<span data-slot="buyer.name">Cliente de ejemplo</span>'), 1)
+  assert.deepEqual(withoutUnit.interiorHeader, { unit: 0, section: 1, reference: 1, limit: 3 })
+
+  // El encabezado admite tres líneas. Una referencia de dos cabe sin unidad y no cabe con ella: antes pasaba
+  // la validación y sólo fallaba al renderizar, con el borde del encabezado a 3,8 px del contenido.
+  const twoLines =
+    'Licitación 1057480-25-LE26 · Servicio de producción de contenidos y gestión de comunidades digitales 2027'
+
+  const header = async mutate => {
+    const q = structuredClone(linesExample)
+
+    mutate(q)
+
+    return (await build(q)).interiorHeader
+  }
+
+  assert.deepEqual(
+    await header(q => {
+      q.reference = twoLines
+      delete q.buyer.unit
+    }),
+    { unit: 0, section: 1, reference: 2, limit: 3 }
+  )
+  await assert.rejects(
+    header(q => (q.reference = twoLines)),
+    /Contenido fuera del A4\. El encabezado de las páginas interiores no cabe: la referencia ocupa 2 líneas y la unidad del cliente, 1 línea; con el nombre de la sección, el encabezado admite 3 en total\. Acorta reference o buyer\.unit, o quita buyer\.unit\./
+  )
+  await assert.rejects(
+    header(
+      q => (q.buyer.unit = 'Gerencia corporativa de marketing, comunicaciones y experiencia de clientes. '.repeat(2))
+    ),
+    /la referencia ocupa 1 línea y la unidad del cliente, 2 líneas/
+  )
+  await assert.rejects(
+    header(q => {
+      q.reference = `${twoLines}. `.repeat(2)
+      delete q.buyer.unit
+    }),
+    /El encabezado de las páginas interiores no cabe: la referencia ocupa 3 líneas y, con el nombre de la sección, el encabezado admite 3 en total\. Acorta reference\./
+  )
+  // Una palabra más ancha que el encabezado no puede partirse: invadiría el logo.
+  await assert.rejects(
+    header(q => (q.reference = 'COT'.repeat(40))),
+    /«(COT){40}» \(reference\) es más ancho que su bloque y no puede partirse/
+  )
+
+  // La versión 1 conserva su encabezado y no estima el de la versión 2.
+  const v1 = await buildHtml(example, dataPath.pathname)
+
+  assert.equal(count(v1.html, '<div class="header-meta"><span data-slot="buyer.unit">'), 3)
+  assert.ok(!v1.html.includes('header-stack') && v1.interiorHeader === undefined)
+})
+
+test('versión 2: buyer.unit, schedule.note y cover.netLabel son opcionales; una clave mal escrita se rechaza', async () => {
+  const bare = structuredClone(linesExample)
+
+  delete bare.buyer.unit
+  assert.equal(bare.schedule.note, undefined)
+  validateQuote(bare)
+  validateQuote({ ...bare, buyer: { ...bare.buyer, unit: null }, schedule: { ...bare.schedule, note: null } })
+
+  const rejects = (mutate, pattern, base = linesExample) => {
+    const q = structuredClone(base)
+
+    mutate(q)
+    assert.throws(() => validateQuote(q), pattern)
+  }
+
+  rejects(q => (q.buyer.unit = ' '), /buyer\.unit debe ser texto/)
+  rejects(q => (q.schedule.note = ''), /schedule\.note debe ser texto/)
+  rejects(q => (q.cover.netLabel = 7), /cover\.netLabel debe ser texto/)
+  // Con claves opcionales, una mal escrita se omitiría en silencio: se rechaza con su nombre.
+  rejects(
+    q => (q.buyer.unidad = 'Gerencia'),
+    /buyer: campos no reconocidos \(unidad\)\. Se admiten: name, unit, taxId, logo/
+  )
+  rejects(q => (q.cover.netLable = 'Valor'), /cover: campos no reconocidos \(netLable\)/)
+  rejects(q => (q.schedule.nota = 'Nota'), /schedule: campos no reconocidos \(nota\)/)
+  rejects(q => delete q.buyer, /buyer\.name debe ser texto/)
+  // La versión 1 no cambia: sus dos campos siguen siendo obligatorios y su rótulo de portada, fijo.
+  rejects(q => delete q.buyer.unit, /buyer\.unit debe ser texto/, example)
+  rejects(q => delete q.schedule.note, /schedule\.note debe ser texto/, example)
+  rejects(q => (q.cover.netLabel = 'Valor neto del proyecto'), /cover\.netLabel sólo existe en la versión 2/, example)
+  validateQuote({ ...example, buyer: { ...example.buyer, unidad: 'La versión 1 no rechaza claves' } })
+
+  // Sin nota, el calendario del servicio no deja su elemento vacío: el título ocupa la fila.
+  const plain = await build(linesExample)
+  const heading = '<div class="section-heading"><h3 data-slot="schedule.title">Calendario de tres meses</h3>'
+
+  assert.ok(plain.html.includes(`${heading}</div>`))
+  assert.ok(!plain.html.includes('data-slot="schedule.note"'))
+  const noted = structuredClone(linesExample)
+
+  noted.schedule.note = 'Sujeto a <la> entrega del contenido'
+  const withNote = await build(noted)
+
+  assert.ok(
+    withNote.html.includes(
+      `${heading}<span data-slot="schedule.note">Sujeto a &lt;la&gt; entrega del contenido</span></div>`
+    )
+  )
+
+  // La nota comparte la fila con el título: una larga lo estrecha y suma altura a la página de alcance.
+  const blockOf = (result, page, key) =>
+    result.fixedPages.find(entry => entry.name === page).blocks.find(block => block.key === key).heightPx
+
+  assert.equal(blockOf(plain, 'alcance', 'scheduleHeading'), 23.33)
+  assert.equal(blockOf(withNote, 'alcance', 'scheduleHeading'), 23.33)
+  noted.schedule.note =
+    'Plazo sujeto a la entrega oportuna del contenido y de las aprobaciones del cliente en cada etapa'
+  assert.ok(blockOf(await build(noted), 'alcance', 'scheduleHeading') > 23.33)
+
+  // Rótulo del valor neto de la portada: el de siempre, byte a byte, o el declarado, con su slot y escapado.
+  const fixedLabel = '<div><span class="label">Valor neto del servicio completo</span><strong data-slot="amount.net">'
+
+  assert.equal(count(plain.html, fixedLabel), 1)
+  assert.ok(!plain.html.includes('data-slot="cover.netLabel"'))
+  const labelled = structuredClone(linesExample)
+
+  labelled.cover.netLabel = 'Valor neto del <programa>'
+  const withLabel = await build(labelled)
+
+  assert.equal(
+    count(
+      withLabel.html,
+      '<div><span class="label" data-slot="cover.netLabel">Valor neto del &lt;programa&gt;</span><strong data-slot="amount.net">'
+    ),
+    1
+  )
+  assert.ok(!withLabel.html.includes('Valor neto del servicio completo'))
+  assert.equal(blockOf(withLabel, 'portada', 'investment'), blockOf(plain, 'portada', 'investment'))
+  // Un rótulo que no cabe en una línea se parte y suma su altura a la caja de la portada (7,6 pt × 1,5).
+  labelled.cover.netLabel =
+    'Valor neto del proyecto completo, con todas sus etapas y entregas, sin impuestos ni costos de terceros'
+  assert.equal(blockOf(await build(labelled), 'portada', 'investment'), 162.6)
+  assert.equal(blockOf(plain, 'portada', 'investment'), 147.4)
+
+  // Con logo y sin unidad, el texto alternativo del logo es el nombre del cliente.
+  const dir = await fs.mkdtemp(path.join((await import('node:os')).tmpdir(), 'cotizacion-unidad-'))
+
+  try {
+    const bytes = Buffer.alloc(33)
+
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]).copy(bytes)
+    bytes.writeUInt32BE(400, 16)
+    bytes.writeUInt32BE(100, 20)
+    await fs.writeFile(path.join(dir, 'logo.png'), bytes)
+    const logo = { path: path.join(dir, 'logo.png'), source: 'https://example.com/logo' }
+    const alt = async q => /data-slot="buyer\.logo" src="[^"]+" alt="([^"]+)"/.exec((await build(q)).html)[1]
+
+    assert.equal(await alt({ ...bare, buyer: { ...bare.buyer, logo } }), 'Cliente de ejemplo')
+    assert.equal(await alt({ ...linesExample, buyer: { ...linesExample.buyer, logo } }), 'Equipo de producto digital')
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('versión 2: los hitos con impuesto imprimen neto, impuesto y total, con estilos propios', async () => {
+  const result = await buildHtml(projectExample, templatePath('ejemplo-lineas-proyecto.json'))
+  const { html } = result
+
+  assert.equal(result.pageCount, 4)
+  assert.deepEqual(result.amounts, { net: 2350000, vat: 446500, total: 2796500, monthly: null, taxSource: 'computed' })
+  // Los estilos de la tabla viajan en su archivo, y sólo en el documento cuyos hitos declaran impuesto.
+  assert.deepEqual(result.templateFiles, [
+    'template-lineas.html',
+    'template.css',
+    'template-lineas.css',
+    MILESTONES_CSS
+  ])
+  assert.ok(html.includes('.milestones-taxed thead th'))
+
+  // Cuatro columnas: el hito con su condición debajo, y los tres importes.
+  assert.ok(
+    html.includes(
+      '<thead><tr><th scope="col">Hito</th><th scope="col">Valor neto</th><th scope="col">IVA</th><th scope="col">Total con IVA</th></tr></thead>'
+    )
+  )
+  assert.ok(
+    html.includes(
+      '<tr><th scope="row"><span data-slot="paymentSchedule.milestones.1.label">Saldo</span><span data-slot="paymentSchedule.milestones.1.when">Contra la aprobación final, antes de publicar</span></th><td data-slot="paymentSchedule.milestones.1.net" data-label="Valor neto">$1.175.000</td><td data-slot="paymentSchedule.milestones.1.tax" data-label="IVA">$223.250</td><td data-slot="paymentSchedule.milestones.1.total" data-label="Total con IVA">$1.398.250</td></tr>'
+    )
+  )
+
+  const shares = [
+    .../<table class="milestones-table milestones-taxed">.*?<colgroup>(.*?)<\/colgroup>/
+      .exec(html)[1]
+      .matchAll(/width:([\d.]+)%/g)
+  ].map(match => Number(match[1]))
+
+  assert.deepEqual(shares, [54.599, 15, 13, 17.401])
+  assert.ok(Math.abs(shares.reduce((sum, share) => sum + share, 0) - 100) < 1e-9)
+  // Sin nota del calendario de pagos no queda su párrafo.
+  assert.ok(html.includes('<h3 data-slot="paymentSchedule.title">Calendario de pagos</h3><table'))
+  assert.ok(!html.includes('data-slot="paymentSchedule.note"'))
+  // Medido en Chromium para este ejemplo: 835,05 px en la página de inversión; la estimación no baja de ahí.
+  assert.deepEqual(blockKeys(result.pagination), [
+    ['overline', 'title', 'intro', 'lines', 'totals', 'taxNote', 'schedule']
+  ])
+  assert.equal(result.pagination[0].estimatedPx, 835.49)
+  assert.equal(result.pagination[0].blocks.at(-1).heightPx, 192.33)
+
+  // La etiqueta del impuesto de la cotización rotula sus dos columnas.
+  const igv = structuredClone(projectExample)
+
+  igv.vatRate = 0.18
+  igv.pricing.taxLabel = 'IGV'
+  igv.paymentSchedule.note = 'Cada pago se factura al cumplirse su condición.'
+  igv.paymentSchedule.milestones.forEach(milestone => Object.assign(milestone, { tax: '211500', total: '1386500' }))
+  const igvHtml = (await build(igv)).html
+
+  assert.ok(igvHtml.includes('<th scope="col">IGV</th><th scope="col">Total con IGV</th>'))
+  assert.ok(igvHtml.includes('data-label="Total con IGV">$1.386.500</td>'))
+  assert.ok(igvHtml.includes('<p data-slot="paymentSchedule.note">Cada pago se factura al cumplirse su condición.</p>'))
+
+  // Con el impuesto declarado por la cotización (taxAmount), los hitos reparten esa cifra, no la calculada.
+  const stated = withLines(
+    [{ label: 'Servicio', quantity: { value: 3, unit: 'meses' }, unitNet: '3333333', net: '9999999' }],
+    {
+      taxAmount: '1899999',
+      paymentSchedule: {
+        title: 'Calendario de pagos',
+        milestones: ['Mes 1', 'Mes 2', 'Mes 3'].map(label => ({
+          label,
+          when: 'Al inicio del mes',
+          net: '3333333',
+          tax: '633333',
+          total: '3966666'
+        }))
+      }
+    }
+  )
+
+  assert.equal((await build(stated)).amounts.total, 11899998)
+  stated.paymentSchedule.milestones[2] = { ...stated.paymentSchedule.milestones[2], tax: '633334', total: '3966667' }
+  await assert.rejects(
+    build(stated),
+    /la suma de milestones\[\]\.total debe ser exactamente igual al total de la cotización \(11899998\); los hitos suman 11899999/
+  )
+
+  // Sin impuesto por hito, la tabla de tres columnas y sus estilos no cambian.
+  const netOnly = await buildHtml(thirdPartyExample, templatePath('ejemplo-lineas-terceros.json'))
+
+  assert.ok(!netOnly.templateFiles.includes(MILESTONES_CSS) && !netOnly.html.includes('milestones-taxed'))
+  assert.ok(
+    netOnly.html.includes(
+      '<table class="milestones-table"><caption class="sr-only">Calendario de pagos</caption><thead><tr><th scope="col">Hito</th><th scope="col">Fecha o condición</th><th scope="col">Valor neto</th></tr></thead>'
+    )
+  )
+  // La nota del calendario de pagos es opcional también sin impuesto: el bloque pierde su línea y su separación.
+  const noNote = structuredClone(thirdPartyExample)
+
+  delete noNote.paymentSchedule.note
+
+  const scheduleOf = async q =>
+    (await build(q)).pagination.flatMap(page => page.blocks).find(block => block.key === 'schedule')
+
+  const noteHeight = (await scheduleOf(thirdPartyExample)).heightPx - (await scheduleOf(noNote)).heightPx
+
+  // Una línea de nota a 8,5 pt × 1,6 y sus 4 px de separación.
+  assert.equal(Math.round(noteHeight * 100) / 100, 22.13)
+
+  // Importes que no dejan sitio al hito y a su condición: el documento no se compone, y lo dice.
+  const wide = structuredClone(projectExample)
+
+  wide.currency = 'USD'
+  wide.lines[0].net = '2350000000000.00'
+  wide.net = '2350000000000.00'
+  wide.paymentSchedule.milestones.forEach(milestone =>
+    Object.assign(milestone, { net: '1175000000000.00', tax: '223250000000.00', total: '1398250000000.00' })
+  )
+  await assert.rejects(
+    build(wide),
+    /Contenido fuera del A4\. Los importes del calendario de pagos son demasiado anchos para la tabla: no dejan espacio al hito y a su condición\./
+  )
+})
+
+test('versión 2: cada regla del impuesto por hito se valida con un mensaje propio', () => {
+  const rejects = (mutate, pattern, base = projectExample) => {
+    const q = structuredClone(base)
+
+    mutate(q)
+    assert.throws(() => validateQuote(q), pattern)
+  }
+
+  const first = q => q.paymentSchedule.milestones[0]
+  const second = q => q.paymentSchedule.milestones[1]
+
+  validateQuote(structuredClone(projectExample))
+  // Los dos o ninguno, en cada hito y en todos.
+  rejects(q => delete first(q).total, /paymentSchedule\.milestones\.0: tax y total se declaran juntos; falta total\./)
+  rejects(q => delete second(q).tax, /paymentSchedule\.milestones\.1: tax y total se declaran juntos; falta tax\./)
+  rejects(q => {
+    delete second(q).tax
+    delete second(q).total
+  }, /paymentSchedule\.milestones\.1: tax y total se declaran en todos los hitos o en ninguno/)
+  rejects(q => (first(q).tax = '-1'), /paymentSchedule\.milestones\.0\.tax: Decimal positivo/)
+  rejects(q => (first(q).tax = '223250.5'), /paymentSchedule\.milestones\.0\.tax: CLP: máximo 0 decimales/)
+  rejects(
+    q => (first(q).total = '1.398.250'),
+    /paymentSchedule\.milestones\.0\.total: Decimal positivo sin separadores/
+  )
+  rejects(
+    q => (first(q).total = '1398251'),
+    /paymentSchedule\.milestones\.0: total debe ser exactamente igual a net más tax\./
+  )
+  // Los totales de los hitos suman el total de la cotización: neto más su impuesto.
+  rejects(q => {
+    first(q).tax = '223251'
+    first(q).total = '1398251'
+  }, /la suma de milestones\[\]\.total debe ser exactamente igual al total de la cotización \(2796500\); los hitos suman 2796501/)
+  // Sólo con una tasa explícita: sin impuesto resuelto no hay total que repartir.
+  rejects(q => (q.vatRate = null), /tax y total sólo se declaran con una tasa explícita en vatRate/)
+  rejects(q => {
+    q.vatRate = null
+    q.taxStatus = 'not_applicable'
+  }, /tax y total sólo se declaran con una tasa explícita en vatRate/)
+
+  // El impuesto de cada hito corresponde a la tasa. Una línea de cantidad 1 admite dos unidades menores de
+  // diferencia: la de taxAmount y una más por el reparto entre hitos.
+  const shifted = units => {
+    const q = structuredClone(projectExample)
+
+    Object.assign(first(q), { tax: String(223250 + units), total: String(1398250 + units) })
+    Object.assign(second(q), { tax: String(223250 - units), total: String(1398250 - units) })
+
+    return q
+  }
+
+  validateQuote(shifted(2))
+  assert.throws(
+    () => validateQuote(shifted(3)),
+    /paymentSchedule\.milestones\.0\.tax no corresponde a la tasa: declara 223253 y el impuesto de vatRate sobre su neto es 223250\. Se admite una diferencia de redondeo de hasta 2 unidades menores/
+  )
+  // Un impuesto mal repartido suma lo mismo y se rechaza igual.
+  rejects(q => {
+    Object.assign(first(q), { tax: '0', total: '1175000' })
+    Object.assign(second(q), { tax: '446500', total: '1621500' })
+  }, /paymentSchedule\.milestones\.0\.tax no corresponde a la tasa/)
+
+  // Tasa cero confirmada: el impuesto de cada hito es cero y su total, su neto.
+  const zero = structuredClone(projectExample)
+
+  zero.vatRate = 0
+  zero.paymentSchedule.milestones.forEach(milestone => Object.assign(milestone, { tax: '0', total: '1175000' }))
+  validateQuote(zero)
+  assert.deepEqual(quoteAmounts(zero), { net: 2350000, vat: 0, total: 2350000, monthly: null, taxSource: 'computed' })
+})
+
+test('versión 2: taxPeriods fija la tolerancia del impuesto declarado en los periodos tributados, no en las líneas', async () => {
+  // Tres meses de 3.333.333 impresos como un solo precio. El impuesto calculado una vez sobre 9.999.999 al 19 %
+  // es 1.900.000; redondeado mes a mes puede diferir en una unidad por mes, pero la línea cuenta una sola vez.
+  const programme = (taxAmount, extra = {}) =>
+    withLines([{ label: 'Programa de tres meses', quantity: { value: 1, unit: 'programa' }, net: '9999999' }], {
+      taxAmount,
+      ...extra
+    })
+
+  const stated = { monthly: null, taxSource: 'stated' }
+
+  // Sin taxPeriods rige la regla de siempre: la suma de las cantidades de las líneas, aquí una unidad.
+  assert.deepEqual(quoteAmounts(validateQuote(programme('1899999'))), {
+    net: 9999999,
+    vat: 1899999,
+    total: 11899998,
+    ...stated
+  })
+  for (const taxAmount of ['1899998', '1899997', '1900002', '1900003'])
+    assert.throws(
+      () => validateQuote(programme(taxAmount)),
+      /taxAmount no corresponde a la tasa: .* hasta 1 unidades menores \(la suma de lines\[\]\.quantity\.value\)/
+    )
+  // Con los tres meses declarados, la misma cotización se acepta hasta tres unidades, y no más allá.
+  for (const taxAmount of ['1899997', '1899998', '1899999', '1900000', '1900003'])
+    validateQuote(programme(taxAmount, { taxPeriods: 3 }))
+  assert.deepEqual(quoteAmounts(programme('1899997', { taxPeriods: 3 })), {
+    net: 9999999,
+    vat: 1899997,
+    total: 11899996,
+    ...stated
+  })
+  for (const taxAmount of ['1899996', '1900004'])
+    assert.throws(
+      () => validateQuote(programme(taxAmount, { taxPeriods: 3 })),
+      /taxAmount no corresponde a la tasa: .* hasta 3 unidades menores \(taxPeriods, los periodos sobre los que se redondeó el impuesto\)/
+    )
+  // El documento imprime ese impuesto y nada de la clave: no cambia el HTML de quien la declara dentro de la regla.
+  const within = await build(programme('1899999'))
+  const declared = await build(programme('1899999', { taxPeriods: 3 }))
+
+  assert.equal(declared.html, within.html)
+  assert.ok(declared.html.includes('data-slot="amount.vat">$1.899.999<') && !declared.html.includes('taxPeriods'))
+
+  // La cuenta manda en los dos sentidos: doce meses en una línea no dan doce unidades si se declara un periodo.
+  const year = extra =>
+    withLines(
+      [{ label: 'Servicio', quantity: { value: 12, unit: 'meses' }, unitNet: '1000000', net: '12000000' }],
+      extra
+    )
+
+  validateQuote(year({ taxAmount: '2280012' }))
+  validateQuote(year({ taxAmount: '2280001', taxPeriods: 1 }))
+  assert.throws(
+    () => validateQuote(year({ taxAmount: '2280002', taxPeriods: 1 })),
+    /hasta 1 unidades menores \(taxPeriods/
+  )
+
+  // El impuesto de cada hito sigue la misma cuenta, más la unidad del reparto.
+  const halves = (first, second, extra) =>
+    year({
+      taxAmount: '2280000',
+      ...extra,
+      paymentSchedule: {
+        title: 'Calendario de pagos',
+        milestones: [first, second].map((tax, i) => ({
+          label: `Semestre ${i + 1}`,
+          when: 'Al inicio del semestre',
+          net: '6000000',
+          tax: String(tax),
+          total: String(6000000 + tax)
+        }))
+      }
+    })
+
+  validateQuote(halves(1140003, 1139997))
+  validateQuote(halves(1140002, 1139998, { taxPeriods: 1 }))
+  assert.throws(
+    () => validateQuote(halves(1140003, 1139997, { taxPeriods: 1 })),
+    /paymentSchedule\.milestones\.0\.tax no corresponde a la tasa: .* hasta 2 unidades menores \(taxPeriods, los periodos sobre los que se redondeó el impuesto, más una por el reparto entre hitos\)/
+  )
+
+  // Sólo acompaña a taxAmount, es un entero de 1 a 120 y no existe en la versión 1.
+  const alone = programme('1899999', { taxPeriods: 3 })
+
+  delete alone.taxAmount
+  assert.throws(() => validateQuote(alone), /taxPeriods sólo se declara junto a taxAmount/)
+  assert.throws(
+    () => validateQuote({ ...alone, vatRate: null }),
+    /taxPeriods sólo se declara junto a taxAmount: es el número de periodos sobre los que se redondeó ese impuesto/
+  )
+  for (const taxPeriods of [0, 121, 1.5, '3', -1])
+    assert.throws(() => validateQuote(programme('1899999', { taxPeriods })), /taxPeriods: entero de 1 a 120\./)
+  validateQuote(programme('1899999', { taxPeriods: 120 }))
+  validateQuote(programme('1899999', { taxPeriods: null }))
+  assert.throws(() => validateQuote(programme('1899999', { taxPeriod: 3 })), /no reconocidos en version 2: taxPeriod/)
+  assert.throws(() => validateQuote({ ...example, taxPeriods: 3 }), /taxPeriods sólo existe en la versión 2/)
 })
