@@ -1,0 +1,874 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-staffing-margin-floor-2026-10-11",
+  "baseDigest": "980a7d5c591fa2a1c51655d18d0e7fb16e788e125ceb941f54cf73b6beb47bd1",
+  "nextVersion": "operating-review-2026-10-11-v7",
+  "actor": "operator-authorized-agent",
+  "reason": "Give the staff-augmentation offer a margin floor. The 32 talent-assurance-staffing policies carried a historical markup with minimum margin 0, so the quoter never flagged a low price. CEO decisions of 2026-10-11: floor 25%, and targets by workbook tier (30/30/35/40%) as proposed by the agent and confirmed by him. Managed-service policies are untouched.",
+  "changes": [
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-001",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-001",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-001",
+          "tierCode": "historical-tier-3",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 35%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-002",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-002",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-002",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-003",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-003",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-003",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-004",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-004",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-004",
+          "tierCode": "historical-tier-3",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 35%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-005",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-005",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-005",
+          "tierCode": "historical-tier-3",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 35%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-006",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-006",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-006",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-007",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-007",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-007",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-008",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-008",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-008",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-009",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-009",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-009",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-010",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-010",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-010",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-011",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-011",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-011",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-012",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-012",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-012",
+          "tierCode": "historical-tier-3",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 35%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-013",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-013",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-013",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-014",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-014",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-014",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-015",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-015",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-015",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-016",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-016",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-016",
+          "tierCode": "historical-tier-3",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.35",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 35%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-017",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-017",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-017",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-018",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-018",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-018",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-019",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-019",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-019",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-020",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-020",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-020",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-021",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-021",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-021",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-022",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-022",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-022",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-023",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-023",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-023",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-024",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-024",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-024",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-025",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-025",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-025",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-026",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-026",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-026",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-027",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-027",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-027",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-028",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-028",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-028",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-029",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-029",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-029",
+          "tierCode": "historical-tier-1",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-030",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-030",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-030",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-031",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-031",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-031",
+          "tierCode": "historical-tier-2",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.30",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 30%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "pricing:ECG-032",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "pricing:ECG-032",
+        "revision": 2,
+        "kind": "pricing",
+        "value": {
+          "profileId": "ECG-032",
+          "tierCode": "historical-tier-4",
+          "offerId": "talent-assurance-staffing",
+          "engagementCode": "monthly",
+          "method": "target_margin",
+          "rate": "0.40",
+          "basis": "all_costs",
+          "minimumMargin": "0.25"
+        },
+        "source": {
+          "reference": "policy:ceo-staffing-margin-floor-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Person sold by dedication (staff augmentation). Floor 25% of margin on all costs and target 40%: decided by the CEO on 2026-10-11. He set the floor ('25% está bien como piso y de ahí en adelante subimos dependiendo') and confirmed the targets by workbook tier that the agent had proposed (30% tiers 1 and 2, 35% tier 3, 40% tier 4); they replace the historical markup. Applying it to an engagement remains a per-case review, not an approved price."
+      }
+    }
+  ]
+}

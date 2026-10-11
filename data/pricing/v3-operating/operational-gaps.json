@@ -36,8 +36,8 @@
     {
       "code": "COMMERCIAL_POLICY",
       "owner": "CEO",
-      "required": "A decided margin target and floor for the offers that still carry only a historical markup, and a decision on the estimated country factors. Exceptions below a floor are decided by the CEO case by case",
-      "known": "Decided by the CEO on 2026-10-10: 45% is the margin floor of the managed services of the creative practice (offer creative-managed-service, target 45, minimum 45); where more can be earned the target of that offer is raised, not the floor. Market factors CL 1, CO 0.90 and US 1.10 are confirmed; PE 0.95, MX 1 and ES 1.10 and every talent factor outside Chile are estimates. Still open: the 32 talent-assurance-staffing records keep a historical markup with minimum margin 0, so role-capacity quotes have no enforced floor; the 40 target / 35 floor of the readiness proposal was never approved and is not a floor"
+      "required": "Decide the estimated country factors when real references exist. Exceptions below a floor are decided by the CEO case by case",
+      "known": "Decided by the CEO: 45% is the margin floor of the managed services of the creative practice (2026-10-10; offer creative-managed-service, target 45, minimum 45), and 25% is the margin floor of a person sold by dedication (2026-10-11; offer talent-assurance-staffing, catalog v7), with the price rising from there case by case. Where more can be earned the target of the offer is raised, not the floor. The staff-augmentation targets by workbook tier (30% tiers 1 and 2, 35% tier 3, 40% tier 4) were proposed by the agent and confirmed by the CEO the same day; they replace the historical markup. Market factors CL 1, CO 0.90 and US 1.10 are confirmed; PE 0.95, MX 1 and ES 1.10 and every talent factor outside Chile are estimates. The 40 target / 35 floor of the readiness proposal was never approved and is not a floor"
     },
     {
       "code": "SERVICE_AND_CONTRACT_TERMS",

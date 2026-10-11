@@ -1,11 +1,11 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Catalog v6 adds an open-ended EUR quote FX; resource policy v6 makes every unit price valid until replaced, with a review date. CEO decision of 2026-10-11: a unit price does not expire.",
+  "reason": "Catalog v7 gives the staff-augmentation offer a margin floor of 25% and targets by tier (30/30/35/40%) in place of the historical markup. CEO decisions of 2026-10-11.",
   "catalog": {
-    "path": "data/pricing/v3-operating/catalog.review-v6.json",
-    "version": "operating-review-2026-10-11-v6",
-    "digest": "980a7d5c591fa2a1c51655d18d0e7fb16e788e125ceb941f54cf73b6beb47bd1"
+    "path": "data/pricing/v3-operating/catalog.review-v7.json",
+    "version": "operating-review-2026-10-11-v7",
+    "digest": "5b07943f1ac533f59d83a91e4d74155b5ee37f7b11d01126ef798d057672735c"
   },
   "policy": {
     "path": "data/pricing/v3-operating/resources.review-v6.json",
