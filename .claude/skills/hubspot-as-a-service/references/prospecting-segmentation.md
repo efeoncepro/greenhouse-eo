@@ -93,8 +93,8 @@ Verified portal dictionary (2026-10-06; revalidate before use):
 | Contact             | `efeonce_prospecting_service_fit`  | checkbox; `creative`, `hubspot_crm`                                                   |
 | Company and Contact | `efeonce_prospecting_researched_on` | date; latest research date. Boundary of 180–187 since 2026-10-11                     |
 
-Group: `efeonce_prospecting` / Prospección Efeonce. Future rounds require a defined option and authorized universe;
-records may carry multiple rounds. Do not label the entire historical CRM as a current research cohort.
+Group: `efeonce_prospecting` / Prospección Efeonce. The cohort examples below are historical; future intakes
+write the research date under the current rule above. Do not label the entire historical CRM as current research.
 
 ```sql
 -- Company sector within this research round
@@ -128,8 +128,36 @@ for a correctly property-driven ACTIVE segment.
   effective membership 177 for Company and 174/176 for Contact, excluding 175. See the functional model for
   the verified delta. A lifecycle/Deal pipeline change by HubSpot automation is not a reason to remove cohort,
   nor proof of a won client. Do not overwrite lifecycle just to match segmentation expectations.
-- New rounds require their own option/filter or an explicitly approved combined universe. Do not relabel the
-  historical CRM or every future intake with `research_2026_10_06`. Preserve multiselect values when extending.
+- New intakes use the research date and existing continuous definitions; a period view filters that date.
+  Do not relabel the historical CRM or future intakes with `research_2026_10_06`; preserve historical values.
+
+## Account-based continuous segments
+
+For an explicitly approved bank/account universe, use the verified Primary Company association when contact
+industry is incomplete or email domains differ from the intended entity. `associatedcompanyid` is the Contact
+property shown as **Empresa principal asociada** in the native filter editor. An approved set of Company IDs
+is an account boundary, not a static Contact-ID roster. Do not widen it to all financial services or banks in
+other countries; new accounts require an authorized definition update and complete-set verification.
+
+ACTIVE **188**, `Efeonce | Prospección continua | Bancos Chile | Personas con email`, was verified on 2026-10-11:
+research date known AND `individual_email` AND email known AND Primary Company in the 14 selected Chile banks.
+The complete independent `ilsListIds=188` read returned 28/28 expected contacts, zero missing and zero extra.
+Reuse it instead of creating a duplicate. New qualifying contacts in those accounts enter automatically;
+contacts without email, retail accounts and companies outside the selected set do not qualify.
+[Exact definition and dated aggregates](../../../../docs/operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json) ·
+[case, provenance and remaining gaps](../../../../docs/commercial/prospects/bancos-chile-2026-10/README.md).
+
+When reporting each contact's properties, distinguish live field values from proposed services in notes.
+Report blanks explicitly; do not fill cargo, country or service fit merely to make the table complete.
+`creative`/`hubspot_crm` are fit, not installed-platform evidence or observed purchase interest. No compatible
+SEO enum exists in the verified dictionary: retain the specific SEO/web focus in notes without forcing fit.
+Email known is presence only; preserve contradictory validator results and require channel review before use.
+
+If an authorized CLI segment create fails with 502, inspect the complete existing catalog for a possible
+successful creation before retrying or using the native UI. A dry-run proves only the payload. Keep the same
+portal, identity, scope and ACTIVE definition in the fallback; read it back through CLI and enumerate membership
+independently through MCP. The observed UI fallback for 188 succeeded after two CLI failures; this is a dated
+observation, not evidence that CLI segment creation is always unavailable.
 
 ## New opportunity on an existing prospect
 
@@ -158,8 +186,8 @@ Dated example: [Sika Q4 LIC-1169](../../../../docs/commercial/tenders/sika-mexic
   identity-pending record inside individual-email segments. Check OR boundaries and unrelated service exclusions.
 - Record portal, version, date, counts and comparisons. Keep PII/manifests locally; repo docs contain aggregates.
 
-A new intake qualifies automatically once its authorized cohort and classification values match the active
-rules. A different future round needs its own option/filter or an explicitly requested combined universe.
+A new intake qualifies automatically once its research date and classification match the continuous rules.
+Historical cohort consumers remain unchanged; do not create a new daily option or per-round segment.
 Revalidate actual recipients before future use; the dated count is not a permanent recipient list.
 
 ## Personalized email preparation

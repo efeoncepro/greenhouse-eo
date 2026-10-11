@@ -9,6 +9,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Fuentes y autoridad
 
+- [Bancos de Chile — segmento activo 188](prospects/bancos-chile-2026-10/README.md): 28 personas con email de 14 bancos, definición por empresa principal, propiedades y brechas de canal verificadas el 11/10. Incluye 20 de la ronda adicional y ocho contactos conocidos; sin outreach.
+
 - [Contactos conocidos — BCI, BICE, Cencosud e Itaú](prospects/contactos-conocidos-banca-retail-2026-10/README.md): 12 contactos incorporados el 11/10 (10 nuevos, 2 reutilizados), focos comerciales y segmentos verificados. Sin outreach; pendientes de canal y vigencia documentados.
 
 - [QuePlan — Jorge Godoy: prospección fría](prospects/queplan-jorge-godoy-2026/README.md) y [WIN Fitness Wear — Fiorella: búsqueda activa de agencia](prospects/win-fitness-wear-social-2026/README.md): investigación, Leads y notas verificados el 08/10; correo corporativo de Jorge obtenido con Apollo. [Auditoría](../audits/commercial/2026-10-08-jorge-fiorella-intake.md).

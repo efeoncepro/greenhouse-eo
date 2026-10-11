@@ -70,6 +70,13 @@ los miembros de este intake, no los totales globales de cada segmento**:
 Membresía automática comprobada después de las escrituras; no hubo inscripción manual. Los correos
 históricos o de validación conflictiva siguen apareciendo en 181 porque su filtro exige presencia, no validez.
 
+## Selección bancaria posterior — 2026-10-11
+
+Los ocho contactos de BCI/BICE/Itaú también pertenecen al nuevo ACTIVE **188**; los cuatro contactos originados
+en Cencosud quedan fuera. El [expediente de bancos de Chile](../bancos-chile-2026-10/README.md) reúne estos ocho
+con 20 contactos con email de otros 11 bancos: **28 personas de 14 bancos**, conjuntos completos verificados.
+No reemplaza ni altera los segmentos 180–187 ni el alcance histórico de este intake.
+
 ## Calidad del canal y pendientes
 
 1. **Andrés:** Apollo waterfall devuelve `Verified`, mientras ZeroBounce devuelve `invalid` para la misma

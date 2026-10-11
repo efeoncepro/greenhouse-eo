@@ -123,6 +123,19 @@ al único alta del día (un contacto sin email y su empresa), que entró sólo p
 son conteos; no se enumeraron los conjuntos completos de membresía. Recuperación: restaurar las ocho expresiones
 desde el prestate; la propiedad histórica no se modificó salvo su etiqueta.
 
+### Aplicación por cuentas bancarias — 2026-10-11
+
+ACTIVE **188** aplica el contrato continuo: fecha conocida AND `individual_email` AND email conocido AND
+`associatedcompanyid IN (...)` con los 14 Company IDs aprobados. El último término es la empresa principal
+del Contact, no su dominio de correo ni una lista estática de Contact IDs. Selección explícita autorizada por
+el operador; no crea propiedad, enum diario ni nuevo límite por ronda. La incorporación sigue siendo nativa
+y automática dentro de esas cuentas; añadir otra cuenta requiere ampliar la definición autorizada.
+
+[Snapshot exacto y agregado](../operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json) y
+[expediente](../commercial/prospects/bancos-chile-2026-10/README.md): 28 miembros enumerados por lector MCP,
+cero faltantes/extras, definición ACTIVE leída por CLI y tamaño procesado en UI. Aplicación del ADR existente,
+sin cambio de source of truth, permisos o propiedades. No altera 180–187 ni las rondas históricas.
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

@@ -15,6 +15,21 @@ guarda la última investigación; el historial queda en las notas. Las secciones
 históricas y siguen siendo válidas para ellas.
 [Decisión y verificación](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--la-fecha-de-investigación-sustituye-a-las-cohortes-fechadas).
 
+## Bancos de Chile: selección continua por empresa principal
+
+El [segmento activo 188](https://app.hubspot.com/contacts/48713323/objectLists/188/filters) selecciona contactos
+investigados con correo y empresa principal en los 14 bancos aprobados. La asociación define el banco incluso
+si el email usa otro dominio, como BTG Pactual o Tanner; no depende de que Contact tenga `industria=Finanzas`.
+Los nuevos contactos que cumplan esas propiedades entran automáticamente. Un banco distinto requiere ampliar
+el filtro de empresas; no es una selección de todos los bancos del mundo ni de toda la industria financiera.
+
+Corte verificado 11/10/2026: **28 contactos**, sin faltantes ni adicionales respecto del manifiesto autorizado.
+Excluye Cencosud y los dos contactos bancarios aún sin email. Presencia de correo no garantiza entregabilidad:
+dos personas mantienen validaciones contradictorias. Fit de servicio: 21 creativo, 7 CRM, cuatro con ambos;
+cuatro con foco SEO/web en notas y fit vacío. [Expediente y propiedades](../../commercial/prospects/bancos-chile-2026-10/README.md)
+y [definición exacta sin PII](../../operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json).
+No se alteraron contactos, permisos de envío, workflows ni las definiciones continuas 180–187 al crear 188.
+
 ## Ronda adicional — 2026-10-08
 
 Se añadió research_2026_10_08 como opción en Company y Contact para dos oportunidades autorizadas.

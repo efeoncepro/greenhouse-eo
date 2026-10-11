@@ -313,3 +313,32 @@ por ronda. Los segmentos 159–179 siguen leyendo la propiedad histórica y no r
 Estado verificado el 11/10: 97 contactos y 92 empresas con fecha; 180 = **97**, 181 = **78**, 182 = **59**,
 183 = **31**, 184 = **10**, 185 + 186 = **9**, 187 = **92**. Son conteos del lector MCP, no una enumeración de
 miembros. Evidencia local (prestate, backfill, definiciones antes y después) fuera del repositorio; no copiar PII.
+
+## 8. Seleccionar bancos por empresa principal
+
+Para el universo aprobado de bancos chilenos, reutilizar ACTIVE **188**. La definición y los 14 Company IDs
+viven en el [snapshot fechado](../../operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json); los contactos y sus
+focos, en el [expediente comercial](../../commercial/prospects/bancos-chile-2026-10/README.md).
+
+1. Verificar identidad y portal 48713323. Leer 188 y comprobar que el pedido sigue dentro de sus 14 cuentas.
+2. Reconciliar Primary, fecha de investigación, `individual_email` y email conocido. No usar dominio del correo
+   ni industria vacía del contacto como sustitutos de la asociación principal. No modificar personas para
+   que coincidan con un filtro; completar atributos sólo con evidencia y dentro del alcance autorizado.
+3. Mantener la fecha como condición conocida, sin fijarla al día de creación del segmento. Una nueva persona
+   que cumpla entra automáticamente; un banco nuevo exige ampliar la condición de empresas con autorización.
+4. Leer la definición ACTIVE por CLI y la membresía completa por MCP `ilsListIds=188`, sin restringir por IDs
+   de Contact. Paginar hasta terminar y comparar con el manifiesto: el corte 11/10 dio 28, cero faltantes/extras.
+5. Reportar propiedades presentes, vacías y señales en notas por separado. SEO/web no tiene enum compatible;
+   no inventarlo ni marcar `creative`/`hubspot_crm` por conveniencia. Revisar conflictos de canal antes de usarlo.
+
+### Recuperación de create 502 observada en 188
+
+Si `segments create` falla, listar todos los segmentos y comprobar si el nombre/definición ya existe antes de
+reintentar: un error no garantiza ausencia de escritura. El 11/10 hubo dos 502 con ausencia comprobada. El MCP
+tenía lectura de listas pero escritura no disponible; la UI autenticada permitió crear 188 en el mismo portal.
+
+En la UI: **Crear segmento → Manual → Contactos → filtros**. Agregar en un único grupo AND fecha de
+investigación conocida, Persona con email, Correo conocido y Empresa principal asociada en las 14 cuentas.
+Revisar 28 coincidencias, elegir **Activo**, guardar y procesar. Después leer por CLI tipo/expresión y por MCP
+miembros completos. Guardar captura de la UI con Activo y tamaño procesado. No recrear 188 si ya existe ni
+activar envíos, secuencias o workflows como parte de la selección.

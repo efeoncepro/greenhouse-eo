@@ -6,6 +6,8 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 
 ## 2026-10-11 — Contactos conocidos de banca y retail
 
+[Bancos Chile](docs/commercial/prospects/bancos-chile-2026-10/README.md): 22 Contact adicionales (18 nuevos, cuatro reutilizados) de 11 bancos; 20 con correo, Arturo/Isabel sin correo. ACTIVE **188** reúne esos 20 y ocho conocidos de BCI/BICE/Itaú: **28 personas de 14 bancos**, definición ACTIVE y conjunto completo verificados. Focos SEO/web de Luisa/Carolina/Rafael/Natalia en notas, sin fit forzado. Antes de contacto: validación conflictiva de Andrés/María Beatriz, vigencia de Cristian y campos pendientes. Sin envíos ni Deals nuevos.
+
 [BCI, BICE, Cencosud e Itaú](docs/commercial/prospects/contactos-conocidos-banca-retail-2026-10/README.md): 12 contactos en HubSpot (10 nuevos, 2 reutilizados), cinco Company existentes, focos por persona y segmentos 180–187 verificados para este intake. Luisa: SEO de sitios públicos; Pamela/Felipe del Sante: creativo. Owner Julio; sin outreach ni nuevos Deals.
 
 Antes de contactar: resolver validación contradictoria del correo de Andrés, correo histórico de Pablo (Primary Mercado Libre) y roles/permanencia de Cencosud. Correos/evidencia en CRM y expediente local indicado en el dossier. Apollo consumió seis créditos autorizados; nuevas revelaciones requieren su propio alcance aprobado.

@@ -70,6 +70,10 @@ are never added or assigned again. Reuse existing ACTIVE segments; populate the 
 duplicates. Research remains a lead until effective qualification; preserve existing Deals the operator asks
 to leave unchanged. A successful CRM create is incomplete until automatic membership and associations are read back.
 
+For a bank/account selection, load the same reference's **Account-based continuous segments** section.
+Reuse ACTIVE **188** for the approved Chile-bank universe; its Company Primary condition covers the 14
+selected accounts, not every financial company or email domain. [Dated case and property gaps](../../../docs/commercial/prospects/bancos-chile-2026-10/README.md).
+
 ## Firmas personales en HubSpot
 
 Para instalar o reparar una firma de correo de Efeonce, seguir el

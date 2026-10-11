@@ -86,6 +86,11 @@ mutar atributos/listas ni recontar la base. Scope de cada lectura y valores prop
 
 ## Procedimiento por operación
 
+Aplicación bancaria verificada el 2026-10-11: ACTIVE **188**, 28 Contact de 14 cuentas Primary. Dos creates CLI
+devolvieron 502; se verificó ausencia antes de reintentar y luego se usó UI autenticada en el mismo portal.
+Readback CLI confirmó ACTIVE/expresión; MCP `ilsListIds=188` enumeró el conjunto completo sin faltantes/extras.
+No generalizar el fallo a todas las escrituras CLI. [Procedimiento y recuperación](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#8-seleccionar-bancos-por-empresa-principal).
+
 1. Identificar portal, objeto, resultado esperado, cohorte y permisos. En clientes, confirmar que la conexión apunta al portal del cliente; `48713323` es Efeonce/Kortex y no ANAM.
 2. Elegir MCP o CLI por cobertura y forma del trabajo. Verificar identidad y una lectura mínima con el carril elegido. Para CLI: `hubspot whoami` y `hubspot <noun> <verb> --help`; para MCP: identidad/portal de la conexión y tool guidance aplicable.
 3. Inventariar estado actual y preparar change set (`actual → propuesto`, IDs, impacto, aprobación y recuperación). Usar `--dry-run` **cuando el comando lo soporte**. La ausencia del flag en create de propiedades exige revisión explícita del payload antes de ejecutar; no inventar un preview.

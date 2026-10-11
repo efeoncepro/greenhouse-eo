@@ -1,0 +1,115 @@
+{
+  "as_of": "2026-10-11",
+  "portal_id": 48713323,
+  "segment": {
+    "listId": 188,
+    "name": "Efeonce | Prospección continua | Bancos Chile | Personas con email",
+    "objectTypeId": "0-1",
+    "listType": "ACTIVE",
+    "description": "Contactos investigados para prospección de servicios Efeonce, con email registrado y uno de los 14 bancos chilenos seleccionados como empresa principal. Actualización automática según propiedades; sin envío automático.",
+    "filterExpression": "efeonce_prospecting_researched_on IS NOT NULL AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND associatedcompanyid IN ('27772171820', '27779788940', '59139325088', '27770039389', '50679454111', '40240771202', '27778976271', '27776076691', '59142731319', '54834597003', '53949834349', '48485493897', '59114382409', '27779618095')"
+  },
+  "accounts": [
+    {
+      "company_id": 48485493897,
+      "bank": "BCI",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 53949834349,
+      "bank": "BICE",
+      "contacts_with_email": 5
+    },
+    {
+      "company_id": 27772171820,
+      "bank": "Itaú",
+      "contacts_with_email": 1
+    },
+    {
+      "company_id": 27776076691,
+      "bank": "Banco de Chile",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 27770039389,
+      "bank": "BancoEstado",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 50679454111,
+      "bank": "Santander",
+      "contacts_with_email": 1
+    },
+    {
+      "company_id": 27778976271,
+      "bank": "Scotiabank",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 27779788940,
+      "bank": "Banco Falabella",
+      "contacts_with_email": 1
+    },
+    {
+      "company_id": 40240771202,
+      "bank": "Banco Ripley",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 59114382409,
+      "bank": "Banco Internacional",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 27779618095,
+      "bank": "Banco Consorcio",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 59142731319,
+      "bank": "BTG Pactual Chile",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 59139325088,
+      "bank": "Tanner Banco Digital",
+      "contacts_with_email": 2
+    },
+    {
+      "company_id": 54834597003,
+      "bank": "Tenpo Bank Chile",
+      "contacts_with_email": 2
+    }
+  ],
+  "verification": {
+    "reader": "HubSpot MCP CONTACT search, ilsListIds EQ 188, limit 100, offset 0",
+    "total": 28,
+    "returned": 28,
+    "next_offset": 28,
+    "expected": 28,
+    "missing_count": 0,
+    "extra_count": 0,
+    "ui_status": "Activo; Tamaño: 28",
+    "definition_reader": "Agent CLI segments get 188 --format json"
+  },
+  "property_summary": {
+    "owner_id": "75788512",
+    "lifecycle": "lead",
+    "contact_kind": "individual_email",
+    "researched_on": "2026-10-11",
+    "creative": 21,
+    "hubspot_crm": 7,
+    "both_fits": 4,
+    "empty_fit": 4,
+    "jobtitle_present": 26,
+    "linkedin_present": 26,
+    "industria_present": 9,
+    "country_present": 18
+  },
+  "limitations": [
+    "Dated configuration snapshot; HubSpot is the live source.",
+    "Company IDs bound the 14 approved accounts; no Contact IDs or email addresses are stored here.",
+    "Known email is presence, not deliverability or sending permission.",
+    "New accounts require an authorized definition update; new matching contacts enter automatically."
+  ]
+}
