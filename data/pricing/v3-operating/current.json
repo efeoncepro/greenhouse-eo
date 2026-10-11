@@ -1,16 +1,16 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Policy v9: Microsoft 365 and Notion as invoiced (a seat binds for one month in both) and the renewal date of the Adobe contract (2026-11-16), all shown by the CEO on 2026-10-11. Catalog v9 unchanged.",
+  "reason": "Policy v10: Adobe Creative Cloud Pro is quoted without its 50% discount from now on (CEO decision of 2026-10-11); the invoiced amount with discount stays selectable for a job that ends before the discount does. Catalog v9 unchanged.",
   "catalog": {
     "path": "data/pricing/v3-operating/catalog.review-v9.json",
     "version": "operating-review-2026-10-11-v9",
     "digest": "2a329a9dd1c9fe672d221584a62f18c4146c3f2042103cd9478fa705cb11a29c"
   },
   "policy": {
-    "path": "data/pricing/v3-operating/resources.review-v9.json",
-    "version": "operating-review-2026-10-11-v9",
-    "digest": "3315bf97053acaacfc22322e9a374d912aae7f3d4551ecea694e9e68a7c27574"
+    "path": "data/pricing/v3-operating/resources.review-v10.json",
+    "version": "operating-review-2026-10-11-v10",
+    "digest": "8ff145bf0c154c553815d6670ccb69aca8f2c17655dd190411d3df243822d8d1"
   },
   "credits": {
     "path": "data/pricing/v3-resources/ai-credits.review-v1.json",
