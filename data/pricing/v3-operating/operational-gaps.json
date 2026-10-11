@@ -6,7 +6,7 @@
     {
       "code": "ADOBE_RENEWAL_DATE",
       "owner": "CEO",
-      "required": "At the renewal of 2026-11-16, record what Adobe charges from then on and how many licences are kept, and issue the policy version that makes it the current price",
+      "required": "At the renewal of 2026-11-16, record how many licences are kept if that number changes. The price to quote with is already decided",
       "known": "The contract renews on 2026-11-16 (vendor console shown by the CEO on 2026-10-11: annual plan paid monthly; at renewal the number of licences can be changed or the plan cancelled). Policy v9 declares that date on the Adobe prices, so the commitment reading counts what is left of the running term. The earlier single package of USD 180 was replaced in policy v7 by the two products as invoiced"
     },
     {
@@ -120,8 +120,8 @@
     {
       "code": "ADOBE_DISCOUNT_ENDS",
       "owner": "CEO",
-      "required": "When the first invoice without the discount arrives (expected after the renewal of 2026-11-16), replace the estimate with the invoiced amount and retire the discounted price",
-      "known": "Decided by the CEO on 2026-10-11: Adobe Creative Cloud Pro is quoted without its 50% discount from now on, because the discount ends in about 36 days and a fee quoted today has to hold after it. Policy v10: the current price is the list price of invoice 3582641940 with IVA, CLP 325,405.5 a month for three licences (CLP 108,468.5 each), an estimate until a full-price invoice exists. The amount actually invoiced until then, CLP 162,605, stays as the price invoiced-with-discount, to be chosen explicitly for a job that ends before the discount does. Adobe Express, 3 licences, CLP 16,240 a month, has no discount. Totals are with IVA by the CEO's decision (the tax is recovered, not month by month). The four content profiles that use Adobe Express were confirmed by the CEO"
+      "required": "Nothing owed. Closed by the CEO on 2026-10-11: Adobe is quoted without its discount, at the list price printed on the invoice. If Adobe changes its list price, issue a new policy version like any other price change",
+      "known": "Decided by the CEO on 2026-10-11: Adobe Creative Cloud Pro is quoted without its 50% discount from now on, because the discount ends in about 36 days and a fee quoted today has to hold after it. Policy v10: the current price is the list price of invoice 3582641940 with IVA, CLP 325,405.5 a month for three licences (CLP 108,468.5 each), a decided value, marked confirmed in policy v11; no further invoice is needed to quote. The amount actually invoiced until then, CLP 162,605, stays as the price invoiced-with-discount, to be chosen explicitly for a job that ends before the discount does. Adobe Express, 3 licences, CLP 16,240 a month, has no discount. Totals are with IVA by the CEO's decision (the tax is recovered, not month by month). The four content profiles that use Adobe Express were confirmed by the CEO"
     },
     {
       "code": "SUPPLIER_CONTRACT_TERMS",

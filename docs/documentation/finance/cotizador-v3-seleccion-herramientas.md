@@ -144,5 +144,6 @@ Reglas para cotizar:
   [provisiones y costos](cotizador-v3-provisiones-y-costos.md#adobe-tal-como-se-factura-y-el-plazo-del-contrato-2026-10-11).
 
 El importe de Adobe Express y el importe facturado de Creative Cloud Pro están confirmados por la factura; el precio
-sin descuento con que se cotiza es estimado hasta que exista una factura a precio completo. Nada de eso confirma
+sin descuento con que se cotiza es el precio de lista de esa misma factura y es un valor decidido por el CEO
+(confirmado desde la policy v11). Nada de eso confirma
 quién tiene asignada cada licencia: las asignaciones de los ejemplos siguen siendo simulaciones.

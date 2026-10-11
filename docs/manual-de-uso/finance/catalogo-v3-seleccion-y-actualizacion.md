@@ -139,9 +139,9 @@ Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, 
 en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
 coincide. Lo que imprime es la respuesta vigente. Al cierre del 2026-10-11 apunta a
 `data/pricing/v3-operating/catalog.review-v10.json` (`operating-review-2026-10-11-v10`),
-`data/pricing/v3-operating/resources.review-v10.json` (`operating-review-2026-10-11-v10`) y
+`data/pricing/v3-operating/resources.review-v11.json` (`operating-review-2026-10-11-v11`) y
 `data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`). Los siguientes serían el
-catálogo v11 y la policy v11.
+catálogo v11 y la policy v12.
 
 | `status`           | Qué significa                                                              |
 | ------------------ | -------------------------------------------------------------------------- |
@@ -652,7 +652,7 @@ completo (`pricing-v3-resource-change/1`, `resources preview` → `resources app
 - **`reviewBy`** de un precio que hay que volver a mirar en una fecha conocida se pone en esa fecha (los tres
   precios de Adobe: `2026-11-16`, el día en que renueva su contrato).
 - **Un descuento que termina** se resuelve con dos `priceId`, y cuál es `current` lo decide el operador. Desde la
-  policy v10, por decisión del CEO, `current` de Creative Cloud Pro es el precio **sin** descuento (estimado) y el
+  policy v10, por decisión del CEO, `current` de Creative Cloud Pro es el precio **sin** descuento (valor decidido; `confirmed` desde la policy v11) y el
   importe facturado es `invoiced-with-discount` (confirmado), que sólo entra por elección explícita. Hasta la v9 era
   al revés: `current` era el importe facturado y el precio de lista se llamaba `renewal-scenario`.
 - **`bundledToolIds`** dice qué otra herramienta ya incluye el plan (`adobe` incluye `adobe-express`). La regla

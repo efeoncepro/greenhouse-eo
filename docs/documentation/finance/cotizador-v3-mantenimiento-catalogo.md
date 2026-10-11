@@ -644,7 +644,7 @@ creativo, On-Demand, Chile, CLP, con producción, talento, medios y una licencia
 motor `pricing-v3-local/1.4.0`: neto 21.033.333, costo 14.750.055, reserva 436.800 y ninguna fila bajo su piso. El
 ejemplo de Colombia (`managed-care-colombia.demand.json`, con la tarea de Adobe Express excluida) da el mismo neto,
 COP 28.100.000, con fecha 2026-10-11 y con fecha 2026-10-12; lo que cambia es cuánto del costo descansa en datos
-estimados: 98,7 % el 11 y 34,0 % el 12. El siguiente catálogo sería v11 y la siguiente policy, v11.
+estimados: 98,7 % el 11 y 34,0 % el 12. El siguiente catálogo sería v11; la policy pasó a v11 esa misma noche.
 
 ### Registro `third_party_policy`
 
@@ -781,7 +781,7 @@ días y un fee cotizado hoy tiene que sostenerse después. Sólo cambia la herra
 
 | `priceId` | Importe mensual (tres licencias) | Una licencia | Estado | Cuándo se usa |
 | --- | --- | --- | --- | --- |
-| `current` | CLP 325.405,5 | CLP 108.468,5 | Estimado, hasta que exista una factura a precio completo | Por defecto, en toda cotización nueva |
+| `current` | CLP 325.405,5 | CLP 108.468,5 | Decidido por el CEO; confirmado desde la policy v11 | Por defecto, en toda cotización nueva |
 | `invoiced-with-discount` | CLP 162.605 | CLP 54.202 | Confirmado por la factura | Sólo por elección explícita, para un trabajo que termina antes que el descuento; lo decide el operador |
 
 - `current` es el precio de lista de la factura 3582641940 (CLP 91.150 por licencia más IVA).
@@ -793,7 +793,9 @@ días y un fee cotizado hoy tiene que sostenerse después. Sólo cambia la herra
   artefacto congelado con la v7 da 1.768.438 y 2.790.000); eligiendo `invoiced-with-discount` vuelven las cifras del
   artefacto. La lectura de compromisos de esa cotización nueva deja un mes de una licencia, CLP 108.468, atada hasta
   el 2026-11-16.
-- La siguiente policy sería v11.
+- La policy v11 (noche del 2026-10-11) sólo cambia el estado de ese precio: `current` de Adobe pasa a `confirmed`,
+  porque es un valor decidido por el CEO sobre el precio de lista de la factura. Ningún monto cambia. Cambio:
+  `adobe-price-decided.change.json`.
 
 ## Valores de política vigentes al 2026-10-11
 

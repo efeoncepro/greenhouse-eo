@@ -1,16 +1,16 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Catalog v10: price rules for third-party costs by category, a contingency reserve for managed services sold On-Demand, and the country factors closed as policy values (CEO decisions of 2026-10-11). Policy v10 unchanged.",
+  "reason": "Policy v11: the price of Adobe Creative Cloud Pro without its discount is a decided value (CEO, 2026-10-11), marked confirmed. No amount changes.",
   "catalog": {
     "path": "data/pricing/v3-operating/catalog.review-v10.json",
     "version": "operating-review-2026-10-11-v10",
     "digest": "9a3bbf4eea14e1e0b7782b829b1a7dbde3effba28c1ced9f0b8f07029d2d3f91"
   },
   "policy": {
-    "path": "data/pricing/v3-operating/resources.review-v10.json",
-    "version": "operating-review-2026-10-11-v10",
-    "digest": "8ff145bf0c154c553815d6670ccb69aca8f2c17655dd190411d3df243822d8d1"
+    "path": "data/pricing/v3-operating/resources.review-v11.json",
+    "version": "operating-review-2026-10-11-v11",
+    "digest": "7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406"
   },
   "credits": {
     "path": "data/pricing/v3-resources/ai-credits.review-v1.json",

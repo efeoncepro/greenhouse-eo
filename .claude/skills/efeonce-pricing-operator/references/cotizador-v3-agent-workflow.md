@@ -60,8 +60,8 @@ comando acepta y no recibió, después de verificar versión y digest del archiv
 `resources budget` rellena `--catalog` con el catálogo de créditos. Sin `--current` nada cambió: sin `--catalog` cae
 en la baseline histórica y `--policy`/`--credits` son obligatorios. Qué nombra el puntero lo imprime `current show`;
 no citarlo de memoria. Al cierre del 2026-10-11: `catalog.review-v10.json` (`operating-review-2026-10-11-v10`) +
-`resources.review-v10.json` (`operating-review-2026-10-11-v10`) + `ai-credits.review-v1.json`; los siguientes serían
-catálogo v11 y policy v11.
+`resources.review-v11.json` (`operating-review-2026-10-11-v11`) + `ai-credits.review-v1.json`; los siguientes serían
+catálogo v11 y policy v12.
 
 Los valores se toman por `quoteDate`, no por el archivo: factores de país, costos en Chile, FX EUR→USD y CLP→USD,
 forma del compromiso, provisiones de puesta en marcha, reglas de terceros, reserva de contingencia y la policy
@@ -583,8 +583,8 @@ rige con `quoteDate` 2026-10-11 o posterior. Aquí, en el orden en que se arma u
   `fx:CLP:USD` en `fxRecordIds` (con Magnific, también `fx:EUR:USD`); si falta →
   `RESOURCE_FX_SELECTION_REQUIRED` en `<periodo>:adobe`.
 - **Creative Cloud Pro se cotiza sin su descuento** (decisión del CEO, 2026-10-11; policy v10): `current` es el
-  precio de lista, CLP 325.405,5/mes (una licencia: 108.468,5), `estimated` hasta que haya factura a precio
-  completo, y es el default. Lo que Adobe factura mientras dura el descuento es
+  precio de lista, CLP 325.405,5/mes (una licencia: 108.468,5), `confirmed` desde la policy v11 — es un valor
+  decidido por el CEO, no un dato a la espera de otra factura; nunca listarlo como pendiente — y es el default. Lo que Adobe factura mientras dura el descuento es
   `priceId: "invoiced-with-discount"` (CLP 162.605/mes, una licencia 54.202, `confirmed`): sólo para un trabajo que
   termina antes que el descuento y **sólo si el operador lo decide**; decir cuál se usó. `renewal-scenario` ya no
   existe (nombrarlo deja `RESOURCE_PRICE_SELECTION_REQUIRED`). Los tres precios de Adobe llevan `reviewBy`

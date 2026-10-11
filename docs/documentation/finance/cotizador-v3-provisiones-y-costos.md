@@ -200,7 +200,7 @@ Desde la policy v7 el costo de Adobe sale de su factura (la del 2026-09-16, que 
 
 **El descuento termina, y se cotiza sin él.** Creative Cloud Pro se factura hoy con un descuento de 50 % que, según el CEO, termina pronto: unos dos meses al cargarse la factura, unos 36 días al decidir esto. Si termina exactamente en la renovación del contrato no está confirmado. El CEO decidió el 2026-10-11 que se calcule sin descuento desde ya, porque un fee cotizado hoy tiene que sostenerse después. Desde la policy v10 la policy guarda estos dos precios:
 
-- `current`: CLP 325.405,5 al mes, el precio de lista de la factura (CLP 91.150 por licencia más IVA). Es **estimado** hasta que exista una factura a precio completo. Es el que usa por defecto toda cotización nueva.
+- `current`: CLP 325.405,5 al mes, el precio de lista de la factura (CLP 91.150 por licencia más IVA). Es un valor **decidido** por el CEO (confirmado desde la policy v11), no un dato a la espera de otra factura. Es el que usa por defecto toda cotización nueva.
 - `invoiced-with-discount`: CLP 162.605 al mes, lo que Adobe factura mientras dure el descuento, confirmado por la factura. Sólo entra si la demanda lo elige de forma explícita.
 
 Los dos llevan fecha de revisión el 2026-11-16, la de la renovación. Hasta la policy v9 era al revés: `current` era el importe facturado y el precio de lista se llamaba `renewal-scenario`, que ya no existe.

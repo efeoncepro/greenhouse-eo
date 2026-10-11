@@ -577,8 +577,8 @@ entero a una sola persona sobrestima sus herramientas. Un diseñador con Creativ
 Adobe Express en la misma cotización son un equipo mixto normal; lo que se rechaza (`BUNDLED_TOOL_DOUBLE_COUNT`) es
 que la **misma** persona o línea lleve el plan y además un producto que el plan ya incluye. El descuento de Creative
 Cloud Pro termina pronto, y desde la policy v10, por decisión del CEO, una cotización nueva lo toma **sin
-descuento**: el precio `current` es CLP 325.405,5 al mes por las tres licencias, estimado hasta que exista una
-factura a precio completo. El importe facturado queda como `invoiced-with-discount`, sólo para un trabajo que
+descuento**: el precio `current` es CLP 325.405,5 al mes por las tres licencias, el precio de lista de la factura,
+y es un valor decidido (confirmado desde la policy v11), no un dato a la espera de otra factura. El importe facturado queda como `invoiced-with-discount`, sólo para un trabajo que
 termina antes que el descuento y sólo si el operador lo elige. Una licencia de Adobe se paga mes a mes pero se sigue
 cobrando hasta que el contrato anual se renueva, el 2026-11-16. Qué significa cada cosa
 al cotizar: [selección de herramientas](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11)

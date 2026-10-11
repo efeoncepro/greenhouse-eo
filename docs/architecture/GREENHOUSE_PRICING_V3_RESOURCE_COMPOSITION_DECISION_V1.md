@@ -204,6 +204,9 @@ Cloud Pro es el de defecto (Decisión 1, última viñeta).
   - `current` pasa a ser el precio **sin** descuento: CLP 325.405,5 al mes por las tres licencias (el precio de
     lista de la factura 3582641940, CLP 91.150 por licencia más IVA), es decir CLP 108.468,5 por licencia. Queda
     `estimated` hasta que exista una factura a precio completo. Es lo que usa por defecto toda cotización nueva.
+    *Nota 2026-10-11 (noche):* la policy v11 lo marca `confirmed`: es un valor decidido por el CEO sobre el precio
+    de lista impreso en la factura, no un dato a la espera de otra factura. Si Adobe cambia su precio de lista, es
+    un cambio de precio común y se resuelve con una versión nueva.
   - `invoiced-with-discount` es un `priceId` nuevo: CLP 162.605 al mes, lo que Adobe factura hasta que termine el
     descuento, `confirmed`. Sólo entra por elección explícita, para un trabajo que termina antes que el descuento, y
     esa elección es del operador.

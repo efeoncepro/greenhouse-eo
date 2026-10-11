@@ -46,9 +46,9 @@ pnpm --silent pricing:v3 catalog validate --current
 
 `current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`, e imprime qué archivo y
 qué versión nombra el puntero; esa es la fuente, no este manual. Al cierre del 2026-10-11 son
-`catalog.review-v10.json` (`operating-review-2026-10-11-v10`), `resources.review-v10.json`
-(`operating-review-2026-10-11-v10`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
-versión del catálogo, con exit 0. Los siguientes serían el catálogo v11 y la policy v11.
+`catalog.review-v10.json` (`operating-review-2026-10-11-v10`), `resources.review-v11.json`
+(`operating-review-2026-10-11-v11`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
+versión del catálogo, con exit 0. Los siguientes serían el catálogo v11 y la policy v12.
 
 - `--current` es un interruptor sin valor. Rellena cada uno de `--catalog`, `--policy` y `--credits` que el comando
   acepta y que no recibió; una opción escrita a mano gana sobre el puntero. En `resources budget` rellena `--catalog`
@@ -1222,7 +1222,7 @@ calcule sin descuento desde ya, y la policy v10 lo deja así:
 
 | `priceId` de `adobe`     | Al mes (tres licencias) | Una licencia  | Estado                                                    |
 | ------------------------ | ----------------------- | ------------- | --------------------------------------------------------- |
-| `current`                | CLP 325.405,5           | CLP 108.468,5 | `estimated`, hasta que exista una factura a precio completo |
+| `current`                | CLP 325.405,5           | CLP 108.468,5 | `confirmed` desde la policy v11: valor decidido por el CEO  |
 | `invoiced-with-discount` | CLP 162.605             | CLP 54.202    | `confirmed` por la factura                                |
 
 - `current` es el precio de lista de la factura (CLP 91.150 por licencia más IVA) y es lo que usa toda cotización

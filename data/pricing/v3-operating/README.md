@@ -9,7 +9,9 @@ las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el 
 fechado: la noche del 2026-10-11 eran `catalog.review-v10.json`,
 `resources.review-v10.json` y `../v3-resources/ai-credits.review-v1.json` (por la mañana, tras la oferta SEO/AEO,
 eran el catálogo v8 y la policy v6; por la tarde el catálogo pasó a v9 y la policy por v7, v8, v9 y v10; por la
-noche el catálogo pasó a v10). El siguiente catálogo sería v11 y la siguiente policy v11.
+noche el catálogo pasó a v10). El siguiente catálogo sería v11. La policy pasó a v11 esa noche
+(`resources.review-v11.json`, cambio `adobe-price-decided.change.json`: el precio de Adobe sin descuento queda
+`confirmed`; ningún monto cambia).
 
 ```bash
 pnpm --silent pricing:v3 current show
@@ -539,8 +541,8 @@ y [tres lecturas](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_W
   al mes). La demanda que use una herramienta en CLP nombra `fx:CLP:USD` en `fxRecordIds`. Creative Cloud Pro se
   factura hoy con 50 % de descuento (CLP 162.605 al mes) y el CEO espera que termine en unos dos meses; que termine
   justo en la renovación del 2026-11-16 no está confirmado. Desde la policy v10, por decisión del CEO, **se cotiza
-  sin el descuento**: `current` es CLP 325.405,5 al mes por las tres licencias (estimado hasta que exista una
-  factura a precio completo), y una licencia de tres es CLP 108.468,5. El importe facturado sigue disponible como
+  sin el descuento**: `current` es CLP 325.405,5 al mes por las tres licencias (valor decidido por el CEO sobre el precio de
+  lista de la factura; `confirmed` desde la policy v11), y una licencia de tres es CLP 108.468,5. El importe facturado sigue disponible como
   `invoiced-with-discount` (una licencia: CLP 54.202), sólo para un trabajo que termina antes que el descuento y
   sólo si el operador lo elige. Ya no existe `renewal-scenario`.
 - **Plazo de compromiso** (`commitmentTermMonths`, en la entrada de precio): por cuántos meses hay que pagar una
