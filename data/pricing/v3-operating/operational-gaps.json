@@ -121,13 +121,13 @@
       "code": "ADOBE_DISCOUNT_ENDS",
       "owner": "CEO",
       "required": "Confirm the price Adobe charges once the 50% discount on Creative Cloud Pro ends (expected about mid-December 2026) and issue a policy version that makes it the current price. Until then, quote engagements that run past that date with the renewal scenario",
-      "known": "Policy v7 carries Adobe as invoiced (invoice 3582641940 of 2026-09-16): Creative Cloud Pro, 3 licences, CLP 162,605 a month, and Adobe Express, 3 licences, CLP 16,240 a month; totals with IVA by the CEO's decision (the tax is recovered, not month by month); both contracted for twelve months and paid monthly. The renewal scenario is the list price of the invoice with IVA, CLP 325,405.5 a month. The current price has a review date of 2026-12-01"
+      "known": "Policy v7 carries Adobe as invoiced (invoice 3582641940 of 2026-09-16): Creative Cloud Pro, 3 licences, CLP 162,605 a month, and Adobe Express, 3 licences, CLP 16,240 a month; totals with IVA by the CEO's decision (the tax is recovered, not month by month); both contracted for twelve months and paid monthly. The renewal scenario is the list price of the invoice with IVA, CLP 325,405.5 a month. The current price has a review date of 2026-12-01. The four content profiles that use Adobe Express (social media manager, community manager, content manager, content creator) were confirmed by the CEO"
     },
     {
       "code": "SUPPLIER_CONTRACT_TERMS",
       "owner": "Operations",
-      "required": "Declare the contract term of each tool whose plan binds for longer than it bills (commitmentTermMonths), and whether a seat is bought for a job or already held",
-      "known": "Only Adobe declares a term (12 months). For every other month-priced tool the commitment reading says the term is not declared. A quote carries periods, not the length of the contract, and does not say whether a seat is a new purchase, so the cash reading of an engagement cannot subtract a seat bought for it"
+      "required": "Load the Microsoft 365 and HubSpot invoices so their current prices stop being pending; declare a term on any other tool whose plan binds for longer than it bills; decide how a quote says whether a seat is bought for a job or already held",
+      "known": "Stated by the CEO on 2026-10-11 and declared in policy v8 as how long a licence, once taken, has to be paid for: Adobe twelve months (a licence that is bought stays available and keeps being charged until the contract ends); Microsoft 365 one month (the contract is yearly and paid monthly, but removing a licence lowers the bill; its amounts are public stand-in prices, the invoice is pending); Notion one month. HubSpot is contracted for a year but its current price is pending evidence, so nothing is declared. A quote carries periods, not the length of the contract, and does not say whether a seat is a new purchase, so the cash reading of an engagement cannot subtract a seat bought for it"
     },
     {
       "code": "THIRD_PARTY_AND_CONTINGENCY",

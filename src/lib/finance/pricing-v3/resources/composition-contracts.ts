@@ -53,12 +53,15 @@ export const compositionPolicySchema = z
                     // feeds derived notices (price-review.ts) and never reaches a calculation or a frozen result.
                     // It lives here, not in `price.source`, because that object is the kernel's strict source.
                     reviewBy: pricingV3RequestSchema.shape.quoteDate.optional(),
-                    // How long the supplier contract binds, in months, when that is longer than what `price.unit`
-                    // bills: a plan contracted for a year and paid month by month is `unit: 'month'` with a term of
-                    // 12. Billing and commitment are two facts; the kernel only needs the first. This one never
+                    // How long a licence, once taken, has to be paid for, in months, when that is longer than what
+                    // `price.unit` bills: a seat that stays charged until a yearly contract ends is `unit: 'month'`
+                    // with a term of 12. It is about the seat, not the paper: a yearly contract whose bill drops as
+                    // soon as a seat is removed binds for 1. Billing and commitment are two facts; the kernel only
+                    // needs the first. This one never
                     // reaches a calculation or a frozen result: it feeds the commitment reading
                     // (commitment-exposure.ts), which without it cannot tell such a plan from one with no commitment.
-                    commitmentTermMonths: z.number().int().min(2).max(120).optional(),
+                    // 1 is a declaration too: paid month by month and free to leave, as opposed to "nobody said".
+                    commitmentTermMonths: z.number().int().min(1).max(120).optional(),
                     pendingReason: z.string().min(1).optional()
                   })
                   .strict()

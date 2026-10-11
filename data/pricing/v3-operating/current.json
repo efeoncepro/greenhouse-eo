@@ -1,16 +1,16 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Catalog v9: engagement form with its price ratio (On-Demand 1.10), costed start-up provisions and CLP to USD. Policy v7: Adobe as invoiced, two products in CLP with a twelve-month contract term. Decisions of 2026-10-11.",
+  "reason": "Policy v8 declares how long a licence, once taken, has to be paid for, as stated by the CEO on 2026-10-11: Notion and Microsoft 365 one month (a seat removed lowers the bill), Adobe twelve months (from v7). Catalog v9 unchanged.",
   "catalog": {
     "path": "data/pricing/v3-operating/catalog.review-v9.json",
     "version": "operating-review-2026-10-11-v9",
     "digest": "2a329a9dd1c9fe672d221584a62f18c4146c3f2042103cd9478fa705cb11a29c"
   },
   "policy": {
-    "path": "data/pricing/v3-operating/resources.review-v7.json",
-    "version": "operating-review-2026-10-11-v7",
-    "digest": "6fbd94cef54bfcdcc981fd56204713d83cb2885514ad9b79d47eb608bcbe78fc"
+    "path": "data/pricing/v3-operating/resources.review-v8.json",
+    "version": "operating-review-2026-10-11-v8",
+    "digest": "6d84e2e7f1d7be165d7c4b3654ab135ed8264932cfe8db9554563356588241e2"
   },
   "credits": {
     "path": "data/pricing/v3-resources/ai-credits.review-v1.json",
