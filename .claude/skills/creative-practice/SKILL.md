@@ -488,6 +488,8 @@ no cambia la política de vender capacidad/lane ni SOW/rights/QA. **Los40/35 pro
 reemplazan el piso creativo45% aprobado en esta skill.** `assess` sólo reporta gaps, nunca aprueba excepción.
 Una excepción bajo el piso la decide sólo el CEO, caso a caso: SKY social care 2027 (40,26%) es una y nunca sirve
 de referencia para otra cuenta; donde se puede ganar más se sube el objetivo de esa oferta, no el piso.
+Staff augmentation (una persona vendida por dedicación, oferta `talent-assurance-staffing`) tiene su propio piso de
+25% (CEO, 2026-10-11): es otro producto y nunca se elige para bajar el piso de un servicio creativo gestionado.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no
 la nómina actual: el margen real en personas hoy es mayor que el que muestra V3; no proponer «conectar nómina real»
 ni escribir el pago de una persona. El resumen trae `estimateExposure` (qué insumo estimado carga más costo:

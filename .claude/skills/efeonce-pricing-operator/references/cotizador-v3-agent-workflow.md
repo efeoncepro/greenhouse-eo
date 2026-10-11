@@ -49,9 +49,9 @@ Desde la raíz. **Las versiones vigentes no se nombran a mano.** El puntero
 ruta, versión y digest; `--current` (interruptor sin valor) rellena cada `--catalog`, `--policy` y `--credits` que el
 comando acepta y no recibió, después de verificar versión y digest del archivo. Una opción escrita gana. En
 `resources budget` rellena `--catalog` con el catálogo de créditos. Sin `--current` nada cambió: sin `--catalog` cae
-en la baseline histórica y `--policy`/`--credits` son obligatorios. Hoy apunta a `catalog.review-v6.json` +
-`resources.review-v6.json` (`operating-review-2026-10-11-v6`) + `ai-credits.review-v1.json`; no citarlo de memoria:
-`current show`.
+en la baseline histórica y `--policy`/`--credits` son obligatorios. Qué nombra el puntero lo imprime `current show`;
+no citarlo de memoria. Al 2026-10-11, tras el piso de staffing: `catalog.review-v7.json`
+(`operating-review-2026-10-11-v7`) + `resources.review-v6.json` + `ai-credits.review-v1.json`.
 
 Los valores se toman por `quoteDate`, no por el archivo: factores de país, costos en Chile y FX EUR→USD rigen con
 `quoteDate` 2026-10-11 o posterior; una demanda fechada 2026-10-10 resuelve sin factores de país y sin error (lo
@@ -243,8 +243,12 @@ líneas bajo el piso; el mismo servicio para un cliente y un equipo en Colombia 
   declarar una herramienta que el servicio no usa para «pasar» la validación. Sólo se excluye lo que la receta agrega.
 - **Piso de margen:** la política `creative-managed-service` usa `target_margin` 0,45 y `minimumMargin` 0,45 en los
   32 perfiles. Decidido por el CEO el 2026-10-10: 45 % es el piso de margen de los servicios gestionados; un servicio
-  donde se puede ganar más sube su objetivo en su propia política, no el piso. `talent-assurance-staffing` sigue con
-  el recargo histórico (margen ~25 %): no usarla para un servicio gestionado. `assess` mantiene sus 40/35 como
+  donde se puede ganar más sube su objetivo en su propia política, no el piso. `talent-assurance-staffing` (una
+  persona vendida por dedicación, staff augmentation) tiene desde el catálogo v7 `minimumMargin` 0,25 —piso decidido
+  por el CEO el 2026-10-11— y objetivo 0,30/0,30/0,35/0,40 por tier, propuesto por el agente y confirmado por el CEO
+  el mismo día (`confirmed`); antes de
+  esa fecha rige el recargo histórico sin piso. No usarla para un servicio gestionado ni bajar un piso para que un
+  precio pase: un neto bajo el piso sale `MARGIN_BELOW_FLOOR` y se informa. `assess` mantiene sus 40/35 como
   propuestas no aprobadas.
 - **Kit y provisiones:** `kitId: "managed-service-core"` en cada línea; provisiones opcionales por `choices`
   (`provision-backfill-coverage`, `provision-on-call-alert-guard`), declaradas en una sola línea. Son estimaciones.
@@ -332,7 +336,8 @@ redondeo ocurren dentro del motor.
   y registra la excepción con su motivo junto al artefacto; no la aprueba, no la da por implícita ni usa el redondeo
   o un ajuste para «cumplir» un piso. Confirmado 2026-10-10: 45 % es el piso de los servicios gestionados y un
   servicio que puede ganar más sube su objetivo, no el piso; la política queda 0,45/0,45; SKY es excepción aprobada
-  por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro cliente.
+  por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro cliente. Confirmado
+  2026-10-11: 25 % es el piso de una persona vendida por dedicación y de ahí sube según el caso.
 - **Abierto** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)):
   `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`, `COUNTRY_FACTORS_UNVALIDATED`, `LOCALIZED_TALENT_COSTS`, provisiones
   estimadas y consumo de agentes sin medir. `MARGIN_FLOOR_SCOPE` quedó decidido; `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE` se
@@ -467,7 +472,7 @@ No editar `current.json` a mano, ni editar o borrar una versión anterior: los a
   persona.
 - Emitir u ofrecer una cotización en EUR, o convertir a mano entre monedas.
 - Usar el precio de SKY o su margen como referencia para otro cliente; presentar los 40/35 de `assess` como piso. La
-  norma de los servicios gestionados es el piso de 45 %.
+  norma es el piso de 45 % en servicios gestionados y de 25 % en una persona por dedicación.
 - Decidir cifras comerciales (márgenes, pisos, precios, FX de cotización, múltiplos, factores, `floorBasis`,
   excepciones): son del operador (CEO). Atribuirle lo que propuso el agente: la fecha de revisión 2027-04-11, el FX
   EUR→USD 1.20 y los factores de talento estimados.

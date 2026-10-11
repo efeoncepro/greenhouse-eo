@@ -375,8 +375,10 @@ créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y r
 FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
 `trial-*` son costos no medidos y no provisiones aprobadas. Margen sobre venta y markup no son intercambiables;
 40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
-El piso 45% es la norma del servicio gestionado creativo; la cifra y sus excepciones las decide el CEO (SKY social
-care 2027, 40,26%, es una y no es referencia): el agente lleva una recomendación verificada contra sus datos.
+Hay dos pisos, ambos del CEO: 45% en el servicio gestionado creativo y, desde 2026-10-11, 25% en una persona vendida
+por dedicación (staff augmentation, oferta `talent-assurance-staffing`); sobre el piso el objetivo sube según el caso.
+Las cifras y sus excepciones las decide el CEO (SKY social care 2027, 40,26%, es una y no es referencia): el agente
+lleva una recomendación verificada contra sus datos.
 
 Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con
 preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca repricea artifacts. Este carril no

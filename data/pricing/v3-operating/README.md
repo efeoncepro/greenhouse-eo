@@ -5,8 +5,9 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
 [referencia funcional completa](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md).
 
 **Empieza aquí (2026-10-11).** Las versiones vigentes no se nombran a mano: las nombra `current.json`, y un comando
-las usa con `--current`. Hoy apunta a `catalog.review-v6.json`, `resources.review-v6.json` y
-`../v3-resources/ai-credits.review-v1.json`; la fuente es el comando, no esta línea.
+las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el comando, no esta línea. Al
+2026-10-11, tras el piso de staffing: `catalog.review-v7.json`, `resources.review-v6.json` y
+`../v3-resources/ai-credits.review-v1.json`.
 
 ```bash
 pnpm --silent pricing:v3 current show
@@ -14,7 +15,8 @@ pnpm --silent pricing:v3 compose quote --input demand.json --current --out artif
 ```
 
 Cómo funciona el puntero, cómo se mueve y qué archivos son de v6:
-[delta del 2026-10-11](#delta-2026-10-11--puntero-de-versiones-vigentes-catálogo-v6-y-policy-v6).
+[delta del 2026-10-11](#delta-2026-10-11--puntero-de-versiones-vigentes-catálogo-v6-y-policy-v6). Qué es el catálogo
+v7: [último delta](#delta-2026-10-11--catálogo-v7-piso-de-margen-de-staffing).
 Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasar la ruta», léelo como historia fechada.
 
 - `current.json` (`pricing-v3-current/1`): puntero a las versiones vigentes de catálogo, policy y créditos, cada una
@@ -69,6 +71,12 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
 - `catalog.review-v6.json` (change-set `eur-quote-fx.change.json`, aplicado sobre v5 con `catalog preview|apply`):
   agrega un solo registro, el tipo de cambio de cotización EUR→USD de 1,20, vigente desde el 2026-10-11, sin fecha
   de término y marcado como estimado. Es el catálogo vigente; v2 a v5 se conservan como padres congelados.
+  *Corrección 2026-10-11 (posterior):* el vigente pasó a ser `catalog.review-v7.json`; v6 queda como padre congelado.
+- `catalog.review-v7.json` (change-set `staffing-margin-floor.change.json`, aplicado sobre v6 con
+  `catalog preview|apply`): las 32 políticas de precio de `talent-assurance-staffing` (una persona vendida por
+  dedicación) pasan del recargo histórico con mínimo 0 a margen objetivo por tier (0,30 / 0,30 / 0,35 / 0,40) con
+  `minimumMargin` 0,25, desde el 2026-10-11. Piso y objetivos: decisión del CEO (los objetivos sobre propuesta del agente).
+- `staffing-margin-floor.change.json` (`pricing-v3-catalog-change/1`): los 32 `replace` que produjeron v7 desde v6.
 - `managed-care-colombia.demand.json` → `managed-care-colombia.artifact.json`: el servicio gestionado sintético de
   `managed-care.*` para un cliente de Colombia con equipo en Colombia, en COP y con fecha 2026-10-11. Es el primer
   artefacto firmado por el motor `pricing-v3-local/1.2.0` y el que la guarda de artefactos congelados exige para ese
@@ -165,7 +173,8 @@ Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/coti
   sigue leyendo review-v1: hay que pasar la ruta.
   *Corrección 2026-10-11:* desde hoy se cotiza con `catalog.review-v5.json`; con él, un cliente de Colombia o de
   Perú se calcula con el contrato 1.2.0. Ver el delta siguiente.
-  *Corrección 2026-10-11 (posterior):* se cotiza con `--current`, que hoy resuelve a v6 + v6. Ver el último delta.
+  *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
+  2026-10-11, catálogo v7 + policy v6). Ver los dos últimos deltas.
 - **Qué no se toca.** `catalog.review-v2.json` y `catalog.review-v3.json` son los padres congelados de los artefactos
   que los usaron. Ningún artefacto de esta carpeta se regeneró: cada uno lleva su catálogo dentro, vuelve a resolver al
   contrato 1.0.0 y responde `verified: true`. La prueba `pricing-v3-frozen-artifacts.test.ts` los reproduce a todos en
@@ -200,9 +209,9 @@ Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador
   `managed-care-colombia.demand.json` y `managed-care-colombia.artifact.json`.
 - **Qué usar para cotizar hoy.** `catalog.review-v5.json` + `resources.review-v5.json` +
   `../v3-resources/ai-credits.review-v1.json`. La CLI sin `--catalog` sigue leyendo review-v1: hay que pasar la ruta.
-  *Corrección 2026-10-11 (posterior):* se cotiza con `--current`, que hoy resuelve a `catalog.review-v6.json` +
-  `resources.review-v6.json` + el mismo catálogo de créditos. Sin `--current` ni `--catalog` la CLI sigue leyendo
-  review-v1.
+  *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
+  2026-10-11, `catalog.review-v7.json` + `resources.review-v6.json` + el mismo catálogo de créditos). Sin `--current`
+  ni `--catalog` la CLI sigue leyendo review-v1.
 - **Qué no se toca.** `catalog.review-v2.json`, `catalog.review-v3.json` y `catalog.review-v4.json` son los padres
   congelados de los artefactos que los usaron. Ningún artefacto anterior de esta carpeta se regeneró: cada uno
   vuelve a resolver a su contrato y responde `verified: true`.
@@ -378,3 +387,15 @@ puntero nombre la versión de número más alto de cada familia, y el mensaje tr
 
 Evidencia fechada, no fixture: no se escribió ningún artefacto en esta carpeta. `pnpm pricing:v3:test`: 16 archivos
 y 501 pruebas.
+
+## Delta 2026-10-11 — catálogo v7: piso de margen de staffing
+
+Decisión: [delta del ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--piso-de-margen-de-staff-augmentation-catálogo-v7).
+
+- **Archivos nuevos.** `catalog.review-v7.json` (versión `operating-review-2026-10-11-v7`) y su change-set
+  `staffing-margin-floor.change.json`. El puntero pasó a nombrar el catálogo v7; policy y créditos no cambiaron.
+- **Qué cambia.** La oferta `talent-assurance-staffing` tiene piso de margen de 25 % (decisión del CEO, 2026-10-11)
+  y un objetivo de 30 %, 35 % o 40 % según el tier del perfil (propuesto por el agente y confirmado por el CEO el
+  mismo día; `confirmed`, `COMMERCIAL_POLICY` en el ledger). Un neto acordado bajo el piso sale marcado `MARGIN_BELOW_FLOOR`.
+- **Qué no cambia.** `creative-managed-service` (45/45), el resto de v6 y todos los artefactos. Una cotización con
+  fecha anterior al 2026-10-11 conserva el recargo histórico. El siguiente catálogo sería `catalog.review-v8.json`.

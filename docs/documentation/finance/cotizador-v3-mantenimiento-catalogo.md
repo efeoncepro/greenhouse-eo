@@ -171,7 +171,8 @@ de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1
 
 > Nota 2026-10-11: el par para cotizaciones nuevas pasó a ser `catalog.review-v5.json` + `resources.review-v5.json`.
 > v4 se suma a los padres congelados y tampoco se edita. Ese mismo día, más tarde, las versiones vigentes dejaron de
-> nombrarse a mano: las dice el [puntero](#puntero-de-versiones-vigentes-2026-10-11), que hoy apunta a v6.
+> nombrarse a mano: las dice el [puntero](#puntero-de-versiones-vigentes-2026-10-11) y las imprime
+> `pnpm --silent pricing:v3 current show` (al 2026-10-11, tras el piso de staffing: catálogo v7 y policy v6).
 
 ## Factores de país: talento y mercado (2026-10-11)
 
@@ -284,8 +285,9 @@ Para cotizaciones nuevas el par es `catalog.review-v5.json` + `resources.review-
 congelados de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.
 
 > Nota 2026-10-11: ese párrafo describe el momento en que se emitió v5. Desde ese mismo día las versiones vigentes
-> las nombra el puntero, que hoy apunta a `catalog.review-v6.json` y `resources.review-v6.json`; v5 pasó a ser un
-> padre congelado más. Las tres secciones siguientes describen el estado vigente.
+> las nombra el puntero y las imprime `current show` (al 2026-10-11, tras el piso de staffing:
+> `catalog.review-v7.json` y `resources.review-v6.json`); v5 y `catalog.review-v6.json` pasaron a ser padres
+> congelados. Las secciones siguientes describen el estado vigente.
 
 ## Puntero de versiones vigentes (2026-10-11)
 
@@ -300,9 +302,9 @@ un nombre de archivo: es un documento aparte, el único que sí cambia. Fuente e
 `policy` y `credits`— y de cada una guarda la ruta relativa al repositorio, la versión y el digest (la huella del
 contenido). Guarda además `updatedAt` (el día en que se movió) y `reason` (por qué).
 
-Al 2026-10-11 nombra `data/pricing/v3-operating/catalog.review-v6.json`,
+Al 2026-10-11, tras el piso de staffing, nombra `data/pricing/v3-operating/catalog.review-v7.json`,
 `data/pricing/v3-operating/resources.review-v6.json` y `data/pricing/v3-resources/ai-credits.review-v1.json`. La
-fuente de esa respuesta es el propio puntero, no este documento.
+fuente de esa respuesta es el propio puntero, no este documento: `pnpm --silent pricing:v3 current show` lo imprime.
 
 ### Cómo se usa al cotizar
 
@@ -437,17 +439,36 @@ registro `fx:EUR:USD`, con tasa 1,20, vigencia desde el 2026-10-11 sin fecha de 
 
 Los demás registros de v5 —costos, factores de país, redondeo y tipos de cambio desde USD— no cambiaron.
 
+## Sucesor v7: piso de margen de staffing (2026-10-11)
+
+`catalog.review-v7.json` (versión `operating-review-2026-10-11-v7`) se emitió desde `catalog.review-v6.json` con
+`catalog preview` y `catalog apply` sobre `staffing-margin-floor.change.json`. El change-set son 32 `replace`, uno
+por perfil (`pricing:ECG-001`…, revisión 2, vigentes desde el 2026-10-11), sobre la oferta
+`talent-assurance-staffing`: una persona vendida por dedicación (staff augmentation).
+
+- Qué cambia: cada registro pasa de `method: markup` con el recargo histórico del workbook y `minimumMargin` 0 a
+  `method: target_margin` sobre todos los costos con `minimumMargin` 0,25. Objetivo por tier del workbook: 0,30 en
+  `historical-tier-1` y `historical-tier-2`, 0,35 en `historical-tier-3`, 0,40 en `historical-tier-4`.
+- Quién decidió qué: el piso de 25 % lo decidió el CEO el 2026-10-11 («25% está bien como piso y de ahí en adelante
+  subimos dependiendo»). Los objetivos por tier los propuso el agente y el CEO los confirmó el mismo día
+  («sí me sirven»); los registros son `confirmed` y su nota dice quién propuso y quién decidió.
+- Qué no cambia: `creative-managed-service` y el resto de v6. Una cotización con fecha anterior al 2026-10-11, las
+  versiones anteriores del catálogo y los artefactos ya congelados conservan el recargo histórico.
+- [Decisión y alternativas descartadas](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--piso-de-margen-de-staff-augmentation-catálogo-v7).
+
 ## Valores de política vigentes al 2026-10-11
 
 Resumen para leer sin abrir el JSON. La fuente es el catálogo que nombra el puntero y su `audit`; estos valores
 cambian sólo con una versión nueva. Los factores de país están en la tabla de
 [sucesor v5](#sucesor-v5).
 
-**Margen.** El piso de 45 % es la norma para los servicios gestionados de la práctica creativa: la política
-`creative-managed-service` tiene margen objetivo 0,45 y mínimo 0,45 para los 32 perfiles. Donde se puede ganar más,
-se sube el objetivo de esa oferta, no el piso. Ese piso vive sólo en esos 32 registros: no cubre todas las ofertas
-del catálogo. Los 32 registros de `talent-assurance-staffing` conservan un markup histórico con margen mínimo 0, así
-que una cotización por capacidad de roles no tiene hoy un piso que el motor haga cumplir, y que no marque ninguna
+**Margen.** Hay dos pisos, ambos decididos por el CEO, y cada uno vive en los 32 registros de su oferta. El de
+45 % es la norma para los servicios gestionados de la práctica creativa: la política `creative-managed-service` tiene
+margen objetivo 0,45 y mínimo 0,45 (2026-10-10). El de 25 % es el de una persona vendida por dedicación (staff
+augmentation): desde el catálogo v7 la política `talent-assurance-staffing` tiene mínimo 0,25 y un objetivo de 0,30,
+0,35 o 0,40 según el tier del perfil (2026-10-11; piso y objetivos decididos por el CEO). Donde se puede
+ganar más se sube el objetivo de la oferta o del perfil, nunca se baja el piso. Una cotización con fecha anterior al
+2026-10-11 o hecha sobre un catálogo anterior conserva el recargo histórico sin piso, y ahí que no se marque ninguna
 línea no prueba que cumpla un piso. El 40 %/35 % que muestra `compose assess` es una propuesta genérica
 sin aprobar, nunca un piso. Un precio bajo el piso queda marcado y requiere una excepción explícita del CEO,
 registrada caso por caso. La que consta en el ledger (`MARGIN_FLOOR_SCOPE`), SKY social care 2027, se aprobó porque
@@ -479,4 +500,5 @@ spot, no una tasa observada):
 
 Pendientes abiertos sobre estos valores, con su responsable, en el
 [ledger](../../../data/pricing/v3-operating/operational-gaps.json): `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`,
-`COUNTRY_FACTORS_UNVALIDATED` y `UNIT_PRICE_REVIEW`.
+`COUNTRY_FACTORS_UNVALIDATED`, `UNIT_PRICE_REVIEW` y `COMMERCIAL_POLICY` (confirmar por perfil los objetivos de
+staffing).

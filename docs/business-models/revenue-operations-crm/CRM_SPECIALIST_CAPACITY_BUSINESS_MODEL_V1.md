@@ -129,9 +129,12 @@ ajusta el precio del componente humano. Provisiones y valores de prueba siguen s
 
 Delta 2026-10-11 — decisión del operador (CEO): el costo de las personas en el cotizador es el nivel salarial
 objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella; el margen real sobre personas hoy es
-mayor que el simulado. Esa base de costo ya está decidida. Esta oferta sigue sin piso ni porcentaje aprobado: el 45%
-es la norma de los servicios gestionados de la práctica creativa y el 40%/35% del pack de capacidad es una
-propuesta sin aprobar; ambos se deciden con el operador, no por analogía.
+mayor que el simulado. Esa base de costo ya está decidida. Ese mismo día el operador fijó el piso de margen de una
+persona vendida por dedicación (staff augmentation) en 25%, y de ahí sube según el caso: rige en el catálogo para toda
+cotización que use la oferta `talent-assurance-staffing`, incluida la capacidad de un especialista CRM en esa
+modalidad. Eso no aprueba este modelo de negocio ni un precio objetivo para él: su estado y su veredicto no cambian.
+El 45% es el piso de los servicios gestionados de la práctica creativa y el 40%/35% del pack de capacidad es una
+propuesta sin aprobar; el objetivo de esta oferta se decide con el operador, no por analogía.
 
 `role_capacity` y `managed_service` distinguen presentación por capacidad y fee de servicio; roles siguen
 costeados internamente. La selección incluye base Notion/Microsoft 365, herramientas de CRM por trabajo y

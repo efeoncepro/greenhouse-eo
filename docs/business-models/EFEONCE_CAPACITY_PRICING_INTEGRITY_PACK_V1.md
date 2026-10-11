@@ -165,7 +165,11 @@ Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CE
 - **Margen.** El 40%/35% de §3 sigue siendo una propuesta sin aprobar y nunca se usa como piso; su decisión (§9)
   corresponde al operador, con costo completo y evidencia de comprador de Commercial y Finance. El piso de 45% es la
   norma de los servicios gestionados de la práctica creativa (política `creative-managed-service`, objetivo 45% y
-  mínimo 45%): donde se puede ganar más se sube el objetivo de esa oferta, no el piso. Una excepción bajo el piso es
+  mínimo 45%): donde se puede ganar más se sube el objetivo de esa oferta, no el piso. Una persona vendida por
+  dedicación (staff augmentation, política `talent-assurance-staffing`) tiene desde el 2026-10-11 un piso de 25%,
+  también decidido por el CEO, y de ahí sube según el caso: ese es el piso que rige en el catálogo para esa oferta,
+  no el 35% propuesto en §3. Los objetivos por tier del catálogo (30%, 35% y 40%) los propuso un agente y los
+  confirmó el CEO el mismo día. Una excepción bajo un piso es
   una decisión explícita del CEO para un cliente (la aprobada el 2026-10-10 está registrada en el expediente comercial de
   ese cliente) y nunca sirve de referencia de margen para otro.
 - **Costo de personas.** Los 32 costos de perfil del catálogo vienen del Excel de pricing, confirmados por su autor

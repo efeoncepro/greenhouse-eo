@@ -64,8 +64,10 @@ En esta baseline, costo sin país sólo puede usarse con `mode=simulation` y `al
 supuesto y revisión, y sus factores de mercado 1 son neutrales de prueba; no WTP aprobado. El catálogo operativo
 vigente sí tiene valores por país desde el 2026-10-11: costos declarados como costo en Chile, un factor de talento por
 país de la persona y un factor de mercado por país del cliente
-([cómo se cotiza con ellos](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo)). Las políticas por tier usan markup histórico, no
-margen objetivo 40%. El catálogo no hereda la aspiración de margen del expediente Pibank.
+([cómo se cotiza con ellos](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo)). Las políticas por tier de la baseline usan markup histórico, no
+margen objetivo 40%. El catálogo no hereda la aspiración de margen del expediente Pibank. En el catálogo operativo,
+desde el v7 (2026-10-11), la oferta de staffing `talent-assurance-staffing` usa margen objetivo por tier (30 %, 30 %,
+35 % y 40 %) con piso de 25 %, ambos decididos por el CEO; las fechas anteriores conservan el markup.
 
 Talent Assurance USD 25/mes, operación USD 25 y setup USD 100 son **placeholders de la prueba anterior**,
 identificados `trial-*`; no costos medidos ni promesas de formación/reemplazo. Se actualizan como recursos explícitos.
@@ -130,8 +132,9 @@ pnpm --silent pricing:v3 current show
 
 Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, `path`, `status` y lo que se encontró
 en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
-coincide. Hoy apunta a `data/pricing/v3-operating/catalog.review-v6.json` y
-`data/pricing/v3-operating/resources.review-v6.json` (ambos `operating-review-2026-10-11-v6`) y a
+coincide. Lo que imprime es la respuesta vigente. Al 2026-10-11, tras el piso de staffing, apunta a
+`data/pricing/v3-operating/catalog.review-v7.json` (`operating-review-2026-10-11-v7`),
+`data/pricing/v3-operating/resources.review-v6.json` (`operating-review-2026-10-11-v6`) y
 `data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`).
 
 | `status`           | Qué significa                                                              |
@@ -289,11 +292,18 @@ pnpm --silent pricing:v3 catalog apply --current --input mi-cambio.change.json \
 carril de catálogo para ver el efecto en casos concretos; una demanda de composición se compara cotizándola con la
 base y con el sucesor.
 
-El cambio más reciente es [`eur-quote-fx.change.json`](../../../data/pricing/v3-operating/eur-quote-fx.change.json),
+Un ejemplo de `add` es [`eur-quote-fx.change.json`](../../../data/pricing/v3-operating/eur-quote-fx.change.json),
 que produjo `catalog.review-v6.json` desde `catalog.review-v5.json`: un solo `add`, el FX de cotización `fx:EUR:USD`
 de `1.20` desde el 2026-10-11, sin fecha de término y marcado `estimated`. Lo propuso el agente aplicando al EUR el
 margen prudencial que el operador fijó para las otras monedas (referencia ECB `1.1206`); el operador no lo decidió de
 forma explícita para EUR, y por eso no está `confirmed`.
+
+El cambio más reciente al 2026-10-11 es
+[`staffing-margin-floor.change.json`](../../../data/pricing/v3-operating/staffing-margin-floor.change.json), que
+produjo `catalog.review-v7.json` desde `catalog.review-v6.json`: 32 `replace`, uno por política de precio de
+`talent-assurance-staffing`, que cambian el markup histórico con mínimo 0 por margen objetivo por tier con
+`minimumMargin` `0.25`. El piso de 25 % lo decidió el CEO; los objetivos por tier los propuso el agente y él los
+confirmó el mismo día, así que los registros están `confirmed`.
 
 Rechazos (exit 1, `error.code` en stderr): `CATALOG_BASE_CONFLICT` (el `baseDigest` no es el de la base entregada),
 `CATALOG_PREVIEW_CONFLICT` (el `--confirm` no es el del preview vigente: repetir el preview),
@@ -305,8 +315,9 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 **Un cambio es siempre una versión nueva del catálogo.** `apply` escribe un sucesor en una ruta nueva y no toca la
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
 conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor cuando el puntero lo
-nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente (hoy sería
-`catalog.review-v7.json`) junto a su change-set, probarlo con los casos afectados y mover el puntero
+nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente al del catálogo
+que nombra el puntero (al 2026-10-11 sería `catalog.review-v8.json`) junto a su change-set, probarlo con los casos
+afectados y mover el puntero
 ([pasos](#versiones-vigentes-el-puntero-currentjson)), para que agentes y operador usen el mismo catálogo.
 
 ## Cambiar un factor de país o registrar el costo de un perfil en un país

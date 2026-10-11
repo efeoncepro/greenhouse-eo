@@ -254,9 +254,10 @@ Versiones vigentes (2026-10-11): ya no hace falta escribir las rutas a mano para
 con su ruta, versión y digest (la huella de su contenido). Con `--current`, la CLI toma de ahí cada fuente que no
 pasaste; si pasas una ruta explícita, gana la ruta. Antes de usar el puntero lo comprueba contra los archivos: si la
 versión o el digest no coinciden, rechaza con `CURRENT_VERSIONS_MISMATCH` en vez de seguirlo. Sin `--current` todo
-sigue como antes: sin `--catalog` se lee review-v1 y `--policy` y `--credits` son obligatorios. Hoy el puntero nombra
-`catalog.review-v6.json`, `resources.review-v6.json` y `ai-credits.review-v1.json`; esa frase envejece, así que
-confírmalo con `pnpm --silent pricing:v3 current show`. Emitir una versión nueva no mueve el puntero: es un paso
+sigue como antes: sin `--catalog` se lee review-v1 y `--policy` y `--credits` son obligatorios. Qué nombra el puntero
+lo imprime `pnpm --silent pricing:v3 current show`; al 2026-10-11, tras el piso de staffing, es
+`catalog.review-v7.json`, `resources.review-v6.json` y `ai-credits.review-v1.json`, y esa frase envejece, así que
+confírmalo con el comando. Emitir una versión nueva no mueve el puntero: es un paso
 aparte. [Cómo se mueve](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
 
 Un artefacto de composición congela catálogo, policy, créditos, demanda y resultado; `createdAt` queda fuera
@@ -271,7 +272,7 @@ El presupuesto IA separado posee su propio formato: no es una quote válida para
 
 `compose assess` separa completitud matemática de evidencia: salario localizado, provisiones medidas,
 suscripciones/acceso/capacidad reales, asignación simulada, impuestos/entidad, SOW y autorización comercial.
-Siempre devuelve revisión. 40% objetivo/35% piso son propuesta, `approved=false`; no reemplazan la policy elegida ni pisos vigentes de la práctica. Creative Practice conserva 45% bruto aprobado: el aviso genérico de `assess` no certifica ese piso ni permite una excepción creativa. El agente debe calcular y verificar el piso de la oferta correspondiente.
+Siempre devuelve revisión. 40% objetivo/35% piso son propuesta, `approved=false`; no reemplazan la policy elegida ni pisos vigentes de la práctica. Creative Practice conserva 45% bruto aprobado y, desde el 2026-10-11, una persona vendida por dedicación (staff augmentation) tiene piso de 25%, ambos decididos por el CEO: el aviso genérico de `assess` no certifica esos pisos ni permite una excepción. El agente debe calcular y verificar el piso de la oferta correspondiente.
 TrialAssurance 25/operación 25/setup 100 permanecen recursos de prueba, no estándares de Talent Assurance.
 
 Delta 2026-10-10: `assess` ya reporta el piso de la política de precio seleccionada, sin recalcularlo. Agrega una
@@ -279,7 +280,9 @@ brecha `MARGIN_BELOW_POLICY_FLOOR` (owner Commercial/Finance) por cada línea qu
 `MARGIN_BELOW_FLOOR`, y `margin.policyFloor.linesBelowFloor` con neto, margen, `marginRateRoundedDown` y
 `marginAmountShortOfFloor` de cada una. `proposedTarget`/`proposedFloor` no cambian. El veredicto vale sólo si la
 oferta elegida codifica el piso de su práctica: con `creative-managed-service` (objetivo y mínimo 0,45) lo hace; una
-política con mínimo 0 no marca nada y `assess` no suple esa verificación. Con objetivo igual al mínimo, costo y precio
+política con mínimo 0 no marca nada y `assess` no suple esa verificación (desde el catálogo v7 del 2026-10-11
+`talent-assurance-staffing`, la persona por dedicación, también codifica el suyo: mínimo 0,25; sólo los catálogos
+anteriores la dejan en mínimo 0). Con objetivo igual al mínimo, costo y precio
 se redondean a CLP enteros por separado y una línea al piso puede quedar bajo él por menos de 1 CLP: el kernel la
 marca y nunca sube el precio. En el ejemplo `managed-care.*` las seis líneas quedan cortas por 0,1 a 0,5 CLP;
 `marginAmountShortOfFloor` distingue esa brecha de redondeo de un incumplimiento real.

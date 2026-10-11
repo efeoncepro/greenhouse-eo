@@ -33,9 +33,11 @@ pnpm --silent pricing:v3 current show
 pnpm --silent pricing:v3 catalog validate --current
 ```
 
-`current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`: hoy apunta a
-`catalog.review-v6.json` y `resources.review-v6.json` (ambos `operating-review-2026-10-11-v6`) y a
-`ai-credits.review-v1.json`. `catalog validate --current` responde esa misma versión del catálogo, con exit 0.
+`current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`, e imprime qué archivo y
+qué versión nombra el puntero; esa es la fuente, no este manual. Al 2026-10-11, tras el piso de staffing, son
+`catalog.review-v7.json` (`operating-review-2026-10-11-v7`), `resources.review-v6.json`
+(`operating-review-2026-10-11-v6`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
+versión del catálogo, con exit 0.
 
 - `--current` es un interruptor sin valor. Rellena cada uno de `--catalog`, `--policy` y `--credits` que el comando
   acepta y que no recibió; una opción escrita a mano gana sobre el puntero. En `resources budget` rellena `--catalog`
@@ -50,9 +52,11 @@ pnpm --silent pricing:v3 catalog validate --current
 - Quién mueve el puntero y cuándo:
   [mantenimiento](catalogo-v3-seleccion-y-actualizacion.md#versiones-vigentes-el-puntero-currentjson).
 
-El catálogo v6 conserva lo del v5 (redondeo comercial por moneda, tipo de cambio de cotización, los 32 costos de
+El catálogo vigente conserva lo del v5 (redondeo comercial por moneda, tipo de cambio de cotización, los 32 costos de
 persona confirmados y declarados como el costo de cada perfil en Chile, y los factores por país del cliente y de cada
-persona) y agrega un tipo de cambio de cotización EUR→USD para las herramientas con precio en EUR. La policy v6 deja
+persona), el tipo de cambio de cotización EUR→USD que el v6 agregó para las herramientas con precio en EUR y, desde
+el v7, el piso de margen de la oferta de staffing ([Oferta y piso de margen](#selección-y-asignación)).
+La policy v6 deja
 los 25 precios de herramientas vigentes hasta que se reemplacen, cada uno con una fecha de revisión
 ([Un precio unitario no vence](#un-precio-unitario-no-vence)).
 
@@ -249,6 +253,24 @@ de hoy sobre las personas es mayor que el que muestra el cotizador. Al explicar 
 reemplaces un costo del catálogo por uno de nómina. Un costo específico se registra sólo cuando el costo objetivo de
 un perfil en un país se aparta del costo de Chile por su factor
 ([cuándo](#cuándo-registrar-el-costo-específico-de-un-perfil-en-un-país)).
+
+**Oferta y piso de margen.** La oferta del brief (`brief.offerId`) elige la política de precio de cada perfil y, con
+ella, el piso que el motor vigila. Hay dos, ambos decididos por el CEO:
+
+- Una persona vendida por dedicación (staff augmentation): `offerId: "talent-assurance-staffing"`, con
+  `commercialUnit: "role_capacity"`. Piso de 25 % (2026-10-11, catálogo v7). El objetivo es 30 %, 35 % o 40 % según el
+  tier del perfil; esos objetivos los propuso el agente y el CEO los confirmó el mismo día (`COMMERCIAL_POLICY` en el
+  ledger).
+- Un servicio gestionado de la práctica creativa: `offerId: "creative-managed-service"`, con
+  `commercialUnit: "managed_service"`. Piso de 45 % y objetivo de 45 % (2026-10-10).
+
+No elijas la oferta de staffing para un servicio gestionado porque su piso es más bajo. Sobre el piso, el objetivo
+sube según el caso; nunca se baja el piso para que un precio pase. Si declaras un neto acordado bajo el piso, el
+cotizador no lo rechaza ni lo corrige: marca la línea con `MARGIN_BELOW_FLOOR` y la lista en `marginFloor.lines[]` del
+resumen, con su `minimumMargin` y su margen real ([Leer el resumen](#leer-el-resumen)). Eso se le informa al operador
+tal cual; no se «arregla» quitando costo, con un descuento ni con el redondeo. La excepción bajo un piso es del CEO,
+caso por caso, y no sirve de referencia para otro cliente. Una cotización con fecha anterior al 2026-10-11 conserva
+el recargo histórico de staffing, sin piso.
 
 Las 32 reglas de perfil son **reglas iniciales para revisión**, no recetas universales completas ni autorización
 de compras. Hay tareas adicionales para WordPress, UX, video, stock, datos, comunidad y automatización.
@@ -907,9 +929,12 @@ la excepción, se registra con su motivo en `reason` y en una nota junto al arte
 45 % es el piso de margen de los servicios gestionados, y un servicio donde se puede ganar más sube su margen
 objetivo, no el piso; la política `creative-managed-service` se mantiene en objetivo 0,45 y mínimo 0,45; SKY social
 care es una excepción aprobada por ser cliente vigente. No usar el precio de SKY ni su margen como referencia para
-otro cliente. Confirmado el 2026-10-11: el precio sigue al país del cliente, el costo al país de la persona y, en los
-mercados con factor bajo 1, el piso acompaña al factor; el 45 % sigue siendo el piso en el mercado base. Declarar
-`floorBasis` en otro mercado, o cambiar un factor, es decisión del operador.
+otro cliente. Confirmado el 2026-10-11: una persona vendida por dedicación (`talent-assurance-staffing`) tiene piso
+de 25 % y de ahí sube según el caso; los objetivos por tier (30 %, 35 % y 40 %) los propuso el agente y el CEO los
+confirmó.
+Confirmado el 2026-10-11: el precio sigue al país del cliente, el costo al país de la persona y, en los
+mercados con factor bajo 1, el piso acompaña al factor; el piso de la oferta (45 % o 25 %) sigue rigiendo en el
+mercado base. Declarar `floorBasis` en otro mercado, o cambiar un factor, es decisión del operador.
 
 Abierto, registrado en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json): la
 revisión del FX de cotización cuando el mercado se mueva más allá de su margen, más el FX de CLF y el de EUR —el
@@ -942,7 +967,8 @@ No resolver nada de esto por cuenta propia en una cotización.
 - **No emitir ni ofrecer una cotización en EUR.** España se cotiza en USD. Tampoco convertir a mano el resultado de
   otra moneda.
 - **No usar el precio de SKY ni su margen como referencia** para otro cliente. Es una excepción que el operador
-  aprobó para ese cliente; la norma de los servicios gestionados es el piso de 45 %.
+  aprobó para ese cliente; la norma es el piso de 45 % en servicios gestionados y de 25 % en una persona por
+  dedicación.
 - **No decidir cifras comerciales.** Márgenes, pisos, precios, FX de cotización, múltiplos de redondeo, factores de
   país, `floorBasis` y excepciones son del operador (CEO). El agente lleva el margen real y una recomendación.
 - **No atribuirle al operador lo que propuso el agente**: la fecha de revisión `2027-04-11`, el FX de cotización

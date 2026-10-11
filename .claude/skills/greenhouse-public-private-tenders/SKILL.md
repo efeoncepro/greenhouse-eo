@@ -252,7 +252,9 @@ sin asignar separados. Plantilla o escenario Pibank no es rate card ni roster di
 Usar las versiones vigentes con `--current` (no nombrar catálogo/política a mano). El salario del catálogo es el
 nivel objetivo del Excel de pricing, no la nómina actual: el margen real en personas es mayor que el simulado y no
 se propone conectar payroll. Cotizar en la moneda que piden las bases (FX de política del CEO y redondeo por moneda;
-nunca convertir a mano; en EUR aún no se emite). Precio y excepción bajo el piso los decide el CEO.
+nunca convertir a mano; en EUR aún no se emite). Precio y excepción bajo el piso los decide el CEO: 45% en un
+servicio gestionado creativo y 25% en una persona vendida por dedicación (staff augmentation); la excepción de una
+cuenta nunca es referencia para otra.
 
 Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
 gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. managed_service proyecta fee,

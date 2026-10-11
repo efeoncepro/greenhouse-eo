@@ -312,9 +312,11 @@ canónicos mantienen V2 hasta promoción propia. No trasladar pisos de Creative/
 Delta 2026-10-11 — decisiones del operador (CEO) que rigen cualquier cotización local. El costo de las personas en
 el cotizador es el nivel salarial objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella: el
 margen real sobre personas hoy es mayor que el simulado. El piso de 45% es la norma de los servicios gestionados de
-la práctica creativa; donde se puede ganar más se sube el objetivo de esa oferta, no el piso. El 40%/35% del pack
-de capacidad sigue sin aprobación y nunca es un piso; una excepción bajo el piso la decide el CEO para un cliente y
-no sirve de referencia para otro. El país de la persona ajusta el costo, el país del cliente ajusta el precio del
+la práctica creativa; donde se puede ganar más se sube el objetivo de esa oferta, no el piso. Una persona vendida
+por dedicación (staff augmentation) tiene un piso de 25%, también del CEO, y de ahí sube según el caso. El 40%/35%
+del pack de capacidad sigue sin aprobación y nunca es un piso; una excepción bajo un piso la decide el CEO para un
+cliente y no sirve de referencia para otro.
+El país de la persona ajusta el costo, el país del cliente ajusta el precio del
 componente humano, cada moneda redondea a su múltiplo y el tipo de cambio de cotización es un valor de política.
 Detalle en el [pack §12](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md#12-delta-2026-10-11--decisiones-del-operador-que-acotan-este-pack);
 valores vigentes y comandos (`--current`) en el manual de agentes.

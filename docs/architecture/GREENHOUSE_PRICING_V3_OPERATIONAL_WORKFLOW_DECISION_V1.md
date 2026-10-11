@@ -384,7 +384,8 @@ Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay coman
   *Nota 2026-10-11:* el catálogo vigente para cotizaciones nuevas pasó a ser `catalog.review-v5.json`; v4 queda
   también como padre congelado. Ver el delta del 2026-10-11, más abajo.
   *Nota 2026-10-11 (posterior):* las versiones vigentes ya no se nombran en este documento. Las nombra el puntero
-  `data/pricing/v3-operating/current.json` y se usan con `--current`; hoy son catálogo v6 y policy v6.
+  `data/pricing/v3-operating/current.json`, se usan con `--current` y las imprime `current show` (al 2026-10-11,
+  tras el piso de staffing: catálogo v7 y policy v6).
 - **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
   `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
   muestran sólo el neto final.
@@ -502,8 +503,9 @@ dueño del tema y aquí sólo se anota su efecto sobre el flujo; los otros tres 
   un artefacto congelado (`compose assess|preview`, `explain`, `replay`) no lo aceptan: responden `INVALID_ARGUMENT`.
 - **Sin `--current` nada cambió.** Sin `--catalog` la CLI lee la baseline histórica
   `data/pricing/v3-catalog/catalog.review-v1.json`, y `--policy` y `--credits` siguen siendo obligatorios.
-- **Qué nombra hoy el puntero.** `catalog.review-v6.json`, `resources.review-v6.json` y
-  `../v3-resources/ai-credits.review-v1.json`. Es un dato fechado: la fuente es `current show`, no este párrafo.
+- **Qué nombra el puntero.** Lo imprime `current show`; esa es la fuente, no este párrafo. Al emitirse esta ronda
+  eran `catalog.review-v6.json`, `resources.review-v6.json` y `../v3-resources/ai-credits.review-v1.json`; al
+  2026-10-11, tras el piso de staffing (delta siguiente), el catálogo es `catalog.review-v7.json`.
 - **Una fecha de cotización posterior ya no se bloquea por la vigencia de un precio de herramienta.** Medido con la
   demanda `managed-care-colombia` fechada el 2026-12-15: con la policy v6 calcula; con la v5 queda `needs_input` con
   `RESOURCE_PRICE_NOT_EFFECTIVE` en Notion, Microsoft 365 y la bandeja social.
@@ -640,6 +642,53 @@ objetivo de un perfil en un país se aparta de la referencia de Chile por el fac
 **Verificación (2026-10-11, local).** `pnpm pricing:v3:test`: 16 archivos y 501 pruebas; ESLint limpio en el módulo
 y el script; la guarda de artefactos congelados pasa; `current show` responde `consistent: true`. La corrida de
 Colombia con `--current` termina con exit 3 (calculada, requiere revisión), motor `pricing-v3-local/1.2.0`.
+
+## Delta 2026-10-11 — piso de margen de staff augmentation (catálogo v7)
+
+**Contexto.** La oferta `talent-assurance-staffing` —una persona vendida por dedicación, `commercialUnit`
+`role_capacity`— conservaba en sus 32 políticas de precio el recargo histórico del workbook (`method: markup`) con
+`minimumMargin` 0. El motor no tenía contra qué comparar: ningún precio de staff augmentation salía marcado, por bajo
+que fuera.
+
+**Decisión del operador (CEO, 2026-10-11).** El piso de margen de una persona vendida por dedicación es 25 %: «25%
+está bien como piso y de ahí en adelante subimos dependiendo». Sobre el piso, el objetivo sube según el caso.
+
+**Qué se registró.** `catalog.review-v7.json` (versión `operating-review-2026-10-11-v7`), emitido desde v6 con el
+change-set `staffing-margin-floor.change.json`: 32 `replace`, uno por perfil (`pricing:ECG-001`…, revisión 2,
+vigentes desde el 2026-10-11). Cada registro pasa a `method: target_margin` sobre todos los costos con
+`minimumMargin` 0,25. El objetivo va por tier del workbook: 0,30 en `historical-tier-1` y `historical-tier-2`, 0,35 en
+`historical-tier-3` y 0,40 en `historical-tier-4`. **Los objetivos por tier los propuso el agente y los confirmó el CEO
+el mismo día** («sí me sirven»): los registros están marcados `confirmed` y su nota dice quién propuso y quién decidió. El puntero
+`current.json` pasó a nombrar el catálogo v7; el ledger lo registra en `COMMERCIAL_POLICY`.
+
+**Qué no cambia.** `creative-managed-service` sigue en objetivo 0,45 y mínimo 0,45: el piso de 45 % de los servicios
+gestionados de la práctica creativa. El 40/35 de `compose assess` sigue siendo una propuesta genérica sin aprobar,
+nunca un piso. Una cotización con fecha anterior al 2026-10-11, las versiones anteriores del catálogo y los artefactos
+congelados conservan el recargo histórico. No hay cambio de motor ni de contrato.
+
+**Alternativas que el operador tuvo a la vista y por qué no se tomaron.**
+
+- *45 %, igual que los servicios gestionados.* Deja a un diseñador senior dedicado muy por encima de lo que se le ha
+  ofrecido al mercado, y en staff augmentation no hay un riesgo de resultado que ese margen pague.
+- *El 40/35 genérico sin aprobar.* El mismo problema, y habría convertido en norma una propuesta que nadie aprobó.
+- *Mantener el recargo del workbook.* 21 de los 32 perfiles (tiers 1 y 2) quedan entre 20 % y 23 % de margen, y nada
+  frena un precio más bajo.
+
+**Comportamiento verificado.** Un diseñador senior dedicado en Chile, un período, con herramientas: el precio por
+defecto es CLP 2.580.000 con 30,5 % de margen (motor 1.1.0) y ninguna línea sale marcada; al declarar un neto
+acordado de CLP 1.900.000, el resumen lista la línea en `marginFloor.lines[]` con `MARGIN_BELOW_FLOOR`,
+`minimumMargin` 0,25 y margen de línea 10,8 %.
+
+**Reglas para agentes.**
+
+- Hay dos pisos, ambos del CEO: 45 % para un servicio gestionado de la práctica creativa
+  (`creative-managed-service`) y 25 % para una persona vendida por dedicación (`talent-assurance-staffing`).
+- **NUNCA** bajar un piso, ni elegir la oferta de staffing para un servicio gestionado, para que un precio pase.
+- El objetivo de un perfil puede subirse en su propio registro, con una versión nueva del catálogo. El piso no.
+- Los objetivos 30/35/40 son decisión del CEO sobre una propuesta del agente; cambiarlos exige una decisión suya y una
+  versión nueva del catálogo.
+- Una línea bajo el piso se informa al operador con su margen real. La excepción es del CEO, caso por caso, y nunca
+  es referencia para otro cliente.
 
 ## Evidencia y rutas de operación
 
