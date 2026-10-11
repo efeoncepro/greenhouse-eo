@@ -24,6 +24,12 @@ comparten entre usuarios: cantidades requeridas por usuarios únicos. No reducir
 plataforma requieren driver y capacidad externos al quote; no se inventa denominador de cartera ni se duplica
 el costo íntegro por persona. Reconciliación es local al input, no reserva global.
 
+*Nota 2026-10-11 (asientos):* «licencias nominativas no se comparten entre usuarios» y «cantidades requeridas por
+usuarios únicos» describen la regla hasta ese día. Desde entonces la demanda puede declarar que varias personas usan
+un mismo asiento, que un asiento pagado está ocioso y que una herramienta se tiene bajo varios planes en un período;
+la regla pasa a ser que todo asiento pagado queda explicado. No reducir licencias por FTE sigue igual. Ver el
+[delta de asientos](#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
+
 Créditos se agregan por proveedor/mes antes de planear un paquete; consumo por función distribuye costo del
 presupuesto con remanente visible. Saldo disponible declarado, no live. Cuota atribuida y nueva compra se
 separan; caja modelada del kernel no es factura ni gasto incremental. No reutilizar créditos/paquetes fuera de
@@ -80,6 +86,11 @@ no cambian quotes existentes y ninguna de estas guardas demuestra compra, acceso
 *Nota 2026-10-11:* «paquetes combinados no permiten sumar otra vez el componente incluido» vale desde la policy v7
 por persona o línea, no por cotización: ver el
 [delta de plazo de compromiso y Adobe](#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp).
+
+*Nota 2026-10-11 (asientos):* «cantidad por usuarios únicos» ya no es la guarda completa de un asiento nominativo:
+el compositor comprueba ahora que los asientos pagados, menos los que la demanda declara ociosos, sean los que
+necesitan las personas y los grupos que comparten. Ver el
+[delta de asientos](#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
 
 ## Delta 2026-10-11 — un precio unitario no vence: vigencia dura y fecha de revisión
 
@@ -340,3 +351,121 @@ hasta que declare la asignación o excluya la tarea con motivo (`work[].excluded
   campos. Medido el 2026-10-11 al volver a cotizar `designer-on-demand.demand.json` con `--current` (policy v10): la
   licencia de Creative Cloud Pro (una de tres, CLP 108.468 al mes sin descuento) deja un mes comprometido, atada
   hasta el 2026-11-16.
+
+## Delta 2026-10-11 — asientos como se compran y períodos declarados una vez
+
+Posterior a los deltas anteriores del mismo día. No cambia el kernel, ningún contrato de entrada del kernel ni la
+versión de la demanda: agrega claves opcionales a `pricing-v3-composition-demand/1`. Operación:
+[manual](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#declarar-los-asientos-de-una-herramienta).
+Contrato y diagnósticos:
+[contrato](../documentation/finance/cotizador-v3-contrato-y-validacion.md#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11).
+
+**Evidencia: lo que no se podía declarar.** El 2026-10-11 se cotizó de punta a punta el primer caso real: un
+servicio gestionado de doce meses, con una persona de refuerzo en las semanas de campaña. El compositor calculó bien
+y se negó a calcular mientras una persona no tenía asiento declarado. Lo que no pudo fue recibir la compra tal como
+es. Tenía tres supuestos:
+
+- un solo precio por herramienta y período;
+- en una herramienta con precio por asiento, exactamente tantos asientos como personas que la usan ese período;
+- una suscripción anual que no cambia de cantidad ni tiene huecos sin una política de renovación.
+
+Con los tres juntos, «un asiento anual todo el año y uno mensual en los meses de campaña» no tenía forma de
+escribirse, y tampoco «dos asientos anuales, uno sin uso fuera de campaña» ni «un asiento que dos personas usan por
+turnos». Se cotizaron en su lugar dos lecturas coherentes que acotaban el costo real por arriba y por abajo, y la
+diferencia entre ellas era material para el margen. Además, la demanda de doce meses repetía cada herramienta doce
+veces: 48 entradas de asignación para cuatro herramientas.
+
+**Decisión.** El operador (CEO) pidió corregirlo de forma robusta. La demanda declara los asientos como se compran,
+con tres claves aditivas, y los períodos iguales una sola vez:
+
+| Qué se declara | Clave | Dónde |
+| --- | --- | --- |
+| Varios planes de una herramienta en un período | Una asignación por `priceId` | `allocations[]` |
+| Asientos pagados que nadie usa en el período | `idleSeats` + `idleReason`; `bornByLineIds` sólo cuando nadie usa la herramienta | `allocations[]` |
+| Personas que usan un mismo asiento | `seatSharing[]`: herramienta, períodos, dos o más personas y motivo | Raíz de la demanda |
+| Una entrada que vale para varios períodos | `periodIds` en lugar de `periodId` | `allocations[]`, `work[].creditDemand[]`, `clientProvidedTools[]`, `seatSharing[]` |
+
+**La regla.** Para una herramienta nominativa con precio por asiento, en cada período:
+
+> asientos pagados − asientos declarados ociosos = asientos necesarios
+
+Los necesarios son las personas que no están en ningún grupo, más uno por cada grupo. Todo asiento pagado se usa, se
+comparte o se declara ocioso, o la cotización no calcula. Si falta uno, `INSUFFICIENT_NAMED_SEAT_CAPACITY`; si sobra
+uno sin explicar, `UNACCOUNTED_NAMED_SEATS`, un código nuevo para un caso que antes salía con el primero. Con un plan
+por paquete en la mezcla, los asientos en uso más la capacidad del paquete deben alcanzar para los necesarios, y los
+asientos en uso no pueden superarlos; un asiento ocioso nunca es capacidad de alguien.
+
+- **El costo es un solo fondo por herramienta y período.** Se junta el costo de todos sus planes y se reparte entre
+  las líneas que la usan por peso de asiento: una persona en un grupo de `g` pesa `1/g`. El costo de un asiento
+  ocioso está dentro del fondo, sobre quienes usan la herramienta. *Por qué:* quien usa la herramienta es quien
+  hace necesario tenerla contratada; cobrar el asiento ocioso aparte, o sacarlo, daría un costo que no es el de la
+  compra.
+- **Sin usuarios, la demanda dice quién lo carga.** Si en un período nadie usa la herramienta y el asiento se paga
+  igual, `bornByLineIds` nombra las líneas, en partes iguales. Con usuarios se rechaza: sería una segunda respuesta
+  a una pregunta que el uso ya responde.
+- **`periodIds` es la misma demanda.** Una sola función lee una entrada período por período, y la usan la
+  composición y todas las lecturas; `periodId` y `periodIds` no pueden significar dos cosas. El artefacto congela lo
+  que se declaró. `creditBudgets[]` conserva una entrada por período, porque cada una está fechada, y el portfolio
+  conserva `periodId`.
+
+**El esquema de identidad que deja iguales las cotizaciones anteriores.** El kernel recibe recursos y coberturas
+con identificador, y suma las cuotas de una cobertura sin aceptar más que el todo. Dos planes de una herramienta
+necesitan, entonces, dos identidades. La regla:
+
+- Una herramienta con **un** plan por período conserva exactamente lo que tenía: recurso `composed:<toolId>`,
+  cobertura `tool:<toolId>` y asignaciones `composed-<toolId>-<n>`. Ninguna cotización escrita antes de este cambio
+  tiene otra cosa, así que todas producen el mismo snapshot, el mismo resultado y el mismo digest: los artefactos
+  congelados se reproducen byte a byte.
+- Una herramienta que en **algún** período tiene dos planes nombra cada plan por su precio, y lo hace en **todos**
+  sus períodos: `composed:<toolId>:<priceId>` y `tool:<toolId>:<priceId>`. *Por qué en todos:* la continuidad de una
+  suscripción anual (`ANNUAL_ASSIGNMENT_CHANGE_REQUIRES_POLICY`) sigue a un recurso por su identidad a lo largo del
+  plazo; si el asiento anual cambiara de nombre en los meses en que tiene un plan mensual al lado, parecería una
+  suscripción distinta. Esa regla no se tocó: un plan anual sigue sin poder cambiar de cantidad ni tener un hueco, y
+  un plan mensual a su lado ya no la dispara.
+- Un identificador de plan que no cabe en los 120 caracteres del kernel se rechaza en la composición
+  (`RESOURCE_HOLDING_ID_TOO_LONG`), con período y herramienta, en lugar de llegar al kernel como una entrada inválida.
+
+**Lecturas.** El resumen trae una fila de atribución por plan, con `seats`, `idle` y `bornByLineIds` sólo donde la
+demanda los declaró. `compose commitments` lee los asientos ociosos como una clase propia (`idle_seat`), dentro de
+los períodos cotizados y sin contarlos otra vez en un precio anual o con plazo. `compose assess` agrega
+`IDLE_SEAT_COST_REVIEW` y `SHARED_SEAT_TERMS_REVIEW`. `split`, `cash` y `explain` no cambian de forma.
+
+**Alternativas descartadas.**
+
+- *Relajar la igualdad a «al menos tantos asientos como personas».* Deja pasar en silencio un asiento pagado que
+  nadie usa: justo el costo que hay que ver.
+- *Que el compositor deduzca los asientos ociosos* (pagados menos usados). Convierte un error de la demanda en un
+  costo aceptado, sin motivo y sin nadie que lo haya decidido.
+- *Un solo recurso agregado por herramienta y período.* Pierde el plan de cada asiento, que es lo que leen la
+  continuidad anual y los compromisos, y mezcla en un precio unidades distintas (mes y año).
+- *Una versión nueva del contrato de demanda en lugar de claves aditivas.* Obligaría a reescribir o a convivir con
+  dos versiones por un cambio que no altera ninguna demanda existente.
+
+**Reglas duras.**
+
+- **NUNCA** quitarle una tarea a una persona para que los asientos calcen: saca de la cotización un costo que existe.
+- **NUNCA** declarar un asiento compartido u ocioso sin su motivo, ni inventar las líneas que lo cargan.
+- **NUNCA** tratar una declaración de asiento compartido como un permiso del proveedor: se informa como un punto por
+  confirmar.
+- **NUNCA** reescribir una demanda ya congelada con `periodIds`: da los mismos totales y otra identidad.
+- **SIEMPRE** declarar los asientos como se compran: dos asignaciones cuando conviven dos planes, `idleSeats` para
+  un asiento pagado sin uso, `seatSharing` para un asiento que usan varias personas.
+- **SIEMPRE** correr `compose commitments` cuando la demanda declara asientos ociosos, y llevar esa entrada al
+  operador.
+
+**Medido el 2026-10-11.** Con la CLI, sobre copias no versionadas de
+`data/pricing/v3-operating/designer-startup-courtesy.demand.json` cotizadas con `--current`: la demanda escrita con
+`periodIds` pasa de 9 asignaciones a 3 y da el mismo costo y el mismo neto (5.068.112 y 7.650.000); con dos asientos
+de Notion para una persona queda bloqueada con `UNACCOUNTED_NAMED_SEATS` en los tres períodos; declarando uno
+ocioso calcula, y `compose commitments` lee 3 meses-asiento ociosos; con dos personas y un asiento queda bloqueada
+con `INSUFFICIENT_NAMED_SEAT_CAPACITY`, y con un grupo de `seatSharing` calcula. `replay` de los 24 artefactos
+versionados bajo `data/pricing/**`: todos `verified: true`. `pnpm pricing:v3:test`: 27 archivos y 1.359 pruebas. En
+el ledger, `NAMED_SEATS_UNDER_TWO_PLANS` quedó cerrado.
+
+**Sigue abierto.**
+
+- Si el proveedor permite compartir un asiento nominativo, y si deja soltar, pausar o reasignar uno ocioso. Son
+  condiciones de su contrato: la cotización registra la declaración y no la valida.
+- Si un asiento ocioso ya existe o hay que comprarlo para el trabajo: el artefacto no lo dice.
+- La duración del contrato con el cliente y una fecha de inicio que éste define después: una cotización tiene meses
+  fechados desde su fecha de cotización.

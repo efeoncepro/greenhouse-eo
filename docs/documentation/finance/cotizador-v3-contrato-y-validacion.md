@@ -8,7 +8,7 @@
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
 
-Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)) y 1.3.0 (ver [Contrato 1.3.0](#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11)) y, desde la noche de ese mismo día, 1.4.0 (ver [Contrato 1.4.0](#contrato-140--costos-de-terceros-y-reserva-de-contingencia-2026-10-11)): cinco contratos conviven. El cotizador canónico no cambia. Las claves del resumen que imprime la CLI, los avisos de la corrida y la lectura de exposición a datos estimados, también del 2026-10-11, están en [Resumen: avisos de la corrida y exposición a estimados](#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11). El contrato de la lectura que emite el documento de cotización para el cliente, de la noche de ese mismo día, está en [Documento de cotización: `compose document`](#documento-de-cotización-compose-document-2026-10-11); no agrega ni cambia ningún contrato del kernel.
+Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)) y 1.3.0 (ver [Contrato 1.3.0](#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11)) y, desde la noche de ese mismo día, 1.4.0 (ver [Contrato 1.4.0](#contrato-140--costos-de-terceros-y-reserva-de-contingencia-2026-10-11)): cinco contratos conviven. El cotizador canónico no cambia. Las claves del resumen que imprime la CLI, los avisos de la corrida y la lectura de exposición a datos estimados, también del 2026-10-11, están en [Resumen: avisos de la corrida y exposición a estimados](#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11). El contrato de la lectura que emite el documento de cotización para el cliente, de la noche de ese mismo día, está en [Documento de cotización: `compose document`](#documento-de-cotización-compose-document-2026-10-11); no agrega ni cambia ningún contrato del kernel. Lo último de ese día, después de cotizar el primer caso real, está en [Demanda de composición: asientos y períodos declarados una vez](#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11) y en [`--out`: una cotización calculada o nada](#--out-una-cotización-calculada-o-nada-2026-10-11); las opciones adicionales y la línea bonificada del documento están dentro de su sección. Tampoco agregan ni cambian un contrato del kernel.
 
 ## Bloque 2 — Contrato del prototipo
 
@@ -467,6 +467,8 @@ Cuatro operaciones leen un artefacto de composición sin recalcular precios: `co
   vio (`reviewed.thirdPartyPurchasesOutsideThisReading`) y que sus condiciones no están congeladas
   (`THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN` en `notDerivable`). Ninguna puede decir cuándo se le paga a un proveedor.
 
+- **Asientos ociosos (2026-10-11, tras el primer caso real).** `compose commitments` tiene una cuarta clase de entrada, la única que está dentro de los períodos cotizados: `kind: "idle_seat"`, una por herramienta y plan con asientos que la demanda declara ociosos (`idleSeats`). Trae `periodIds`, `seats` (`unit`, `unitPrice`, `byPeriod[]` con `paid` e `idle`, `idleSeatMonths` y `reasons`), `committed` (asientos ociosos ÷ asientos pagados × el costo que el kernel guardó para ese plan en cada período: ya está dentro de `totals.cost`, no es un monto para sumar), `coveredByUse` (siempre cero), `carriedBy` (`lines_that_use_the_tool` o `lines_named_by_the_demand`, con sus líneas) e `incrementalCash: null`. `notDerivable` declara dos cosas que el artefacto no dice: si el asiento ya existe o hay que comprarlo, y si el proveedor permite soltarlo, pausarlo o dárselo a otra persona (`seats.release`). La señal es `PAID_SEAT_IDLE_WITHIN_ENGAGEMENT`; los totales agregan `idleSeats` (`count`, `idleSeatMonths`, `committed`, `coveredByUse`) y `reviewed` agrega `holdingsWithIdleSeats`. Un asiento ocioso nunca se cuenta otra vez en una entrada de precio anual o con plazo, que leen los meses posteriores a la cotización. Una cotización que no declara asientos ociosos no trae entrada, señal ni total de esta clase. `compose assess` agrega las brechas `IDLE_SEAT_COST_REVIEW` (owner Operations/Commercial) y `SHARED_SEAT_TERMS_REVIEW` (owner Operations/Legal), una por herramienta y período.
+
 Estas lecturas contienen costo y margen. Son vistas internas, no documentos para el cliente. El documento para el cliente es otra lectura, con su propio contrato: la sección siguiente.
 
 ### Documento de cotización: `compose document` (2026-10-11)
@@ -477,6 +479,8 @@ Una quinta operación lee un artefacto de composición sin recalcular precios: `
 | --- | --- | --- | --- | --- |
 | `compose document` sin `--brief` | Andamio `pricing-v3-quote-document-scaffold/1`; `--out` guarda sólo su `brief` | — | 2 | Los rechazos que dependen de la cotización (ver tabla), salida 1 |
 | `compose document --brief` | Datos del documento, `version: 2` de la plantilla A4; `--out` los guarda | `--brief`: objeto JSON `pricing-v3-quote-document-brief/1` | 3 | Todos los de la tabla, salida 1 |
+
+Las dos formas admiten además `--option <clave>=<artefacto>`, repetible, hasta ocho veces (2026-10-11, tras el primer caso real): la cotización congelada de una opción adicional, verificada por replay igual que `--input`. La clave empieza con una letra o un dígito y admite letras, dígitos, `_` y `-`, hasta 40 caracteres. Un `--option` sin `=`, sin ruta o con una clave inválida o repetida es `INVALID_ARGUMENT` con `option: "option"`.
 
 **Dos fuentes separadas.** La cotización congelada entrega toda cifra; el brief, todo texto y la presentación de las líneas. La fecha del documento es la `quoteDate` de la cotización y la moneda es su moneda de salida, sin conversión. El andamio lista las cifras para quien escribe los textos; ninguna pertenece al brief.
 
@@ -494,7 +498,9 @@ Una quinta operación lee un artefacto de composición sin recalcular precios: `
 | `pricing` | `title`, `intro`, `summary` y `taxNote`; opcionales `taxLabel` (el nombre del impuesto) y `monthly` (`{ months, note }`: una cantidad de meses de 1 a 120, no un importe) | Sí |
 | `conditions` | `title` y de 1 a 6 `rows` de `{ title, text }` | Sí |
 | `locale` | Locale BCP 47 con que la plantilla da formato; sin él, la plantilla lo elige por la moneda | No |
-| `lines` | Presentación de las líneas, por clave: `{ label?, detail?, group? }` | No |
+| `lines` | Presentación de las líneas, por clave: `{ label?, detail?, group?, courtesy? }`. `courtesy: true` sólo en una clave que la cotización bonifica por completo | No |
+| `options` | Nombre y unidad de cada opción adicional, por la clave con que se entregó su artefacto: `{ <clave>: { label, unit, detail? } }`. Nombra exactamente las opciones de la corrida | Sí, si la corrida recibe `--option`; no se admite sin él |
+| `optionsTexts` | `{ title?, note? }` del bloque de opciones; sólo junto con opciones | No |
 | `paymentMilestones` | De 1 a 12 hitos, la misma lista que recibe `compose schedule --milestones`: `{ id, label, share, periodId? \| when? }` | No |
 | `paymentScheduleTexts` | `{ title?, note? }` del calendario de pagos; sólo junto con `paymentMilestones` | No |
 
@@ -507,7 +513,19 @@ Un texto de una línea tiene hasta 300 caracteres y no admite saltos; un párraf
 | Servicio gestionado | `fee`, `setup` y `third_party:<costId>` |
 | Vendida por líneas | `<lineId>`, `<lineId>:setup` y `third_party:<costId>` |
 
-**Cómo se forman las líneas.** Por clave, los períodos consecutivos con el mismo neto son una línea: `quantity` `{ value: n, unit: "meses" }` (o `"mes"`), `unitNet` el neto de un período y `net` su producto exacto. Un cobro que cae en un solo período y no es recurrente (puesta en marcha, costo de terceros) es `{ value: 1, unit: "pago único" }`, sin `unitNet`. Una clave cuyo neto cambia produce una línea por tramo, con los meses como `detail` salvo que el brief dé uno. Un período con neto cero no produce nada. Los grupos por defecto son «Servicio», «Puesta en marcha» y «Costos de terceros»; las líneas se ordenan por la primera aparición de su grupo.
+**Cómo se forman las líneas.** Por clave, los períodos consecutivos con el mismo neto son una línea: `quantity` `{ value: n, unit: "meses" }` (o `"mes"`), `unitNet` el neto de un período y `net` su producto exacto. Un cobro que cae en un solo período y no es recurrente (puesta en marcha, costo de terceros) es `{ value: 1, unit: "pago único" }`, sin `unitNet`. Una clave cuyo neto cambia produce una línea por tramo, con los meses como `detail` salvo que el brief dé uno. Un período con neto cero no produce nada, salvo que su clave sea una línea bonificada que el brief marca (párrafo siguiente). Los grupos por defecto son «Servicio», «Puesta en marcha» y «Costos de terceros»; las líneas se ordenan por la primera aparición de su grupo.
+
+**Línea bonificada (`courtesy`).** Una clave está bonificada cuando la cotización la deja en neto cero con un ajuste explícito en todos los períodos en que aparece (un `agreed_net` de `0` o un descuento que la anula) y no la cobra en ninguno. Por defecto no imprime nada y el brief no puede nombrarla. Con `lines.<clave>.courtesy: true`, se imprime con `net: "0"`, sin `unitNet`, y con `referenceNet`: el precio que la fila tenía antes de la rebaja (`undiscountedPrice`), sumado sobre los períodos consecutivos en que está bonificada. Ese valor sale de una función propia y segura para el cliente (`clientSafeWaivedItems` en [`resources/readiness.ts`](../../../src/lib/finance/pricing-v3/resources/readiness.ts)), el único lugar del que sale un valor de referencia; `compose preview` no cambió. La línea ocupa el lugar que tendría si se cobrara, cuenta contra el límite de 40 líneas y no suma al neto, al impuesto ni al total, ni a los meses y pagos que cuenta la tolerancia del impuesto. El andamio lista las claves bonificadas bajo `waived[]`, cada una como se imprimiría, y no marca ninguna: una cortesía se pide, nunca se supone.
+
+**Opciones adicionales (`--option`, `options`).** Cada opción es la cotización congelada de esa opción sola. Su precio es el neto de uno de sus períodos, tal como el kernel lo congeló, y viaja en los datos como `options.items[]` (`label`, `detail?`, `net`, `unit`), con `options.title` y `options.note` del brief o sus textos por defecto. Para que un solo importe diga todo de la opción se exige que la cotización de la opción:
+
+- esté calculada, con totales en todos sus períodos;
+- esté en la moneda de la cotización base;
+- tenga el mismo neto en todos sus períodos, y que su neto total sea ese importe por el número de períodos;
+- no declare costos que el cliente paga directo;
+- no sea la cotización base ni la de otra opción de la misma corrida.
+
+Nada de una opción llega a las líneas, al neto, al impuesto ni al total de la cotización base. El brief no tiene clave para el precio de una opción. `source` agrega, por opción y en el orden en que se imprimen, `option<n>CalculationId` y `option<n>Digest`. El rótulo que dice que las opciones están fuera de la cotización lo pone la plantilla: [versión 2 de sus datos](../../commercial/templates/cotizacion-a4/README.md#versión-2-varias-líneas-con-precio).
 
 **Regla de impuesto.** El documento imprime el impuesto que la cotización congeló; ni esta lectura ni la plantilla calculan otro.
 
@@ -519,24 +537,98 @@ Un texto de una línea tiene hasta 300 caracteres y no admite saltos; un párraf
 
 La tolerancia existe porque el kernel redondea el impuesto de cada período y suma; el impuesto del neto entero redondeado una sola vez puede ser otra cifra. Más allá de esa tolerancia el importe no es el impuesto de esa tasa sobre ese neto y no se emite nada.
 
-**Bloques opcionales.** `clientPaidDirectly[]` aparece sólo si la cotización declara costos que el cliente paga directo: concepto, importe y moneda tal como se declararon, con los meses como detalle; fuera de toda línea, suma y conversión. `paymentSchedule` aparece sólo si el brief declara `paymentMilestones`: los importes los calcula la lectura del calendario de pagos, suman exactamente el neto, y cada hito necesita `periodId` o `when` (la lectura `compose schedule` admite un hito sin ninguno; un documento que pide un pago dice cuándo).
+**Bloques opcionales.** Son tres; el tercero, `options`, está descrito arriba. `clientPaidDirectly[]` aparece sólo si la cotización declara costos que el cliente paga directo: concepto, importe y moneda tal como se declararon, con los meses como detalle; fuera de toda línea, suma y conversión. `paymentSchedule` aparece sólo si el brief declara `paymentMilestones`: los importes los calcula la lectura del calendario de pagos, suman exactamente el neto, y cada hito necesita `periodId` o `when` (la lectura `compose schedule` admite un hito sin ninguno; un documento que pide un pago dice cuándo).
 
-**Lo que se rechaza.** Todos con salida 1. `option` dice qué corrige quien llama: `brief` (sus textos, sus claves de línea o sus hitos) o `input` (la cotización misma). `issues[]` trae hasta 20 ubicaciones `{ path, rule }`; una entrada de `lines` se reporta por su posición (`lines.2`), nunca por su clave ni por su contenido.
+**Lo que se rechaza.** Todos con salida 1. `option` dice qué corrige quien llama: `brief` (sus textos, sus claves de línea o de opción, o sus hitos), `input` (la cotización misma) u `option` (la cotización de una opción). `issues[]` trae hasta 20 ubicaciones `{ path, rule }`; una entrada de `lines` o de `options` se reporta por su posición (`lines.2`, `options.0`), nunca por su clave ni por su contenido.
 
 | `code` | `option` | Cuándo | Reglas (`rule`) |
 | --- | --- | --- | --- |
-| `QUOTE_DOCUMENT_BRIEF_INVALID` | `brief` | El brief no cumple su schema, nombra una línea que la cotización no tiene, o declara mal el calendario | `unrecognized_keys` (una clave que el schema no define: es lo que recibe un importe, una moneda, una tasa o una fecha); la regla del validador en la ruta de un texto vacío o mal formado; `unknown_key`, `not_an_object`, `unknown_field`, `invalid_label`, `invalid_detail`, `invalid_group` en `lines.<posición>`; `requires_payment_milestones` en `paymentScheduleTexts`; `timing_required` en `paymentMilestones.<posición>` |
+| `QUOTE_DOCUMENT_BRIEF_INVALID` | `brief` | El brief no cumple su schema, nombra una línea que la cotización no tiene, o declara mal el calendario | `unrecognized_keys` (una clave que el schema no define: es lo que recibe un importe, una moneda, una tasa o una fecha); la regla del validador en la ruta de un texto vacío o mal formado; `unknown_key`, `not_an_object`, `unknown_field`, `invalid_label`, `invalid_detail`, `invalid_group` en `lines.<posición>`; `requires_payment_milestones` en `paymentScheduleTexts`; `timing_required` en `paymentMilestones.<posición>`. Desde el 2026-10-11: `invalid_courtesy` (no es un booleano) y `line_is_charged` (la marca está en una línea que se cobra) en `lines.<posición>.courtesy`; `unknown_key` también para una clave bonificada que el brief nombra sin marcarla; en `options`, `option_not_named` (el brief no nombra una opción entregada, o no trae `options` habiendo `--option`), y en `options.<posición>`, `unknown_key` (nombra una opción que no se entregó), `not_an_object`, `unknown_field`, `missing_label`, `missing_unit`, `invalid_label`, `invalid_unit` e `invalid_detail`; `requires_options` en `optionsTexts` |
 | `SCHEDULE_MILESTONES_INVALID` | `brief` | La lista de hitos no pasa las reglas de `compose schedule`; el código es el de esa lectura y la ruta empieza en `paymentMilestones` | Las de esa lectura, por ejemplo `shares_must_sum_to_one` |
 | `QUOTE_DOCUMENT_REQUIRES_CALCULATED_QUOTE` | `input` | La cotización está bloqueada o no tiene totales | — |
 | `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` | `input` | Las líneas, o los hitos del calendario, no suman exactamente el neto de la cotización | `sum_differs_from_net` |
-| `QUOTE_DOCUMENT_NOT_REPRESENTABLE` | `input` | Un importe no se puede escribir en su moneda, o el contenido excede lo que la plantilla admite | `currency_not_supported`, `amount_not_representable`, `negative_net`, `duplicate_key` (dos filas de un período sobre la misma clave), `empty`, `too_many` (más de 40 líneas o más de 8 costos pagados por el cliente), `quantity_not_representable` (una cantidad mayor que 9999) |
+| `QUOTE_DOCUMENT_NOT_REPRESENTABLE` | `input` | Un importe no se puede escribir en su moneda, o el contenido excede lo que la plantilla admite | `currency_not_supported`, `amount_not_representable`, `negative_net`, `duplicate_key` (dos filas de un período sobre la misma clave), `empty`, `too_many` (más de 40 líneas o más de 8 costos pagados por el cliente), `quantity_not_representable` (una cantidad mayor que 9999); `reference_not_representable` en `lines.<posición>.courtesy` (el valor de referencia de una línea bonificada no se puede escribir en la moneda) |
 | `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE` | `input` | El impuesto congelado no corresponde a su tratamiento o a su tasa | `tax_inconsistent`, `rate_not_representable`, `amount_not_representable`, `tax_differs_from_rate`, `total_differs_from_document` |
+| `QUOTE_DOCUMENT_OPTION_INVALID` | `option` | Una opción no se puede imprimir como un solo importe, o las opciones de la corrida están mal entregadas. Cada opción se reporta por su posición en la lista de `--option` (`options.<posición>`) | `not_calculated`, `currency_differs_from_quote`, `net_differs_between_periods`, `periods_differ_from_net`, `amount_not_representable` (también un neto de cero), `client_pays_costs_directly`, `same_as_quote` (es la cotización base), `duplicate_option` (la misma cotización dos veces), `invalid_key`, `duplicate_key`; `too_many` en `options` (más de 8) |
 
-Los cuatro rechazos con `option: "input"` no se arreglan editando el brief ni los datos: se corrige la cotización y se vuelve a emitir. Un artefacto alterado se rechaza antes, con `REPLAY_MISMATCH`.
+Los cuatro rechazos con `option: "input"` no se arreglan editando el brief ni los datos: se corrige la cotización y se vuelve a emitir. Lo mismo vale para `QUOTE_DOCUMENT_OPTION_INVALID`: se corrige la cotización de la opción, o cómo se entregó, nunca su precio a mano. Un artefacto alterado se rechaza antes, con `REPLAY_MISMATCH`.
 
 **Qué garantiza y qué no.** Los datos llevan siempre `status: "draft"`: una composición es una simulación en revisión y esta lectura no aprueba nada. `source` (`system`, `calculationId`, `digest`, `engineVersion`) nombra el cálculo de origen; la plantilla lo copia a su manifiesto y no imprime nada de él. `compose preview` no cambió: imprime la misma proyección período por período. La lectura no emite una cotización, no crea una `quotation_id` y no escribe en Greenhouse ni en el CRM.
 
-**Límites.** Los textos se escriben por cotización; no vienen de un catálogo ni de una biblioteca de condiciones. El reparto en persona y kit de `compose split` no es una forma del documento. La moneda del documento es la de la cotización: la versión 2 de la plantilla rechaza una moneda de presentación distinta. Número de cotización, versiones, verificación por QR, firmas, aprobación y envío no existen aquí. Portada, alcance y condiciones son páginas fijas: un contenido que no cabe hace fallar al generador de la plantilla («Contenido fuera del A4»), después de que esta lectura ya emitió los datos.
+**Límites.** Un servicio gestionado no tiene puesta en marcha en el catálogo (`managed-service-core` no la pide), así que su cotización no tiene una fila que bonificar: su «puesta en marcha bonificada» es un texto del brief sin valor de referencia (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC` en el ledger). Una opción que sólo agrega dedicación de personas que ya están en la cotización base es una línea nueva en su propia cotización y vuelve a llevar el fee de plataforma por línea y su parte de las herramientas base: su costo está sobrestimado y su margen es una cota inferior, sin efecto sobre el precio impreso (`OPTION_QUOTES_REPEAT_PER_LINE_FEES`). Los textos se escriben por cotización; no vienen de un catálogo ni de una biblioteca de condiciones. El reparto en persona y kit de `compose split` no es una forma del documento. La moneda del documento es la de la cotización: la versión 2 de la plantilla rechaza una moneda de presentación distinta. Número de cotización, versiones, verificación por QR, firmas, aprobación y envío no existen aquí. Portada, alcance y condiciones son páginas fijas: un contenido que no cabe hace fallar al generador de la plantilla («Contenido fuera del A4»), después de que esta lectura ya emitió los datos.
+
+### Demanda de composición: asientos y períodos declarados una vez (2026-10-11)
+
+La demanda sigue siendo `pricing-v3-composition-demand/1`. Las claves que siguen son opcionales y aditivas: una demanda que no las usa se lee, se compone y se congela exactamente igual que antes, y todos los artefactos congelados se reproducen byte a byte. No hay contrato ni motor nuevo. Qué resuelven: [superficie implementada](cotizador-v3-superficie-implementada.md#asientos-como-se-compran-y-períodos-declarados-una-vez-2026-10-11). Fuentes ejecutables: [`resources/composition-contracts.ts`](../../../src/lib/finance/pricing-v3/resources/composition-contracts.ts) y [`resources/composition.ts`](../../../src/lib/finance/pricing-v3/resources/composition.ts).
+
+**Claves nuevas y sus reglas de «una o la otra».**
+
+| Clave | Dónde | Regla |
+| --- | --- | --- |
+| `periodIds` | `allocations[]`, `work[].creditDemand[]`, `clientProvidedTools[]` y `seatSharing[]` | Arreglo de 1 a 60 períodos, sin repetir. Cada entrada lleva **exactamente una** de `periodId` o `periodIds`: las dos, o ninguna, no pasan el schema (`SCHEMA_INVALID`, salida 1) |
+| `idleSeats` e `idleReason` | `allocations[]` | Van **juntas o ninguna** (una sola no pasa el schema: `SCHEMA_INVALID`): un entero de 1 a 10.000 y un texto de hasta 1.000 caracteres. Sólo en una herramienta nominativa con precio por asiento, y nunca más que los asientos que la entrada paga |
+| `bornByLineIds` | `allocations[]` | Las líneas que cargan el costo de los asientos ociosos, en partes iguales. **Obligatoria** cuando nadie usa la herramienta en el período (todos los asientos de la entrada son ociosos) y **rechazada** cuando alguien la usa: entonces el costo sigue al uso |
+| `seatSharing[]` | Raíz de la demanda | `{ toolId, periodId \| periodIds, assigneeIds, reason }`: dos o más personas que usan un mismo asiento. Cada persona del grupo usa la herramienta en ese período y pertenece a un solo grupo |
+
+`creditBudgets[]` conserva una entrada por período, porque cada una lleva sus fechas de compra y de vencimiento. El portfolio (`pricing-v3-resource-portfolio/1`) conserva `periodId`. El `periodIds` de `thirdPartyCosts[]` es una clave anterior y distinta, propia del brief, y sigue siendo obligatoria.
+
+**Una entrada con `periodIds` es la misma demanda que una entrada por período.** La composición y todas las lecturas la leen de una sola forma, período por período y en el orden declarado; `periodId` y `periodIds` no pueden significar dos cosas en dos lugares. El artefacto congela lo que se declaró: reescribir una demanda con `periodIds` da los mismos totales y otra identidad de cálculo.
+
+**Planes de una herramienta en un período.** Una herramienta puede tener varias asignaciones en un mismo período si cada una tiene un `priceId` distinto: cada una es un plan. La misma herramienta, el mismo período y el mismo `priceId` dos veces siguen siendo `DUPLICATE_RESOURCE_ALLOCATION`.
+
+**La regla de los asientos.** Para una herramienta de acceso nominativo, sobre todos sus planes en el período:
+
+- `pagados` = suma de `quantity` de los planes con precio por asiento; `ociosos` = suma de `idleSeats`; `capacidad` = suma de `seatCapacity` de los planes con precio por paquete;
+- `necesarios` = personas que usan la herramienta y no están en ningún grupo de `seatSharing`, más uno por cada grupo;
+- sin un plan por paquete: `pagados − ociosos` debe ser **igual** a `necesarios`;
+- con un plan por paquete: `(pagados − ociosos) + capacidad` debe ser **al menos** `necesarios`, y `pagados − ociosos` no puede superarlo. Un asiento ocioso nunca cuenta como capacidad de alguien.
+
+Todo asiento pagado se usa, se comparte o se declara ocioso, o la cotización no calcula. El compositor no deduce nada de esto.
+
+**Costo.** El costo de todos los planes de una herramienta en un período se junta y se reparte entre las líneas que la usan por peso de asiento: una persona de un grupo de `g` pesa `1/g`, y una persona que aparece en varias líneas reparte su asiento entre ellas. El costo de un asiento ocioso está dentro de ese fondo. Cuando nadie usa la herramienta, lo cargan en partes iguales las líneas de `bornByLineIds`, y la fila de selección de cada una lleva el motivo `bears-idle-seat:<idleReason>`.
+
+**Identidad.** Una herramienta con un solo plan por período conserva sus identificadores: recurso `composed:<toolId>`, cobertura `tool:<toolId>`. Una herramienta que en algún período tiene dos planes nombra cada plan por su precio, y lo hace **en todos sus períodos**: recurso `composed:<toolId>:<priceId>`, cobertura `tool:<toolId>:<priceId>` y, en el nombre que muestran las lecturas, el `priceId` entre paréntesis. El kernel ve un recurso y una cobertura por plan, y un asiento anual conserva una sola identidad durante el plazo, que es lo que sigue `ANNUAL_ASSIGNMENT_CHANGE_REQUIRES_POLICY`. Esa regla no cambió: un plan anual no puede cambiar de cantidad ni tener un hueco; un plan mensual a su lado ya no la dispara.
+
+**Diagnósticos.** Todos son bloqueos de composición: van en `diagnostics` del resumen, dejan `totals` en `null` y la corrida sale con 2. La ruta es `<período>:<toolId>`, o `<período>:<toolId>:<priceId>` cuando el diagnóstico es de un plan de una herramienta con varios.
+
+| `code` | Cuándo |
+| --- | --- |
+| `INSUFFICIENT_NAMED_SEAT_CAPACITY` | Faltan asientos: los asientos en uso más la capacidad de paquete no alcanzan para las personas, o un plan por paquete no declara `seatCapacity` |
+| `UNACCOUNTED_NAMED_SEATS` | Sobran asientos: se paga uno que nadie usa y que nadie declaró ocioso. Hasta el 2026-10-11 este caso también salía como `INSUFFICIENT_NAMED_SEAT_CAPACITY`. `detail` dice cuántos se pagan, cuántos se declaran ociosos y cuántos se necesitan |
+| `INVALID_IDLE_SEATS` | `idleSeats` en una herramienta que no es nominativa, en un plan que no es por asiento, o mayor que los asientos que la entrada paga |
+| `IDLE_SEAT_BEARER_REQUIRED` | Nadie usa la herramienta en el período y la entrada no nombra `bornByLineIds` |
+| `IDLE_SEAT_BEARER_NOT_ALLOWED` | `bornByLineIds` cuando la herramienta tiene usuarios en el período, o en una entrada que no declara asientos ociosos (un paquete o una herramienta compartida que nadie usa es una asignación sin uso, no un asiento ocioso) |
+| `INVALID_IDLE_SEAT_BEARER` | `bornByLineIds` repite una línea o nombra una que no es una línea activa de la cotización en ese período |
+| `INVALID_SEAT_SHARING` | Un grupo sobre una herramienta que no es nominativa; una persona repetida en el grupo, en dos grupos, o que no usa la herramienta en ese período |
+| `UNUSED_SEAT_SHARING` | Una entrada de `seatSharing` para una herramienta y un período en que nadie la usa |
+| `RESOURCE_HOLDING_ID_TOO_LONG` | El identificador de un plan (herramienta más precio) supera los 120 caracteres que el kernel admite |
+| `DUPLICATE_RESOURCE_ALLOCATION`, `UNUSED_RESOURCE_ALLOCATION`, `WHOLE_NAMED_LICENSE_REQUIRED`, `ANNUAL_ASSIGNMENT_CHANGE_REQUIRES_POLICY` | Sin cambio de significado. Los dos primeros se leen ahora por plan |
+
+**En el resumen.** `attributions` trae una fila por plan. Tres claves existen sólo donde la demanda las declaró; toda otra fila conserva las que tenía:
+
+| Clave | Contenido |
+| --- | --- |
+| `seats` | `{ needed, paid, idle, packageCapacity?, sharedSeats[] }` sobre todos los planes de la herramienta en el período; `sharedSeats[]` trae `{ people, reason }` por grupo, nunca los identificadores de las personas. Aparece cuando el período declara asientos ociosos o compartidos, o tiene varios planes, y es igual en cada plan de la herramienta |
+| `idle` | `{ seats, reason, attributedMonthlyCost }`: los asientos ociosos de ese plan y su parte del costo atribuido, en la moneda de la herramienta |
+| `bornByLineIds` | Las líneas que la demanda nombró, cuando nadie usa la herramienta |
+
+**Qué queda fuera.** Que el proveedor permita compartir un asiento nominativo, y que un asiento ocioso se pueda soltar, pausar o reasignar, son preguntas del contrato con el proveedor. La cotización registra la declaración y su motivo, `compose assess` pide confirmarlas y nada las valida.
+
+### `--out`: una cotización calculada o nada (2026-10-11)
+
+Vale para los tres comandos que congelan una cotización: `calculate`, `quote` del carril de catálogo y `compose prepare|quote`. Fuente ejecutable: [la CLI](../../../scripts/commercial/pricing-v3.ts).
+
+| Corrida | Qué queda en `--out` | Qué imprime |
+| --- | --- | --- |
+| Calcula (salida 0 o 3) | El artefacto, en una ruta nueva (`wx`/0600) | Lo de siempre; sin aviso |
+| No calcula (salida 2) | **Nada** | Todo lo que encontró, más `runNotices.output`: `{ option: "out", written: false, reason: "QUOTE_NOT_CALCULATED", statement }` |
+| No calcula, con `--keep-blocked` | El artefacto bloqueado | Lo mismo, con `written: true` y `reason: "KEPT_BLOCKED"` |
+
+- Como una corrida bloqueada no deja archivo, la corrida corregida usa el mismo `--out`. Hasta el 2026-10-11 el archivo quedaba escrito y esa segunda corrida fallaba con `OUTPUT_EXISTS` contra algo que nunca fue una cotización.
+- `--keep-blocked` existe porque un artefacto bloqueado tiene lectores propios: `explain`, `replay`, `compose assess` y `compose commitments`. Exige `--out` (solo, es `INVALID_ARGUMENT` con `option: "keep-blocked"`) y una ruta propia: ese archivo no es una cotización, ninguna lectura de una cotización calculada lo acepta y la corrida corregida necesita otra ruta.
+- Un archivo que existe nunca se sobrescribe: `OUTPUT_EXISTS`, como antes.
+- En `calculate`, una entrada que el contrato rechaza no produce artefacto, con el interruptor o sin él.
+- El aviso no cambia el código de salida ni el estado: los decide el resultado.
 
 ### Resumen: avisos de la corrida y exposición a estimados (2026-10-11)
 
@@ -562,12 +654,13 @@ Este cambio no agrega contrato ni motor: los contratos del kernel que existían 
 - No se guarda en el artefacto, y `replay` del mismo artefacto no la imprime.
 - No existe cuando no hay nada que avisar: no va vacía ni en `null`.
 - Nunca bloquea y no cambia el código de salida. Quien cotiza la informa al operador junto al resultado.
-- Tiene hasta dos miembros, cada uno presente sólo si aplica:
+- Tiene hasta tres miembros, cada uno presente sólo si aplica (eran dos hasta que el mismo 2026-10-11 se agregó `output`):
 
 | Miembro | Forma | Qué dice |
 | --- | --- | --- |
 | `laterCatalogValues` | `{ quoteDate, newestEffectiveFrom, records, byKind }` | El catálogo tiene registros que empiezan a regir después de la fecha de la cotización. La cotización se calculó con los valores de su fecha, que es lo correcto para una cotización de ese día y un error silencioso si la demanda conservó una fecha vieja |
 | `priceDates` | `{ withinDays, reviewDue, dueSoon, expired }` | Fechas de los precios que esta cotización usa: revisiones ya pasadas, fechas que caen dentro de `withinDays` (30 días) y vigencias terminadas |
+| `output` | `{ option, written, reason, statement }` | Qué hizo la corrida con `--out` cuando la cotización no calculó: no escribió nada (`QUOTE_NOT_CALCULATED`) o escribió el artefacto bloqueado porque se pidió (`KEPT_BLOCKED`). Es el único miembro que también imprimen `calculate` y `quote` del carril de catálogo. [Regla](#--out-una-cotización-calculada-o-nada-2026-10-11) |
 
 Cada aviso de `priceDates` trae `kind` (`hard_expiry`: vigencia, bloquea al pasar; `review`: fecha de revisión, nunca bloquea), `subject` (`tool_price`, `resource_policy`, `catalog_record`, `credit_provider` o, desde el contrato 1.4.0, `third_party_quote`: la vigencia de la cotización de un proveedor), `ref`, `label`, `date`, `daysLeft` y `blocksWith` (el diagnóstico que daría una vigencia pasada; `null` en una revisión).
 

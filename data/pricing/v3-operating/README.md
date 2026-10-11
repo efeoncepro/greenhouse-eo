@@ -29,7 +29,10 @@ cómo se lee una cotización con terceros:
 [delta del catálogo v10](#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
 Cómo sale el documento de cotización para el cliente de una cotización congelada (`compose document`) y qué ejemplos
 lo muestran:
-[último delta](#delta-2026-10-11--compose-document-el-documento-de-cotización-de-una-cotización-congelada).
+[delta del documento](#delta-2026-10-11--compose-document-el-documento-de-cotización-de-una-cotización-congelada).
+Cómo se declaran los asientos de una herramienta tal como se compran, los meses iguales una sola vez, las opciones y
+la cortesía de un documento, y qué hace `--out` cuando la cotización no calcula:
+[último delta](#delta-2026-10-11--asientos-como-se-compran-períodos-declarados-una-vez-opciones-y-cortesía-del-documento-y---out).
 Donde una viñeta o un delta anterior dice «el vigente es…», «último delta» o «hay que pasar la ruta», léelo como
 historia fechada.
 
@@ -165,6 +168,21 @@ historia fechada.
   dedicado en Chile, On-Demand y en CLP, por **tres meses** y con un impuesto resuelto: IVA de 19 %, declarado sólo
   para el ejemplo y no como criterio tributario para ningún cliente. Es la primera cotización versionada con varios
   períodos y con impuesto. Motor `pricing-v3-local/1.3.0`; se congeló con el catálogo v10 y la policy v11.
+- `designer-startup-courtesy.demand.json` → `designer-startup-courtesy.artifact.json`: la demanda de
+  `designer-three-months-iva` con un ajuste más, un neto pactado de cero sobre la puesta en marcha
+  (`kind: "agreed_net"`, `amount: "0"`, `billing: "setup"`), declarado sólo para el ejemplo y no como una aprobación
+  comercial. Es el ejemplo de una línea bonificada: su fila de puesta en marcha queda en neto cero y conserva el
+  precio que tenía antes de la rebaja, que el documento imprime como valor de referencia. Motor
+  `pricing-v3-local/1.3.0`; se congeló con el catálogo v10 y la policy v11.
+- `designer-startup-courtesy.option-copywriter.demand.json` → `.option-copywriter.artifact.json` y
+  `designer-startup-courtesy.option-motion.demand.json` → `.option-motion.artifact.json`: las cotizaciones de dos
+  opciones adicionales de ese documento, cada una sola. La primera es un redactor por tres meses iguales, con su
+  puesta en marcha dejada fuera por un ajuste declarado; la segunda, una persona de video por un mes, con su puesta
+  en marcha dentro. Las dos tienen el mismo neto en todos sus períodos, que es lo que el documento exige para
+  imprimirlas como un solo importe. Motor `pricing-v3-local/1.3.0`, catálogo v10 y policy v11.
+- `designer-startup-courtesy.document-brief.json` → `designer-startup-courtesy.document.json`: el brief marca la
+  puesta en marcha con `courtesy: true` y nombra las dos opciones (`options`, `optionsTexts`); los datos se emiten
+  con `compose document` y un `--option` por opción.
 - `<nombre>.document-brief.json` → `<nombre>.document.json`, para `designer-on-demand`, `designer-three-months-iva`
   y `managed-on-demand-third-party`: el brief del documento de cotización (sólo textos y presentación; el comprador
   es inventado) y los datos que `compose document` emite desde el artefacto del mismo nombre, en la versión 2 de los
@@ -175,6 +193,8 @@ historia fechada.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
   *Corrección 2026-10-11:* la base de costo quedó decidida (el costo objetivo del Excel de pricing, no la nómina);
   no hay salarios que pedir ni nómina que conectar.
+  *Cambios 2026-10-11 (tras el primer caso real):* `NAMED_SEATS_UNDER_TWO_PLANS` quedó cerrado el mismo día en que
+  se abrió (el ítem se conserva, con «nada pendiente»), y se agregó `OPTION_QUOTES_REPEAT_PER_LINE_FEES`.
 - `*.assessment.json`, `*.preview.json`: pendientes y precio de simulación redactado; no export comercial autorizado.
 - `writer.brief.json`: entrada para scaffold; tareaSEO debe confirmarse, no inferir salario distinto.
 - `verification.cli.json`: smoke real de comandos y negativos; exit 3 es estado de revisión, no fallo de cálculo.
@@ -200,6 +220,11 @@ conservan `commercialUnit`, brief, trabajo/usuarios/tareas, selección IA/servic
 presupuestos, FX y cobertura cliente cuando aplica. Los planes añaden portfolio opcional; éste conserva clientes,
 parte interna y no asignada con reconciliación. Named seats y paquetes/bundles no se convierten en cuentas
 compartidas por repartir costo.
+*Corrección 2026-10-11 (tras el primer caso real):* «allocations por mes» admite ahora varios planes de una
+herramienta en un mes, y un mes igual a otros se declara una vez con `periodIds`. Repartir un costo sigue sin ser
+permiso para compartir una cuenta; que dos personas usen un asiento se declara aparte, con su motivo (`seatSharing`),
+y un asiento pagado sin uso, con `idleSeats`. Ver el
+[último delta](#delta-2026-10-11--asientos-como-se-compran-períodos-declarados-una-vez-opciones-y-cortesía-del-documento-y---out).
 
 `resources inspect` expone planes y hashes; `catalog validate` expone digest monetario. Mantenimiento monetario
 usa change-set incremental; policy/créditos usan replacement completo. Ambos requieren preview/impacto, base
@@ -745,3 +770,76 @@ Cada documento se emitió con el brief versionado de su artefacto y se generó c
   (`node --test scripts/documents/render-cotizacion-a4.test.mjs scripts/documents/document-money.test.mjs`): 25.
 
 Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `designer-three-months-iva`.
+
+## Delta 2026-10-11 — asientos como se compran, períodos declarados una vez, opciones y cortesía del documento, y `--out`
+
+Lo que se corrigió después de cotizar de punta a punta el primer caso real, un servicio gestionado de doce meses.
+Decisiones:
+[asientos y períodos](../../../docs/architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez)
+y [opciones, cortesía y `--out`](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--opciones-cortesía-y---out-después-del-primer-caso-real).
+Paso a paso:
+[asientos](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#declarar-los-asientos-de-una-herramienta)
+y [opciones y cortesía](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#agregar-opciones-y-una-cortesía).
+Datos y reglas de la plantilla: [su README](../../../docs/commercial/templates/cotizacion-a4/README.md).
+
+- **Archivos nuevos.** `designer-startup-courtesy.demand.json`, `.artifact.json`, `.document-brief.json` y
+  `.document.json`; y las dos opciones, `designer-startup-courtesy.option-copywriter.demand.json` y `.artifact.json`
+  y `designer-startup-courtesy.option-motion.demand.json` y `.artifact.json`.
+- **Qué no se toca.** Catálogo, policy, créditos y puntero no cambiaron: lo vigente lo imprime `current show`. No hay
+  contrato ni motor nuevo. Ningún artefacto anterior cambió y todos se reproducen byte a byte.
+- **Asientos.** En una herramienta nominativa con precio por asiento, la demanda declara lo que se compra: varios
+  planes en un mes (una asignación por `priceId`), asientos pagados sin uso (`idleSeats` con `idleReason`) y
+  personas que usan un mismo asiento (`seatSharing`, con su motivo). La regla: asientos pagados menos ociosos igual
+  a asientos necesarios. Si falta uno, `INSUFFICIENT_NAMED_SEAT_CAPACITY`; si sobra uno sin explicar,
+  `UNACCOUNTED_NAMED_SEATS`. El compositor no deduce nada.
+- **Períodos.** `allocations`, `work[].creditDemand`, `clientProvidedTools` y `seatSharing` admiten `periodIds` en
+  lugar de `periodId`: exactamente una de las dos. `creditBudgets` sigue con una entrada por período. Las demandas
+  de ejemplo de esta carpeta siguen escritas con `periodId`; no se reescriben.
+- **Opciones del documento.** `compose document --option <clave>=<artefacto>`, hasta ocho: la cotización congelada
+  de cada opción. Su precio es el neto de uno de sus períodos y el brief sólo la nombra (`options`).
+- **Cortesía.** Una línea que la cotización deja en cero con un ajuste explícito no imprime nada; con
+  `lines.<clave>.courtesy: true` se imprime como «Bonificado» con su valor de referencia, tomado del artefacto.
+- **`--out`.** `calculate`, `quote` y `compose prepare|quote` escriben `--out` sólo si la cotización calcula. Una
+  corrida bloqueada no deja archivo y lo dice en `runNotices.output`; `--keep-blocked` guarda el artefacto bloqueado
+  a propósito, en una ruta propia.
+- **Ledger.** `operational-gaps.json` cerró `NAMED_SEATS_UNDER_TWO_PLANS` y agregó
+  `OPTION_QUOTES_REPEAT_PER_LINE_FEES`.
+- **Lo que todavía no se puede.** Validar que un proveedor permite compartir un asiento nominativo, o soltar uno
+  ocioso. Bonificar con valor de referencia la puesta en marcha de un servicio gestionado, que no tiene esa fila
+  (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC`). Dar el margen real de una opción que sólo agrega dedicación de personas
+  que ya están en la cotización base: su propia cotización repite el fee por línea y las herramientas base. Declarar
+  la duración del contrato o una fecha de inicio que el cliente define después. Presentar el reparto en persona y kit
+  como documento. Número de cotización, versiones, QR, firmas y aprobación: pertenecen al cotizador de Greenhouse;
+  llevar este diseño allá es el paso acordado y no ha empezado.
+
+### Corridas del 2026-10-11 (asientos y opciones)
+
+Importes en CLP. Las corridas «fuera de esta carpeta» usan copias de `designer-startup-courtesy.demand.json` con un
+solo cambio, cotizadas con `--current`; no están versionadas.
+
+- `designer-startup-courtesy.artifact.json`: `replay` responde `verified: true`. Motor `pricing-v3-local/1.3.0`,
+  tres períodos, costo 5.068.112, precio antes del ajuste 7.970.000, rebaja 320.000, neto 7.650.000, impuesto
+  1.453.500 y total 9.103.500. Una fila marcada bajo su piso: la puesta en marcha bonificada.
+- Las dos opciones: `replay` responde `verified: true`. Redactor, tres períodos a 2.580.000; video, un período de
+  3.570.000.
+- Su documento: «Diseñador visual sénior», 3 meses a 2.550.000, que son 7.650.000; «Puesta en marcha del servicio»,
+  «Bonificado», valor de referencia 320.000. Neto 7.650.000; IVA 19 %, 1.453.500; total 9.103.500. Opciones:
+  2.580.000 «al mes» y 3.570.000 «por mes de campaña». Cinco páginas.
+- `compose document` sobre ese artefacto con los dos `--option` y sin brief: exit 2, con la línea `design`, `waived`
+  con `design:setup` y `options` con las dos claves.
+- El `.document.json` vuelto a emitir es idéntico al versionado.
+- La demanda con `periodIds` (fuera de esta carpeta): 9 asignaciones pasan a 3; mismo costo y mismo neto, otra
+  identidad de cálculo.
+- La demanda con dos asientos de Notion para una persona (fuera de esta carpeta): exit 2,
+  `UNACCOUNTED_NAMED_SEATS` en los tres meses; con `--out`, ningún archivo y `runNotices.output` con
+  `written: false`. Con `--keep-blocked` y otra ruta, el artefacto bloqueado queda escrito (`KEPT_BLOCKED`).
+- La misma declarando uno de los dos asientos ocioso (fuera de esta carpeta): exit 3, costo 5.140.112 y neto
+  7.770.000; `compose commitments` lista 3 meses-asiento ociosos y `compose assess`, `IDLE_SEAT_COST_REVIEW`.
+- Dos personas en la línea y un solo asiento de Notion (fuera de esta carpeta): exit 2,
+  `INSUFFICIENT_NAMED_SEAT_CAPACITY`. Con un grupo de `seatSharing` para las dos: exit 3, y `compose assess` lista
+  `SHARED_SEAT_TERMS_REVIEW`.
+- `replay` de los 24 artefactos versionados bajo `data/pricing/**`: todos `verified: true`.
+- `pnpm pricing:v3:test`: 27 archivos y 1.359 pruebas.
+
+Evidencia fechada. Los artefactos que se agregaron a esta carpeta son el de `designer-startup-courtesy` y los de sus
+dos opciones.

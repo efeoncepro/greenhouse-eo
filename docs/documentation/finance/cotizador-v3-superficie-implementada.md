@@ -33,6 +33,12 @@ del kernel ni ninguna cotización congelada: una lectura nueva, `compose documen
 congelada en los datos de su documento para el cliente (la plantilla A4 de cotización, en su versión 2). El resumen
 para leer primero está en
 [El documento de cotización para el cliente](#el-documento-de-cotización-para-el-cliente-2026-10-11).
+Los párrafos marcados «asientos y opciones (2026-10-11)» describen lo que se corrigió ese mismo día después de
+cotizar el primer caso real de punta a punta: los asientos de una herramienta se declaran como se compran, los meses
+iguales se declaran una vez, el documento admite opciones adicionales y líneas bonificadas, y `--out` guarda una
+cotización calculada o no guarda nada. No toca ningún contrato del kernel, y todos los artefactos congelados se
+reproducen igual. El resumen para leer primero está en
+[Asientos como se compran y períodos declarados una vez](#asientos-como-se-compran-y-períodos-declarados-una-vez-2026-10-11).
 
 ## Qué versiones se usan hoy (2026-10-11)
 
@@ -384,6 +390,14 @@ precios por año no usan ninguno de los dos datos.
 Como no distingue un trabajo de un mes del mes representativo de un servicio continuo, esta lectura se pide a
 propósito para trabajos acotados; no es un aviso automático.
 
+Asientos y opciones (2026-10-11): la lectura tiene una cuarta clase de entrada, la única que está **dentro** de los
+períodos cotizados. Cuando la demanda declara asientos pagados que nadie usa (`idleSeats`), cada herramienta y plan
+con asientos ociosos sale como `kind: "idle_seat"`: cuántos meses-asiento son, cuánto cuestan (una parte del costo
+que la cotización ya tiene; no es un monto para sumar) y que el uso no cubre nada de ellos. La señal es
+`PAID_SEAT_IDLE_WITHIN_ENGAGEMENT` y el total, `totals.idleSeats`. Una cotización sin asientos ociosos no trae nada
+de esto. Qué es un asiento ocioso:
+[Asientos como se compran](#asientos-como-se-compran-y-períodos-declarados-una-vez-2026-10-11).
+
 `compose split` no cambió de propósito. Con una forma declarada, el kit de herramientas lleva la razón de la forma
 igual que cualquier otro componente: en el ejemplo, kit 190.000 más persona 2.600.000.
 
@@ -433,8 +447,9 @@ este diseño a ese cotizador, que aporta lo que falta; ese paso no ha empezado.
 
 | Sale de | Qué |
 | --- | --- |
-| La cotización congelada | Toda cifra: la moneda, la fecha del documento, las líneas y su neto, el impuesto, el total, los costos que el cliente paga directo y los importes de un calendario de pagos |
-| El brief del documento | Todo texto: referencia, quién emite y para quién, portada, nombre del servicio, alcance, calendario del trabajo, textos de la sección de precio y condiciones. También cómo se presentan las líneas: nombre, detalle y grupo |
+| La cotización congelada | Toda cifra: la moneda, la fecha del documento, las líneas y su neto, el impuesto, el total, los costos que el cliente paga directo, los importes de un calendario de pagos y el valor de referencia de una línea bonificada |
+| La cotización congelada de cada opción | El precio de esa opción adicional (asientos y opciones, 2026-10-11): cada opción se cotiza aparte y su precio sale de su propio artefacto |
+| El brief del documento | Todo texto: referencia, quién emite y para quién, portada, nombre del servicio, alcance, calendario del trabajo, textos de la sección de precio y condiciones. También cómo se presentan las líneas: nombre, detalle y grupo, si una línea bonificada se muestra, y el nombre y la unidad de cada opción |
 
 El brief (`pricing-v3-quote-document-brief/1`) no tiene dónde escribir un importe, una moneda, una tasa de impuesto
 ni una fecha: uno que trae alguno se rechaza. Por eso un documento no puede contradecir a su cotización. Para cambiar
@@ -447,7 +462,8 @@ una cifra se cambia la cotización y se vuelve a emitir.
    bajo su clave con el nombre y el grupo que tendría por defecto, y los textos por llenar. Sale con código 2
    (falta información).
 2. Con el brief lleno, `compose document --input <artefacto> --brief <brief> --out <datos>` emite los datos del
-   documento. Sale con código 3: es el borrador de una cotización en revisión.
+   documento. Sale con código 3: es el borrador de una cotización en revisión. Si el documento lleva opciones
+   adicionales, los dos pasos reciben además `--option <clave>=<artefacto de la opción>`, una vez por opción.
 3. `node scripts/documents/render-cotizacion-a4.mjs --data <datos> --out <carpeta nueva>` genera el HTML, el PDF,
    un manifiesto y las capturas para revisar.
 
@@ -461,7 +477,8 @@ documento las reúne a lo largo del plazo.
 - Los meses consecutivos en que un concepto cuesta lo mismo son una sola línea: la cantidad es «n meses», el valor
   unitario es el neto de un mes y el neto es su suma exacta. Un cobro único es «1 pago único», sin valor unitario.
 - Si el neto de un concepto cambia durante el plazo, sale una línea por cada tramo y el detalle dice qué meses cubre
-  («Mes 3», «Meses 1 a 2»). Un mes con neto cero no se cobra y no imprime nada.
+  («Mes 3», «Meses 1 a 2»). Un mes con neto cero no se cobra y, por defecto, no imprime nada; la excepción es una
+  línea bonificada que el brief pide mostrar (ver «Línea bonificada», más abajo).
 - Las líneas se agrupan por defecto en «Servicio», «Puesta en marcha» y «Costos de terceros».
 - Cada línea tiene una clave con la que el brief puede cambiarle el nombre, agregarle un detalle o moverla de grupo.
   La clave nunca se imprime.
@@ -479,18 +496,47 @@ a mes y suma los resultados; calcularlo una sola vez sobre el total puede dar un
 habría dos cifras para la misma cotización. La plantilla trae un
 [ejemplo de esa diferencia](../../commercial/templates/cotizacion-a4/README.md#versión-2-varias-líneas-con-precio).
 
-**Dos bloques opcionales.**
+**Tres bloques opcionales.** Eran dos hasta el cambio «asientos y opciones (2026-10-11)», que agregó el tercero.
 
 - **Costos que el cliente paga directo a su proveedor.** Aparecen si la cotización los declara. Se imprimen aparte,
   cada uno en su propia moneda, sin convertir y fuera de todo total.
 - **Calendario de pagos.** Aparece si el brief declara `paymentMilestones`, la misma lista que recibe
   `compose schedule --milestones`: partes del neto, nunca importes. Los importes se derivan y suman exactamente el
   neto. Cada hito dice cuándo se cobra: en un período de la cotización o con un texto.
+- **Opciones adicionales.** Aparecen si la corrida recibe la cotización congelada de cada opción con
+  `--option <clave>=<artefacto>` (hasta ocho). Se imprimen en un bloque propio, fuera de las líneas, del neto, del
+  impuesto y del total.
+
+**Opciones adicionales (asientos y opciones, 2026-10-11).** Un servicio que el cliente puede contratar aparte se
+muestra con su precio sin entrar a la cotización. La regla es una sola: **el precio de una opción sale de su propia
+cotización congelada**, nunca de un texto.
+
+- Cada opción se cotiza sola, como cualquier cotización, y su artefacto se entrega al documento con `--option`. Se
+  verifica por replay igual que la cotización base.
+- El precio que se imprime es el neto de **uno** de sus períodos. Por eso una opción sólo se acepta si está
+  calculada, está en la moneda de la cotización base, tiene el mismo neto en todos sus períodos y no declara costos
+  que el cliente paga directo. Tampoco puede ser la cotización base ni repetir la de otra opción.
+- El brief nombra exactamente las opciones entregadas, ni una más ni una menos: para cada una, su nombre, la unidad
+  en que se lee el precio («al mes», «por mes de campaña») y un detalle opcional. No tiene dónde escribir el precio.
+- El documento las imprime bajo un rótulo que dice que están fuera de la cotización y que sus valores son netos. Ese
+  texto es fijo y lo pone la plantilla.
+
+**Línea bonificada (asientos y opciones, 2026-10-11).** Una línea que la cotización deja en cero con un ajuste
+explícito (por ejemplo, una puesta en marcha que se regala a cambio de un compromiso de plazo) no imprime nada por
+defecto. Si el brief marca su clave con `courtesy: true`, el documento la imprime como «Bonificado» con su «Valor de
+referencia»: el precio que esa línea tenía antes de la rebaja, **leído de la cotización congelada**. No suma al
+subtotal, al impuesto ni al total. Una línea que se cobra no se puede marcar. El andamio lista las claves
+bonificadas, con su valor de referencia, bajo `waived`.
+
+En la cotización, la fila bonificada sigue siendo una rebaja real: el kernel la marca bajo su piso
+(`MARGIN_BELOW_FLOOR`) y el resumen la lista en `marginFloor.lines`. Regalarla es una decisión del operador, no un
+efecto del documento.
 
 **Cuándo no se emite.** Cada garantía es un rechazo, no un documento equivocado: las líneas suman exactamente el
 neto de la cotización; la cotización está calculada; cada importe se puede escribir en su moneda y el contenido
-cabe en los límites de la plantilla (hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos); y el impuesto
-corresponde a su tasa. Códigos y reglas:
+cabe en los límites de la plantilla (hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos); el impuesto
+corresponde a su tasa; y cada opción es un solo importe que dice todo de ella (`QUOTE_DOCUMENT_OPTION_INVALID` si no).
+Códigos y reglas:
 [contrato](cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11).
 
 **Es un borrador.** Los datos salen con `status: "draft"`. Un documento producido aquí no es una `quotation_id`, un
@@ -508,7 +554,13 @@ en CLP.
 | `designer-on-demand` (contrato 1.3.0, un mes) | «Diseñador visual sénior», 1 mes, 2.470.000; «Puesta en marcha del servicio», 1 pago único, 320.000 | 2.790.000 | Sin resolver: «Por confirmar» | 4 |
 | `designer-three-months-iva` (contrato 1.3.0, tres meses) | El mismo diseñador, 3 meses × 2.550.000 = 7.650.000; puesta en marcha, 320.000 | 7.970.000 | IVA 19 %: 1.514.300; total 9.484.300 | 4 |
 | `managed-on-demand-third-party` (contrato 1.4.0, un mes) | Fee del servicio 11.370.000; tres costos de terceros: 4.950.000, 1.380.000 y 3.333.333 | 21.033.333 | Sin resolver: «Por confirmar» | 5 |
+| `designer-startup-courtesy` (contrato 1.3.0, tres meses; asientos y opciones) | El mismo diseñador, 3 meses × 2.550.000 = 7.650.000; puesta en marcha «Bonificado», valor de referencia 320.000. Dos opciones: 2.580.000 «al mes» y 3.570.000 «por mes de campaña» | 7.650.000 | IVA 19 %: 1.453.500; total 9.103.500 | 5 |
 
+- `designer-startup-courtesy` es el ejemplo de una línea bonificada y de dos opciones. Su demanda es la de
+  `designer-three-months-iva` con un ajuste más: un neto pactado de cero sobre la puesta en marcha. Por eso el neto
+  baja en los 320.000 de esa fila y esa cifra aparece sólo como valor de referencia. Cada opción tiene su propia
+  demanda y su propio artefacto (`designer-startup-courtesy.option-copywriter.*` y `.option-motion.*`); ninguna
+  entra al neto, al impuesto ni al total.
 - `designer-three-months-iva` es una cotización congelada nueva (demanda y artefacto), la primera versionada con
   varios períodos y con el impuesto resuelto. Su IVA de 19 % es la fuente de impuesto de un ejemplo, no un criterio
   tributario para ningún cliente. Su mensualidad difiere de la del ejemplo de un mes porque aquél se congeló con una
@@ -529,9 +581,108 @@ en CLP.
 - El documento se emite en la moneda de la cotización, sin conversión a otra.
 - Generar el HTML y el PDF necesita un Chromium local (Playwright), como todos los documentos de
   `scripts/documents/`.
+- **La puesta en marcha de un servicio gestionado no tiene valor de referencia.** El catálogo no le carga puesta en
+  marcha a un servicio gestionado, así que su cotización no tiene una fila que bonificar: una «puesta en marcha
+  bonificada» de un servicio gestionado sigue siendo un texto del brief, sin cifra, hasta que el catálogo la costee
+  (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC` en el ledger).
+- **El margen de una opción que sólo suma dedicación es un piso, no la cifra real.** Una opción que agrega
+  dedicación de personas que ya están en la cotización base es una línea nueva en su propia cotización, y vuelve a
+  llevar el fee de plataforma por línea y su parte de las herramientas base. Su costo queda sobrestimado y su margen
+  es una cota inferior. El precio impreso no cambia (`OPTION_QUOTES_REPEAT_PER_LINE_FEES` en el ledger).
+- La duración del contrato y una fecha de inicio que el cliente define después: una cotización tiene meses fechados
+  desde su fecha de cotización.
 
 Datos, reglas de composición y límites de la plantilla:
 [su manual](../../commercial/templates/cotizacion-a4/README.md).
+
+## Asientos como se compran y períodos declarados una vez (2026-10-11)
+
+**Qué es y para qué sirve.** Una herramienta con licencias nominativas (un asiento por persona) rara vez se compra
+de la forma más simple. Un equipo puede tener un asiento anual y sumar uno mensual en los meses de campaña; puede
+pagar todo el año un asiento que su persona usa sólo algunos meses; o dos personas pueden turnarse un mismo asiento.
+Hasta este cambio la demanda no podía decir ninguna de las tres cosas: admitía un solo plan por herramienta y mes, y
+exigía tantos asientos como personas. Ahora las tres se declaran, y la regla que las une es más estricta que la
+anterior: **todo asiento pagado se usa, se comparte o se declara ocioso, o la cotización no calcula.**
+
+**De dónde salió.** El 2026-10-11 se cotizó de punta a punta el primer caso real: un servicio gestionado de doce
+meses, con una persona de refuerzo en las semanas de campaña. El cotizador calculó bien —reprodujo el precio
+acordado y coincidió con una estimación independiente— y se negó a calcular mientras una persona no tenía asiento
+declarado, que es justo lo que debe hacer. Pero dejó a la vista cuatro límites: los planes de compra reales no se
+podían expresar; una demanda de doce meses repetía cada herramienta doce veces; el documento no podía mostrar
+opciones con precio ni una cortesía con su valor; y una corrida bloqueada dejaba un archivo en la ruta de salida. Los
+cuatro están corregidos. Este cambio no agrega contrato ni motor: las claves nuevas de la demanda son opcionales y
+una demanda que no las usa produce exactamente lo mismo que antes.
+
+**Las tres formas de declarar un asiento.** Las tres viven en la demanda (`pricing-v3-composition-demand/1`).
+
+| Lo que pasa en la realidad | Cómo se declara | Qué hace el cotizador |
+| --- | --- | --- |
+| **Dos planes conviven** en un mes: por ejemplo, un asiento anual y uno mensual en los meses de campaña | Dos entradas en `allocations` para la misma herramienta y el mismo mes, cada una con su `priceId` | Lee cada plan por separado, junta su costo y lo reparte entre las líneas que usan la herramienta. La misma herramienta, el mismo mes y el mismo `priceId` dos veces siguen siendo un duplicado |
+| **Un asiento pagado que nadie usa** ese mes: un asiento anual cuya persona trabaja sólo algunos meses | `idleSeats` (cuántos) e `idleReason` (por qué se paga) en la entrada de ese plan | El costo del asiento ocioso se queda en la cotización, sobre las líneas que usan la herramienta. Si ese mes nadie la usa, la entrada nombra en `bornByLineIds` las líneas que lo cargan, en partes iguales |
+| **Dos o más personas usan un mismo asiento**: la persona dedicada y la que la refuerza en campaña | Una entrada en `seatSharing`: la herramienta, los meses, las personas (dos o más) y el motivo | El grupo cuenta como un solo asiento y cada persona carga su fracción |
+
+**La regla.** Para una herramienta nominativa con precio por asiento, en cada mes:
+
+- asientos pagados − asientos declarados ociosos = asientos necesarios;
+- los asientos necesarios son las personas que no están en ningún grupo, más uno por cada grupo que comparte.
+
+Si faltan asientos, la cotización queda bloqueada con `INSUFFICIENT_NAMED_SEAT_CAPACITY`. Si sobran —se paga un
+asiento que nadie usa y nadie declaró ocioso— queda bloqueada con `UNACCOUNTED_NAMED_SEATS`. Antes de este cambio ese
+segundo caso salía con el primer código, que decía lo contrario de lo que pasaba. Cuando uno de los planes es un
+paquete (un precio por un grupo de licencias), el paquete cuenta como capacidad: los asientos en uso más la
+capacidad del paquete deben alcanzar para las personas, y un asiento ocioso nunca cuenta como capacidad de nadie.
+
+**Cómo se reparte el costo.** El costo de todos los planes de una herramienta en un mes forma un solo fondo, que se
+reparte entre las líneas que la usan según el peso de sus asientos. Una persona que comparte un asiento entre `g`
+personas pesa `1/g`; una persona que aparece en varias funciones sigue contando como un solo asiento, dividido entre
+esas funciones. El costo de un asiento ocioso está dentro de ese fondo: no desaparece ni se cobra aparte.
+
+**Lo que no cambia en una cotización que ya existía.** Una herramienta con un solo plan por mes conserva
+exactamente los identificadores que tenía, así que toda cotización congelada se reproduce byte a byte. Sólo una
+herramienta que en algún mes tiene dos planes recibe un identificador por plan, y lo recibe en todos sus meses:
+`composed:<herramienta>:<priceId>`, con la cobertura `tool:<herramienta>:<priceId>`. Así un asiento comprado por un
+año mantiene una sola identidad durante el plazo, que es lo que sigue la regla de continuidad anual. Esa regla
+(`ANNUAL_ASSIGNMENT_CHANGE_REQUIRES_POLICY`) no cambió: un plan anual todavía no puede cambiar de cantidad ni tener
+un hueco, pero un plan mensual a su lado ya no la dispara.
+
+**Dónde se ve.** En el resumen, `attributions` trae una fila por plan. Cuando un mes declara asientos ociosos o
+compartidos, o tiene dos planes, la fila agrega `seats` (`needed`, `paid`, `idle` y `sharedSeats`, con cuántas
+personas comparten cada asiento y el motivo); `idle`, con los asientos ociosos de ese plan y su costo; y
+`bornByLineIds` cuando nadie usa la herramienta. `compose commitments` lista los asientos ociosos como una entrada
+propia (ver [las lecturas](#tres-lecturas-de-una-cotización-congelada-2026-10-11)). `compose assess` agrega dos
+brechas de revisión: `IDLE_SEAT_COST_REVIEW` (confirmar que el asiento no se puede soltar, pausar ni reasignar, y que
+el cliente debe cargarlo) y `SHARED_SEAT_TERMS_REVIEW` (confirmar que el proveedor permite compartir el asiento).
+`compose split`, `compose cash` y `explain` no cambian de forma.
+
+**Períodos declarados una vez.** Una entrada de la demanda que vale igual para varios meses se escribe una sola
+vez, con `periodIds: [1, 2, 3]` en lugar de `periodId`. Lo admiten `allocations`, la demanda de créditos de cada
+línea (`work[].creditDemand`), `clientProvidedTools` y `seatSharing`. Cada entrada lleva exactamente una de las dos
+claves, y `periodIds` no repite un mes. Declarar doce meses iguales una vez es la misma demanda que doce entradas:
+el cotizador la lee mes por mes. `compose plan` ya escribe así las asignaciones que deriva del portfolio cuando sus
+meses son idénticos (lo que declaró quien llama queda como lo escribió), y `compose scaffold` lo pide en su pregunta
+por cada herramienta. En el primer caso real, la
+demanda de doce meses pasó de 48 entradas de asignación a 6. Dos cosas siguen por mes: los presupuestos de créditos
+(`creditBudgets`), porque cada uno lleva sus fechas de compra y de vencimiento, y el portfolio, que conserva
+`periodId`. Los costos de terceros ya usaban su propio `periodIds`, que es otra clave y sigue siendo obligatoria.
+
+Una demanda reescrita con `periodIds` da los mismos totales, pero es otra demanda: el artefacto congela lo que se
+declaró, así que su identidad (`calculationId`) es distinta. Un artefacto ya congelado no se reescribe.
+
+**Qué no está modelado.** No describir nada de esto como existente:
+
+- **Si el proveedor permite compartir un asiento nominativo.** Es una pregunta del contrato con el proveedor. La
+  cotización registra la declaración y su motivo, y `compose assess` pide confirmarlo; no lo valida.
+- **Si un asiento ocioso se puede soltar, pausar o reasignar.** Tampoco está en el artefacto.
+- El cotizador no deduce asientos ociosos ni compartidos: si no se declaran, la cotización no calcula.
+
+Claves, reglas y diagnósticos:
+[contrato](cotizador-v3-contrato-y-validacion.md#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11).
+Un ejemplo en palabras:
+[selección de herramientas](cotizador-v3-seleccion-herramientas.md#asientos-de-una-herramienta-nominativa-las-tres-formas-de-declararlos-2026-10-11).
+Paso a paso:
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#declarar-los-asientos-de-una-herramienta).
+Por qué así y qué se descartó:
+[decisión](../../architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
 
 ## Las piezas y sus versiones
 
@@ -543,7 +694,7 @@ Datos, reglas de composición y límites de la plantilla:
 | Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`. Versiones vigentes (2026-10-11): cada precio admite `reviewBy`, una fecha de revisión que avisa y no bloquea. Lecturas (2026-10-11): cada precio admite además `commitmentTermMonths`, los meses que hay que seguir pagando una licencia una vez tomada; no entra a ningún cálculo |
 | Puntero de versiones vigentes | `pricing-v3-current/1` (`adapters/current-versions.ts`) | Versiones vigentes (2026-10-11): `data/pricing/v3-operating/current.json` nombra catálogo, policy y catálogo de créditos por ruta, versión y digest; `--current` lo usa y `current show\|set` lo lee y lo reemplaza |
 | Fechas de los precios     | `resources/price-review.ts`                                 | Versiones vigentes (2026-10-11): lectura derivada de qué fechas de revisión pasaron, cuáles vencen pronto y qué vigencias ya terminaron; no cambia ningún precio ni resultado |
-| Demanda compuesta         | `pricing-v3-composition-demand/1`                           | Brief, trabajo, usuarios, tareas, IA, allocations, presupuestos y cobertura cliente            |
+| Demanda compuesta         | `pricing-v3-composition-demand/1`                           | Brief, trabajo, usuarios, tareas, IA, allocations, presupuestos y cobertura cliente. Asientos y opciones (2026-10-11, claves opcionales, misma versión): `periodIds` en vez de `periodId`, `idleSeats`, `idleReason` y `bornByLineIds` en una asignación, y `seatSharing` |
 | Plan                      | `pricing-v3-operating-plan/1`                               | Demanda y portfolio opcional; produce demanda resuelta sin elegir reparto arbitrario           |
 | Portfolio                 | `pricing-v3-resource-portfolio/1`                           | Capacidad de clientes, interna y sin asignar; genera allocations y reconciliación              |
 | Créditos                  | `pricing-v3-credit-catalog/1`, `pricing-v3-credit-budget/1` | Suscripción, paquetes y demanda por proveedor; presupuesto, caja y remanente                   |
@@ -552,8 +703,8 @@ Datos, reglas de composición y límites de la plantilla:
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
 | Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado. Motor 1.3 (aditivo): bloque `engagementForm` y `totals.engagementAdjustment`, sólo cuando el pedido declara la forma. Motor 1.4 (aditivo): bloques `ownWork`, `thirdParty` y `contingencyReserve`, sólo en una cotización 1.4.0 |
-| Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total. Motor 1.4: las cuatro reconocen las filas de terceros y la reserva |
-| Documento de cotización   | `pricing-v3-quote-document-brief/1`, `pricing-v3-quote-document-scaffold/1` (`resources/quote-document.ts`) | Documento (2026-10-11): recibe un artefacto congelado y un brief de textos; devuelve la versión 2 de los datos de la plantilla A4 de cotización, o el andamio del brief si no se entrega uno. Verifica el artefacto por replay, toma toda cifra de la cotización y no cambia ningún total |
+| Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total. Motor 1.4: las cuatro reconocen las filas de terceros y la reserva. Asientos y opciones (2026-10-11): compromisos lista los asientos ociosos declarados (`kind: "idle_seat"`) |
+| Documento de cotización   | `pricing-v3-quote-document-brief/1`, `pricing-v3-quote-document-scaffold/1` (`resources/quote-document.ts`) | Documento (2026-10-11): recibe un artefacto congelado y un brief de textos; devuelve la versión 2 de los datos de la plantilla A4 de cotización, o el andamio del brief si no se entrega uno. Verifica el artefacto por replay, toma toda cifra de la cotización y no cambia ningún total. Asientos y opciones (2026-10-11): recibe además la cotización congelada de cada opción adicional (`--option`), y el brief admite `options`, `optionsTexts` y `lines.<clave>.courtesy` |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
 | Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2), `1.3.0` → `pricing-v3-local/1.3.0` (motor 1.3), `1.4.0` → `pricing-v3-local/1.4.0` (motor 1.4); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
@@ -682,10 +833,18 @@ Cada elección conserva razón y fuente. Las 32 reglas iniciales son revisables:
 stock, publicación, video, UX, automatización o IA requiere evaluación específica.
 
 `assigneeIds` identifica usuarios únicos: dos filas del mismo usuario no crean dos seats. `allocations` declara
-por tool/mes `priceId`, cantidad, cuota, driver, motivo y, cuando aplica, capacidad y seats contractuales.
+por tool, mes y plan `priceId`, cantidad, cuota, driver, motivo y, cuando aplica, capacidad y seats contractuales.
 Los nominativos requieren cantidad entera; seat por usuario no se convierte en pool en el portfolio.
 Un paquete nominativo exige capacidad suficiente. Mínimos de contratación se mantienen separados de los
-usuarios atribuidos a la cuenta. Ningún reparto permite compartir credenciales ni prueba acceso real.
+usuarios atribuidos a la cuenta. Ningún reparto de costo permite compartir credenciales ni prueba acceso real.
+
+Asientos y opciones (2026-10-11): hasta ese día una herramienta admitía una sola asignación por mes y una
+herramienta con precio por asiento exigía exactamente tantos asientos como personas. Ya no: una herramienta puede
+tener varios planes en un mes, un asiento pagado puede declararse ocioso y varias personas pueden declarar que usan
+un mismo asiento. Lo que se exige ahora es que cada asiento pagado quede explicado
+([Asientos como se compran](#asientos-como-se-compran-y-períodos-declarados-una-vez-2026-10-11)). Que dos personas
+usen un asiento es una declaración con su motivo sobre el uso, no un permiso para compartir una cuenta: si el
+proveedor lo permite se confirma fuera del cotizador.
 
 Hasta la policy v6, Adobe figuraba como un solo paquete: 180 USD/mes por 3 CC Teams+3 Express, declarado por el
 operador, con 306 USD como escenario de un alza de 70 % sin fecha. Esos dos importes ya no son los vigentes.
@@ -875,6 +1034,10 @@ lo produce `compose document` sobre esa misma proyección, sin agregar cifras pr
 CLI: JSON limpio por stdout con `pnpm --silent`; exit 0 técnico, exit 2 pendiente, exit 3 cálculo/revisión y exit 1
 schema/argumentos/conflicto/adaptador/export rechazado, error sanitizado en stderr. `--out` usa ruta nueva
 `wx`/0600; no sobrescribe. Códigos 2/3 exigen leer envelope, no concatenar pasos suponiendo exit 0.
+Asientos y opciones (2026-10-11): el `--out` de una cotización (`calculate`, `quote` y `compose prepare|quote`)
+guarda una cotización calculada o no guarda nada. Hasta ese día una corrida bloqueada escribía igual su artefacto, y
+la corrida corregida chocaba con `OUTPUT_EXISTS` contra un archivo que nunca fue una cotización. Detalle en el delta
+del mismo nombre, más abajo.
 
 Delta 2026-10-10, qué imprime cada comando. Códigos de salida, flags, digests y el escritor `wx`/0600 no cambian.
 
@@ -1093,6 +1256,43 @@ rechazos nuevos; los códigos de salida significan lo mismo que antes. Ningún o
 - El HTML y el PDF no los genera la CLI de pricing sino el generador de la plantilla:
   `node scripts/documents/render-cotizacion-a4.mjs --data <datos> --out <carpeta nueva>`.
 
+Asientos y opciones (2026-10-11), qué imprime cada comando. Hay dos opciones nuevas, `--option` y `--keep-blocked`,
+y un rechazo nuevo; no hay comandos nuevos y los códigos de salida significan lo mismo que antes.
+
+- **`--out` es una cotización calculada o nada.** Vale para `calculate`, `quote` del carril de catálogo y
+  `compose prepare|quote`. Una corrida que no calcula imprime igual todo lo que encontró, sale con 2, **no escribe
+  nada** en `--out` y lo dice en `runNotices.output`: `{ option: "out", written: false, reason:
+  "QUOTE_NOT_CALCULATED", statement }`. Como no quedó ningún archivo, la corrida corregida usa el mismo `--out`. Un
+  archivo que ya existe nunca se sobrescribe (`OUTPUT_EXISTS`), igual que antes.
+- **`--keep-blocked`** guarda a propósito el artefacto de una corrida que no calculó, para las lecturas que lo
+  aceptan (`explain`, `replay`, `compose assess` y `compose commitments`). Exige `--out`; sin él es
+  `INVALID_ARGUMENT` con `option: "keep-blocked"`. La corrida avisa en `runNotices.output` con `written: true` y
+  `reason: "KEPT_BLOCKED"`: ese archivo no es una cotización y la corrida corregida necesita otra ruta. Una entrada
+  que el contrato rechaza no produce artefacto, con el interruptor o sin él.
+- `compose prepare|quote` y `replay` de una composición: en `attributions`, una fila por plan de cada herramienta.
+  Las claves `seats`, `idle` y `bornByLineIds` existen sólo donde la demanda declaró asientos ociosos o compartidos,
+  o dos planes en un mes; toda otra fila conserva las claves que tenía.
+- Bloqueos nuevos al cotizar, con salida 2 y en `diagnostics`: `UNACCOUNTED_NAMED_SEATS`, `INVALID_IDLE_SEATS`,
+  `IDLE_SEAT_BEARER_REQUIRED`, `IDLE_SEAT_BEARER_NOT_ALLOWED`, `INVALID_IDLE_SEAT_BEARER`, `INVALID_SEAT_SHARING`,
+  `UNUSED_SEAT_SHARING` y `RESOURCE_HOLDING_ID_TOO_LONG`. La ruta de cada uno es `<período>:<herramienta>`, o
+  `<período>:<herramienta>:<priceId>` cuando la herramienta tiene dos planes. Tabla completa:
+  [contrato](cotizador-v3-contrato-y-validacion.md#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11).
+- Una entrada de la demanda con `periodId` y `periodIds` a la vez, sin ninguna de las dos o con un mes repetido no
+  pasa el schema: rechazo `SCHEMA_INVALID`, salida 1.
+- `compose commitments`: entradas `kind: "idle_seat"`, la señal `PAID_SEAT_IDLE_WITHIN_ENGAGEMENT`,
+  `totals.idleSeats` y `reviewed.holdingsWithIdleSeats`, sólo cuando la demanda declara un asiento ocioso.
+- `compose assess`: brechas `IDLE_SEAT_COST_REVIEW` y `SHARED_SEAT_TERMS_REVIEW`.
+- `compose document --option <clave>=<artefacto>`: repetible, hasta ocho. Sin `--brief`, el andamio agrega
+  `options[]` (clave, precio, moneda, períodos e identidad del cálculo de cada opción) y, si la cotización bonifica
+  alguna línea, `waived[]` (cada clave bonificada con su valor de referencia); el `brief` del andamio trae cada opción
+  con su nombre y su unidad por llenar. Con `--brief`, los datos agregan el bloque `options` y, en una línea
+  bonificada, `referenceNet`; `source` agrega la identidad del cálculo de cada opción.
+- Rechazo nuevo del [registro](../../../src/lib/finance/pricing-v3/errors.ts), con salida 1:
+  `QUOTE_DOCUMENT_OPTION_INVALID` (`option: "option"`): una opción no se puede imprimir como un solo importe. Un
+  `--option` mal escrito (sin `=`, sin ruta, con una clave inválida o repetida) es `INVALID_ARGUMENT` con
+  `option: "option"`.
+- `compose preview`, `compose split`, `compose cash`, `compose schedule` y `explain` no cambian de forma.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -1256,6 +1456,26 @@ copias de un brief con un solo cambio y no están versionadas:
 | El andamio sin llenar entregado como brief | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`, una entrada por texto vacío |
 | Un título de portada de tres líneas largas | 3 al emitir; 1 al generar | Los datos se emiten; el generador falla con «Contenido fuera del A4» y no deja documento |
 | `compose document` con `--current` | 1 | `INVALID_ARGUMENT` con `option: "current"` |
+
+Readback del 2026-10-11 tras «asientos y opciones», hecho con la CLI: `pnpm pricing:v3:test` con 27 archivos y
+1.359 pruebas V3, y `replay` con `verified: true` en los 24 `*.artifact.json` versionados bajo `data/pricing/`, entre
+ellos los tres nuevos: `designer-startup-courtesy.artifact.json` y sus dos opciones. Los tres son del motor 1.3.0 y
+congelaron el catálogo v10 y la policy v11. Corridas de ese día; las que no nombran un archivo versionado usan
+copias de la demanda de `designer-startup-courtesy` con un solo cambio y no están versionadas:
+
+| Caso | Salida | Resultado |
+| --- | --- | --- |
+| `replay` de `designer-startup-courtesy.artifact.json` | 3 | Costo 5.068.112, precio antes del ajuste 7.970.000, rebaja 320.000, neto 7.650.000, impuesto 1.453.500 y total 9.103.500. Una fila marcada: la puesta en marcha bonificada |
+| `compose document` sobre ese artefacto con sus dos `--option`, sin brief | 2 | Andamio: una línea (`design`, 3 meses a 2.550.000); `waived` con `design:setup` y su valor de referencia, 320.000; `options` con `copywriter` (2.580.000, tres períodos) y `motion` (3.570.000, un período) |
+| El mismo con su brief versionado | 3 | Datos idénticos a `designer-startup-courtesy.document.json`: la línea bonificada con `net` 0 y `referenceNet` 320.000, y el bloque `options` |
+| Ese documento generado con la plantilla | 0 | Cinco páginas |
+| La demanda con `periodIds` en vez de una entrada por mes | 3 | 9 entradas de asignación pasan a 3. Mismo costo y mismo neto (5.068.112 y 7.650.000); otra identidad de cálculo |
+| La demanda con dos asientos de Notion pagados y una persona | 2 | `needs_input`: `UNACCOUNTED_NAMED_SEATS` en `1:notion`, `2:notion` y `3:notion`. Con `--out`, ningún archivo; `runNotices.output` con `written: false` |
+| La misma con `--keep-blocked` y otra ruta | 2 | El artefacto bloqueado se escribe; `runNotices.output` con `reason: "KEPT_BLOCKED"` |
+| La misma declarando uno de los dos asientos ocioso, con su motivo | 3 | Calcula: costo 5.140.112, neto 7.770.000. `compose commitments` lista 3 meses-asiento ociosos; `compose assess`, `IDLE_SEAT_COST_REVIEW` en los tres meses |
+| La demanda con un segundo plan de Microsoft 365 en el mes 2, con su asiento declarado ocioso | 3 | Calcula; `attributions` trae una fila por plan, y `seats` sólo en el mes 2 |
+| La demanda con un grupo de `seatSharing` que nombra a alguien que no usa la herramienta | 2 | `needs_input`: `INVALID_SEAT_SHARING` |
+| Una asignación con `periodId` y `periodIds` a la vez | 1 | Rechazo `SCHEMA_INVALID` en `allocations.0` |
 
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios

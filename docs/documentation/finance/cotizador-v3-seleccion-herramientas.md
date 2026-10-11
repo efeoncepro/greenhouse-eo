@@ -35,9 +35,13 @@ excepción a la base requiere decisión explícita y cobertura suficiente; las o
 ## Asignación y desglose
 
 Separar quién necesita acceso, qué suscripción/seat lo cubre y qué parte de su costo corresponde al trabajo.
-Las licencias nominativas se cuentan por usuarios distintos; no compartir identidades ni reducir un seat
-al 50% por una dedicación parcial. Un mismo seat usado por una persona en varios servicios requiere reparto
+Las licencias nominativas se cuentan por usuarios distintos; no reducir un seat al 50% por una dedicación
+parcial. Un mismo seat usado por una persona en varios servicios requiere reparto
 documentado, no repetir su costo completo ni borrar todas las repeticiones por nombre del proveedor.
+Desde el 2026-10-11, que dos personas usen un mismo seat ya no es algo que la demanda no pueda decir: se declara
+expresamente, con su motivo, y que el proveedor lo permita se confirma aparte. Lo que sigue sin admitirse es
+repartir el costo de un seat entre personas sin declararlo. Detalle:
+[las tres formas de declarar un asiento](#asientos-de-una-herramienta-nominativa-las-tres-formas-de-declararlos-2026-10-11).
 Suscripción, periodo y asignación identifican el costo que se reconcilia; consumo IA y caja adicional tienen
 tratamiento separado. Una licencia existente mantiene costo atribuible aunque no exija comprar otra.
 
@@ -73,7 +77,8 @@ normalizan las reglas anteriores. El registro raw del operador sigue siendo ante
 
 El agente interpreta demanda y elige variantes/supuestos explícitos; el dominio exige base/selección y
 calcula desde precios versionados. No elige automáticamente variante barata ni porcentajes de reparto.
-Usuarios únicos cuentan seats; varios roles comparten un pool según asignación declarada, sin descuento FTE.
+Usuarios únicos cuentan seats (salvo los que la demanda declara que comparten uno, desde el 2026-10-11); varios
+roles comparten un pool según asignación declarada, sin descuento FTE.
 Créditos se agregan por proveedor/mes antes de elegir packs. El desglose conserva selección/omisiones,
 fuente, usuarios, cantidad, driver, costo/cuota y remanentes; caja adicional separada de costo atribuido.
 
@@ -147,3 +152,57 @@ El importe de Adobe Express y el importe facturado de Creative Cloud Pro están 
 sin descuento con que se cotiza es el precio de lista de esa misma factura y es un valor decidido por el CEO
 (confirmado desde la policy v11). Nada de eso confirma
 quién tiene asignada cada licencia: las asignaciones de los ejemplos siguen siendo simulaciones.
+
+## Asientos de una herramienta nominativa: las tres formas de declararlos (2026-10-11)
+
+Una herramienta nominativa con precio por asiento es la que se paga por persona: cada persona que la usa necesita un
+asiento, y el asiento se paga entero aunque esa persona le dedique una fracción de su tiempo. Hasta el 2026-10-11 la
+demanda sólo podía decir «tantas personas, tantos asientos, un solo plan». La compra real suele ser otra cosa, y
+desde ese día se declara tal como es. Hay tres formas, que se pueden combinar:
+
+| Forma | Cuándo se usa | Qué se escribe en la demanda |
+| --- | --- | --- |
+| **Dos planes a la vez** | La herramienta se tiene bajo más de un plan en un mismo mes: un asiento anual y, además, uno mensual en ciertos meses | Una asignación por plan, cada una con su `priceId` |
+| **Un asiento ocioso** | Se paga un asiento que ese mes nadie usa | En la asignación de ese plan, `idleSeats` (cuántos) e `idleReason` (por qué se paga igual) |
+| **Un asiento compartido** | Dos o más personas usan el mismo asiento | Una entrada en `seatSharing` con la herramienta, los meses, las personas y el motivo |
+
+La regla que las une: **en cada mes, los asientos pagados menos los declarados ociosos son exactamente los que se
+necesitan**, contando una vez a cada persona que no comparte y una vez a cada grupo que comparte. Si falta un
+asiento, o si sobra uno que nadie explicó, la cotización no calcula. El cotizador no completa la cuenta por su
+lado: no supone que un asiento sobrante está ocioso ni que dos personas se turnan uno.
+
+**Un ejemplo, en palabras.** Un servicio gestionado de doce meses. Una persona atiende la herramienta todo el año;
+una segunda persona la refuerza sólo en los cinco meses de campaña. La herramienta se paga por asiento. Hay tres
+maneras reales de comprarla, y las tres se pueden cotizar:
+
+1. **Un asiento, compartido.** Se paga un asiento todo el año y las dos personas lo usan por turnos en los meses de
+   campaña. La demanda declara un asiento en cada mes y, para los cinco meses de campaña, un grupo de `seatSharing`
+   con las dos personas y el motivo. En esos meses el grupo cuenta como un asiento y cada persona carga la mitad; en
+   los otros siete, el asiento es entero de la primera. Lo que hay que confirmar fuera del cotizador es que el
+   proveedor permita que dos personas usen un asiento nominativo.
+2. **Un asiento anual y uno mensual en campaña.** La primera persona tiene un asiento anual; para la segunda se
+   contrata un asiento mensual sólo en los cinco meses de campaña. La demanda declara el plan anual en los doce meses
+   y, en los cinco de campaña, una segunda asignación de la misma herramienta con el plan mensual. En esos meses hay
+   dos asientos pagados y dos personas: la cuenta cierra sin nada ocioso.
+3. **Dos asientos anuales, uno ocioso parte del año.** Los dos asientos se compran por el año. La demanda declara dos
+   asientos en los doce meses y, en los siete meses en que la segunda persona no trabaja, un asiento ocioso con su
+   motivo. El costo de ese asiento no desaparece: se queda en la cotización, sobre las líneas que usan la
+   herramienta, y la lectura de compromisos lo muestra aparte como siete meses-asiento pagados que nadie usa.
+
+Las tres dan costos distintos, y por eso importa declarar la que de verdad se va a comprar. Cuál conviene es una
+decisión de compra del operador, no del cotizador. Lo que nunca se hace para que la cuenta cierre es quitarle a una
+persona la tarea que le pide la herramienta: la demanda diría que esa persona no la usa, y el costo quedaría fuera
+de la cotización.
+
+Un caso más, menos frecuente: un mes en que nadie usa la herramienta y el asiento se paga igual. Todos los asientos
+de esa asignación se declaran ociosos, y como no hay líneas que la usen, la asignación nombra en `bornByLineIds` las
+líneas que cargan ese costo, en partes iguales.
+
+Qué no resuelve el cotizador: si el proveedor permite compartir un asiento, y si un asiento ocioso se puede soltar,
+pausar o reasignar mientras tanto. Son condiciones del contrato con el proveedor. La cotización registra lo que se
+declaró y su motivo, y `compose assess` las lista como puntos por confirmar.
+
+Reglas, claves y diagnósticos:
+[contrato](cotizador-v3-contrato-y-validacion.md#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11).
+Cómo se declara paso a paso:
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#declarar-los-asientos-de-una-herramienta).

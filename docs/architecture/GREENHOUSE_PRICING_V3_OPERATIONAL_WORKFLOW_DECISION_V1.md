@@ -77,6 +77,13 @@ Seat nominativo conserva usuario, cantidad entera y capacidad contratada. No se 
 entre personas por prorratear costo. Cantidad por seat corresponde a usuarios únicos; paquete nominativo exige
 capacidad suficiente dentro de sus seats incluidos, y Team exige mínimo de contrato explícito.
 
+*Nota 2026-10-11 (asientos):* «no se comparte entre personas por prorratear costo» sigue valiendo: repartir un costo
+no autoriza compartir una cuenta. Lo que cambió es que la demanda puede **declarar** que varias personas usan un
+mismo asiento (`seatSharing`, con su motivo), que un asiento pagado está ocioso (`idleSeats`) y que una herramienta
+se tiene bajo varios planes en un período; «cantidad por seat corresponde a usuarios únicos» pasa a ser «todo asiento
+pagado se usa, se comparte o se declara ocioso». Decisión:
+[composición de recursos](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
+
 Portfolio declara unidades por recurso/período y cuenta, junto con unidades internas y no asignadas. Todas suman
 al denominador; la cuota deriva con Decimal. La reconciliación muestra unidades, costo mensual completo,
 atribución a cuentas, parte interna, no asignada y residual de precisión. Sin catálogo/fecha o precio vigente
@@ -1400,6 +1407,10 @@ El contrato de los datos y las reglas de composición son de la plantilla y vive
   imprimen aparte, en su moneda y fuera de todo total. El calendario de pagos sale cuando el brief declara
   `paymentMilestones`, la misma lista de participaciones que recibe `compose schedule --milestones`: los importes
   los calcula esa lectura, sus rechazos llegan tal cual y, en un documento, cada hito dice cuándo se cobra.
+  *Nota 2026-10-11 (posterior):* son tres bloques desde el
+  [delta de opciones y cortesía](#delta-2026-10-11--opciones-cortesía-y---out-después-del-primer-caso-real), que
+  agrega las opciones adicionales; y «un mes con neto cero no imprime nada» tiene desde ahí una excepción, la línea
+  bonificada que el brief pide mostrar.
 - **Siempre un borrador.** Sale con exit 3 y `status: "draft"`, como toda lectura de una cotización en revisión. Los
   datos llevan `source { system, calculationId, digest, engineVersion }`, que llega al manifiesto de la plantilla
   y nunca se imprime.
@@ -1486,6 +1497,91 @@ No describir nada de esta lista como existente.
   y 6 condiciones).
 - Un documento en una moneda distinta de la de la cotización.
 - Generar sin un Chromium local: como todo documento de `scripts/documents/`, usa Playwright.
+
+## Delta 2026-10-11 — opciones, cortesía y `--out`, después del primer caso real
+
+Posterior al delta del documento, el mismo día. El primer caso real se cotizó de punta a punta —un servicio
+gestionado de doce meses, con su documento para el cliente— y dejó tres cosas que el flujo no podía hacer bien. El
+operador (CEO) pidió corregirlas de forma robusta. No cambian el kernel, ningún contrato de entrada ni lo que congela
+un artefacto. La cuarta corrección de ese día, los asientos y los períodos de la demanda, está en la
+[decisión de composición](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
+Contrato: [documento](../documentation/finance/cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11)
+y [`--out`](../documentation/finance/cotizador-v3-contrato-y-validacion.md#--out-una-cotización-calculada-o-nada-2026-10-11).
+Los datos y las reglas de composición son de la plantilla:
+[su README](../commercial/templates/cotizacion-a4/README.md#versión-2-varias-líneas-con-precio).
+
+- **Una opción adicional sale de su propia cotización congelada.** `compose document --option <clave>=<artefacto>`,
+  repetible hasta ocho veces. Cada opción es la cotización de esa opción sola, verificada por replay como la base. Su
+  precio es el neto de uno de sus períodos, y por eso se exige que esté calculada, en la moneda de la base, con el
+  mismo neto en todos sus períodos y sin costos que el cliente paga directo. El brief nombra exactamente las opciones
+  entregadas, con su nombre y su unidad, y no tiene clave para el precio. Nada de una opción entra a las líneas, al
+  neto, al impuesto ni al total. Rechazo propio: `QUOTE_DOCUMENT_OPTION_INVALID`. *Por qué:* el documento ya tenía una
+  regla, que toda cifra sale de una cotización congelada. Una opción con el precio escrito en un texto era la única
+  cifra del documento sin cálculo detrás: nadie le había revisado costo, piso ni margen, y quedaba vieja al volver a
+  cotizar. *Descartado:* un importe en el brief (rompe esa regla) y una fila de la cotización base marcada como
+  opcional (entraría al neto, al impuesto y al total de algo que el cliente todavía no compra).
+- **Una cortesía sale de una fila que la cotización bonifica.** Una línea que la cotización deja en cero con un
+  ajuste explícito sigue sin imprimir nada por defecto. Si el brief marca su clave con `courtesy: true`, se imprime
+  como «Bonificado» con su valor de referencia: el precio que la fila tenía antes de la rebaja, leído del artefacto
+  por una función propia y segura para el cliente (`clientSafeWaivedItems`). No suma a ningún total, y una línea que
+  se cobra no se puede marcar. `compose preview` y la frontera de siempre (`clientSafePeriodItems`) no cambiaron.
+  *Por qué:* decir cuánto vale lo que se regala es una cifra como cualquier otra, y sólo es cierta si la cotización
+  de verdad costeó esa fila y de verdad la bonificó. Marcarla es una decisión de presentación; bonificarla es una
+  decisión comercial que queda en la demanda, con su motivo, y que deja la fila marcada bajo su piso. *Descartado:*
+  imprimir toda fila bonificada (una cortesía se pide, no se supone) y un valor de referencia escrito en el brief.
+- **`--out` es una cotización calculada o nada.** `calculate`, `quote` y `compose prepare|quote` escriben `--out`
+  sólo si la cotización calcula. Una corrida bloqueada imprime todo lo que encontró, sale con 2, no escribe nada y lo
+  dice en `runNotices.output` (`written: false`, `reason: "QUOTE_NOT_CALCULATED"`); la corrida corregida usa el mismo
+  `--out`. `--keep-blocked`, que exige `--out`, guarda el artefacto bloqueado a propósito para `explain`, `replay`,
+  `compose assess` y `compose commitments`, y lo rotula (`KEPT_BLOCKED`). Un archivo que existe nunca se sobrescribe.
+  *Por qué:* un artefacto bloqueado en la ruta de la cotización tenía el nombre y la forma de una cotización sin
+  serlo, y obligaba a elegir entre inventar otro nombre o borrar un archivo, que es justo lo que este flujo prohíbe
+  hacer con un artefacto. *Descartado:* sobrescribir la ruta en la corrida siguiente (ningún artefacto se
+  sobrescribe) y dejar de escribir del todo el bloqueado (tiene lectores propios).
+
+**Límites que se declaran.**
+
+- Un servicio gestionado no tiene puesta en marcha en el catálogo, así que su cotización no tiene una fila que
+  bonificar: su «puesta en marcha bonificada» queda como un texto sin valor de referencia hasta que el catálogo la
+  costee (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC`).
+- Una opción que sólo agrega dedicación de personas que ya están en la cotización base es una línea nueva en su
+  propia cotización: vuelve a llevar el fee de plataforma por línea y su parte de las herramientas base. Su costo
+  está sobrestimado y su margen es una cota inferior; el precio impreso no cambia
+  (`OPTION_QUOTES_REPEAT_PER_LINE_FEES`, agregado al ledger).
+- La duración del contrato y una fecha de inicio que el cliente define después siguen sin ser un dato: una
+  cotización tiene meses fechados desde su fecha de cotización.
+- El reparto en persona y kit sigue sin ser una forma del documento, y número de cotización, versiones, QR, firmas y
+  aprobación siguen perteneciendo al cotizador de Greenhouse. Llevar este diseño allá es el paso acordado y **no ha
+  empezado**.
+
+**Reglas para agentes.**
+
+- **NUNCA** escribir el precio de una opción ni un valor de referencia: la opción se cotiza y se pasa con `--option`;
+  la cortesía se bonifica en la cotización y se marca en el brief.
+- **NUNCA** presentar una opción como parte del total, ni una línea que se cobra como una cortesía.
+- **NUNCA** tratar un artefacto guardado con `--keep-blocked` como una cotización.
+- **SIEMPRE** corregir la demanda y repetir con el mismo `--out` cuando una corrida queda bloqueada.
+- **SIEMPRE** decir, al entregar una opción que sólo suma dedicación, que su margen es una cota inferior.
+
+**Medido el 2026-10-11.** Ejemplo versionado `designer-startup-courtesy` en
+[`data/pricing/v3-operating/`](../../data/pricing/v3-operating/README.md), con sus dos opciones, cada una con su
+demanda y su artefacto (motor `1.3.0`, catálogo v10 y policy v11). Importes en CLP:
+
+| Ejemplo | Líneas | Neto | Impuesto y total | Opciones | Páginas |
+| --- | --- | --- | --- | --- | --- |
+| `designer-startup-courtesy` (tres meses) | 3 meses × 2.550.000 = 7.650.000; puesta en marcha «Bonificado», valor de referencia 320.000 | 7.650.000 | IVA 19 %: 1.453.500; total 9.103.500 | 2.580.000 «al mes» y 3.570.000 «por mes de campaña» | 5 |
+
+- Los datos vueltos a emitir son idénticos al versionado `designer-startup-courtesy.document.json`. Sin brief, el
+  andamio lista la clave bonificada (`design:setup`, 320.000) bajo `waived` y las dos opciones bajo `options`.
+- En la cotización, la fila bonificada queda marcada bajo su piso; el documento no cambia eso.
+- Una corrida bloqueada con `--out` no dejó archivo y trajo `runNotices.output` con `written: false`; con
+  `--keep-blocked` y otra ruta, el artefacto bloqueado quedó escrito y `compose cash` y `compose document` lo
+  rechazaron.
+- `pnpm pricing:v3:test`: 27 archivos y 1.359 pruebas. `replay` de los 24 artefactos versionados bajo
+  `data/pricing/**`: todos `verified: true`.
+
+Evidencia fechada. Los artefactos que se agregaron a la carpeta de datos son el de `designer-startup-courtesy` y los
+de sus dos opciones.
 
 ## Evidencia y rutas de operación
 
