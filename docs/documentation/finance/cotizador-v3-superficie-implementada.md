@@ -431,6 +431,10 @@ Versiones vigentes (2026-10-11), qué imprime cada comando. Hay un comando nuevo
   pasadas, fechas que caen en los próximos 30 días y vigencias que ya terminaron. Sólo estas últimas bloquean una
   cotización de esa fecha. Con `--current` incluye además el digest del catálogo de créditos.
 - `compose assess` agrega `costEvidencePriority`, descrito en la sección de evaluación.
+- `compose split --input <artefacto> --tools <ids|all>` presenta una cotización ya calculada en dos cifras por
+  fila, la persona y un kit con las herramientas elegidas, sin cambiar el total. Sirve para vender una persona por
+  dedicación mostrando las herramientas como ítem propio. Avisa si una de las dos partes queda bajo el piso aunque
+  la fila lo cumpla. Es una lectura interna (trae costos), no un documento para el cliente.
 - Rechazos nuevos del [registro](../../../src/lib/finance/pricing-v3/errors.ts), ambos con salida 1:
   `CURRENT_VERSIONS_MISMATCH` (el puntero y un archivo que nombra no coinciden) y `CURRENT_VERSIONS_CONFLICT` (el
   `--confirm` de `current set` no es el digest del puntero que se reemplaza, o se pasó un `--confirm` cuando el

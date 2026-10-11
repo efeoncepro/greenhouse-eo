@@ -444,6 +444,17 @@ Aquí las reglas.
   muestra el cotizador. No proponer «conectar la nómina real», no llamar al costo del catálogo «lo que Efeonce paga»,
   no escribir el sueldo de una persona en ningún archivo.
 
+## Presentar persona y kit de herramientas (delta 2026-10-11)
+
+`compose split --input <artefacto> --tools <id,id|all> [--label …] [--out …]` presenta el neto ya cotizado en dos
+cifras por fila: persona y kit de las herramientas elegidas. Es lectura de un artefacto congelado (se verifica con
+replay antes): `tools.net + person.net` = neto de la fila, el total no cambia, exit 3. `--tools` es obligatorio; qué
+se muestra aparte lo decide el operador (recomendado: base de trabajo dentro del fee; especializadas e IA aparte).
+El kit toma el precio de política de esas herramientas con el ajuste de la fila y sube al múltiplo de la moneda; el
+factor de mercado y el redondeo de la fila quedan en la persona. Informar `person.belowFloor` y
+`partsBelowFloorWhileRowMeetsIt` si aparecen; no corregirlos a mano. La salida trae costos: no va al cliente.
+Rechazos: `SPLIT_TOOL_NOT_ATTRIBUTED`, `SPLIT_REQUIRES_CALCULATED_QUOTE`, `SPLIT_ATTRIBUTION_NOT_TRACEABLE`.
+
 ## Mantenimiento: versión nueva y puntero (delta 2026-10-11)
 
 Pasos completos, flags y problemas:
@@ -501,6 +512,7 @@ No editar `current.json` a mano, ni editar o borrar una versión anterior: los a
 | Resumen derivado (`compose prepare`, `compose quote`, `replay`): líneas bajo el piso (`floorNet`, `netShortOfFloor`), `engineVersion`, `commercialAdjustments`, `priceRounding`, `marketFactor`, `estimateExposure` | `src/lib/finance/pricing-v3/resources/summary.ts` |
 | Fechas de precios: `priceReview` de `resources inspect` y `runNotices.priceDates`; `reviewBy` en el contrato de la policy | `src/lib/finance/pricing-v3/resources/price-review.ts`, `composition-contracts.ts` |
 | Puntero de versiones vigentes: schema, verificación, `--current`, `current show|set` | `src/lib/finance/pricing-v3/adapters/current-versions.ts`, `data/pricing/v3-operating/current.json` |
+| Persona y kit de herramientas sobre un artefacto congelado (`compose split`) | `src/lib/finance/pricing-v3/resources/price-split.ts` |
 | Gaps económicos, `costEvidencePriority`, veredicto del piso por línea (con `marketFactor`) y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
 | Snapshots/digests/IO/mantenimiento local | `src/lib/finance/pricing-v3/adapters/{local-snapshot,catalog-local,resource-composition,resource-maintenance}.ts` |
 | Adapter CLI, flags, exit, clasificación de errores, escritura exclusiva y `runNotices` | `scripts/commercial/pricing-v3.ts` |

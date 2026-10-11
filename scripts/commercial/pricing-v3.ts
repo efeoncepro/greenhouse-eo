@@ -23,6 +23,7 @@ import {
 } from '../../src/lib/finance/pricing-v3/resources/readiness'
 import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
 import { quotePriceNotices } from '../../src/lib/finance/pricing-v3/resources/price-review'
+import { splitQuotedPrice } from '../../src/lib/finance/pricing-v3/resources/price-split'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -88,6 +89,8 @@ const options = {
   impact: { type: 'string' },
   confirm: { type: 'string' },
   reason: { type: 'string' },
+  tools: { type: 'string' },
+  label: { type: 'string' },
   current: { type: 'boolean' },
   help: { type: 'boolean' }
 } as const
@@ -224,7 +227,7 @@ try {
       'confirm',
       'help'
     ],
-    compose: ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'format', 'brief', 'help'],
+    compose: ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'format', 'brief', 'tools', 'label', 'help'],
     current: ['catalog', 'policy', 'credits', 'reason', 'confirm', 'input', 'out', 'help'],
     help: ['help']
   }
@@ -294,7 +297,7 @@ try {
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md]',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
           current:
@@ -382,18 +385,20 @@ try {
     }
   } else if (command === 'compose') {
     if (
-      !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'workload'].includes(subcommand) ||
+      !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'split', 'workload'].includes(subcommand) ||
       positionals.length !== 2
     )
       throw new PricingV3Error('INVALID_ARGUMENT')
 
     const allowed = ['assess', 'preview'].includes(subcommand)
       ? ['input', 'out', 'format', 'help']
-      : subcommand === 'workload'
-        ? ['input', 'brief', 'out', 'help']
-        : subcommand === 'scaffold'
-          ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
-          : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
+      : subcommand === 'split'
+        ? ['input', 'out', 'tools', 'label', 'help']
+        : subcommand === 'workload'
+          ? ['input', 'brief', 'out', 'help']
+          : subcommand === 'scaffold'
+            ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
+            : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
 
     permit(allowed)
 
@@ -444,6 +449,36 @@ try {
 
       if (values.out) writeNew(values.out, output)
       process.stdout.write(output)
+      process.exitCode = 3
+    } else if (subcommand === 'split') {
+      // Which tools are shown apart is the operator's presentation choice: there is no default set to fall back on.
+      const requested = required('tools')
+        .split(',')
+        .map(id => id.trim())
+
+      if (
+        requested.some(id => !id) ||
+        new Set(requested).size !== requested.length ||
+        (requested.includes('all') && requested.length > 1)
+      )
+        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'tools' })
+      if (
+        values.label !== undefined &&
+        (!values.label.trim() || values.label.length > 120 || /[\r\n]/.test(values.label))
+      )
+        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'label' })
+
+      // Same check as `replay`: nothing is derived from an artifact that does not reproduce its own digest.
+      const artifact = replayResourceComposition(load('input'))
+
+      const result = splitQuotedPrice(artifact.semantic.result, artifact, {
+        tools: requested[0] === 'all' ? 'all' : requested,
+        ...(values.label ? { label: values.label } : {})
+      })
+
+      if (values.out) writeNew(values.out, json(result))
+      process.stdout.write(json(result))
+      // A composition is always under review, exactly as `assess` and `preview` report it; a rejection exits 1.
       process.exitCode = 3
     } else {
       const artifact = runResourceComposition(loadCatalog(), load('policy'), load('credits'), load('input'))

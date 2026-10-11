@@ -735,6 +735,40 @@ tiene política y la corrida queda `needs_input` con `MISSING_CATALOG_SELECTION`
 - La excepción bajo un piso es del CEO, caso por caso, y nunca es referencia para otro cliente.
 - El 40/35 de `compose assess` sigue siendo una propuesta genérica sin aprobar, nunca un piso.
 
+## Delta 2026-10-11 — presentar persona y kit de herramientas (`compose split`)
+
+**Contexto.** En la venta de una persona por dedicación, las herramientas y provisiones son cerca de un quinto del
+costo de un perfil creativo. Con todo dentro de un solo fee, el precio se compara mal con una contratación directa.
+El operador pidió una recomendación y aceptó mostrar las herramientas especializadas como un ítem propio.
+
+**Decisión.** `compose split` deriva, de un artefacto congelado y de una lista de herramientas que entrega quien
+llama, dos cifras por fila y periodo: kit y persona. Vive en `resources/price-split.ts` (función pura) y en el
+adaptador CLI. No cambia el kernel, ningún contrato de entrada, la demanda ni lo que congela un artefacto.
+
+**Regla de reparto.** El kit parte del precio que el kernel ya guardó por componente, toma la misma proporción de
+descuento o ajuste de su fila y sube al múltiplo de redondeo de la moneda. La persona es el resto del neto de la
+fila, por lo que la suma es exacta por construcción. El factor de mercado y el redondeo de la fila quedan en la
+persona, porque el kernel los aplica al componente humano y a la fila.
+
+**Alternativas descartadas.**
+
+- *Un campo en la demanda que declare qué herramientas se cobran aparte:* cambia un contrato congelado para algo
+  que es presentación, y obliga a decidirlo antes de cotizar.
+- *Prorratear el neto de la fila por costo:* le daría al kit un margen que la política no le dio cuando la base es
+  sólo humana, y repartiría el factor de mercado sobre herramientas que el motor no ajusta.
+- *Incluirlo en el resumen por defecto:* nadie eligió qué herramientas separar; el cotizador no debe adivinarlo.
+
+**Reglas para agentes.**
+
+- **NUNCA** presentar el reparto como otro precio: el total es el del artefacto.
+- **NUNCA** elegir por cuenta propia qué herramientas van aparte; es decisión del operador.
+- **SIEMPRE** informar si una parte queda bajo el piso mientras la fila lo cumple.
+- La salida es interna: trae costos y márgenes.
+
+**Abierto.** Si el kit de un servicio gestionado de varias líneas debe redondearse una vez por periodo y no por
+fila; si el redondeo del kit debe ser hacia arriba cuando objetivo y piso coinciden; una vista del reparto apta
+para el cliente.
+
 ## Evidencia y rutas de operación
 
 - [Manual para agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).

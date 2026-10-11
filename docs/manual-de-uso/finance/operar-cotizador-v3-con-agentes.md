@@ -184,6 +184,7 @@ No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interp
 | `compare`                                              | Dos artefactos compatibles de snapshot o catálogo                  | Diferencias internas; el CLI actual no compara artefactos de composición directamente                        |
 | `compose assess`                                       | Artefacto compuesto                                                | Gaps, `costEvidencePriority` (qué dato estimado confirmar primero), margen propuesto y piso de la política por línea; siempre revisión, no aprueba excepciones; JSON |
 | `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, importes en escala de moneda, sin emisión   |
+| `compose split`                                        | Artefacto compuesto calculado + `--tools`                          | El mismo neto presentado en dos cifras por fila: persona y kit de herramientas; no cambia el total; JSON     |
 | `catalog preview` / `catalog apply`                    | Change-set monetario; impacto de briefs opcional                   | Preview / sucesor nuevo; apply exige digest confirmado y `--out`                                             |
 | `resources preview` / `resources apply`                | Replacement completo policy/créditos; impacto de demandas opcional | Preview / sucesor nuevo; mismo contexto/hash/impacto, sin selección automática                               |
 | `export`                                               | Artefacto completo dentro de policy                                | Gate propio de borrador: composiciones review-only actuales siguen bloqueadas                                |
@@ -964,6 +965,39 @@ Tampoco se decidió, a propósito, redondear sobre el total del periodo en vez d
 terminaciones comerciales como 990.000 (un precio así se registra como neto acordado), ni factores por tipo de
 cliente (también neto acordado) ni factores de talento por perfil o seniority (se expresan como costo específico).
 No resolver nada de esto por cuenta propia en una cotización.
+
+## Presentar el precio en fee de la persona y kit de herramientas
+
+Sirve cuando se vende una persona por dedicación y conviene mostrar las herramientas como un ítem propio: el cliente
+compara el fee de la persona con una contratación y ve aparte lo que cuestan Adobe o las herramientas de IA. Es una
+**presentación** de una cotización ya calculada: el total no cambia y no se recalcula nada.
+
+```bash
+pnpm --silent pricing:v3 compose split --input artefacto.json --tools adobe,higgsfield,magnific
+```
+
+- `--tools` es obligatorio. Qué herramientas se muestran aparte lo decide el operador; el cotizador no lo adivina.
+  `all` separa todas las que la cotización atribuye. Recomendación vigente: dejar dentro del fee lo básico de trabajo
+  (Notion, Microsoft 365) y mostrar aparte las especializadas y de IA.
+- `--label "…"` cambia el nombre del kit (por defecto «Kit de herramientas»). `--out` guarda el JSON.
+- Sale con código 3, como `compose assess`: es una lectura para revisar, no una cotización emitida. El artefacto se
+  verifica antes de leerlo; uno alterado se rechaza con `REPLAY_MISMATCH`.
+
+Cómo leer la salida (`pricing-v3-price-split/1`):
+
+- En cada fila y periodo, `tools.net + person.net` es exactamente el neto de la fila. `totals` trae las dos sumas.
+- **Kit:** el precio que la política ya le había dado a esas herramientas, con el mismo descuento o ajuste de la
+  fila, subido al múltiplo de redondeo de la moneda. **Persona:** el resto de la fila: la persona, la plataforma,
+  las provisiones, las herramientas que no se separaron y el redondeo de la fila.
+- El factor de mercado por país queda entero en la persona: el motor sólo lo aplica al componente humano.
+- `person.belowFloor` y `partsBelowFloorWhileRowMeetsIt` avisan cuando una parte queda bajo el piso aunque la fila
+  lo cumpla. Pasa sobre todo cuando objetivo y piso son iguales y el kit se redondea hacia arriba. Importa si el
+  cliente puede quitar el kit: lo que queda es esa parte de persona. Se informa al operador; no se corrige a mano.
+- La salida trae costos y márgenes: es interna. No se entrega al cliente tal cual.
+
+Ejemplo verificado (diseñador senior dedicado en Chile, CLP, un periodo, versiones vigentes del 2026-10-11): fila
+mensual 2.430.000 = persona 2.080.000 + kit 350.000 (Adobe, Higgsfield y Magnific); margen 30,3 % y 30,2 %; ninguna
+parte bajo el piso de 25 %. La puesta en marcha (150.000) queda entera en la persona.
 
 ## Qué no hacer
 
