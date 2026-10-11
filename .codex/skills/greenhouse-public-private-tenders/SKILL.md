@@ -260,8 +260,15 @@ excepción de una cuenta nunca es referencia para otra.
 Si las bases piden un trabajo acotado con hitos, decláralo `engagementForm: "on_demand"`: es la forma del compromiso,
 no una cuarta oferta (+10% al precio sobre On-Going, mismo piso). Antes de comprometer la oferta revisa `compose
 schedule` (calendario de pagos por hito) y `compose commitments` (compromisos con proveedores que sobreviven al
-encargo); `compose cash` no es margen ni decide precio. Sin modelar: terceros (freelancers, producción, derechos,
-medios), reserva de contingencia de alcance fijo y el plazo del contrato: costéalos aparte y declara el supuesto.
+encargo); `compose cash` no es margen ni decide precio. Una licitación con producción y medios ya se cotiza completa
+(contrato 1.4.0, 2026-10-11): cada costo que se compra y se refactura es una fila propia con la regla de su categoría
+(producción, talento e impresión: 10% de gestión con piso 5%; medios y licencias: al costo) y lo que el cliente paga
+directo es una nota sin total. 🔴 Con terceros el piso se lee sobre el margen del trabajo propio (`ownWork`), nunca
+sobre el mezclado: juzgar por el mezclado rechaza una oferta sana o lleva a bajarle el precio al equipo. Un servicio
+gestionado declarado On-Demand lleva una reserva de contingencia de 12% del costo de personas, que sale sólo por una
+renuncia declarada con motivo. Sin modelar: el buffer de un servicio On-Going con multas (el caso típico de una
+licitación), cuándo se le paga al proveedor, derechos de uso que sobreviven al encargo y el plazo del contrato:
+costéalos aparte y declara el supuesto.
 
 Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
 gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. managed_service proyecta fee,

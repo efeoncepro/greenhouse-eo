@@ -6,10 +6,10 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
 
 **Empieza aquí (2026-10-11).** Las versiones vigentes no se nombran a mano: las nombra `current.json`, y un comando
 las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el comando, no esta línea. Como hecho
-fechado: al cierre del 2026-10-11 eran `catalog.review-v9.json`,
+fechado: la noche del 2026-10-11 eran `catalog.review-v10.json`,
 `resources.review-v10.json` y `../v3-resources/ai-credits.review-v1.json` (por la mañana, tras la oferta SEO/AEO,
-eran el catálogo v8 y la policy v6; por la tarde la policy pasó por v7, v8 y v9). La siguiente policy sería v11 y
-el siguiente catálogo v10.
+eran el catálogo v8 y la policy v6; por la tarde el catálogo pasó a v9 y la policy por v7, v8, v9 y v10; por la
+noche el catálogo pasó a v10). El siguiente catálogo sería v11 y la siguiente policy v11.
 
 ```bash
 pnpm --silent pricing:v3 current show
@@ -21,8 +21,12 @@ Cómo funciona el puntero, cómo se mueve y qué archivos son de v6:
 v7: [delta de staffing](#delta-2026-10-11--catálogo-v7-piso-de-margen-de-staffing). Qué traen el catálogo v9 y las
 policies v7 y v8 (forma del engagement, puesta en marcha, Adobe como se factura, plazos de compromiso y tres
 lecturas nuevas):
-[último delta](#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
-Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasar la ruta», léelo como historia fechada.
+[delta del catálogo v9](#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
+Qué trae el catálogo v10 (costos de terceros de un encargo, reserva de contingencia y factores de país cerrados) y
+cómo se lee una cotización con terceros:
+[último delta](#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
+Donde una viñeta o un delta anterior dice «el vigente es…», «último delta» o «hay que pasar la ruta», léelo como
+historia fechada.
 
 - `current.json` (`pricing-v3-current/1`): puntero a las versiones vigentes de catálogo, policy y créditos, cada una
   con ruta, versión y digest, más `updatedAt` y `reason`. Es el único archivo de esta carpeta que se reemplaza; se
@@ -125,6 +129,16 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
   2026-10-11. No toca políticas de precio ni pisos.
 - `engagement-forms-setup-clp.change.json` (`pricing-v3-catalog-change/1`): las 13 operaciones que produjeron v9
   desde v8 (5 `add`, 7 `replace` y 1 `retire`).
+- `catalog.review-v10.json` (change-set `third-party-contingency-factors.change.json`, aplicado sobre v9 con
+  `catalog preview|apply`): cinco reglas de precio para costos de terceros, una por categoría (`third_party_policy`:
+  `production`, `talent` y `printing` con recargo de 10 %, piso 5 % y redondeo comercial; `media` y `licences` al
+  costo, sin redondeo); dos reservas de contingencia (`contingency_reserve`: 12 % del costo de las personas para
+  `creative-managed-service` y `seo-aeo-managed-service` vendidos On-Demand), todo `estimated` y vigente desde el
+  2026-10-11; y los factores de país que seguían estimados, cerrados como valores de política `confirmed` desde el
+  2026-10-12. No toca políticas de precio ni pisos. Las tasas y la reserva son estimaciones propuestas por el agente
+  que el CEO aceptó; los factores de país los cerró el CEO.
+- `third-party-contingency-factors.change.json` (`pricing-v3-catalog-change/1`): las 15 operaciones que produjeron
+  v10 desde v9 (7 `add` y 8 `replace`).
 - `managed-care-colombia.demand.json` → `managed-care-colombia.artifact.json`: el servicio gestionado sintético de
   `managed-care.*` para un cliente de Colombia con equipo en Colombia, en COP y con fecha 2026-10-11. Es el primer
   artefacto firmado por el motor `pricing-v3-local/1.2.0` y el que la guarda de artefactos congelados exige para ese
@@ -137,6 +151,11 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
   Chile, On-Demand, en CLP, con una licencia de tres de Creative Cloud Pro, Higgsfield y Magnific. Es el primer
   artefacto firmado por el motor `pricing-v3-local/1.3.0` y el que la guarda exige para ese motor. Se congeló con el
   catálogo v9 y la policy v7.
+- `managed-on-demand-third-party.demand.json` → `managed-on-demand-third-party.artifact.json`: un servicio
+  gestionado creativo vendido On-Demand en Chile, un período, en CLP, con cuatro costos de terceros declarados: una
+  producción en CLP, talento en USD y medios al costo, refacturados, y una licencia que el cliente paga directo. Es
+  el primer artefacto firmado por el motor `pricing-v3-local/1.4.0` y el que la guarda exige para ese motor. Los
+  proveedores del ejemplo son marcadores, no proveedores reales. Se congeló con el catálogo v10 y la policy v10.
 - `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
   dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
@@ -293,6 +312,9 @@ Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador
   Los factores de talento estimados salen de avisos de empleo y guías salariales leídos el 2026-10-11, uno por país
   para todos los perfiles. Los de mercado confirmados los decidió el operador (CEO) desde los rangos de la hoja
   «Factor País» del workbook, que era una tabla guía que ninguna fórmula referenciaba.
+  *Corrección 2026-10-11 (noche):* la tabla es la de v5. El CEO cerró los factores de país ese mismo día («deja eso
+  cerrado ya»): en el catálogo v10 todos los que aquí dicen «estimado» son valores de política `confirmed` desde el
+  2026-10-12, con los mismos valores. Una cotización fechada el 2026-10-11 todavía lee la estimación.
 - **Piso en Colombia y Perú.** Su factor de mercado declara `floorBasis: "base_market"`: la cotización se calcula
   con el contrato 1.2.0 y el piso de cada fila acompaña al factor. A precio de política ninguna línea sale marcada,
   aunque el margen real quede cerca de 41 % (CO) y 43 % (PE); un descuento o un neto pactado adicional sí cruza el
@@ -312,6 +334,8 @@ Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador
   Factores de talento por perfil o seniority: hoy son un costo específico.
 - **Ledger.** `operational-gaps.json` agregó `COUNTRY_FACTORS_UNVALIDATED` (validar cada factor con contrataciones
   reales y con negocios cerrados o perdidos) y actualizó `LOCALIZED_TALENT_COSTS`.
+  *Corrección 2026-10-11 (noche):* `COUNTRY_FACTORS_UNVALIDATED` quedó cerrado por el CEO; no es un pendiente del
+  operador. Un factor se revisa sólo si una contratación real o un negocio cerrado en ese país lo contradice.
 - **Corrida del 2026-10-11** con v5 + v5. `managed-care-colombia.demand.json`: COP 28.100.000 al mes, margen real
   0,4152, ninguna línea marcada; el artefacto versionado responde `verified: true`. La misma demanda con un
   `agreed_net` de 24.000.000: margen 0,3153 y las seis líneas marcadas, cada una con su `floorNet` y
@@ -427,6 +451,8 @@ puntero nombre la versión de número más alto de cada familia, y el mensaje tr
   USD). CLF sigue sin regla de redondeo y con un tipo de cambio estimado de 2025. Un registro de factor duplicado
   pasa `catalog preview` y recién bloquea al cotizar, con `AMBIGUOUS_SELECTION`. `compose assess` no lista los
   factores de país estimados como brecha.
+  *Corrección 2026-10-11 (noche):* lo último dejó de importar desde el 2026-10-12: con el catálogo v10 ningún
+  factor de país es estimado.
 - **Ledger.** `operational-gaps.json` agregó `UNIT_PRICE_REVIEW` y actualizó `QUOTE_FX_REVIEW` y
   `LOCALIZED_TALENT_COSTS`.
 
@@ -498,6 +524,7 @@ y [tres lecturas](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_W
   `adobe-without-discount.change.json`; `designer-on-demand.demand.json` y `designer-on-demand.artifact.json`. El
   puntero quedó, al cierre del 2026-10-11, en catálogo v9 + policy v10 + créditos v1; lo vigente lo imprime
   `current show`.
+  *Corrección 2026-10-11 (noche):* esa noche el puntero pasó a catálogo v10 (delta siguiente).
 - **Qué no se toca.** Las versiones anteriores y todos los artefactos. Las tres ofertas y sus pisos no cambiaron.
 - **Forma del engagement.** El brief admite `"engagementForm": "on_going" | "on_demand"` (los ids son datos del
   catálogo). Es aparte de `engagementCode`, que sigue en `monthly` y sigue eligiendo la política. On-Demand lleva una
@@ -545,6 +572,8 @@ y [tres lecturas](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_W
 - **Lo que todavía no se puede.** Declarar el plazo del contrato con el cliente (una cotización tiene períodos).
   Decir si un asiento se compra para el trabajo. Un engagement de menos de un mes se expresa como horas dentro de un
   período. No se modelan costos de terceros de un encargo ni una reserva de contingencia para alcance fijo.
+  *Corrección 2026-10-11 (noche):* lo último dejó de ser cierto ese mismo día: los dos se modelan desde el contrato
+  1.4.0 y el catálogo v10 (delta siguiente).
 
 ### Corridas del 2026-10-11
 
@@ -572,3 +601,70 @@ y [tres lecturas](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_W
   un mes y no dejan nada.
 
 Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `designer-on-demand`.
+
+## Delta 2026-10-11 — catálogo v10 y contrato 1.4.0: costos de terceros, reserva de contingencia y factores de país
+
+Decisiones: [contrato 1.4.0](../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-140-costos-de-terceros-y-reserva-de-contingencia)
+y [cómo se lee una cotización con terceros y reserva](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--contrato-140-y-catálogo-v10-cómo-se-lee-una-cotización-con-terceros-y-reserva).
+
+- **Archivos nuevos.** `catalog.review-v10.json` (versión `operating-review-2026-10-11-v10`) y su change-set
+  `third-party-contingency-factors.change.json`; `managed-on-demand-third-party.demand.json` y
+  `managed-on-demand-third-party.artifact.json`. El puntero pasó a nombrar el catálogo v10; policy (v10) y créditos
+  (v1) no cambiaron. Lo vigente lo imprime `current show`.
+- **Qué no se toca.** Las versiones anteriores y todos los artefactos. Las tres ofertas, sus políticas y sus pisos
+  no cambiaron.
+- **Costos de terceros.** El brief declara cada costo en `thirdPartyCosts[]` con categoría, concepto, proveedor,
+  importe, moneda, cantidad, períodos y evidencia. `settlement: "reinvoiced"` lo vuelve una fila propia de la
+  cotización, con el precio y el piso de la regla de su categoría; `settlement: "client_direct"` lo deja como una
+  nota que no entra a ningún total. La cotización nunca escribe una tasa. `periodIds` es obligatorio.
+- **Reserva de contingencia.** No se declara: sale del catálogo según la oferta y la forma. Hoy la llevan los dos
+  servicios gestionados cuando el brief declara `"engagementForm": "on_demand"`. Es un costo, así que se vende con
+  el margen de la oferta y con la razón On-Demand. Sólo sale con
+  `"contingency": { "kind": "waived", "reason": "…" }`, y queda marcada.
+- **Dos márgenes.** El resumen trae el margen mezclado (`marginRateRoundedDown`) y el del trabajo propio
+  (`ownWork.marginRateRoundedDown`). El primero baja con todo lo que se refactura al costo o cerca; el segundo es el
+  que se compara con el piso de la oferta. No hay veredicto a nivel de cotización: el piso se juzga por fila.
+- **Quién decidió qué.** Las tasas de terceros y el 12 % de la reserva son estimaciones propuestas por el agente
+  que el CEO aceptó el 2026-10-11, para ajustar con el primer trabajo real. Los factores de país los cerró el CEO
+  ese día: no son un pendiente del operador. HubSpot no hace falta en las cotizaciones por ahora, según el CEO; su
+  precio queda pendiente a propósito.
+- **Ledger.** `operational-gaps.json` agregó `THIRD_PARTY_AND_CONTINGENCY` y cerró `COUNTRY_FACTORS_UNVALIDATED`.
+- **Lo que todavía no se puede.** Decir cuándo se le paga a un proveedor o si una compra ata más allá del trabajo;
+  cobrar una comisión sobre lo que el cliente paga directo; una tarifa de proveedores recurrentes; un tratamiento
+  de impuesto por fila; una cotización con terceros y sin ninguna línea de equipo; la reserva para un servicio
+  On-Going ganado en una licitación con multas; liberar la reserva después de la entrega.
+
+### Corridas del 2026-10-11 (noche)
+
+Todas sobre `managed-on-demand-third-party.artifact.json`, salvo donde se dice otra cosa. Los costos se nombran por
+su concepto.
+
+- `replay`: `verified: true`, motor `pricing-v3-local/1.4.0`. Costo 14.750.055, neto CLP 21.033.333, margen mezclado
+  0,2987. Terceros refacturados: costo 9.083.333 y neto 9.663.333. Trabajo propio: costo 5.666.722, neto 11.370.000,
+  margen 0,5016. Reserva 436.800, que es 12 % de 3.640.000. Ninguna fila marcada.
+- Filas de terceros: producción 4.500.000 → 4.950.000; talento, USD 1.250 → costo 1.250.000 y neto 1.380.000;
+  medios 3.333.333 → 3.333.333, exactos.
+- `compose assess`: `margin.ownWorkRate` 0,5016, `proposedFloorReadOn: "ownWorkRate"`, `belowProposedFloor: false`;
+  brechas `THIRD_PARTY_FX_EXPOSURE` (talento), `THIRD_PARTY_COST_EVIDENCE_REQUIRED` (medios) y
+  `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED`.
+- `compose preview`: fee del período 11.370.000 más tres ítems de terceros; `clientPaidDirectly` con la licencia,
+  USD 890, sin convertir.
+- `compose split --tools all`: herramientas 2.020.000, persona 9.350.000 y terceros 9.663.333.
+- `compose cash`: personas 3.640.000, provisiones 300.000, fee de plataforma 294.000, asientos y paquetes 995.922,
+  terceros 9.083.333 y reserva 436.800; caja nueva a proveedores 9.083.333; caja sobre capacidad contratada
+  11.950.000.
+- `compose schedule` con 50/50 y el anticipo en el período 1: 10.520.000 y 10.513.333. Con 30/70: 6.310.000 y
+  14.723.333, y el período 1 queda 2.773.333 por debajo de lo que cuestan sus proveedores.
+- `compose commitments`: tres compras a terceros vistas y fuera de la lectura
+  (`THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN`); un compromiso leído, la bandeja social con precio por año.
+- La misma demanda con la reserva en `waived` (fuera de esta carpeta, con `--current`): neto CLP 20.163.333, que son
+  870.000 menos; costo 14.313.255; `contingencyReserveWaived` 436.800 y la señal `CONTINGENCY_RESERVE_WAIVED`.
+- La misma demanda sólo con la nota `client_direct` y sin `engagementForm` (fuera de esta carpeta): motor
+  `pricing-v3-local/1.1.0`, neto CLP 9.530.000, y el supuesto
+  `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`.
+- El mismo ejemplo con equipo en Colombia y cliente en Perú (fuera de esta carpeta): fechado el 2026-10-11,
+  `ESTIMATED_SOURCE` nombra los factores de talento y de mercado y `runNotices.laterCatalogValues` avisa 8 registros
+  vigentes desde el 2026-10-12; fechado el 2026-10-12, ninguno de los dos, mismo costo y mismo neto.
+- `replay` de los 19 artefactos versionados bajo `data/pricing/**`: todos `verified: true`.
+
+Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `managed-on-demand-third-party`.

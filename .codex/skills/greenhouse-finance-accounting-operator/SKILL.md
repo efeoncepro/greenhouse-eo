@@ -362,8 +362,9 @@ el kernel Decimal calcula desde fuentes versionadas. **El costo de personas del 
 nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), así que el margen real en personas hoy
 es mayor que el que muestra V3. No «corregirlo» con payroll ni proponer conectarlo, y nunca escribir el pago de una
 persona en un artefacto o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de
-talento, base Chile; fuera de Chile son estimaciones propuestas por un agente) y el del cliente cambia el **precio**
-de la parte humana (factor de mercado). El FX de cotización es política del CEO con USD de referencia (CLP 1000 ·
+talento, base Chile) y el del cliente cambia el **precio** de la parte humana (factor de mercado). Los factores de
+país están cerrados: el CEO los cerró el 2026-10-11 y son valores de política confirmados desde el 2026-10-12, no
+estimaciones a la espera de su decisión; uno se revisa sólo si una contratación o un negocio real lo contradice. El FX de cotización es política del CEO con USD de referencia (CLP 1000 ·
 COP 3650 · MXN 19,25 · PEN 3,70), no el tipo contable ni spot; cada moneda redondea hacia arriba (CLP 10.000 ·
 USD 10 · PEN 50 · COP 50.000 · MXN 100) y en EUR aún no se emite.
 No introducir cifras del expediente como costos centrales sin fuente/fecha/mantenimiento gobernado.
@@ -395,4 +396,14 @@ preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca rep
 registra ledger/payroll/pagos/CRM, no compra tools y no promueve automáticamente el motor al canon.
 Tres lecturas de un artefacto: calendario de pagos (no es factura ni cobro), caja (nunca es margen ni decide precio) y
 compromisos con proveedores (una licencia Adobe comprada para un encargo de un mes se sigue cobrando hasta que renueva
-el contrato si nadie más la usa). Sin modelar: costos de terceros, reserva de contingencia de alcance fijo y duración del contrato.
+el contrato si nadie más la usa). Desde el contrato 1.4.0 (2026-10-11) una cotización lleva los costos de terceros
+que se compran y refacturan, cada uno como fila propia con la regla de su categoría (producción, talento e impresión:
+10% de gestión con piso 5%; medios y licencias: al costo; un costo que el cliente paga directo es una nota sin total),
+y un servicio gestionado On-Demand lleva una reserva de contingencia de 12% del costo de personas, como costo: se vende
+con el margen de la oferta y sale sólo por una renuncia declarada con motivo; staff augmentation no la lleva. Son
+estimaciones propuestas por el agente y aceptadas por el CEO. 🔴 Con terceros hay dos márgenes: el piso de la oferta se
+compara contra el del trabajo propio (`ownWork`), nunca contra el mezclado, que baja con todo lo refacturado cerca del
+costo. La caja nueva a proveedores incluye lo refacturado; la reserva no es caja ni pasivo. Sin modelar: cuándo se le
+paga al proveedor, una compra que obliga más allá del encargo (derechos de uso), comisión sobre lo que paga el cliente,
+tarifario de proveedores, el buffer de un On-Going de licitación con multas y la duración del contrato. El precio de
+HubSpot no es un insumo pendiente (CEO: hoy no se necesita en cotizaciones).

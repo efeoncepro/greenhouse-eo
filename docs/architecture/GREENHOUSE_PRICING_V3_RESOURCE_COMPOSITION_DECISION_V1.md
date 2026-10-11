@@ -41,6 +41,15 @@ consumo inválido, FX ausente o fecha incompatible → needs_input, sin total co
 Tool común obligatoria no desaparece por usar otro PMS cliente. Reemplazo de cuotas/precios exige versión nueva;
 quotes anteriores sólo se verifican desde sus propios datos congelados.
 
+*Nota 2026-10-11 (noche):* «no precios» y «ningún precio inline» siguen valiendo para personas, herramientas,
+créditos y provisiones. Desde el contrato `1.4.0` el brief de una demanda puede declarar además los costos de
+terceros del encargo (`thirdPartyCosts[]`). Cada uno lleva el importe de la cotización de un proveedor con su
+evidencia: es un costo con fuente, no un precio, y su regla de precio sale del catálogo por categoría; la demanda
+nunca escribe una tasa. El compositor lleva el brief al kernel sin tocarlo y sigue inyectando sus herramientas. Una
+reserva de contingencia de base `own_costs` descansa también sobre esas herramientas compuestas, y nunca sobre un
+costo de terceros.
+[ADR del motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-140-costos-de-terceros-y-reserva-de-contingencia).
+
 ## Verification / alternatives
 
 Tres escenarios de selección, asignación y costo (SEO, diseño y servicio multirol), negativos, replay y
@@ -105,6 +114,12 @@ cambian su precio; lo que cambia es cuántas licencias se contratan.
   proveedores de crédito. Un registro de catálogo que termina porque empieza su siguiente revisión, o que fue
   retirado, no se lista. Para una cotización, lo mismo filtrado a lo que usó sale en `runNotices.priceDates`
   ([flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones)).
+  *Nota 2026-10-11 (noche):* la lista de `subject` tiene un quinto valor, `third_party_quote`: la vigencia de la
+  cotización del proveedor de un costo de terceros refacturado (contrato `1.4.0`). Sale sólo en los avisos de una
+  cotización, por `costId` y concepto, con `blocksWith: "STALE_SOURCE"`. Y `blocksWith` puede ser `null` también en
+  una vigencia dura: la de un registro `contingency_reserve`, cuyo término no bloquea nada. Ese aviso lleva un campo
+  `consequence` que dice qué pasa en su lugar (la cotización siguiente sale sin reserva); para una cotización que
+  renuncia a la reserva, `blocksWith` es `CONTINGENCY_WAIVER_WITHOUT_RESERVE`.
 
 **Datos.** `resources.review-v6.json` (versión `operating-review-2026-10-11-v6`, cambio
 `stable-unit-prices.change.json` sobre v5): los 25 precios de herramienta quedan sin fecha de término y cada uno
@@ -236,6 +251,8 @@ una vez que se toma.
   HubSpot se contrata por año, según el CEO, pero su precio vigente está pendiente de evidencia y por eso no lleva
   plazo. La policy v8 (`supplier-contract-terms.change.json`) sólo agrega plazos: ningún importe, moneda ni unidad
   cambió. En ella los importes de Microsoft 365 eran precios públicos de lista, porque su factura estaba pendiente.
+  *Nota 2026-10-11 (noche):* el CEO dijo ese día que HubSpot no hace falta en las cotizaciones por ahora; su precio
+  queda pendiente a propósito y no es un insumo que falte para cotizar.
 - **Microsoft 365 y Notion como se facturan (policy v9, `microsoft-invoice-adobe-renewal.change.json`).** El CEO
   mostró las dos facturas el 2026-10-11. Microsoft 365, factura G185142527 del 2026-09-16: Business Standard, USD
   14,70 por licencia al mes, seis licencias, sin impuesto; su precio `current` deja de estar pendiente y queda
@@ -309,6 +326,8 @@ hasta que declare la asignación o excluya la tarea con motivo (`work[].excluded
 - La fecha exacta en que termina el descuento de Creative Cloud Pro. El contrato renueva el 2026-11-16; que el
   descuento termine en esa renovación no está confirmado.
 - La evidencia del plan de HubSpot. La factura de Microsoft 365 llegó con la policy v9.
+  *Nota 2026-10-11 (noche):* la de HubSpot no se le debe pedir al operador: dijo que no hace falta en las
+  cotizaciones por ahora, y el precio queda pendiente a propósito.
 - El resto de las herramientas no declara plazo.
 - La recuperación del IVA no se modela: el costo lleva el impuesto.
 - **La fecha de renovación sólo está declarada para Adobe.** Un precio con `commitmentTermMonths` y sin

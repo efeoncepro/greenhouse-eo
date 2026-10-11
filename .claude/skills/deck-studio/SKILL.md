@@ -1295,6 +1295,8 @@ Para incorporar una simulación local de costos/precio, cargar
 Usar preview redactado para cifras presentables pendientes de revisión; artifact/explain permanecen internos.
 No convertir el costo de las funciones de `managed_service` en horas o roles vendidos: conservar fee/plazo/setup
 y alcance de servicio. Otra moneda es otra cotización (FX de política y redondeo propios), nunca una conversión a
-mano en la lámina; en EUR aún no se emite. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
+mano en la lámina; en EUR aún no se emite. Si la cotización lleva costos de terceros (contrato 1.4.0), el preview
+trae el fee del servicio, un ítem por costo refacturado y, aparte de los totales, lo que el cliente paga directo en su
+propia moneda: no sumes eso último al total ni muestres proveedor, costo, tasa o margen. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
 SOW o aprobación comercial; seguir la autoridad del expediente y documentar estado de simulación cuando aplique.
 No borrar ese estado, emitir precio ni enviar propuesta por generar el deck. Mantener piso y contratos de la práctica.

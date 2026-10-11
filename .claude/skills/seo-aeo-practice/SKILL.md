@@ -574,6 +574,9 @@ conservar variante salarial, países, dedicación y fuente real. Reparto declara
 `offerId: "seo-aeo-managed-service"` (objetivo 55%, piso 45%; desde el 2026-10-11), no la oferta creativa.
 Un encargo acotado se declara On-Demand en la cotización (forma de compromiso, no oferta: +10% sobre On-Going, mismo
 piso) y los perfiles de contenido llevan Adobe Express, no Creative Cloud Pro: detalle en `modules/04_PRICING.md`.
+Desde el contrato 1.4.0 (2026-10-11) ese encargo On-Demand lleva una reserva de contingencia de 12% del costo de
+personas y puede llevar terceros refacturados como filas propias (con ellos el piso se lee sobre el margen del trabajo
+propio, no sobre el mezclado); el buffer de un On-Going de licitación con multas sigue sin modelar.
 Readiness40/35 son propuestas genéricas, **no
 reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del

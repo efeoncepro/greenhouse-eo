@@ -22,6 +22,12 @@ Estado: ficha y simulación histórica ejecutable preparadas; validación econó
 > USD 20: es Creative Cloud Pro facturado en pesos, del que una persona carga un tercio. Detalle:
 > [puesta en marcha](cotizador-v3-provisiones-y-costos.md#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11)
 > y [Adobe](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11).
+>
+> Nota 2026-10-11 (noche). La primera nota dice que el factor de talento de Colombia (0,80) es estimado. Ya no lo es:
+> el CEO dejó cerrados los factores de país ese día y el catálogo v10 lo registra, con el mismo valor, como valor de
+> política confirmado desde el 2026-10-12. No es una estimación a la espera de su decisión; se vuelve a mirar sólo
+> si una contratación real o un negocio cerrado en Colombia lo contradice. Detalle:
+> [factores de país cerrados](cotizador-v3-provisiones-y-costos.md#los-factores-de-país-quedaron-cerrados).
 
 ## Alcance confirmado y supuestos
 

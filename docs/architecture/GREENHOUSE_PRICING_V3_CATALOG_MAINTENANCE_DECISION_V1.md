@@ -185,3 +185,55 @@ presentadas al operador.
 debe llevar puesta en marcha (hoy `managed-service-core` no la tiene). Los términos de contrato que reemplazan la
 protección del workbook son materia legal y quedan fuera de este ADR.
 
+## Delta 2026-10-11 — clases de registro del catálogo y dos nuevas (catálogo v10)
+
+Registro, no decisión nueva: la decisión de motor está en el
+[delta 1.4.0 del ADR del motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-140-costos-de-terceros-y-reserva-de-contingencia)
+y los valores en el
+[delta del flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--contrato-140-y-catálogo-v10-cómo-se-lee-una-cotización-con-terceros-y-reserva).
+
+**Clases de registro del catálogo monetario** (`pricing-v3-catalog/1`): trece. La fuente es la unión
+`catalogRecordSchema` en `catalog/contracts.ts`, no esta tabla. Cada clase declara qué **no** puede cambiar una
+revisión: su identidad.
+
+| Clase | Existe desde | Identidad que una revisión no puede cambiar |
+| --- | --- | --- |
+| `profile`, `cost` | TASK-2019 | perfil y seniority |
+| `resource` | TASK-2019 | `resourceId` |
+| `kit` | TASK-2019 | `kitId` |
+| `allocation` | TASK-2019 | `policyId` |
+| `pricing` | TASK-2019 | perfil, tier, oferta y `engagementCode` |
+| `talent_factor` | TASK-2019 (primeros registros en el catálogo v5) | país y país de referencia |
+| `market_factor` | TASK-2019 (`floorBasis` desde el contrato `1.2.0`) | país |
+| `fx` | TASK-2019 | par de monedas |
+| `price_rounding` | contrato `1.1.0` | moneda y oferta |
+| `engagement_factor` | contrato `1.3.0` | forma y oferta |
+| `third_party_policy` | contrato `1.4.0` | categoría y oferta |
+| `contingency_reserve` | contrato `1.4.0` | oferta y forma del engagement |
+
+- **Validación de las dos nuevas.** `third_party_policy`: un piso que pide más margen del que da su método, o un
+  margen objetivo de 1 o más, es `INVALID_THIRD_PARTY_POLICY`. `contingency_reserve`: una tasa fuera de
+  `0 < rate < 1` es `INVALID_CONTINGENCY_RESERVE`.
+- **Identidad exhaustiva.** Una revisión que cambia la identidad de un registro es `CATALOG_IDENTITY_CONFLICT`,
+  en las trece clases. Una clase agregada a la unión sin declarar su identidad deja de compilar; antes, dos
+  identidades `undefined` habrían comparado iguales y la revisión habría pasado.
+- **CLI.** `catalog search|show --kind` acepta las trece; una clase desconocida sigue siendo `INVALID_ARGUMENT`.
+- **Cómo se registró v10.** Con el flujo de siempre: change-set `third-party-contingency-factors.change.json` sobre
+  el catálogo v9, `catalog preview|apply`, sucesor `catalog.review-v10.json` (versión
+  `operating-review-2026-10-11-v10`) y puntero movido con `current set`. Son 15 operaciones: 7 `add` (cinco
+  `third_party_policy` y dos `contingency_reserve`, vigentes desde el 2026-10-11) y 8 `replace` (cinco
+  `talent_factor` y tres `market_factor`, que pasan de `estimated` a `confirmed` desde el 2026-10-12 sin cambiar de
+  valor).
+
+**Regla dura de secuencia.**
+
+- **NUNCA** emitir un registro `contingency_reserve` en una versión del catálogo que una cotización ya congelada
+  pueda volver a resolver. La resolución elige la reserva por oferta y forma sin que el brief la pida: una
+  cotización congelada contra una versión que después «ganara» una reserva resolvería a otro contrato y su replay
+  fallaría. Se emite sólo en una versión más nueva que toda cotización a la que no debe alcanzar. Un
+  `third_party_policy` es inerte hasta que un brief declara un costo de su categoría.
+- **SIEMPRE** dar a un registro de reserva una vigencia pensada: cuando termina, la cotización siguiente sale sin
+  reserva y ningún diagnóstico lo dice. La lectura de fechas (`priceReview`) lista esa vigencia con
+  `blocksWith: null` y un `consequence` que lo explica, cuando la fecha entra en su ventana o ya pasó. Los dos
+  registros de v10 no tienen fecha de término.
+

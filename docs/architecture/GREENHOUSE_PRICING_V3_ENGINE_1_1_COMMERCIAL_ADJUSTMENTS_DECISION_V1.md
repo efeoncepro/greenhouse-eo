@@ -62,6 +62,13 @@ anteriores intactos. Nunca se modifica el comportamiento de un contrato ya usado
 > de precio. Ver el
 > [delta del contrato 1.3.0](#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio). La fuente del
 > registro es `PRICING_V3_ENGINES` en `schemas.ts`, no esta tabla.
+>
+> Nota 2026-10-11 (noche): «cuatro contratos» es el conteo de esa tarde. El registro tiene cinco contratos que
+> conviven: `1.0.0`, `1.1.0`, `1.2.0`, `1.3.0` y `1.4.0` (motor `pricing-v3-local/1.4.0`), agregado con el mismo
+> patrón: los costos de terceros de un encargo y una reserva de contingencia. Ver el
+> [delta del contrato 1.4.0](#delta-2026-10-11--contrato-140-costos-de-terceros-y-reserva-de-contingencia). En el
+> carril de catálogo y composición, la regla de emisión de `1.4.0` va antes que las de los contratos anteriores; un
+> `agreed_net` admite además `billing: "third_party"`, sólo en ese contrato.
 
 ### 2. Ajustes comerciales (contrato 1.1.0)
 
@@ -317,6 +324,11 @@ teniendo tres contratos (`1.0.0`, `1.1.0`, `1.2.0`); `calculate.ts`, `schemas.ts
   para EUR.
 - **Factores de talento.** Chile vale 1 por definición. Los de Colombia, Perú, México, España y Estados Unidos los
   propuso el agente y siguen marcados como estimados; no son una decisión del operador.
+  *Nota 2026-10-11 (noche):* eso describe esa ronda. El CEO cerró los factores de país ese mismo día («deja eso
+  cerrado ya»): el catálogo v10 registra los cinco factores de talento (y los factores de mercado de Perú, México y
+  España) como valores de política `confirmed` desde el 2026-10-12. Son valores de política, no observaciones de
+  mercado. Una cotización fechada el 2026-10-11 sigue leyendo la estimación.
+  [Detalle](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--contrato-140-y-catálogo-v10-cómo-se-lee-una-cotización-con-terceros-y-reserva).
 - **Lectura.** El resumen agrega `estimateExposure` (dónde pesa más un dato estimado; en la cotización de Colombia
   el factor de talento lleva el 64,7 % del costo) y, cuando corresponde, `runNotices`. Ninguna de las dos claves es
   del motor ni entra al resultado que firma.
@@ -475,10 +487,347 @@ piso. La misma demanda sin `engagementForm`, con las mismas versiones, resuelve 
 
 - No hay forma Hybrid ni Licence/Consulting, ni un tope para la razón.
 - Una forma no declarada se cotiza como On-Going sin aviso.
+  *Nota 2026-10-11 (noche):* sigue siendo así para el precio. Lo que cambió: si el catálogo tiene una reserva de
+  contingencia por forma que podría aplicar a la oferta y el brief no declara `engagementForm`, la resolución deja el
+  supuesto `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`. Con el catálogo v10 eso ocurre en las dos
+  ofertas de servicio gestionado.
 - El plazo del contrato con el cliente no es un input: una cotización tiene períodos, no un plazo.
 - Un encargo de menos de un mes se expresa como horas dentro de un período.
 - Todavía no se modelan los costos de terceros de un encargo ni una reserva de contingencia para trabajo de alcance
   fijo. No hay contrato de entrada ni datos para eso.
+  *Nota 2026-10-11 (noche):* dejó de ser cierto ese mismo día. Los dos existen desde el contrato `1.4.0` y el
+  catálogo v10: es el delta siguiente.
+
+## Delta 2026-10-11 — contrato 1.4.0: costos de terceros y reserva de contingencia
+
+Posterior al delta anterior, la noche del mismo día. Construido con el visto bueno del operador (CEO) a la
+recomendación del agente («seguiré tu recomendación»). Sigue el patrón de este ADR: contrato nuevo, motor nuevo en el
+registro (`pricing-v3-local/1.4.0`, con su propio `precisionPolicy`), contratos anteriores intactos. El registro
+tiene cinco contratos.
+
+**Contexto.** Un encargo de alcance fijo trae dos cosas que el motor no podía expresar.
+
+1. **Lo que se compra a terceros para el trabajo** (producción, talento, medios, licencias, impresión) y se
+   refactura al cliente. No entraba a la cotización: el motor sólo conoce líneas de equipo con sus recursos. Si se
+   lo hubiera metido como un recurso de una línea, habría tomado el multiplicador de la política de esa persona
+   (1,82 veces con un objetivo de 45 % sobre todos los costos), la razón de la forma del engagement y el descuento
+   de la fila, y habría diluido el veredicto de piso de esa fila.
+2. **Un colchón para el desvío de un trabajo de alcance fijo.** Las prácticas lo aplican a mano (el 12 % que el
+   operador usó en una oferta de licitación). Fuera del motor, el margen que se muestra no cae cuando el colchón no
+   se cobra, y el piso no se mueve.
+
+**Decisión.** Las dos capacidades entran con un solo contrato.
+
+- **Costos de terceros: el importe vive en la cotización y la regla de precio en el catálogo.** El brief declara
+  cada costo con su proveedor, importe, moneda, cantidad, períodos y evidencia (referencia de la cotización del
+  proveedor, fecha y vigencia). La regla vive en un registro `third_party_policy` **por categoría**: método, tasa,
+  piso y redondeo. La cotización lleva sólo el id de la categoría, nunca una tasa.
+- **Cada costo refacturado es una fila comercial propia**, de clase `third_party`, con el piso de su categoría.
+  Nunca es un componente de una fila de equipo.
+- **Lo que nunca toca una fila de terceros:** el multiplicador de una política de precio, el factor de mercado, la
+  razón de la forma del engagement, un descuento por tasa y la reserva de contingencia. Lo único que mueve su precio
+  es la regla de su categoría y un `agreed_net` explícito con `billing: "third_party"` que nombre ese costo.
+- **Tipo de cambio de identidad.** Un proveedor que cobra en la moneda de salida no se convierte: un costo en CLP
+  dentro de una cotización en CLP entra exacto. Cualquier otra moneda pasa por la moneda de cálculo con los tipos de
+  cambio que la cotización congela.
+- **Un costo que el cliente paga directo al proveedor es una nota.** Queda congelado en el brief y no llega al
+  kernel, a ningún total, a ninguna cifra de caja ni a ninguna conversión.
+- **La reserva de contingencia es un costo sobre una base declarada.** Un registro `contingency_reserve` del
+  catálogo trae la tasa y la base (`human`: el costo de la persona; `own_costs`: todos los costos propios de la
+  fila). La resolución lo elige por lo que el registro nombra —oferta, forma del engagement, ambas o ninguna— y el
+  kernel lo agrega como componente de costo de cada fila de equipo. Nunca descansa sobre una fila de terceros.
+- **Sale de una cotización sólo por una renuncia declarada:** `brief.contingency = { kind: "waived", reason }`. El
+  importe pasa a cero, la cotización queda bajo revisión y los totales dicen cuánto se dejó de reservar.
+- **Un contrato para las dos capacidades.** Tocan las mismas costuras (el costo de la fila, las claves de totales y
+  el piso) y tienen que coincidir en una cosa: la base de la reserva se define excluyendo las filas de terceros.
+- **Regla de emisión.** La resolución emite `1.4.0` si y sólo si el brief declara al menos un costo refacturado
+  **o** exactamente un registro de reserva prevalece para la cotización, también cuando el brief renuncia a ella.
+  En cualquier otro caso rige la cadena anterior sin cambio.
+
+**En el kernel.** El contrato `1.4.0` contiene todo lo de `1.3.0` y agrega, todas opcionales:
+
+| Dónde | Clave | Contenido |
+| --- | --- | --- |
+| request | `thirdPartyCosts[]` (hasta 50) | `{ costId, label, category, amount, currency, quantity, periodIds, source }`. Sólo los refacturados; sin proveedor. `amount` es el importe unitario en la moneda del proveedor; `source` es la evidencia del importe |
+| request | `contingencyWaiver` | `{ reason }` |
+| request | `adjustments[].billing` | Un `agreed_net` admite además `third_party`; sus `lineIds` son entonces `costId` |
+| snapshot | `thirdPartyPolicies[]` | `{ category, method: markup \| target_margin, rate, minimumMargin, rounding: commercial \| none, source }`, una por categoría |
+| snapshot | `contingencyReserve` | `{ rate, base: human \| own_costs, source }`, con `0 < rate < 1` |
+
+Las categorías son datos: el kernel no conoce ninguna lista, sólo la regla de la que un costo nombra. Las claves
+existen sólo en `1.4.0`: un contrato anterior que las traiga se rechaza, no se reinterpreta. Un input `1.3.0`
+reetiquetado `1.4.0` es válido y cotiza igual. La etiqueta del componente de reserva es una constante del kernel
+(`Contingency reserve`): el snapshot trae una tasa y una base, no un nombre; el registro que la nombra queda en los
+enlaces de la cotización.
+
+**En el brief** (`pricing-v3-brief/1`, dos campos opcionales y **sin valor por defecto**: el brief parseado está
+dentro de todo resultado congelado, y un default movería el digest de cada artefacto anterior).
+
+- `thirdPartyCosts[]`: `{ costId, category, label, supplier, settlement, amount, currency, quantity, periodIds,
+  evidence }`. `settlement` es `reinvoiced` (Efeonce compra y refactura) o `client_direct` (el cliente le paga al
+  proveedor). `periodIds` es obligatorio: el importe completo (`amount × quantity`) se cobra en cada período
+  listado, así que un costo de una vez nunca se multiplica por el plazo en silencio. `evidence` (`reference`,
+  `effectiveFrom`, `effectiveUntil`, `status`) es obligatoria en un costo refacturado y opcional en uno que paga el
+  cliente. `supplier` es interno: queda en el brief y no llega al kernel.
+- `contingency`: `{ kind: "waived", reason }`. Es una unión por `kind` para que otra declaración se pueda agregar
+  después sin tocar ésta.
+
+**En el catálogo** (`pricing-v3-catalog/1`, dos clases de registro nuevas; el catálogo tiene trece).
+
+- `third_party_policy`: `{ category, label, method, rate, minimumMargin, rounding, offerId? }`. Un registro con
+  `offerId` prevalece sobre el general de la misma categoría, y el de otra oferta nunca aplica. Refacturar al costo
+  es `markup` con tasa 0, piso 0 y redondeo `none`. La validación rechaza una regla cuyo piso pide más margen del
+  que su método da (`rate / (1 + rate)` en un `markup`, la tasa misma en un `target_margin`) o un margen objetivo de
+  1 o más: `INVALID_THIRD_PARTY_POLICY`.
+- `contingency_reserve`: `{ label, rate, base, offerId?, engagementForm? }`. Una tasa fuera de `0 < rate < 1` es
+  `INVALID_CONTINGENCY_RESERVE`.
+- Una revisión puede cambiar la regla de un registro, nunca de qué categoría, oferta o forma es la regla
+  (`CATALOG_IDENTITY_CONFLICT`). La función de identidad del change-set ahora es exhaustiva: una clase de registro
+  agregada a la unión sin su caso deja de compilar, en vez de comparar dos `undefined` y dejar pasar la revisión.
+
+**En la resolución.**
+
+- **Regla de precio de un costo.** Por `costId`: el registro de la oferta prevalece sobre el general. Ninguno
+  vigente es `MISSING_CATALOG_SELECTION` y dos del nivel que prevalece `AMBIGUOUS_SELECTION`, los dos con ruta
+  `thirdPartyCosts.<costId>.policy`. Una regla `pending` bloquea (`PENDING_CATALOG_VALUE`); una `estimated` se
+  cotiza bajo revisión.
+- **Reserva.** Aplican los registros que no nombran nada que el brief contradiga; gana el que nombra más
+  dimensiones (oferta y forma vence a cualquiera de las dos sola, y cualquiera de las dos al general). Dos en el
+  nivel que prevalece —también uno que nombra sólo la oferta contra otro que nombra sólo la forma— bloquean con
+  `AMBIGUOUS_CONTINGENCY_RESERVE` (ruta `contingency`): no hay elección silenciosa.
+- **Forma no declarada.** Si el catálogo tiene reservas por forma que podrían aplicar a la oferta y el brief no
+  declara `engagementForm`, la resolución agrega el supuesto
+  `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`. Es lo que evita que una forma olvidada signifique en
+  silencio «sin reserva».
+- **Renuncia sin reserva.** Un brief que renuncia a una reserva que ningún registro vigente le daría es un error
+  del brief (otra oferta, otra forma, una fecha anterior): `CONTINGENCY_WAIVER_WITHOUT_RESERVE`.
+- **Emisión.** `1.4.0` va primero en la cadena; como es superconjunto, una cotización `1.4.0` puede usar además
+  neto pactado, redondeo, factor de mercado con `floorBasis` y forma del engagement. Un brief que sólo trae notas
+  `client_direct` se queda en su contrato anterior, igual que una cotización para la que sólo existe la reserva de
+  otra oferta o de otra forma. Un catálogo congelado antes de `1.4.0` no tiene reserva y un brief congelado antes no
+  tiene costos: los dos vuelven a resolver como siempre.
+- **Períodos.** Cada período es su propia entrada del kernel, así que un costo llega a cada período que lista como
+  un costo del período 1 de esa entrada. Un período fuera del plazo o repetido es `INVALID_THIRD_PARTY_SCHEDULE`
+  (también en una nota `client_direct`); un costo refacturado en un período sin ninguna línea activa es
+  `THIRD_PARTY_COST_OUTSIDE_ACTIVE_PERIOD`, porque ese período no tiene cotización de la que ser fila.
+- **Ids.** Los ajustes nombran las filas por el id de su padre, así que costos y líneas comparten un espacio de
+  nombres: un `costId` repetido o igual a un `lineId` es `DUPLICATE_THIRD_PARTY_COST_ID`.
+- **Tipos de cambio.** Un costo en la moneda de salida no pide ningún registro. Uno en la moneda de cálculo usa el
+  tipo de cambio de salida que la cotización ya congela. Cualquier otra moneda necesita su registro hacia la moneda
+  de cálculo; si falta, `MISSING_CATALOG_SELECTION` en `fx.<moneda>:<moneda de cálculo>`.
+- **Borrador comercial.** En `commercial_draft`, la evidencia de un costo refacturado que no esté `confirmed` es
+  `UNCONFIRMED_THIRD_PARTY_COST`.
+- **Enlaces.** `(costId, "third_party_policy")` y `("*", "contingency_reserve")`.
+
+**Dónde entra cada elemento en la formación del precio, en orden.**
+
+*Fila de equipo* (línea × período × clase `monthly` o `setup`):
+
+1. Costo de cada componente: la persona (con su factor de talento) y los recursos de la fila.
+2. Precio de política de cada componente: costo por el multiplicador de la política (los recursos, sólo si la base
+   de la política es `all_costs`).
+3. Factor de mercado, sólo sobre el componente humano.
+4. **Reserva de contingencia.** Se lee con los componentes de la fila ya armados y antes de sumar su precio, así
+   que nunca descansa sobre sí misma. Base: el costo del componente humano (`human`) o la suma de los costos de
+   todos los componentes de la fila (`own_costs`). Reserva = base × tasa. Entra como un componente más, de clase
+   `contingency_reserve`: su costo es la reserva; su precio, la reserva por el multiplicador cuando la política
+   forma el precio sobre todos los costos, y al costo si no; `cashCommitment` 0; sin factor de mercado. Su `trace`
+   lleva `rate`, `base` y `baseAmount`. No se agrega cuando la base es cero (una fila `setup` bajo base `human` no
+   tiene persona) ni cuando el request trae la renuncia.
+5. Razón de la forma del engagement, sobre el precio de todos los componentes de la fila, la reserva incluida.
+6. Presentación de la fila (`HALF_UP` a la precisión de la moneda). `contingencyReserve` de la fila es el costo
+   presentado menos el costo presentado que la fila tendría sin reserva: una diferencia de importes presentados,
+   como `marketAdjustment`.
+7. Redondeo comercial, con su regla de conservación del piso, que se lee sobre el costo con la reserva.
+8. Ajustes (`discount`, `agreed_net` de `monthly` o `setup`).
+9. Veredicto de piso sobre el neto final contra el costo con la reserva.
+
+*Fila de terceros* (costo × período listado), después de todas las líneas:
+
+1. Validación del costo: períodos sin repetir y dentro del plazo (`INVALID_PERIOD`), importe sin más decimales que
+   la moneda del proveedor (`INVALID_THIRD_PARTY_AMOUNT`) y evidencia juzgada como cualquier fuente.
+2. Conversión a la moneda de salida: factor 1 si el proveedor cobra en ella; si no, tipo de cambio de su moneda a
+   la de cálculo por el tipo de cambio de salida.
+3. Costo = `amount × quantity × factor`.
+4. Precio por la regla de su categoría: `costo × (1 + rate)` en un `markup`, `costo / (1 − rate)` en un
+   `target_margin`. Nada más: sin multiplicador de una línea, sin factor de mercado y sin razón de forma. Los tres
+   precios del recorrido son el mismo, así que `marketAdjustment` y `engagementAdjustment` valen 0 y
+   `marketPriceRatio` y `engagementPriceRatio` valen `"1"`, declare lo que declare la cotización.
+5. Un solo componente, de clase `third_party`, **denominado en la moneda de salida** (a diferencia de todos los
+   demás, que van en la moneda de cálculo). Su `trace` lo dice: `denominatedIn`, `outputFx: "1"`,
+   `supplierCurrency`, `supplierAmount`, `fxPath` y `fxRate`. Su `cashCommitment` es su costo.
+6. Presentación (`HALF_UP` a la precisión de la moneda de salida).
+7. Redondeo comercial **sólo si la regla de la categoría dice `rounding: "commercial"`**, con la misma conservación
+   del piso sobre el `minimumMargin` de la categoría. Con `none` el precio de política queda como está: un costo
+   refacturado al costo en su propia moneda da neto exactamente igual a lo que cobra el proveedor.
+8. Ajustes: sólo un `agreed_net` de `billing: "third_party"`, por período, repartido en proporción entre los costos
+   que nombra. Un `discount` o un `agreed_net` de equipo que nombre un `costId`, o uno de terceros que nombre una
+   línea, es `UNKNOWN_ADJUSTMENT_LINE`: un descuento por tasa no puede alcanzar lo que cobra un proveedor.
+9. Veredicto de piso sobre su propio neto contra su propio costo, con el `minimumMargin` de su categoría.
+
+La fila lleva `lineId` `<costId>:<período>:third_party`, `parentLineId` = `costId` y el `label` declarado.
+
+**Forma del resultado 1.4.0** (un resultado de un contrato anterior no tiene ninguna de estas claves; no van en
+cero: no van).
+
+- Por fila: `kind` puede ser `third_party`, y toda fila agrega `contingencyReserve` (cero en una fila de
+  terceros).
+- En totales: `contingencyReserve`, `contingencyBase`, `contingencyReserveWaived`, `thirdPartyCost`,
+  `thirdPartyNet` y `ownWorkMarginRate`.
+- En el carril de catálogo y composición, el libro de caja (`cashLedger`) gana una entrada `third-party:<costId>`
+  por período, que sale de la entrada del equipo (`human-monthly-and-once`): lo que compromete un costo refacturado
+  se le paga a su proveedor.
+
+**Identidades de los totales**, exactas:
+
+- Cada total es la suma de sus filas, clave por clave. El recorrido de precio de `1.3.0` se conserva en toda fila.
+- `thirdPartyCost` y `thirdPartyNet` son las sumas sobre las filas de terceros. El trabajo propio es el resto:
+  `net − thirdPartyNet` y `cost − thirdPartyCost`.
+- `ownWorkMarginRate = ((net − thirdPartyNet) − (cost − thirdPartyCost)) / (net − thirdPartyNet)`; `null` cuando
+  la cotización no vende trabajo propio a un neto mayor que cero.
+- `cost − contingencyReserve` es el costo de la misma cotización sin reserva.
+- `contingencyBase` es el costo sobre el que descansa la reserva aplicada. `contingencyReserveWaived` es lo que una
+  renuncia dejó fuera del costo: lo que `contingencyReserve` habría sido.
+- `marginRate` no cambia de significado: sigue siendo el margen real de toda la cotización, mezclado.
+- Un impuesto `exclusive` se aplica al neto entero, filas de terceros incluidas.
+
+**Semántica del piso.**
+
+- **No hay veredicto de piso a nivel de cotización**, ni sobre el margen mezclado ni sobre el del trabajo propio.
+  `ownWorkMarginRate` es una lectura; el único veredicto sigue siendo `MARGIN_BELOW_FLOOR` por fila.
+- **Fila de equipo:** el `minimumMargin` de su política de precio, sobre su propio neto contra su propio costo, la
+  reserva incluida. Por eso `floorNet = costo × ρ / (1 − m)` sube con la reserva: un precio que no la cobra queda
+  bajo el piso, y el mismo neto pactado sin reserva no.
+- **Fila de terceros:** el `minimumMargin` de su categoría, sobre su propio neto, con `ρ = 1` siempre. Una
+  categoría con piso 0 sólo sale marcada cuando se vende bajo el costo.
+- **El veredicto de una fila no depende de ninguna otra.** Agregar o quitar un costo de terceros no cambia ningún
+  importe, piso ni diagnóstico de una fila de equipo; un trabajo que es 60 % medios al costo deja intacto el
+  veredicto del equipo.
+- La prima de una forma es margen; la reserva es costo. Un descuento puede consumir la primera hasta el piso de la
+  oferta; si consume la segunda, la fila queda bajo el piso.
+
+| Regla anterior | Fila de equipo con reserva | Fila de terceros |
+| --- | --- | --- |
+| Redondeo por fila (`1.1.0`) | Sin cambio; la conservación usa el costo con la reserva | Según el dato `rounding` de su categoría |
+| `floorBasis: "base_market"` (`1.2.0`) | `ρ` se lee igual; la reserva no recibe factor de mercado, así que su precio es el mismo en los dos mercados | `ρ = 1` siempre |
+| Reparto de un `agreed_net` (`1.1.0`) | Sin cambio | Sólo `billing: "third_party"`, por período, en proporción entre los costos nombrados |
+| Razón de la forma (`1.3.0`) | Aplica, reserva incluida | Nunca aplica |
+
+**Errores y diagnósticos del kernel.** Nuevos: `MISSING_THIRD_PARTY_POLICY` (una categoría sin su regla retiene el
+cálculo, `needs_input`: no se asume ninguna tasa, tampoco «al costo»), `INVALID_THIRD_PARTY_AMOUNT` (error),
+`CONTINGENCY_WAIVER_WITHOUT_RESERVE` (error) y `CONTINGENCY_RESERVE_WAIVED` (revisión). Reusados: `DUPLICATE_ID`
+(un `costId` igual a un `lineId`, o una categoría repetida en el snapshot), `INVALID_PERIOD`, `INVALID_MARGIN_RATE`,
+`UNKNOWN_ADJUSTMENT_LINE`, `AGREED_NET_WITHOUT_BASE` y `MARGIN_BELOW_FLOOR`. La evidencia de un importe, la regla de
+una categoría y la reserva se juzgan como cualquier fuente: fuera de vigencia a la fecha de la cotización,
+`STALE_SOURCE` (una cotización de proveedor vencida retiene la cotización siguiente); `pending`,
+`MISSING_SOURCE_CONFIRMATION`; `estimated`, `ESTIMATED_SOURCE` bajo revisión.
+
+**Lectura.** Cómo describen una cotización `1.4.0` el resumen, `explain` y las lecturas `compose assess`, `preview`,
+`split`, `cash`, `schedule` y `commitments`, y la regla para leer sus dos márgenes:
+[delta del flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--contrato-140-y-catálogo-v10-cómo-se-lee-una-cotización-con-terceros-y-reserva).
+
+**Datos (catálogo v10).** Cinco registros `third_party_policy` y dos `contingency_reserve`, todos `estimated` y
+vigentes desde el 2026-10-11: son estimaciones propuestas por el agente que el CEO aceptó, para ajustar con el
+primer trabajo real. Valores y quién decidió qué: el JSON, su `audit` y el mismo delta del flujo operativo.
+
+**Alternativas descartadas** (razones del diseño con que se construyó el contrato; lo que el operador aceptó fue la
+recomendación del agente sobre los valores, no una elección entre estas alternativas).
+
+- *Un costo de terceros como componente de una fila de persona.* Tomaría el multiplicador de esa fila, la razón de
+  la forma y su descuento, y diluiría el veredicto de piso de esa persona.
+- *Importes de terceros en el catálogo.* No son precios reutilizables: cada trabajo pediría una versión del
+  catálogo. Una tarifa de proveedores recurrentes puede llegar después como un registro al que la declaración
+  apunte; `quantity × amount` tiene la forma para eso.
+- *Una tasa o un recargo escrito en la cotización.* Rompe «el operador cambia un solo dato»: el brief lleva sólo el
+  id de la categoría.
+- *Inferir «al costo» o el redondeo desde `rate == 0`.* Este ADR ya descartó inferir una regla desde un valor (el
+  piso desde `factor < 1`). El redondeo es un campo declarado, y una categoría sin regla no se asume al costo.
+- *Un piso a nivel de cotización, neto de lo refacturado.* El kernel no tiene un piso de cotización; agregarlo
+  crearía un segundo dueño del veredicto. Filas separadas dan la misma honestidad con el veredicto que ya existe.
+- *Paridad con el costo directo del cotizador en producción.* Ahí un costo directo se vende al costo con
+  cumplimiento `unknown`, que degrada toda la cotización a advertencia y diluye el margen agregado; el fee de
+  gestión de 10 % se cobra sobre un subtotal que lo incluye; y no lleva proveedor, evidencia ni vigencia.
+- *La reserva como recargo de precio o como `agreed_net`.* El margen que se muestra no caería cuando no se cobra, y
+  el piso no se movería.
+- *La reserva materializada por la resolución como un recurso fijo.* La composición inyecta las herramientas
+  después de resolver, así que la base `own_costs` quedaría mal, y el factor de talento y el tipo de cambio no se
+  trasladarían.
+- *La reserva sumada al costo humano.* No se vería como un componente propio.
+- *Dos contratos (`1.4.0` y después `1.5.0`).* Dos motores, dos artefactos de guarda y dos rondas de cambios en los
+  lectores para capacidades que tienen que coincidir en la base.
+
+**Dónde el código se aparta del diseño** (rige lo que hace el código).
+
+- Las claves de `1.4.0` en el kernel son todas opcionales, como en toda capacidad anterior; el diseño pedía
+  `thirdPartyCosts` y `thirdPartyPolicies` como arreglos obligatorios.
+- La etiqueta de la reserva es una constante del kernel; el `label` del registro no viaja en el snapshot.
+- En una cotización con renuncia, `contingencyBase` vale 0 junto con `contingencyReserve`: sólo se informa lo que
+  se dejó de reservar (`contingencyReserveWaived`).
+- Una reserva a la que se renuncia y cuyo registro es `estimated` sigue levantando `ESTIMATED_SOURCE`.
+- Una regla de terceros con un margen objetivo imposible (1 o más) omite esa fila con el diagnóstico
+  `INVALID_MARGIN_RATE`, y la entrada queda `invalid`.
+- La caja de un costo de terceros es el costo congelado de su fila, ya en la moneda de salida.
+
+**Reglas duras.**
+
+- **NUNCA** escribir una tasa, un recargo o un margen de terceros en la cotización: el brief lleva la categoría y la
+  regla sale del catálogo.
+- **NUNCA** meter un costo de terceros como recurso, herramienta o provisión de una línea de equipo, ni declarar
+  trabajo propio como «tercero» para dejarlo bajo un piso más bajo.
+- **NUNCA** aplicar a una fila de terceros un factor de mercado, la razón de una forma o un descuento por tasa. El
+  único ajuste que la alcanza es un `agreed_net` de `billing: "third_party"` con su motivo.
+- **NUNCA** sumar ni convertir un costo `client_direct` a un total, a la caja o al precio: es una nota.
+- **NUNCA** asumir «al costo» para una categoría sin regla, ni inferir el redondeo desde la tasa.
+- **NUNCA** quitar la reserva bajando su tasa, con un descuento o editando el catálogo para una cotización: sale
+  sólo por `brief.contingency`, con motivo, y queda marcada.
+- **NUNCA** emitir un registro `contingency_reserve` en una versión del catálogo que alguna cotización ya congelada
+  pueda volver a resolver: se emite sólo en una versión más nueva que toda cotización a la que no debe alcanzar. De
+  lo contrario esa cotización resolvería a `1.4.0` y su replay fallaría.
+- **NUNCA** presentar el margen del trabajo propio como el margen de la cotización, ni el mezclado como el número
+  que se compara con el piso de una oferta. El veredicto es por fila.
+- **SIEMPRE** declarar `periodIds` de cada costo: no existe «todos los períodos» por defecto.
+- **SIEMPRE** registrar la evidencia de un costo refacturado (referencia, fecha y vigencia de la cotización del
+  proveedor) antes de congelar.
+- **SIEMPRE** declarar `engagementForm` en un servicio gestionado: una reserva por forma no se evalúa sin ella.
+- **SIEMPRE** correr la guarda de artefactos congelados al tocar `calculate.ts`, `schemas.ts` o la resolución; exige
+  un artefacto firmado por cada uno de los cinco motores.
+
+**Verificación (2026-10-11, local).** El primer artefacto `1.4.0`, y el que la guarda exige para ese motor, es
+[`managed-on-demand-third-party.artifact.json`](../../data/pricing/v3-operating/managed-on-demand-third-party.artifact.json):
+un servicio gestionado creativo vendido On-Demand en Chile, un período, en CLP, con un costo de producción en CLP,
+talento en USD, medios al costo y una licencia que paga el cliente. `replay` responde `verified: true`, motor
+`pricing-v3-local/1.4.0`. Medido: costo 14.750.055, neto 21.033.333, margen mezclado 29,87 %; terceros con costo
+9.083.333 y neto 9.663.333; trabajo propio con costo 5.666.722 y neto 11.370.000, margen 50,16 %; reserva 436.800,
+que es 12 % de 3.640.000; ninguna fila bajo su piso. Las identidades cierran sobre esas cifras:
+14.750.055 − 9.083.333 = 5.666.722 y 21.033.333 − 9.663.333 = 11.370.000. Variantes medidas fuera de la carpeta de
+datos, con `--current`:
+
+- Con `brief.contingency` en `waived`: motor `1.4.0`, costo 14.313.255 (436.800 menos), neto 20.163.333,
+  `contingencyReserve` 0, `contingencyBase` 0, `contingencyReserveWaived` 436.800 y la señal
+  `CONTINGENCY_RESERVE_WAIVED`. `ESTIMATED_SOURCE` sigue nombrando `snapshot.contingencyReserve`: el registro de la
+  reserva es estimado y se juzga aunque se renuncie a ella.
+- Sin costos refacturados (sólo la nota `client_direct`) y sin `engagementForm`: motor `1.1.0`, ninguna clave de
+  `1.4.0` en los totales y el supuesto `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`.
+
+`replay` por CLI de los 19 artefactos versionados bajo `data/pricing/**` y de los dos que la guarda suma fuera de
+esa carpeta: los 21 responden `verified: true`; 16 firmados por `1.0.0`, uno por cada uno de `1.1.0`, `1.2.0`,
+`1.3.0` y `1.4.0`, y una cotización bloqueada que no llegó a calcular. Las pruebas del contrato están en
+`pricing-v3-third-party-reserve.test.ts` (kernel) y `pricing-v3-third-party-reserve-resolution.test.ts` (catálogo,
+resolución, composición y CLI); esta nota no registra una corrida de la suite.
+
+**Sigue abierto** (no está modelado; no describirlo como existente).
+
+- Cuándo se le paga a un proveedor, y si una compra ata más allá del trabajo (un plazo mínimo, derechos de uso que
+  lo sobreviven).
+- Una comisión sobre los costos que el cliente paga directo.
+- Una tarifa de proveedores recurrentes en el catálogo.
+- Tratamiento de impuesto por fila: hoy una cotización tiene un solo tratamiento.
+- Una cotización, o un período, con terceros y sin ninguna línea de equipo.
+- La reserva para un servicio On-Going ganado en una licitación con multas: los dos registros de hoy son por forma
+  On-Demand.
+- La liberación de la reserva después de la entrega.
+- De antes: el plazo del contrato con el cliente, un asiento comprado para el trabajo, períodos de menos de un mes,
+  la forma Hybrid, cotizar en EUR y una vista apta para el cliente de las lecturas internas.
 
 ## No decidido a propósito
 

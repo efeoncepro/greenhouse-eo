@@ -18,8 +18,14 @@ staffing; `--current` y fecha de cotización desde el 2026-10-11.
 `engagementForm: "on_demand"` en su propia cotización: +10% al precio sobre On-Going, mismo piso; es forma de
 compromiso, no otra oferta ni delivery model, y la Operación va On-Going (dos cotizaciones; no hay forma híbrida).
 Arranque, coordinación y compromisos con proveedores van como costo; antes de comprometer revisa `compose schedule`
-y `compose commitments` (`compose cash` no es margen ni decide precio). Sin modelar: terceros, contingencia de alcance
-fijo, duración del contrato, períodos bajo un mes y la regla del ad-hoc (bug 2). Los perfiles de contenido llevan
+y `compose commitments` (`compose cash` no es margen ni decide precio). Desde el contrato 1.4.0 (2026-10-11) un
+encargo On-Demand de esta oferta lleva una reserva de contingencia de 12% del costo de personas, como costo (se vende
+con el margen de la oferta y el 10% On-Demand) y sale sólo con una renuncia declarada con motivo; y los terceros que
+se compran y refacturan van como filas propias (producción, talento e impresión +10% con piso 5%; medios y licencias
+al costo), con el piso de 45% leído sobre el margen del trabajo propio (`ownWork`), nunca sobre el mezclado. Las dos
+son estimaciones aceptadas por el CEO. Sin modelar: el buffer de un On-Going ganado en licitación con multas (§4),
+cuándo se le paga al proveedor, una compra que obliga más allá del encargo, duración del contrato, períodos bajo un
+mes y la regla del ad-hoc (bug 2). Los perfiles de contenido llevan
 Adobe Express (CEO): declara su reparto o excluye la tarea con motivo.
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
@@ -358,6 +364,10 @@ PISO = loaded cost del pod          ← del squad blueprint (nómina real, %dedi
      ────────────────────────────
      ÷ (1 − margen mínimo)
 ```
+
+**En V3 (contrato 1.4.0, 2026-10-11):** el buffer de riesgo sólo está modelado para un servicio gestionado vendido
+On-Demand (reserva de 12% del costo de personas). 🔴 El de un On-Going ganado en licitación con multas —este caso—
+**no** está modelado: V3 no lo suma, así que se sigue computando a mano antes de leer el piso.
 
 ### 🔴 Aplicado a SKY — y el piso declarado NO pasa la regla
 

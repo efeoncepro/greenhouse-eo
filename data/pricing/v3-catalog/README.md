@@ -26,6 +26,11 @@ puesta en marcha son dos provisiones estimadas por persona; el paquete de Adobe 
 licencia. Ese catálogo agrega además la clase de registro `engagement_factor` (la razón de precio de cada forma de
 engagement), que esta baseline no tiene.
 [Detalle](../v3-operating/README.md#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
+*Nota 2026-10-11 (noche):* desde v10 el catálogo operativo agrega otras dos clases de registro que esta baseline
+tampoco tiene: `third_party_policy` (la regla de precio de cada categoría de costo de terceros) y
+`contingency_reserve` (la reserva de contingencia por oferta y forma). El esquema del catálogo tiene trece clases;
+esta baseline usa ocho. `catalog search --kind` las acepta todas.
+[Detalle](../v3-operating/README.md#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
 
 [Antecedentes actuales declarados por el operador](../v3-pilot/economics/resource-inputs/README.md): Higgsfield, Magnific, Adobe y plataforma Vercel/GCP. Registro local para normalizar; aún no reemplaza valores de esta baseline ni asigna usuarios/costos por servicio automáticamente.
 

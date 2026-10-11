@@ -179,6 +179,12 @@ antes de computar el piso**, y el buffer se **declara**, no se intuye:
 Si el cliente quiere el buffer más bajo, **que baje el riesgo** (rondas acotadas, owner nombrado, sin
 penalidades). **Eso es una negociación honesta.** Bajarle el buffer sin bajarle el riesgo es regalarle margen.
 
+**En V3 (contrato 1.4.0, 2026-10-11):** el buffer de un alcance fijo ya se expresa en un servicio gestionado vendido
+On-Demand, como reserva de contingencia: 12% del costo de personas (no de todo el loaded), sumado como costo —se vende
+con el margen de la oferta y el 10% On-Demand— y sale sólo con una renuncia declarada con su motivo, que queda señalada.
+Es una estimación aceptada por el CEO; staff augmentation no la lleva. 🔴 El buffer de un On-Going ganado en licitación
+con multas (la primera fila) **no** está modelado en V3: ése, y los demás riesgos de la tabla, se siguen sumando a mano.
+
 ---
 
 ## 5. El piso — 45% de margen bruto, aprobado por el dueño
@@ -274,8 +280,17 @@ oferta ni delivery model) y suma 10% al precio sobre On-Going con el mismo piso;
 una persona) y compromisos con proveedores van como costo, y el 10% cubre sólo riesgo y política. Antes de comprometer
 un encargo (Factory, licitación) revisa `compose schedule` (calendario de pagos) y `compose commitments` (una licencia
 Adobe comprada para un mes se sigue cobrando hasta el fin del contrato si nadie más la usa); `compose cash` no es
-margen ni decide precio. Sin modelar: terceros (freelancers, producción, derechos, medios), reserva de contingencia de
-alcance fijo, duración del contrato y períodos menores a un mes.
+margen ni decide precio. Desde el contrato 1.4.0 (2026-10-11) V3 sí lleva los terceros del encargo: cada costo que
+se compra y se refactura es una fila propia con la regla de su categoría (producción, talento e impresión: +10% de
+gestión con piso 5%; medios y licencias: al costo; estimaciones propuestas por el agente y aceptadas por el CEO, a
+ajustar con el primer encargo real), fuera del 10% On-Demand y de los descuentos; lo que el cliente paga directo es una
+nota que no entra a ningún total. 🔴 **Con terceros hay dos márgenes:** el 45% se compara contra el del trabajo propio
+(`ownWork`), nunca contra el mezclado, que baja con todo lo refacturado cerca del costo; juzgar por el mezclado rechaza
+trabajo sano o, peor, lleva a bajarle el precio al equipo. Un servicio gestionado On-Demand lleva además la reserva de
+contingencia del §4. Cómo declararlo y leerlo:
+[contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md). Sin modelar: cuándo se le
+paga al proveedor, una compra que obliga más allá del encargo (derechos de uso que lo sobreviven), comisión sobre lo
+que paga el cliente, tarifario de proveedores recurrentes, duración del contrato y períodos menores a un mes.
 
 ### (c) Ad-hoc / trabajo fuera del plan
 🩸 **BUG (oferta original del blog SKY, superseded 2026-09-23):** el ad-hoc (**CLP 260.000/artículo**) era **más barato que el marginal del plan
@@ -330,6 +345,9 @@ explicar qué compra el cliente sin vender horas, piezas ni tokens.
 | **Studio Credits** | operaciones generativas variables gobernadas | pool/envelope; nunca precio por pieza/token/provider |
 | **Implementación/IP** | onboarding, Brand Profile, templates, workflows, integración y training | milestone/aceptación; no regalar buyout del método |
 | **Derechos/licencias/pass-through** | stock, talento, voz, música, territorio, exclusividad y terceros | se negocia/cotiza aparte; no se esconde en credits |
+
+En V3 esta última línea ya se cotiza dentro del encargo, como filas de terceros con su propia regla y su propio piso
+(§7b). Los derechos se siguen negociando aparte: V3 no sabe si un derecho de uso dura más que el encargo.
 
 🔴 **Por qué el gobierno no se descuenta sin rediseño:** workspace, policy, ledger, seguridad, observabilidad
 y soporte base tienen costo operativo asignado y sostienen control, transparencia y switching cost. Un descuento

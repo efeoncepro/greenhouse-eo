@@ -158,9 +158,10 @@ mueve el puntero con `current set`; no sobrescribir artifacts. Se puede cotizar 
 (`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo; no en EUR (España se cotiza en USD).
 El país entra por dos campos distintos de la demanda y rige con `quoteDate` 2026-10-11 o posterior:
 `brief.offerMarketCountry` (país del cliente) ajusta el precio de la parte humana y `brief.lines[].talentCountry`
-(país de cada persona) ajusta el costo; país no es moneda y varios factores son estimados. Con cliente en Colombia o
-Perú el piso acompaña al factor de mercado: una cotización al precio de política no sale marcada aunque su margen
-real quede bajo el piso de su oferta, así que el margen que se informa es siempre `marginRateRoundedDown`.
+(país de cada persona) ajusta el costo; país no es moneda y los factores están cerrados por el CEO (valores de
+política confirmados desde 2026-10-12; no reabrirlos). Con cliente en Colombia o Perú el piso acompaña al factor de
+mercado: una cotización al precio de política no sale marcada aunque su margen real quede bajo el piso de su oferta,
+así que el margen que se informa es siempre `marginRateRoundedDown`.
 La forma del compromiso va en `brief.engagementForm`: `on_going` (razón 1) u `on_demand` (razón 1,10 sobre toda la
 fila; no mueve costo ni piso). Es una forma de compromiso, no una oferta ni un modelo de entrega; sin declararla
 cotiza como On-Going y no avisa, e Híbrido son dos cotizaciones. Tres lecturas de un artefacto congelado, que no
@@ -168,6 +169,12 @@ cambian nada: `compose schedule` (calendario de pagos, no factura), `compose cas
 precio) y `compose commitments` (compromisos con proveedores; informa y decide el operador). Puesta en marcha por
 persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
 licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.
+Contrato 1.4.0: una compra a un tercero para un trabajo va en `brief.thirdPartyCosts[]` (`reinvoiced` = fila propia
+con la regla de su categoría; `client_direct` = nota fuera de todo total) con monto, moneda, `periodIds` y
+`evidence`: categoría, nunca una tasa. Un servicio gestionado `on_demand` recibe sola la reserva de contingencia
+(12 % del costo de persona, como costo); sólo sale con `brief.contingency` `waived` y su motivo, y queda marcada. Con
+terceros, contra el piso de la oferta se lee `ownWork.marginRateRoundedDown`, no el margen mezclado. Detalle:
+[referencia](references/cotizador-v3-agent-workflow.md#costos-de-terceros-y-reserva-de-contingencia-delta-2026-10-11-noche).
 Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 `compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
 el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo

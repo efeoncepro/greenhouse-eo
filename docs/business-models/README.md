@@ -322,5 +322,10 @@ componente humano, cada moneda redondea a su múltiplo y el tipo de cambio de co
 On-Demand es una forma de compromiso que se declara en la cotización (10% más de precio que On-Going, mismo piso), no
 una oferta ni un delivery model; la puesta en marcha de una persona por dedicación se costea con provisiones estimadas
 (onboarding siempre, reclutamiento sólo si hay que contratar) y Adobe va como se factura, dos productos en CLP.
+Desde la noche del 2026-10-11 una cotización lleva los costos de terceros que se refacturan (fila propia por costo:
+10% de gestión con piso de 5% en producción, talento e impresión; medios y licencias al costo) y, en un servicio
+gestionado On-Demand, una reserva de contingencia de 12% del costo de las personas; con terceros el piso se lee sobre
+el margen del trabajo propio, no sobre el mezclado. Los factores de país quedaron cerrados por el CEO como valores de
+política, confirmados desde el 2026-10-12.
 Detalle en el [pack §12](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md#12-delta-2026-10-11--decisiones-del-operador-que-acotan-este-pack);
 valores vigentes y comandos (`--current`) en el manual de agentes.

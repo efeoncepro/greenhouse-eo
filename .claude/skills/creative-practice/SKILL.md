@@ -496,6 +496,10 @@ Staff augmentation (una persona vendida por dedicación, oferta `talent-assuranc
 La oferta V3 de esta práctica es `creative-managed-service` (objetivo y piso 45%); un programa SEO/AEO gestionado
 usa la suya, `seo-aeo-managed-service` (objetivo 55%, piso 45%). On-Demand es una forma de compromiso que se declara
 en la cotización (+10% sobre On-Going, mismo piso), no una oferta; eso y la puesta en marcha: `modules/04_PRICING.md` §7.
+Desde el contrato 1.4.0 (2026-10-11) V3 lleva los terceros refacturados de un encargo (producción, talento e impresión
++10% con piso 5%; medios y licencias al costo) y, en un servicio gestionado On-Demand, una reserva de contingencia de
+12% del costo de personas; con terceros el 45% se compara contra el margen del trabajo propio, nunca contra el mezclado
+(`modules/04_PRICING.md` §4 y §7b).
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no
 la nómina actual: el margen real en personas hoy es mayor que el que muestra V3; no proponer «conectar nómina real»
 ni escribir el pago de una persona. El resumen trae `estimateExposure` (qué insumo estimado carga más costo:

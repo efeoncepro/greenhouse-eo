@@ -60,7 +60,9 @@ que firmó el artefacto, y la verificación sigue siendo por recálculo y digest
 [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Desde el 2026-10-11
 el registro tiene un tercer contrato, `1.2.0` (el piso de margen acompaña al factor de mercado que lo declara),
 agregado con el mismo patrón. Ese mismo día, más tarde, se agregó el cuarto, `1.3.0`: la forma del engagement
-(On-Going, On-Demand) como dato propio del brief, con una razón de precio que vive en el catálogo. La fuente del
+(On-Going, On-Demand) como dato propio del brief, con una razón de precio que vive en el catálogo. Por la noche se
+agregó el quinto, `1.4.0`: los costos de terceros de un encargo, cada uno como fila propia con la regla de precio de
+su categoría, y una reserva de contingencia que entra como costo. Son cinco contratos que conviven. La fuente del
 registro es `PRICING_V3_ENGINES` en `schemas.ts`.
 
 Tres precisiones del 2026-10-11 sobre lo que este documento dice arriba:
@@ -91,6 +93,12 @@ Tres precisiones más, de la tarde del 2026-10-11:
   [Decisión](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--provisiones-de-puesta-en-marcha-costeadas-catálogo-v9).
 - Todavía no se modelan los costos de terceros de un encargo ni una reserva de contingencia para trabajo de alcance
   fijo.
+  *Nota 2026-10-11 (noche):* dejó de ser cierto ese mismo día. Los dos se modelan desde el contrato `1.4.0` y el
+  catálogo v10.
+  [Motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-140-costos-de-terceros-y-reserva-de-contingencia)
+  y [lectura](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--contrato-140-y-catálogo-v10-cómo-se-lee-una-cotización-con-terceros-y-reserva).
+  Lo que sigue sin modelarse (cuándo se le paga a un proveedor, si una compra ata más allá del trabajo, una
+  cotización con terceros y sin línea de equipo, la liberación de la reserva) está al final de esos dos deltas.
 
 El [ADR operativo vigente](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica módulos,
 fuentes y límites. [TASK-2022](../tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md) está completa

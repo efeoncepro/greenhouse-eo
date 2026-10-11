@@ -12,7 +12,9 @@ Código: `catalog/contracts.ts`, `catalog/catalog.ts`, `adapters/catalog-local.t
   2026-10-10 también el redondeo comercial; piso de margen, tipo de cambio de cotización, múltiplos de redondeo y
   excepciones los decide el operador (CEO) y se registran con su decisión como fuente. Desde el 2026-10-11 también
   los factores de país —talento y mercado— y la base del piso de un mercado (`floorBasis`); People aporta el costo
-  real por perfil y país cuando existe.
+  real por perfil y país cuando existe. Desde la noche del 2026-10-11 también las reglas de precio de los costos de
+  terceros por categoría y la reserva de contingencia; el importe de cada costo de terceros no vive en el catálogo:
+  lo declara cada cotización, con la cotización del proveedor como evidencia.
 - Operations mantiene perfiles, kits, capacidad/asignación y costos de Talent Assurance/operación.
 - Platform mantiene schemas, compatibilidad y consumers.
 
@@ -31,7 +33,9 @@ Kinds: profile, cost, resource, kit, allocation, pricing, talent_factor, market_
 price_rounding ([detalle](#redondeo-tipo-de-cambio-de-cotización-y-costos-confirmados-2026-10-10)). talent_factor y
 market_factor llevan valores desde el 2026-10-11 ([detalle](#factores-de-país-talento-y-mercado-2026-10-11)). Desde
 la tarde del 2026-10-11 hay un kind más, engagement_factor: la razón de precio de cada forma del trabajo
-([detalle](#registro-engagement_factor)). Perfil no incorpora fee,
+([detalle](#registro-engagement_factor)). Desde la noche de ese día hay dos más: third_party_policy, la regla de
+precio de una categoría de costo de terceros ([detalle](#registro-third_party_policy)), y contingency_reserve, la
+reserva de contingencia ([detalle](#registro-contingency_reserve)). Perfil no incorpora fee,
 software ni margen dentro de salario. Cost conserva componentes/coberturas y país específico, referencia con factor
 u origen desconocido; kits describen cómo asignar recursos. Datos de unidad/scope/moneda son parte del valor.
 El catálogo declara países/monedas con precisión explícita y evidence/hashes de los antecedentes.
@@ -178,8 +182,8 @@ de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1
 > v4 se suma a los padres congelados y tampoco se edita. Ese mismo día, más tarde, las versiones vigentes dejaron de
 > nombrarse a mano: las dice el [puntero](#puntero-de-versiones-vigentes-2026-10-11) y las imprime
 > `pnpm --silent pricing:v3 current show`. Este documento no repite cuál es la vigente; como dato fechado, tras la
-> oferta SEO/AEO del 2026-10-11 eran el catálogo v8 y la policy v6, y al cierre de ese día el catálogo v9 y la
-> policy v10.
+> oferta SEO/AEO del 2026-10-11 eran el catálogo v8 y la policy v6, por la tarde el catálogo v9 y la policy v10, y
+> por la noche, tras el contrato 1.4.0, el catálogo v10 con la misma policy v10.
 
 ## Factores de país: talento y mercado (2026-10-11)
 
@@ -283,6 +287,10 @@ Valores al 2026-10-11; la fuente es el JSON y su `audit`, y cambian por `replace
   decidió el operador a partir de los rangos de la hoja «Factor País» del workbook, que era una tabla guía sin
   fórmulas que la referenciaran; los de PE, MX y ES son estimaciones. Validarlos es el pendiente `COUNTRY_FACTORS_UNVALIDATED` del
   [ledger](../../../data/pricing/v3-operating/operational-gaps.json).
+- Nota 2026-10-11 (noche): la tabla y el punto anterior describen v5. El CEO dejó cerrados los factores de país ese
+  mismo día y el [catálogo v10](#sucesor-v10-costos-de-terceros-reserva-de-contingencia-y-factores-de-país-cerrados-2026-10-11)
+  registra los ocho que seguían estimados como valores de política **confirmados** desde el 2026-10-12, sin cambiar
+  ningún valor. `COUNTRY_FACTORS_UNVALIDATED` quedó cerrado en el ledger: no es una decisión pendiente del operador.
 - España entró como país, no como moneda de cotización: no hay regla de redondeo ni tipo de cambio vigente para
   EUR, así que todavía no se puede cotizar en EUR a un cliente de España.
 - No hay factores por tipo de cliente (pyme, licitación, cliente estratégico): hoy se expresan como `agreed_net` en
@@ -294,8 +302,9 @@ congelados de los artefactos que los usaron. La CLI sin `--catalog` sigue leyend
 
 > Nota 2026-10-11: ese párrafo describe el momento en que se emitió v5. Desde ese mismo día las versiones vigentes
 > las nombra el puntero y las imprime `current show`, que es la fuente. Como dato fechado: tras la oferta SEO/AEO
-> eran `catalog.review-v8.json` y `resources.review-v6.json`, y al cierre del 2026-10-11 `catalog.review-v9.json` y
-> `resources.review-v10.json`. Cada versión anterior pasó a ser un padre congelado. Las secciones siguientes describen
+> eran `catalog.review-v8.json` y `resources.review-v6.json`, por la tarde del 2026-10-11 `catalog.review-v9.json` y
+> `resources.review-v10.json`, y por la noche `catalog.review-v10.json` con la misma policy. Cada versión anterior
+> pasó a ser un padre congelado. Las secciones siguientes describen
 > cada versión en el orden en que se emitió.
 
 ## Puntero de versiones vigentes (2026-10-11)
@@ -312,9 +321,12 @@ un nombre de archivo: es un documento aparte, el único que sí cambia. Fuente e
 contenido). Guarda además `updatedAt` (el día en que se movió) y `reason` (por qué).
 
 La fuente de qué nombra es el propio puntero, no este documento: `pnpm --silent pricing:v3 current show` lo imprime.
-Como dato fechado, al cierre del 2026-10-11 nombraba `data/pricing/v3-operating/catalog.review-v9.json`,
-`data/pricing/v3-operating/resources.review-v10.json` y `data/pricing/v3-resources/ai-credits.review-v1.json`; más
-temprano ese día, tras la oferta SEO/AEO, el catálogo v8 y la policy v6.
+Como dato fechado, por la noche del 2026-10-11 nombraba `data/pricing/v3-operating/catalog.review-v10.json`,
+`data/pricing/v3-operating/resources.review-v10.json` y `data/pricing/v3-resources/ai-credits.review-v1.json`, con el
+motivo registrado de ese movimiento: reglas de precio para costos de terceros por categoría, una reserva de
+contingencia para servicios gestionados vendidos On-Demand y los factores de país cerrados como valores de política.
+Más temprano ese día
+nombró el catálogo v8 y la policy v6 (tras la oferta SEO/AEO) y el catálogo v9 y la policy v10 (por la tarde).
 
 ### Cómo se usa al cotizar
 
@@ -537,7 +549,8 @@ operaciones, todas vigentes desde el 2026-10-11, y hace tres cosas. Las polític
 Medido el 2026-10-11: el ejemplo `designer-on-demand.demand.json` (un mes de un diseñador senior en Chile,
 On-Demand, CLP) calcula con motor `pricing-v3-local/1.3.0` y ninguna línea bajo el piso. Su artefacto congelado,
 con la policy v7 (Adobe con descuento), da neto 2.790.000; vuelto a cotizar con `--current` y la policy v10 (Adobe
-sin descuento), 2.870.000. El siguiente catálogo sería v10.
+sin descuento), 2.870.000. El siguiente catálogo fue el
+[v10](#sucesor-v10-costos-de-terceros-reserva-de-contingencia-y-factores-de-país-cerrados-2026-10-11).
 
 ### Registro `engagement_factor`
 
@@ -555,6 +568,121 @@ forma más la oferta (o general cuando no lleva `offerId`).
   compromiso; hoy no hay ninguna.
 - Agregar o cambiar un registro no toca ninguna cotización congelada ni ningún pedido que no declare la forma.
 - Consultar: `pricing:v3 catalog search --kind engagement_factor --current --date YYYY-MM-DD`.
+
+## Sucesor v10: costos de terceros, reserva de contingencia y factores de país cerrados (2026-10-11)
+
+`catalog.review-v10.json` (versión `operating-review-2026-10-11-v10`) se emitió desde `catalog.review-v9.json` con
+`catalog preview` y `catalog apply` sobre `third-party-contingency-factors.change.json`. El change-set son 15
+operaciones —7 `add` y 8 `replace`— y hace tres cosas. Las políticas de precio, los pisos y todos los demás
+registros no se tocan. La policy de recursos sigue siendo la v10 y el catálogo de créditos, el v1.
+
+**1. Reglas de precio para los costos de terceros** — 5 `add` de un kind nuevo, vigentes desde el 2026-10-11.
+
+- Qué agrega: una regla por categoría (`third_party_policy`). Qué es un costo de terceros y cómo entra a una
+  cotización: [superficie implementada](cotizador-v3-superficie-implementada.md#costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
+
+  | Registro | Categoría | Regla | Piso de la fila | Redondeo |
+  | --- | --- | --- | --- | --- |
+  | `third-party:production` | Producción y terceros | Recargo de 10 % sobre el costo del proveedor | 5 % | Comercial |
+  | `third-party:talent` | Talento | Recargo de 10 % | 5 % | Comercial |
+  | `third-party:printing` | Impresión | Recargo de 10 % | 5 % | Comercial |
+  | `third-party:media` | Medios | Al costo (recargo 0) | 0 | Ninguno |
+  | `third-party:licences` | Licencias | Al costo (recargo 0) | 0 | Ninguno |
+
+- Quién decidió qué: las cinco las propuso el agente y las aceptó el CEO el 2026-10-11 («seguiré tu recomendación»).
+  El 10 % es el fee de gestión de proyectos del Excel de pricing; «sin margen sobre la inversión en medios» es la
+  regla que el operador ya aplicaba a los medios pagados. Los registros son `estimated`: se ajustan con el primer
+  trabajo real.
+- Qué no carga: el importe de ningún costo. Lo declara cada cotización, con su evidencia. No hay una lista de
+  precios de proveedores recurrentes.
+
+**2. Reserva de contingencia** — 2 `add` de otro kind nuevo, vigentes desde el 2026-10-11.
+
+- Qué agrega: `contingency:creative-managed-service:on_demand` y `contingency:seo-aeo-managed-service:on_demand`,
+  cada uno con tasa 0,12 sobre el costo de las personas (`base: human`), para su oferta cuando el pedido declara la
+  forma `on_demand`.
+- Quién decidió qué: el 12 % es el colchón que el operador usó en una oferta de licitación. Lo propuso el agente y
+  lo aceptó el CEO el 2026-10-11, en la misma respuesta. Los dos registros son `estimated`.
+- Qué no carga: una reserva para `talent-assurance-staffing` (en staff augmentation el cliente dirige el trabajo) ni
+  para la forma `on_going`. Si la reserva aplica también a un servicio On-Going ganado en una licitación con multas
+  queda sin decidir.
+- Consecuencia para las demandas existentes: una demanda de servicio gestionado que **declara** `on_demand` y se
+  cotiza con `--current` desde esta versión lleva la reserva y pasa al contrato 1.4.0. Una que no declara la forma
+  no la lleva, y el resumen trae el supuesto `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`. Los
+  artefactos ya congelados no cambian.
+
+**3. Factores de país cerrados** — 8 `replace`, vigentes desde el **2026-10-12**.
+
+- Qué cambia: sólo el estado y la fuente. Los factores de talento de CO (0,80), PE (0,85), MX (0,90), ES (3) y US (5)
+  y los factores de mercado de PE (0,95), MX (1) y ES (1,10) pasan de `estimated` a `confirmed`, con los mismos
+  valores y, en PE, el mismo `floorBasis`. La revisión anterior de cada uno se conserva con su ventana cerrada el
+  2026-10-11.
+- Quién decidió qué: el CEO los cerró el 2026-10-11 («deja eso cerrado ya») como los valores con que se cotiza. Los
+  valores los había propuesto el agente a partir de avisos de empleo, guías salariales y los rangos del workbook.
+  Son valores de política, no observaciones de mercado.
+- Cómo se mantienen desde ahora: uno se vuelve a mirar sólo cuando una contratación real o un negocio cerrado en ese
+  país lo contradice, y se cambia con un `replace` en una versión nueva. No se presentan como una estimación a la
+  espera de una decisión del operador.
+- Rigen desde el 12, no desde el 11: una cotización con fecha 2026-10-11 sigue leyendo el valor estimado, y el
+  resumen lo avisa con `runNotices.laterCatalogValues` (8 registros: 5 factores de talento y 3 de mercado). Con
+  fecha desde el 2026-10-12 lee el confirmado y el aviso no aparece.
+
+Estado de los factores desde el 2026-10-12, todos confirmados; los valores son los de la tabla de
+[sucesor v5](#sucesor-v5):
+
+| País | Factor de talento (referencia CL) | Factor de mercado | `floorBasis` |
+| --- | --- | --- | --- |
+| CL | 1 | 1 | — |
+| CO | 0,80 | 0,90 | `base_market` |
+| PE | 0,85 | 0,95 | `base_market` |
+| MX | 0,90 | 1 | — |
+| US | 5 | 1,10 | — |
+| ES | 3 | 1,10 | — |
+
+Medido el 2026-10-11 con `--current`: el ejemplo `managed-on-demand-third-party.demand.json` (servicio gestionado
+creativo, On-Demand, Chile, CLP, con producción, talento, medios y una licencia que paga el cliente) calcula con
+motor `pricing-v3-local/1.4.0`: neto 21.033.333, costo 14.750.055, reserva 436.800 y ninguna fila bajo su piso. El
+ejemplo de Colombia (`managed-care-colombia.demand.json`, con la tarea de Adobe Express excluida) da el mismo neto,
+COP 28.100.000, con fecha 2026-10-11 y con fecha 2026-10-12; lo que cambia es cuánto del costo descansa en datos
+estimados: 98,7 % el 11 y 34,0 % el 12. El siguiente catálogo sería v11 y la siguiente policy, v11.
+
+### Registro `third_party_policy`
+
+`value` es `{ "category", "label", "method", "rate", "minimumMargin", "rounding", "offerId"? }`; `source` y vigencia
+como cualquier otro registro. Identidad: la categoría más la oferta (o general cuando no lleva `offerId`).
+
+- `method` es `markup` (recargo sobre el costo) o `target_margin` (margen objetivo sobre el precio). `rounding` es
+  `commercial` (la fila sube al múltiplo de la regla de redondeo de la cotización) o `none` (se cobra el precio de la
+  regla tal cual). El redondeo se declara: no se deduce de que la tasa sea 0.
+- Un registro general por categoría. Un registro con `offerId` gobierna esa oferta y prevalece sobre el general.
+- Las categorías son datos: existe la que tenga un registro vigente. Agregar una es un `add`; cambiar una tasa o un
+  piso es un `replace` del registro existente con referencia nueva.
+- La cotización nombra la categoría y nunca una tasa. Un costo cuya categoría no tiene regla vigente a la fecha de
+  la cotización bloquea con `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.<costId>.policy`.
+- La validación rechaza una regla imposible (`INVALID_THIRD_PARTY_POLICY`): un margen objetivo de 1 o más, o un piso
+  mayor que el margen que la propia regla da, que marcaría toda fila a su precio de regla.
+- Agregar o cambiar un registro no toca ninguna cotización congelada ni ningún pedido sin costos de terceros.
+- Consultar: `pricing:v3 catalog search --kind third_party_policy --current --date YYYY-MM-DD`.
+
+### Registro `contingency_reserve`
+
+`value` es `{ "label", "rate", "base", "offerId"?, "engagementForm"? }`; `source` y vigencia como cualquier otro
+registro.
+
+- `rate` es mayor que 0 y menor que 1 (`INVALID_CONTINGENCY_RESERVE` si no). Una reserva de cero no es una reserva:
+  la cotización que no debe llevarla declara una renuncia.
+- `base` es `human` (el costo de las personas de cada fila del equipo) u `own_costs` (todos los componentes de costo
+  de la fila). Nunca incluye costos de terceros.
+- Un registro aplica a una cotización cuando no nombra nada que el pedido contradiga: su oferta y su forma del
+  trabajo. Entre los que aplican prevalece el que nombra más dimensiones. Dos en el nivel que prevalece bloquean con
+  `AMBIGUOUS_CONTINGENCY_RESERVE`, también cuando uno nombra sólo la oferta y el otro sólo la forma.
+- Emitir un registro cambia el contrato de las cotizaciones **nuevas** a las que aplica: la resolución pasa a emitir
+  `1.4.0`. Por eso un registro de reserva entra siempre en un sucesor, nunca corrigiendo una versión que ya usó una
+  cotización.
+- Cuando su vigencia termina, la cotización siguiente se calcula sin reserva y ningún diagnóstico lo dice; sólo un
+  pedido que la renuncia queda bloqueado (`CONTINGENCY_WAIVER_WITHOUT_RESERVE`). La lectura de fechas de los
+  precios trata ese vencimiento como un aviso con su consecuencia, no como un bloqueo.
+- Consultar: `pricing:v3 catalog search --kind contingency_reserve --current --date YYYY-MM-DD`.
 
 ## Policy v7: Adobe tal como se factura (2026-10-11)
 
@@ -600,13 +728,15 @@ toma. Habla de la licencia, no del papel del contrato. Lo declaró el CEO el 202
 | Adobe (los tres precios) | 12, desde v7 | Plan anual pagado mes a mes: una licencia comprada sigue disponible y se sigue cobrando hasta que el contrato se renueva; la cuenta no baja |
 | Microsoft 365 (sus dos precios mensuales) | 1 | El contrato es anual y se paga mes a mes, pero quitar una licencia baja la cuenta |
 | Notion (`current`) | 1 | Se paga mes a mes, sin más compromiso |
-| HubSpot | Sin declarar | Es anual, pero su precio vigente está pendiente de evidencia; un precio pendiente no admite plazo |
+| HubSpot | Sin declarar | Es anual, pero su precio está pendiente y un precio pendiente no admite plazo. Nota 2026-10-11 (noche): pendiente a propósito; el CEO indicó que hoy no se necesita en las cotizaciones |
 
 - Un plazo de 1 es una declaración, distinta de no declarar nada: con él la lectura de compromisos deja de listar la
   herramienta como «sin declarar».
 - En la v8 los importes de Microsoft 365 eran precios públicos de referencia, porque su factura estaba pendiente;
   llegó con la [policy v9](#policy-v9-microsoft-365-y-notion-como-se-facturan-y-la-renovación-de-adobe-2026-10-11).
-  La evidencia del plan de HubSpot sigue en el pendiente `SUPPLIER_CONTRACT_TERMS`, a cargo de Operations.
+  La evidencia del plan de HubSpot sigue en el pendiente `SUPPLIER_CONTRACT_TERMS`, a cargo de Operations. Nota
+  2026-10-11 (noche): el CEO indicó que HubSpot no se necesita hoy en las cotizaciones (los account managers podrían
+  usarlo más adelante para gestionar su cartera), así que su precio queda pendiente a propósito y nadie lo debe.
 - Las demás herramientas todavía no declaran plazo.
 - Límite de la v8: declara cuánto dura el plazo, no cuándo se renueva el contrato. Con ella la lectura de
   compromisos supone un plazo entero desde el primer mes cotizado y sobrestima lo que falta de un contrato que ya
@@ -669,7 +799,16 @@ días y un fee cotizado hoy tiene que sostenerse después. Sólo cambia la herra
 
 Resumen para leer sin abrir el JSON. La fuente es el catálogo que nombra el puntero y su `audit`; estos valores
 cambian sólo con una versión nueva. Los factores de país están en la tabla de
-[sucesor v5](#sucesor-v5).
+[sucesor v5](#sucesor-v5); sus valores no cambiaron, y desde el 2026-10-12 todos son valores de política confirmados
+([sucesor v10](#sucesor-v10-costos-de-terceros-reserva-de-contingencia-y-factores-de-país-cerrados-2026-10-11)).
+
+**Costos de terceros** (catálogo v10, 2026-10-11; propuestos por el agente y aceptados por el CEO; estimados):
+producción, talento e impresión se refacturan con 10 % de gestión y un piso de 5 % por fila; medios y licencias, al
+costo. Un costo que el cliente paga directo es una nota y no entra a ningún total.
+
+**Reserva de contingencia** (catálogo v10, 2026-10-11; propuesta por el agente y aceptada por el CEO; estimada): 12 %
+del costo de las personas en los servicios gestionados de las prácticas creativa y SEO/AEO cuando se venden
+On-Demand. Es un costo, sale sólo con una renuncia declarada y una persona por dedicación no la lleva.
 
 **Forma del trabajo** (catálogo v9, 2026-10-11; diseño elegido por el CEO, 10 % mantenido por el agente): On-Going,
 razón de precio 1; On-Demand, razón 1,10 sobre el precio de toda la fila. No mueve el costo ni ningún piso. Un
@@ -723,5 +862,10 @@ Pendientes abiertos sobre estos valores, con su responsable, en el
 `COUNTRY_FACTORS_UNVALIDATED`, `UNIT_PRICE_REVIEW` y `COMMERCIAL_POLICY` (las excepciones bajo un piso, caso por
 caso; los objetivos de staffing y de SEO/AEO ya están confirmados). Desde la tarde del 2026-10-11 también
 `ENGAGEMENT_FORM` (si los pedidos nuevos deben declarar la forma, si hacen falta más formas y la revisión del 10 %),
-`STARTUP_PROVISIONS_NOT_MEASURED`, `ADOBE_DISCOUNT_ENDS`, `SUPPLIER_CONTRACT_TERMS` y `THIRD_PARTY_AND_CONTINGENCY`
-(costos de terceros y reserva de contingencia: diseñados, no construidos).
+`STARTUP_PROVISIONS_NOT_MEASURED`, `ADOBE_DISCOUNT_ENDS`, `SUPPLIER_CONTRACT_TERMS` y `THIRD_PARTY_AND_CONTINGENCY`.
+Nota 2026-10-11 (noche): dos de esa lista cambiaron. `COUNTRY_FACTORS_UNVALIDATED` quedó cerrado: los factores de
+país son los valores de política con que se cotiza y no hay nada que el operador deba. Y
+`THIRD_PARTY_AND_CONTINGENCY` ya no significa «diseñados, no construidos»: los costos de terceros y la reserva
+existen desde el contrato 1.4.0 y el catálogo v10. Lo que ese pendiente conserva es ajustar las tasas con el primer
+trabajo real, decidir si la reserva aplica también a un servicio On-Going ganado en licitación con multas, y cómo
+se declaran el plazo de pago de un proveedor y un compromiso que dure más que el trabajo.

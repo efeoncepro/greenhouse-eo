@@ -1048,7 +1048,8 @@ Commercial conserva el mercado del comprador; las cifras salen del catálogo ver
 CEO, 2026-10-11), así que el margen real en personas hoy es mayor que el que muestra V3. No proponer conectarlo a
 payroll, no leerlo como lo que Efeonce paga hoy y nunca escribir el pago de una persona en un blueprint, artefacto
 o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de talento, base Chile;
-fuera de Chile son estimaciones propuestas por un agente, sin validar con contrataciones reales) y el del cliente
+el CEO los cerró el 2026-10-11 como valores de política, confirmados desde el 2026-10-12: uno se revisa sólo si una
+contratación real en ese país lo contradice, y ese dato lo aporta Talent) y el del cliente
 cambia el **precio** de la parte humana (factor de mercado). Mantener escalas de consultoría separadas:
 una necesidad SEO o CRM no autoriza sustituir el salario de la variante elegida. `planned-*` son slots,
 no personas contratadas, licencias asignadas ni capacidad disponible. No promover demanda local a Hiring por inferencia.
@@ -1058,6 +1059,8 @@ en las próximas dos incorporaciones. La regla del Excel de «un mes del recurso
 cláusula de conversión si el cliente contrata a la persona son materia de contrato y revisión legal, no de precio.
 Persona nueva en un encargo corto: una licencia Adobe comprada para ella se sigue cobrando hasta el fin del contrato de
 doce meses si nadie más la usa (`compose commitments` lo muestra); Microsoft 365 y Notion bajan al quitar el seat.
+Una persona por dedicación no lleva reserva de contingencia (el cliente dirige el trabajo); la reserva de 12% del costo
+de personas existe sólo en un servicio gestionado vendido On-Demand (contrato 1.4.0, 2026-10-11).
 
 Notion/M365 son base; tools nominativas necesitan capacidad y acceso, no descuento automático por dedicación50%.
 Portfolio declarado separa clientes/interno/sin asignar; no certifica ICO ni inventario live. Talent Assurance

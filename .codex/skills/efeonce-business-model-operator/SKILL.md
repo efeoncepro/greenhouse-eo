@@ -116,12 +116,15 @@ costear un servicio no implican vender horas/personas. Talent Assurance sigue di
 sus actividades y el caso comercial requieren evidencia. Herramientas base/específicas, crédito incremental,
 plataforma, setup, riesgos y límites deben estar en economics aunque la proyección comercial sea un fee.
 On-Demand tampoco es oferta ni delivery model: es la forma del compromiso declarada en la cotización (`engagementForm`;
-+10% al precio sobre On-Going, mismo piso) y Factory es su vía comercial. Costos de terceros y reserva de contingencia
-de alcance fijo aún no se modelan en V3: se llevan aparte en economics.
++10% al precio sobre On-Going, mismo piso) y Factory es su vía comercial. Desde el contrato 1.4.0 (2026-10-11) V3
+lleva los costos de terceros refacturados (fila propia por costo, con la regla de su categoría) y, en un servicio
+gestionado On-Demand, una reserva de contingencia de 12% del costo de personas; con terceros el piso de la oferta se
+lee sobre el margen del trabajo propio, no sobre el mezclado. Siguen aparte en economics: cuándo se le paga al
+proveedor, compras que obligan más allá del encargo (derechos de uso) y el buffer de un On-Going con multas.
 
 Portfolio usa capacidad declarada y separa cliente/interno/sin asignar. Los salarios del Excel de pricing son
 válidos como costo objetivo (los fijó el CEO; no son la nómina actual: el margen real en personas hoy es mayor que
-el que muestra V3 y no se propone conectar payroll); los factores de talento fuera de Chile y los de mercado de
-PE/MX/ES siguen siendo estimaciones. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
+el que muestra V3 y no se propone conectar payroll); los factores de país (talento y mercado) están cerrados por el
+CEO como valores de política confirmados desde el 2026-10-12, no como estimaciones pendientes. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
 quote lifecycle ni integración API/UI/MCP; el [handoff de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
 conserva esos gates. No presentar los ejemplos o propuestas de margen como oferta aprobada.

@@ -176,12 +176,14 @@ Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CE
   ese cliente) y nunca sirve de referencia de margen para otro.
 - **Costo de personas.** Los 32 costos de perfil del catálogo vienen del Excel de pricing, confirmados por su autor
   como el costo de cada perfil en Chile; son el nivel objetivo descrito en §4. La fila «Costo y modalidad en
-  Colombia» de §9 ya no espera una base de costo: queda validar el factor de talento estimado y la recruitability, o
-  registrar un costo específico cuando el costo objetivo de un perfil en un país se aparte de esa referencia.
+  Colombia» de §9 ya no espera una base de costo: queda validar la recruitability, o registrar un costo específico
+  cuando el costo objetivo de un perfil en un país se aparte de esa referencia (el factor de talento quedó cerrado
+  esa noche: ver «País»).
 - **País.** El país de la persona cambia el costo (factor de talento; Chile es la base con 1; CO 0,80 · PE 0,85 ·
-  MX 0,90 · ES 3 · US 5 son estimaciones propuestas por un agente y marcadas como estimadas). El país del cliente
-  cambia el precio del componente humano (factor de mercado: CL 1 · CO 0,90 · US 1,10 confirmados; PE 0,95 · MX 1 ·
-  ES 1,10 estimados). Donde el factor declara `floorBasis: base_market` (CO y PE) el piso se lee sobre el precio del
+  MX 0,90 · ES 3 · US 5, propuestos por un agente). El país del cliente cambia el precio del componente humano
+  (factor de mercado: CL 1 · CO 0,90 · US 1,10 · PE 0,95 · MX 1 · ES 1,10). El CEO los cerró todos el 2026-10-11 por la
+  noche y rigen como valores de política confirmados desde el 2026-10-12: no son estimaciones a la espera de su
+  decisión, y uno se revisa sólo si una contratación real o un negocio cerrado en ese país lo contradice. Donde el factor declara `floorBasis: base_market` (CO y PE) el piso se lee sobre el precio del
   mercado base. No hay factores por tipo de cliente ni factores de talento por perfil.
 - **Monedas.** El redondeo comercial sube cada fila al múltiplo de su moneda: CLP 10.000 · USD 10 · PEN 50 ·
   COP 50.000 · MXN 100. El FX de cotización es política del CEO, con USD de referencia y margen prudencial sobre el
@@ -199,7 +201,7 @@ Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CE
   importa es cuánto tiempo se paga una licencia una vez tomada, según lo declaró el CEO: una licencia Adobe se sigue
   cobrando hasta que renueva el contrato; en Microsoft 365 (contrato anual pagado al mes, con el precio de su
   factura desde el 2026-10-11) quitar una licencia baja la cuenta, y Notion es mes a mes; HubSpot es anual,
-  pero su precio vigente espera evidencia y no tiene plazo declarado. Esto concreta la regla de §6 sobre compromiso y
+  pero no tiene precio ni plazo declarado, a propósito: el CEO indicó que hoy no se necesita en las cotizaciones. Esto concreta la regla de §6 sobre compromiso y
   pago: una licencia Adobe comprada para un encargo de un mes se sigue cobrando hasta la renovación del contrato si
   nadie más la usa.
 - **Puesta en marcha.** La regla del Excel de pricing (fee de reclutamiento y onboarding = un mes del costo del recurso)
@@ -217,9 +219,20 @@ Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CE
   con proveedores) van como costo, y el 10% cubre sólo riesgo y política. No hay forma híbrida: se cotiza una fundación
   On-Demand y una operación On-Going por separado. Una forma no declarada se cotiza como On-Going.
 - **Lecturas y pendientes.** De una cotización congelada salen tres lecturas: calendario de pagos, compromisos con
-  proveedores y lectura de caja, que nunca es un margen ni decide el precio. Todavía no se modelan costos de terceros
-  (freelancers, producción, derechos, medios), reserva de contingencia para alcance fijo, duración del contrato ni
-  períodos menores a un mes.
+  proveedores y lectura de caja, que nunca es un margen ni decide el precio. Todavía no se modelan la duración del
+  contrato ni períodos menores a un mes.
+- **Terceros y reserva (noche del 2026-10-11).** La línea «Terceros / consumo extraordinario» de §2 ya se puede
+  cotizar: cada costo que se compra para un trabajo y se refactura es una fila propia, con la regla de su categoría
+  (producción, talento e impresión: 10% de gestión con piso de 5%; medios y licencias: al costo), y un costo que el
+  cliente paga directo es una nota que no entra a ningún total. Un servicio gestionado vendido On-Demand lleva una
+  reserva de contingencia de 12% del costo de las personas, como costo: se vende con el margen de la oferta y con la
+  razón On-Demand y sale sólo por una renuncia declarada con su motivo, que queda señalada; una persona por dedicación
+  no la lleva. Las dos son estimaciones propuestas por un agente y aceptadas por el CEO, a ajustar con el primer
+  trabajo real. Con terceros hay dos márgenes: el mezclado baja con todo lo refacturado cerca del costo y el piso de
+  la oferta (45% o 25%) se lee sobre el del trabajo propio; quien juzgue por el mezclado rechaza trabajo sano o le baja
+  el precio al equipo. No se modelan cuándo se le paga al proveedor, si una compra obliga más allá del trabajo
+  (derechos de uso que lo sobreviven), una comisión sobre lo que paga el cliente, un tarifario de proveedores
+  recurrentes ni el colchón de un servicio On-Going ganado en licitación con multas.
 - **Resultados de §8.** Son el registro del piloto del 2026-10-09, anterior al redondeo comercial, al FX de política y
   a los factores de país; una cotización nueva con las versiones vigentes no tiene por qué repetir esas cifras.
 - **Comandos.** Usa `--current` en lugar de nombrar a mano las versiones de catálogo, policy y créditos; los pasos y

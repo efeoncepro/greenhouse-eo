@@ -20,6 +20,11 @@ de prueba ([Puesta en marcha](#puesta-en-marcha-onboarding-y-reclutamiento)); Ad
 plazo de contrato ([Herramientas con contrato](#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor)); y tres
 lecturas de una cotización congelada: calendario de pagos, caja y compromisos con proveedores
 ([Tres lecturas de una cotización](#tres-lecturas-de-una-cotización)).
+Por la noche del 2026-10-11: contrato 1.4.0 y catálogo v10, con los costos de terceros de un trabajo
+([Costos de terceros](#costos-de-terceros)), la reserva de contingencia de un alcance fijo
+([Reserva de contingencia](#reserva-de-contingencia)) y el margen del trabajo propio junto al margen total
+([Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros)); y los factores de país cerrados
+como valores de política, confirmados desde el 2026-10-12 ([Valores vigentes](#valores-vigentes)).
 
 El operador puede pedir «cotiza un diseñador senior al 50%, talento Colombia, mercado Chile».
 El agente consulta perfiles y recursos, interpreta las tareas, completa una demanda explícita y usa la CLI.
@@ -41,9 +46,9 @@ pnpm --silent pricing:v3 catalog validate --current
 
 `current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`, e imprime qué archivo y
 qué versión nombra el puntero; esa es la fuente, no este manual. Al cierre del 2026-10-11 son
-`catalog.review-v9.json` (`operating-review-2026-10-11-v9`), `resources.review-v10.json`
+`catalog.review-v10.json` (`operating-review-2026-10-11-v10`), `resources.review-v10.json`
 (`operating-review-2026-10-11-v10`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
-versión del catálogo, con exit 0. Los siguientes serían el catálogo v10 y la policy v11.
+versión del catálogo, con exit 0. Los siguientes serían el catálogo v11 y la policy v11.
 
 - `--current` es un interruptor sin valor. Rellena cada uno de `--catalog`, `--policy` y `--credits` que el comando
   acepta y que no recibió; una opción escrita a mano gana sobre el puntero. En `resources budget` rellena `--catalog`
@@ -63,7 +68,9 @@ persona confirmados y declarados como el costo de cada perfil en Chile, y los fa
 persona), el tipo de cambio de cotización EUR→USD que el v6 agregó para las herramientas con precio en EUR, el piso
 de margen de la oferta de staffing desde el v7 y la oferta propia de la práctica SEO/AEO desde el v8
 ([Oferta y piso de margen](#selección-y-asignación)). El v9 agrega la forma del compromiso con su razón de precio,
-las dos provisiones de puesta en marcha y el tipo de cambio CLP→USD para un costo facturado en CLP.
+las dos provisiones de puesta en marcha y el tipo de cambio CLP→USD para un costo facturado en CLP. El v10 agrega
+la regla de precio de los costos de terceros por categoría y la reserva de contingencia de los servicios gestionados
+vendidos On-Demand, y deja confirmados desde el 2026-10-12 los factores de país que seguían estimados.
 La policy vigente tiene 27 precios de herramientas que rigen hasta que se reemplacen, cada uno con una fecha de
 revisión ([Un precio unitario no vence](#un-precio-unitario-no-vence)). La v7 registró Adobe como se factura (dos
 productos, en CLP) y la v8 declaró por cuánto tiempo hay que pagar una licencia de Notion o de Microsoft 365 una
@@ -82,8 +89,15 @@ demanda fechada antes del 2026-10-11 no calcula: devuelve exit 2 con `RESOURCE_P
 Cuando la demanda está fechada antes de valores más nuevos del catálogo, `compose prepare` y `compose quote` lo
 dicen: el resumen trae `runNotices.laterCatalogValues`, con la fecha de la demanda, la fecha más reciente del
 catálogo y cuántos valores posteriores no se usaron, por clase. Si aparece en una cotización nueva, la fecha está
-mal: corregir `quoteDate` y volver a correr. No aparece cuando la fecha está al día, ni en `replay`, que reproduce
-una cotización tal como se congeló ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)).
+atrasada: corregir `quoteDate` y volver a correr. No aparece cuando la fecha está al día, ni en `replay`, que
+reproduce una cotización tal como se congeló ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)).
+
+**Único caso en que el aviso sale con la fecha correcta: una cotización fechada 2026-10-11.** El catálogo v10
+confirma ocho factores de país desde el 2026-10-12 (cinco de talento y tres de mercado), así que toda cotización con
+`quoteDate` 2026-10-11 trae `laterCatalogValues` con `newestEffectiveFrom` `2026-10-12`, `records` `8` y `byKind`
+`{ "talent_factor": 5, "market_factor": 3 }`. Los valores son los mismos; cambia su estado: ese día se leen como
+estimados y desde el 2026-10-12 como confirmados ([Valores vigentes](#valores-vigentes)). Se informa tal cual; desde
+el 2026-10-12, con la fecha del día, el aviso no sale.
 
 Los catálogos y las policies anteriores a los que nombra el puntero son padres congelados: las cotizaciones hechas
 con ellos se siguen reproduciendo igual con `replay`, y en este manual sólo se nombran para repetir un ejemplo
@@ -122,11 +136,14 @@ pnpm --silent pricing:v3 compose preview --input /tmp/cotizacion-v3-hoy.json \
 ```
 
 `inspect` devuelve exit 0, `scaffold` exit 2 (siempre deja preguntas) y los demás exit 3. El resumen de
-`compose quote` trae `engineVersion` `pricing-v3-local/1.1.0`, `totals.net` `1390.00` en USD y
-`priceRounding.multiple` `10`; el preview lo muestra como 1.100,00 del diseñador más 290,00 de implementación
+`compose quote` trae `engineVersion` `pricing-v3-local/1.1.0`, `totals.net` `1450.00` en USD y
+`priceRounding.multiple` `10`; el preview lo muestra como 1.160,00 del diseñador más 290,00 de implementación
 inicial, que es el onboarding de la persona ([Puesta en marcha](#puesta-en-marcha-onboarding-y-reclutamiento)). El
 plan no declara forma del compromiso, así que cotiza como On-Going y el resumen no trae `engagementForm`
-([Cotizar On-Demand u On-Going](#cotizar-on-demand-u-on-going)). Sin `fx:CLP:USD` en `fxRecordIds`, `compose plan`
+([Cotizar On-Demand u On-Going](#cotizar-on-demand-u-on-going)). Es una persona por dedicación: no lleva reserva de
+contingencia ni el supuesto que la acompaña ([Reserva de contingencia](#reserva-de-contingencia)). Con la fecha
+2026-10-11 el resumen trae `runNotices.laterCatalogValues` por los ocho factores de país que rigen desde el día
+siguiente ([Versiones vigentes](#versiones-vigentes)). Sin `fx:CLP:USD` en `fxRecordIds`, `compose plan`
 devuelve exit 2 con `RESOURCE_FX_SELECTION_REQUIRED` en `1:adobe`: Adobe tiene precio en CLP. `explain`, `replay`,
 `compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash` y `compose commitments`
 leen sólo el artefacto: no reciben `--current` ni versiones.
@@ -169,8 +186,8 @@ Los códigos de salida son los mismos. Aquí el resumen de `compose quote` trae 
 `pricing-v3-local/1.0.0` y `priceRounding: null` (es una cotización anterior al redondeo), y
 `runNotices.priceDates.dueSoon` nombra cuatro vigencias que con esas versiones terminaban dentro de los 30 días
 siguientes (la referencia EUR→USD de ese día y los precios de Notion, Adobe y Microsoft 365). Con `--current`, ese
-plan sin copiar devuelve exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` y `RESOURCE_PRICE_NOT_EFFECTIVE` en `1:adobe`: la
-policy vigente y el precio de Adobe rigen desde el 2026-10-11.
+plan sin copiar devuelve exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` y `RESOURCE_PRICE_NOT_EFFECTIVE` en `1:adobe` y
+`1:notion`: la policy vigente y esos precios rigen desde el 2026-10-11.
 
 Las rutas `--out` deben ser nuevas; nunca sobrescriben un padre o artefacto. JSON en stdout es interfaz para agentes.
 Exit 0: operación técnica verificada. Exit 2: falta información. Exit 3: preparado/calculado en revisión;
@@ -189,23 +206,23 @@ No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interp
 | Comando                                                | Input/formato                                                      | Resultado y estado                                                                                           |
 | ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `current show` / `current set`                         | Sin input / las tres rutas, `--reason` y `--confirm`               | Puntero de versiones vigentes, su `pointerDigest` y estado por fuente (exit 0 coherente, 2 si no) / puntero nuevo |
-| `catalog search` / `catalog show` / `catalog validate` | Catálogo monetario, consulta/kind y fecha opcionales               | Registros con fuentes o digest validado; no vigencia comercial aprobada                                      |
+| `catalog search` / `catalog show` / `catalog validate` | Catálogo monetario, consulta/kind y fecha opcionales               | Registros con fuentes o digest validado; no vigencia comercial aprobada. `--kind third_party_policy` y `--kind contingency_reserve` listan las reglas de terceros y la reserva |
 | `prepare` / `quote`                                    | Brief y catálogo                                                   | Selección / quote del carril de kits; no recibe demanda compuesta                                            |
 | `validate` / `calculate`                               | Request + snapshot resuelto                                        | Validación / artefacto del núcleo; no lee Excel ni descubre tools                                            |
 | `resources inspect`                                    | Catálogo + policy + fecha; créditos opcionales                     | Perfiles, tools, planes, fee separado, necesidades y hashes; precio vencido deja `needs_input` en su entrada; `priceReview` lista revisiones y vigencias por fecha |
 | `compose scaffold`                                     | Brief + policy + catálogo                                          | Demanda editable con slots y preguntas, siempre exit 2; completar planes/asignaciones/alcance                |
 | `resources portfolio`                                  | Portfolio + policy; fecha/catálogo para costos                     | Cuotas reconciliadas, interno/sin asignar y residual; exit 3 preparado o 2 pendiente                         |
 | `compose plan`                                         | Plan con demanda y portfolio opcional + las tres fuentes           | Demanda resuelta y cálculo de prueba; `--out` guarda la demanda, **no** el artefacto                         |
-| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Resumen derivado en stdout; `quote` añade `replayDigest`; `runNotices` si la corrida tiene avisos. Resultado completo sólo en el artefacto de `--out` |
+| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Resumen derivado en stdout; `quote` añade `replayDigest`; `runNotices` si la corrida tiene avisos; `ownWork`, `thirdParty` y `contingencyReserve` en una cotización 1.4.0. Resultado completo sólo en el artefacto de `--out` |
 | `resources budget`                                     | Request de créditos; `--catalog` es catálogo de packs              | Presupuesto independiente; no es input de quote/replay de cotizaciones                                       |
 | `explain` / `replay`                                   | Artefacto snapshot, catálogo o composición                         | Detalle completo / verificación con inputs congelados, sin sucesor; replay de composición devuelve resumen   |
 | `compare`                                              | Dos artefactos compatibles de snapshot o catálogo                  | Diferencias internas; el CLI actual no compara artefactos de composición directamente                        |
-| `compose assess`                                       | Artefacto compuesto                                                | Gaps, `costEvidencePriority` (qué dato estimado confirmar primero), margen propuesto y piso de la política por línea; siempre revisión, no aprueba excepciones; JSON |
-| `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, importes en escala de moneda, sin emisión   |
-| `compose split`                                        | Artefacto compuesto calculado + `--tools`                          | El mismo neto presentado en dos cifras por fila: persona y kit de herramientas; no cambia el total; JSON     |
-| `compose schedule`                                     | Artefacto compuesto calculado + `--milestones` (arreglo JSON)      | Calendario de pagos: el neto repartido en hitos que suman exactamente el neto; no es factura ni cobro; exit 3 |
-| `compose cash`                                         | Artefacto compuesto calculado                                      | Lectura de caja: neto, costo completo por naturaleza, caja nueva a proveedores y caja sobre capacidad ya contratada; no es margen ni decide precio; exit 3 |
-| `compose commitments`                                  | Artefacto compuesto                                                | Compromisos con proveedores que duran más que los periodos cotizados; informa, no recomienda; exit 3 (2 si la cotización no está calculada) |
+| `compose assess`                                       | Artefacto compuesto                                                | Gaps, `costEvidencePriority` (qué dato estimado confirmar primero), margen propuesto (leído sobre el trabajo propio si hay terceros) y piso de la política por línea; siempre revisión, no aprueba excepciones; JSON |
+| `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, un ítem por costo de terceros y lo que el cliente paga directo aparte; importes en escala de moneda, sin emisión |
+| `compose split`                                        | Artefacto compuesto calculado + `--tools`                          | El mismo neto presentado en dos cifras por fila: persona y kit de herramientas (tres con terceros); no cambia el total; JSON |
+| `compose schedule`                                     | Artefacto compuesto calculado + `--milestones` (arreglo JSON)      | Calendario de pagos: el neto repartido en hitos que suman exactamente el neto, terceros incluidos; no es factura ni cobro; exit 3 |
+| `compose cash`                                         | Artefacto compuesto calculado                                      | Lectura de caja: neto, costo completo por naturaleza, caja nueva a proveedores (incluye los terceros refacturados) y caja sobre capacidad ya contratada; no es margen ni decide precio; exit 3 |
+| `compose commitments`                                  | Artefacto compuesto                                                | Compromisos con proveedores que duran más que los periodos cotizados; deja fuera las compras a terceros y lo dice; informa, no recomienda; exit 3 (2 si la cotización no está calculada) |
 | `catalog preview` / `catalog apply`                    | Change-set monetario; impacto de briefs opcional                   | Preview / sucesor nuevo; apply exige digest confirmado y `--out`                                             |
 | `resources preview` / `resources apply`                | Replacement completo policy/créditos; impacto de demandas opcional | Preview / sucesor nuevo; mismo contexto/hash/impacto, sin selección automática                               |
 | `export`                                               | Artefacto completo dentro de policy                                | Gate propio de borrador: composiciones review-only actuales siguen bloqueadas                                |
@@ -261,8 +278,9 @@ su versión no está soportada: no editarlo, volver a cotizar), `CATALOG_BASE_CO
 es un error: el motivo está en el JSON de stdout, no en stderr. Ahí llegan, en `diagnostics`, las fallas de selección
 de la forma del compromiso: `MISSING_CATALOG_SELECTION` con `path` `engagementForm` (la forma declarada no tiene
 registro vigente a la fecha de la demanda) y `AMBIGUOUS_SELECTION` en el mismo `path` (dos registros vigentes del
-mismo nivel para esa forma). `compose commitments` sobre una cotización bloqueada tampoco es un rechazo: devuelve
-exit 2 con `calculationStatus` `needs_input`.
+mismo nivel para esa forma). También llegan ahí los diagnósticos de los costos de terceros y de la reserva de
+contingencia ([tabla](#si-un-costo-de-terceros-o-la-reserva-fallan)). `compose commitments` sobre una cotización
+bloqueada tampoco es un rechazo: devuelve exit 2 con `calculationStatus` `needs_input`.
 
 ## Selección y asignación
 
@@ -314,7 +332,9 @@ el recargo histórico de staffing, sin piso.
 **La oferta no es la forma del compromiso.** Qué se vende lo dice `offerId`; si es un trabajo continuo o uno acotado
 lo dice otro campo, `brief.engagementForm`, que mueve el precio y nunca el piso
 ([Cotizar On-Demand u On-Going](#cotizar-on-demand-u-on-going)). `engagementCode` (`monthly`) sigue siendo la
-cadencia de cobro que elige la política de precio: no se cambia para expresar la forma.
+cadencia de cobro que elige la política de precio: no se cambia para expresar la forma. En las dos ofertas de
+servicio gestionado la forma decide además si la cotización lleva la reserva de contingencia
+([Reserva de contingencia](#reserva-de-contingencia)).
 
 Las 32 reglas de perfil son **reglas iniciales para revisión**, no recetas universales completas ni autorización
 de compras. Hay tareas adicionales para WordPress, UX, video, stock, datos, comunidad y automatización.
@@ -428,7 +448,7 @@ cambian su precio; lo que cambia es cuántas licencias se contratan.
 - **Un precio cambia sólo con una versión nueva de la policy** (`resources preview` → `resources apply` → mover el
   puntero). No se corrige en la demanda ni editando la versión vigente.
 - **La cantidad de licencias se declara en cada cotización** (asignaciones de la demanda); no es parte del precio.
-- **22 de los 26 siguen marcados `estimated`**; la mayoría es precio público de lista. Salen en `reviewSignals`
+- **22 de los 27 siguen marcados `estimated`**; la mayoría es precio público de lista. Salen en `reviewSignals`
   como `ESTIMATED_SOURCE` y en `estimateExposure` con su peso. Pendiente en el ledger como `UNIT_PRICE_REVIEW`
   (confirmar el plan contratado donde el precio es de lista).
 
@@ -445,13 +465,18 @@ pnpm --silent pricing:v3 resources inspect --current --date 2026-10-11
 | `expired`              | Vigencias duras que ya pasaron: una cotización con esa fecha no puede usar ese valor      | `blocksWith` dice el diagnóstico que saldría; el valor se reemplaza con una versión nueva   |
 
 Cada entrada trae `kind` (`review` o `hard_expiry`), `subject` (`tool_price`, `resource_policy`, `catalog_record` o
-`credit_provider`), `ref`, `date`, `daysLeft` (negativo si ya pasó) y `blocksWith` (`null` en una revisión). Con
+`credit_provider`), `ref`, `date`, `daysLeft` (negativo si ya pasó) y `blocksWith` (`null` en una revisión). Dos
+casos del contrato 1.4.0: en el resumen de una cotización, la vigencia de la cotización de un proveedor sale con
+`subject` `third_party_quote` y `blocksWith` `STALE_SOURCE`
+([Costos de terceros](#costos-de-terceros)); y el fin de un registro de reserva de contingencia sale como
+`catalog_record` con `blocksWith` `null` y un texto en `consequence`, porque no bloquea: la cotización siguiente
+simplemente no lleva reserva ([Reserva de contingencia](#reserva-de-contingencia)). Con
 `--date 2026-10-11` devuelve exit 0, `reviewDue` y `dueSoon` vacíos y una entrada en `expired`:
 `fx:EUR:USD:ECB:2026-10-09`, la referencia EUR→USD de un solo día. No afecta a una cotización nueva, que usa el tipo
 de cambio de cotización `fx:EUR:USD`; sigue apareciendo porque el registro anterior no se retiró. Con `--date`
-2026-11-15 los dos precios de Adobe Creative Cloud Pro pasan a `dueSoon` (`daysLeft` `16`) y desde el 2026-12-02 a
-`reviewDue`; con `--date` 2027-03-20 los otros 24 pasan a `dueSoon`, y desde el 2027-04-12 los 26 están en
-`reviewDue`.
+2026-11-15 los tres precios de Adobe (los dos de Creative Cloud Pro y el de Adobe Express) pasan a `dueSoon`
+(`daysLeft` `1`) y desde el 2026-11-17 a `reviewDue`; con `--date` 2027-03-20 los otros 24 pasan a `dueSoon`
+(`daysLeft` `22`), y desde el 2027-04-12 los 27 están en `reviewDue`.
 
 ## Cotizar un servicio gestionado por volumen
 
@@ -526,16 +551,30 @@ donde se puede ganar más sube su margen objetivo en su propia política, no el 
 la misma copia con `offerId: "seo-aeo-managed-service"` sale en CLP 11.640.000 al mes, con margen `0.550693`, motor
 `pricing-v3-local/1.1.0` y ninguna línea bajo el piso.
 
+**Desde el catálogo v10 la forma del compromiso cambia este resultado.** La demanda del ejemplo no declara
+`engagementForm`, y las dos ofertas de servicio gestionado tienen una reserva de contingencia para la forma
+On-Demand. Por eso el resumen de las dos corridas de arriba trae, en `assumptions`, el supuesto
+`CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`: el precio es el mismo de antes, pero el cotizador avisa
+que no evaluó la reserva porque no sabe la forma. Se resuelve declarándola en el `brief`:
+
+- `"engagementForm": "on_going"` (servicio continuo): mismo neto, CLP 9.530.000, sin reserva y sin el supuesto; el
+  motor pasa a `pricing-v3-local/1.3.0`.
+- `"engagementForm": "on_demand"` (alcance fijo): la cotización lleva el recargo de la forma y la reserva. La misma
+  copia sale en CLP 11.370.000, con costo 5.666.722 (436.800 de reserva), margen `0.501607` y motor
+  `pricing-v3-local/1.4.0` ([Reserva de contingencia](#reserva-de-contingencia)).
+
+Un supuesto no bloquea, pero no se deja pasar: se pregunta la forma y se vuelve a correr.
+
 Sigue siendo una simulación en revisión. Las provisiones y el consumo de agentes son hipótesis declaradas y el plan
 de Sprout es precio público. Los 32 costos de persona están confirmados por su autor (el CEO) con los montos del
 Excel y, desde el catálogo v5, declarados como el costo de cada perfil en Chile.
 
 `managed-care.demand.json` está fechada el 2026-10-10, un día antes de esa declaración y del inicio de la policy
-vigente. Cotizada tal cual con `--current` no calcula: exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` en `policy.source`
-y `RESOURCE_ALLOCATION_REQUIRED` en `1:adobe-express`, y su resumen avisa en `runNotices.laterCatalogValues` que hay
-121 valores del catálogo posteriores a esa fecha. Por eso el paso 2 la copia con la fecha del día: la copia da el
-precio de arriba —cliente y equipo en Chile: los dos factores de país valen 1— sin el supuesto
-`UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. Para un cliente o un equipo de otro país:
+vigente. Cotizada tal cual con `--current` no calcula: exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` en `policy.source`,
+`RESOURCE_PRICE_NOT_EFFECTIVE` en `1:notion` y `RESOURCE_ALLOCATION_REQUIRED` en `1:adobe-express`, y su resumen
+avisa en `runNotices.laterCatalogValues` que hay 136 valores del catálogo posteriores a esa fecha. Por eso el paso 2
+la copia con la fecha del día: la copia da el precio de arriba —cliente y equipo en Chile: los dos factores de país
+valen 1— sin el supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. Para un cliente o un equipo de otro país:
 [Cotizar según el país del cliente y del equipo](#cotizar-según-el-país-del-cliente-y-del-equipo).
 
 ## Leer el resumen
@@ -550,30 +589,31 @@ pnpm --silent pricing:v3 replay --input /tmp/servicio-gestionado.artifact.json
 pnpm --silent pricing:v3 explain --input /tmp/servicio-gestionado.artifact.json
 ```
 
-Los dos devuelven exit 3 en este ejemplo, igual que el `compose quote` que lo generó. El resumen pesa unos 18 KB;
-`explain` del mismo artefacto, unos 236 KB.
+Los dos devuelven exit 3 en este ejemplo, igual que el `compose quote` que lo generó. El resumen pesa unos 19 KB;
+`explain` del mismo artefacto, unos 237 KB.
 
 | Parte                                                                   | Qué dice                                                                                                                                                                                                                                                                                                                                                                                                                                               | Qué hacer                                                                                                                                                                                                                                                             |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `calculationId`, `replayDigest`                                         | Identidad del cálculo. `replayDigest` sólo aparece en `quote` y en `replay`: es lo que una reproducción debe igualar                                                                                                                                                                                                                                                                                                                                   | Citarlos al registrar o compartir el caso                                                                                                                                                                                                                             |
 | `calculationStatus`, `diagnostics`                                      | `diagnostics` son los **bloqueos**, completos. Si no está vacío, el estado es `needs_input`, `totals` es `null` y el exit es 2                                                                                                                                                                                                                                                                                                                         | Resolver cada bloqueo en la demanda (su `path` dice dónde) y volver a correr. No presentar precio                                                                                                                                                                     |
 | `reviewStatus`, `quoteReviewStatus`                                     | Revisión de la composición (siempre `requires_review`) y revisión que devuelve el kernel                                                                                                                                                                                                                                                                                                                                                               | Tratar el número como simulación; ninguno de los dos es una aprobación                                                                                                                                                                                                |
-| `engineVersion` | Motor que calculó: `pricing-v3-local/1.3.0` si la demanda declara la forma del compromiso (`brief.engagementForm`), también con razón 1; si no, `pricing-v3-local/1.2.0` si el factor de mercado del país del cliente declara que el piso lo acompaña (hoy Colombia y Perú); `pricing-v3-local/1.1.0` si la cotización usa un neto acordado, varios ajustes o una regla de redondeo para su moneda; `pricing-v3-local/1.0.0` en los demás casos. `null` si la demanda quedó bloqueada antes de llegar al motor | No se elige: sale de la demanda y del catálogo. Dice qué lectura de `totals` y del piso aplica |
-| `totals`, `marginRateRoundedDown` | Del plazo: `cost`, `undiscountedPrice` (precio calculado; ya incluye el factor de mercado, la razón de la forma del compromiso y el redondeo), `discount`, `net`, margen, impuestos y moneda. Con el motor 1.1.0 se agregan `roundingAdjustment` (lo que sumó el redondeo) y `uplift` (recargo de un neto acordado sobre el precio); en una cotización 1.0.0 esas dos claves no existen. Con el motor 1.2.0 se agrega `marketAdjustment`: cuánto movió el precio el factor de mercado, con signo (negativo en un mercado bajo 1). Con el motor 1.3.0 se agrega `engagementAdjustment`: cuánto movió el precio la forma del compromiso (`"0"` en On-Going). Los dos son informativos y no se suman otra vez. `net = undiscountedPrice + uplift − discount`. `marginRateRoundedDown` es **siempre el margen real** del neto final contra el costo, a 6 decimales y redondeado hacia abajo, en cualquier mercado | Leer el margen de aquí, no recalcularlo. Es el que se informa al operador, también cuando ninguna línea sale marcada. `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero |
+| `engineVersion` | Motor que calculó: `pricing-v3-local/1.4.0` si la demanda refactura al menos un costo de terceros o si la cotización tiene una reserva de contingencia (también cuando se renuncia a ella); si no, `pricing-v3-local/1.3.0` si la demanda declara la forma del compromiso (`brief.engagementForm`), también con razón 1; si no, `pricing-v3-local/1.2.0` si el factor de mercado del país del cliente declara que el piso lo acompaña (hoy Colombia y Perú); `pricing-v3-local/1.1.0` si la cotización usa un neto acordado, varios ajustes o una regla de redondeo para su moneda; `pricing-v3-local/1.0.0` en los demás casos. `null` si la demanda quedó bloqueada antes de llegar al motor | No se elige: sale de la demanda y del catálogo. Dice qué lectura de `totals` y del piso aplica |
+| `totals`, `marginRateRoundedDown` | Del plazo: `cost`, `undiscountedPrice` (precio calculado; ya incluye el factor de mercado, la razón de la forma del compromiso y el redondeo), `discount`, `net`, margen, impuestos y moneda. Con el motor 1.1.0 se agregan `roundingAdjustment` (lo que sumó el redondeo) y `uplift` (recargo de un neto acordado sobre el precio); en una cotización 1.0.0 esas dos claves no existen. Con el motor 1.2.0 se agrega `marketAdjustment`: cuánto movió el precio el factor de mercado, con signo (negativo en un mercado bajo 1). Con el motor 1.3.0 se agrega `engagementAdjustment`: cuánto movió el precio la forma del compromiso (`"0"` en On-Going). Los dos son informativos y no se suman otra vez. Con el motor 1.4.0 se agregan `thirdPartyCost` y `thirdPartyNet` (costo y neto de las filas de terceros, ya incluidos en `cost` y `net`), `ownWorkMarginRate` (margen del trabajo propio), `contingencyReserve` (reserva dentro de `cost`), `contingencyBase` (costo sobre el que se calculó) y `contingencyReserveWaived` (reserva a la que se renunció). `net = undiscountedPrice + uplift − discount`. `marginRateRoundedDown` es **siempre el margen real** del neto final contra el costo, a 6 decimales y redondeado hacia abajo, en cualquier mercado; con terceros es el margen **mezclado** | Leer el margen de aquí, no recalcularlo. Es el que se informa al operador, también cuando ninguna línea sale marcada. Con costos de terceros se informa junto al de `ownWork`, que es el que se compara con el piso de la oferta ([regla](#cómo-leer-una-cotización-con-terceros)). `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero |
 | `commercialAdjustments`                                                 | Los ajustes tal como los declara el `brief` congelado: neto acordado (`agreed_net`) o descuento por tasa (`discount`), con su `reason`. `[]` si no hay                                                                                                                                                                                                                                                                                                 | Comprobar que el monto y el motivo son los que aprobó el operador ([Registrar el precio acordado](#registrar-el-precio-acordado))                                                                                                                                     |
 | `priceRounding`                                                         | Regla de redondeo aplicada a la moneda de salida: `{ currency, multiple, scope, offerId, recordId, revision, sourceStatus }`; `scope` es `general` (regla de la moneda) u `offer` (regla propia de la oferta, que prevalece). `null`: esta cotización no redondea                                                                                                                                                                                      | Con valor, una línea marcada es un incumplimiento real; con `null`, leer «Qué significa una línea marcada» abajo                                                                                                                                                            |
 | `marketFactor` | Factor de mercado del país del cliente: `{ country, factor, floorBasis, recordId, revision, sourceStatus }`. Sólo aparece cuando cambia algo: factor distinto de 1 o `floorBasis` declarado. Con cliente en Chile o México (factor 1) la clave no existe. `floorBasis: "base_market"` dice que el piso se lee sobre el precio del mercado base; `null`, sobre el neto final. `sourceStatus` dice si el factor es una decisión (`confirmed`) o un estimado (`estimated`) | Comprobar que el país es el del cliente. Con `floorBasis`, leer «Qué significa una línea marcada» abajo. Si esperabas un factor y la clave no está, revisar `offerMarketCountry` y `quoteDate` ([por país](#cotizar-según-el-país-del-cliente-y-del-equipo)) |
 | `engagementForm` | Forma del compromiso que la demanda declaró y su razón de precio: `{ form, priceRatio, scope, offerId, recordId, revision, sourceStatus }`; `scope` es `general` (registro de la forma) u `offer` (registro propio de la oferta, que prevalece). La clave sólo existe si la demanda declara la forma; aparece también con razón 1 | Comprobar que la forma es la del pedido. Si la clave no está, la cotización se calculó como On-Going sin decirlo: en un trabajo acotado, declarar la forma y volver a correr ([formas](#cotizar-on-demand-u-on-going)) |
+| `ownWork`, `thirdParty`, `contingencyReserve` | Sólo en una cotización 1.4.0. `ownWork`: costo, neto y margen de la cotización sin las filas de terceros. `thirdParty`: lo refacturado (`reinvoiced`, con una fila por costo), lo que el cliente paga directo (`clientDirect`, fuera de todo total) y los costos con proveedor en otra moneda (`fxExposed`). `contingencyReserve`: tasa, base, monto y si se renunció a ella. En una cotización anterior las tres claves no existen | [Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros). Comparar con el piso de la oferta el margen de `ownWork`, no el mezclado |
 | `periods[]`                                                             | Estado y totales de cada periodo                                                                                                                                                                                                                                                                                                                                                                                                                       | Revisar que ningún periodo quede sin calcular y si el neto varía entre meses                                                                                                                                                                                          |
-| `assumptions` | Supuestos con que se resolvió el pedido. `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` (el costo no declara país y se asume para el de la línea) sólo aparece en demandas fechadas antes del 2026-10-11; desde esa fecha los costos son el costo en Chile y el país de la persona entra por su factor, así que la lista suele venir vacía | Declararlos al explicar el precio. Si aparece en una cotización nueva, la fecha de la demanda es anterior al catálogo v5: los factores de país no se aplicaron |
-| `reviewSignals[]` | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales. Un factor de país estimado se informa como `ESTIMATED_SOURCE` con `paths` `snapshot.talentFactors` (país de la persona) o `snapshot.marketFactors` (país del cliente) | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`…); `paths` dice qué dato lo origina. Con un factor estimado, decir que el precio depende de un estimado sin validar |
-| `marginFloor.lines[]` | Líneas que el kernel marcó bajo el piso de su política: `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` (margen real de la línea) y cuánto falta. En un mercado cuyo piso acompaña al factor: `floorNet` (neto mínimo de esa línea en ese mercado) y `netShortOfFloor` (neto que falta para alcanzarlo), con `marginAmountShortOfFloor` en `null`. En los demás mercados: `marginAmountShortOfFloor` (margen que falta al neto actual), y las otras dos claves no existen | Ver «Qué significa una línea marcada» abajo |
+| `assumptions` | Supuestos con que se resolvió el pedido. `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` (el costo no declara país y se asume para el de la línea) sólo aparece en demandas fechadas antes del 2026-10-11; desde esa fecha los costos son el costo en Chile y el país de la persona entra por su factor. `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM` aparece cuando la oferta tiene una reserva de contingencia que depende de la forma del compromiso y la demanda no declara la forma: la reserva no se evaluó | Declararlos al explicar el precio. Si aparece el primero en una cotización nueva, la fecha de la demanda es anterior al catálogo v5: los factores de país no se aplicaron. Si aparece el segundo, preguntar la forma, declararla y volver a correr ([reserva](#reserva-de-contingencia)) |
+| `reviewSignals[]` | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales. Un factor de país sale como `ESTIMATED_SOURCE` con `paths` `snapshot.talentFactors` (país de la persona) o `snapshot.marketFactors` (país del cliente) sólo en una cotización fechada 2026-10-11: desde el 2026-10-12 están confirmados. La reserva de contingencia y las reglas de terceros, que son estimadas, salen con `paths` `snapshot.contingencyReserve` y `snapshot.thirdPartyPolicies.<categoría>`; una renuncia a la reserva, como `CONTINGENCY_RESERVE_WAIVED` | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`, `CONTINGENCY_RESERVE_WAIVED`…); `paths` dice qué dato lo origina. Con un dato estimado, decir que el precio depende de un estimado |
+| `marginFloor.lines[]` | Líneas que el kernel marcó bajo su piso (una fila de equipo, el de su política; una fila de terceros, con `kind` `third_party`, el de su categoría): `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` (margen real de la línea) y cuánto falta. En un mercado cuyo piso acompaña al factor: `floorNet` (neto mínimo de esa línea en ese mercado) y `netShortOfFloor` (neto que falta para alcanzarlo), con `marginAmountShortOfFloor` en `null`. En los demás mercados: `marginAmountShortOfFloor` (margen que falta al neto actual), y las otras dos claves no existen | Ver «Qué significa una línea marcada» abajo |
 | `toolSelections`                                                        | `counts` y las herramientas incluidas, las que aporta el cliente y las excluidas con motivo                                                                                                                                                                                                                                                                                                                                                            | Confirmar que cada herramienta incluida corresponde al alcance y que cada exclusión tiene un motivo defendible                                                                                                                                                        |
 | `attributions`                                                          | Por herramienta y precio: estado de la fuente, cantidad, parte del servicio y costo mensual completo, atribuido y sin asignar                                                                                                                                                                                                                                                                                                                          | Revisar fuentes no confirmadas y el costo que queda sin asignar                                                                                                                                                                                                       |
 | `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` | Presupuesto de créditos y caja. Costo atribuido no es dinero nuevo por pagar; `cashMeaning` lo explica                                                                                                                                                                                                                                                                                                                                                 | No presentar `cashCommitment` como factura ni como compra                                                                                                                                                                                                             |
-| `estimateExposure` | Cuánto del costo descansa en datos estimados y, por dato, cuánto costo depende de él (`costAtRisk`, `shareOfCost`, `marginRateLostIfTenPctHigher`). `null` si la cotización quedó bloqueada | Decirle al operador qué dato estimado conviene confirmar primero ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Es una lectura de sensibilidad, no una validación |
-| `runNotices` | Avisos sobre la corrida, no sobre la cotización: `laterCatalogValues` (la demanda está fechada antes de valores más nuevos del catálogo) y `priceDates` (fechas de revisión o de vigencia de los precios que esta cotización usa). La clave no existe si no hay nada que avisar; no está en el artefacto ni en `replay` | Nunca bloquea. Informarlo al operador junto al resultado ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)) |
-| `fullDetail` | Recuerda que el detalle vive en el artefacto, bajo `semantic.result` | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea. `explain.commercialAdjustments.rows` trae el recorrido del precio por fila: `undiscountedPrice`, `roundingAdjustment`, `discount`, `uplift` y `net`; con el motor 1.2.0, además `marketAdjustment`, `marketPriceRatio` (cuánto del precio base conserva la fila tras el factor) y `floorNet`; con el motor 1.3.0, además `engagementAdjustment` y `engagementPriceRatio` por fila, y `explain.commercialAdjustments.engagementForm` |
+| `estimateExposure` | Cuánto del costo descansa en datos estimados y, por dato, cuánto costo depende de él (`costAtRisk`, `shareOfCost`, `marginRateLostIfTenPctHigher`). La cotización estimada de un proveedor es un dato más del ranking (`kind` `third_party`). `null` si la cotización quedó bloqueada | Decirle al operador qué dato estimado conviene confirmar primero ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Es una lectura de sensibilidad, no una validación |
+| `runNotices` | Avisos sobre la corrida, no sobre la cotización: `laterCatalogValues` (la demanda está fechada antes de valores más nuevos del catálogo) y `priceDates` (fechas de revisión o de vigencia de los precios que esta cotización usa, incluida la vigencia de la cotización de cada proveedor). La clave no existe si no hay nada que avisar; no está en el artefacto ni en `replay` | Nunca bloquea. Informarlo al operador junto al resultado ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)) |
+| `fullDetail` | Recuerda que el detalle vive en el artefacto, bajo `semantic.result` | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea. `explain.commercialAdjustments.rows` trae el recorrido del precio por fila: `undiscountedPrice`, `roundingAdjustment`, `discount`, `uplift` y `net`; con el motor 1.2.0, además `marketAdjustment`, `marketPriceRatio` (cuánto del precio base conserva la fila tras el factor) y `floorNet`; con el motor 1.3.0, además `engagementAdjustment` y `engagementPriceRatio` por fila, y `explain.commercialAdjustments.engagementForm`; con el motor 1.4.0, además `contingencyReserve` por fila, las filas de terceros (`kind` `third_party`) y `explain.commercialAdjustments.thirdPartyPolicies[]` y `.contingencyReserve` |
 
 Las filas que sólo difieren por periodo se agrupan en una con `periodIds`.
 
@@ -591,6 +631,10 @@ marca (`MARGIN_BELOW_FLOOR`); nunca corrige un incumplimiento. La lectura depend
     45 %»**: el margen real de esa cotización está bajo el mínimo de la política (41,5 % en el ejemplo de Colombia) y
     se lee en `marginRateRoundedDown`. Una línea sale marcada cuando su neto queda bajo `floorNet`, es decir, cuando
     hay una rebaja adicional a la del país.
+- **Una fila de terceros tiene su propio piso** (`kind: "third_party"`): el de la regla de su categoría, no el de la
+  oferta. No recibe factor de mercado ni razón de la forma, así que su piso se lee sobre su neto final en cualquier
+  país. Sale marcada sólo cuando un neto acordado la deja bajo ese piso
+  ([Costos de terceros](#costos-de-terceros)).
 - **La forma del compromiso no mueve el piso** (`engagementForm`): el recargo de On-Demand cuenta como margen, así
   que un descuento puede consumirlo hasta el mismo piso que rige en On-Going. Una línea marcada se lee igual con o
   sin forma declarada.
@@ -617,8 +661,8 @@ clave no existe cuando no hay nada que avisar. Tiene hasta dos miembros:
 
 | Miembro              | Qué dice                                                                                                                                                                                                    | Qué hacer                                                                                                                                                                              |
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `laterCatalogValues` | `{ quoteDate, newestEffectiveFrom, records, byKind }`: el catálogo tiene valores que empiezan a regir después de la fecha de la demanda. La cotización se calculó con los valores de su fecha, sin error     | En una cotización nueva la fecha está atrasada: corregir `quoteDate` y volver a correr. Si se repite a propósito un caso anterior, decir que usa los valores de esa fecha               |
-| `priceDates`         | `{ withinDays, reviewDue, dueSoon, expired }`, sólo para los precios, registros y proveedores que esta cotización usa, leídos a su `quoteDate`. Las entradas son las de `priceReview` de `resources inspect` | Entrada `review`: avisar que toca revisar ese precio. Entrada `hard_expiry` en `dueSoon`: ese valor deja de servir en esa fecha; avisarlo antes de que bloquee la próxima cotización |
+| `laterCatalogValues` | `{ quoteDate, newestEffectiveFrom, records, byKind }`: el catálogo tiene valores que empiezan a regir después de la fecha de la demanda. La cotización se calculó con los valores de su fecha, sin error     | En una cotización nueva la fecha está atrasada: corregir `quoteDate` y volver a correr. Si se repite a propósito un caso anterior, decir que usa los valores de esa fecha. Excepción: con `quoteDate` 2026-10-11 sale siempre, por los ocho factores de país confirmados desde el 2026-10-12 |
+| `priceDates`         | `{ withinDays, reviewDue, dueSoon, expired }`, sólo para los precios, registros y proveedores que esta cotización usa, leídos a su `quoteDate`. Las entradas son las de `priceReview` de `resources inspect` | Entrada `review`: avisar que toca revisar ese precio. Entrada `hard_expiry` en `dueSoon`: ese valor deja de servir en esa fecha; avisarlo antes de que bloquee la próxima cotización. Con `subject` `third_party_quote`: la cotización de ese proveedor vence y hay que pedirle una nueva |
 
 Reglas de lectura:
 
@@ -628,12 +672,17 @@ Reglas de lectura:
   `compose quote` (como hace el ejemplo del servicio gestionado con `> …summary.json`).
 
 Casos verificados con `--current`: `managed-care.demand.json` (fechada 2026-10-10) queda bloqueada por la fecha
-(exit 2, `RESOURCE_POLICY_NOT_EFFECTIVE`) y aun así trae `laterCatalogValues` con `newestEffectiveFrom` `2026-10-11`
-y `records` `121` (64 políticas de precio, 32 costos, 7 kits, 6 factores de talento, 6 de mercado, 2 tipos de
-cambio, 2 formas del compromiso y 2 recursos); la copia de `managed-care-colombia.demand.json` que arma
-[el ejemplo de Colombia](#en-colombia-y-perú-el-piso-acompaña-al-factor) (fechada 2026-10-11) no trae `runNotices`;
-esa misma copia fechada 2027-03-20 trae `priceDates.dueSoon` con cuatro revisiones para el 2027-04-11 (`daysLeft`
-`22`) y calcula igual, con exit 3.
+(exit 2, `RESOURCE_POLICY_NOT_EFFECTIVE`) y aun así trae `laterCatalogValues` con `newestEffectiveFrom` `2026-10-12`
+y `records` `136` (64 políticas de precio, 32 costos, 11 factores de talento, 9 de mercado, 7 kits, 5 reglas de
+terceros, 2 reservas de contingencia, 2 tipos de cambio, 2 formas del compromiso y 2 recursos); la copia de
+`managed-care-colombia.demand.json` que arma
+[el ejemplo de Colombia](#en-colombia-y-perú-el-piso-acompaña-al-factor) (fechada 2026-10-11) trae
+`laterCatalogValues` con `records` `8` (los factores de país confirmados desde el día siguiente); esa misma copia
+fechada 2026-10-12 no trae `runNotices`; y fechada 2027-03-20 trae `priceDates.dueSoon` con cuatro revisiones para
+el 2027-04-11 (`daysLeft` `22`) y calcula igual, con exit 3. El
+[ejemplo con terceros](#cómo-leer-una-cotización-con-terceros), copiado con fecha 2026-11-10, trae en
+`priceDates.dueSoon` tres entradas `third_party_quote` para el 2026-11-30 (`daysLeft` `20`, `blocksWith`
+`STALE_SOURCE`).
 
 ### Dónde pesa un dato estimado (`estimateExposure`)
 
@@ -645,16 +694,16 @@ también viene en `replay`.
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `currency`, `totalCost`, `net`                           | Costo y neto del plazo: los mismos de `totals`                                                                                                                                                                                        |
 | `estimatedCost`, `confirmedCost`, `estimatedShareOfCost` | Cuánto del costo depende de al menos un dato estimado y cuánto no; los dos montos suman `totalCost`. Un componente cuenta una sola vez aunque dependa de dos datos estimados                                                          |
-| `costInputs[]`                                           | Los datos estimados del lado del costo, de mayor a menor `costAtRisk`: `kind` (`talent_factor`, `person_cost`, `fx`, `tool`, `platform_fee`, `talent_assurance`, `operations`, `setup`), `id`, `label`, `lineIds` y `periodIds`      |
+| `costInputs[]`                                           | Los datos estimados del lado del costo, de mayor a menor `costAtRisk`: `kind` (`talent_factor`, `person_cost`, `fx`, `tool`, `platform_fee`, `talent_assurance`, `operations`, `setup`, `third_party`), `id`, `label`, `lineIds` y `periodIds`. `third_party` es el monto de un proveedor cuya evidencia está `estimated`; su `id` es el `costId` |
 | `costAtRisk`                                             | Costo de esta cotización que depende de ese dato. Como un componente puede depender de dos datos, la suma de los `costAtRisk` puede superar `estimatedCost`                                                                           |
 | `shareOfCost`                                            | `costAtRisk ÷ totalCost`                                                                                                                                                                                                              |
 | `marginRateLostIfTenPctHigher`                           | Margen que se pierde si ese dato resulta 10 % más alto y el neto no cambia: `0,10 × costAtRisk ÷ net`, redondeado hacia arriba. `0.037825` son 3,8 puntos de margen                                                                   |
-| `priceInputs[]`                                          | Un factor de mercado estimado (Perú, México, España): mueve el precio, nunca el costo, y no entra en el ranking. Trae `priceOnFactor` (precio de las personas que multiplica) y `marketAdjustment`                                    |
-| `estimatedRules[]`                                       | Políticas estimadas que son reglas y no montos (capacidad facturada, política de precio). No admiten la lectura «10 % más alto» y quedan fuera del ranking                                                                            |
+| `priceInputs[]`                                          | Un factor de mercado estimado: mueve el precio, nunca el costo, y no entra en el ranking. Trae `priceOnFactor` (precio de las personas que multiplica) y `marketAdjustment`. Sólo en cotizaciones fechadas 2026-10-11 con cliente en Perú, México o España: desde el 2026-10-12 esos factores están confirmados |
+| `estimatedRules[]`                                       | Políticas estimadas que son reglas y no montos (capacidad facturada, política de precio y, desde el contrato 1.4.0, `contingency_reserve` y `third_party_policy`). No admiten la lectura «10 % más alto» y quedan fuera del ranking. La reserva no es un dato del ranking: agranda en `(1 + tasa)` el costo que depende de los datos de su base |
 
 Ejemplo, la copia de `managed-care-colombia.demand.json` de
-[el ejemplo de Colombia](#en-colombia-y-perú-el-piso-acompaña-al-factor), con `--current` (COP 28.100.000, margen
-real 41,5 %):
+[el ejemplo de Colombia](#en-colombia-y-perú-el-piso-acompaña-al-factor), con `--current` y fechada 2026-10-11, el
+último día en que el factor de talento de Colombia se lee como estimado (COP 28.100.000, margen real 41,5 %):
 
 | Dato estimado (`kind` / `id`)                   | `shareOfCost`       | `marginRateLostIfTenPctHigher` |
 | ----------------------------------------------- | ------------------- | ------------------------------ |
@@ -662,23 +711,27 @@ real 41,5 %):
 | `talent_factor` / `CO:CL`                       | `0.646835` (64,7 %) | `0.037825` (3,8 puntos)        |
 | `tool` / `social-inbox`                         | `0.177258` (17,7 %) | `0.010366` (1,0 punto)         |
 
+La misma copia fechada 2026-10-12 da el mismo precio y otra lectura, porque los factores de país ya están
+confirmados: `estimatedShareOfCost` baja a `0.340370` (34,0 %), `talent_factor` sale del ranking y el primer dato es
+`tool` / `social-inbox`, con los mismos `0.177258` y `0.010366`.
+
 Qué hacer con esto:
 
 1. Decírselo al operador junto al precio: qué parte del costo es estimada, cuál es el primer dato a confirmar y
-   cuántos puntos de margen mueve. En el ejemplo: «casi todo el costo es estimado; lo primero a confirmar es el factor
-   de talento de Colombia (3,8 puntos de margen por cada 10 % de error) y después el plan de Sprout (1,0 punto)».
+   cuántos puntos de margen mueve. En el ejemplo fechado 2026-10-12: «un tercio del costo es estimado; lo primero a
+   confirmar es el plan de Sprout (1,0 punto de margen por cada 10 % de error)».
 2. Leerlo como sensibilidad, no como validación ni pronóstico. No dice que el dato esté mal ni que el margen vaya a
    bajar: dice dónde un error costaría más.
 3. No usarlo para aprobar ni rechazar una cotización, ni para «corregir» un dato en la demanda. Un dato se confirma
    con evidencia y se cambia emitiendo una versión nueva del catálogo o de la policy.
 4. Con `quoteDate` 2026-10-11 o posterior, el costo de persona en Chile no aparece en este ranking: está confirmado
-   por su autor como costo objetivo ([base de costo](#selección-y-asignación)). El factor de talento de otro país sí
-   aparece, porque es un estimado.
+   por su autor como costo objetivo ([base de costo](#selección-y-asignación)). El factor de talento de otro país
+   aparece sólo con `quoteDate` 2026-10-11; desde el 2026-10-12 es un valor de política confirmado y no entra.
 
 `compose assess` entrega el mismo orden en `costEvidencePriority`: `{ currency, estimatedCost, confirmedCost,
 estimatedShareOfCost, confirmFirst }`, donde `confirmFirst` son los cinco primeros `costInputs`. Es la forma de
 priorizar los gaps de evidencia, que por sí solos se leen todos igual. `assess` no lista un factor de país estimado
-entre sus `gaps`; en `confirmFirst` sí aparece.
+entre sus `gaps`; en `confirmFirst` sí aparece (sólo en cotizaciones fechadas 2026-10-11).
 
 ## Cotizar según el país del cliente y del equipo
 
@@ -698,24 +751,31 @@ del otro ni de la moneda: un cliente chileno con equipo en Colombia es `offerMar
 
 | País | Factor de talento (costo, respecto de Chile) | Factor de mercado (precio de la parte humana) | El piso acompaña al factor |
 | ---- | -------------------------------------------- | --------------------------------------------- | -------------------------- |
-| CL   | `1`, por definición: es la referencia        | `1`, decidido                                 | No                         |
-| CO   | `0.80`, estimado                             | `0.90`, decidido                              | Sí                         |
-| PE   | `0.85`, estimado                             | `0.95`, estimado                              | Sí                         |
-| MX   | `0.90`, estimado                             | `1`, estimado                                 | No                         |
-| US   | `5`, estimado                                | `1.10`, decidido                              | No                         |
-| ES   | `3`, estimado                                | `1.10`, estimado                              | No                         |
+| CL   | `1`, por definición: es la referencia        | `1`                                           | No                         |
+| CO   | `0.80`                                       | `0.90`                                        | Sí                         |
+| PE   | `0.85`                                       | `0.95`                                        | Sí                         |
+| MX   | `0.90`                                       | `1`                                           | No                         |
+| US   | `5`                                          | `1.10`                                        | No                         |
+| ES   | `3`                                          | `1.10`                                        | No                         |
+
+**Los doce valores son valores de política confirmados. Está cerrado.**
 
 - **Decidido** por el operador (CEO) el 2026-10-11: los 32 costos del Excel son el costo de cada perfil en Chile; el
   precio sigue al país del cliente y el costo al país de la persona; factor de mercado de Chile 1, Colombia 0,90 y
   Estados Unidos 1,10, tomados de los rangos de «Factor País» del Excel; y en los mercados bajo 1 el piso acompaña al
-  factor.
-- **Estimado** y sin validar: los cinco factores de talento (avisos de empleo y guías salariales leídos el
-  2026-10-11; un solo número por país para todos los perfiles y seniorities, sin contraste con contrataciones reales;
-  el operador pidió que el agente los propusiera y que quedaran marcados como estimados, así que es su elección y no
-  una decisión que deba) y los factores de mercado de Perú, México y España (propuestos por el agente, sin contraste
-  con negocios cerrados o perdidos). Cada uno aparece en
-  el resumen como `ESTIMATED_SOURCE` y está abierto en el ledger como `COUNTRY_FACTORS_UNVALIDATED`. Un precio que
-  dependa de un factor estimado se presenta diciéndolo.
+  factor. Esos tres factores de mercado y el factor de talento de Chile están confirmados desde el 2026-10-11.
+- **Cerrados por el CEO el 2026-10-11 («deja eso cerrado ya»)** como los valores con que se cotiza: los cinco
+  factores de talento fuera de Chile (CO 0,80; PE 0,85; MX 0,90; ES 3; US 5) y los factores de mercado de Perú,
+  México y España (0,95; 1; 1,10). Los propuso el agente —los de talento, desde avisos de empleo y guías salariales
+  leídos ese día— y el catálogo v10 los registra como confirmados **desde el 2026-10-12**. Son valores de política,
+  no observaciones de mercado: uno se revisa sólo cuando una contratación real o un negocio cerrado en ese país lo
+  contradice, con una versión nueva del catálogo.
+- **Qué cambia según la fecha de la demanda.** Con `quoteDate` 2026-10-11 esos ocho factores todavía se leen como
+  estimados: salen en `reviewSignals` como `ESTIMATED_SOURCE`, pesan en `estimateExposure` y el resumen trae
+  `runNotices.laterCatalogValues`. Con `quoteDate` 2026-10-12 o posterior no sale ninguna de las tres cosas. El
+  precio es el mismo en las dos fechas.
+- **No se le vuelve a plantear al operador** como una decisión pendiente ni como un dato por validar. En el ledger,
+  `COUNTRY_FACTORS_UNVALIDATED` quedó cerrado: no debe nada.
 - **No están en el cotizador** los factores por tipo de cliente que trae el Excel (pyme 0,9; licitación pública
   0,85–0,95; cliente estratégico 0,95). Un precio así se registra como neto acordado con su motivo
   ([Registrar el precio acordado](#registrar-el-precio-acordado)); no se aplica el porcentaje a mano.
@@ -732,7 +792,8 @@ pnpm --silent pricing:v3 catalog search --kind talent_factor --current --date 20
 
 Los dos factores se aplican a la vez y ninguno compensa al otro. El ejemplo `managed-care` (seis líneas, un mes),
 con la copia fechada 2026-10-11 de [el servicio gestionado](#cotizar-un-servicio-gestionado-por-volumen) y cotizado
-en USD para aislar el efecto del país; todas las filas son `calculated`, exit 3:
+en USD para aislar el efecto del país; todas las filas son `calculated`, exit 3. Las cifras son las mismas con la
+copia fechada 2026-10-12:
 
 | Cliente | Equipo | `totals.cost` | `totals.net` al mes | `marginRateRoundedDown` | Líneas marcadas | Motor |
 | ------- | ------ | ------------- | ------------------- | ----------------------- | --------------- | ----- |
@@ -753,9 +814,9 @@ en USD para aislar el efecto del país; todas las filas son `calculated`, exit 3
   Estados Unidos.
 - **El factor de mercado no es el descuento total**: sólo toca la parte humana. Con factor 0,90 el precio del ejemplo
   baja entre 6 % y 7 %, no 10 %, porque herramientas y fees se cobran igual.
-- **Equipo en España o Estados Unidos**: los factores 3 y 5 son órdenes de magnitud, no costos. Las dos últimas filas
-  muestran cuánto pesan; antes de presentar una cifra así conviene tener el costo específico del perfil en ese país
-  ([abajo](#cuándo-registrar-el-costo-específico-de-un-perfil-en-un-país)).
+- **Equipo en España o Estados Unidos**: los factores 3 y 5 son un solo número para todos los perfiles. Las dos
+  últimas filas muestran cuánto pesan; si el costo objetivo de un perfil en ese país se aparta de ese número, se
+  registra su costo específico ([abajo](#cuándo-registrar-el-costo-específico-de-un-perfil-en-un-país)).
 
 Para cotizar una combinación se copia la demanda a una ruta nueva y se cambian los campos; un archivo versionado no
 se edita. Cliente y equipo en Colombia, en USD, desde la copia `/tmp/servicio-gestionado.demand.json` que dejó el
@@ -774,7 +835,8 @@ Devuelve exit 3 con `totals.net` `7690.00`, `engineVersion` `pricing-v3-local/1.
 y `totals.marketAdjustment` `-529.47`. Comprobar siempre en el resumen que el país entró: `marketFactor` trae el país
 del cliente (salvo Chile y México, cuyo factor 1 no cambia nada y no se muestra) y `assumptions` no trae
 `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. Si ese supuesto aparece, la demanda está fechada antes del 2026-10-11 y
-ningún factor de país se aplicó.
+ningún factor de país se aplicó. (La copia no declara forma del compromiso, así que `assumptions` trae el supuesto
+de la reserva no evaluada: [Reserva de contingencia](#reserva-de-contingencia).)
 
 **País sin factor.** Un `talentCountry` sin factor de talento devuelve exit 2 con `MISSING_CATALOG_SELECTION` en
 `lines.<lineId>.talentFactor`; un `offerMarketCountry` sin factor de mercado, exit 2 con `MISSING_CATALOG_SELECTION`
@@ -847,7 +909,7 @@ va en el otro sentido: convierte el costo de una herramienta con precio en EUR
 
 ### Cuándo registrar el costo específico de un perfil en un país
 
-El factor de talento es una aproximación: un solo número por país, igual para un diseñador junior y para un
+El factor de talento es un valor de política: un solo número por país, igual para un diseñador junior y para un
 consultor senior. Cuando el costo de un perfil en un país se aparta del costo de Chile por ese factor, se registra en
 el catálogo como **costo específico** de ese perfil y ese país. A partir de su fecha de vigencia, una línea con ese
 perfil y ese `talentCountry` usa ese costo, sin factor de talento; las personas del mismo perfil en otros países
@@ -863,7 +925,7 @@ cambiando el factor del país (afecta a todos los perfiles) ni usando el factor 
 paga el cliente). Pasos y change-set:
 [registrar el costo de un perfil en un país](catalogo-v3-seleccion-y-actualizacion.md#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país).
 En el ledger está como `LOCALIZED_TALENT_COSTS`: la base de costo quedó decidida y sólo falta el registro donde un
-perfil se aparte de su factor.
+perfil se aparte de su factor. Es la única vía para apartarse de un factor de país: el factor mismo está cerrado.
 
 ## Cotizar en otra moneda
 
@@ -946,6 +1008,9 @@ Devuelve exit 3 con `totals.net` `9530.00` y `totals.currency` `USD`.
 
 **Para qué sirve.** Decirle al cotizador si lo que se vende es un trabajo continuo (On-Going) o uno acotado
 (On-Demand), para que el precio lleve el recargo de la forma. Es el contrato 1.3.0, motor `pricing-v3-local/1.3.0`.
+En un servicio gestionado la forma On-Demand trae además la reserva de contingencia, y esa cotización la firma el
+motor `pricing-v3-local/1.4.0` ([Reserva de contingencia](#reserva-de-contingencia)). Una persona por dedicación no
+lleva reserva: el ejemplo de esta sección sigue en 1.3.0.
 
 **Qué es la forma y qué no es.**
 
@@ -1046,8 +1111,10 @@ operación.
 **Lo que el cotizador todavía no cubre en un trabajo acotado.**
 
 - La duración del contrato no es un input: una cotización tiene periodos, no un plazo.
-- Los costos de terceros del trabajo y una reserva de contingencia para alcance fijo no están modelados.
 - Un trabajo de menos de un mes se expresa como horas dentro de un periodo; no hay periodos más cortos.
+- Los costos de terceros y la reserva de contingencia **sí** están modelados desde el contrato 1.4.0
+  ([Costos de terceros](#costos-de-terceros), [Reserva de contingencia](#reserva-de-contingencia)). Lo que falta de
+  ellos está en [Lo que todavía no está modelado](#lo-que-todavía-no-está-modelado).
 - No hay tope a la razón ni formas Híbrido o Licencia/Consultoría.
 - Qué compromisos con proveedores quedan después del trabajo se lee aparte, con `compose commitments`
   ([Tres lecturas de una cotización](#tres-lecturas-de-una-cotización)).
@@ -1110,8 +1177,8 @@ y el CEO las aceptó, para medirlas en las próximas dos incorporaciones reales.
 
 **Para qué sirve.** Cotizar Adobe con el precio correcto y saber qué herramienta sigue cobrándose cuando el trabajo
 termina. Policy v7 (Adobe como se factura), v8 (plazos), v9 (Microsoft 365 y Notion como se facturan, fecha de
-renovación de Adobe) y v10 (Creative Cloud Pro sin descuento), con el catálogo v9; rige para demandas fechadas desde
-el 2026-10-11.
+renovación de Adobe) y v10 (Creative Cloud Pro sin descuento), con el catálogo v9 o posterior; rige para demandas
+fechadas desde el 2026-10-11.
 
 **Adobe son dos productos, no un paquete.** Fuente: la factura de Adobe 3582641940 del 2026-09-16, que mostró el
 CEO.
@@ -1178,7 +1245,7 @@ congelado: sólo lo lee `compose commitments`. Lo declarado, dicho por el CEO el
 | Adobe Creative Cloud Pro y Adobe Express      | `12`                   | Plan anual pagado mes a mes: una licencia comprada queda disponible y se sigue cobrando hasta que el contrato se renueva; la factura no baja antes |
 | Microsoft 365 (precios mensuales)             | `1`                    | Contrato anual facturado mes a mes, pero asignar o quitar una licencia sube o baja el monto mensual. Desde la policy v9 `current` es el de la factura G185142527 del 2026-09-16: Business Standard, USD 14,70 por licencia, seis licencias, sin impuesto |
 | Notion (`current`)                            | `1`                    | Se paga mes a mes, sin más compromiso. Factura 0D8C80A9-0039 del 2026-09-21: Business mensual, nueve miembros a USD 24, más 3000 créditos a USD 30, sin impuesto |
-| HubSpot                                       | No declarado           | Es anual, pero su precio vigente está pendiente de evidencia                                          |
+| HubSpot                                       | No declarado           | Se contrata por un año, pero el CEO indicó el 2026-10-11 que hoy no hace falta en las cotizaciones: su precio queda sin cargar a propósito. No es un dato que el cotizador espere |
 
 Las facturas y la consola de Adobe las mostró el CEO, y el comportamiento del asiento de Microsoft 365 lo afirmó él.
 Los precios públicos de Microsoft 365 (`public-standard-teams-monthly`, USD 16,80, y los demás) siguen en la policy:
@@ -1209,6 +1276,527 @@ incluye: un diseñador con Creative Cloud Pro no lleva además Adobe Express.
 - No declarar `adobe-express` en una línea que ya lleva `adobe`, ni excluir `express-design` sin un motivo cierto.
 - No leer `commitmentTermMonths` como parte del precio, ni inventar un plazo para una herramienta que no lo declara.
 
+## Costos de terceros
+
+**Para qué sirve.** Poner dentro de la cotización lo que se le compra a otro para un trabajo —una productora, talento,
+impresión, medios, una licencia comprada para ese trabajo— con su propia regla de precio y su propio piso, sin
+mezclarlo con el equipo. Es el contrato 1.4.0, motor `pricing-v3-local/1.4.0`, con el catálogo v10; rige para
+demandas fechadas desde el 2026-10-11.
+
+**Cuándo usarlo.** Cuando el costo es de un proveedor externo, se compra para este trabajo y tiene un monto con
+respaldo (una cotización del proveedor, un plan de medios). No es el lugar para una herramienta de Efeonce (va por
+la policy y sus asignaciones), una persona (va como línea) ni una provisión.
+
+**Las dos liquidaciones (`settlement`).** Lo primero que se le pregunta al operador es quién le paga al proveedor.
+
+| `settlement`    | Qué significa                                                     | Qué hace el cotizador                                                                                                                                             |
+| --------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `reinvoiced`    | Efeonce le compra al proveedor, le paga y se lo factura al cliente | Lo convierte en una fila comercial propia, con la regla de precio de su categoría. Entra al costo, al neto, al margen y a la caja. `evidence` es obligatoria      |
+| `client_direct` | El cliente contrata al proveedor y le paga directo                 | Lo deja congelado en el `brief` como una nota. No llega al motor ni a ningún total, cifra de caja o conversión. `evidence` es opcional                            |
+
+Una demanda que sólo trae costos `client_direct` se queda en el contrato que ya tenía: no pasa a 1.4.0 por ellos.
+
+**Antes de empezar.** Tener de cada costo la cotización del proveedor (referencia, fecha y hasta cuándo vale), su
+moneda, en qué periodo cae y quién le paga; y leer las categorías vigentes, que son datos del catálogo y no una
+lista de la CLI:
+
+```bash
+pnpm --silent pricing:v3 catalog search --current --kind third_party_policy
+```
+
+Devuelve exit 0 con cinco registros (`"resolution": "ambiguous"` sólo dice que la consulta devolvió varios):
+
+| `category`   | Regla (`method`, `rate`) | Piso de la fila (`minimumMargin`) | Redondeo (`rounding`) | Qué significa                                            |
+| ------------ | ------------------------ | --------------------------------- | --------------------- | -------------------------------------------------------- |
+| `production` | `markup`, `0.10`         | `0.05`                            | `commercial`          | Costo más 10 %, subido al múltiplo de la moneda          |
+| `talent`     | `markup`, `0.10`         | `0.05`                            | `commercial`          | Lo mismo                                                 |
+| `printing`   | `markup`, `0.10`         | `0.05`                            | `commercial`          | Lo mismo                                                 |
+| `media`      | `markup`, `0`            | `0`                               | `none`                | Se cobra exactamente al costo, sin redondear             |
+| `licences`   | `markup`, `0`            | `0`                               | `none`                | Lo mismo                                                 |
+
+El 10 % es el fee de gestión de proyecto del Excel de pricing; «sin margen sobre la inversión en medios» es la
+regla del propio operador para medios pagados. Las cinco reglas las propuso el agente y el CEO las aceptó el
+2026-10-11 («seguiré tu recomendación») como estimaciones por ajustar con el primer trabajo real: los registros
+están `estimated` y salen en `reviewSignals` como `ESTIMATED_SOURCE`. Un registro con `offerId` es propio de esa
+oferta y prevalece sobre el general; hoy los cinco son generales.
+
+**Paso a paso.**
+
+1. Declarar los costos en el `brief` de la demanda, en `thirdPartyCosts`. Este es el bloque del ejemplo de
+   referencia,
+   [`managed-on-demand-third-party.demand.json`](../../../data/pricing/v3-operating/managed-on-demand-third-party.demand.json),
+   tal como está en el archivo: tres costos refacturados y uno que paga el cliente. Los nombres de proveedor son
+   marcadores.
+
+   ```json
+   "thirdPartyCosts": [
+     {
+       "costId": "tp-production",
+       "category": "production",
+       "label": "Producción audiovisual de la campaña",
+       "supplier": "Productora de ejemplo",
+       "settlement": "reinvoiced",
+       "amount": "4500000",
+       "currency": "CLP",
+       "quantity": "1",
+       "periodIds": [1],
+       "evidence": {
+         "reference": "supplier-quote:example-production:COT-0001",
+         "effectiveFrom": "2026-10-05",
+         "effectiveUntil": "2026-11-30",
+         "status": "confirmed"
+       }
+     },
+     {
+       "costId": "tp-talent",
+       "category": "talent",
+       "label": "Talento: locución y derechos de uso por 12 meses",
+       "supplier": "Agencia de talento de ejemplo",
+       "settlement": "reinvoiced",
+       "amount": "1250.00",
+       "currency": "USD",
+       "quantity": "1",
+       "periodIds": [1],
+       "evidence": {
+         "reference": "supplier-quote:example-talent:Q-0001",
+         "effectiveFrom": "2026-10-05",
+         "effectiveUntil": "2026-11-30",
+         "status": "confirmed"
+       }
+     },
+     {
+       "costId": "tp-media",
+       "category": "media",
+       "label": "Inversión en medios pagados",
+       "supplier": "Plataforma de medios de ejemplo",
+       "settlement": "reinvoiced",
+       "amount": "3333333",
+       "currency": "CLP",
+       "quantity": "1",
+       "periodIds": [1],
+       "evidence": {
+         "reference": "media-plan:example:2026-10",
+         "effectiveFrom": "2026-10-05",
+         "effectiveUntil": "2026-11-30",
+         "status": "estimated"
+       }
+     },
+     {
+       "costId": "tp-stock",
+       "category": "licences",
+       "label": "Banco de imágenes contratado por el cliente",
+       "supplier": "Banco de imágenes de ejemplo",
+       "settlement": "client_direct",
+       "amount": "890.00",
+       "currency": "USD",
+       "quantity": "1",
+       "periodIds": [1]
+     }
+   ]
+   ```
+
+2. Revisar cada campo:
+
+   | Campo        | Qué se escribe                                                                                                                                                                                                 |
+   | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | `costId`     | Un id estable y único. No puede repetirse ni ser igual al `lineId` de una línea: costos y líneas comparten nombres, porque un ajuste los nombra por ese id                                                    |
+   | `category`   | Una de las categorías del catálogo. La demanda lleva sólo el id: **nunca una tasa**                                                                                                                            |
+   | `label`      | El nombre del ítem. **Es lo que ve el cliente** en `compose preview`: se escribe para él, sin nombrar al proveedor ni un costo                                                                                 |
+   | `supplier`   | El proveedor. Es interno: se queda en el `brief` congelado y no sale en el resumen ni en ninguna lectura                                                                                                       |
+   | `settlement` | `reinvoiced` o `client_direct`                                                                                                                                                                                 |
+   | `amount`     | El monto unitario del proveedor, antes de la regla de precio, como cadena, mayor que cero y sin más decimales que su moneda (`"4500000"` en CLP, `"1250.00"` en USD)                                           |
+   | `currency`   | La moneda en que cobra el proveedor, tres letras. No tiene que ser la de la cotización                                                                                                                         |
+   | `quantity`   | Un entero de 1 a 9999, como cadena (`"1"`). El costo es `amount × quantity`                                                                                                                                    |
+   | `periodIds`  | Obligatorio. Los periodos en que se cobra, sin repetir. **El costo completo se cobra en cada periodo listado**: un costo único lleva un solo periodo; uno mensual de tres meses, `[1, 2, 3]`                   |
+   | `evidence`   | El respaldo del monto: `reference` (un id de la cotización del proveedor, no el documento), `effectiveFrom`, `effectiveUntil` y `status` (`confirmed`, `estimated` o `pending`). Obligatoria si `reinvoiced`   |
+
+   Se admiten hasta 50 costos. El objeto es estricto: un campo de más (por ejemplo una tasa) se rechaza con
+   `SCHEMA_INVALID`.
+
+3. Cotizar como siempre y verificar el artefacto de referencia. Los dos comandos devuelven exit 3 y `replay`
+   responde `"verified": true`; el primero reproduce el mismo `calculationId` del artefacto congelado:
+
+   ```bash
+   pnpm --silent pricing:v3 compose quote --current \
+     --input data/pricing/v3-operating/managed-on-demand-third-party.demand.json \
+     --out /tmp/terceros.artifact.json > /tmp/terceros.summary.json
+
+   pnpm --silent pricing:v3 replay --input data/pricing/v3-operating/managed-on-demand-third-party.artifact.json
+   ```
+
+4. Leer el resultado: [Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros).
+
+**Cómo se calcula una fila de terceros.** Cada costo refacturado es una fila propia por periodo, de clase
+`third_party` (`<costId>:<periodo>:third_party`), nunca un componente de una fila del equipo.
+
+- Costo: `amount × quantity`, llevado a la moneda de la cotización.
+- Precio: con `markup`, costo × (1 + tasa); con `target_margin`, costo ÷ (1 − tasa).
+- Redondeo: con `rounding: "commercial"` la fila sube al múltiplo de la moneda de la cotización; con `"none"` queda
+  exacta.
+- Piso: el `minimumMargin` de su categoría. La fila trae `floorNet`, el neto mínimo que lo cumple.
+
+En el ejemplo de referencia (CLP):
+
+| `costId`        | Proveedor cobra | Costo en la cotización | Neto      | Margen de la fila | `floorNet` |
+| --------------- | --------------- | ---------------------- | --------- | ----------------- | ---------- |
+| `tp-production` | CLP 4.500.000   | 4.500.000              | 4.950.000 | 450.000           | 4.736.843  |
+| `tp-talent`     | USD 1.250,00    | 1.250.000              | 1.380.000 | 130.000           | 1.315.790  |
+| `tp-media`      | CLP 3.333.333   | 3.333.333              | 3.333.333 | 0                 | 3.333.333  |
+
+El talento sale en 1.380.000 y no en 1.375.000 porque su regla redondea: 5.000 de `roundingAdjustment`. Los medios
+se cobran al peso.
+
+**Lo que nunca toca a una fila de terceros.** El factor de mercado del país del cliente, la razón de la forma del
+compromiso (el 10 % de On-Demand), un `discount` por tasa, la reserva de contingencia y la política de precio de la
+oferta. Un `discount` o un `agreed_net` de clase `monthly` o `setup` que nombre un `costId` devuelve exit 2 con
+`INVALID_ADJUSTMENT_LINE`. El único ajuste que llega a una fila de terceros es un neto acordado explícito.
+
+### Acordar el neto de un costo de terceros
+
+Cuando el operador pacta con el cliente un neto distinto para un costo, se declara en `brief.adjustments` con
+`billing: "third_party"` y los `costId` en `lineIds`. El motivo de este ejemplo es ilustrativo:
+
+```json
+"adjustments": [
+  {
+    "adjustmentId": "produccion-acordada",
+    "kind": "agreed_net",
+    "amount": "4800000",
+    "billing": "third_party",
+    "lineIds": ["tp-production"],
+    "reason": "Neto acordado con el cliente por la producción; aprobado por el operador el 2026-10-11."
+  }
+]
+```
+
+- `amount` es el neto de esas filas por periodo, en la moneda de la cotización, igual que en
+  [Registrar el precio acordado](#registrar-el-precio-acordado). `lineIds` sólo admite costos `reinvoiced`: nombrar
+  uno `client_direct` devuelve `INVALID_ADJUSTMENT_LINE`.
+- Sobre una copia del ejemplo, ese ajuste deja la fila en 4.800.000 (`discount` 150.000), el neto total en
+  20.883.333 y ninguna fila marcada: 4.800.000 está sobre el `floorNet` de 4.736.843.
+- Con `amount` `"4600000"` la fila sale marcada: `marginFloor.lines[]` la trae con `kind` `third_party`,
+  `minimumMargin` `0.05`, `floorNet` `4736843` y `netShortOfFloor` `136843`. Es un incumplimiento real del piso de
+  esa categoría y lo decide el operador, como cualquier otro.
+
+### Moneda de un costo de terceros
+
+- **Proveedor en la moneda de la cotización: no hay conversión.** Un proveedor en CLP dentro de una cotización en
+  CLP entra por su monto exacto (4.500.000 y 3.333.333 en el ejemplo).
+- **Proveedor en otra moneda:** el monto pasa por la moneda de cálculo (USD) con los tipos de cambio que la
+  cotización congela. En el ejemplo, USD 1.250,00 al FX de cotización USD→CLP `1000` (`fxPath` `USD>CLP`). Un
+  proveedor en EUR en esa misma cotización pasaría por `EUR>USD>CLP`, a `1200`.
+- **El tipo de cambio se elige solo.** A diferencia de una herramienta con precio en otra moneda, el par de un costo
+  de terceros **no** se nombra en `fxRecordIds`: hacerlo devuelve exit 2 con `UNUSED_FX_SELECTION`. Si el catálogo
+  no tiene ese par, `MISSING_CATALOG_SELECTION` en `fx.<par>`.
+- **La brecha de exposición.** El resumen lista en `thirdParty.fxExposed` los costos cuyo proveedor cobra en otra
+  moneda (`tp-talent`), y `compose assess` levanta `THIRD_PARTY_FX_EXPOSURE` por cada uno: la fila se convirtió con
+  el FX congelado en la cotización y al proveedor se le paga al tipo de cambio del día del pago. Se le lleva al
+  operador para que acuerde una cláusula de reajuste o un margen de cambio explícito. El cotizador no agrega ninguno.
+
+### Vigencia y estado de la cotización del proveedor
+
+La `evidence` de un costo refacturado se juzga como cualquier fuente, contra `quoteDate`:
+
+| Estado de la `evidence`                                         | Qué pasa                                                                                                                                                |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `confirmed` y `quoteDate` entre `effectiveFrom` y `effectiveUntil` | Calcula                                                                                                                                                |
+| `estimated`                                                     | Calcula, en revisión: `ESTIMATED_SOURCE`, el gap `THIRD_PARTY_COST_EVIDENCE_REQUIRED` en `compose assess` y una entrada `third_party` en `estimateExposure` |
+| `pending`                                                       | No calcula: exit 2 con `MISSING_SOURCE_CONFIRMATION`                                                                                                    |
+| `quoteDate` fuera de la vigencia (cotización vencida o posterior) | No calcula: exit 2 con `STALE_SOURCE` en `periods.<n>.request.thirdPartyCosts.<i>.source`                                                              |
+
+El ejemplo copiado con fecha 2026-12-01 queda bloqueado con tres `STALE_SOURCE`: las tres cotizaciones valían hasta
+el 2026-11-30. Antes de eso el resumen avisa: copiado con fecha 2026-11-10 trae en `runNotices.priceDates.dueSoon`
+tres entradas con `subject` `third_party_quote`, `date` `2026-11-30`, `daysLeft` `20` y `blocksWith`
+`STALE_SOURCE`. Una cotización vencida no se arregla moviendo la fecha de la `evidence`: se le pide una nueva al
+proveedor.
+
+### Un costo que paga el cliente
+
+Un costo `client_direct` es una nota: no está en el costo, en el neto, en el margen ni en ninguna cifra de caja, y
+su monto se muestra en su propia moneda, sin convertir. Dónde aparece:
+
+- en el resumen, en `thirdParty.clientDirect[]`;
+- en `compose preview`, en `clientPaidDirectly[]` y, en Markdown, en un bloque aparte después del neto: «Pagado
+  directamente por el cliente a su proveedor. No forma parte de esta cotización ni de su neto»;
+- en `compose cash`, en `supplierCash.paidByClientDirectly`;
+- en `compose assess`, dentro del gap `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED`.
+
+No hay una comisión sobre lo que el cliente paga directo: si se pacta una, hoy se registra aparte y se dice.
+
+### Qué no hacer con los costos de terceros
+
+- No escribir una tasa en la demanda ni calcular a mano el precio de una fila: la regla es la de la categoría.
+- No esconder un costo de proveedor dentro de una línea de persona, de una herramienta o de una provisión, ni
+  restarlo como un descuento.
+- No elegir la categoría por la regla que conviene (`media` o `licences` para cobrar al costo algo que es
+  producción).
+- No declarar `client_direct` un costo que Efeonce va a pagar para sacarlo del margen, ni `reinvoiced` uno que paga
+  el cliente.
+- No repetir un costo único en varios periodos: se multiplica.
+- No marcar `confirmed` una `evidence` sin cotización del proveedor, ni estirar su vigencia para que la corrida pase.
+- No escribir el proveedor ni su monto en `label`: el `label` llega al cliente.
+- No nombrar el tipo de cambio de un costo en `fxRecordIds`.
+
+## Reserva de contingencia
+
+**Qué es.** Un porcentaje sobre el costo del equipo que el cotizador agrega **como costo** a cada fila del equipo
+de un trabajo de alcance fijo, para cubrir sobrecostos. No es un fee, no es un descuento disponible y no se le paga
+a nadie: es una provisión dentro del costo. Es parte del contrato 1.4.0.
+
+**Cuándo se aplica.** La reserva es un registro del catálogo y la cotización lo recibe sola, según su oferta y su
+forma del compromiso:
+
+```bash
+pnpm --silent pricing:v3 catalog search --current --kind contingency_reserve
+```
+
+Devuelve exit 0 con dos registros, los dos de `rate` `0.12` y `base` `human`:
+
+| `recordId`                                      | Oferta                     | Forma       |
+| ----------------------------------------------- | -------------------------- | ----------- |
+| `contingency:creative-managed-service:on_demand` | `creative-managed-service` | `on_demand` |
+| `contingency:seo-aeo-managed-service:on_demand`  | `seo-aeo-managed-service`  | `on_demand` |
+
+- **Se aplica** a un servicio gestionado (creativo o SEO/AEO) cuya demanda declara `"engagementForm": "on_demand"` y
+  está fechada desde el 2026-10-11.
+- **No se aplica** a un servicio gestionado On-Going ni a una persona vendida por dedicación
+  (`talent-assurance-staffing`), en ninguna forma: ahí el cliente dirige el trabajo.
+- `base: "human"` es el costo de persona de cada fila del equipo; `own_costs` sería todo el costo propio de la fila.
+  Nunca descansa sobre una fila de terceros.
+- El 12 % es el colchón que el operador usó en una oferta de licitación. Lo propuso el agente y el CEO lo aceptó el
+  2026-10-11 («seguiré tu recomendación») como estimación por ajustar con el primer trabajo real: los dos registros
+  están `estimated`.
+
+**Paso a paso.** No se declara nada para tenerla: basta la oferta y la forma. Sobre la copia fechada 2026-10-11 de
+[el servicio gestionado](#cotizar-un-servicio-gestionado-por-volumen) (cliente y equipo en Chile, CLP), con
+`"engagementForm": "on_demand"` en el `brief`:
+
+| Qué                                                      | Valor                    |
+| -------------------------------------------------------- | ------------------------ |
+| `engineVersion`                                          | `pricing-v3-local/1.4.0` |
+| `totals.contingencyBase` (costo de persona del equipo)   | 3.640.000                |
+| `totals.contingencyReserve` (12 %, dentro de `totals.cost`) | 436.800               |
+| `totals.cost`                                            | 5.666.722                |
+| `totals.net`                                             | 11.370.000               |
+| `marginRateRoundedDown`                                  | `0.501607`               |
+
+**Es un costo, así que se vende.** La reserva entra al costo de la fila antes de la política de precio: lleva el
+margen de la oferta y la razón de On-Demand como cualquier otro costo, y sube el neto mínimo de la fila
+(`floorNet`). En el ejemplo, 436.800 de costo se vuelven 870.000 de precio: la misma demanda con la reserva
+renunciada da 10.500.000 en vez de 11.370.000. `totals.cost − totals.contingencyReserve` es el costo de esa misma
+cotización sin reserva.
+
+**Cómo renunciar a ella.** La reserva sale de una cotización de una sola manera: una renuncia declarada en el
+`brief`, con su motivo.
+
+```json
+"contingency": { "kind": "waived", "reason": "El cliente asume el riesgo de alcance: todo cambio va por orden de cambio firmada." }
+```
+
+Qué hace una renuncia, medido sobre el mismo ejemplo:
+
+- La reserva pasa a `0`, el costo baja a 5.229.922 y el neto a 10.500.000 (870.000 menos).
+- `totals.contingencyReserveWaived` informa lo que se dejó fuera (`436800`) y `totals.contingencyBase` queda en `0`.
+  El resumen trae `contingencyReserve.waived` `true`, `waiverReason` y `waivedAmount`.
+- La cotización queda marcada: `reviewSignals` trae `CONTINGENCY_RESERVE_WAIVED` y `compose assess` un gap con el
+  mismo código. Sigue firmada por el motor 1.4.0: la renuncia es parte de lo que la cotización congela.
+- El `reason` es obligatorio (sin él, `SCHEMA_INVALID`). Dice quién decidió renunciar y por qué el riesgo de alcance
+  queda cubierto de otra forma.
+- Una renuncia donde no hay reserva que renunciar (otra oferta, forma On-Going, fecha anterior) no se ignora:
+  exit 2 con `CONTINGENCY_WAIVER_WITHOUT_RESERVE` en `contingency`.
+
+**Si la forma no está declarada.** El cotizador no puede saber si la reserva aplica y lo dice: la cotización calcula
+sin reserva y `assumptions` trae `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`, con el registro que no
+se evaluó en `candidates`. Le pasa a toda cotización de servicio gestionado que no declara `engagementForm`,
+incluido [el ejemplo del servicio gestionado](#cotizar-un-servicio-gestionado-por-volumen). Se pregunta la forma, se
+declara (`on_going` u `on_demand`) y se vuelve a correr; el supuesto no se deja en una cotización que se presenta.
+
+**Qué significan las señales.**
+
+- `contingencyReserve` en el resumen: `{ rate, base, amount, baseAmount, shareOfNet, waived, recordId, revision,
+  scope, sourceStatus }`, más `waiverReason` y `waivedAmount` si se renunció. La clave no existe si la cotización no
+  tiene reserva.
+- `ESTIMATED_SOURCE` con `paths` `snapshot.contingencyReserve`: la tasa es una estimación. Sale también en una
+  cotización que renuncia a la reserva.
+- En `estimateExposure`, la reserva no es un dato del ranking: aparece en `estimatedRules` y agranda en
+  `(1 + tasa)` el costo que depende de los datos de su base.
+- `compose split` la deja dentro de la persona; `compose cash` la muestra como una naturaleza propia
+  (`contingencyReserve`), que no es caja de nadie ni capacidad contratada.
+
+**Qué no hacer.**
+
+- No renunciar a la reserva para llegar a un precio sin decirlo: una renuncia se decide con el operador, lleva su
+  motivo y queda marcada.
+- No omitir `engagementForm` para que la reserva no entre, ni declarar `on_going` un trabajo de alcance fijo.
+- No sumar una reserva a mano como una línea, una provisión o un porcentaje sobre el precio: ya está en el costo.
+- No presentarla como margen ni como un descuento que se puede ofrecer.
+- No presentar el 12 % como un dato medido: es una estimación.
+
+## Cómo leer una cotización con terceros
+
+**Para qué sirve.** Explicar bien una cotización 1.4.0. Con costos de terceros el margen total deja de decir si el
+trabajo propio está bien vendido, y el cotizador entrega las dos lecturas. Todas las cifras de esta sección salen
+del ejemplo de referencia, `managed-on-demand-third-party.demand.json` y su artefacto: un servicio gestionado
+creativo vendido On-Demand en Chile, en CLP, con una producción en CLP, talento en USD, medios al costo y una
+licencia que paga el cliente.
+
+**Antes de empezar.** Tener el artefacto. Las lecturas se corren sobre el de referencia; todas devuelven exit 3:
+
+```bash
+terceros=data/pricing/v3-operating/managed-on-demand-third-party.artifact.json
+
+pnpm --silent pricing:v3 replay --input "$terceros"
+pnpm --silent pricing:v3 compose assess --input "$terceros"
+pnpm --silent pricing:v3 compose preview --input "$terceros" --format markdown --out /tmp/terceros-preview.md
+pnpm --silent pricing:v3 compose split --input "$terceros" --tools all
+pnpm --silent pricing:v3 compose cash --input "$terceros"
+pnpm --silent pricing:v3 compose commitments --input "$terceros"
+pnpm --silent pricing:v3 compose schedule --input "$terceros" --milestones /tmp/hitos.json
+```
+
+`/tmp/hitos.json` es el archivo de hitos de [Calendario de pagos](#calendario-de-pagos-compose-schedule).
+
+### La regla de lectura
+
+| Lectura                                  | Costo      | Neto       | Margen                   |
+| ---------------------------------------- | ---------- | ---------- | ------------------------ |
+| Toda la cotización (`totals`)            | 14.750.055 | 21.033.333 | 29,87 % (`0.298729`)     |
+| Terceros refacturados (`thirdParty.reinvoiced`) | 9.083.333 | 9.663.333 | 580.000 de margen  |
+| Trabajo propio (`ownWork`)               | 5.666.722  | 11.370.000 | 50,16 % (`0.501607`)     |
+
+- **El margen mezclado baja con todo lo que se refactura al costo o cerca del costo.** 29,87 % no dice que el
+  servicio esté mal vendido: casi la mitad del neto (`shareOfNet` `0.459429`) son compras que se traspasan.
+- **El número que se compara con el piso de la oferta es `ownWork.marginRateRoundedDown`**, no el mezclado. Aquí,
+  50,16 % contra el piso de 45 %.
+- **No hay un veredicto a nivel de cotización sobre ninguno de los dos.** El piso se juzga por fila: una fila del
+  equipo contra la política de su oferta, una fila de terceros contra la regla de su categoría. En el ejemplo
+  `marginFloor.lines` está vacío: ninguna fila está bajo su piso.
+- Se le informan al operador los dos márgenes, cada uno con su nombre. No se presenta el mezclado como «el margen
+  del servicio» ni el del trabajo propio como «el margen de la cotización».
+
+Identidades que se pueden comprobar: trabajo propio = `totals` − terceros (11.370.000 = 21.033.333 − 9.663.333;
+5.666.722 = 14.750.055 − 9.083.333), y cada total es la suma de sus filas.
+
+### En el resumen
+
+- **`thirdParty.reinvoiced`**: `cost`, `net`, `marginAmount`, `shareOfNet` y `rows[]`, una por costo, con `costId`,
+  `label`, `category`, el monto y la moneda del proveedor, el estado y las fechas de su `evidence`, la regla aplicada
+  (`policy`), `cost`, `net`, `marginAmount`, `minimumMargin` y `floorNet`. **No trae el nombre del proveedor ni la
+  referencia de su cotización**: un costo se nombra por `costId`, `label` y categoría; lo demás queda en el `brief`
+  congelado.
+- **`thirdParty.clientDirect[]`**: lo que paga el cliente, como se declaró. **`thirdParty.fxExposed[]`**: los
+  `costId` con proveedor en otra moneda.
+- **`contingencyReserve`**: aquí `amount` `436800`, `baseAmount` `3640000`, `rate` `0.12`, `shareOfNet`
+  `0.020767`, `waived` `false`.
+- **`estimateExposure`**: la cotización estimada de un proveedor es un dato del ranking. En el ejemplo el primero es
+  `third_party` / `tp-media`, con `shareOfCost` `0.225988` y `marginRateLostIfTenPctHigher` `0.015848`: los medios
+  son un plan estimado y se cobran al costo, así que un 10 % más de inversión son 1,6 puntos de margen mezclado si
+  el neto no se mueve. Las reglas de terceros y la reserva, que son estimadas, están en `estimatedRules`.
+- **`cashLedger`**: una entrada `third-party:<costId>` por costo, en el periodo en que cae.
+
+### En cada lectura del artefacto
+
+- **`compose assess`.** `margin.ownWorkRate` trae el margen del trabajo propio y `margin.proposedFloorReadOn` dice
+  `"ownWorkRate"`: `belowProposedFloor` se lee sobre el trabajo propio, no sobre el mezclado (`modeledRate`). Sus
+  40 %/35 % siguen siendo propuestas genéricas. Gaps nuevos:
+
+  | Gap                                    | Cuándo sale                                                              | Qué hacer                                                                                             |
+  | -------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+  | `THIRD_PARTY_COST_EVIDENCE_REQUIRED`   | Un costo refacturado cuya `evidence` no está `confirmed` (`tp-media`)    | Conseguir la cotización del proveedor con su referencia, fecha y vigencia                             |
+  | `THIRD_PARTY_FX_EXPOSURE`              | Un costo refacturado con proveedor en otra moneda (`tp-talent`)          | Acordar una cláusula de reajuste o un margen de cambio explícito                                      |
+  | `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED` | La demanda declara algún costo de terceros, de cualquier liquidación     | Validar qué cubre cada uno, quién contrata y paga, plazos de pago, derechos de uso y qué cuesta cancelar |
+  | `THIRD_PARTY_TAX_TREATMENT_REVIEW`     | Hay un costo refacturado y el impuesto de la cotización es `exclusive`   | Confirmar que cada fila de terceros lleva el tratamiento del servicio: la tasa se aplicó a todo el neto |
+  | `CONTINGENCY_RESERVE_WAIVED`           | La demanda renuncia a la reserva                                          | Llevarle al operador el monto que quedó fuera y el motivo                                             |
+
+  En el ejemplo salen los tres primeros.
+
+- **`compose preview`** (lo que ve el cliente). El fee es sólo el trabajo propio y cada costo de terceros es un ítem
+  con su `label` y su neto final:
+
+  | Ítem                                             | Neto (CLP) |
+  | ------------------------------------------------ | ---------- |
+  | Servicio gestionado — fee del periodo            | 11.370.000 |
+  | Producción audiovisual de la campaña             | 4.950.000  |
+  | Talento: locución y derechos de uso por 12 meses | 1.380.000  |
+  | Inversión en medios pagados                      | 3.333.333  |
+  | Neto del plazo                                   | 21.033.333 |
+
+  Después del neto, `clientPaidDirectly[]`: «Banco de imágenes contratado por el cliente: 890.00 USD (periodo 1)»,
+  en su moneda y sin convertir. **Nunca muestra un proveedor, un costo, una tasa ni la reserva** (que va dentro del
+  fee).
+
+- **`compose split`.** Con filas de terceros la presentación tiene **tres** partes y
+  `tools.net + person.net + thirdParty.net` es el neto de cada fila. Con `--tools all`: kit 2.020.000 + persona
+  9.350.000 + terceros 9.663.333 = 21.033.333. La reserva queda dentro de la persona. Una fila de terceros es
+  entera `thirdParty`.
+
+- **`compose cash`.** `fullCostByNature` suma dos naturalezas: `thirdParty` (9.083.333) y `contingencyReserve`
+  (436.800). **`newSupplierCash` incluye ahora lo que se les paga a los proveedores de los costos refacturados**:
+  9.083.333, detallado en `supplierCash.thirdParty.purchases[]`; por eso `cashAddedOnContractedCapacity` es
+  11.950.000 (21.033.333 − 9.083.333). La reserva es una provisión dentro del costo: no es caja de nadie y no está
+  en `capacityCostAbsorbed`. Lo que paga el cliente se lista en `supplierCash.paidByClientDirectly` y no se cuenta
+  en ninguna cifra. `results.marginAtFullCost.ownWork` repite el margen del trabajo propio. `restsOn` agrega un
+  supuesto —que cada costo se paga al monto que la cotización congeló— y `notDerivable` dice que la fecha en que se
+  le paga a un proveedor no se puede leer (`supplierCash.thirdParty.paymentDate`).
+
+- **`compose schedule`.** Reparte **todo** el neto, costos refacturados incluidos: con los hitos del ejemplo,
+  10.520.000, 6.310.000 y 4.203.333. El bloque `thirdParty` compara por periodo lo que se les paga a los proveedores
+  con los hitos puestos en ese periodo: en el periodo 1, `supplierCost` 9.083.333 contra `milestonesPlacedInPeriod`
+  6.310.000, `supplierCostAboveMilestones` 2.773.333. Esa diferencia es lo que la empresa adelanta hasta cobrar un
+  hito posterior. Un hito con `when` o sin periodo no se compara con nada (`milestonesInNoPeriod`), y el hito que
+  declara un periodo trae `thirdPartyCostInPeriod`.
+
+- **`compose commitments`.** Las compras a terceros quedan **fuera** de esta lectura a propósito: un costo
+  refacturado se congela como un monto en un periodo, sin plazo mínimo, cargo de cancelación ni derechos que sigan
+  corriendo. La lectura dice cuántas vio (`reviewed.thirdPartyPurchasesOutsideThisReading`: `3`) y lo declara en
+  `notDerivable` con `THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN`. Que no aparezca un compromiso por una compra a un
+  tercero no significa que no lo haya: se revisa en el contrato con el proveedor.
+
+- **Fechas de precio.** La vigencia de cada cotización de proveedor es una fecha dura del resumen
+  (`runNotices.priceDates`, `subject` `third_party_quote`,
+  [detalle](#vigencia-y-estado-de-la-cotización-del-proveedor)). El fin de un registro de reserva no bloquea: la
+  cotización siguiente no lleva reserva ([Reserva de contingencia](#reserva-de-contingencia)).
+
+Ninguna de estas lecturas, salvo `compose preview`, va al cliente: traen costos, márgenes y montos de proveedor.
+
+### Si un costo de terceros o la reserva fallan
+
+Todos llegan en `diagnostics` del resumen, con exit 2 y sin precio, salvo donde se indica:
+
+| Qué devuelve                                                                       | Causa                                                                                                                                  | Arreglo                                                                                                    |
+| ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.<costId>.policy`                    | La categoría no tiene regla vigente a la fecha de la demanda; por ejemplo, un id que no existe en el catálogo                          | Usar una categoría del catálogo. Una categoría nueva la decide el operador y entra por el catálogo        |
+| `AMBIGUOUS_SELECTION` en `thirdPartyCosts.<costId>.policy`                          | Dos reglas vigentes del mismo nivel para esa categoría                                                                                 | Error del catálogo: versión nueva que retire el duplicado                                                  |
+| `MISSING_THIRD_PARTY_POLICY`                                                        | Sólo en el carril del núcleo (`calculate`): el snapshot no trae la regla de la categoría de un costo                                   | Agregar la regla a `snapshot.thirdPartyPolicies`. En `compose` este faltante es el de la primera fila     |
+| `INVALID_THIRD_PARTY_AMOUNT` en `periods.<n>.request.thirdPartyCosts.<i>.amount`    | `amount` tiene más decimales que la moneda del proveedor                                                                               | Escribirlo en la escala de su moneda                                                                       |
+| `DUPLICATE_THIRD_PARTY_COST_ID` en `thirdPartyCosts`                                | Un `costId` repetido, o igual al `lineId` de una línea                                                                                  | Un id distinto por costo y distinto de toda línea                                                          |
+| `INVALID_THIRD_PARTY_SCHEDULE` en `thirdPartyCosts.<costId>`                        | `periodIds` repite un periodo o nombra uno que la cotización no tiene                                                                   | Listar periodos de 1 a `brief.periods`, sin repetir                                                        |
+| `THIRD_PARTY_COST_OUTSIDE_ACTIVE_PERIOD` en `thirdPartyCosts.<costId>`              | Un costo refacturado cae en un periodo en que ninguna línea del equipo está activa                                                      | Moverlo a un periodo cotizado, o activar una línea en ese periodo                                          |
+| `UNCONFIRMED_THIRD_PARTY_COST` en `thirdPartyCosts.<costId>.evidence`               | Demanda en `mode: "commercial_draft"` con un costo refacturado cuya `evidence` no está `confirmed`                                      | Confirmar la cotización del proveedor. Hoy toda composición es simulación: sale junto a otros bloqueos     |
+| `STALE_SOURCE` en `periods.<n>.request.thirdPartyCosts.<i>.source`                  | `quoteDate` fuera de la vigencia de la cotización del proveedor                                                                         | Pedirle una cotización nueva al proveedor y actualizar la `evidence`                                       |
+| `MISSING_SOURCE_CONFIRMATION` en la misma ruta                                      | `evidence.status` es `pending`                                                                                                          | Conseguir el respaldo; `estimated` calcula en revisión                                                     |
+| `INVALID_ADJUSTMENT_LINE` en `adjustments`                                          | Un `discount`, o un `agreed_net` `monthly`/`setup`, nombra un `costId`; o un `agreed_net` `third_party` nombra una línea o un costo `client_direct` | Las líneas van con `monthly`/`setup`; los costos refacturados, con `third_party`                |
+| `UNUSED_FX_SELECTION` en un `fx:…`                                                  | `fxRecordIds` nombra el par de la moneda de un proveedor                                                                                | Quitarlo: el tipo de cambio de un costo de terceros se elige solo                                          |
+| `AMBIGUOUS_CONTINGENCY_RESERVE` en `contingency`                                    | Dos registros de reserva del mismo nivel aplican a la cotización; `candidates` los lista                                                | Error del catálogo: versión nueva que retire uno                                                           |
+| `CONTINGENCY_WAIVER_WITHOUT_RESERVE` en `contingency`                               | La demanda renuncia a una reserva que esta cotización no tiene                                                                          | Quitar `contingency`, o corregir la oferta, la forma o la fecha                                            |
+| `CONTINGENCY_RESERVE_WAIVED` (exit 3, en `reviewSignals`; no bloquea)               | La demanda renuncia a la reserva y había una                                                                                            | No es un error: informar el monto renunciado y el motivo                                                   |
+| Exit 1, `SCHEMA_INVALID` en stderr (`issues` da el `path`)                          | Falta `evidence` en un costo `reinvoiced`, falta `reason` en la renuncia, `amount` o `quantity` no son cadenas válidas, o sobra un campo | Corregir cada `path`                                                                                       |
+
+### Lo que todavía no está modelado
+
+Se dice cuando el pedido lo toca; no se resuelve por cuenta propia en una cotización:
+
+- cuándo se le paga a un proveedor, y si una compra obliga más allá del trabajo (plazo mínimo, derechos de uso que
+  siguen corriendo);
+- una comisión sobre lo que el cliente paga directo;
+- una tarifa registrada de proveedores recurrentes: cada costo se declara en su cotización;
+- un tratamiento de impuestos por fila: hay uno por cotización;
+- una cotización sólo de terceros, sin ninguna línea de equipo;
+- la reserva para un servicio On-Going ganado en una licitación con multas;
+- la liberación de la reserva después de la entrega.
+
+En el ledger: `THIRD_PARTY_AND_CONTINGENCY`.
+
 ## Registrar el precio acordado
 
 El precio que el operador acuerda de verdad tiene que pasar por el motor. Si se anota sólo en la propuesta, el
@@ -1236,7 +1824,9 @@ declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a
    - Es **por periodo**: con `billing: "monthly"` es lo que se factura cada mes por esas líneas, no el total del plazo.
      En doce meses, el plazo suma doce veces `amount`.
    - `billing`: `monthly` acuerda las filas mensuales de esas líneas; `setup`, las de implementación (cobro único), y
-     sólo rige en los periodos que tienen filas de implementación. Acordar las dos cosas son dos ajustes.
+     sólo rige en los periodos que tienen filas de implementación. Acordar las dos cosas son dos ajustes. Un tercer
+     valor, `third_party`, acuerda el neto de costos de terceros: ahí `lineIds` lleva `costId`, no líneas
+     ([cómo](#acordar-el-neto-de-un-costo-de-terceros)).
    - `lineIds`: los IDs de las líneas del brief que cubre el acuerdo. El motor reparte la diferencia entre sus filas
      en proporción al precio de cada una.
    - `reason`: obligatorio. Dice qué se acordó, quién lo aprobó y cuándo.
@@ -1246,7 +1836,8 @@ declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a
 3. Volver a correr con `compose prepare` y comprobar en el resumen: el neto de cada periodo (`periods[].totals.net`;
    `totals.net` suma todo el plazo) es el monto acordado más lo que facturen las filas que el acuerdo no cubre,
    `commercialAdjustments` trae el ajuste con su motivo y `engineVersion` es `pricing-v3-local/1.1.0` (`1.2.0` con
-   cliente en Colombia o Perú; `1.3.0` si la demanda declara la forma del compromiso). El motor no juzga si el monto
+   cliente en Colombia o Perú; `1.3.0` si la demanda declara la forma del compromiso; `1.4.0` si refactura un costo
+   de terceros o lleva reserva de contingencia). El motor no juzga si el monto
    es razonable (acepta incluso `"0"`): revisar la cifra antes de congelar.
 4. Leer el margen real en `marginRateRoundedDown` y las líneas bajo el piso en `marginFloor.lines[]`:
    `marginAmountShortOfFloor` es el margen que falta en cada una; con cliente en Colombia o Perú la línea trae en su
@@ -1324,22 +1915,31 @@ decisión del CEO; los cuatro perfiles de contenido que usan Adobe Express los c
 se paga una licencia de Adobe, Microsoft 365 y Notion los declaró él, lo mismo que cotizar Creative Cloud Pro sin
 descuento. Una forma nueva, otra razón, otro monto de
 puesta en marcha u otro plazo son decisión del operador y entran por una versión del catálogo o de la policy.
+Por la noche del 2026-10-11: el CEO cerró los factores de país («deja eso cerrado ya»), confirmados desde el
+2026-10-12; las reglas de precio de los costos de terceros (10 % con piso de 5 % en producción, talento e impresión;
+al costo en medios y licencias) y la reserva de contingencia de 12 % las propuso el agente y él las aceptó
+(«seguiré tu recomendación») como estimaciones por ajustar con el primer trabajo real; y dijo que HubSpot no hace
+falta hoy en las cotizaciones. Otra tasa, otra categoría u otra reserva son decisión suya y entran por una versión
+del catálogo.
 
 Abierto, registrado en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json): la
 revisión del FX de cotización cuando el mercado se mueva más allá de su margen, más el FX de CLF y el de EUR —el
 EUR→USD `1.20` del v6 es un estimado sin decisión explícita, y no hay USD→EUR— (`QUOTE_FX_REVIEW`); los múltiplos
-de redondeo para otras monedas o para una oferta que deba redondear distinto (`COMMERCIAL_ROUNDING_SCOPE`); la validación de los factores de país con contrataciones reales y con negocios
-cerrados o perdidos (`COUNTRY_FACTORS_UNVALIDATED`); el costo específico de un perfil en un país donde se aparte del
-costo de Chile por su factor (`LOCALIZED_TALENT_COSTS`; la base de costo quedó decidida: costo objetivo, no nómina); y
-la revisión de cada precio unitario de herramienta en su fecha (`UNIT_PRICE_REVIEW`). El alcance del piso
-(`MARGIN_FLOOR_SCOPE`) quedó decidido.
+de redondeo para otras monedas o para una oferta que deba redondear distinto (`COMMERCIAL_ROUNDING_SCOPE`); el costo
+específico de un perfil en un país donde se aparte del costo de Chile por su factor (`LOCALIZED_TALENT_COSTS`; la
+base de costo quedó decidida: costo objetivo, no nómina); la revisión de cada precio unitario de herramienta en su
+fecha (`UNIT_PRICE_REVIEW`); y el ajuste de las tasas de terceros y de la reserva con el primer trabajo real que las
+use (`THIRD_PARTY_AND_CONTINGENCY`). El alcance del piso (`MARGIN_FLOOR_SCOPE`) y los factores de país
+(`COUNTRY_FACTORS_UNVALIDATED`) quedaron decididos: no deben nada.
 Tampoco se decidió, a propósito, redondear sobre el total del periodo en vez de por fila ni redondear a
 terminaciones comerciales como 990.000 (un precio así se registra como neto acordado), ni factores por tipo de
 cliente (también neto acordado) ni factores de talento por perfil o seniority (se expresan como costo específico).
 Sin modelar todavía, y se dice cuando el pedido lo toca: la duración del contrato (una cotización tiene periodos, no
-un plazo), los costos de terceros de un trabajo y una reserva de contingencia para alcance fijo, si un asiento se
-compra para el trabajo, el plazo de las herramientas que no lo declaran, la fecha en que un contrato se renueva, y
-las formas Híbrido y Licencia/Consultoría.
+un plazo), si un asiento se compra para el trabajo, el plazo de las herramientas que no lo declaran, la fecha en que
+se renueva un contrato que no la declara, los periodos menores a un mes, una cotización en EUR, las formas Híbrido y
+Licencia/Consultoría y una vista de las lecturas internas lista para el cliente; y, de los costos de terceros y la
+reserva, lo que lista
+[Lo que todavía no está modelado](#lo-que-todavía-no-está-modelado).
 No resolver nada de esto por cuenta propia en una cotización.
 
 ## Presentar el precio en fee de la persona y kit de herramientas
@@ -1369,6 +1969,9 @@ Cómo leer la salida (`pricing-v3-price-split/1`):
 - El factor de mercado por país queda entero en la persona: el motor sólo lo aplica al componente humano.
 - Con la forma del compromiso declarada (contrato 1.3.0), el kit lleva la razón de la forma como cualquier
   componente: cada parte carga su propia porción del recargo.
+- En una cotización con costos de terceros (contrato 1.4.0) hay una tercera parte, `thirdParty`, y la suma es
+  `tools.net + person.net + thirdParty.net`. La reserva de contingencia queda dentro de la persona
+  ([ejemplo](#en-cada-lectura-del-artefacto)).
 - `person.belowFloor` y `partsBelowFloorWhileRowMeetsIt` avisan cuando una parte queda bajo el piso aunque la fila
   lo cumpla. Pasa sobre todo cuando objetivo y piso son iguales y el kit se redondea hacia arriba. Importa si el
   cliente puede quitar el kit: lo que queda es esa parte de persona. Se informa al operador; no se corrige a mano.
@@ -1385,7 +1988,9 @@ persona. En total, persona 2.600.000 + kit 190.000 = 2.790.000, con margen 36,5 
 caja mueve y qué queda comprometido con proveedores cuando termina. Como `compose split`, las tres leen un artefacto
 de composición, lo verifican con `replay` antes de leerlo (uno alterado se rechaza con `REPLAY_MISMATCH`), no
 recalculan ni cambian nada, no reciben `--current` y aceptan `--out` para guardar el JSON en una ruta nueva. Sirven
-sobre todo en un trabajo acotado (On-Demand).
+sobre todo en un trabajo acotado (On-Demand). Lo que cada una agrega cuando la cotización trae costos de terceros o
+reserva de contingencia está en [Cómo leer una cotización con terceros](#en-cada-lectura-del-artefacto); el ejemplo
+de esta sección no los tiene y sus salidas no cambiaron.
 
 **Antes de empezar.** Tener el artefacto que escribió `compose quote --out`. Los ejemplos usan el de referencia,
 `data/pricing/v3-operating/designer-on-demand.artifact.json` (neto CLP 2.790.000).
@@ -1453,8 +2058,8 @@ Devuelve exit 3 con `pricing-v3-engagement-cash/1`.
 | Parte                                        | Qué dice                                                                                                                  | En el ejemplo                 |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | `totals.net`, `fullCost`, `marginAtFullCost` | Neto, costo completo atribuido y margen, **leídos** de la cotización, no recalculados                                     | 2.790.000, 1.768.438 y 1.021.562 (`0.366151`) |
-| `fullCostByNature`                           | El costo por naturaleza: `people`, `provisions`, `platformFee`, `setup`, `toolCreditBudgets` y `toolSeatsAndPackages`; suman `fullCost` | —                             |
-| `newSupplierCash`                            | La caja **nueva** que la cotización hace pagar a proveedores: sólo los packs extra de créditos declarados                 | 43.770                        |
+| `fullCostByNature`                           | El costo por naturaleza: `people`, `provisions`, `platformFee`, `setup`, `toolCreditBudgets` y `toolSeatsAndPackages`; suman `fullCost`. En una cotización 1.4.0 se agregan `thirdParty` y `contingencyReserve` | —                             |
+| `newSupplierCash`                            | La caja **nueva** que la cotización hace pagar a proveedores: los packs extra de créditos declarados y, en una cotización 1.4.0, el costo de cada tercero refacturado | 43.770                        |
 | `cashAddedOnContractedCapacity`              | `net − newSupplierCash`: la caja que el trabajo suma una vez cobrado, **si** las personas son capacidad ya contratada     | 2.746.230                     |
 | `results.marginAtFullCost`                   | El margen sobre el costo completo, con `decides: "viability"` y las filas bajo el piso                                    | Ninguna fila bajo el piso     |
 | `restsOn`, `notDerivable`                    | Los supuestos de esa cifra y lo que el artefacto no permite saber                                                         | Ver abajo                     |
@@ -1582,10 +2187,13 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 - **No elegir la oferta por el margen que deja pasar.** Un programa SEO/AEO gestionado va con
   `seo-aeo-managed-service`, no con la oferta creativa; un servicio gestionado no va con la de staffing.
 - **No atribuirle al operador lo que propuso el agente**: la fecha de revisión `2027-04-11` y el FX de cotización
-  EUR→USD `1.20` se presentan como estimados pendientes de su decisión. Los factores de talento fuera de Chile siguen
-  estimados porque el operador lo pidió así: se presentan como estimados, no como una decisión que él deba. El 10 %
-  de On-Demand lo mantuvo el agente por encargo del CEO, y los montos de puesta en marcha los propuso el agente y el
-  CEO los aceptó como estimaciones.
+  EUR→USD `1.20` se presentan como estimados pendientes de su decisión. El 10 % de On-Demand lo mantuvo el agente por
+  encargo del CEO; los montos de puesta en marcha, las reglas de terceros y el 12 % de la reserva los propuso el
+  agente y el CEO los aceptó como estimaciones.
+- **No reabrir los factores de país.** El CEO los cerró el 2026-10-11 y están confirmados desde el 2026-10-12: no se
+  presentan como estimados, como un dato por validar ni como una decisión que él deba. Si un perfil se aparta de su
+  factor, se registra su costo específico.
+- **No pedir el precio de HubSpot como un dato pendiente**: el CEO indicó que hoy no hace falta en las cotizaciones.
 - **No cotizar un trabajo acotado sin declarar la forma.** Sin `engagementForm` el precio sale como On-Going y nada
   avisa. Tampoco declarar On-Demand para subir un precio, usar `engagementCode` para expresar la forma ni inventar un
   id de forma: Híbrido son dos cotizaciones.
@@ -1599,8 +2207,19 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
   factura, y no decidir qué compromiso con un proveedor es aceptable: se informa y decide el operador. Tampoco
   presentar como cifra cierta el monto comprometido de un precio con plazo que no declara fecha de renovación: es un
   techo ([límites](#compromisos-con-proveedores-compose-commitments)).
-- **No prometer lo que el cotizador no modela** en un trabajo acotado: duración del contrato, costos de terceros,
-  reserva de contingencia ni periodos menores a un mes.
+- **No prometer lo que el cotizador no modela** en un trabajo acotado: duración del contrato, periodos menores a un
+  mes, ni lo que falta de terceros y reserva ([lista](#lo-que-todavía-no-está-modelado)).
+- **No escribir una tasa en la demanda** para un costo de terceros: la demanda lleva la categoría y el catálogo pone
+  la regla.
+- **No esconder un costo de proveedor** dentro de una línea de persona, de una herramienta o de una provisión, ni
+  restarlo como un descuento: se declara en `thirdPartyCosts` con su liquidación y su respaldo.
+- **No renunciar a la reserva de contingencia para llegar a un precio sin decirlo**, ni omitir `engagementForm` para
+  que no entre. La renuncia la decide el operador, lleva su motivo y queda marcada.
+- **No comparar el margen mezclado con el piso de la oferta.** Con costos de terceros el número que se compara es
+  `ownWork.marginRateRoundedDown`; se informan los dos, cada uno con su nombre.
+- **No mostrarle al cliente las lecturas internas** (resumen, `explain`, `assess`, `split`, `cash`, `schedule`,
+  `commitments`): traen costos, márgenes, la reserva y montos de proveedor. Al cliente va lo que arma
+  `compose preview`.
 - **No usar el redondeo, un ajuste ni un cambio de fecha para «cumplir» un piso** o para llegar a un precio.
 - **No editar un archivo versionado** (catálogo, policy, demanda de ejemplo, artefacto): se copia a una ruta nueva o
   se emite una versión.
@@ -1628,9 +2247,19 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 | Exit 2, `RESOURCE_FX_SELECTION_REQUIRED` junto a `UNUSED_FX_SELECTION`                                                                   | Una herramienta con precio en EUR y `fxRecordIds` nombra la referencia de un solo día (`fx:EUR:USD:ECB:2026-10-09`)                                                       | Nombrar `fx:EUR:USD` en `fxRecordIds` ([Cotizar en otra moneda](#cotizar-en-otra-moneda))                                                                                                                                                         |
 | Exit 2, `MISSING_CATALOG_SELECTION` en `fx.USD:EUR`                                                                                      | Se pidió `outputCurrency: "EUR"`                                                                                                                                          | Cotizar en USD. No hay cotización en EUR                                                                                                                                                                                                          |
 | Exit 1, `INVALID_ARGUMENT` con `option: "current"`                                                                                       | `--current` con un valor (`--current=…`) o en un comando que no carga fuentes (`explain`, `replay`, `compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash`, `compose commitments`, `current`) | Quitarlo, o escribirlo sin valor                                                                                                                                                                                                                  |
+| El resumen de un servicio gestionado trae `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM` en `assumptions`                  | La demanda no declara `engagementForm` y la oferta tiene una reserva de contingencia para la forma On-Demand: no se evaluó. Le pasa a los ejemplos `managed-care` | Preguntar la forma, declarar `on_going` u `on_demand` y volver a correr ([reserva](#reserva-de-contingencia))                                                                                                                                     |
+| Un servicio gestionado On-Demand sale más caro que antes del catálogo v10 y el motor es `1.4.0`                                          | Ahora lleva la reserva de contingencia: 12 % del costo de persona, como costo                                                                                             | Es lo esperado. `contingencyReserve` en el resumen dice cuánto. No se quita cambiando la forma: se renuncia con motivo, si el operador lo decide                                                                                                  |
+| Una cotización fechada 2026-10-11 trae `runNotices.laterCatalogValues` con `records` `8`                                                 | Los ocho factores de país confirmados rigen desde el 2026-10-12                                                                                                           | Informarlo. No es una fecha atrasada: desde el 2026-10-12, con la fecha del día, no sale                                                                                                                                                           |
+| El margen de una cotización con terceros parece bajo el piso y ninguna línea sale marcada                                                | `marginRateRoundedDown` es el margen mezclado; el piso se juzga por fila                                                                                                  | Leer `ownWork.marginRateRoundedDown` y `marginFloor.lines` ([regla](#la-regla-de-lectura))                                                                                                                                                        |
+| Exit 2, `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.<costId>.policy`                                                                 | La categoría del costo no tiene regla vigente                                                                                                                             | Usar una categoría de `catalog search --current --kind third_party_policy`                                                                                                                                                                        |
+| Exit 2, `STALE_SOURCE` en `periods.<n>.request.thirdPartyCosts.<i>.source`                                                               | La cotización del proveedor no rige a la fecha de la demanda                                                                                                              | Pedir una nueva y actualizar la `evidence`; no estirar la vigencia a mano                                                                                                                                                                         |
+| Exit 2, `UNUSED_FX_SELECTION` tras agregar un costo de terceros en otra moneda                                                           | Se nombró el par de la moneda del proveedor en `fxRecordIds`                                                                                                              | Quitarlo: ese tipo de cambio se elige solo                                                                                                                                                                                                         |
+| Exit 2, `CONTINGENCY_WAIVER_WITHOUT_RESERVE` en `contingency`                                                                            | La demanda renuncia a una reserva que esta cotización no tiene (otra oferta, On-Going, sin forma)                                                                         | Quitar `contingency` o corregir oferta y forma                                                                                                                                                                                                    |
+| Un costo de terceros aparece multiplicado                                                                                                | `periodIds` lista varios periodos: el costo completo se cobra en cada uno; o `quantity` mayor que 1                                                                       | Un costo único lleva un solo periodo                                                                                                                                                                                                              |
 | Exit 1, `OUTPUT_EXISTS`                                                                                                                  | La ruta de `--out` ya existe                                                                                                                                              | Elegir una ruta nueva; no borrar un artefacto para reutilizar su nombre                                                                                                                                                                           |
 
-Los demás rechazos están en [Qué hacer con cada error](#qué-hacer-con-cada-error).
+Los demás rechazos están en [Qué hacer con cada error](#qué-hacer-con-cada-error); los de costos de terceros y
+reserva, en [su tabla](#si-un-costo-de-terceros-o-la-reserva-fallan).
 
 ## Pendientes que permanecen visibles
 
@@ -1641,7 +2270,9 @@ el v5: con una demanda fechada 2026-10-11 o después `assess` ya no emite `HUMAN
 fechada antes lo sigue emitiendo por línea, porque ese día los registros no declaraban país. `assess` no avisa de un
 factor de país estimado entre sus `gaps`: eso se lee en `reviewSignals` del resumen, y su peso, en
 `costEvidencePriority` ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Cuando el
-factor de mercado cambia algo, `margin.policyFloor.marketFactor` lo repite.
+factor de mercado cambia algo, `margin.policyFloor.marketFactor` lo repite. Con costos de terceros o una renuncia a
+la reserva, `assess` agrega sus propios gaps y lee el margen propuesto sobre el trabajo propio
+([detalle](#en-cada-lectura-del-artefacto)).
 Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Los pisos aprobados son los de cada oferta (45 % en los servicios gestionados de las prácticas creativa y SEO/AEO, 25 % en una persona por dedicación); `assess` no los sustituye ni aprueba una excepción. El precio que se presenta y toda excepción los decide el operador (CEO). El preview está redactado, local y marcado como simulación;
 no es oferta emitida. La promoción futura tiene [mapa de integración](../../documentation/finance/cotizador-v3-promocion-canonica.md),
 con la autoridad y lifecycle del cotizador vigente. Este trabajo no despliega ni escribe API/DB/CRM.

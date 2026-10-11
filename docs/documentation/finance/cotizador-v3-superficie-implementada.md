@@ -24,6 +24,10 @@ policy v10 que cotiza Creative Cloud Pro sin su descuento, y
 tres lecturas nuevas de una cotización ya congelada. El resumen para leer primero
 está en [Forma del trabajo: On-Going y On-Demand](#forma-del-trabajo-on-going-y-on-demand-2026-10-11) y en
 [Tres lecturas de una cotización congelada](#tres-lecturas-de-una-cotización-congelada-2026-10-11).
+Los párrafos marcados «motor 1.4» describen el cambio de la noche de ese mismo día: el contrato 1.4.0 del kernel
+(los costos de terceros de un trabajo y una reserva de contingencia para trabajos de alcance fijo) y el catálogo v10,
+que además deja cerrados los factores de país. El resumen para leer primero está en
+[Costos de terceros y reserva de contingencia](#costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
 
 ## Qué versiones se usan hoy (2026-10-11)
 
@@ -122,7 +126,9 @@ cifras del artefacto congelado.
 - La duración del contrato no es un dato de entrada: una cotización tiene períodos, no un plazo. El cotizador no
   sabe si un mes es un trabajo de un mes o el mes representativo de un servicio continuo.
 - Un trabajo de menos de un mes se expresa como horas dentro de un período; no hay períodos más cortos.
-- Los costos de terceros del trabajo y una reserva de contingencia para alcance fijo no están modelados todavía.
+- Los costos de terceros del trabajo y una reserva de contingencia para alcance fijo no estaban modelados cuando se
+  escribió esta lista. Existen desde el contrato 1.4.0, de la noche del mismo 2026-10-11:
+  [costos de terceros y reserva de contingencia](#costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
 - Sólo existen On-Going y On-Demand. No hay forma híbrida ni de licencia o consultoría: un trabajo híbrido se cotiza
   como dos cotizaciones, una base On-Demand y una operación On-Going.
 - Un pedido que no declara la forma se calcula como On-Going y no avisa. Declararla es responsabilidad de quien
@@ -135,6 +141,164 @@ Qué significa On-Demand en el modelo de negocio:
 [Efeonce Factory](../../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md), la ruta comercial reservada a
 los trabajos On-Demand. Contrato, claves y fallas:
 [contrato 1.3.0](cotizador-v3-contrato-y-validacion.md#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11).
+
+## Costos de terceros y reserva de contingencia (2026-10-11)
+
+**Qué son y para qué sirven.** Son dos cosas que un trabajo real trae y que el cotizador no sabía expresar hasta el
+contrato 1.4.0. Antes se sumaban a mano, fuera de la cotización, y el margen y el veredicto de piso no las veían.
+
+- Un **costo de terceros** es algo que se compra a un proveedor para ese trabajo y que no es parte del equipo ni
+  una herramienta del catálogo: una producción audiovisual, un locutor y sus derechos de uso, una impresión, la
+  inversión en medios, una licencia.
+- Una **reserva de contingencia** es un colchón dentro del costo para absorber sobrecostos cuando el alcance es
+  fijo. Si un trabajo de alcance cerrado toma más horas que las previstas, el precio ya no se mueve; la reserva es
+  lo que cubre esa diferencia.
+
+### Costos de terceros: quién le paga al proveedor
+
+Cada costo se declara en el pedido (`brief.thirdPartyCosts[]`) con un identificador, su categoría, un nombre, el
+proveedor, el importe y su moneda, la cantidad, los períodos en que cae y la evidencia del importe (la cotización
+del proveedor: referencia, vigencia y estado). Lo primero que se declara es quién le paga al proveedor
+(`settlement`), porque cambia todo lo demás:
+
+| Quién paga | Valor | Qué pasa en la cotización |
+| --- | --- | --- |
+| Efeonce le paga al proveedor y se lo refactura al cliente | `reinvoiced` | Es una fila propia de la cotización, con su costo, su precio y su piso. Entra a los totales, al margen y a la caja |
+| El cliente le paga directo al proveedor | `client_direct` | Es una nota. No entra a ningún total, costo, cifra de caja ni conversión de moneda; se muestra aparte, en su propia moneda |
+
+El precio de un costo refacturado no se escribe en el pedido: el pedido lleva sólo la **categoría**, y la regla de
+precio de cada categoría vive en el catálogo. Reglas del catálogo v10:
+
+| Categoría | Regla de precio | Piso de la fila | Redondeo |
+| --- | --- | --- | --- |
+| Producción, talento e impresión (`production`, `talent`, `printing`) | Costo del proveedor más 10 % de gestión | 5 % de margen | Comercial: sube al múltiplo de la moneda |
+| Medios y licencias (`media`, `licences`) | Al costo, sin recargo | 0 | Ninguno: se cobra exactamente el costo |
+
+El 10 % es el fee de gestión de proyectos que ya traía el Excel de pricing, y «sin margen sobre la inversión en
+medios» es la regla que el operador ya aplicaba a los medios pagados. Las cinco reglas son **estimaciones**: las
+propuso el agente y el CEO las aceptó el 2026-10-11 («seguiré tu recomendación»), para ajustarlas con el primer
+trabajo real. Los registros están marcados como estimados.
+
+Cómo se comporta una fila de terceros:
+
+- Queda **fuera** del factor de mercado, de la razón On-Demand y de los descuentos por tasa. Un proveedor cobra lo
+  mismo sea cual sea el país del cliente o la forma del trabajo, y un descuento sobre el servicio no rebaja lo que
+  hay que pagarle. El único ajuste que la alcanza es un neto pactado explícito (`agreed_net` con
+  `billing: "third_party"`) que nombra los costos.
+- Los períodos son obligatorios (`periodIds`): un costo de una sola vez nunca se multiplica en silencio por los
+  meses de la cotización.
+- Si el proveedor cobra en la moneda de la cotización, no hay conversión y el importe entra exacto. Si cobra en
+  otra, se convierte con el tipo de cambio que la cotización congela, y la evaluación lo avisa: al proveedor se le
+  paga al tipo de cambio del día del pago.
+- Una cotización de proveedor vencida bloquea la cotización siguiente (`STALE_SOURCE`); una estimada la deja en
+  revisión.
+- El nombre del proveedor y la referencia de su cotización quedan en el pedido congelado, pero no salen en el
+  resumen ni en la vista para el cliente: ahí un costo se nombra por su identificador, su nombre y su categoría.
+
+### Dos márgenes, y cuál se compara contra el piso
+
+Una cotización con terceros tiene dos márgenes, y confundirlos lleva a una decisión equivocada.
+
+- El **margen mezclado** es el de toda la cotización (`marginRateRoundedDown`). Baja con todo lo que se refactura
+  al costo o cerca del costo: mientras más medios o producción lleva un trabajo, más bajo se ve, aunque el trabajo
+  del equipo esté igual de bien vendido.
+- El **margen del trabajo propio** (`ownWork.marginRateRoundedDown`) es el mismo cálculo sin las filas de terceros:
+  equipo, herramientas, provisiones y reserva. Es el que se compara contra el piso de la oferta: 45 % en los
+  servicios gestionados, 25 % en una persona vendida por dedicación.
+
+Quien juzgue una cotización con terceros por el margen mezclado va a rechazar trabajo sano o, peor, va a bajarle
+el precio al equipo para «recuperar» un margen que nunca estuvo en riesgo. No existe un veredicto único para toda
+la cotización sobre ninguno de los dos márgenes: el piso se juzga fila por fila, una fila del equipo contra su
+política de precio y una fila de terceros contra la regla de su categoría.
+
+### Reserva de contingencia: un costo que se vende con margen
+
+Un servicio gestionado vendido On-Demand lleva una reserva de 12 % del costo de las personas del equipo. El catálogo
+v10 la carga para las dos ofertas de servicio gestionado (`creative-managed-service` y `seo-aeo-managed-service`)
+cuando el pedido declara `engagementForm: on_demand`. El 12 % es el colchón que el operador usó en una oferta de
+licitación; lo propuso el agente y lo aceptó el CEO el 2026-10-11, también como estimación para ajustar con el
+primer trabajo real.
+
+- **Es un costo, no un recargo.** Se suma al costo de cada fila del equipo. Como cualquier otro costo, se vende con
+  el margen de la oferta y con la razón On-Demand, y sube el piso de la fila. En el ejemplo de más abajo, 436.800 de
+  reserva en el costo se convierten en 870.000 de precio. Una reserva vendida al costo dejaría de proteger el
+  margen justo cuando se usa.
+- **Nunca incluye las filas de terceros.** Se calcula sobre el costo de las personas.
+- **Sale sólo por una renuncia declarada.** El pedido la quita con `contingency: { kind: "waived", reason }`. La
+  reserva pasa a cero, el resumen levanta la señal `CONTINGENCY_RESERVE_WAIVED` y dice cuánto se dejó fuera. Un
+  servicio gestionado declarado On-Demand no tiene otra forma de cotizarse sin ella.
+- **Una persona por dedicación no lleva reserva.** En staff augmentation el cliente dirige el trabajo y el riesgo
+  de alcance es suyo.
+- **Si el pedido no declara la forma, la reserva no se evalúa, y el cotizador lo dice.** La cotización trae el
+  supuesto `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`, para que una forma olvidada no signifique en
+  silencio «sin reserva».
+
+El colchón que las prácticas sumaban a mano para un trabajo de alcance fijo se puede expresar ahora en un servicio
+gestionado On-Demand. El colchón de un servicio On-Going ganado en una licitación con multas **no** está modelado.
+
+### Ejemplo congelado, vuelto a correr el 2026-10-11
+
+[`managed-on-demand-third-party.demand.json`](../../../data/pricing/v3-operating/managed-on-demand-third-party.demand.json)
+→ `.artifact.json` es el primer artefacto firmado por el motor 1.4.0: un servicio gestionado creativo vendido
+On-Demand en Chile, un mes, salida en CLP, con una producción en pesos, talento en dólares, medios al costo y una
+licencia que paga el cliente. Es una simulación de prueba; los proveedores son nombres de ejemplo. Cifras del
+artefacto, reproducidas con `replay` y vueltas a obtener cotizando la demanda con `--current`:
+
+| | Costo | Neto | Piso de la fila |
+| --- | --- | --- | --- |
+| Producción audiovisual (proveedor en CLP, +10 %) | 4.500.000 | 4.950.000 | 4.736.843 |
+| Talento: USD 1.250 a 1.000 CLP por USD, +10 % y redondeo | 1.250.000 | 1.380.000 | 1.315.790 |
+| Medios pagados, al costo | 3.333.333 | 3.333.333 | 3.333.333 |
+| **Terceros refacturados** | **9.083.333** | **9.663.333** | — |
+| **Trabajo propio** (equipo, herramientas, provisiones y reserva) | **5.666.722** | **11.370.000** | Por fila del equipo |
+| **Total de la cotización** | **14.750.055** | **21.033.333** | — |
+| Banco de imágenes que paga el cliente (USD 890) | Fuera | Fuera | — |
+
+- Margen mezclado: 29,87 %. Margen del trabajo propio: 50,16 %. Ninguna fila está bajo su piso. Leído por el
+  margen mezclado, este trabajo parecería estar quince puntos bajo el piso de 45 % de la oferta; no lo está.
+- El trabajo propio supera el 45 % objetivo de la oferta porque es On-Demand: la razón 1,10 suma margen
+  (`engagementAdjustment` 1.030.311).
+- Los terceros son el 45,9 % del neto y dejan 580.000 de margen, todo de producción y talento.
+- La reserva es 436.800, el 12 % de 3.640.000 de costo de personas, y pesa 2,1 % del neto.
+- El total no es un múltiplo de 10.000 porque los medios se cobran exactamente al costo, sin redondeo.
+
+La misma demanda con un solo cambio, cotizada ese día con `--current` (copias sin versionar):
+
+| Cambio | Contrato | Costo | Neto | Margen mezclado | Margen del trabajo propio |
+| --- | --- | --- | --- | --- | --- |
+| Ninguno (el ejemplo) | 1.4.0 | 14.750.055 | 21.033.333 | 29,87 % | 50,16 % |
+| Con la reserva renunciada y su motivo | 1.4.0 | 14.313.255 | 20.163.333 | 29,01 % | 50,19 % |
+| Sin costos de terceros | 1.4.0 | 5.666.722 | 11.370.000 | 50,16 % | 50,16 % |
+| Declarada On-Going | 1.4.0 | 14.313.255 | 19.193.333 | 25,43 % | 45,12 % |
+| Sin declarar la forma | 1.4.0 | 14.313.255 | 19.193.333 | 25,43 % | 45,12 % |
+| Sin forma y sólo con la licencia que paga el cliente | 1.1.0 | 5.229.922 | 9.530.000 | 45,12 % | — |
+
+- Renunciar a la reserva baja el precio en 870.000 y el costo en 436.800, y queda señalado
+  (`totals.contingencyReserveWaived` 436.800).
+- On-Going no lleva reserva. La fila «sin declarar la forma» da las mismas cifras, pero trae el supuesto de que la
+  reserva no se evaluó.
+- La última fila muestra que una nota de costo pagado por el cliente no cambia el contrato ni ninguna cifra: la
+  cotización se calcula como antes y la nota viaja aparte.
+- Con la cotización de la productora vencida el 2026-10-08, la cotización queda `needs_input` (salida 2) con
+  `STALE_SOURCE`, y `runNotices.priceDates.expired` nombra el costo.
+
+### Qué no está modelado
+
+- **Cuándo se le paga al proveedor.** La cotización congela el período en que cae un costo, no la fecha de pago ni
+  las condiciones del proveedor. No puede decir si Efeonce le paga al proveedor antes de cobrarle al cliente.
+- **Si una compra obliga más allá del trabajo.** Un plazo mínimo, un cargo por cancelar o unos derechos de uso que
+  duran más que el trabajo (como los doce meses del ejemplo) no se leen: la lectura de compromisos los deja fuera a
+  propósito y lo dice.
+- **Una comisión sobre lo que el cliente paga directo.** Un costo `client_direct` es sólo una nota.
+- **Una lista de precios de proveedores recurrentes.** Cada costo llega con su propia evidencia.
+- **El tratamiento de impuesto por fila**, y una cotización que sólo tenga terceros, sin ninguna línea de equipo.
+- **La reserva de un servicio On-Going ganado en licitación con multas**, y la liberación de la reserva después de
+  la entrega.
+
+Contrato, claves y fallas:
+[contrato 1.4.0](cotizador-v3-contrato-y-validacion.md#contrato-140--costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
+Por qué la reserva es un costo y qué pasa con los factores de país:
+[provisiones y costos](cotizador-v3-provisiones-y-costos.md#costos-de-terceros-y-reserva-de-contingencia-como-costos-2026-10-11).
 
 ## Tres lecturas de una cotización congelada (2026-10-11)
 
@@ -183,7 +347,8 @@ una vez que se toma. Habla de la licencia, no del papel del contrato. Lo declar�
 - **Microsoft 365, un mes.** El contrato es anual y se paga mes a mes, pero asignar o quitar una licencia sube o
   baja la cuenta mensual. No queda nada comprometido cuando termina un trabajo corto.
 - **Notion, un mes.** Se paga mes a mes, sin más compromiso.
-- **HubSpot, sin declarar.** Es anual, pero su precio vigente está pendiente de evidencia y todavía no lleva plazo.
+- **HubSpot, sin declarar.** Es anual, pero el CEO indicó el 2026-10-11 que hoy no se necesita en las cotizaciones.
+  Su precio queda pendiente a propósito y por eso no lleva plazo: no es un dato que alguien deba.
 
 Un plazo de un mes es una declaración, distinta de «nadie lo dijo»: para una herramienta sin plazo declarado la
 lectura responde que no está declarado.
@@ -217,13 +382,37 @@ propósito para trabajos acotados; no es un aviso automático.
 `compose split` no cambió de propósito. Con una forma declarada, el kit de herramientas lleva la razón de la forma
 igual que cualquier otro componente: en el ejemplo, kit 190.000 más persona 2.600.000.
 
+**Motor 1.4 (2026-10-11): cómo leen estas lecturas una cotización con terceros y reserva.** Las cuatro siguen sin
+cambiar un total. Medido sobre el
+[ejemplo con terceros](#ejemplo-congelado-vuelto-a-correr-el-2026-10-11) (`managed-on-demand-third-party.artifact.json`):
+
+- **Calendario de pagos.** Reparte el neto completo, costos refacturados incluidos. Agrega `thirdParty.byPeriod`,
+  que compara lo que se les paga a los proveedores de un período con los hitos puestos en ese período. Con hitos de
+  30 %, 40 % y 30 % y sólo el primero puesto en el mes cotizado: 6.310.000, 8.410.000 y 6.313.333. Los proveedores
+  de ese mes cuestan 9.083.333, así que `supplierCostAboveMilestones` es 2.773.333: Efeonce pone esa diferencia hasta
+  cobrar un hito posterior. No conoce fechas de pago a proveedores; un hito sin período no se compara con nada.
+- **Lectura de caja.** El costo por naturaleza suma dos: `thirdParty` 9.083.333 y `contingencyReserve` 436.800. La
+  caja nueva a proveedores incluye ahora lo que se les paga a los proveedores de costos refacturados: 9.083.333. La
+  caja agregada sobre capacidad ya contratada es 11.950.000 (21.033.333 menos esa caja nueva). La reserva es una
+  provisión dentro del costo: no se le paga a nadie, no compromete caja y no cuenta como capacidad
+  (`capacityCostAbsorbed` 3.940.000 son personas y provisiones). El costo que paga el cliente aparece listado y no
+  se cuenta en ninguna cifra. `results.marginAtFullCost` trae al lado `ownWork`, el margen del trabajo propio.
+- **Compromisos con proveedores.** Las compras a terceros quedan fuera de esta lectura a propósito: dice cuántas vio
+  (`reviewed.thirdPartyPurchasesOutsideThisReading`, 3 en el ejemplo) y que sus condiciones no están congeladas
+  (`THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN`). En el ejemplo lo único que lista es la bandeja de atención social, una
+  herramienta a precio anual: 9.576.000 comprometidos, 798.000 dentro del mes cotizado y 8.778.000 que quedan
+  varados si nada más la usa. Los derechos de uso por doce meses del talento no aparecen: es justo lo que esta
+  lectura no sabe.
+- **Persona y kit (`compose split`).** Con filas de terceros son tres partes que suman el neto: kit 2.020.000,
+  persona 9.350.000 y terceros 9.663.333. La reserva queda dentro de la parte de la persona.
+
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
 | ------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0`, `1.1.0` (motor 1.1), `1.2.0` (motor 1.2) o `1.3.0` (motor 1.3); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
-| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`); desde el motor 1.2, `floorBasis` opcional en `market_factor`; desde el motor 1.3, la razón de precio de cada forma del trabajo (`kind: engagement_factor`) |
-| Brief                     | `pricing-v3-brief/1`                                        | Necesidad, selecciones y ajustes comerciales (`discount`, `agreed_net`); el resolver devuelve bindings, supuestos, pendientes y el contrato que emite al kernel. Motor 1.3: `engagementForm` opcional, la forma del trabajo |
+| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0`, `1.1.0` (motor 1.1), `1.2.0` (motor 1.2), `1.3.0` (motor 1.3) o `1.4.0` (motor 1.4); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
+| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`); desde el motor 1.2, `floorBasis` opcional en `market_factor`; desde el motor 1.3, la razón de precio de cada forma del trabajo (`kind: engagement_factor`); desde el motor 1.4, la regla de precio de cada categoría de costo de terceros (`kind: third_party_policy`) y la reserva de contingencia (`kind: contingency_reserve`) |
+| Brief                     | `pricing-v3-brief/1`                                        | Necesidad, selecciones y ajustes comerciales (`discount`, `agreed_net`); el resolver devuelve bindings, supuestos, pendientes y el contrato que emite al kernel. Motor 1.3: `engagementForm` opcional, la forma del trabajo. Motor 1.4: `thirdPartyCosts[]` opcional, los costos de terceros del trabajo, y `contingency` opcional, sólo para renunciar a la reserva con un motivo |
 | Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`. Versiones vigentes (2026-10-11): cada precio admite `reviewBy`, una fecha de revisión que avisa y no bloquea. Lecturas (2026-10-11): cada precio admite además `commitmentTermMonths`, los meses que hay que seguir pagando una licencia una vez tomada; no entra a ningún cálculo |
 | Puntero de versiones vigentes | `pricing-v3-current/1` (`adapters/current-versions.ts`) | Versiones vigentes (2026-10-11): `data/pricing/v3-operating/current.json` nombra catálogo, policy y catálogo de créditos por ruta, versión y digest; `--current` lo usa y `current show\|set` lo lee y lo reemplaza |
 | Fechas de los precios     | `resources/price-review.ts`                                 | Versiones vigentes (2026-10-11): lectura derivada de qué fechas de revisión pasaron, cuáles vencen pronto y qué vigencias ya terminaron; no cambia ningún precio ni resultado |
@@ -235,15 +424,15 @@ igual que cualquier otro componente: en el ejemplo, kit 190.000 más persona 2.6
 | Mantenimiento de recursos | `pricing-v3-resource-change/1`                              | Replacement completo `policy` o `credits`; preview con impacto y sucesor nuevo                 |
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
-| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado. Motor 1.3 (aditivo): bloque `engagementForm` y `totals.engagementAdjustment`, sólo cuando el pedido declara la forma |
-| Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total |
+| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado. Motor 1.3 (aditivo): bloque `engagementForm` y `totals.engagementAdjustment`, sólo cuando el pedido declara la forma. Motor 1.4 (aditivo): bloques `ownWork`, `thirdParty` y `contingencyReserve`, sólo en una cotización 1.4.0 |
+| Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total. Motor 1.4: las cuatro reconocen las filas de terceros y la reserva |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
-| Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2), `1.3.0` → `pricing-v3-local/1.3.0` (motor 1.3); cada uno con su `precisionPolicy` |
+| Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2), `1.3.0` → `pricing-v3-local/1.3.0` (motor 1.3), `1.4.0` → `pricing-v3-local/1.4.0` (motor 1.4); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
 
 Fuentes ejecutables: [dominio](../../../src/lib/finance/pricing-v3/),
 [CLI](../../../scripts/commercial/pricing-v3.ts), [fixtures operativas](../../../data/pricing/v3-operating/README.md).
-Versiones de reproducción: motor `pricing-v3-local/1.0.0`, desde el motor 1.1 también `pricing-v3-local/1.1.0` desde el motor 1.2 también `pricing-v3-local/1.2.0` y desde el motor 1.3 también `pricing-v3-local/1.3.0` (cada artefacto se reproduce con el que lo firmó; `ENGINE_VERSION` ya no existe), artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`. Las tres versiones de artefacto no cambiaron.
+Versiones de reproducción: motor `pricing-v3-local/1.0.0`, desde el motor 1.1 también `pricing-v3-local/1.1.0` desde el motor 1.2 también `pricing-v3-local/1.2.0` desde el motor 1.3 también `pricing-v3-local/1.3.0` y desde el motor 1.4 también `pricing-v3-local/1.4.0` (cada artefacto se reproduce con el que lo firmó; `ENGINE_VERSION` ya no existe), artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`. Las tres versiones de artefacto no cambiaron.
 Las propiedades desconocidas de los inputs estrictos se rechazan. Versiones o hashes incompatibles no se
 reinterpretan con la versión más reciente.
 
@@ -321,6 +510,15 @@ y del factor de mercado y antes del redondeo comercial y de los ajustes. El cost
 `marketPriceRatio` y `floorNet` son los mismos con forma y sin ella. El margen final sigue siendo
 `(neto − costo) / neto`. Detalle:
 [contrato 1.3.0](cotizador-v3-contrato-y-validacion.md#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11).
+
+Motor 1.4 (2026-10-11): dos componentes de costo nuevos. La reserva de contingencia es un costo de cada fila del
+equipo, `base × tasa` (hoy, el costo de las personas de la fila por 0,12); entra al precio por la política de precio
+y por la razón de la forma como cualquier otro costo, y sube `floorNet`. Cada costo de terceros refacturado es una
+fila propia de tipo `third_party`: su costo es `importe × cantidad` del proveedor en la moneda de salida, su precio
+sale de la regla de su categoría y su piso es el de esa regla; no recibe factor de mercado, razón de la forma ni
+descuento por tasa. El margen final sigue siendo `(neto − costo) / neto` sobre todo, terceros incluidos, y los
+totales agregan el margen del trabajo propio, que es la misma cuenta sin las filas de terceros. Detalle:
+[contrato 1.4.0](cotizador-v3-contrato-y-validacion.md#contrato-140--costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
 
 FX conserva par, tasa, fecha, fuente e IDs; convertir exige la dirección seleccionada, sin invertir o cruzar
 automáticamente. La referencia EUR→USD de la fixture operativa es 1.1206 al 09-10-2026; permite simular Magnific,
@@ -469,7 +667,7 @@ versión o el digest no coinciden, rechaza con `CURRENT_VERSIONS_MISMATCH` en ve
 sigue como antes: sin `--catalog` se lee review-v1 y `--policy` y `--credits` son obligatorios. Qué nombra el puntero
 lo imprime `pnpm --silent pricing:v3 current show`, y esa es la fuente: este documento no lo repite como vigente.
 Como dato fechado, al cierre del 2026-10-11 el comando respondía `catalog.review-v9.json`, `resources.review-v10.json`
-y `ai-credits.review-v1.json` (más temprano ese día, tras la oferta SEO/AEO, catálogo v8 y policy v6). Emitir una versión nueva no mueve el puntero: es un paso
+y `ai-credits.review-v1.json` (más temprano ese día, tras la oferta SEO/AEO, catálogo v8 y policy v6; por la noche, tras el motor 1.4, `catalog.review-v10.json` con la misma policy v10). Emitir una versión nueva no mueve el puntero: es un paso
 aparte. [Cómo se mueve](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
 
 Un artefacto de composición congela catálogo, policy, créditos, demanda y resultado; `createdAt` queda fuera
@@ -519,7 +717,22 @@ datos estimados del costo. Trae `currency`, `estimatedCost`, `confirmedCost`, `e
 `confirmFirst`, que son los cinco primeros datos del mismo ranking que el resumen publica en `estimateExposure`. No
 es una brecha nueva ni cambia el estado: es una lectura para priorizar. Pendiente conocido: `assess` todavía no
 lista como brecha propia que un factor de país sea estimado; hoy eso se ve en `reviewSignals` (`ESTIMATED_SOURCE`) y
-en este ranking.
+en este ranking. Nota del motor 1.4: ese pendiente perdió su objeto. El CEO dejó cerrados los factores de país el
+2026-10-11 y el catálogo v10 los registra como valores de política confirmados desde el 2026-10-12; una cotización
+con fecha desde ese día ya no los reporta como estimados.
+
+Motor 1.4 (2026-10-11): `assess` lee el piso propuesto sobre el trabajo propio. `margin` agrega `ownWorkRate` y
+`proposedFloorReadOn: "ownWorkRate"`, y `belowProposedFloor` se evalúa sobre ese margen, no sobre el mezclado;
+`modeledRate` sigue siendo el margen real de toda la cotización. En el ejemplo con terceros: `modeledRate` 0,2987,
+`ownWorkRate` 0,5016 y `belowProposedFloor: false`. El 40 %/35 % sigue siendo la propuesta genérica sin aprobar. Hay
+brechas nuevas, todas de revisión: `THIRD_PARTY_COST_EVIDENCE_REQUIRED` (el importe de un costo refacturado descansa
+en evidencia sin confirmar), `THIRD_PARTY_FX_EXPOSURE` (el proveedor cobra en otra moneda que la cotización),
+`THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED` (siempre que hay terceros: qué cubre cada costo, quién contrata, plazos de
+pago, derechos de uso y qué cuesta cancelar), `THIRD_PARTY_TAX_TREATMENT_REVIEW` (sólo con impuesto `exclusive` y un
+costo refacturado) y `CONTINGENCY_RESERVE_WAIVED` (la reserva se renunció). En el ejemplo aparecen las tres
+primeras: el talento en USD, los medios con evidencia estimada y la de alcance y condiciones. En
+`costEvidencePriority`, la cotización de un proveedor es un dato más del ranking: en el ejemplo el primero es la
+inversión en medios, con 22,6 % del costo y 1,6 puntos de margen en juego.
 
 `compose preview` admite simulación calculada en revisión y entrega JSON/Markdown con allowlist. Excluye
 costos, margen, IDs/fuentes privados, providers, drivers y países de talento. No autoriza publicación o envío.
@@ -683,6 +896,48 @@ Motor 1.3 y lecturas (2026-10-11), qué imprime cada comando. Hay tres operacion
   tasa en `fxRecordIds`).
 - `catalog search|show` aceptan `--kind engagement_factor`.
 
+Motor 1.4 (2026-10-11), qué imprime cada comando. No hay comandos, flags ni códigos de salida nuevos. Todas las
+claves que siguen existen sólo en una cotización 1.4.0; una cotización de un contrato anterior conserva su resumen.
+
+- `compose prepare|quote` y `replay` de una composición: el resumen agrega tres bloques. `ownWork`
+  (`{ cost, net, marginAmount, marginRateRoundedDown }`) es el trabajo propio. `thirdParty` separa `reinvoiced`
+  (`{ cost, net, marginAmount, shareOfNet, rows[] }`, una entrada por costo con su categoría, su regla, su precio y su
+  piso), `clientDirect[]` (las notas de lo que paga el cliente) y `fxExposed[]` (los costos cuyo proveedor cobra en
+  otra moneda). `contingencyReserve` trae la tasa, la base, el importe, su parte del neto, el registro que la decidió
+  y, si se renunció, `waived: true` con el motivo y el importe dejado fuera. `totals` agrega `thirdPartyCost`,
+  `thirdPartyNet`, `ownWorkMarginRate`, `contingencyReserve`, `contingencyBase` y `contingencyReserveWaived`.
+  `marginRateRoundedDown` de la raíz sigue siendo el margen mezclado real. El resumen nunca trae el nombre de un
+  proveedor ni la referencia de su cotización. `engineVersion` es `pricing-v3-local/1.4.0`.
+- `estimateExposure`: la cotización de un proveedor con evidencia estimada entra al ranking como un dato de costo
+  de tipo `third_party`; con evidencia confirmada cuenta en el costo confirmado. La reserva no es un dato del ranking: agranda en `(1 + tasa)` el peso de los
+  datos sobre los que se calcula. Una regla de categoría o un registro de reserva estimados aparecen en
+  `estimatedRules`.
+- `runNotices.priceDates`: un aviso con `subject: "third_party_quote"` cuando la cotización de un proveedor venció o
+  vence pronto. Un registro de reserva que termina no bloquea: la cotización siguiente simplemente no lleva reserva.
+- `explain`: `commercialAdjustments` agrega `thirdPartyPolicies[]` (la regla aplicada a cada categoría y a qué
+  costos) y `contingencyReserve`; las filas de terceros aparecen en el desglose de costo, y cada fila trae
+  `contingencyReserve`, la parte de su costo que es reserva.
+- `compose assess`: `margin.ownWorkRate`, `margin.proposedFloorReadOn` y las brechas nuevas descritas en la sección
+  de evaluación.
+- `compose preview` (vista para el cliente): el fee del servicio es sólo el trabajo propio; cada costo de terceros
+  es un ítem aparte con su nombre y su neto final; y después de los totales, `clientPaidDirectly[]` lista lo que el
+  cliente paga directo, en su propia moneda y sin convertir. Nunca muestra un proveedor, un costo ni una tasa. En el
+  ejemplo: fee 11.370.000, producción 4.950.000, talento 1.380.000, medios 3.333.333, neto 21.033.333, y aparte el
+  banco de imágenes por USD 890.
+- `compose split`, `compose cash`, `compose schedule` y `compose commitments`: descritos en
+  [las lecturas](#tres-lecturas-de-una-cotización-congelada-2026-10-11).
+- Situaciones que bloquean al cotizar, con salida 2 (códigos nuevos y códigos de siempre en rutas nuevas):
+  `AMBIGUOUS_CONTINGENCY_RESERVE` (dos registros de reserva del mismo
+  nivel aplican al pedido), `CONTINGENCY_WAIVER_WITHOUT_RESERVE` (el pedido renuncia a una reserva que no le aplica),
+  `DUPLICATE_THIRD_PARTY_COST_ID`, `INVALID_THIRD_PARTY_SCHEDULE`, `THIRD_PARTY_COST_OUTSIDE_ACTIVE_PERIOD`,
+  `MISSING_CATALOG_SELECTION` en la ruta `thirdPartyCosts.<costId>.policy` (la categoría no tiene regla vigente),
+  `INVALID_ADJUSTMENT_LINE` (un descuento por tasa nombra un costo de terceros) y, sobre la cotización de un
+  proveedor, `STALE_SOURCE` (vencida) o `MISSING_SOURCE_CONFIRMATION` (pendiente). Tabla completa:
+  [modos de falla del contrato 1.4.0](cotizador-v3-contrato-y-validacion.md#contrato-140--costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
+- Supuesto nuevo: `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`, cuando el catálogo tiene reservas que
+  dependen de la forma y el pedido no declara ninguna.
+- `catalog search|show` aceptan `--kind third_party_policy` y `--kind contingency_reserve`.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -802,10 +1057,36 @@ cifras son las del precio `current`. Y eligiendo `invoiced-with-discount` vuelve
 (1.768.438 y 2.790.000). Con reclutamiento, costo 2.322.704 y neto 3.650.000. Las demás filas con Creative Cloud
 Pro no se volvieron a medir.
 
+Readback del 2026-10-11 por la noche, tras el motor 1.4 y el catálogo v10, hecho con la CLI: `current show` responde
+`consistent: true` con las tres fuentes en `match` (catálogo v10, policy v10, créditos v1), y `replay` da
+`verified: true` en los 19 `*.artifact.json` bajo `data/pricing/`, entre ellos
+`managed-on-demand-third-party.artifact.json`, el primero firmado por el motor 1.4.0. Hay al menos uno firmado por
+cada motor: 1.0.0, 1.2.0, 1.3.0 y 1.4.0 en esa carpeta, y el de 1.1.0 en la carpeta del caso SKY. Corridas de ese
+día con `--current`; salvo la primera, usan copias de la demanda con un solo cambio y no están versionadas:
+
+| Caso | Salida | Resultado |
+| --- | --- | --- |
+| `managed-on-demand-third-party.demand.json` | 3 | Contrato 1.4.0; neto 21.033.333, costo 14.750.055, margen mezclado 0,2987, margen del trabajo propio 0,5016, reserva 436.800; ninguna fila marcada. La misma identidad (`calculationId`) que el artefacto versionado. `runNotices.laterCatalogValues` avisa 8 registros que rigen desde el 2026-10-12: los factores de país confirmados |
+| La misma con fecha 2026-10-12 | 3 | Las mismas cifras (equipo y cliente en Chile) y sin `runNotices` |
+| La misma con la reserva renunciada | 3 | Neto 20.163.333, costo 14.313.255; `totals.contingencyReserveWaived` 436.800; señal `CONTINGENCY_RESERVE_WAIVED` |
+| La misma declarada On-Going con una renuncia | 2 | `needs_input`: `CONTINGENCY_WAIVER_WITHOUT_RESERVE` en `contingency` |
+| La misma con la oferta `seo-aeo-managed-service` y sin terceros | 3 | Contrato 1.4.0; la reserva de esa oferta, 436.800; costo 5.666.722, neto 13.880.000 |
+| La misma con un neto pactado de 4.800.000 para la producción (`agreed_net`, `billing: "third_party"`) | 3 | Esa fila baja de 4.950.000 a 4.800.000 (`discount` 150.000), sobre su piso de 4.736.843; neto 20.883.333 |
+| La misma con un descuento por tasa que nombra la producción | 2 | `needs_input`: `INVALID_ADJUSTMENT_LINE` |
+| La misma con la cotización de la productora vencida el 2026-10-08 | 2 | `needs_input`: `STALE_SOURCE`; `runNotices.priceDates.expired` nombra el costo |
+| La misma con esa cotización vigente hasta el 2026-10-25 | 3 | Calcula; `runNotices.priceDates.dueSoon` avisa que vence en 14 días |
+| La misma con una categoría sin regla en el catálogo | 2 | `needs_input`: `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.tp-production.policy` |
+| La misma con un costo refacturado sin evidencia | 1 | Rechazo `SCHEMA_INVALID` en `brief.thirdPartyCosts.0.evidence` |
+| `designer-on-demand.demand.json` (una persona por dedicación, On-Demand) | 3 | Contrato 1.3.0, sin reserva: costo 1.822.704, neto 2.870.000, las cifras de antes |
+
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
 vigentes, medición de provisiones, policy comercial y términos reales siguen en
 [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json). Cambios salariales por periodo,
 drivers actuariales/contables, setup amortizado, fees porcentuales, ajustes encadenados y promoción de consumers
-API/UI/MCP/Nexa necesitan extensión propia. Tampoco están modelados todavía (2026-10-11) los costos de terceros de un
-trabajo ni una reserva de contingencia para alcance fijo, y la duración del contrato no es un dato de entrada. [Handoff de promoción](cotizador-v3-promocion-canonica.md).
+API/UI/MCP/Nexa necesitan extensión propia. La duración del contrato no es un dato de entrada. Los costos de terceros
+de un trabajo y la reserva de contingencia para alcance fijo, que esta lista daba por no modelados, existen desde el
+motor 1.4 (2026-10-11); lo que de ellos sigue sin modelarse —cuándo se le paga al proveedor, si una compra obliga más
+allá del trabajo, una comisión sobre lo que el cliente paga directo, una lista de precios de proveedores recurrentes
+y la reserva de un servicio On-Going ganado en licitación con multas— está en
+[qué no está modelado](#qué-no-está-modelado). [Handoff de promoción](cotizador-v3-promocion-canonica.md).

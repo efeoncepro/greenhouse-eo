@@ -120,9 +120,20 @@ no una banda de margen Factory. La puesta en marcha, la coordinación (como dedi
 con proveedores se costean como costo, y el 10% cubre sólo riesgo y política. De una cotización congelada salen tres
 lecturas: calendario de pagos por hitos, compromisos con proveedores que sobreviven al encargo y lectura de caja sobre
 capacidad ya contratada, que no es un margen ni decide el precio; antes de comprometer un encargo se revisan las dos
-primeras. Aún no modela costos de terceros (freelancers, producción, derechos, medios), reserva de contingencia para
-alcance fijo, duración del contrato ni períodos menores a un mes. Pasos en el
-[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+primeras. Pasos en el [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+
+Nota 2026-10-11 (noche) — la línea «Derechos / terceros» de la tabla ya se puede cotizar (simulación; tampoco cambia
+este modelo, su estado ni su veredicto). Lo que se compra para el encargo y se refactura va como una fila propia,
+con la regla de su categoría: producción, talento e impresión con 10% de gestión y un piso de 5%; medios y licencias
+al costo. Lo que el cliente paga directo al proveedor queda como nota y no entra a ningún total. Son estimaciones
+propuestas por el agente y aceptadas por el CEO, a ajustar con el primer encargo real; no son una banda de margen
+Factory. Con terceros una cotización tiene dos márgenes: el mezclado baja con todo lo refacturado cerca del costo, y
+el piso de la oferta se lee sobre el del trabajo propio. Un servicio gestionado vendido On-Demand lleva además una
+reserva de contingencia de 12% del costo de las personas, como costo, que sale sólo por una renuncia declarada con su
+motivo. Lo que el cotizador todavía no lleva: cuándo se le paga al proveedor, si una compra obliga más allá del
+encargo (por ejemplo, derechos de uso que lo sobreviven), una comisión sobre lo que el cliente paga directo, un
+tarifario de proveedores recurrentes, la duración del contrato y períodos menores a un mes. Los derechos se siguen
+fijando en cada propuesta (§6 y §7).
 
 ## 6. Activación, OT, alcance y responsabilidad
 

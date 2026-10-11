@@ -25,6 +25,14 @@
 > ([puesta en marcha](cotizador-v3-provisiones-y-costos.md#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11)).
 > Y Adobe ya no se costea con el importe histórico del libro: son dos productos facturados en pesos
 > ([Adobe](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11)).
+>
+> Nota 2026-10-11 (noche). La primera nota dice que de los factores de talento y de mercado hay «algunos confirmados,
+> otros estimados». Ya no: el CEO dejó cerrados los factores de país ese día y el catálogo v10 los registra todos
+> como valores de política confirmados desde el 2026-10-12, sin cambiar ningún valor. Además, dos cosas que este
+> documento no contempla ya se pueden cotizar: los costos de terceros de un trabajo, con una regla de precio por
+> categoría, y una reserva de contingencia para un servicio gestionado vendido On-Demand, las dos todavía estimadas
+> ([costos de terceros y reserva](cotizador-v3-superficie-implementada.md#costos-de-terceros-y-reserva-de-contingencia-2026-10-11),
+> [factores de país cerrados](cotizador-v3-provisiones-y-costos.md#los-factores-de-país-quedaron-cerrados)).
 
 ## Procedencia y estados
 

@@ -7,7 +7,7 @@ operador (CEO).
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
-Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Versiones vigentes: el puntero `current.json`](#versiones-vigentes-el-puntero-currentjson), [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización), [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país) y [Forma del compromiso, puesta en marcha y plazos de proveedor](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor), que operan sobre el catálogo operativo vigente: el que nombra el puntero y se carga con `--current`.
+Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Versiones vigentes: el puntero `current.json`](#versiones-vigentes-el-puntero-currentjson), [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización), [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país) [Forma del compromiso, puesta en marcha y plazos de proveedor](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor) y [Costos de terceros, reserva de contingencia y factores de país cerrados](#costos-de-terceros-reserva-de-contingencia-y-factores-de-país-cerrados), que operan sobre el catálogo operativo vigente: el que nombra el puntero y se carga con `--current`.
 
 ## Qué hace el agente
 
@@ -138,10 +138,10 @@ pnpm --silent pricing:v3 current show
 Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, `path`, `status` y lo que se encontró
 en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
 coincide. Lo que imprime es la respuesta vigente. Al cierre del 2026-10-11 apunta a
-`data/pricing/v3-operating/catalog.review-v9.json` (`operating-review-2026-10-11-v9`),
+`data/pricing/v3-operating/catalog.review-v10.json` (`operating-review-2026-10-11-v10`),
 `data/pricing/v3-operating/resources.review-v10.json` (`operating-review-2026-10-11-v10`) y
 `data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`). Los siguientes serían el
-catálogo v10 y la policy v11.
+catálogo v11 y la policy v11.
 
 | `status`           | Qué significa                                                              |
 | ------------------ | -------------------------------------------------------------------------- |
@@ -324,11 +324,17 @@ produjo `catalog.review-v8.json` desde `catalog.review-v7.json`: 32 `add`, uno p
 propuso el agente y él lo confirmó el 2026-10-11, así que los registros están `confirmed`. Una oferta nueva son 32
 registros, uno por perfil: ya hay tres ofertas y 96 políticas de precio vigentes.
 
-El cambio más reciente al 2026-10-11 es
-[`engagement-forms-setup-clp.change.json`](../../../data/pricing/v3-operating/engagement-forms-setup-clp.change.json),
-que produjo `catalog.review-v9.json` desde `catalog.review-v8.json`: la forma del compromiso, las provisiones de
+Por la tarde del 2026-10-11,
+[`engagement-forms-setup-clp.change.json`](../../../data/pricing/v3-operating/engagement-forms-setup-clp.change.json)
+produjo `catalog.review-v9.json` desde `catalog.review-v8.json`: la forma del compromiso, las provisiones de
 puesta en marcha y el tipo de cambio CLP→USD. Qué trae y cómo se mantiene:
 [Forma del compromiso, puesta en marcha y plazos de proveedor](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor).
+
+El cambio más reciente al 2026-10-11 es
+[`third-party-contingency-factors.change.json`](../../../data/pricing/v3-operating/third-party-contingency-factors.change.json),
+que produjo `catalog.review-v10.json` desde `catalog.review-v9.json`: las reglas de precio de los costos de
+terceros, la reserva de contingencia y los factores de país confirmados. Qué trae y cómo se mantiene:
+[Costos de terceros, reserva de contingencia y factores de país cerrados](#costos-de-terceros-reserva-de-contingencia-y-factores-de-país-cerrados).
 
 Rechazos (exit 1, `error.code` en stderr): `CATALOG_BASE_CONFLICT` (el `baseDigest` no es el de la base entregada),
 `CATALOG_PREVIEW_CONFLICT` (el `--confirm` no es el del preview vigente: repetir el preview),
@@ -341,7 +347,7 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
 conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor cuando el puntero lo
 nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente al del catálogo
-que nombra el puntero (al cierre del 2026-10-11 sería `catalog.review-v10.json`) junto a su change-set, probarlo con los casos
+que nombra el puntero (al cierre del 2026-10-11 sería `catalog.review-v11.json`) junto a su change-set, probarlo con los casos
 afectados y mover el puntero
 ([pasos](#versiones-vigentes-el-puntero-currentjson)), para que agentes y operador usen el mismo catálogo.
 
@@ -350,7 +356,9 @@ afectados y mover el puntero
 El país entra al precio por tres clases de registro del catálogo monetario operativo. Qué significan al cotizar,
 valores vigentes y ejemplos: [Cotizar según el país del cliente y del equipo](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo).
 Los valores los decide el operador (CEO); el agente prepara el change-set, le muestra el preview y aplica sólo con su
-confirmación. Para ver lo vigente (los tres devuelven exit 0):
+confirmación. Los factores vigentes están cerrados desde el catálogo v10: son valores de política confirmados y no
+se reabren sin una contratación real o un negocio cerrado que los contradiga
+([detalle](#los-factores-de-país-quedaron-cerrados)). Para ver lo vigente (los tres devuelven exit 0):
 
 ```bash
 pnpm --silent pricing:v3 catalog search --kind talent_factor --current --date 2026-10-11
@@ -401,6 +409,7 @@ de mercado de Colombia en el change-set real (era `1`, revisión 1):
 
 - `source.status`: `confirmed` si el valor es una decisión del operador o sale de evidencia real; `estimated` si es
   una aproximación. Un factor `estimated` hace que toda cotización que lo use lo informe como `ESTIMATED_SOURCE`.
+  Hoy los doce factores están `confirmed` (los ocho que el v5 cargó como estimados, desde el 2026-10-12).
   `note` dice quién lo decidió o de dónde sale el estimado, y contra qué observación.
 - **`floorBasis`** sólo existe en el factor de mercado y su único valor es `"base_market"`: el piso de margen se lee
   sobre el precio del mercado base y la rebaja del país no se marca. Sin el campo, el piso se lee sobre el neto
@@ -480,7 +489,8 @@ los estimados que propuso el agente (marcados `estimated`):
 `dimensions.countriesAdd` con `ES`; 32 `replace` de costos de persona, que pasan a ser el costo en Chile sin cambiar
 ningún monto; seis `add` de factor de talento (CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3 y US 5, estimados); cinco
 `replace` de factor de mercado (CL 1, CO 0.90 con `floorBasis`, US 1.10, decididos; PE 0.95 con `floorBasis` y MX 1,
-estimados) y un `add` (ES 1.10, estimado). Todo con `effectiveFrom` 2026-10-11. Se reproduce así; la base es el v4
+estimados) y un `add` (ES 1.10, estimado). Todo con `effectiveFrom` 2026-10-11. Los ocho que ahí quedaron estimados
+los confirmó el catálogo v10 desde el 2026-10-12, sin cambiar ningún valor. Se reproduce así; la base es el v4
 porque el cambio se construyó sobre él:
 
 ```bash
@@ -707,6 +717,232 @@ de `compose commitments`, y un artefacto congelado conserva la lectura de la pol
 - No dejar como `current` un precio con un descuento que está por terminar sin que el operador lo decida, ni volver
   a cargar `renewal-scenario`.
 
+## Costos de terceros, reserva de contingencia y factores de país cerrados
+
+**Para qué sirve.** Mantener lo que entró con el catálogo v10 (contrato 1.4.0, 2026-10-11 por la noche): la regla de
+precio de cada categoría de costo de terceros, la reserva de contingencia de un alcance fijo y los factores de país
+como valores de política confirmados. Qué significan al cotizar:
+[Costos de terceros](operar-cotizador-v3-con-agentes.md#costos-de-terceros),
+[Reserva de contingencia](operar-cotizador-v3-con-agentes.md#reserva-de-contingencia) y
+[Valores vigentes](operar-cotizador-v3-con-agentes.md#valores-vigentes).
+
+**Antes de empezar.** Las tasas las decide el operador (CEO); el agente prepara el change-set, le muestra el preview
+y aplica sólo con su confirmación. Para ver lo vigente (los dos devuelven exit 0; `"resolution": "ambiguous"` sólo
+dice que la consulta devolvió varios registros):
+
+```bash
+pnpm --silent pricing:v3 catalog search --current --kind third_party_policy
+pnpm --silent pricing:v3 catalog search --current --kind contingency_reserve
+```
+
+### El registro `third_party_policy`
+
+Clase de registro nueva del catálogo monetario: la regla de precio de **una** categoría de costo de terceros. Una
+cotización lleva sólo el id de la categoría; la tasa vive aquí. Así está el de producción:
+
+```json
+{
+  "recordId": "third-party:production",
+  "revision": 1,
+  "kind": "third_party_policy",
+  "source": {
+    "reference": "policy:ceo-third-party-handling-2026-10-11",
+    "effectiveFrom": "2026-10-11",
+    "effectiveUntil": "9999-12-31",
+    "status": "estimated"
+  },
+  "note": "Bought for a job and re-invoiced: handling of 10% over the supplier cost, floor of 5% of margin on the row, commercial rounding. The 10% is the project-management fee of the pricing workbook. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job.",
+  "value": {
+    "category": "production",
+    "label": "Producción y terceros",
+    "method": "markup",
+    "rate": "0.10",
+    "minimumMargin": "0.05",
+    "rounding": "commercial"
+  }
+}
+```
+
+- `value.category` es el id que la demanda declara en `thirdPartyCosts[].category`. Las categorías son datos: la CLI
+  no tiene una lista. Hoy hay cinco: `production`, `talent` y `printing` (`markup` `0.10`, `minimumMargin` `0.05`,
+  `rounding` `commercial`) y `media` y `licences` (`markup` `0`, `minimumMargin` `0`, `rounding` `none`: se cobran
+  exactamente al costo).
+- `value.method` es `markup` (precio = costo × (1 + `rate`)) o `target_margin` (precio = costo ÷ (1 − `rate`)).
+- `value.minimumMargin` es el piso de la fila. No puede pedir más margen del que da el método: un `markup` de
+  `0.10` da 9,09 % de margen, así que un piso de `0.10` se rechaza al validar el catálogo con
+  `INVALID_THIRD_PARTY_POLICY`, igual que un `target_margin` de 1 o más.
+- `value.rounding` se declara, nunca se infiere de la tasa: `commercial` sube la fila al múltiplo de la moneda de la
+  cotización; `none` la deja exacta. Una categoría que se cobra al costo lleva `none`, o el redondeo le agregaría
+  margen.
+- `value.label` es el nombre de la categoría para quien mantiene el catálogo; no es lo que ve el cliente.
+- `value.offerId` es opcional: con él la regla es propia de esa oferta y prevalece sobre la general. Hoy las cinco
+  son generales.
+- **Un registro por categoría y nivel.** Un segundo registro general con otro `recordId` para la misma categoría
+  pasa `preview` y `apply` y después bloquea toda cotización que use esa categoría con `AMBIGUOUS_SELECTION` en
+  `thirdPartyCosts.<costId>.policy`. Una categoría sin regla vigente da `MISSING_CATALOG_SELECTION` en esa misma
+  ruta.
+
+### El registro `contingency_reserve`
+
+La otra clase nueva: una tasa sobre el costo del equipo, que el motor agrega como costo. Así está la de la oferta
+creativa:
+
+```json
+{
+  "recordId": "contingency:creative-managed-service:on_demand",
+  "revision": 1,
+  "kind": "contingency_reserve",
+  "source": {
+    "reference": "policy:ceo-contingency-reserve-2026-10-11",
+    "effectiveFrom": "2026-10-11",
+    "effectiveUntil": "9999-12-31",
+    "status": "estimated"
+  },
+  "note": "Contingency reserve of a managed service sold On-Demand (fixed scope): 12% of the person cost of every team row, added as cost. It leaves a quote only through a declared waiver with a reason. The 12% is the buffer the operator used in a tender bid. Proposed by the agent and accepted by the CEO on 2026-10-11 («seguiré tu recomendación»); an estimate to adjust with the first real job. Staff augmentation carries none: the client directs the work.",
+  "value": {
+    "label": "Reserva de contingencia",
+    "rate": "0.12",
+    "base": "human",
+    "offerId": "creative-managed-service",
+    "engagementForm": "on_demand"
+  }
+}
+```
+
+- `value.rate` es una cadena decimal mayor que 0 y menor que 1; fuera de ese rango el catálogo no valida
+  (`INVALID_CONTINGENCY_RESERVE`). Una reserva de cero no se carga: la cotización que no debe llevarla declara una
+  renuncia.
+- `value.base` es `human` (el costo de persona de cada fila del equipo) u `own_costs` (todo el costo propio de la
+  fila). Nunca descansa sobre un costo de terceros.
+- `value.offerId` y `value.engagementForm` son opcionales y dicen a qué cotizaciones aplica el registro: a una
+  oferta, a una forma, a las dos o a ninguna (general). Aplica cuando no nombra nada que la demanda contradiga, y
+  prevalece el que nombra más cosas. Hoy hay dos, uno por oferta de servicio gestionado, los dos para `on_demand`;
+  la oferta de staffing no tiene ninguno, a propósito.
+- **Dos registros del mismo nivel que aplican a la misma cotización la bloquean** con
+  `AMBIGUOUS_CONTINGENCY_RESERVE` en `contingency` (`candidates` los lista). Pasa también cuando uno nombra sólo la
+  oferta y el otro sólo la forma. `preview` y `apply` lo aceptan; aparece al cotizar.
+- Un registro con `engagementForm` hace que toda demanda de esa oferta que no declare la forma traiga el supuesto
+  `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`.
+- **Un registro de reserva cambia el contrato de las cotizaciones que alcanza**: pasan a firmarse con el motor
+  `pricing-v3-local/1.4.0`. Por eso una reserva se emite siempre en una versión nueva del catálogo, más nueva que
+  toda cotización que no debe recibirla: las congeladas con versiones anteriores no la ven y se reproducen igual.
+
+### Cambiar una tasa
+
+Una tasa es un registro: cambiarla es **un change-set con un `replace` de ese registro**, sobre el catálogo vigente.
+No se edita la demanda, no se agrega un segundo registro y no se toca ninguna política de precio.
+
+```json
+{
+  "operation": "replace",
+  "recordId": "third-party:production",
+  "effectiveFrom": "FECHA_DESDE_QUE_RIGE",
+  "record": {
+    "recordId": "third-party:production",
+    "revision": 2,
+    "kind": "third_party_policy",
+    "source": {
+      "reference": "REFERENCIA_DE_LA_DECISION",
+      "effectiveFrom": "FECHA_DESDE_QUE_RIGE",
+      "effectiveUntil": "9999-12-31",
+      "status": "confirmed"
+    },
+    "note": "Quién lo decidió, cuándo y con qué trabajo real se midió.",
+    "value": {
+      "category": "production",
+      "label": "Producción y terceros",
+      "method": "markup",
+      "rate": "TASA",
+      "minimumMargin": "PISO",
+      "rounding": "commercial"
+    }
+  }
+}
+```
+
+- `revision` es la anterior más uno, `source.reference` es distinta de la anterior y `effectiveFrom` es igual o
+  posterior al del registro que reemplaza. `FECHA_DESDE_QUE_RIGE`, `REFERENCIA_DE_LA_DECISION`, `TASA` y `PISO` son
+  marcadores.
+- La tasa de la reserva se cambia igual: `replace` de `contingency:<oferta>:on_demand`, con `rate` nuevo. Cada
+  oferta tiene su registro: cambiar las dos son dos entradas en el mismo change-set.
+- Una categoría nueva, o una reserva para otra oferta u otra forma, es un `add` con `revision: 1` y la decisión del
+  operador.
+- `status` pasa a `confirmed` cuando la tasa sale de un trabajo real medido o de una decisión del operador sobre
+  ese valor; mientras sea la propuesta del agente, queda `estimated`.
+- Después: `catalog preview --current`, mostrarle el preview al operador, `catalog apply --current` con su
+  confirmación, probar el sucesor cotizando el ejemplo de referencia
+  (`managed-on-demand-third-party.demand.json`) y mover el puntero
+  ([pasos](#versiones-vigentes-el-puntero-currentjson)). Las cotizaciones congeladas conservan su tasa.
+
+### La trampa: un registro de reserva que termina no bloquea
+
+Un precio de herramienta o un tipo de cambio que vence bloquea la cotización siguiente. Una reserva no: si su
+registro termina (`effectiveUntil`) o se retira y ningún otro aplica, la cotización siguiente **se calcula sin
+reserva, sin ningún diagnóstico**, y vuelve al contrato anterior. Medido sobre una copia del catálogo cuyo registro
+de la oferta creativa terminaba el 2026-10-31: el servicio gestionado On-Demand del ejemplo da 11.370.000 con el
+motor 1.4.0 fechado 2026-10-12, y 10.500.000 con el motor 1.3.0 fechado 2026-11-05, sin `assumptions` ni
+`diagnostics`. Sólo una demanda que renuncia a la reserva lo nota, porque queda bloqueada con
+`CONTINGENCY_WAIVER_WITHOUT_RESERVE`.
+
+- Dónde se ve antes: `resources inspect --current --date <fecha>` lista el fin del registro en `priceReview`
+  (`dueSoon`, después `expired`) con `subject` `catalog_record`, `blocksWith` `null` y un texto en `consequence` que
+  dice exactamente esto. `runNotices.priceDates` lo repite en una cotización que usa esa reserva.
+- Regla: un registro de reserva lleva `effectiveUntil` `9999-12-31` y se cambia con `replace`. No se le pone una
+  fecha de término «para revisarlo», ni se retira sin emitir en el mismo change-set el que lo sustituye.
+- Al probar un sucesor que toca una reserva, cotizar un servicio gestionado On-Demand y comprobar que
+  `contingencyReserve` sigue en el resumen.
+
+### El change-set del catálogo v10
+
+[`third-party-contingency-factors.change.json`](../../../data/pricing/v3-operating/third-party-contingency-factors.change.json)
+produjo `catalog.review-v10.json` desde `catalog.review-v9.json` con 15 operaciones, por decisiones del CEO del
+2026-10-11:
+
+| Operaciones                          | Qué hacen                                                                                                              | Desde      | Estado      |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | ---------- | ----------- |
+| 5 `add` de `third_party_policy`      | Las cinco categorías: producción, talento e impresión con 10 % y piso de 5 %; medios y licencias al costo               | 2026-10-11 | `estimated` |
+| 2 `add` de `contingency_reserve`     | 12 % del costo de persona para `creative-managed-service` y `seo-aeo-managed-service` vendidos On-Demand                | 2026-10-11 | `estimated` |
+| 5 `replace` de `talent_factor`       | CO 0.80, PE 0.85, MX 0.90, ES 3 y US 5: mismos valores, ahora valores de política                                       | 2026-10-12 | `confirmed` |
+| 3 `replace` de `market_factor`       | PE 0.95 (con `floorBasis`), MX 1 y ES 1.10: mismos valores, ahora valores de política                                   | 2026-10-12 | `confirmed` |
+
+- Las reglas de terceros y la reserva las propuso el agente y el CEO las aceptó («seguiré tu recomendación») como
+  estimaciones por ajustar con el primer trabajo real. Los factores de país los cerró él («deja eso cerrado ya»).
+- No toca ninguna política de precio, ningún piso ni ningún otro registro.
+- Los ocho factores rigen como confirmados desde el 2026-10-12: la revisión estimada de cada uno queda vigente sólo
+  el 2026-10-11, así que una demanda fechada ese día la sigue leyendo y su resumen trae
+  `runNotices.laterCatalogValues`.
+
+El preview se reproduce sobre su base:
+
+```bash
+pnpm --silent pricing:v3 catalog preview --catalog data/pricing/v3-operating/catalog.review-v9.json \
+  --input data/pricing/v3-operating/third-party-contingency-factors.change.json
+```
+
+Devuelve exit 0 con `previewDigest` `5454aae989d07721602b541c8ed1f1adbdefaee399a196551e69b6c429f19782` y 15 entradas en
+`differences`; el sucesor tiene la versión `operating-review-2026-10-11-v10` y 391 registros (los 376 del v9 más las
+15 revisiones nuevas).
+
+### Los factores de país quedaron cerrados
+
+Desde el catálogo v10 los doce factores (seis de talento, seis de mercado) son valores de política confirmados. Son
+los valores con que se cotiza, no observaciones de mercado. Para el mantenimiento significa:
+
+- No se prepara un change-set para «validarlos» ni se le plantea al operador como algo pendiente.
+- Un factor se revisa sólo cuando una contratación real o un negocio cerrado en ese país lo contradice, y entonces
+  es un `replace` con esa evidencia en `source.reference` ([cómo](#cambiar-un-factor)).
+- Si es un perfil el que se aparta de su país, no se mueve el factor: se registra su costo específico
+  ([cómo](#registrar-el-costo-específico-de-un-perfil-en-un-país)).
+
+**Qué no hacer.**
+
+- No escribir una tasa de terceros ni una reserva en una demanda, ni cambiar una editando la versión vigente.
+- No agregar un segundo registro para la misma categoría, ni dos reservas del mismo nivel para una oferta.
+- No ponerle fecha de término a un registro de reserva ni retirarlo sin su reemplazo.
+- No marcar `confirmed` una tasa que sigue siendo la propuesta del agente.
+- No editar una versión del catálogo para agregarle una reserva: se emite una versión nueva.
+- No declarar `rounding: "commercial"` en una categoría que se cobra al costo.
+
 ## Problemas comunes
 
 | Síntoma                                                                                                  | Causa                                                                                                                                                 | Qué hacer                                                                                                                                                                                                                                             |
@@ -720,6 +956,10 @@ de `compose commitments`, y un artefacto congelado conserva la lectura de la pol
 | Exit 2, `AMBIGUOUS_PRICE_ROUNDING` en toda cotización de una moneda                                      | Una segunda regla general de redondeo para la misma moneda                                                                                            | El múltiplo se cambia con `replace` de la regla existente, no con un segundo `add`                                                                                                                                                                    |
 | Exit 2, `MISSING_CATALOG_SELECTION` en `lines.<lineId>.setup` (u otro requisito) en toda línea de un kit, tras un cambio de catálogo | Se retiró un recurso que el kit todavía lista en `candidateResourceIds`. `catalog preview` y `catalog apply` lo aceptan; bloquea recién al cotizar | Versión nueva que reemplace el kit para que nombre el recurso vigente, y mover el puntero. Se detecta cotizando una línea de cada kit antes de mover el puntero |
 | Exit 2, `AMBIGUOUS_SELECTION` o `MISSING_CATALOG_SELECTION` en `engagementForm`                          | Dos registros `engagement_factor` del mismo nivel para una forma, o ninguno vigente a la fecha de la demanda                                           | Un registro por forma y nivel: `replace` para cambiar la razón, `retire` del duplicado. Una forma nueva es un `add` con decisión del operador                                                                                                          |
+| Exit 2, `AMBIGUOUS_SELECTION` o `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.<costId>.policy`         | Dos registros `third_party_policy` del mismo nivel para una categoría, o ninguno vigente a la fecha de la demanda                                     | Un registro por categoría y nivel: `replace` para cambiar la tasa, `retire` del duplicado. Una categoría nueva es un `add` con decisión del operador                                                                                                  |
+| Exit 2, `AMBIGUOUS_CONTINGENCY_RESERVE` en `contingency` en toda cotización On-Demand de una oferta       | Dos registros `contingency_reserve` del mismo nivel aplican a esas cotizaciones. `catalog preview` y `catalog apply` lo aceptan                       | Versión nueva que retire uno. Se detecta cotizando un servicio gestionado On-Demand antes de mover el puntero                                                                                                                                         |
+| Un servicio gestionado On-Demand deja de traer `contingencyReserve` y baja de precio, sin ningún diagnóstico | El registro de reserva de esa oferta terminó o se retiró y ningún otro aplica. No bloquea                                                           | Versión nueva con el registro vigente ([la trampa](#la-trampa-un-registro-de-reserva-que-termina-no-bloquea)). Volver a cotizar los casos abiertos de esa oferta                                                                                       |
+| Exit 1, `INVALID_THIRD_PARTY_POLICY` o `INVALID_CONTINGENCY_RESERVE` al validar o aplicar un catálogo      | El piso de una regla de terceros pide más margen del que da su método, o la tasa de una reserva no está entre 0 y 1                                   | Corregir el registro en el change-set                                                                                                                                                                                                                 |
 | Exit 2, `RESOURCE_POLICY_NOT_EFFECTIVE` en demandas que antes calculaban, tras emitir una policy          | El reemplazo movió `source.effectiveFrom` de la policy a una fecha posterior a la de esas demandas                                                     | Es lo esperado: una demanda nueva lleva la fecha del día; un caso anterior se repite con las versiones de su fecha                                                                                                                                     |
 | Exit 2, `RESOURCE_ALLOCATION_REQUIRED` en `<periodo>:<toolId>` en demandas que antes calculaban            | Se agregó una tarea a la receta de un perfil (`profileTasks`)                                                                                          | Cada demanda con ese perfil declara la asignación o excluye la tarea con motivo. Revisar los casos abiertos antes de mover el puntero                                                                                                                  |
 | Exit 2, `UNSUPPORTED_COUNTRY` con un país recién agregado                                                | Faltó `dimensions.countriesAdd` en el change-set                                                                                                      | Versión nueva que declare el país                                                                                                                                                                                                                     |

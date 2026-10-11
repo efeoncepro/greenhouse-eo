@@ -15,7 +15,16 @@ actual.
 (`on_going`, `on_demand`), aparte de `engagementCode`; On-Demand lleva una razón de precio que vive en el catálogo.
 Sobre un artefacto congelado hay cuatro lecturas que derivan y nunca forman un precio: `compose split`,
 `compose schedule`, `compose cash` y `compose commitments`. Detalle y cifras medidas:
-[último delta del flujo operativo](v3-operating/README.md#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
+[delta del catálogo v9 del flujo operativo](v3-operating/README.md#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
+
+**Costos de terceros y reserva de contingencia (2026-10-11, noche).** El brief puede declarar lo que se compra a
+terceros para un encargo en `thirdPartyCosts[]`: lo que Efeonce refactura entra como una fila propia con la regla de
+precio de su categoría, y lo que el cliente paga directo queda como una nota fuera de todo total. Un servicio
+gestionado vendido On-Demand lleva además una reserva de contingencia que sale del catálogo y entra como costo. Una
+cotización así se calcula con el contrato 1.4.0 y trae dos márgenes: el mezclado, que se diluye con lo refacturado,
+y el del trabajo propio, que es el que se compara con el piso de la oferta. Las tasas son estimaciones propuestas
+por el agente que el CEO aceptó. Detalle y cifras medidas:
+[último delta del flujo operativo](v3-operating/README.md#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
 
 - [Prototipo del motor del cotizador V3](../../docs/documentation/finance/cotizador-cli-modelo-propuesto.md): dirección confirmada; CLI como primer consumidor, motor reutilizable y futura integración al cotizador canónico con Full API Parity. País del talento y mercado separados, fee genérico, tiers y herramientas por perfil. Contrato definido abajo; parámetros comerciales e integración canónica pendientes; primera vertical local implementada bajo ADR.
 - [Contrato y pruebas/convergencia V3](../../docs/documentation/finance/cotizador-v3-contrato-y-validacion.md): bloques 2 y 3 definidos; baseline inicial de código, casos y gates de integración. Parámetros comerciales pendientes; alcance implementado y extensiones se distinguen en el manual V3.
