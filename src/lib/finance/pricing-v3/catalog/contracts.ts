@@ -98,7 +98,8 @@ export const catalogRecordSchema = z.union([
   ),
   // Price ratio of a form of engagement (contract 1.3.0): one record per form, the single source of its premium or
   // discount for every pricing policy. Forms are data, so the catalog decides which exist. With `offerId` the record
-  // governs that offer and prevails over the general one of the same form. The ratio is bounded like a market factor.
+  // governs that offer and prevails over the general one of the same form. Like a market factor, the ratio is any
+  // positive decimal: there is no cap, so a mistyped value is accepted.
   record(
     'engagement_factor',
     pricingV3EngagementFactorSchemaV13.omit({ source: true }).extend({ offerId: id.optional() }).strict()

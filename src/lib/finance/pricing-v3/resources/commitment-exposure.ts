@@ -42,6 +42,76 @@ const lastDayOfPeriod = (quoteDate: string, periodId: number) => {
 
 const dayBefore = (date: string) => new Date(Date.parse(date) - DAY).toISOString().slice(0, 10)
 
+/**
+ * Calendar arithmetic for a running contract term, on year, month and day as integers: no `Date`, no timezone, no
+ * day that can shift. A calendar month is counted as `year x 12 + (month - 1)`, so adding a term is an addition.
+ */
+const monthIndexOf = (date: string) => {
+  const [year, month] = date.split('-').map(Number)
+
+  return year * 12 + month - 1
+}
+
+const daysInMonth = (monthIndex: number) => {
+  const year = Math.floor(monthIndex / 12)
+  const month = (monthIndex % 12) + 1
+
+  if (month === 2) return year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28
+
+  return [4, 6, 9, 11].includes(month) ? 30 : 31
+}
+
+const two = (value: number) => String(value).padStart(2, '0')
+
+/** The given day of a calendar month, or its last day when the month is shorter (the 31st in November is the 30th). */
+const dateIn = (monthIndex: number, day: number) =>
+  `${String(Math.floor(monthIndex / 12)).padStart(4, '0')}-${two((monthIndex % 12) + 1)}-${two(Math.min(day, daysInMonth(monthIndex)))}`
+
+/**
+ * A contract term already running, read from the date the policy declares it renews on (`commitmentRenewsOn`).
+ *
+ * Renewal boundaries: the declared date and every `termMonths` months after it. Each one is derived from the declared
+ * date, never from the boundary before it, so a day a month does not have is clamped to the last day of that month
+ * without drifting: declared on the 31st with a term of three months, the boundaries are 31, 30 (a month of 30 days),
+ * 28 or 29 (February), 31. The declared date may already be past when the quote is read (the policy was written
+ * earlier): the boundary that applies is then a later one of the same series. No boundary is read BEFORE the declared
+ * date: it is declared as the next renewal, so a date further away than one term binds until that date.
+ *
+ * A quoted period is a calendar month. The licence the quote uses is bound until the first boundary STRICTLY AFTER
+ * the last day of the last quoted period that uses the price: a boundary on that last day, or earlier in a quoted
+ * month, is a renewal the quote needs the licence across, and the next one binds.
+ *
+ * `monthsBeyondQuote` is the number of calendar months after that last quoted period that BEGIN before the boundary.
+ * A month the term only partly covers counts whole: it is billed. One period in October 2026 against a renewal on
+ * 2026-11-16 leaves 1 (November begins before the 16th); against 2026-11-01 it leaves 0 (November begins on the
+ * boundary, not before it); against 2026-10-20 or 2026-10-31 the renewal falls inside the quoted month, the licence
+ * is bound until the same day of October 2027 and 12 are left (November 2026 to October 2027).
+ *
+ * `renewsWithin` are the boundaries that fall inside a quoted calendar month that uses the price, first to last.
+ */
+const runningTermOf = (renewsOn: string, termMonths: number, firstMonth: number, lastMonth: number) => {
+  const declared = monthIndexOf(renewsOn)
+  const day = Number(renewsOn.split('-')[2])
+  // A boundary is after the last day of a month exactly when its own month is a later one.
+  const steps = Math.max(0, Math.floor((lastMonth - declared) / termMonths) + 1)
+  const boundMonth = declared + steps * termMonths
+  const renewsWithin: string[] = []
+
+  // The boundaries up to the last quoted month, from the first one that is not before the first quoted month.
+  for (let step = Math.max(0, Math.ceil((firstMonth - declared) / termMonths)); step < steps; step += 1)
+    renewsWithin.push(dateIn(declared + step * termMonths, day))
+
+  return {
+    renewsOn,
+    boundUntil: dateIn(boundMonth, day),
+    // Whole months between the two, plus the month of the boundary unless the boundary is its first day.
+    monthsBeyondQuote: boundMonth - lastMonth - 1 + (day > 1 ? 1 : 0),
+    renewsWithin
+  }
+}
+
+type RunningTerm = ReturnType<typeof runningTermOf>
+
 /** The part of a frozen composition artifact this reading uses. Verifying it by replay is the caller's job. */
 export type CommitmentExposureSource = {
   calculationId: string
@@ -58,6 +128,11 @@ type Signal = {
   code:
     | 'COMMITMENT_OUTLIVES_ENGAGEMENT'
     | 'SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT'
+    /**
+     * A declared contract term renews inside the quoted periods. Raised besides the signal that names the commitment,
+     * with the same amount: it is the same money read from the renewal, never an amount to add to it.
+     */
+    | 'COMMITMENT_RENEWS_WITHIN_ENGAGEMENT'
     | 'SHORTER_COMMITMENT_PRICE_IN_POLICY'
     | 'CREDITS_LEFT_OVER_AFTER_ENGAGEMENT'
     | 'CREDITS_LAPSE_WITHIN_ENGAGEMENT'
@@ -101,10 +176,20 @@ type Signal = {
  *    the months left. Cash is paid month by month: nothing is paid up front, which is what tells it from a price per
  *    year. Sharing, stranded and released follow the rule of the annual price.
  *
- *    The term is ONE term, opening in the first quoted period that uses the price. No renewal is assumed: the policy
- *    declares a term, not what happens when it ends, and the kernel books nothing that would say (a price per year
- *    is different: the ledger itself opens a second year at period 13). A quote that uses the price past its term
- *    leaves no entry for it; the tool is listed in `notDerivable` as `CONTRACT_RENEWAL_NOT_DECLARED`.
+ *    Without a renewal date the term is ONE term, opening in the first quoted period that uses the price. No renewal
+ *    is assumed: the policy declares a term, not what happens when it ends, and the kernel books nothing that would
+ *    say (a price per year is different: the ledger itself opens a second year at period 13). A quote that uses the
+ *    price past its term leaves no entry for it; the tool is listed in `notDerivable` as
+ *    `CONTRACT_RENEWAL_NOT_DECLARED`. That reading overstates a contract already running.
+ *
+ *    When the policy entry also declares the date the contract renews (`commitmentRenewsOn`), the term is read as
+ *    RUNNING: the licence the quote uses is bound until the first renewal after the last quoted period that uses the
+ *    price, and what is left is the months up to that date, not a whole term (`runningTermOf` states the rule).
+ *    `unrecovered` is those months times the monthly amount the quote is attributed in that last period, and
+ *    `committed` is what the quote attributes plus that: what the quote's use of the licence binds, NOT a full term.
+ *    A renewal that falls inside the quoted periods is crossed with the licence in use, so the term after it binds;
+ *    it is reported as it is, with `COMMITMENT_RENEWS_WITHIN_ENGAGEMENT`. A term of one month is the month it bills
+ *    and leaves nothing, with or without a date.
  *
  * 3. A pack of AI credits bigger than its use. The credit plan is the artifact's (`creditBudgets`): credits bought,
  *    used and left over, the expiry of the pack and its cash (`resourceIncrementalCash`). The quote already assigns
@@ -384,13 +469,18 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
   }
 
   /**
-   * A price per month whose policy entry declares a contract term longer than the quoted periods that use it.
-   * `uses` are the attributions of the quoted periods inside the term, in period order; `kernelCost` is the cost the
-   * kernel stored for the tool in each of those periods, in the quote currency.
+   * A price per month whose policy entry declares a contract term that outlives the quoted periods that use it.
+   * `kernelCost` is the cost the kernel stored for the tool in the periods of `uses`, in the quote currency.
    *
    * The cash ledger is not read here: the kernel books what is billed, one month per quoted period, so the ledger
    * does not contain the months the contract still binds after the last one. The commitment is the term the policy
    * declares, on the monthly amount the frozen attribution gives the quote.
+   *
+   * Without `running` the term is one whole term opening in the first quoted period that uses the price: `uses` are
+   * the attributions of the quoted periods inside it, in period order, and `input` is the one of that first period.
+   * With `running` (the policy entry declares the date the contract renews) `uses` are every quoted period that uses
+   * the price and `input` is the one of the last: the months left follow that period, so its amount, quantity and
+   * share are the ones read. A quantity or share that changes inside the quote is not followed month by month.
    */
   const readTermedMonthlyPrice = (
     tool: PolicyTool,
@@ -398,39 +488,58 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
     termMonths: number,
     uses: Attribution[],
     input: PeriodInput,
-    kernelCost: Decimal
+    kernelCost: Decimal,
+    running?: RunningTerm
   ) => {
     const opening = uses[0]
-    const { resource } = opening
+    // The period whose attribution the months outside the quote are read on.
+    const held = running ? uses[uses.length - 1] : opening
+    const { resource } = held
     const periodIds = uses.map(a => a.periodId)
     const inTool = toolMoney(input, resource.currency)
     const sum = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new D(0))
-    const allocation = demand.allocations.find(a => a.periodId === opening.periodId && a.toolId === tool.toolId)
-    const quoteShare = new D(opening.serviceShare)
+    const allocation = demand.allocations.find(a => a.periodId === held.periodId && a.toolId === tool.toolId)
+    const quoteShare = new D(held.serviceShare)
+    const monthsBeyondQuote = running ? running.monthsBeyondQuote : termMonths - uses.length
 
-    // Amount x quantity x share of the period the term opens in, as the attribution froze it. A term has one amount.
-    const perMonth = new D(opening.attributedMonthlyCost)
+    // Amount x quantity x share as the attribution froze it: of the period the term opens in (a term has one
+    // amount), or of the last quoted period when the term is read as running.
+    const perMonth = new D(held.attributedMonthlyCost)
 
     const both = (value: Decimal): Amount => ({
       inToolCurrency: inTool(value),
       inQuoteCurrency: toQuoteCurrency(input, value, resource.currency)
     })
 
-    // The whole term was never priced by the quote: it is converted with the FX the opening period froze.
-    const committed = both(perMonth.mul(termMonths))
-
     const attributedWithinPeriods = {
       inToolCurrency: inTool(sum(uses.map(a => new D(a.attributedMonthlyCost)))),
       inQuoteCurrency: money(kernelCost)
     }
 
-    const unrecovered: Amount = {
-      inToolCurrency: inTool(new D(committed.inToolCurrency).minus(attributedWithinPeriods.inToolCurrency)),
-      inQuoteCurrency:
-        committed.inQuoteCurrency === null
-          ? null
-          : money(new D(committed.inQuoteCurrency).minus(attributedWithinPeriods.inQuoteCurrency))
-    }
+    // The months outside the quote were never priced by it: they are converted with the FX that period froze.
+    const left = both(perMonth.mul(monthsBeyondQuote))
+
+    // With a renewal date, `committed` is what the quote's use of the licence binds: what it attributes plus the
+    // months up to the renewal, not a full term. Without one it is the whole declared term.
+    const committed: Amount = running
+      ? {
+          inToolCurrency: inTool(new D(attributedWithinPeriods.inToolCurrency).plus(left.inToolCurrency)),
+          inQuoteCurrency:
+            left.inQuoteCurrency === null
+              ? null
+              : money(new D(attributedWithinPeriods.inQuoteCurrency).plus(left.inQuoteCurrency))
+        }
+      : both(perMonth.mul(termMonths))
+
+    const unrecovered: Amount = running
+      ? left
+      : {
+          inToolCurrency: inTool(new D(committed.inToolCurrency).minus(attributedWithinPeriods.inToolCurrency)),
+          inQuoteCurrency:
+            committed.inQuoteCurrency === null
+              ? null
+              : money(new D(committed.inQuoteCurrency).minus(attributedWithinPeriods.inQuoteCurrency))
+        }
 
     const none: Amount = { inToolCurrency: inTool(new D(0)), inQuoteCurrency: money(new D(0)) }
     // Same rule as a price per year: a share under 1 is capacity the demand declares as shared.
@@ -451,16 +560,34 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         // Declared by the policy entry (`commitmentTermMonths`), not booked by the kernel.
         declaredBy: 'policy' as const,
         termMonths,
-        // One term: no renewal is assumed.
-        terms: 1,
-        coversPeriods: { from: opening.periodId, through: opening.periodId + termMonths - 1 },
-        monthsCommitted: termMonths,
+        // One term when no renewal date is declared: no renewal is assumed. With one, the terms the quoted periods
+        // touch: the running one and one more for each renewal inside them.
+        terms: running ? running.renewsWithin.length + 1 : 1,
+        // Period indexes; `through` is past the last quoted period.
+        coversPeriods: {
+          from: opening.periodId,
+          through: running ? held.periodId + monthsBeyondQuote : opening.periodId + termMonths - 1
+        },
+        // The whole term, or with a renewal date the months the quote's use of the licence binds.
+        monthsCommitted: running ? uses.length + monthsBeyondQuote : termMonths,
         monthsWithinQuote: uses.length,
-        monthsBeyondQuote: termMonths - uses.length,
+        monthsBeyondQuote,
         unitPrice: resource.amount,
-        quantity: opening.quantity,
+        quantity: held.quantity,
         // Invoiced month by month over the term: nothing is paid when it opens.
-        billing: 'monthly' as const
+        billing: 'monthly' as const,
+        // Only when the policy entry declares the date the contract renews (`commitmentRenewsOn`).
+        ...(running
+          ? {
+              termStartKnown: true as const,
+              // As declared; it may be past when the quote is read.
+              renewsOn: running.renewsOn,
+              // The renewal the licence this quote uses is bound until: the first one after its last quoted period.
+              boundUntil: running.boundUntil,
+              // Renewals that fall inside a quoted calendar month that uses the price.
+              renewsWithinQuotedPeriods: running.renewsWithin
+            }
+          : {})
       },
       currency: resource.currency,
       // What the quote is attributed each month of the term.
@@ -472,8 +599,8 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       sharing: {
         basis: shared ? ('shared_declared_capacity' as const) : ('sole_declared_user' as const),
         quoteShare: quoteShare.toString(),
-        driver: opening.driver,
-        consumerCount: opening.consumerIds.length,
+        driver: held.driver,
+        consumerCount: held.consumerIds.length,
         priceBasis: price.basis,
         ...(price.includedSeats ? { includedSeats: price.includedSeats } : {}),
         ...(allocation?.seatCapacity ? { seatCapacity: allocation.seatCapacity } : {}),
@@ -489,7 +616,7 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         tool,
         selected: price,
         input,
-        quantity: opening.quantity,
+        quantity: held.quantity,
         quoteShare,
         months: uses.length,
         termMonths,
@@ -503,11 +630,17 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
           reason:
             'The commitment is a declared contract term, not a purchase: the artifact does not say whether this seat or plan already exists and is paid, or has to be contracted for this quote.'
         },
-        {
-          field: 'commitment.termStart',
-          reason:
-            'The term is read as one term opening in the first quoted period that uses the price. A contract already running, its renewal and its cancellation or early-exit terms are not in the artifact.'
-        },
+        running
+          ? {
+              field: 'commitment.exitTerms',
+              reason:
+                'The term is read as running, from the renewal date the policy declares. Leaving before that date, its fee or refund, what the supplier bills for a month the term only partly covers (counted whole here) and whether the contract is renewed at that date are not in the artifact.'
+            }
+          : {
+              field: 'commitment.termStart',
+              reason:
+                'The term is read as one term opening in the first quoted period that uses the price. A contract already running, its renewal and its cancellation or early-exit terms are not in the artifact.'
+            },
         ...(shared
           ? [
               {
@@ -603,6 +736,7 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
   const notDerivable: { code: string; toolIds: string[]; reason: string }[] = []
   let annualPriceUses = 0
   let termedMonthlyPriceUses = 0
+  let renewalDatedPriceUses = 0
 
   // A blocked quote has no cash ledger to read a commitment from, and a credit plan that may be incomplete.
   if (quote.calculationStatus === 'calculated' && quote.totals) {
@@ -702,13 +836,48 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       termedMonthlyPriceUses += 1
       uses.sort((a, b) => a.periodId - b.periodId)
 
+      if (price.commitmentRenewsOn) {
+        renewalDatedPriceUses += 1
+
+        // A term of one month is the month it bills: the seat can be dropped at the next bill, whatever day that
+        // is, so nothing is left. Counting calendar months would report the month that bill falls in.
+        if (termMonths === 1) continue
+
+        const last = uses[uses.length - 1]
+        const quoteMonth = monthIndexOf(quoteDate)
+
+        // Period 1 is the calendar month of the quote date. Every quoted period that uses the price is read: the
+        // date says what happens when a term ends, so `CONTRACT_RENEWAL_NOT_DECLARED` is not raised for it.
+        const running = runningTermOf(
+          price.commitmentRenewsOn,
+          termMonths,
+          quoteMonth + uses[0].periodId - 1,
+          quoteMonth + last.periodId - 1
+        )
+
+        const input = inputOf(last.periodId)
+
+        // The contract renews on the first day after the last quoted period: nothing is left behind.
+        if (!input || running.monthsBeyondQuote <= 0) continue
+
+        const kernelCost = uses.reduce(
+          (sum, a) => sum.plus(monthlyCost.get(`${a.periodId}:${a.resource.resourceId}`) ?? 0),
+          new D(0)
+        )
+
+        termedMonthlyPrices.push(readTermedMonthlyPrice(tool, price, termMonths, uses, input, kernelCost, running))
+        continue
+      }
+
       // One term, opening in the first quoted period that uses the price. No renewal is assumed: a period past the
       // term is read as the kernel charges it, a month at a time, and the tool is named below as not derivable.
       const lastPeriodOfTerm = uses[0].periodId + termMonths - 1
       const withinTerm = uses.filter(a => a.periodId <= lastPeriodOfTerm)
       const input = inputOf(uses[0].periodId)
 
-      if (withinTerm.length < uses.length) usedPastTerm.add(tool.toolId)
+      // A term of one month is "paid month by month and free to leave": there is no renewal to declare, however many
+      // periods the quote runs.
+      if (termMonths > 1 && withinTerm.length < uses.length) usedPastTerm.add(tool.toolId)
 
       // A term the quote uses to its last month leaves nothing behind.
       if (!input || termMonths <= withinTerm.length) continue
@@ -764,6 +933,14 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         const left = `${entry.unrecovered.inQuoteCurrency ?? `${entry.unrecovered.inToolCurrency} ${entry.currency}, no FX frozen to`} ${currency}`
         const pool = entry.sharing.restSitsIn === 'shared_package' ? 'a package' : 'a capacity'
 
+        // A term read as running, from the renewal date the policy declares: what is left is up to that renewal.
+        const { boundUntil, renewsOn } = entry.commitment
+        const renewsWithin = entry.commitment.renewsWithinQuotedPeriods ?? []
+
+        const term = boundUntil
+          ? `${entry.label}: priced per month under a contract term of ${months.termMonths} months the policy declares, renewing on ${renewsOn} and every ${months.termMonths} months after it, billed month by month with nothing paid up front. The licence this quote uses is bound until ${boundUntil}, the first renewal after its last quoted period. Months inside the quote: ${months.monthsWithinQuote}; months after it that begin before that date: ${months.monthsBeyondQuote}.`
+          : `${entry.label}: priced per month under a contract term of ${months.termMonths} months the policy declares, billed month by month with nothing paid up front. ${months.monthsWithinQuote} inside the quote.`
+
         return [
           {
             code: shared
@@ -772,9 +949,21 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
             ...base,
             amount: entry.unrecovered.inQuoteCurrency,
             detail: shared
-              ? `${entry.label}: priced per month under a contract term of ${months.termMonths} months the policy declares, billed month by month with nothing paid up front. ${months.monthsWithinQuote} inside the quote. The share of this quote for the other ${months.monthsBeyondQuote} (${left}) goes back to ${pool} the demand declares as shared; it is not stranded by this quote ending.`
-              : `${entry.label}: priced per month under a contract term of ${months.termMonths} months the policy declares, billed month by month with nothing paid up front. ${months.monthsWithinQuote} inside the quote. The other ${months.monthsBeyondQuote} (${left}) are still owed month by month, are not recovered by this quote and are stranded if nothing else uses them.`
+              ? `${term} The share of this quote for the other ${months.monthsBeyondQuote} (${left}) goes back to ${pool} the demand declares as shared; it is not stranded by this quote ending.`
+              : `${term} The other ${months.monthsBeyondQuote} (${left}) are still owed month by month, are not recovered by this quote and are stranded if nothing else uses them.`
           },
+          // Its own code, besides the one above: the renewal is a date somebody can act on, and it changes what the
+          // months left mean. They belong to a term that starts inside the engagement, with the licence in use.
+          ...(renewsWithin.length
+            ? [
+                {
+                  code: 'COMMITMENT_RENEWS_WITHIN_ENGAGEMENT' as const,
+                  ...base,
+                  amount: entry.unrecovered.inQuoteCurrency,
+                  detail: `${entry.label}: the contract term renews inside the engagement (${renewsWithin.join(', ')}), while the quote still uses the licence. The licence is needed across the renewal, so the term that starts there binds it until ${boundUntil}: the ${months.monthsBeyondQuote} months left (${left}) belong to that term. At a renewal the number of licences can be changed, but only for licences no longer needed, and this one still is. The amount is the one of the commitment above, not an amount to add to it.`
+                }
+              ]
+            : []),
           ...entry.shorterCommitmentPrices
             .filter(price => price.extraCostOverQuotedPeriods !== null)
             .map(price => ({
@@ -846,6 +1035,12 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       'annual price: committed = the cash ledger rows of the quote for that resource (the whole year, charged in the period the term opens); attributedWithinPeriods = cost of its components in the quoted periods (a twelfth a period); unrecovered = committed - attributedWithinPeriods.',
       'sharing: a quote share of 1 makes the quote the only declared user, and the unrecovered amount is stranded if nothing else uses it. A share under 1 is a capacity the demand declares as shared: the amount is released to it, never counted as stranded.',
       'termed monthly price: a price per month whose policy entry declares a contract term (commitmentTermMonths) longer than the quoted periods that use it. The commitment is declared by the policy, not booked by the kernel: the cash ledger holds one month per quoted period and is not read. committed = the monthly amount the quote is attributed (amount x quantity x share) x the months of the term; attributedWithinPeriods = cost of its components in the quoted periods; unrecovered = committed - attributedWithinPeriods, the months left. It is billed month by month: nothing is paid up front. One term from the first quoted period that uses the price; no renewal is assumed.',
+      // Stated only when a price of this reading declares the date, so a reading without one says what it always said.
+      ...(renewalDatedPriceUses
+        ? [
+            'termed monthly price with a renewal date: when the policy entry also declares the date the contract renews (commitmentRenewsOn), the term is read as running instead of opening with the quote. Renewals are that date and every term after it. The licence is bound until the first renewal strictly after the last day of the last quoted period that uses the price (commitment.boundUntil). monthsBeyondQuote = the calendar months after that period that begin before that renewal, a month the term only partly covers counted whole. unrecovered = monthsBeyondQuote x the monthly amount the quote is attributed in that last period; committed = attributedWithinPeriods + unrecovered, what the quote\'s use of the licence binds, not a full term. A renewal inside the quoted periods is crossed with the licence in use: the term after it binds.'
+          ]
+        : []),
       'shorter-commitment prices: every price per month the frozen policy holds for the same tool on the quote date that binds for less than the price the quote uses, over the same periods, quantity and share. The policy does not link the prices of one plan.',
       'credit pack: the plan of the artifact (creditBudgets), never recomputed. incrementalCash is the cash of whole packs (resourceIncrementalCash); the subscription share is attributed cost with no new cash.',
       'amounts in the quote currency use the FX the quote froze; none of them is new cash unless it is named incrementalCash.'
@@ -856,6 +1051,8 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       annualPriceUses,
       // Month-priced uses whose policy price declares a contract term, whether or not it outlives the quote.
       termedMonthlyPriceUses,
+      // Of those, the ones whose policy price also declares the date the contract renews. Absent when none does.
+      ...(renewalDatedPriceUses ? { renewalDatedPriceUses } : {}),
       creditBudgets: result.creditBudgets.length,
       creditBudgetsWithPacks: result.creditBudgets.filter(b => (b.result.breakdown?.extra.purchasedCredits ?? 0) > 0)
         .length

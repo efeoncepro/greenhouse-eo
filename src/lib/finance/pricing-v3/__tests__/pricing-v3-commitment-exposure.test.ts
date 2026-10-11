@@ -5,8 +5,9 @@
 // kernel: every expectation below is read from what the composition froze (the cash ledger of the quote, the kernel
 // components, the attributions, the credit plan), from the committed policy the quote was composed with, or from a
 // second quote composed by `composeResourceQuote` with one input changed (the same seat on its monthly price, the
-// same engagement over twelve periods, the same policy with or without a declared contract term). Nothing asserts
-// the text of the module, and no expected amount comes from a previous run of the reader.
+// same engagement over twelve periods, the same policy with or without a declared contract term or the date it
+// renews). Nothing asserts the text of the module, and no expected amount comes from a previous run of the reader.
+// Dates and months of a running term are stated in each case from the calendar, with the reasoning in its name.
 //
 // Everything is read from the committed artifacts or built in memory from the committed sources; nothing is written
 // under data/.
@@ -31,7 +32,13 @@ type Entry = Reading['commitments'][number]
 type AnnualEntry = Extract<Entry, { kind: 'annual_price' }>
 type TermedEntry = Extract<Entry, { kind: 'termed_monthly_price' }>
 type CreditEntry = Extract<Entry, { kind: 'credit_pack' }>
-type PolicyPrice = { priceId: string; basis: string; commitmentTermMonths?: number; price?: { amount: string } }
+type PolicyPrice = {
+  priceId: string
+  basis: string
+  commitmentTermMonths?: number
+  commitmentRenewsOn?: string
+  price?: { amount: string }
+}
 
 const D = Decimal.clone({ precision: 80 })
 const read = (p: string) => JSON.parse(readFileSync(p, 'utf8'))
@@ -381,22 +388,46 @@ describe('commitment exposure over every committed composition artifact', () => 
       )
 
       const term = declaresTerm(attributions[0])!
+      // A committed policy may come to declare the date its contract renews; the term is then read as running.
+      const renewsOn = selectedPrice(artifact.semantic.policy, attributions[0])?.commitmentRenewsOn
+      const last = attributions[attributions.length - 1]
 
-      // The term is the one the policy declares, it opens in the first period and the quote stops before it does.
+      const inToolCurrency = (value: Decimal) =>
+        value.toFixed(entry.committed.inToolCurrency.split('.')[1]?.length ?? 0, D.ROUND_HALF_UP)
+
       expect(entry.commitment.termMonths).toBe(term)
       expect(entry.periodIds).toEqual(attributions.map(a => a.periodId))
-      expect(entry.commitment.monthsBeyondQuote).toBe(term - entry.periodIds.length)
       expect(entry.commitment.monthsBeyondQuote).toBeGreaterThan(0)
       expect(entry.commitment.billing).toBe('monthly')
 
       // Declared by the policy, not booked by the kernel: the quote has no ledger row for this resource.
       expect(result.quote.cashLedger.filter(c => c.key.startsWith(`${entry.resourceId}:`))).toEqual([])
 
-      // committed = the monthly amount the attribution froze x the term; attributed = what the kernel costed.
-      const inToolCurrency = (value: Decimal) =>
-        value.toFixed(entry.committed.inToolCurrency.split('.')[1]?.length ?? 0, D.ROUND_HALF_UP)
+      if (renewsOn) {
+        // Bound until a renewal after the last quoted period that uses the price, and committed for what the quote
+        // attributes plus the months up to it: never a whole term assumed from the first quoted month.
+        const [year, month] = demand.brief.quoteDate.split('-').map(Number)
+        const lastQuotedDay = new Date(Date.UTC(year, month - 1 + last.periodId, 0)).toISOString().slice(0, 10)
 
-      expect(entry.committed.inToolCurrency).toBe(inToolCurrency(new D(attributions[0].attributedMonthlyCost).mul(term)))
+        expect(entry.commitment.termStartKnown).toBe(true)
+        expect(entry.commitment.renewsOn).toBe(renewsOn)
+        expect(entry.commitment.boundUntil! > lastQuotedDay).toBe(true)
+        expect(entry.commitment.monthsCommitted).toBe(entry.periodIds.length + entry.commitment.monthsBeyondQuote)
+        expect(entry.unrecovered.inToolCurrency).toBe(
+          inToolCurrency(new D(last.attributedMonthlyCost).mul(entry.commitment.monthsBeyondQuote))
+        )
+        expect(entry.notDerivable.map(n => n.field)).not.toContain('commitment.termStart')
+      } else {
+        // One term, the one the policy declares: it opens in the first period and the quote stops before it does.
+        expect(entry.commitment.monthsBeyondQuote).toBe(term - entry.periodIds.length)
+        expect(entry.commitment).not.toHaveProperty('termStartKnown')
+        // committed = the monthly amount the attribution froze x the term.
+        expect(entry.committed.inToolCurrency).toBe(
+          inToolCurrency(new D(attributions[0].attributedMonthlyCost).mul(term))
+        )
+      }
+
+      // attributed = what the kernel costed.
       expect(entry.attributedWithinPeriods.inToolCurrency).toBe(
         inToolCurrency(sum(attributions.map(a => a.attributedMonthlyCost)))
       )
@@ -424,7 +455,7 @@ describe('commitment exposure over every committed composition artifact', () => 
 
       // A share under 1 is released to the shared capacity and never counted as stranded.
       expect(new D(entry.strandedIfNothingElseUsesIt.inToolCurrency).isZero()).toBe(
-        new D(attributions[0].serviceShare).lt(1)
+        new D((renewsOn ? last : attributions[0]).serviceShare).lt(1)
       )
       expect(entry.incrementalCash).toBeNull()
     }
@@ -442,10 +473,14 @@ describe('commitment exposure over every committed composition artifact', () => 
       expect(entry.currency).toBe(cash.currency)
     }
 
-    // One signal names each commitment, with its tool, its periods and its amount.
+    // One signal names each commitment, with its tool, its periods and its amount. A cheaper price in the policy and
+    // a renewal inside the engagement are said besides it, under their own codes.
     for (const entry of reading.commitments) {
       const named = reading.signals.filter(
-        signal => signal.toolId === entry.toolId && signal.code !== 'SHORTER_COMMITMENT_PRICE_IN_POLICY'
+        signal =>
+          signal.toolId === entry.toolId &&
+          signal.code !== 'SHORTER_COMMITMENT_PRICE_IN_POLICY' &&
+          signal.code !== 'COMMITMENT_RENEWS_WITHIN_ENGAGEMENT'
       )
 
       expect(named.filter(signal => signal.periodIds.join() === entry.periodIds.join())).toHaveLength(1)
@@ -924,6 +959,370 @@ describe('a price per month under a contract term the policy declares', () => {
       expect(microsoft(bound)).not.toContain(MONTHLY_SEAT)
       expect(microsoft(bound).length).toBe(microsoft(policy).length - 1)
     })
+  })
+})
+
+describe('a contract term already running: the policy also declares the date it renews', () => {
+  // The real case: Adobe, an annual plan paid monthly that renews by itself on 16 November 2026, 36 days after the
+  // quote date. Policy v8 as committed (a package of three seats, bound for twelve months) with that date declared
+  // on the price the quote selects; the designer uses one of the three seats. A quoted period is a calendar month:
+  // period 1 is October 2026.
+  const ONE_SEAT_OF_THREE = { unit: 'assigned-user-seat', total: '3', allocated: '1', share: '0.333333333333333333' }
+  const policyV8 = read('data/pricing/v3-operating/resources.review-v8.json')
+  const adobeOf = (source: typeof policyV8) => source.tools.find((t: { toolId: string }) => t.toolId === 'adobe')
+  const packagePrice = adobeOf(policyV8).prices.find((p: PolicyPrice) => p.priceId === 'current').price
+
+  /** Policy v8 with the term and the renewal date under test on Adobe `current`; `null` declares no date. */
+  const policyRenewing = (renewsOn: string | null, termMonths = 12) => {
+    const copy = clone(policyV8)
+    const price: PolicyPrice = adobeOf(copy).prices.find((p: PolicyPrice) => p.priceId === 'current')
+
+    price.commitmentTermMonths = termMonths
+    if (renewsOn) price.commitmentRenewsOn = renewsOn
+    else delete price.commitmentRenewsOn
+
+    return copy
+  }
+
+  // Policy v8 prices the package in CLP: the demand names the FX record that takes it to the calculation currency,
+  // as the committed demand of the same case does (designer-on-demand).
+  const composeV8 = (periods: number, withPolicy: unknown, adobeUnits?: typeof ONE_SEAT_OF_THREE) =>
+    calculated(
+      runResourceComposition(
+        catalog,
+        withPolicy,
+        credits,
+        { ...demandFor({ periods, microsoftPriceId: MONTHLY_SEAT, adobeUnits }), fxRecordIds: ['fx:CLP:USD'] },
+        '2026-10-11T00:00:00.000Z'
+      )
+    )
+
+  const quoteOn = (
+    periods: number,
+    renewsOn: string | null,
+    termMonths = 12,
+    seats: 'one-of-three' | 'whole-package' = 'one-of-three'
+  ) => {
+    const artifact = composeV8(
+      periods,
+      policyRenewing(renewsOn, termMonths),
+      seats === 'one-of-three' ? ONE_SEAT_OF_THREE : undefined
+    )
+
+    const reading = commitmentExposure(artifact)
+
+    return {
+      artifact,
+      result: artifact.semantic.result,
+      reading,
+      entry: termedEntries(reading).find(entry => entry.toolId === 'adobe')
+    }
+  }
+
+  /** Tools whose renewal the reading reports as unknown. */
+  const renewalNotDeclared = (reading: Reading) =>
+    reading.notDerivable.find(n => n.code === 'CONTRACT_RENEWAL_NOT_DECLARED')?.toolIds ?? []
+
+  const signalCodes = (reading: Reading) =>
+    reading.signals.filter(s => s.toolId === 'adobe').map(s => s.code)
+
+  /**
+   * What every reading of a running term has to say, against the calendar facts the case states and against the
+   * artifact: the months left are costed on the month the kernel costed last, and add up with what it attributed.
+   */
+  const expectRunningTerm = (
+    quoted: ReturnType<typeof quoteOn>,
+    expected: { renewsOn: string; termMonths: number; boundUntil: string; monthsBeyond: number; renewsWithin: string[] }
+  ) => {
+    const { result, reading } = quoted
+    const entry = quoted.entry!
+    const periods = result.quote.periods.length
+    const lastUse = result.attributions.filter(a => a.toolId === 'adobe').find(a => a.periodId === periods)!
+
+    expect(entry.priceId).toBe('current')
+    expect(entry.periodIds).toEqual(Array.from({ length: periods }, (_, index) => index + 1))
+    expect(entry.commitment).toMatchObject({
+      declaredBy: 'policy',
+      billing: 'monthly',
+      termMonths: expected.termMonths,
+      termStartKnown: true,
+      renewsOn: expected.renewsOn,
+      boundUntil: expected.boundUntil,
+      renewsWithinQuotedPeriods: expected.renewsWithin,
+      terms: expected.renewsWithin.length + 1,
+      monthsWithinQuote: periods,
+      monthsBeyondQuote: expected.monthsBeyond,
+      // What the quote's use of the licence binds, not a whole term.
+      monthsCommitted: periods + expected.monthsBeyond,
+      coversPeriods: { from: 1, through: periods + expected.monthsBeyond }
+    })
+
+    // In the currency of the tool, against the policy price (a third of the package) and the frozen attribution.
+    const inToolCurrency = (value: Decimal) =>
+      value.toFixed(entry.unrecovered.inToolCurrency.split('.')[1]?.length ?? 0, D.ROUND_HALF_UP)
+
+    expect(new D(lastUse.attributedMonthlyCost).toFixed(2)).toBe(new D(packagePrice.amount).div(3).toFixed(2))
+    expect(entry.monthlyAmount.inToolCurrency).toBe(inToolCurrency(new D(lastUse.attributedMonthlyCost)))
+    expect(entry.unrecovered.inToolCurrency).toBe(
+      inToolCurrency(new D(lastUse.attributedMonthlyCost).mul(expected.monthsBeyond))
+    )
+
+    // In the currency of the quote, against the kernel: the months left at the cost of the last quoted month, the
+    // attributed amount at the cost of all of them.
+    expect(entry.unrecovered.inQuoteCurrency).toBe(
+      kernelCost(result, 'adobe', periods).mul(expected.monthsBeyond).toFixed(0, D.ROUND_HALF_UP)
+    )
+    expect(entry.attributedWithinPeriods.inQuoteCurrency).toBe(kernelCost(result, 'adobe').toFixed(0, D.ROUND_HALF_UP))
+
+    for (const currency of ['inToolCurrency', 'inQuoteCurrency'] as const) {
+      // committed = attributed inside the quote + the months left.
+      expect(
+        new D(entry.committed[currency]!).eq(
+          new D(entry.attributedWithinPeriods[currency]!).plus(entry.unrecovered[currency]!)
+        )
+      ).toBe(true)
+      expect(new D(entry.paidUpFront[currency]!).isZero()).toBe(true)
+    }
+
+    // One seat of a package of three: released to it, never stranded, and never new cash.
+    expect(entry.sharing).toMatchObject({ basis: 'shared_declared_capacity', restSitsIn: 'shared_package' })
+    expect(entry.releasedToSharedCapacity).toEqual(entry.unrecovered)
+    expect(new D(entry.strandedIfNothingElseUsesIt.inQuoteCurrency!).isZero()).toBe(true)
+    expect(entry.incrementalCash).toBeNull()
+    expect(reading.totals.termedMonthlyPrices).toMatchObject({
+      count: 1,
+      committed: entry.committed.inQuoteCurrency,
+      unrecovered: entry.unrecovered.inQuoteCurrency,
+      releasedToSharedCapacity: entry.unrecovered.inQuoteCurrency
+    })
+
+    // The start of the term is known: it is no longer listed as unknown, and neither is the renewal.
+    expect(entry.notDerivable.map(n => n.field)).toContain('incrementalCash')
+    expect(entry.notDerivable.map(n => n.field)).not.toContain('commitment.termStart')
+    expect(renewalNotDeclared(reading)).not.toContain('adobe')
+    expect(reading.reviewed).toMatchObject({ renewalDatedPriceUses: 1 })
+
+    // One signal names the commitment; a renewal inside the quoted periods is said besides it, same amount.
+    const named = reading.signals.filter(s => s.toolId === 'adobe' && s.code.endsWith('OUTLIVES_ENGAGEMENT'))
+
+    expect(named).toHaveLength(1)
+    expect(named[0]).toMatchObject({
+      code: 'SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT',
+      amount: entry.unrecovered.inQuoteCurrency,
+      periodIds: entry.periodIds
+    })
+    expect(reading.signals.filter(s => s.code === 'COMMITMENT_RENEWS_WITHIN_ENGAGEMENT')).toEqual(
+      expected.renewsWithin.length
+        ? [expect.objectContaining({ toolId: 'adobe', amount: entry.unrecovered.inQuoteCurrency })]
+        : []
+    )
+  }
+
+  it('one period in October, renewal on 16 November: November begins before the 16th and is billed, so one month is left, not eleven', () => {
+    const quoted = quoteOn(1, '2026-11-16')
+
+    expect(quoted.reading.engagement.endsOn).toBe('2026-10-31')
+    expectRunningTerm(quoted, {
+      renewsOn: '2026-11-16',
+      termMonths: 12,
+      boundUntil: '2026-11-16',
+      monthsBeyond: 1,
+      renewsWithin: []
+    })
+
+    // The figures of the case: the package costs CLP 162,605 a month and the quote holds one seat of three.
+    const entry = quoted.entry!
+
+    expect(packagePrice).toMatchObject({ amount: '162605', currency: 'CLP', unit: 'month' })
+    expect(entry.unrecovered.inQuoteCurrency).toBe(new D(162605).div(3).toFixed(0, D.ROUND_HALF_UP))
+    expect(entry.attributedWithinPeriods.inQuoteCurrency).toBe(entry.unrecovered.inQuoteCurrency)
+    expect(new D(entry.committed.inQuoteCurrency!).eq(new D(entry.unrecovered.inQuoteCurrency!).mul(2))).toBe(true)
+
+    // The same quote read without the date leaves eleven months of the same seat.
+    const undated = quoteOn(1, null).entry!
+
+    expect(undated.commitment.monthsBeyondQuote).toBe(11)
+    expect(new D(undated.unrecovered.inQuoteCurrency!).gt(new D(entry.unrecovered.inQuoteCurrency!).mul(10))).toBe(true)
+  })
+
+  it('the date never reaches the calculation: the quote is the one the policy without it composes', () => {
+    expect(quoteOn(1, '2026-11-16').result).toEqual(quoteOn(1, null).result)
+  })
+
+  it('the whole package held by the quote is stranded for that one month if nothing else uses it', () => {
+    const { reading, entry } = quoteOn(1, '2026-11-16', 12, 'whole-package')
+
+    expect(entry!.commitment).toMatchObject({ boundUntil: '2026-11-16', monthsBeyondQuote: 1 })
+    expect(entry!.unrecovered.inToolCurrency).toBe(packagePrice.amount)
+    expect(entry!.sharing.basis).toBe('sole_declared_user')
+    expect(entry!.strandedIfNothingElseUsesIt).toEqual(entry!.unrecovered)
+    expect(signalCodes(reading)).toEqual(['COMMITMENT_OUTLIVES_ENGAGEMENT'])
+  })
+
+  it('renewal on 20 October, inside the quoted month: the licence is in use across it, so it is bound until 20 October 2027 and twelve months are left (November to October)', () => {
+    expectRunningTerm(quoteOn(1, '2026-10-20'), {
+      renewsOn: '2026-10-20',
+      termMonths: 12,
+      boundUntil: '2027-10-20',
+      monthsBeyond: 12,
+      renewsWithin: ['2026-10-20']
+    })
+  })
+
+  it('renewal on 1 November exactly: November begins on the renewal, not before it, so nothing is left and nothing is listed', () => {
+    const { reading, entry } = quoteOn(1, '2026-11-01')
+
+    expect(entry).toBeUndefined()
+    expect(reading.commitments).toEqual([])
+    expect(reading.signals).toEqual([])
+    expect(reading.totals.termedMonthlyPrices.count).toBe(0)
+    // Looked at, with its date; not a term nobody declared and not an unknown renewal.
+    expect(reading.reviewed).toMatchObject({ renewalDatedPriceUses: 1 })
+    expect(reading.notDerivable.find(n => n.code === 'CONTRACT_TERM_NOT_FROZEN')?.toolIds ?? []).not.toContain('adobe')
+    expect(renewalNotDeclared(reading)).not.toContain('adobe')
+  })
+
+  it('renewal on 31 October, the last quoted day: it is not after the quoted month, so the next one binds, 31 October 2027, and twelve months are left', () => {
+    expectRunningTerm(quoteOn(1, '2026-10-31'), {
+      renewsOn: '2026-10-31',
+      termMonths: 12,
+      boundUntil: '2027-10-31',
+      monthsBeyond: 12,
+      renewsWithin: ['2026-10-31']
+    })
+  })
+
+  it('renewal on 1 October, the first quoted day: the term opens with the quote, and the reading is the whole term the undated one assumes', () => {
+    const dated = quoteOn(1, '2026-10-01')
+    const undated = quoteOn(1, null).entry!
+
+    expectRunningTerm(dated, {
+      renewsOn: '2026-10-01',
+      termMonths: 12,
+      boundUntil: '2027-10-01',
+      monthsBeyond: 11,
+      renewsWithin: ['2026-10-01']
+    })
+    expect(dated.entry!.committed).toEqual(undated.committed)
+    expect(dated.entry!.unrecovered).toEqual(undated.unrecovered)
+  })
+
+  it('a tool paid month by month has no renewal to declare, however many periods the quote runs', () => {
+    // Policy v8 declares a term of one month on Notion and on the monthly Microsoft 365 prices: free to leave.
+    const { reading } = quoteOn(3, '2026-11-16')
+
+    expect(reading.engagement.periods).toBe(3)
+    expect(reading.notDerivable.map(n => n.code)).not.toContain('CONTRACT_RENEWAL_NOT_DECLARED')
+    expect(reading.commitments.filter(c => c.toolId === 'notion' || c.toolId === 'microsoft-365')).toEqual([])
+  })
+
+  it('three periods, October to December, renewal on 16 November: the job crosses it, the licence is bound until 16 November 2027 and eleven months are left (January to November)', () => {
+    const quoted = quoteOn(3, '2026-11-16')
+
+    expect(quoted.reading.engagement.endsOn).toBe('2026-12-31')
+    expectRunningTerm(quoted, {
+      renewsOn: '2026-11-16',
+      termMonths: 12,
+      boundUntil: '2027-11-16',
+      monthsBeyond: 11,
+      renewsWithin: ['2026-11-16']
+    })
+    expect(signalCodes(quoted.reading)).toEqual([
+      'SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT',
+      'COMMITMENT_RENEWS_WITHIN_ENGAGEMENT'
+    ])
+  })
+
+  it('a date already past, 16 March 2026: the renewal that applies is the next of the series, 16 March 2027, and five months are left (November to March)', () => {
+    expectRunningTerm(quoteOn(1, '2026-03-16'), {
+      renewsOn: '2026-03-16',
+      termMonths: 12,
+      boundUntil: '2027-03-16',
+      monthsBeyond: 5,
+      renewsWithin: []
+    })
+  })
+
+  it('a date further away than one term, 16 March 2028: it is declared as the next renewal, so no earlier one is read and seventeen months are left (November 2026 to March 2028)', () => {
+    expectRunningTerm(quoteOn(1, '2028-03-16'), {
+      renewsOn: '2028-03-16',
+      termMonths: 12,
+      boundUntil: '2028-03-16',
+      monthsBeyond: 17,
+      renewsWithin: []
+    })
+  })
+
+  it('thirteen periods with the date: the renewal is known, so the whole job is read, bound until 16 November 2027, with one month left (November)', () => {
+    // Without the date the same quote leaves no entry and an unknown renewal; see the thirteen periods above.
+    expectRunningTerm(quoteOn(13, '2026-11-16'), {
+      renewsOn: '2026-11-16',
+      termMonths: 12,
+      boundUntil: '2027-11-16',
+      monthsBeyond: 1,
+      renewsWithin: ['2026-11-16']
+    })
+    expect(renewalNotDeclared(quoteOn(13, null).reading)).toContain('adobe')
+  })
+
+  describe('a renewal day the month does not have', () => {
+    // A term of three months declared on 31 August 2026: 30 November, 28 February 2027, 31 May 2027. Each renewal
+    // is the 31st or the last day of its month, counted from the declared date and not from the one before.
+    it('one period in October: bound until 30 November, and November is left', () => {
+      expectRunningTerm(quoteOn(1, '2026-08-31', 3), {
+        renewsOn: '2026-08-31',
+        termMonths: 3,
+        boundUntil: '2026-11-30',
+        monthsBeyond: 1,
+        renewsWithin: []
+      })
+    })
+
+    it('five periods, October to February: 28 February is the last quoted day, so the renewal after it binds, 31 May, and three months are left (March to May)', () => {
+      expectRunningTerm(quoteOn(5, '2026-08-31', 3), {
+        renewsOn: '2026-08-31',
+        termMonths: 3,
+        boundUntil: '2027-05-31',
+        monthsBeyond: 3,
+        renewsWithin: ['2026-11-30', '2027-02-28']
+      })
+    })
+  })
+
+  it('a term without a date reads as it always did: one whole term from the first quoted month, its start listed as unknown', () => {
+    const { reading, entry } = quoteOn(1, null)
+
+    expect(entry!.commitment).toMatchObject({
+      termMonths: 12,
+      terms: 1,
+      coversPeriods: { from: 1, through: 12 },
+      monthsCommitted: 12,
+      monthsWithinQuote: 1,
+      monthsBeyondQuote: 11
+    })
+    for (const key of ['termStartKnown', 'renewsOn', 'boundUntil', 'renewsWithinQuotedPeriods'])
+      expect(entry!.commitment).not.toHaveProperty(key)
+    expect(entry!.notDerivable.map(n => n.field)).toContain('commitment.termStart')
+    expect(reading.reviewed).not.toHaveProperty('renewalDatedPriceUses')
+    expect(signalCodes(reading)).toEqual(['SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT'])
+
+    // And it is the reading of policy v8 exactly as committed, which declares the term and no date.
+    expect(adobeOf(policyV8).prices.find((p: PolicyPrice) => p.priceId === 'current').commitmentTermMonths).toBe(12)
+    expect(reading).toEqual(commitmentExposure(composeV8(1, policyV8, ONE_SEAT_OF_THREE)))
+  })
+
+  it.each([
+    ['2026-11-16', 1],
+    ['2026-10-20', 1],
+    ['2026-10-31', 3],
+    ['2026-03-16', 13]
+  ])('a term of one month is the month it bills: with a date (%s, %i periods) it is never an entry', (renewsOn, periods) => {
+    const { reading, entry } = quoteOn(periods, renewsOn, 1)
+
+    expect(entry).toBeUndefined()
+    expect(reading.commitments).toEqual([])
+    expect(reading.signals).toEqual([])
+    expect(renewalNotDeclared(reading)).not.toContain('adobe')
   })
 })
 

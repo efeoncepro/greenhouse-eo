@@ -62,6 +62,10 @@ export const compositionPolicySchema = z
                     // (commitment-exposure.ts), which without it cannot tell such a plan from one with no commitment.
                     // 1 is a declaration too: paid month by month and free to leave, as opposed to "nobody said".
                     commitmentTermMonths: z.number().int().min(1).max(120).optional(),
+                    // The next date the supplier contract renews, when it is known (the vendor console states it).
+                    // With it the commitment reading counts what is left of the running term instead of assuming a
+                    // whole term from the first quoted month; at that date the number of licences can be changed.
+                    commitmentRenewsOn: pricingV3RequestSchema.shape.quoteDate.optional(),
                     pendingReason: z.string().min(1).optional()
                   })
                   .strict()
@@ -75,6 +79,8 @@ export const compositionPolicySchema = z
                   // A price nobody has yet has nothing to review, and no contract to be bound by.
                   .refine(v => !(v.reviewBy && v.pendingReason))
                   .refine(v => !(v.commitmentTermMonths && v.pendingReason))
+                  // A renewal date belongs to a declared term; alone it says nothing about how long a seat binds.
+                  .refine(v => !(v.commitmentRenewsOn && !v.commitmentTermMonths))
               )
               .max(20)
           })
