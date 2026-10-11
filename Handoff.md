@@ -4,6 +4,12 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-11 — Contactos conocidos de banca y retail
+
+[BCI, BICE, Cencosud e Itaú](docs/commercial/prospects/contactos-conocidos-banca-retail-2026-10/README.md): 12 contactos en HubSpot (10 nuevos, 2 reutilizados), cinco Company existentes, focos por persona y segmentos 180–187 verificados para este intake. Luisa: SEO de sitios públicos; Pamela/Felipe del Sante: creativo. Owner Julio; sin outreach ni nuevos Deals.
+
+Antes de contactar: resolver validación contradictoria del correo de Andrés, correo histórico de Pablo (Primary Mercado Libre) y roles/permanencia de Cencosud. Correos/evidencia en CRM y expediente local indicado en el dossier. Apollo consumió seis créditos autorizados; nuevas revelaciones requieren su propio alcance aprobado.
+
 ## 2026-10-10 — Brochure web y Product Design 360
 
 **Cotizador V3, versiones vigentes, precios sin vencimiento y exposición a estimados** (commit `c38e2249b`, docs en el siguiente): las versiones vigentes ya no se nombran a mano; las nombra el puntero [`current.json`](data/pricing/v3-operating/current.json) y los comandos las cargan con `--current` (`current show|set`). Tras emitir una versión hay que mover el puntero o `pnpm pricing:v3:test` queda en rojo. Policy v6: el precio unitario de una herramienta no vence, lleva una fecha de revisión que avisa sin bloquear. El resumen suma `runNotices` (avisos de la corrida, no se congelan) y `estimateExposure` (qué dato estimado pesa más). Decidido por el CEO el 11/10: el costo de personas es el nivel salarial objetivo del Excel, no la nómina; no conectar nómina ni escribir sueldos. Propuestos por el agente, sin decisión expresa: revisión de precios el 2027-04-11 y FX EUR→USD 1,20; no se cotiza en EUR. Catálogo v7 (commit siguiente): la venta de una persona por dedicación (`talent-assurance-staffing`) tiene piso de margen de 25 % y objetivos de 30/35/40 % según el nivel del perfil, decididos por el CEO el 11/10; antes no tenía piso. Guía: [manual para agentes](docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md); pendientes en el [ledger](data/pricing/v3-operating/operational-gaps.json).
