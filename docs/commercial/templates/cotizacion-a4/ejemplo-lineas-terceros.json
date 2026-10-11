@@ -1,0 +1,204 @@
+{
+  "version": 2,
+  "status": "example",
+  "date": "2026-10-11",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Gerencia de marketing",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": [
+      "Servicio",
+      "gestionado de",
+      "contenidos."
+    ],
+    "subtitle": "Tres meses de operación, con costos de terceros identificados, para Cliente de ejemplo."
+  },
+  "service": {
+    "name": "Servicio gestionado de contenidos y campañas"
+  },
+  "scope": {
+    "title": [
+      "Un servicio gestionado,",
+      "con costos a la vista."
+    ],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar las entregas, los costos de terceros y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Planificación",
+        "text": "Plan editorial y de campañas por mes, con objetivos, calendario y responsables."
+      },
+      {
+        "title": "Producción de contenidos",
+        "text": "Piezas gráficas y textos para los canales acordados, con dos rondas consolidadas de revisión."
+      },
+      {
+        "title": "Operación de campañas",
+        "text": "Configuración, seguimiento y optimización de campañas en las plataformas acordadas."
+      },
+      {
+        "title": "Costos de terceros",
+        "text": "Licencias y producción externa que Efeonce contrata y refactura, identificadas línea por línea."
+      },
+      {
+        "title": "Medición e informes",
+        "text": "Tablero de resultados y un informe mensual con conclusiones y próximos pasos."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Responsable del servicio, reunión quincenal y canal de atención durante la operación."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de tres meses",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Puesta en marcha",
+        "text": "Auditoría de cuentas, estructura de campañas, tablero de medición y plan editorial."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Operación",
+        "text": "Producción y publicación continuas, optimización de campañas e informe mensual."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Operación y cierre",
+        "text": "Continuidad de la operación, jornada de producción audiovisual e informe de cierre."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una cotización con",
+      "cada costo identificado."
+    ],
+    "intro": "El servicio se cotiza por mes; la puesta en marcha y la producción externa se cobran una sola vez. Todos los valores se expresan en pesos chilenos (CLP).",
+    "summary": "Tres meses · Pesos chilenos · IVA no incluido",
+    "taxNote": "Los valores netos excluyen IVA. El total incluye IVA y corresponde a los tres meses de servicio, la puesta en marcha y los costos de terceros refacturados."
+  },
+  "lines": [
+    {
+      "label": "Servicio gestionado de contenidos y campañas",
+      "detail": "Planificación, producción, operación de campañas e informe mensual.",
+      "group": "Servicio",
+      "quantity": {
+        "value": 3,
+        "unit": "meses"
+      },
+      "unitNet": "4200000",
+      "net": "12600000"
+    },
+    {
+      "label": "Configuración inicial del servicio",
+      "detail": "Auditoría de cuentas, estructura de campañas, tablero de medición y plan editorial.",
+      "group": "Puesta en marcha",
+      "quantity": {
+        "value": 1,
+        "unit": "pago único"
+      },
+      "unitNet": "1500000",
+      "net": "1500000"
+    },
+    {
+      "label": "Banco de imágenes con licencia comercial",
+      "detail": "Suscripción contratada por Efeonce y refacturada al cliente.",
+      "group": "Costos de terceros",
+      "quantity": {
+        "value": 3,
+        "unit": "meses"
+      },
+      "unitNet": "180000",
+      "net": "540000"
+    },
+    {
+      "label": "Producción audiovisual externa",
+      "detail": "Una jornada de registro y edición, refacturada al valor acordado.",
+      "group": "Costos de terceros",
+      "quantity": {
+        "value": 1,
+        "unit": "pago único"
+      },
+      "unitNet": "2400000",
+      "net": "2400000"
+    }
+  ],
+  "net": "17040000",
+  "clientPaidDirectly": [
+    {
+      "label": "Licencia de la plataforma de gestión de campañas",
+      "amount": "350.00",
+      "currency": "USD",
+      "detail": "Importe mensual durante los tres meses del servicio."
+    }
+  ],
+  "paymentSchedule": {
+    "title": "Calendario de pagos",
+    "note": "Cada hito se factura por su valor neto más IVA. Los plazos de pago se establecen en las condiciones comerciales.",
+    "milestones": [
+      {
+        "label": "Inicio del servicio",
+        "when": "A la aceptación de la cotización",
+        "net": "6816000"
+      },
+      {
+        "label": "Segundo mes",
+        "when": "Al inicio del segundo mes de servicio",
+        "net": "5112000"
+      },
+      {
+        "label": "Cierre",
+        "when": "A la entrega del informe de cierre",
+        "net": "5112000"
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "Tres meses desde la fecha acordada. El calendario de entregas, revisión y publicación se define con la contraparte del cliente."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de recepción, facturación y pago se acuerdan antes de emitir la cotización final. El calendario de este ejemplo es ilustrativo."
+      },
+      {
+        "title": "Costos de terceros",
+        "text": "Los costos refacturados se incluyen en esta cotización por el valor indicado. Un cambio de tarifa del proveedor se informa antes de aplicarlo."
+      },
+      {
+        "title": "Costos pagados por el cliente",
+        "text": "Las licencias que el cliente contrata directamente no forman parte de esta cotización; se informan como referencia en su propia moneda."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente aprueba las piezas antes de publicar y facilita los accesos y permisos acordados; los cambios se ejecutan con autorización."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  }
+}

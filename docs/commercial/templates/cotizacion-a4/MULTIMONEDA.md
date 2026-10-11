@@ -44,10 +44,17 @@ Este fragmento reproduce la equivalencia referencial preparada para Pibank; no c
 
 Editar también textos que mencionen moneda o cifras: el renderer no convierte automáticamente cantidades incrustadas en párrafos. El renderer detallado Pibank usa `{{money:4500}}` para precios convertibles y conserva en USD metas bancarias que no son precios de la oferta.
 
+## Versión 2: una sola moneda por documento
+
+La equivalencia con `presentation` es una capacidad de la versión 1, que cotiza un único precio. En la [versión 2](README.md#versión-2-varias-líneas-con-precio) el documento se emite en la moneda de la cotización: `presentation` con otra moneda o con `fx` se rechaza con un mensaje explícito, y `presentation.locale` sólo cambia el formato regional. Convertir línea por línea obligaría a decidir dónde se redondea y a explicar por qué las líneas convertidas no suman el total convertido; ese criterio no está definido y no se implementa a medias. Para entregar una cotización de varias líneas en otra moneda, cotizarla en esa moneda en su origen.
+
+Los costos de `clientPaidDirectly` no son una conversión: cada uno se imprime en su propia moneda (`currency` de la entrada, con su código ISO), fuera de todo total. Un costo en USD dentro de una cotización en CLP se lee tal cual, sin tasa ni equivalencia.
+
 ## Impuestos, precisión y redondeo
 
 - `vatRate` es explícito e independiente de la moneda. `null` mantiene impuesto y total facturable pendientes; `0` declara una tasa cero confirmada. Nunca transformar desconocido en cero ni asignar IVA/IGV al elegir PEN.
 - El neto fuente debe respetar la unidad menor ISO. Conversión e impuestos usan ratios decimales y BigInt; el redondeo es half-up a la precisión destino. Se rechazan importes fuera de la precisión segura de representación.
+- En la versión 2 el neto es la suma exacta de las líneas y el impuesto se calcula una vez sobre ella, no línea por línea; `taxAmount` permite declarar el impuesto de la cotización de origen cuando difiere en unidades de redondeo.
 - El documento A4 calcula impuestos sobre el neto convertido. Las referencias mensuales dividen los importes totales de salida antes del redondeo de visualización; no son cuotas. En el renderer Pibank, promedios y hitos dividen el importe fuente antes de convertir/redondear, evitando convertir un promedio USD previamente redondeado.
 - Sumar importes redondeados puede introducir diferencias respecto del total convertido. Revisar subtotales, hitos y calendarios en cada versión; documentar cualquier ajuste explícito. Pibank con la tasa registrada concilia sin ajuste.
 

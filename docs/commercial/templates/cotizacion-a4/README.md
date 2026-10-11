@@ -2,6 +2,8 @@
 
 Plantilla reutilizable solicitada por Julio el 08/10/2026, derivada del diseño aprobado de la cotización UTEM. Cuatro páginas: portada, alcance/calendario, inversión y condiciones. La cotización presentada a UTEM conserva sus archivos originales; esta plantilla tiene datos de ejemplo sin validez comercial.
 
+Desde el 11/10/2026 la plantilla tiene dos versiones del contrato de datos. La **versión 1** cotiza un único precio en cuatro páginas fijas y no cambia: las cotizaciones ya entregadas se regeneran byte a byte. La **versión 2** cotiza varias líneas con precio, pagina la sección de inversión según su contenido y admite dos bloques opcionales; se describe en [Versión 2: varias líneas con precio](#versión-2-varias-líneas-con-precio). Todo lo demás de este manual vale para ambas.
+
 ## Elegir la vía según el pedido
 
 Esta plantilla sirve para **preparar rápidamente la oferta económica en HTML/PDF de una licitación o Compra Ágil**, a partir de un precio, alcance y condiciones aprobados por el operador. La oferta resultante puede ser el documento formal que se presenta al comprador. La leyenda «Sin validez comercial» pertenece únicamente al ejemplo y se reemplaza al preparar la oferta real.
@@ -29,8 +31,9 @@ Ejemplos de ruteo para agentes:
 
 - [Vista previa HTML](vista-previa/cotizacion.html), autónoma y lista para imprimir.
 - [Vista previa PDF](vista-previa/cotizacion.pdf), cuatro páginas A4 verificadas.
-- [Datos de ejemplo](ejemplo.json): copiar y editar para una nueva cotización.
-- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño.
+- [Datos de ejemplo](ejemplo.json): copiar y editar para una nueva cotización de un único precio (versión 1).
+- Datos de ejemplo de la versión 2: [dos perfiles por dedicación y una puesta en marcha](ejemplo-lineas.json); [servicio gestionado con costos de terceros, calendario de pagos y un costo que paga el cliente](ejemplo-lineas-terceros.json).
+- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño. La versión 2 usa [su propio HTML](template-lineas.html) y añade [sus estilos](template-lineas.css) a los comunes; portada, alcance y condiciones son idénticos en ambos HTML y una prueba lo comprueba.
 - [Generador](../../../../scripts/documents/render-cotizacion-a4.mjs): resuelve slots, incrusta recursos y exporta HTML/PDF.
 
 ## Uso rápido
@@ -54,7 +57,7 @@ node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/tenders/n
 
 La carpeta de salida debe ser nueva o estar vacía. Se generan `cotizacion.html`, `cotizacion.pdf`, `datos.json`, `manifest.json` y capturas en `qa/`. Si hay logo del cliente, se conserva también junto al snapshot de datos. Las salidas HTML/PDF incluyen imágenes y fuentes; abren sin conexión. La generación requiere Node, Playwright y las dependencias de marca instaladas en este repo.
 
-5. Revisar las cuatro páginas del **PDF exportado**, además del HTML: legibilidad, folios, encabezado/pie, cortes, logo, textos de ejemplo remanentes y coherencia de alcance, precio, IVA y total. Comprobar extracción de texto y fuentes incrustadas. Los PNG de `qa/` son capturas del navegador; no sustituyen la inspección del PDF. Si falla la reserva A4, acortar o repaginar el contenido preservando el alcance aprobado, sin omitir obligaciones para hacerlo caber.
+5. Revisar todas las páginas del **PDF exportado** (cuatro en la versión 1; cuatro o más en la versión 2), además del HTML: legibilidad, folios, encabezado/pie, cortes, logo, textos de ejemplo remanentes y coherencia de alcance, precio, IVA y total. Comprobar extracción de texto y fuentes incrustadas. Los PNG de `qa/` son capturas del navegador; no sustituyen la inspección del PDF. Si falla la reserva A4, acortar o repaginar el contenido preservando el alcance aprobado, sin omitir obligaciones para hacerlo caber.
 6. Guardar en el expediente el JSON fuente, HTML/PDF, manifiesto, revisión realizada y la referencia a la aprobación comercial. El manifiesto nace con `visualReview` y `pdfTextAndPageAudit` pendientes; registrar sus resultados sólo después de revisar esa versión. Conservar las versiones que se presenten al comprador y su evidencia de envío. Una presentación o actualización CRM requiere su propia ejecución y verificación; generar HTML/PDF no acredita envío, aceptación, aprobación persistida, facturación ni cobro.
 
 `status: draft` permite producir el documento real para revisión/presentación y no equivale al estado de aprobación de Greenhouse. Los flags `submitted` y `signed`, si se incorporan al JSON del expediente, impiden regenerarlo cuando son verdaderos. La ausencia de esos flags no autoriza sobrescribir un documento presentado: una corrección requiere un nuevo mandato y una nueva versión. El archivo generado empieza con `submitted: false` y `signed: false`; no incorpora firmas.
@@ -65,12 +68,12 @@ Los atributos `data-slot` permiten localizar los campos en el HTML generado. La 
 
 | Campo JSON | Contenido |
 | --- | --- |
-| `version`, `status` | `1`; `example` o `draft`. Un documento firmado/presentado no se regenera. |
+| `version`, `status` | `1` (un único precio) o `2` (varias líneas); `example` o `draft`. Un documento firmado/presentado no se regenera. |
 | `date`, `reference` | Fecha `YYYY-MM-DD`; número de cotización o proceso. |
 | `supplier` | Razón social, identificación fiscal con etiqueta, responsable, correo y teléfono. |
 | `buyer` | Nombre, unidad, identificación fiscal con etiqueta y logo oficial opcional. |
 | `cover` | Etiqueta, título de hasta tres líneas y bajada. |
-| `service` | Nombre y detalle del servicio completo. Una unidad por cotización. |
+| `service` | Nombre y detalle del servicio completo. Una unidad por cotización. En la versión 2 sólo se usa `name` (título y descripción del documento); el detalle vive en cada línea. |
 | `scope` | Título, introducción y hasta siete componentes con título/texto. |
 | `schedule` | Título, nota de inicio y entre una y tres fases con etiqueta/título/texto. |
 | `currency`, `locale`, `net` | Moneda ISO 4217 del precio base; locale opcional (`es-CL`, `es-PE`); neto **total** con los decimales propios de la moneda (CLP: 0; USD/PEN: 2). Número o string decimal sin separadores. |
@@ -91,17 +94,53 @@ Los títulos aceptan texto o arrays de líneas. Los campos contienen texto plano
 
 Usar un archivo oficial ya descargado. La fuente se registra en el manifiesto. Si `logo` es `null`, aparece el nombre del cliente sin inventar una identidad gráfica. El ejemplo contiene datos corporativos públicos de Efeonce confirmados en [Datos para licitaciones](../../EFEONCE_DATOS_PARA_LICITACIONES.md); verificar responsable e identificación antes de emitir otra oferta.
 
+## Versión 2: varias líneas con precio
+
+Usar `"version": 2` cuando la cotización tiene más de un concepto con precio: perfiles por dedicación, un servicio mensual con su puesta en marcha, costos de terceros refacturados. Es también el formato que emite el puente de una cotización Pricing V3 hacia este documento; en ese caso los importes vienen de la cotización y no se editan a mano. Todos los campos de la versión 1 conservan su significado, salvo los que se indican.
+
+| Campo JSON | Contenido |
+| --- | --- |
+| `lines` | Entre 1 y 40 líneas, en el orden de impresión. Cada una: `label`; `detail` opcional; `group` opcional; `quantity` con `value` (entero de 1 a 9999) y `unit` (texto: `meses`, `pago único`); `unitNet` opcional; `net`, el importe de la línea por todo el plazo. |
+| `net` | Opcional. Si se declara, debe ser exactamente igual a la suma de `lines[].net`. El subtotal neto siempre es esa suma. |
+| `vatRate`, `taxStatus` | `vatRate` como en la versión 1. Con `vatRate: null`, `taxStatus` distingue `pending` (por defecto: «Por confirmar» y «Total facturable») de `not_applicable` («No aplica»; el total es igual al neto y se rotula «Total»). |
+| `taxAmount` | Opcional, sólo con una tasa explícita. Declara el impuesto de la cotización cuando difiere en unidades del calculado sobre el subtotal. Ver más abajo. |
+| `clientPaidDirectly` | Opcional, de 1 a 8 entradas: `label`, `amount`, `currency` y `detail` opcional. Costos que el cliente contrata y paga a su proveedor. |
+| `paymentSchedule` | Opcional: `title`, `note` y de 1 a 12 `milestones` con `label`, `when` y `net`. La suma de los hitos debe ser exactamente igual al neto. |
+| `source` | Opcional: objeto plano de textos con el origen de los datos (`system`, `calculationId`, `digest`…). Se copia al manifiesto y nunca se imprime. |
+| `pricing.monthly` | Como en la versión 1; lo decide el operador. |
+
+Reglas que el generador hace cumplir:
+
+- **Sumas exactas.** Los importes se suman en la unidad menor de la moneda, sin coma flotante. Si una línea declara `unitNet`, `unitNet × quantity.value` debe ser exactamente igual a su `net`. Una línea puede valer cero (una cortesía); la suma debe ser positiva.
+- **Columna de valor unitario.** Existe sólo cuando al menos una línea declara `unitNet`; las líneas que no lo declaran muestran una raya en esa columna.
+- **Encabezados de grupo.** Se imprime un encabezado cada vez que `group` cambia, y sólo si el documento tiene dos o más grupos distintos. En ese caso todas las líneas declaran su grupo: una línea sin grupo quedaría bajo el encabezado anterior y se rechaza.
+- **Costos que paga el cliente.** `clientPaidDirectly` se imprime en un bloque aparte, «Pagado directamente por el cliente a su proveedor», que declara que no forma parte de la cotización ni de su valor neto o total. Cada importe conserva su propia moneda: no se convierte ni se suma.
+- **Campos desconocidos.** En la versión 2 se rechazan las claves que el contrato no define, en la raíz y en `lines`, `quantity`, `clientPaidDirectly`, `paymentSchedule` e hitos. Un bloque mal escrito no se omite en silencio.
+- **Una sola moneda.** El documento se emite en `currency`. `presentation` con otra moneda o con tipo de cambio se rechaza; ver [MULTIMONEDA.md](MULTIMONEDA.md).
+
+**Impuesto declarado (`taxAmount`).** El documento calcula el impuesto una vez, sobre el subtotal. Una cotización que tributa mes a mes y suma los resultados redondeados puede diferir en unidades: tres meses de 3.333.333 al 19 % suman 1.899.999, y el cálculo sobre 9.999.999 da 1.900.000. Con `"taxAmount": "1899999"` el documento imprime el impuesto de la cotización, nunca una segunda cifra; el total es subtotal más ese impuesto, la etiqueta de la tasa no cambia y el equivalente mensual, si existe, deriva de él. Se acepta sólo si corresponde a la tasa: puede diferir del impuesto calculado en tantas unidades menores como sume `lines[].quantity.value` (cada mes aporta como máximo una unidad de redondeo); más allá se rechaza. No se admite con `vatRate: null` ni en la versión 1. El manifiesto registra en `amounts.taxSource` si el impuesto fue declarado (`stated`), calculado (`computed`), está por confirmar (`pending`) o no aplica (`not_applicable`).
+
+**Paginación.** La sección de inversión ocupa las páginas que necesita, sin reducir la tipografía. La tabla continúa en la página siguiente con su cabecera repetida y, si corta un grupo, lo vuelve a anunciar con «(continuación)»; un encabezado de grupo nunca queda solo al pie. Los totales con su nota tributaria, el calendario de pagos, el bloque de costos pagados por el cliente y el equivalente mensual son bloques enteros: el que no cabe pasa completo a la página siguiente. Folios, anclas de la barra, capturas de `qa/` y manifiesto siguen el número real de páginas. Portada, alcance y condiciones siguen siendo de una página cada una, con los límites de la versión 1.
+
+El reparto se decide sin navegador, con un presupuesto de altura calculado desde las fuentes incrustadas y las medidas de los estilos; después, la comprobación del render lo verifica en Chromium. Si un contenido no puede componerse —una línea o un bloque más altos que una página, importes que no caben en su columna—, el generador falla con «Contenido fuera del A4» y dice qué acortar. No recorta ni omite. El manifiesto guarda en `checks.pagination` la altura estimada y la medida de cada página de inversión; el [registro de revisión](VERIFICACION.md) explica cómo se calibró.
+
+Límites de la versión 2: una sola moneda por documento; hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos; cada bloque debe caber en una página; el generador no calcula precios, márgenes ni calendarios, sólo comprueba que lo declarado suma.
+
+```sh
+node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-terceros.json --out .captures/cotizacion-a4-lineas-nueva
+```
+
 ## Multimoneda
 
 La plantilla admite presentación de monedas ISO mediante `Intl`, con símbolos, separadores y decimales locales. Permite precios nativos en CLP, USD o PEN y equivalencias con un snapshot FX explícito, fechado y con fuente. No consulta tasas al generar ni reescribe el precio base. Uso, campos y límites: [MULTIMONEDA.md](MULTIMONEDA.md). Ejemplo nativo en soles: [ejemplo-pen.json](ejemplo-pen.json); conversión explícita USD → PEN: [ejemplo-usd-pen.json](ejemplo-usd-pen.json). El soporte documental no amplía monedas/providers ni readiness de Finance o del pricing engine.
 
 ## Cálculo, marca y revisión
 
-`amount.net`, `amount.vat` y `amount.total` se calculan desde el precio completo: impuestos redondeados a la unidad menor de la moneda de salida y total = neto + impuestos. Con `vatRate: null`, impuesto y total facturable quedan por confirmar. La moneda no decide el tratamiento tributario. Nunca se ingresa el monto mensual en `net` salvo que el servicio cotizado sea efectivamente de un mes. El equivalente mensual es referencial, redondeado para su visualización; no define cuotas ni fechas de cobro. En casos no divisibles, la suma de referencias redondeadas puede diferir del total.
+`amount.net`, `amount.vat` y `amount.total` se calculan desde el precio completo (en la versión 2, desde la suma de las líneas): impuestos redondeados a la unidad menor de la moneda de salida y total = neto + impuestos. Con `vatRate: null`, impuesto y total facturable quedan por confirmar. La moneda no decide el tratamiento tributario. Nunca se ingresa el monto mensual en `net` salvo que el servicio cotizado sea efectivamente de un mes. El equivalente mensual es referencial, redondeado para su visualización; no define cuotas ni fechas de cobro. En casos no divisibles, la suma de referencias redondeadas puede diferir del total.
 
 La marca procede de `@efeoncepro/axis-tokens`, `axis-brand-assets` y `axis-graphic-line`: Engine, Poppins/Bricolage, logo oficial, órbita de portada, divisor y burbuja URL horneada. El pie institucional se lee de `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json`; no se copia en el JSON comercial. Esta plantilla es un artefacto documental local, sin cambios al Composer ni al runtime de cotizaciones.
 
-El generador comprueba reserva de encabezado/pie, desborde horizontal, carga de fuentes/imágenes y ancho móvil. Si el contenido supera las cuatro hojas, falla con el folio afectado: editar/paginar el texto, sin recortarlo ni reducir automáticamente la tipografía. Tras cambiar datos, revisar **todas las páginas del PDF final**, extracción de texto, fuentes y montos. Cada manifiesto nuevo mantiene esa revisión manual como pendiente.
+El generador comprueba reserva de encabezado/pie, desborde horizontal, carga de fuentes/imágenes y ancho móvil. Si el contenido supera sus hojas (las cuatro de la versión 1; en la versión 2, una página fija o un bloque que no cabe en una hoja), falla con el folio afectado: editar/paginar el texto, sin recortarlo ni reducir automáticamente la tipografía. En la versión 2 comprueba además que ningún texto o cifra se salga de su caja. Tras cambiar datos, revisar **todas las páginas del PDF final**, extracción de texto, fuentes y montos. Cada manifiesto nuevo mantiene esa revisión manual como pendiente.
 
 Referencia verificada: [registro de revisión](VERIFICACION.md). Uso y frontera con Greenhouse: [continuidad de agentes](../../../audits/commercial/2026-10-08-plantilla-cotizacion-licitacion-routing.md). Pruebas del cálculo, validación y escape:
 
