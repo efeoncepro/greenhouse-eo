@@ -902,6 +902,292 @@ test('versión 2: los totales no se separan de una tabla que les deja sitio', as
   ])
 })
 
+// ── Páginas fijas: portada, alcance y condiciones ────────────────────────────────────────────────────────
+// buildHtml comprueba sin navegador que las páginas que no paginan caben. Dos veces se versionó un ejemplo cuya
+// portada sólo fallaba al renderizar: estas pruebas son la guarda mecánica de ese defecto.
+const operatingDir = new URL('../../data/pricing/v3-operating/', import.meta.url)
+const fixedNames = result => result.fixedPages.map(page => page.name)
+const coverOf = result => result.fixedPages.find(page => page.name === 'portada')
+
+test('páginas fijas: los dos títulos de portada que sólo fallaban al renderizar se rechazan sin navegador', async () => {
+  // Cada caso es la portada que falló: el título largo con la bajada de su documento. En Chromium ocupaban
+  // 860,9 px y 829,8 px de los 802,75 px que admite la portada.
+  const failures = [
+    {
+      title: ['Contenidos y comunidad,', 'gestionados de punta', 'a punta.'],
+      subtitle:
+        'Un servicio gestionado de un mes para Cliente de ejemplo, con la producción y los medios de su campaña.',
+      message:
+        /Contenido fuera del A4\. El título de portada no cabe: «Contenidos y comunidad,» no entra en una línea a su tamaño y el título ocupa 5 líneas\. Acórtalo \(cover\.title\)\. La portada ocupa 861 px y la página admite 803 px\./,
+      fixed: ['Contenidos y', 'comunidad', 'gestionados.']
+    },
+    {
+      title: ['Atención en redes', 'como servicio gestionado,', 'con una opción.'],
+      subtitle:
+        'Un servicio gestionado de atención en redes sociales durante tres meses para Cliente de ejemplo, con un fee mensual único y un servicio opcional que amplía su capacidad.',
+      message:
+        /Contenido fuera del A4\. El título de portada no cabe: «como servicio gestionado,» no entra en una línea a su tamaño y el título ocupa 4 líneas\. Acórtalo \(cover\.title\)\. La portada ocupa 830 px y la página admite 803 px\./,
+      fixed: ['Atención en', 'redes sociales', 'gestionada.']
+    }
+  ]
+
+  for (const { title, subtitle, message, fixed } of failures) {
+    for (const [base, name] of [
+      [linesExample, 'ejemplo-lineas.json'],
+      [example, 'ejemplo.json']
+    ]) {
+      const q = structuredClone(base)
+
+      q.cover = { ...q.cover, title, subtitle }
+      await assert.rejects(buildHtml(q, templatePath(name)), message)
+      // El título con el que cada documento quedó versionado sí cabe, en la misma portada.
+      q.cover.title = fixed
+      const cover = coverOf(await buildHtml(q, templatePath(name)))
+
+      assert.ok(cover.estimatedPx <= cover.capacityPx)
+    }
+  }
+})
+
+test('páginas fijas: todo documento versionado de la plantilla y del puente se compone', async () => {
+  const files = [
+    ...(await fs.readdir(templateDir)).filter(name => /^ejemplo.*\.json$/.test(name)).map(name => templatePath(name)),
+    ...(await fs.readdir(operatingDir))
+      .filter(name => name.endsWith('.document.json'))
+      .map(name => fileURLToPath(new URL(name, operatingDir)))
+  ]
+
+  let versionTwo = 0
+
+  for (const file of files) {
+    const q = JSON.parse(await fs.readFile(file, 'utf8'))
+    // Un ejemplo que no puede componerse hace fallar esta prueba con la causa: buildHtml lanza.
+    const result = await buildHtml(q, file)
+
+    assert.deepEqual(fixedNames(result), ['portada', 'alcance', 'condiciones'], file)
+    assert.deepEqual(
+      result.fixedPages.map(page => page.page),
+      [1, 2, result.pageCount],
+      file
+    )
+    for (const page of [...result.fixedPages, ...(result.pagination ?? [])])
+      assert.ok(page.estimatedPx <= page.capacityPx, `${file}: página ${page.page}`)
+    if (q.version === 2) versionTwo++
+  }
+
+  // Los tres ejemplos de la versión 2 y, al menos, los documentos del puente que existían al escribir la prueba.
+  assert.ok(versionTwo >= 3 + 3, `documentos de la versión 2 comprobados: ${versionTwo}`)
+})
+
+test('páginas fijas: cada página estima sus bloques y dice qué acortar cuando no cabe', async () => {
+  const { fixedPages } = await build(linesExample)
+
+  assert.deepEqual(
+    fixedPages.map(page => [page.page, page.name, page.capacityPx, page.blocks.map(block => block.key)]),
+    [
+      [1, 'portada', 802.75, ['label', 'title', 'subtitle', 'client', 'investment', 'supplier']],
+      [2, 'alcance', 882.56, ['overline', 'title', 'intro', 'rows', 'scheduleHeading', 'phases']],
+      [4, 'condiciones', 882.56, ['overline', 'title', 'rows', 'contact']]
+    ]
+  )
+  // Medido en Chromium para este ejemplo: 705,92 px, 670,38 px y 697,88 px. La estimación no baja de la medida.
+  assert.deepEqual(
+    fixedPages.map(page => page.estimatedPx),
+    [705.99, 670.54, 697.91]
+  )
+
+  const rejects = async (mutate, pattern, base = linesExample, name = 'ejemplo-lineas.json') => {
+    const q = structuredClone(base)
+
+    mutate(q)
+    await assert.rejects(buildHtml(q, templatePath(name)), pattern)
+  }
+
+  // Portada: sin título partido, la causa nombra título y bajada con sus líneas.
+  await rejects(
+    q => (q.cover.subtitle = 'Dos perfiles dedicados durante tres meses para Cliente de ejemplo. '.repeat(4)),
+    /Contenido fuera del A4\. La portada no cabe: el título de portada ocupa 3 líneas y la bajada, \d+\. Acorta cover\.title o cover\.subtitle\./
+  )
+  // Otros textos de la portada que suman altura se nombran.
+  await rejects(q => {
+    q.cover.subtitle = 'Dos perfiles dedicados durante tres meses para Cliente de ejemplo. '.repeat(3)
+    q.reference = 'Referencia del proceso de compra con su código completo y su descripción. '.repeat(3)
+  }, /La portada no cabe: .* También ocupan más de una línea: reference \(\d líneas\)\./)
+
+  // Una referencia de varias líneas baja el inicio de la portada: admite menos.
+  const longReference = structuredClone(linesExample)
+
+  longReference.reference = 'Referencia del proceso de compra con su código completo y su descripción. '.repeat(2)
+  assert.equal(coverOf(await build(longReference)).capacityPx, 802.75 - 18)
+
+  await rejects(
+    q =>
+      (q.scope.rows = Array.from({ length: 7 }, (_, i) => ({
+        title: `Componente ${i + 1}`,
+        text: 'Alcance incluido en el valor, con sus entregables y responsabilidades. '.repeat(i === 4 ? 6 : 4)
+      }))),
+    /Contenido fuera del A4\. La página de alcance y calendario no cabe: acorta los textos de scope\.rows \(el más largo es «Componente 5», \d+ líneas\), reduce sus entradas o acorta los de schedule\.phases\. Su contenido ocupa [\d.]+ px y la página admite 883 px\./
+  )
+  await rejects(
+    q =>
+      (q.conditions.rows = Array.from({ length: 6 }, (_, i) => ({
+        title: `Condición ${i + 1}`,
+        text: 'Texto de la condición comercial acordada con el cliente. '.repeat(i === 2 ? 14 : 10)
+      }))),
+    /Contenido fuera del A4\. La página de condiciones no cabe: acorta los textos de conditions\.rows \(el más largo es «Condición 3»\) o reduce sus entradas\./
+  )
+
+  // Versión 2: una palabra más ancha que su bloque se saldría de su caja y el render la rechaza; aquí se nombra.
+  await rejects(
+    q => (q.cover.title = ['Desinstitucionalización']),
+    /Contenido fuera del A4\. «Desinstitucionalización» \(cover\.title\) es más ancho que su bloque y no puede partirse/
+  )
+  // La versión 1 no hace esa comprobación en el render: el mismo título se compone.
+  const wideTitle = structuredClone(example)
+
+  wideTitle.cover.title = ['Desinstitucionalización']
+  assert.equal(coverOf(await buildHtml(wideTitle, dataPath.pathname)).blocks[1].heightPx, 62.04)
+
+  // Un correo largo ensancha su columna en vez de salirse: la portada sigue cabiendo.
+  const longEmail = structuredClone(linesExample)
+
+  longEmail.supplier.email = 'equipo.comercial.de.cuentas.estrategicas@efeoncepro.com'
+  assert.ok(coverOf(await build(longEmail)).estimatedPx >= 705.99)
+})
+
+test('páginas fijas: el logo del cliente entra en la estimación por su proporción', async () => {
+  const dir = await fs.mkdtemp(path.join((await import('node:os')).tmpdir(), 'cotizacion-logo-'))
+
+  // Cabecera PNG mínima: firma, bloque IHDR y dimensiones. La estimación sólo lee la proporción.
+  const png = (width, height) => {
+    const bytes = Buffer.alloc(33)
+
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]).copy(bytes)
+    bytes.writeUInt32BE(width, 16)
+    bytes.writeUInt32BE(height, 20)
+
+    return bytes
+  }
+
+  try {
+    const withLogo = async (name, bytes) => {
+      const q = structuredClone(linesExample)
+
+      await fs.writeFile(path.join(dir, name), bytes)
+      q.buyer.logo = { path: path.join(dir, name), source: 'https://example.com/logo' }
+
+      return buildHtml(q, templatePath('ejemplo-lineas.json'))
+    }
+
+    // 400 × 200: a 205 px de ancho mide 102,5 px. Bloque: rótulo, márgenes, logo y dos líneas de datos.
+    const wide = coverOf(await withLogo('ancho.png', png(400, 200)))
+
+    assert.equal(wide.blocks.find(block => block.key === 'client').heightPx, 178.1)
+    await assert.rejects(
+      withLogo('alto.png', png(200, 800)),
+      /Contenido fuera del A4\. La portada no cabe: .* El logo del cliente ocupa 820 px de alto\./
+    )
+    // Sin dimensiones legibles no hay estimación de portada: queda a cargo de la comprobación del render.
+    assert.deepEqual(
+      fixedNames(await withLogo('sin-medidas.svg', Buffer.from('<svg xmlns="http://www.w3.org/2000/svg"/>'))),
+      ['alcance', 'condiciones']
+    )
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('medición: instancia variable de la fuente de títulos, líneas sin partir palabras y proporción de imágenes', async () => {
+  const { fontDir, fontAdvance, textWidth, wrapLines, imageRatio } = paginationInternals
+  const display = await fontAdvance(path.join(fontDir, 'bricolage-grotesque-variable.ttf'))
+  const regular = await fontAdvance(path.join(fontDir, 'poppins-400.ttf'))
+  const size = (47 * 96) / 72
+  const h1 = { advance: display.instance({ opsz: size, wght: 760 }), size, tracking: -0.04 }
+
+  // Ancho medido en Chromium para el título de portada (47 pt, peso 760): la instancia coincide dentro del 1 %;
+  // la tabla de avances por defecto, que es la de otro peso y tamaño óptico, queda un 4 % corta.
+  for (const [text, measured] of [
+    ['Contenidos y comunidad,', 676.34],
+    ['como servicio gestionado,', 696.22],
+    ['Posicionamiento', 448.22]
+  ]) {
+    const estimated = textWidth(text, h1)
+
+    assert.ok(Math.abs(estimated / measured - 1) < 0.01, `${text}: ${estimated}`)
+    assert.ok(textWidth(text, { ...h1, advance: display }) < measured * 0.97, text)
+  }
+
+  // La instancia por defecto es la propia tabla; una fuente estática no tiene instancias.
+  assert.equal(display.instance({})(97), display(97))
+  assert.equal(regular.instance({ wght: 700 }), regular)
+  assert.equal(display.instance({ opsz: size, wght: 760 }), display.instance({ opsz: size, wght: 760 }))
+
+  const font = { advance: regular, size: 12 }
+  const width = text => textWidth(text, font)
+
+  // Sin overflow-wrap el navegador no parte una palabra: ocupa su línea y se sale de la caja.
+  assert.deepEqual(wrapLines('electroencefalografista', width('electroen'), font), {
+    lines: 1,
+    overflow: 'electroencefalografista'
+  })
+  assert.deepEqual(wrapLines('un electroencefalografista', width('electroen'), font).lines, 2)
+  // Sólo se corta en guiones y barras, y en los espacios que el navegador puede cortar.
+  assert.deepEqual(wrapLines('front-end', width('front-') * 1.05, font), { lines: 2, overflow: null })
+  assert.equal(wrapLines('uno dos', width('uno') * 1.05, font).lines, 2)
+  assert.equal(wrapLines('uno dos', width('uno') * 1.05, font).lines, 1)
+  assert.deepEqual(wrapLines('texto de una línea', 1000, font), { lines: 1, overflow: null })
+
+  const svg = attributes =>
+    Buffer.from(`<?xml version="1.0"?><svg xmlns="http://www.w3.org/2000/svg" ${attributes}></svg>`)
+
+  const header = (length, write) => {
+    const bytes = Buffer.alloc(length)
+
+    write(bytes)
+
+    return bytes
+  }
+
+  assert.equal(imageRatio(svg('viewBox="0 0 907 298"'), '.svg'), 298 / 907)
+  assert.equal(imageRatio(svg('width="200" height="50px" viewBox="0 0 10 10"'), '.svg'), 0.25)
+  assert.equal(imageRatio(svg('width="100%"'), '.svg'), null)
+  assert.equal(
+    imageRatio(
+      header(33, bytes => {
+        bytes.writeUInt32BE(907, 16)
+        bytes.writeUInt32BE(298, 20)
+      }),
+      '.png'
+    ),
+    298 / 907
+  )
+  assert.equal(
+    imageRatio(
+      header(24, bytes => {
+        Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x04, 0x00, 0x00, 0xff, 0xc0, 0x00, 0x11, 0x08]).copy(bytes)
+        bytes.writeUInt16BE(300, 13)
+        bytes.writeUInt16BE(600, 15)
+      }),
+      '.jpg'
+    ),
+    0.5
+  )
+  assert.equal(
+    imageRatio(
+      header(30, bytes => {
+        bytes.write('RIFF', 0, 'latin1')
+        bytes.write('WEBPVP8X', 8, 'latin1')
+        bytes.writeUIntLE(399, 24, 3)
+        bytes.writeUIntLE(99, 27, 3)
+      }),
+      '.webp'
+    ),
+    0.25
+  )
+  assert.equal(imageRatio(Buffer.from('no es una imagen'), '.jpg'), null)
+  assert.equal(imageRatio(Buffer.alloc(4), '.png'), null)
+})
+
 test('medición de texto: nunca cuenta menos líneas de las que caben en el ancho', async () => {
   const { fontDir, fontAdvance, textWidth, countLines } = paginationInternals
   const font = { advance: await fontAdvance(path.join(fontDir, 'poppins-400.ttf')), size: 12 }

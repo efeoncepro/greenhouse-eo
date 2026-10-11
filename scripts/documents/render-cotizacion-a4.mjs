@@ -521,7 +521,7 @@ function parseFont(bytes) {
   const advances = new Map()
 
   // Avance en em. Un carácter sin glifo usa una fuente de respaldo: se reserva un em completo.
-  return code => {
+  const advance = code => {
     if (!advances.has(code)) {
       const id = glyph(code)
 
@@ -530,6 +530,132 @@ function parseFont(bytes) {
 
     return advances.get(code)
   }
+
+  // Avances exactos de una instancia de una fuente variable (fvar, avar y HVAR), p. ej. { opsz: 62.67, wght: 760 }.
+  // La tabla hmtx sólo describe la instancia por defecto; el navegador interpola el resto con estas tablas.
+  const variation = settings => {
+    const fixed = at => view.getInt32(at) / 65536
+    const f2dot14 = at => view.getInt16(at) / 16384
+    const fvar = table('fvar')
+    const axisCount = view.getUint16(fvar + 8)
+
+    const coords = Array.from({ length: axisCount }, (_, i) => {
+      const at = fvar + view.getUint16(fvar + 4) + i * view.getUint16(fvar + 10)
+      const [min, base, max] = [fixed(at + 4), fixed(at + 8), fixed(at + 12)]
+      const value = Math.min(max, Math.max(min, settings[String.fromCharCode(...bytes.subarray(at, at + 4))] ?? base))
+
+      return value < base ? (value - base) / (base - min) : value > base ? (value - base) / (max - base) : 0
+    })
+
+    if (tables.has('avar')) {
+      let at = table('avar') + 8
+
+      for (let i = 0; i < axisCount; i++) {
+        const count = view.getUint16(at)
+        const maps = Array.from({ length: count }, (_, j) => [f2dot14(at + 2 + j * 4), f2dot14(at + 4 + j * 4)])
+
+        at += 2 + count * 4
+        const next = maps.findIndex(([from], j) => j > 0 && coords[i] <= from)
+
+        if (next > 0) {
+          const [[from0, to0], [from1, to1]] = [maps[next - 1], maps[next]]
+
+          coords[i] = from1 === from0 ? to1 : to0 + ((to1 - to0) * (coords[i] - from0)) / (from1 - from0)
+        }
+      }
+    }
+
+    const hvar = table('HVAR')
+    const store = hvar + view.getUint32(hvar + 4)
+    const map = view.getUint32(hvar + 8) ? hvar + view.getUint32(hvar + 8) : null
+    const regions = store + view.getUint32(store + 2)
+    const regionAxes = view.getUint16(regions)
+
+    // Peso de cada región de variación en estas coordenadas (producto de sus tiendas por eje).
+    const scalars = Array.from({ length: view.getUint16(regions + 2) }, (_, region) => {
+      let scalar = 1
+
+      for (let axis = 0; axis < regionAxes; axis++) {
+        const at = regions + 4 + (region * regionAxes + axis) * 6
+        const [start, peak, end] = [f2dot14(at), f2dot14(at + 2), f2dot14(at + 4)]
+        const value = coords[axis] ?? 0
+
+        if (peak === 0 || start > peak || peak > end || (start < 0 && end > 0) || value === peak) continue
+        if (value <= start || value >= end) return 0
+        scalar *= value < peak ? (value - start) / (peak - start) : (end - value) / (end - peak)
+      }
+
+      return scalar
+    })
+
+    const delta = (outer, inner) => {
+      if (outer >= view.getUint16(store + 6)) return 0
+      const data = store + view.getUint32(store + 8 + outer * 4)
+
+      if (inner >= view.getUint16(data)) return 0
+      const long = (view.getUint16(data + 2) & 0x8000) !== 0
+      const words = view.getUint16(data + 2) & 0x7fff
+      const regionCount = view.getUint16(data + 4)
+      const [wide, narrow] = long ? [4, 2] : [2, 1]
+      let at = data + 6 + regionCount * 2 + inner * (words * wide + (regionCount - words) * narrow)
+      let sum = 0
+
+      for (let k = 0; k < regionCount; k++) {
+        const size = k < words ? wide : narrow
+        const value = size === 4 ? view.getInt32(at) : size === 2 ? view.getInt16(at) : view.getInt8(at)
+
+        sum += scalars[view.getUint16(data + 6 + k * 2)] * value
+        at += size
+      }
+
+      return sum
+    }
+
+    // Glifo → (subtabla, fila) de deltas; sin mapa, la fila es el propio glifo.
+    const index = id => {
+      if (map === null) return [0, id]
+      const format = view.getUint8(map)
+      const entryFormat = view.getUint8(map + 1)
+      const count = format ? view.getUint32(map + 2) : view.getUint16(map + 2)
+
+      if (!count) return [0, id]
+      const size = ((entryFormat & 0x30) >> 4) + 1
+      const inner = 2 ** ((entryFormat & 0x0f) + 1)
+      let entry = 0
+
+      for (let b = 0; b < size; b++)
+        entry = entry * 256 + view.getUint8(map + (format ? 6 : 4) + Math.min(id, count - 1) * size + b)
+
+      return [Math.floor(entry / inner), entry % inner]
+    }
+
+    const varied = new Map()
+
+    return code => {
+      if (!varied.has(code)) {
+        const id = glyph(code)
+        const base = id ? view.getUint16(hmtx + 4 * Math.min(id, metricCount - 1)) : 0
+
+        varied.set(code, id ? (base + Math.round(delta(...index(id)))) / unitsPerEm : 1)
+      }
+
+      return varied.get(code)
+    }
+  }
+
+  const instances = new Map()
+
+  // Una fuente estática no tiene instancias: su único avance es el de hmtx.
+  advance.instance = settings => {
+    if (!tables.has('fvar') || !tables.has('HVAR')) return advance
+    const key = JSON.stringify(settings)
+
+    if (!instances.has(key)) instances.set(key, variation(settings))
+
+    return instances.get(key)
+  }
+
+  return advance
 }
 
 async function fontAdvance(file) {
@@ -641,8 +767,530 @@ function countLines(text, width, font) {
   return count
 }
 
+// Líneas de un texto donde el navegador no parte palabras (portada, alcance y condiciones no usan
+// overflow-wrap): una palabra más ancha que la línea sólo se corta en sus guiones y barras, y lo que aun así no
+// cabe se devuelve en overflow, porque se saldría de su caja. Sólo corta donde el navegador puede hacerlo (un
+// espacio de no separación no es un corte), así que nunca cuenta menos líneas que él.
+function wrapLines(text, width, font, slack = FLOW.wrapSlack) {
+  const limit = width * slack
+  const space = textWidth(' ', font)
+  let lines = 1
+  let used = 0
+  let overflow = null
+
+  for (const word of String(text)
+    .trim()
+    .split(/[ \t\n\r\f]+/)) {
+    const size = textWidth(word, font)
+
+    if (used > 0 && used + space + size <= limit) {
+      used += space + size
+      continue
+    }
+
+    if (used > 0) {
+      lines++
+      used = 0
+    }
+
+    if (size <= limit) {
+      used = size
+      continue
+    }
+
+    for (const piece of word.split(/(?<=[-/‐–—])/)) {
+      const pieceSize = textWidth(piece, font)
+
+      if (used > 0 && used + pieceSize > limit) {
+        lines++
+        used = 0
+      }
+
+      used += pieceSize
+      if (pieceSize > limit) overflow ??= piece
+    }
+  }
+
+  return { lines, overflow }
+}
+
+// Proporción alto/ancho de una imagen, leída de su cabecera. null si no puede saberse sin decodificarla.
+function imageRatio(bytes, extension) {
+  const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  const ratio = (width, height) => (width > 0 && height > 0 ? height / width : null)
+
+  try {
+    if (extension === '.svg') {
+      const tag = /<svg\b[^>]*>/i.exec(bytes.toString('utf8'))?.[0] ?? ''
+      const attribute = name => new RegExp(`\\s${name}\\s*=\\s*["']([^"']+)["']`, 'i').exec(tag)?.[1]
+      const size = name => (/^\s*[\d.]+(px)?\s*$/.test(attribute(name) ?? '') ? parseFloat(attribute(name)) : null)
+
+      const box = (attribute('viewBox') ?? '')
+        .trim()
+        .split(/[\s,]+/)
+        .map(Number)
+
+      if (size('width') && size('height')) return ratio(size('width'), size('height'))
+
+      return box.length === 4 && box.every(Number.isFinite) ? ratio(box[2], box[3]) : null
+    }
+
+    if (extension === '.png') return ratio(view.getUint32(16), view.getUint32(20))
+
+    if (extension === '.webp') {
+      const chunk = bytes.toString('latin1', 12, 16)
+
+      if (chunk === 'VP8 ') return ratio(view.getUint16(26, true) & 0x3fff, view.getUint16(28, true) & 0x3fff)
+
+      if (chunk === 'VP8L') {
+        const bits = view.getUint32(21, true)
+
+        return ratio(1 + (bits & 0x3fff), 1 + ((bits >>> 14) & 0x3fff))
+      }
+
+      if (chunk === 'VP8X') {
+        const uint24 = at => view.getUint16(at, true) + view.getUint8(at + 2) * 65536
+
+        return ratio(1 + uint24(24), 1 + uint24(27))
+      }
+
+      return null
+    }
+
+    // JPEG: el primer marcador de trama (SOF) lleva alto y ancho.
+    for (let at = 2; at + 9 < bytes.length; ) {
+      if (view.getUint8(at) !== 0xff) return null
+      const marker = view.getUint8(at + 1)
+
+      if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker))
+        return ratio(view.getUint16(at + 7), view.getUint16(at + 5))
+      at += 2 + view.getUint16(at + 2)
+    }
+  } catch {
+    return null
+  }
+
+  return null
+}
+
+// ── Páginas fijas: portada, alcance y condiciones ────────────────────────────────────────────────────────
+// Estas páginas no paginan: si su contenido no cabe, el documento no puede componerse. buildHtml lo comprueba
+// sin navegador, con las mismas fuentes y las medidas de template.css, para que un título de portada demasiado
+// largo falle al validar los datos y no al renderizar. La comprobación de layout del render sigue siendo la
+// segunda guarda. Nada de esto se imprime: no cambia el HTML.
+const FIXED = {
+  // Alto útil medido en Chromium (medios de impresión), desde el inicio del contenido hasta 6 px sobre el pie:
+  // una página interior y la portada con sobretítulo y referencia de una línea cada uno.
+  interior: 882.56,
+  cover: 802.75,
+  // Los avances de una instancia de Bricolage son exactos (HVAR); el navegador añade kerning por pares (GPOS),
+  // casi siempre negativo. Medido en 40.000 párrafos: sin holgura cuenta una línea de menos en 1 de cada 1.000;
+  // con 0,5 % o con 1 %, en ninguno. Se usa 1 %.
+  displaySlack: 1.01,
+  // Cota inferior del mismo kerning, para el ancho mínimo de una palabra de Bricolage (medido: hasta −6 %).
+  displayFloor: 0.93,
+  // Holgura del ancho de línea de Poppins, cuyos avances coinciden con Chromium (±0,05 %). Medido en 76.000
+  // párrafos: ninguno cuenta de menos ni siquiera sin holgura. Aquí importa no contar de más: una línea de
+  // sobra rechaza una página que cabe.
+  wrapSlack: 0.999
+}
+
+const COVER_NET_LABEL = 'Valor neto del servicio completo'
+
+// Ancho mínimo que el navegador puede dar a cada elemento de una fila flexible. Si la fila cabe, cada uno
+// conserva su ancho natural. Si no, cada uno conserva al menos lo que dejan los demás sin ceder nada, y nunca
+// menos que su palabra más larga: es una cota inferior del reparto de flex-shrink, así que el texto nunca se
+// cuenta en más ancho del que tendrá. `overflow` dice si, aun en sus mínimos, los elementos se salen de la fila.
+function flexRow(items, available, tolerance = 1) {
+  const sum = values => values.reduce((total, value) => total + value, 0)
+  const natural = sum(items.map(item => item.max))
+
+  return {
+    widths: items.map(item =>
+      natural <= available ? item.max : Math.max(item.floor, available - (natural - item.max))
+    ),
+    overflow: sum(items.map(item => item.min)) > available + tolerance
+  }
+}
+
+// Pistas `1fr` de una rejilla: se reparten el ancho por igual, pero ninguna baja de su palabra más larga, y la
+// que crece le quita ancho a las demás. Devuelve, para cada pista, el menor ancho que puede tocarle.
+function frTracks(mins, available) {
+  const sum = values => values.reduce((total, value) => total + value, 0)
+
+  const share = lowest => {
+    const frozen = lowest.map(() => false)
+
+    for (;;) {
+      const open = frozen.filter(value => !value).length
+      const each = (available - sum(lowest.filter((_, i) => frozen[i]))) / Math.max(open, 1)
+      const short = lowest.map((min, i) => !frozen[i] && min > each)
+
+      if (!open || !short.some(Boolean)) return lowest.map((min, i) => (frozen[i] ? min : Math.max(each, 0)))
+      short.forEach((value, i) => {
+        if (value) frozen[i] = true
+      })
+    }
+  }
+
+  return {
+    // La pista i sin mínimo propio: lo que le dejan las demás.
+    widths: mins.map((_, i) => share(mins.map((min, j) => (j === i ? 0 : min)))[i]),
+    overflow: sum(mins) > available + 1
+  }
+}
+
+// Estima la altura de las tres páginas fijas. Devuelve la estimación por página y, si alguna no cabe, la causa
+// en failure; buildHtml la convierte en error. No lanza por sí misma para poder recalibrarla contra el navegador.
+async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText, logoRatio, lastPage }) {
+  const [regular, medium, semibold, display] = await Promise.all(
+    ['poppins-400.ttf', 'poppins-500.ttf', 'poppins-600.ttf', 'bricolage-grotesque-variable.ttf'].map(file =>
+      fontAdvance(path.join(fontDir, file))
+    )
+  )
+
+  if (!/^-?[\d.]+em$/.test(gl.type.answer.tracking) || !Number.isFinite(gl.type.answer.weight))
+    throw new Error('Tokens de marca con unidades inesperadas: recalibra las páginas fijas.')
+  const pt = value => value * PX_PER_PT
+  const W = FLOW.width
+
+  // Bricolage en el tamaño óptico que el navegador fija al tamaño del texto (font-optical-sizing: auto).
+  const displayFont = (size, weight, tracking = 0) => ({
+    advance: display.instance({ opsz: pt(size), wght: weight }),
+    size: pt(size),
+    tracking,
+    scale: FIXED.displaySlack,
+    floor: FIXED.displayFloor
+  })
+
+  const heading = size => displayFont(size, gl.type.answer.weight, parseFloat(gl.type.answer.tracking))
+  const body = (size, advance = regular, extra = {}) => ({ advance, size: pt(size), ...extra })
+  const label = (size, tracking) => body(size, medium, { tracking, upper: true })
+  const strict = q.version === 2
+  const tooWide = []
+
+  // Líneas de un campo en su ancho. Una palabra que no cabe en su caja se anota: en la versión 2 es un fallo.
+  const lines = (value, width, font, field) => {
+    const result = wrapLines(value, width, font, FIXED.wrapSlack)
+
+    if (result.overflow) tooWide.push({ field, word: result.overflow })
+
+    return result.lines
+  }
+
+  const widest = (value, font) => textWidth(value, font)
+
+  const longestWord = (value, font) =>
+    Math.max(
+      ...String(value)
+        .trim()
+        .split(/[ \t\n\r\f]+/)
+        .map(word => textWidth(word, font))
+    )
+
+  const sum = values => values.reduce((total, value) => total + value, 0)
+  const titleOf = value => (Array.isArray(value) ? value : [value])
+
+  // ── Portada ──
+  const h1 = displayFont(47, gl.type.answer.weight, -0.04)
+  const coverTitle = titleOf(q.cover.title).map(entry => ({ entry, lines: lines(entry, 550, h1, 'cover.title') }))
+  const subtitleLines = lines(q.cover.subtitle, 540, body(16, regular, { tracking: -0.01 }), 'cover.subtitle')
+
+  // Sobretítulo y referencia de la cabecera: cada línea de más baja el inicio del contenido.
+  const headerLines = {
+    overline: lines(coverOverline, W, label(8.5, 0.12), 'date'),
+    reference: lines(q.reference, W, body(9), 'reference')
+  }
+
+  const coverCapacity =
+    FIXED.cover - (headerLines.overline - 1) * pt(8.5) * 1.5 - (headerLines.reference - 1) * pt(9) * 1.5
+
+  const buyerLines = lines(q.buyer.name, W, body(9), 'buyer.name') + lines(q.buyer.taxId, W, body(9), 'buyer.taxId')
+
+  // Sin logo, el nombre del cliente a 22 pt; con logo, su imagen a 205 px de ancho.
+  const clientMark =
+    q.buyer.logo == null ? lines(q.buyer.name, W, displayFont(22, 600), 'buyer.name') * pt(22) * 1.5 : 205 * logoRatio
+
+  // Líneas de un texto dentro de una fila flexible o de una pista de rejilla, cuyo ancho ya es una cota: una
+  // sola si conserva su ancho natural; si no, las que resulten en el ancho que le queda. No anota desbordes:
+  // de eso responde el reparto de la fila.
+  const flexLines = (value, font, width, natural = Infinity) =>
+    width >= natural ? 1 : wrapLines(value, width, font, FIXED.wrapSlack).lines
+
+  // Palabra más larga de unos textos: cota superior (min) y cota inferior (floor) de su ancho.
+  const wordOf = (texts, floor) =>
+    Math.max(
+      ...texts.map(([value, font]) =>
+        longestWord(value, floor ? { ...font, scale: font.floor ?? FIXED.wrapSlack } : font)
+      )
+    )
+
+  const flexItem = (texts, fixed = 0) => ({
+    max: fixed + Math.max(...texts.map(([value, font]) => widest(value, font))),
+    min: fixed + wordOf(texts, false),
+    floor: fixed + wordOf(texts, true)
+  })
+
+  // Caja de inversión: dos columnas que se reparten el ancho; el texto de la que cede se parte.
+  const small = label(7.6, 0.08)
+  const netFont = displayFont(32, gl.type.answer.weight)
+  const summaryFont = body(7.9)
+  const totalFont = body(19, semibold, { scale: FLOW.amountScale })
+  const divider = 25
+
+  const boxItems = [
+    flexItem([
+      [COVER_NET_LABEL, small],
+      [netText, netFont],
+      [q.pricing.summary, summaryFont]
+    ]),
+    flexItem(
+      [
+        [totalLabel, small],
+        [totalText, totalFont]
+      ],
+      divider
+    )
+  ]
+
+  // La caja tiene 24 px de relleno a cada lado: el render sólo la rechaza si el contenido lo rebasa.
+  const box = flexRow(boxItems, W - 48 - 20, 24 + 1)
+  const [leftWidth, rightWidth] = box.widths
+  const summaryLines = flexLines(q.pricing.summary, summaryFont, leftWidth, boxItems[0].max)
+
+  const investment =
+    46 +
+    Math.max(
+      flexLines(COVER_NET_LABEL, small, leftWidth, boxItems[0].max) * pt(7.6) * 1.5 +
+        14 +
+        flexLines(netText, netFont, leftWidth, boxItems[0].max) * pt(32) * 1.2 +
+        summaryLines * pt(10.5) * 1.5,
+      flexLines(totalLabel, small, rightWidth - divider, boxItems[1].max - divider) * pt(7.6) * 1.5 +
+        8 +
+        flexLines(totalText, totalFont, rightWidth - divider, boxItems[1].max - divider) * pt(19) * 1.5
+    )
+
+  if (box.overflow)
+    tooWide.push({
+      field: 'net',
+      word: `${netText} · ${totalText}`,
+      cause: 'Los importes de la portada no caben en su caja'
+    })
+
+  // Oferente y responsable: dos pistas iguales, salvo que una palabra larga (un correo) ensanche la suya.
+  const supplierTexts = [
+    [
+      ['Oferente', label(8, 0.08)],
+      [q.supplier.name, body(9, semibold)],
+      [q.supplier.taxId, body(9)]
+    ],
+    [
+      ['Responsable', label(8, 0.08)],
+      [q.supplier.contact, body(9, semibold)],
+      [q.supplier.email, body(9)]
+    ]
+  ]
+
+  const supplierTracks = frTracks(
+    supplierTexts.map(texts => wordOf(texts, false)),
+    W - 30
+  )
+
+  const supplier = Math.max(
+    ...supplierTexts.map(
+      ([, strong, plain], i) =>
+        pt(8) * 1.5 +
+        5 +
+        (flexLines(strong[0], strong[1], supplierTracks.widths[i]) +
+          flexLines(plain[0], plain[1], supplierTracks.widths[i])) *
+          pt(9) *
+          1.5
+    )
+  )
+
+  if (supplierTracks.overflow) tooWide.push({ field: 'supplier.email', word: q.supplier.email })
+
+  const cover = [
+    { key: 'label', gap: 0, height: lines(q.cover.label, W, label(8, 0.12), 'cover.label') * pt(8) * 1.5 },
+    { key: 'title', gap: 16, height: sum(coverTitle.map(entry => entry.lines)) * pt(47) * 0.99 },
+    { key: 'subtitle', gap: 22, height: subtitleLines * pt(16) * 1.45 },
+    { key: 'client', gap: 28, height: pt(8) * 1.5 + 20 + clientMark + buyerLines * pt(9) * 1.65 },
+    { key: 'investment', gap: 28, height: investment },
+    { key: 'supplier', gap: 24, height: supplier }
+  ]
+
+  // ── Alcance y calendario ──
+  const h2 = heading(29)
+  const h2Lines = (value, field) => sum(titleOf(value).map(entry => lines(entry, W, h2, field)))
+  const cell = pt(8.8) * 1.47
+
+  const scopeRows = q.scope.rows.map((row, i) => ({
+    title: row.title,
+    lines: Math.max(
+      lines(row.title, W * 0.3 - 13, body(8.8, semibold), `scope.rows.${i}.title`),
+      lines(row.text, W * 0.7 - 13, body(8.8), `scope.rows.${i}.text`)
+    )
+  }))
+
+  const h3 = heading(14)
+  const noteFont = body(7.5)
+
+  const headingItems = [flexItem([[q.schedule.title, h3]]), flexItem([[q.schedule.note, noteFont]])]
+  const headingRow = flexRow(headingItems, W - 14)
+
+  const scheduleHeading = Math.max(
+    flexLines(q.schedule.title, h3, headingRow.widths[0], headingItems[0].max) * pt(14) * 1.25,
+    flexLines(q.schedule.note, noteFont, headingRow.widths[1], headingItems[1].max) * pt(7.5) * 1.5
+  )
+
+  if (headingRow.overflow) tooWide.push({ field: 'schedule.title', word: q.schedule.title })
+
+  // Una pista por fase (una, dos o tres); una palabra más ancha que la suya le quita ancho a las demás.
+  const phaseTexts = q.schedule.phases.map(phase => [
+    [phase.label, label(7, 0.08)],
+    [phase.title, heading(12)],
+    [phase.text, body(8.4)]
+  ])
+
+  const phaseTracks = frTracks(
+    phaseTexts.map(texts => wordOf(texts, false)),
+    W - 18 * (phaseTexts.length - 1)
+  )
+
+  const phases = Math.max(
+    ...phaseTexts.map(
+      ([tag, title, text], i) =>
+        12 +
+        flexLines(tag[0], tag[1], phaseTracks.widths[i]) * pt(7) * 1.5 +
+        16 +
+        flexLines(title[0], title[1], phaseTracks.widths[i]) * pt(12) * 1.2 +
+        flexLines(text[0], text[1], phaseTracks.widths[i]) * pt(8.4) * 1.55
+    )
+  )
+
+  if (phaseTracks.overflow) tooWide.push({ field: 'schedule.phases', word: q.schedule.phases[0].title })
+
+  const scope = [
+    { key: 'overline', gap: 0, height: pt(8) * 1.5 },
+    { key: 'title', gap: 10, height: h2Lines(q.scope.title, 'scope.title') * pt(29) * 1.1 },
+    { key: 'intro', gap: 14, height: lines(q.scope.intro, W * 0.95, body(10.3), 'scope.intro') * pt(10.3) * 1.6 },
+    { key: 'rows', gap: 20, height: 22 + pt(8) * 1.47 + sum(scopeRows.map(row => 22 + row.lines * cell + 1)) },
+    { key: 'scheduleHeading', gap: 23, height: scheduleHeading },
+    { key: 'phases', gap: 14, height: phases }
+  ]
+
+  // ── Condiciones ──
+  const conditionWidth = W - 28 - 14
+
+  const conditionRows = q.conditions.rows.map((row, i) => ({
+    title: row.title,
+    height:
+      21 +
+      Math.max(
+        3 + pt(8) * 1.5,
+        lines(row.title, conditionWidth, heading(13), `conditions.rows.${i}.title`) * pt(13) * 1.25 +
+          6 +
+          lines(row.text, conditionWidth, body(9.3), `conditions.rows.${i}.text`) * pt(9.3) * 1.6
+      )
+  }))
+
+  // Línea de contacto: tres datos en una fila flexible.
+  const contact = [
+    [q.supplier.contact, body(8.3, semibold)],
+    [q.supplier.email, body(8.3)],
+    [q.supplier.phone, body(8.3)]
+  ]
+
+  const contactItems = contact.map(entry => flexItem([entry]))
+  const contactRow = flexRow(contactItems, W - 24)
+
+  const contactLines = Math.max(
+    ...contact.map(([value, font], i) => flexLines(value, font, contactRow.widths[i], contactItems[i].max))
+  )
+
+  if (contactRow.overflow) tooWide.push({ field: 'supplier.email', word: q.supplier.email })
+
+  const conditions = [
+    { key: 'overline', gap: 0, height: pt(8) * 1.5 },
+    { key: 'title', gap: 10, height: h2Lines(q.conditions.title, 'conditions.title') * pt(29) * 1.1 },
+    { key: 'rows', gap: 22, height: sum(conditionRows.map(row => row.height)) },
+    { key: 'contact', gap: 22, height: 16 + contactLines * pt(8.3) * 1.5 }
+  ]
+
+  const total = blocks => sum(blocks.map(block => block.gap + block.height))
+  const px = value => new Intl.NumberFormat('es-CL', { maximumFractionDigits: 0 }).format(Math.ceil(value))
+
+  const room = (name, used, capacity) => `${name} ocupa ${px(used)} px y la página admite ${px(capacity)} px.`
+
+  // Con logo de dimensiones ilegibles no puede estimarse la portada: queda a cargo de la comprobación del render.
+  const coverKnown = q.buyer.logo == null || logoRatio != null
+  let failure = null
+
+  if (coverKnown && total(cover) > coverCapacity) {
+    const split = coverTitle.find(entry => entry.lines > 1)
+    const titleLines = sum(coverTitle.map(entry => entry.lines))
+
+    // Otros textos de la portada que ocupan más de una línea: también suman altura.
+    const others = [
+      ['cover.label', cover[0].height / (pt(8) * 1.5)],
+      ['reference', headerLines.reference],
+      ['buyer.name y buyer.taxId', buyerLines - 1],
+      ['pricing.summary', summaryLines]
+    ]
+      .filter(([, count]) => count > 1)
+      .map(([field, count]) => `${field} (${Math.round(count)} líneas)`)
+
+    const logoNote = q.buyer.logo == null ? '' : ` El logo del cliente ocupa ${px(205 * logoRatio)} px de alto.`
+    const also = (others.length ? ` También ocupan más de una línea: ${others.join(', ')}.` : '') + logoNote
+
+    failure = split
+      ? `El título de portada no cabe: «${split.entry}» no entra en una línea a su tamaño y el título ocupa ${titleLines} líneas. Acórtalo (cover.title).${also} ${room('La portada', total(cover), coverCapacity)}`
+      : `La portada no cabe: el título de portada ocupa ${titleLines} líneas y la bajada, ${subtitleLines}. Acorta cover.title o cover.subtitle.${also} ${room('La portada', total(cover), coverCapacity)}`
+  } else if (total(scope) > FIXED.interior) {
+    const tallest = scopeRows.reduce((worst, row) => (row.lines > worst.lines ? row : worst))
+
+    failure = `La página de alcance y calendario no cabe: acorta los textos de scope.rows (el más largo es «${tallest.title}», ${tallest.lines} líneas), reduce sus entradas o acorta los de schedule.phases. ${room('Su contenido', total(scope), FIXED.interior)}`
+  } else if (total(conditions) > FIXED.interior) {
+    const tallest = conditionRows.reduce((worst, row) => (row.height > worst.height ? row : worst))
+
+    failure = `La página de condiciones no cabe: acorta los textos de conditions.rows (el más largo es «${tallest.title}») o reduce sus entradas. ${room('Su contenido', total(conditions), FIXED.interior)}`
+  } else if (strict && tooWide.length) {
+    // Versión 2: el render rechaza un texto que se sale de su caja; aquí se dice cuál.
+    failure = tooWide[0].cause
+      ? `${tooWide[0].cause}: ${tooWide[0].word}. El documento no puede componerse con esos importes en la portada.`
+      : `«${tooWide[0].word}» (${tooWide[0].field}) es más ancho que su bloque y no puede partirse: acórtalo o sepáralo en palabras.`
+  }
+
+  const report = (page, name, blocks, capacity) => ({
+    page,
+    name,
+    estimatedPx: round2(total(blocks)),
+    capacityPx: round2(capacity),
+    blocks: blocks.map(block => ({ key: block.key, gapPx: round2(block.gap), heightPx: round2(block.height) }))
+  })
+
+  return {
+    failure,
+    pages: [
+      ...(coverKnown ? [report(1, 'portada', cover, coverCapacity)] : []),
+      report(2, 'alcance', scope, FIXED.interior),
+      report(lastPage, 'condiciones', conditions, FIXED.interior)
+    ]
+  }
+}
+
 // Piezas de medición expuestas para las pruebas y para recalibrar el presupuesto contra el navegador.
-export const paginationInternals = { FLOW, fontDir, fontAdvance, textWidth, countLines }
+export const paginationInternals = {
+  FLOW,
+  FIXED,
+  fontDir,
+  fontAdvance,
+  textWidth,
+  countLines,
+  wrapLines,
+  imageRatio,
+  planFixedPages
+}
 
 const CLIENT_PAID_TITLE = 'Pagado directamente por el cliente a su proveedor'
 
@@ -1163,9 +1811,12 @@ export async function buildHtml(q, dataPath) {
   )
 
   let clientLogo = `<div class="client-name" data-slot="buyer.name">${esc(q.buyer.name)}</div>`
+  let logoRatio = null
 
   if (q.buyer.logo) {
     const file = path.resolve(path.dirname(dataPath), q.buyer.logo.path)
+
+    logoRatio = imageRatio(await fs.readFile(file), path.extname(file).toLowerCase())
 
     const mime = {
       '.svg': 'image/svg+xml',
@@ -1232,6 +1883,21 @@ export async function buildHtml(q, dataPath) {
   const pageTotal = v2 ? 3 + pricingPlan.pages.length : 4
   const folio = n => String(n).padStart(2, '0')
 
+  const dateLabel = new Intl.DateTimeFormat('es-CL', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(q.date))
+
+  // Portada, alcance y condiciones: se comprueba que caben antes de componer nada.
+  const fixed = await planFixedPages(q, {
+    coverOverline: `Oferta económica · ${dateLabel} · ${presentation.currency}`,
+    netText: money(amounts.net),
+    totalLabel: taxTotalLabel,
+    totalText: money(amounts.total),
+    logoRatio,
+    lastPage: pageTotal
+  })
+
+  if (fixed.failure)
+    throw new Error(`Contenido fuera del A4. ${fixed.failure} No se reduce la tipografía ni se recorta el contenido.`)
+
   const header = label =>
     `<header class="page-header"><img class="header-logo" src="${logo}" alt="Efeonce"><div class="header-meta"><span data-slot="buyer.unit">${esc(q.buyer.unit)}</span><span>${esc(label)} · <span data-slot="reference">${esc(q.reference)}</span></span></div></header>`
 
@@ -1252,9 +1918,7 @@ export async function buildHtml(q, dataPath) {
     'brand.css': css,
     'brand.logo': logo,
     'brand.orbit': orbit.svg,
-    'date.label': esc(
-      new Intl.DateTimeFormat('es-CL', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(q.date))
-    ),
+    'date.label': esc(dateLabel),
     reference: esc(q.reference),
     'buyer.logo': clientLogo,
     'buyer.name': esc(q.buyer.name),
@@ -1338,6 +2002,7 @@ export async function buildHtml(q, dataPath) {
     amounts,
     pageCount: pageTotal,
     templateFiles: [template.html, ...cssFiles],
+    fixedPages: fixed.pages,
     pagination: pricingPlan
       ? pricingPlan.pages.map((page, i) => ({
           page: 3 + i,
@@ -1378,6 +2043,7 @@ async function main(args) {
     brand,
     pageCount,
     templateFiles: templateNames,
+    fixedPages,
     pagination
   } = await buildHtml(q, dataPath)
 
@@ -1456,11 +2122,15 @@ async function main(args) {
         `Contenido fuera del A4. Acorte el texto o prepare otra paginación; no se reduce la tipografía automáticamente.\n${JSON.stringify({ pageCount, layout, errors }, null, 2)}`
       )
 
-    // Versión 2: altura estimada por el plan frente a la medida en el navegador, página por página.
-    const paginationCheck = pagination?.map(estimate => ({
+    // Altura estimada por el plan frente a la medida en el navegador, página por página: las páginas fijas
+    // (portada, alcance y condiciones) y, en la versión 2, las de inversión.
+    const measured = estimate => ({
       ...estimate,
       measuredPx: Math.round(layout[estimate.page - 1].contentPx * 100) / 100
-    }))
+    })
+
+    const fixedPagesCheck = fixedPages.map(measured)
+    const paginationCheck = pagination?.map(measured)
 
     const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } })
 
@@ -1532,6 +2202,7 @@ async function main(args) {
       brand,
       checks: {
         layout,
+        fixedPages: fixedPagesCheck,
         ...(paginationCheck ? { pagination: paginationCheck } : {}),
         mobile: mobileCheck,
         browserErrors: errors,
@@ -1552,6 +2223,7 @@ async function main(args) {
           pageCount,
           amounts,
           layout,
+          fixedPages: fixedPagesCheck,
           ...(paginationCheck ? { pagination: paginationCheck } : {}),
           mobile: mobileCheck
         },

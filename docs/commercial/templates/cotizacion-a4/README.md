@@ -152,6 +152,19 @@ Una línea bonificada y un bloque de opciones se declaran así:
 
 `options` no existe en la versión 1: declararlo allí se rechaza, porque el bloque no se imprimiría.
 
+## Páginas fijas: portada, alcance y condiciones
+
+Estas tres páginas no paginan: su contenido cabe en una hoja o el documento no puede componerse. El generador lo comprueba **antes de abrir el navegador**, en las dos versiones del contrato, con las mismas fuentes que incrusta y las medidas de `template.css`. Así, un título de portada demasiado largo falla al validar los datos (en una fracción de segundo, y también en las pruebas) y no al renderizar. El mensaje empieza por «Contenido fuera del A4» y dice qué acortar:
+
+- **Portada.** «El título de portada no cabe: «…» no entra en una línea a su tamaño y el título ocupa N líneas. Acórtalo (cover.title).» Cada entrada de `cover.title` es una línea del diseño: la que no entra en el ancho del título (550 px a 47 pt) se parte en dos y empuja todo lo demás. Si ninguna entrada se parte, el mensaje nombra el título y la bajada con sus líneas, y los demás textos que ocupan más de una (`cover.label`, `reference`, `buyer.name`, `pricing.summary`) o el alto del logo del cliente. Como orientación, sin logo y con los demás textos en una línea, caben un título de tres líneas con una bajada de hasta cinco, o uno de cuatro con una bajada de hasta tres.
+- **Alcance y calendario.** Nombra la fila más larga de `scope.rows`; también cuentan el título, la introducción y las fases.
+- **Condiciones.** Nombra la condición más larga de `conditions.rows`.
+- **Versión 2: una palabra más ancha que su bloque.** Estas páginas no parten palabras. Una que no cabe en su caja (un título de una sola palabra muy larga, importes de portada enormes) se saldría de ella y el render la rechaza; la comprobación dice cuál es. La versión 1 no hace esa comprobación en el render y aquí tampoco.
+
+La estimación es conservadora: nunca da menos altura que el navegador, y por eso puede rechazar una página que cabía por muy poco (una línea que entra en su ancho por menos del 1 %). La comprobación del render sigue siendo la segunda guarda. El manifiesto guarda en `checks.fixedPages` la altura estimada, la medida y la disponible de cada una de estas páginas. Si el logo del cliente no declara dimensiones legibles (un SVG sin `viewBox` ni medidas), la portada no se estima y queda a cargo del render. La página de inversión de la versión 1 tampoco se estima: la cubre sólo el render.
+
+Una prueba permanente compone, sin navegador, todos los `ejemplo*.json` de esta carpeta y todos los `data/pricing/v3-operating/*.document.json`: un ejemplo que no puede componerse hace fallar la suite con su causa. Calibración y márgenes: [registro de revisión](VERIFICACION.md).
+
 ## Multimoneda
 
 La plantilla admite presentación de monedas ISO mediante `Intl`, con símbolos, separadores y decimales locales. Permite precios nativos en CLP, USD o PEN y equivalencias con un snapshot FX explícito, fechado y con fuente. No consulta tasas al generar ni reescribe el precio base. Uso, campos y límites: [MULTIMONEDA.md](MULTIMONEDA.md). Ejemplo nativo en soles: [ejemplo-pen.json](ejemplo-pen.json); conversión explícita USD → PEN: [ejemplo-usd-pen.json](ejemplo-usd-pen.json). El soporte documental no amplía monedas/providers ni readiness de Finance o del pricing engine.
@@ -162,7 +175,7 @@ La plantilla admite presentación de monedas ISO mediante `Intl`, con símbolos,
 
 La marca procede de `@efeoncepro/axis-tokens`, `axis-brand-assets` y `axis-graphic-line`: Engine, Poppins/Bricolage, logo oficial, órbita de portada, divisor y burbuja URL horneada. El pie institucional se lee de `src/lib/artifact-composer/catalogs/deck-axis/back-cover-full.slots.json`; no se copia en el JSON comercial. Esta plantilla es un artefacto documental local, sin cambios al Composer ni al runtime de cotizaciones.
 
-El generador comprueba reserva de encabezado/pie, desborde horizontal, carga de fuentes/imágenes y ancho móvil. Si el contenido supera sus hojas (las cuatro de la versión 1; en la versión 2, una página fija o un bloque que no cabe en una hoja), falla con el folio afectado: editar/paginar el texto, sin recortarlo ni reducir automáticamente la tipografía. En la versión 2 comprueba además que ningún texto o cifra se salga de su caja. Tras cambiar datos, revisar **todas las páginas del PDF final**, extracción de texto, fuentes y montos. Cada manifiesto nuevo mantiene esa revisión manual como pendiente.
+El generador comprueba primero, sin navegador, que [las páginas fijas](#páginas-fijas-portada-alcance-y-condiciones) caben. Después, en el render, comprueba reserva de encabezado/pie, desborde horizontal, carga de fuentes/imágenes y ancho móvil. Si el contenido supera sus hojas (las cuatro de la versión 1; en la versión 2, una página fija o un bloque que no cabe en una hoja), falla con el folio afectado: editar/paginar el texto, sin recortarlo ni reducir automáticamente la tipografía. En la versión 2 comprueba además que ningún texto o cifra se salga de su caja. Tras cambiar datos, revisar **todas las páginas del PDF final**, extracción de texto, fuentes y montos. Cada manifiesto nuevo mantiene esa revisión manual como pendiente.
 
 Referencia verificada: [registro de revisión](VERIFICACION.md). Uso y frontera con Greenhouse: [continuidad de agentes](../../../audits/commercial/2026-10-08-plantilla-cotizacion-licitacion-routing.md). Pruebas del cálculo, validación y escape:
 

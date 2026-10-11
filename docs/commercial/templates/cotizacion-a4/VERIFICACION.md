@@ -93,3 +93,34 @@ Resultado en ese documento: sigue en cinco páginas; la página 3 lleva tabla y 
 | Rechazados por el plan | 33, con mensaje: un bloque de opciones más alto que una página |
 
 La sobrestimación viene del conteo de líneas, que es conservador a propósito. Las reglas de recalibración de la sección anterior valen también para `template-lineas-opciones.css`.
+
+## Páginas fijas: comprobación sin navegador · 11/10/2026
+
+Dos veces se versionó un ejemplo cuya portada no cabía: el título pasaba la validación y `buildHtml`, y sólo fallaba en el navegador. Desde esta revisión `buildHtml` estima también la portada, la página de alcance y la de condiciones, en las dos versiones del contrato, y falla con «Contenido fuera del A4» y la causa. La estimación no escribe nada en el HTML: los SHA-256 de la versión 1 (`623988f8…`, `3bebc250…`, `d5ce5915…`) y los fijados de la versión 2 (`9cab83ed…`, `433ee479…`) no cambian.
+
+- **Los dos fallos conocidos se rechazan sin navegador**, en 0,15 s y sin crear la carpeta de salida. Título `["Contenidos y comunidad,", "gestionados de punta", "a punta."]` con la bajada de su documento: Chromium mide 860,91 px y la estimación da 861,00 px, de 802,75 px disponibles. Título `["Atención en redes", "como servicio gestionado,", "con una opción."]`: 829,80 px medidos, 829,89 px estimados. En ambos una entrada no entra en el ancho del título (676,3 px y 696,2 px medidos, de 550 px) y se parte.
+- **Ningún documento que hoy se compone se rechaza.** Comprobados en Chromium, con la estimación al lado, los 17 que existen: los seis `ejemplo*.json`, `vista-previa/datos.json`, los cinco `data/pricing/v3-operating/*.document.json` y los cinco `datos.json` de esta plantilla bajo `docs/commercial/prospects/` (cuatro versiones de una cotización de varias líneas y una de precio único con logo). Los 17 se componen; estimación menos medida: 0,06–0,08 px en la portada, 0,13–0,23 px en alcance y 0,02–0,03 px en condiciones, nunca por debajo. Espacio libre estimado mínimo: 34,9 px en la portada (dos documentos del puente, con título de tres líneas y bajada de cuatro), 79,8 px en alcance y 125,1 px en condiciones.
+- **Pruebas.** 35 pruebas Node PASS (31 del generador, 4 de dinero). Las cinco nuevas: los dos fallos conocidos, en las dos versiones; todos los documentos versionados de la plantilla y del puente se componen; bloques, capacidades y cada causa de rechazo; el logo del cliente; y las piezas de medición (instancia de la fuente variable contra anchos medidos, líneas sin partir palabras, proporción de imágenes).
+
+### Cómo se estima
+
+| Pieza | Medida |
+| --- | --- |
+| Alto útil de la portada (sobretítulo y referencia de una línea) | 802,75 px; cada línea de más en la referencia resta 18 px |
+| Alto útil de alcance y condiciones | 882,56 px, el de toda página interior. Aquí se usa completo: la estimación no baja de la medida, así que no hace falta el margen de 12,56 px de la sección de inversión |
+| Títulos (Bricolage, variable) | Avances exactos de la instancia que usa el navegador: peso 760 (600 en el nombre del cliente) y tamaño óptico igual al tamaño del texto, leídos de `fvar`/`HVAR`. Antes se usaba la tabla por defecto con una cota (1,18): en el título de portada la tabla por defecto queda un 4 % corta y la instancia coincide con Chromium entre 0,994 y 1,000 |
+| Holgura de títulos | 1 %, por el kerning que añade el navegador. En 40.000 párrafos: sin holgura, una línea de menos en 1 de cada 1.000; con 0,5 % o con 1 %, en ninguno |
+| Holgura de Poppins | 0,1 %. En 76.000 párrafos, ninguno cuenta de menos ni siquiera sin holgura; con el 1 % de la sección de inversión, uno de cada 30 contaba una línea de más, y en una página fija eso es un rechazo |
+| Palabras | Estas páginas no usan `overflow-wrap`: una palabra sólo se corta en guiones y barras. El conteo corta donde corta el navegador o menos |
+| Filas flexibles (caja de inversión, encabezado del calendario, línea de contacto) | Cota inferior del reparto: cada elemento conserva lo que le dejan los demás sin ceder. Exacta mientras la fila cabe; pesimista, nunca optimista, cuando no |
+| Rejillas (oferente y responsable, fases del calendario) | Pistas iguales, salvo que una palabra larga, como un correo, ensanche la suya y estreche las demás |
+
+### Barridos contra Chromium
+
+| Barrido | Resultado |
+| --- | --- |
+| 1.600 portadas aleatorias (título, bajada, etiqueta, referencia, cliente, resumen, importes y oferente), puestas en el DOM de un documento compuesto | 741 caben y se aceptan; 839 no caben y se rechazan; **0 fallos sin detectar**; 0 estimaciones por debajo de la medida. 20 rechazos de más (1,25 %): 8 por una línea de título que entraba por menos del 1 %, 8 por importes de miles de millones en el mismo margen, 4 por otros textos. El 91 % de las estimaciones coincide con la medida en menos de 0,5 px |
+| 500 documentos aleatorios, de las dos versiones, con todas las páginas fijas variadas y un logo en uno de cada siete | 296 compuestos, 888 páginas fijas: 0 fallos sin detectar, 0 por debajo (mínimo −0,01 px). Se aceptaron, y cabían, páginas con 2,2 px de aire real. Coinciden en menos de 0,5 px el 94 % de las portadas, el 86 % de las páginas de alcance y el 95 % de las de condiciones; la mayor sobrestimación, 93,5 px, es la cota de una fila flexible con una nota de calendario de varias líneas |
+
+Lo que queda fuera: la página de inversión de la versión 1, que sólo cubre el render; una portada cuyo logo no declara dimensiones; y el desborde horizontal en la versión 1, que su render tampoco comprueba. Recalibrar si cambian `template.css`, las fuentes de marca, el logo o el pie: `checks.fixedPages` de cada manifiesto guarda estimación y medida, y una medida mayor que la estimación es la señal.
+
