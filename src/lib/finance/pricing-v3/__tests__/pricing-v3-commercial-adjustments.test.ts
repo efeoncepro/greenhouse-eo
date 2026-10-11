@@ -761,7 +761,7 @@ describe('freeze, replay, summary and preview of a composition using both capabi
   it('the summary of a quote frozen before 1.1.0 only gains keys', () => {
     const committed = read(`${skyDir}/acordado.summary.json`)
 
-    const { engineVersion, commercialAdjustments, priceRounding, ...before } = JSON.parse(
+    const { engineVersion, commercialAdjustments, priceRounding, estimateExposure, ...before } = JSON.parse(
       JSON.stringify(summarizeComposition(replayResourceComposition(skyArtifact).semantic.result, skyArtifact))
     )
 
@@ -769,6 +769,9 @@ describe('freeze, replay, summary and preview of a composition using both capabi
     expect(engineVersion).toBe(PRICING_V3_ENGINES['1.0.0'])
     expect(commercialAdjustments).toEqual(sky.brief.adjustments)
     expect(priceRounding).toBeNull()
+    // Added later still: a reading of the same frozen totals (pricing-v3-estimate-exposure.test.ts verifies it).
+    expect(estimateExposure.totalCost).toBe(committed.totals.cost)
+    expect(estimateExposure.net).toBe(committed.totals.net)
   })
 
   it('the preview shows the final net and nothing about how it was reached', () => {
@@ -825,6 +828,15 @@ describe('freeze, replay, summary and preview of a composition using both capabi
   })
 })
 
+// stdout of compose prepare|quote is the summary of the result plus, under `runNotices`, what describes the run.
+const summaryOf = (stdout: string) => {
+  const body = JSON.parse(stdout)
+
+  delete body.runNotices
+
+  return body
+}
+
 describe('CLI end to end', () => {
   const dir = mkdtempSync(join(tmpdir(), 'pricing-v3-commercial-adjustments-'))
 
@@ -859,7 +871,7 @@ describe('CLI end to end', () => {
   )
 
   it('compose quote: exit 3, the summary on stdout, the detail in the artifact', () => {
-    const body = JSON.parse(quote.stdout)
+    const body = summaryOf(quote.stdout)
     const artifact = read(out)
 
     expect(quote.status).toBe(3)
@@ -879,7 +891,7 @@ describe('CLI end to end', () => {
 
     expect(replay.status).toBe(3)
     expect(JSON.parse(replay.stdout).verified).toBe(true)
-    expect(JSON.parse(replay.stdout).summary).toEqual(JSON.parse(quote.stdout))
+    expect(JSON.parse(replay.stdout).summary).toEqual(summaryOf(quote.stdout))
     expect(explain.status).toBe(3)
     expect(JSON.parse(explain.stdout).commercialAdjustments.priceRounding.recordId).toBe(clp.recordId)
     expect(assess.status).toBe(3)

@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "pricing-v3-current/1",
+  "updatedAt": "2026-10-11",
+  "reason": "Catalog v6 adds an open-ended EUR quote FX; resource policy v6 makes every unit price valid until replaced, with a review date. CEO decision of 2026-10-11: a unit price does not expire.",
+  "catalog": {
+    "path": "data/pricing/v3-operating/catalog.review-v6.json",
+    "version": "operating-review-2026-10-11-v6",
+    "digest": "980a7d5c591fa2a1c51655d18d0e7fb16e788e125ceb941f54cf73b6beb47bd1"
+  },
+  "policy": {
+    "path": "data/pricing/v3-operating/resources.review-v6.json",
+    "version": "operating-review-2026-10-11-v6",
+    "digest": "f0bc05a6f16f852bc2ffe8116f386da289eba8a0665b18902f5189f5784c5d88"
+  },
+  "credits": {
+    "path": "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "version": "operator-screenshots-2026-10-09-v1",
+    "digest": "6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d"
+  }
+}

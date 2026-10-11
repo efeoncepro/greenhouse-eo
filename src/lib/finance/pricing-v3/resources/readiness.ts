@@ -3,7 +3,7 @@ import Decimal from 'decimal.js'
 import { describeMarketFactor } from '../catalog/explain'
 import { PricingV3Error } from '../errors'
 import type { composeResourceQuote } from './composition'
-import { linesBelowPolicyFloor } from './summary'
+import { estimateExposure, linesBelowPolicyFloor } from './summary'
 
 type Composition = ReturnType<typeof composeResourceQuote>
 
@@ -97,11 +97,24 @@ export function assessCompositionReadiness(result: Composition) {
       'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.'
     )
 
+  // The ranking is the summary's (`estimateExposure`); readiness only points at where the evidence matters most.
+  const exposure = estimateExposure(result)
+
   return {
     calculationStatus: result.quote.calculationStatus,
     commercialStatus: 'requires_review',
     binding: false,
     gaps: gaps.filter((g, i) => gaps.findIndex(x => x.code === g.code && x.path === g.path) === i),
+    // Evidence gaps above all read alike; this is the order to close the cost ones in, largest cost first.
+    costEvidencePriority: exposure
+      ? {
+          currency: exposure.currency,
+          estimatedCost: exposure.estimatedCost,
+          confirmedCost: exposure.confirmedCost,
+          estimatedShareOfCost: exposure.estimatedShareOfCost,
+          confirmFirst: exposure.costInputs.slice(0, 5)
+        }
+      : null,
     margin: result.quote.totals
       ? {
           modeledRate: result.quote.totals.marginRate,

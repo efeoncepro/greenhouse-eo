@@ -23,9 +23,9 @@
     },
     {
       "code": "LOCALIZED_TALENT_COSTS",
-      "owner": "CEO/People",
-      "required": "The real cost of a profile in a country, registered as a specific cost record, wherever it departs from the Chile reference times the talent factor; and burden, bonus and coverage by profile variant where they differ",
-      "known": "Catalog v5 (2026-10-11) declares the 32 workbook costs, confirmed by their author (CEO), as the cost of each profile in Chile. The person's country adjusts them through one talent factor per country. The costs are no longer reported as estimated or unlocalized. Component check: Community Manager is salary 900 + bonuses 500 + employer charges 0 (USD per month)"
+      "owner": "CEO",
+      "required": "Nothing further on the cost basis: decided. A specific cost record only where the target cost of a profile in a country departs from the Chile reference times the talent factor",
+      "known": "Decided by the CEO on 2026-10-11: the quoter prices on the TARGET cost of each profile (the pricing workbook, confirmed by its author), not on current payroll. Current payroll is deliberately lower and the goal is to raise the team's pay to the quoter's figures, so the real margin on people today is higher than the quoter shows. Do not replace the catalog costs with payroll costs, and do not record anyone's pay here. Since catalog v5 the 32 workbook costs are the cost of each profile in Chile; the person's country adjusts them through one talent factor per country"
     },
     {
       "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
@@ -35,9 +35,9 @@
     },
     {
       "code": "COMMERCIAL_POLICY",
-      "owner": "Commercial/Finance",
-      "required": "Approved margin/markup, floors, country/market factors and exception authority",
-      "known": "40target/35floorproposed; historicalmarkup stays as simulation."
+      "owner": "CEO",
+      "required": "A decided margin target and floor for the offers that still carry only a historical markup, and a decision on the estimated country factors. Exceptions below a floor are decided by the CEO case by case",
+      "known": "Decided by the CEO on 2026-10-10: 45% is the margin floor of the managed services of the creative practice (offer creative-managed-service, target 45, minimum 45); where more can be earned the target of that offer is raised, not the floor. Market factors CL 1, CO 0.90 and US 1.10 are confirmed; PE 0.95, MX 1 and ES 1.10 and every talent factor outside Chile are estimates. Still open: the 32 talent-assurance-staffing records keep a historical markup with minimum margin 0, so role-capacity quotes have no enforced floor; the 40 target / 35 floor of the readiness proposal was never approved and is not a floor"
     },
     {
       "code": "SERVICE_AND_CONTRACT_TERMS",
@@ -85,7 +85,7 @@
       "code": "QUOTE_FX_REVIEW",
       "owner": "CEO",
       "required": "Review the quote FX when the market moves beyond its margin, and decide CLF and the EUR reference, which were not part of this decision",
-      "known": "Catalog v4 holds quote FX as CEO policy from 2026-10-10: USD to CLP 1000 (spot ~937), COP 3650 (~3219), MXN 19.25 (~17.98), PEN 3.70 (~3.435). USD is the reference currency. USD to CLF 0.024 stays an estimated 2025 value, and the ECB EUR to USD reference is dated 2026-10-09 only, so a quote dated later that needs EUR has no effective rate"
+      "known": "Quote FX are CEO policy values with a prudential margin over spot, USD as reference currency: USD to CLP 1000 (spot ~937), COP 3650 (~3219), MXN 19.25 (~17.98), PEN 3.70 (~3.435), all from 2026-10-10. Catalog v6 adds EUR to USD 1.20 (ECB reference 1.1206) as an open-ended estimate under the same instruction; it was not explicitly decided for EUR. USD to CLF 0.024 stays an estimated 2025 value. There is no USD to EUR quote FX, so a quote cannot be issued in EUR"
     },
     {
       "code": "COMMERCIAL_ROUNDING_SCOPE",
@@ -98,6 +98,12 @@
       "owner": "CEO",
       "required": "Validation of each factor with real hires (talent) and closed or lost deals (market), and a specific cost record wherever a profile or seniority departs from its country factor",
       "known": "Catalog v5 holds two country axes. Talent factor on cost, relative to Chile: CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3, US 5 are estimates from job postings and salary guides read on 2026-10-11, one factor per country for every profile. Market factor on the human price: CL 1, CO 0.90 and US 1.10 decided by the CEO from the workbook ranges; PE 0.95, MX 1 and ES 1.10 are estimates. In CO and PE the margin floor follows the factor (floorBasis base_market), so a quote at policy price shows about 41% and 43% real margin without being flagged. Factors by client type (SME, public tender, strategic client) exist in the workbook and are expressed today as an agreed net"
+    },
+    {
+      "code": "UNIT_PRICE_REVIEW",
+      "owner": "Operations",
+      "required": "Review each tool unit price by its review date, and replace it with a new policy version when a provider changes it; confirm the contracted plan where the price is a public list price",
+      "known": "Decided by the CEO on 2026-10-11: a unit price does not expire. Resource policy v6 keeps the 25 tool prices valid until replaced and gives each a review date of 2027-04-11 that warns without blocking; before, every price ended within 30 days of its evidence and blocked the quote. What varies is the number of seats, declared per quote. Most prices are still public list prices marked estimated"
     }
   ]
 }

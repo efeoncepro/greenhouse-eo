@@ -1,4 +1,5 @@
-import { readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
@@ -21,6 +22,7 @@ import {
   projectCompositionPreview
 } from '../../src/lib/finance/pricing-v3/resources/readiness'
 import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
+import { quotePriceNotices } from '../../src/lib/finance/pricing-v3/resources/price-review'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -43,6 +45,15 @@ import {
   previewCatalogChange,
   applyCatalogChange
 } from '../../src/lib/finance/pricing-v3/adapters/catalog-local'
+import {
+  CURRENT_SOURCE_ROLES,
+  buildCurrentVersions,
+  currentVersionsDigest,
+  currentVersionsSchema,
+  resolveCurrentSource,
+  verifyCurrentVersions
+} from '../../src/lib/finance/pricing-v3/adapters/current-versions'
+import type { CurrentSourceRole, CurrentVersions } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
 
 import {
   PRICING_V3_UNCLASSIFIED_ERROR_CODE,
@@ -76,10 +87,13 @@ const options = {
   date: { type: 'string' },
   impact: { type: 'string' },
   confirm: { type: 'string' },
+  reason: { type: 'string' },
+  current: { type: 'boolean' },
   help: { type: 'boolean' }
 } as const
 
-type ValueOption = Exclude<keyof typeof options, 'help'>
+type Switch = 'current' | 'help'
+type ValueOption = Exclude<keyof typeof options, Switch>
 
 // An unknown flag is echoed only when it reads as a flag name, so a mistyped value cannot ride out as a "name".
 const named = (option: string) => (/^[a-z][a-z-]{0,31}$/i.test(option) ? { option } : {})
@@ -87,16 +101,16 @@ const named = (option: string) => (/^[a-z][a-z-]{0,31}$/i.test(option) ? { optio
 const parseCli = () => {
   // Non-strict on purpose: an unknown flag arrives as a token we can name, not as Node prose we would have to parse.
   const { positionals, tokens } = parseArgs({ allowPositionals: true, strict: false, tokens: true, options })
-  const values: Partial<Record<ValueOption, string>> & { help?: boolean } = {}
+  const values: Partial<Record<ValueOption, string>> & Partial<Record<Switch, boolean>> = {}
 
   for (const token of tokens) {
     if (token.kind !== 'option') continue
     if (!Object.keys(options).includes(token.name)) throw new PricingV3Error('UNKNOWN_OPTION', named(token.name))
     const option = token.name as keyof typeof options
 
-    if (option === 'help') {
+    if (option === 'help' || option === 'current') {
       if (token.value !== undefined) throw new PricingV3Error('INVALID_ARGUMENT', { option })
-      values.help = true
+      values[option] = true
     } else {
       // Strict mode refused a value shaped like the next flag; without this, `--input --out x` would read "--out".
       if (token.value === undefined || (!token.inlineValue && token.value.startsWith('-')))
@@ -109,7 +123,7 @@ const parseCli = () => {
 }
 
 // Only the option name leaves here: a path or a parser message could quote what the caller keeps private.
-const readJson = (option: ValueOption, path: string): unknown => {
+const readJson = (option: ValueOption | 'current', path: string): unknown => {
   let text: string
 
   try {
@@ -134,6 +148,33 @@ const writeNew = (path: string, body: string) => {
     const exists = (error as NodeJS.ErrnoException).code === 'EEXIST'
 
     throw new PricingV3Error(exists ? 'OUTPUT_EXISTS' : 'OUTPUT_NOT_WRITABLE', { option: 'out' })
+  }
+}
+
+const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
+const currentPointerPath = join(repositoryRoot, 'data/pricing/v3-operating/current.json')
+
+// A source the pointer names may be gone or broken; that is a verdict for the verifier, not a failure to raise here.
+const readIfPossible = (path: string): unknown => {
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch {
+    return undefined
+  }
+}
+
+// The pointer is the one file this tool replaces. A sibling temp file plus rename means a reader sees the old pointer
+// or the new one, never half of either. Not private like the other outputs: it is a tracked file with no amounts.
+const replacePointer = (path: string, body: string) => {
+  const staging = join(dirname(path), `.current.${process.pid}.tmp`)
+
+  try {
+    writeFileSync(staging, body, { flag: 'wx', mode: 0o644 })
+    renameSync(staging, path)
+  } catch {
+    rmSync(staging, { force: true })
+
+    throw new PricingV3Error('OUTPUT_NOT_WRITABLE', { option: 'out' })
   }
 }
 
@@ -167,11 +208,24 @@ try {
     replay: ['input', 'help'],
     compare: ['left', 'right', 'help'],
     export: ['input', 'out', 'format', 'help'],
-    catalog: ['catalog', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
-    prepare: ['catalog', 'input', 'out', 'help'],
-    quote: ['catalog', 'input', 'out', 'help'],
-    resources: ['catalog', 'policy', 'credits', 'date', 'query', 'input', 'out', 'impact', 'confirm', 'help'],
-    compose: ['catalog', 'policy', 'credits', 'input', 'out', 'format', 'brief', 'help'],
+    catalog: ['catalog', 'current', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
+    prepare: ['catalog', 'current', 'input', 'out', 'help'],
+    quote: ['catalog', 'current', 'input', 'out', 'help'],
+    resources: [
+      'catalog',
+      'policy',
+      'credits',
+      'current',
+      'date',
+      'query',
+      'input',
+      'out',
+      'impact',
+      'confirm',
+      'help'
+    ],
+    compose: ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'format', 'brief', 'help'],
+    current: ['catalog', 'policy', 'credits', 'reason', 'confirm', 'input', 'out', 'help'],
     help: ['help']
   }
 
@@ -195,8 +249,24 @@ try {
   const catalogPath =
     values.catalog ?? fileURLToPath(new URL('../../data/pricing/v3-catalog/catalog.review-v1.json', import.meta.url))
 
-  const load = (option: ValueOption) => readJson(option, required(option))
-  const loadCatalog = () => readJson('catalog', catalogPath)
+  let pointer: CurrentVersions | undefined
+
+  // Opt-in (`--current`): a source the caller did not name comes from the pointer, and only once the file read
+  // here is the one the pointer vouches for. An explicit flag never reaches this, so it always wins.
+  const fromCurrent = (option: CurrentSourceRole) => {
+    // `resources budget` takes the credit catalog through `--catalog`; everywhere else a flag names its own source.
+    const role = command === 'resources' && subcommand === 'budget' ? 'credits' : option
+
+    pointer ??= currentVersionsSchema.parse(readJson('current', currentPointerPath))
+
+    return resolveCurrentSource(pointer, role, readIfPossible(join(repositoryRoot, pointer[role].path)))
+  }
+
+  const pointed = (option: ValueOption): option is CurrentSourceRole =>
+    Boolean(values.current) && values[option] === undefined && CURRENT_SOURCE_ROLES.some(role => role === option)
+
+  const load = (option: ValueOption) => (pointed(option) ? fromCurrent(option) : readJson(option, required(option)))
+  const loadCatalog = () => (pointed('catalog') ? fromCurrent('catalog') : readJson('catalog', catalogPath))
 
   const impacts = () => {
     if (!values.impact) return []
@@ -226,7 +296,14 @@ try {
           compose:
             'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md]',
           catalog:
-            'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json'
+            'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
+          current:
+            '[show] [--input pointer.json] | set --catalog catalog.json --policy policy.json --credits credits.json --reason text [--confirm pointerDigest] [--out pointer.json]'
+        },
+        currentVersions: {
+          pointer: 'data/pricing/v3-operating/current.json',
+          flag: '--current fills each of --catalog, --policy and --credits the caller did not pass, on every operation that takes them. It is verified first (version and digest); an explicit flag wins. For `resources budget` it fills --catalog with the credit catalog.',
+          withoutFlag: 'Unchanged: no --catalog means the historical baseline, and --policy/--credits stay mandatory.'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
@@ -235,6 +312,74 @@ try {
         ]
       })
     )
+  } else if (command === 'current') {
+    const action = subcommand ?? 'show'
+
+    if (!['show', 'set'].includes(action) || positionals.length > 2) throw new PricingV3Error('INVALID_ARGUMENT')
+    permit(action === 'show' ? ['input', 'help'] : ['catalog', 'policy', 'credits', 'reason', 'confirm', 'out', 'help'])
+
+    if (action === 'show') {
+      // `--input` inspects a pointer that is not the committed one, e.g. the one `set --out` just wrote for review.
+      const shown = currentVersionsSchema.parse(
+        values.input ? readJson('input', values.input) : readJson('current', currentPointerPath)
+      )
+
+      const read = (role: CurrentSourceRole) => readIfPossible(join(repositoryRoot, shown[role].path))
+
+      const verification = verifyCurrentVersions(shown, {
+        catalog: read('catalog'),
+        policy: read('policy'),
+        credits: read('credits')
+      })
+
+      process.stdout.write(
+        json({ binding: false, pointerDigest: currentVersionsDigest(shown), ...verification, pointer: shown })
+      )
+      process.exitCode = verification.consistent ? 0 : 2
+    } else {
+      const reason = required('reason')
+
+      // Stored relative to the repository so the pointer reads the same on every machine; a source outside it
+      // could not be found again from another checkout.
+      const repositoryPath = (role: CurrentSourceRole) => {
+        const path = relative(repositoryRoot, resolve(required(role)))
+
+        if (path.startsWith('..') || isAbsolute(path)) throw new PricingV3Error('INVALID_ARGUMENT', { option: role })
+
+        return path.split(sep).join('/')
+      }
+
+      const now = new Date()
+      const pad = (part: number) => String(part).padStart(2, '0')
+
+      const next = buildCurrentVersions({
+        paths: {
+          catalog: repositoryPath('catalog'),
+          policy: repositoryPath('policy'),
+          credits: repositoryPath('credits')
+        },
+        documents: { catalog: load('catalog'), policy: load('policy'), credits: load('credits') },
+        reason,
+        // The operator's calendar day, not UTC: near midnight they differ and this field is read by people.
+        updatedAt: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+      })
+
+      const target = values.out ?? currentPointerPath
+
+      const replaced = existsSync(target)
+        ? currentVersionsDigest(readJson(values.out ? 'out' : 'current', target))
+        : null
+
+      // Same lock as `catalog apply`: replacing requires having read exactly what is being replaced. A first
+      // pointer has nothing to confirm, so a digest offered for one means the caller expected a file that is gone.
+      if (replaced === null ? values.confirm !== undefined : required('confirm') !== replaced)
+        throw new PricingV3Error('CURRENT_VERSIONS_CONFLICT', { option: 'confirm' })
+
+      replacePointer(target, json(next))
+      process.stdout.write(
+        json({ updated: true, binding: false, replaced, pointerDigest: currentVersionsDigest(next), pointer: next })
+      )
+    }
   } else if (command === 'compose') {
     if (
       !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'workload'].includes(subcommand) ||
@@ -247,8 +392,8 @@ try {
       : subcommand === 'workload'
         ? ['input', 'brief', 'out', 'help']
         : subcommand === 'scaffold'
-          ? ['catalog', 'policy', 'input', 'out', 'help']
-          : ['catalog', 'policy', 'credits', 'input', 'out', 'help']
+          ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
+          : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
 
     permit(allowed)
 
@@ -314,6 +459,23 @@ try {
         artifact.semantic.demand.brief.quoteDate
       )
 
+      // Dates of the prices this quote used: a review that is due warns, a validity about to end is named before it
+      // blocks the next quote. Like the notice above, it describes the run and never enters the frozen result.
+      const dates = quotePriceNotices(artifact, artifact.semantic.policy, artifact.semantic.demand.brief.quoteDate, {
+        catalog: artifact.semantic.catalog,
+        credits: artifact.semantic.credits
+      })
+
+      const priceDates =
+        dates.reviewDue.length || dates.dueSoon.length || dates.expired.length
+          ? {
+              withinDays: dates.withinDays,
+              reviewDue: dates.reviewDue,
+              dueSoon: dates.dueSoon,
+              expired: dates.expired
+            }
+          : null
+
       // Both print the same derived summary; the complete result lives only in the artifact written by --out.
       // `quote` is the one that freezes, so only it reports the digest a later replay must reproduce.
       process.stdout.write(
@@ -322,7 +484,16 @@ try {
             calculationId: artifact.calculationId,
             ...(subcommand === 'quote' ? { replayDigest: artifact.replayDigest } : {})
           }),
-          ...(laterCatalogValues ? { laterCatalogValues } : {})
+          // Everything under `runNotices` describes this run against today's sources; the rest is the summary of the
+          // result and is what a replay of the frozen artifact prints again.
+          ...(laterCatalogValues || priceDates
+            ? {
+                runNotices: {
+                  ...(laterCatalogValues ? { laterCatalogValues } : {}),
+                  ...(priceDates ? { priceDates } : {})
+                }
+              }
+            : {})
         })
       )
       process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
@@ -331,11 +502,11 @@ try {
     if (positionals.length !== 2) throw new PricingV3Error('INVALID_ARGUMENT')
 
     const allowed: Record<string, string[]> = {
-      inspect: ['catalog', 'policy', 'credits', 'date', 'query', 'out', 'help'],
-      portfolio: ['catalog', 'policy', 'date', 'input', 'out', 'help'],
-      budget: ['catalog', 'input', 'out', 'help'],
-      preview: ['catalog', 'policy', 'credits', 'input', 'impact', 'out', 'help'],
-      apply: ['catalog', 'policy', 'credits', 'input', 'impact', 'confirm', 'out', 'help']
+      inspect: ['catalog', 'policy', 'credits', 'current', 'date', 'query', 'out', 'help'],
+      portfolio: ['catalog', 'policy', 'current', 'date', 'input', 'out', 'help'],
+      budget: ['catalog', 'current', 'input', 'out', 'help'],
+      preview: ['catalog', 'policy', 'credits', 'current', 'input', 'impact', 'out', 'help'],
+      apply: ['catalog', 'policy', 'credits', 'current', 'input', 'impact', 'confirm', 'out', 'help']
     }
 
     if (!allowed[subcommand]) throw new PricingV3Error('INVALID_ARGUMENT')
@@ -354,14 +525,14 @@ try {
       process.stdout.write(json(result))
     } else if (subcommand === 'inspect') {
       const policy = compositionPolicySchema.parse(load('policy'))
-      const discovery = inspectOperatingResources(loadCatalog(), policy, required('date'), values.query)
+      const withCredits = Boolean(values.credits || values.current)
+      const credits = withCredits ? creditCatalogSchema.parse(load('credits')) : undefined
+      const discovery = inspectOperatingResources(loadCatalog(), policy, required('date'), values.query, credits)
 
       const result = {
         ...discovery,
         policyDigest: catalogDigest(policy),
-        ...(values.credits
-          ? { creditCatalogDigest: catalogDigest(creditCatalogSchema.parse(readJson('credits', values.credits))) }
-          : {})
+        ...(credits ? { creditCatalogDigest: catalogDigest(credits) } : {})
       }
 
       if (values.out) writeNew(values.out, json(result))
@@ -385,11 +556,11 @@ try {
       throw new PricingV3Error('INVALID_ARGUMENT')
 
     const permittedSub: Record<string, string[]> = {
-      search: ['catalog', 'query', 'kind', 'date', 'help'],
-      show: ['catalog', 'query', 'kind', 'date', 'help'],
-      validate: ['catalog', 'help'],
-      preview: ['catalog', 'input', 'impact', 'help'],
-      apply: ['catalog', 'input', 'impact', 'confirm', 'out', 'help']
+      search: ['catalog', 'current', 'query', 'kind', 'date', 'help'],
+      show: ['catalog', 'current', 'query', 'kind', 'date', 'help'],
+      validate: ['catalog', 'current', 'help'],
+      preview: ['catalog', 'current', 'input', 'impact', 'help'],
+      apply: ['catalog', 'current', 'input', 'impact', 'confirm', 'out', 'help']
     }
 
     permit(permittedSub[subcommand])

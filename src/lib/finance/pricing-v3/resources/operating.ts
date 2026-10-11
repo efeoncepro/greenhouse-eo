@@ -6,6 +6,8 @@ import { briefSchema } from '../catalog/contracts'
 import { PricingV3Error } from '../errors'
 import { compositionDemandSchema, compositionPolicySchema } from './composition-contracts'
 import { composeResourceQuote } from './composition'
+import { creditCatalogSchema } from './credit-budget'
+import { reviewResourcePrices } from './price-review'
 
 const D = Decimal.clone({ precision: 80 })
 const id = z.string().min(1).max(80)
@@ -177,11 +179,22 @@ export function allocateResourcePortfolio(raw: unknown, policyRaw: unknown, cata
 }
 
 /** Queryable policy/catalog inventory; source classification is not an invoice or access grant. */
-export function inspectOperatingResources(catalogRaw: unknown, policyRaw: unknown, asOf: string, query = '') {
+export function inspectOperatingResources(
+  catalogRaw: unknown,
+  policyRaw: unknown,
+  asOf: string,
+  query = '',
+  creditsRaw?: unknown
+) {
   briefSchema.shape.quoteDate.parse(asOf)
   const catalog = validateCatalog(catalogRaw)
   const policy = compositionPolicySchema.parse(policyRaw)
   const live = activeRecords(catalog, asOf)
+
+  const review = reviewResourcePrices(policy, asOf, {
+    catalog,
+    ...(creditsRaw === undefined ? {} : { credits: creditCatalogSchema.parse(creditsRaw) })
+  })
 
   const normalized = (v: string) =>
     v
@@ -233,6 +246,13 @@ export function inspectOperatingResources(catalogRaw: unknown, policyRaw: unknow
         })
       }))
       .filter(matches),
+    // Dates to act on, read at `asOf`. A review date never blocks; a hard validity does once it has passed.
+    priceReview: {
+      withinDays: review.withinDays,
+      reviewDue: review.reviewDue.filter(matches),
+      dueSoon: review.dueSoon.filter(matches),
+      expired: review.expired.filter(matches)
+    },
     instructions:
       'Choose profile, tasks, plan and allocations explicitly. References do not establish purchased seats or operational readiness.'
   }

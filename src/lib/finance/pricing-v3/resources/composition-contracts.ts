@@ -48,6 +48,11 @@ export const compositionPolicySchema = z
                       })
                       .strict()
                       .optional(),
+                    // A stable unit price stays valid until someone changes it: `price.source.effectiveUntil` is the
+                    // hard validity and blocks a quote. `reviewBy` is the date to look at the price again; it only
+                    // feeds derived notices (price-review.ts) and never reaches a calculation or a frozen result.
+                    // It lives here, not in `price.source`, because that object is the kernel's strict source.
+                    reviewBy: pricingV3RequestSchema.shape.quoteDate.optional(),
                     pendingReason: z.string().min(1).optional()
                   })
                   .strict()
@@ -58,6 +63,8 @@ export const compositionPolicySchema = z
                         Number(Boolean(v.pendingReason)) ===
                       1
                   )
+                  // A price nobody has yet has nothing to review.
+                  .refine(v => !(v.reviewBy && v.pendingReason))
               )
               .max(20)
           })

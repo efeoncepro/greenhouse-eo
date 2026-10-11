@@ -2034,6 +2034,15 @@ describe('catalog maintenance carries the floor basis of a market factor', () =>
   })
 })
 
+// stdout of compose prepare|quote is the summary of the result plus, under `runNotices`, what describes the run.
+const summaryOf = (stdout: string) => {
+  const body = JSON.parse(stdout)
+
+  delete body.runNotices
+
+  return body
+}
+
 describe('CLI end to end with a 1.2.0 quote', () => {
   const dir = mkdtempSync(join(tmpdir(), 'pricing-v3-market-floor-'))
 
@@ -2058,7 +2067,7 @@ describe('CLI end to end with a 1.2.0 quote', () => {
   const quote = cli('compose', 'quote', '--catalog', catalogFile, ...sources, '--input', demandFile, '--out', out)
 
   it('compose prepare and quote: exit 3, the same summary, the detail in the artifact', () => {
-    const body = JSON.parse(quote.stdout)
+    const body = summaryOf(quote.stdout)
     const artifact = read(out)
 
     expect(quote.status).toBe(3)
@@ -2086,7 +2095,7 @@ describe('CLI end to end with a 1.2.0 quote', () => {
 
     expect(replay.status).toBe(3)
     expect(JSON.parse(replay.stdout).verified).toBe(true)
-    expect(JSON.parse(replay.stdout).summary).toEqual(JSON.parse(quote.stdout))
+    expect(JSON.parse(replay.stdout).summary).toEqual(summaryOf(quote.stdout))
     expect(explain.status).toBe(3)
     expect(JSON.parse(explain.stdout).commercialAdjustments.marketFactor.floorBasis).toBe(FLOOR_BASIS)
     expect(JSON.parse(explain.stdout).commercialAdjustments.rows[0]).toHaveProperty('floorNet')

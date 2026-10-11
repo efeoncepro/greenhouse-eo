@@ -7,6 +7,7 @@ import { afterAll, describe, expect, it } from 'vitest'
 
 import { composeResourceQuote } from '../resources/composition'
 import { projectCompositionPreview } from '../resources/readiness'
+import { quotePriceNotices } from '../resources/price-review'
 import { summarizeComposition } from '../resources/summary'
 
 const dir = mkdtempSync(join(tmpdir(), 'pricing-v3-cli-summary-'))
@@ -26,6 +27,15 @@ const sources = [
   credits
 ]
 
+// stdout of compose prepare|quote is the summary of the result plus, under `runNotices`, what describes the run.
+const summaryOf = (stdout: string) => {
+  const body = JSON.parse(stdout)
+
+  delete body.runNotices
+
+  return body
+}
+
 const cli = (...args: string[]) =>
   spawnSync('node', ['--import', 'tsx', 'scripts/commercial/pricing-v3.ts', ...args], { encoding: 'utf8' })
 
@@ -36,10 +46,10 @@ describe('compose prints the derived summary and keeps the detail in the artifac
 
   it('quote: stdout is exactly the summary of the artifact it froze', () => {
     expect(quote.status).toBe(3)
-    expect(JSON.parse(quote.stdout)).toEqual(
+    expect(summaryOf(quote.stdout)).toEqual(
       JSON.parse(JSON.stringify(summarizeComposition(artifact.semantic.result, artifact)))
     )
-    expect(JSON.parse(quote.stdout).replayDigest).toBe(artifact.replayDigest)
+    expect(summaryOf(quote.stdout).replayDigest).toBe(artifact.replayDigest)
   })
 
   it('quote: the summary is a fraction of the frozen detail, measured on this run', () => {
@@ -48,11 +58,11 @@ describe('compose prints the derived summary and keeps the detail in the artifac
 
   it('prepare: same summary without a digest, because nothing was frozen for replay', () => {
     const prepare = cli('compose', 'prepare', ...sources, '--input', operating('managed-care.demand'))
-    const { replayDigest, ...withoutDigest } = JSON.parse(quote.stdout)
+    const { replayDigest, ...withoutDigest } = summaryOf(quote.stdout)
 
     expect(prepare.status).toBe(3)
     expect(replayDigest).toBeDefined()
-    expect(JSON.parse(prepare.stdout)).toEqual(withoutDigest)
+    expect(summaryOf(prepare.stdout)).toEqual(withoutDigest)
   })
 
   it('replay: verifies the file and answers with its summary, not a second copy of the detail', () => {
@@ -62,7 +72,7 @@ describe('compose prints the derived summary and keeps the detail in the artifac
     expect(replay.status).toBe(3)
     expect(Object.keys(body)).toEqual(['verified', 'calculationId', 'summary'])
     expect(body.verified).toBe(true)
-    expect(body.summary).toEqual(JSON.parse(quote.stdout))
+    expect(body.summary).toEqual(summaryOf(quote.stdout))
   })
 
   it('needs_input keeps exit 2 and every blocker in the summary', () => {
@@ -157,7 +167,7 @@ describe('a demand dated before newer catalog values says so', () => {
     expect(demand.brief.quoteDate < newest).toBe(true)
 
     const run = cli('compose', 'prepare', ...current, '--input', operating('managed-care.demand'))
-    const notice = JSON.parse(run.stdout).laterCatalogValues
+    const notice = JSON.parse(run.stdout).runNotices.laterCatalogValues
 
     expect(run.status).toBe(3)
     expect(notice.quoteDate).toBe(demand.brief.quoteDate)
@@ -173,6 +183,43 @@ describe('a demand dated before newer catalog values says so', () => {
     const run = cli('compose', 'prepare', ...current, '--input', operating('managed-care-colombia.demand'))
 
     expect(run.status).toBe(3)
-    expect(JSON.parse(run.stdout)).not.toHaveProperty('laterCatalogValues')
+    expect(JSON.parse(run.stdout).runNotices?.laterCatalogValues).toBeUndefined()
+  })
+})
+
+describe('the dates of the prices a quote used travel with the run, not with the result', () => {
+  // Policy v5 on purpose: its prices carry hard validity windows, so there is something to report. The expectation is
+  // derived with the same function the CLI calls, over the artifact the CLI froze.
+  const trio = [
+    '--catalog',
+    operating('catalog.review-v5'),
+    '--policy',
+    operating('resources.review-v5'),
+    '--credits',
+    credits
+  ]
+
+  const out = join(dir, 'colombia-v5.artifact.json')
+  const quote = cli('compose', 'quote', ...trio, '--input', operating('managed-care-colombia.demand'), '--out', out)
+  const artifact = read(out)
+
+  const expected = quotePriceNotices(artifact, artifact.semantic.policy, artifact.semantic.demand.brief.quoteDate, {
+    catalog: artifact.semantic.catalog,
+    credits: artifact.semantic.credits
+  })
+
+  it('reports what is due or about to end, exactly as the domain reads it', () => {
+    const { priceDates } = JSON.parse(quote.stdout).runNotices
+
+    expect(quote.status).toBe(3)
+    expect(expected.dueSoon.length + expected.reviewDue.length + expected.expired.length).toBeGreaterThan(0)
+    expect(priceDates.dueSoon).toEqual(JSON.parse(JSON.stringify(expected.dueSoon)))
+    expect(priceDates.reviewDue).toEqual(JSON.parse(JSON.stringify(expected.reviewDue)))
+    expect(priceDates.expired).toEqual(JSON.parse(JSON.stringify(expected.expired)))
+  })
+
+  it('leaves the frozen result and its replay untouched', () => {
+    expect(JSON.stringify(artifact)).not.toContain('runNotices')
+    expect(JSON.parse(cli('replay', '--input', out).stdout).summary).toEqual(summaryOf(quote.stdout))
   })
 })

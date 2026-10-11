@@ -39,6 +39,8 @@ export const PRICING_V3_DOMAIN_ERROR_CODES = [
 
 /** Rejections that belong to the transport: arguments, files and formats. They never describe pricing content. */
 export const PRICING_V3_ADAPTER_ERROR_CODES = [
+  'CURRENT_VERSIONS_CONFLICT',
+  'CURRENT_VERSIONS_MISMATCH',
   'EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY',
   'INPUT_NOT_FOUND',
   'INPUT_NOT_JSON',
