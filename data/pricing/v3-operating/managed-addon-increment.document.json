@@ -1,0 +1,152 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-11",
+  "reference": "Borrador · Atención en redes por tres meses, con una opción",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "taxAmount": "3220500",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de experiencia de clientes",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Atención en redes",
+      "como servicio gestionado,",
+      "con una opción."
+    ],
+    "subtitle": "Un servicio gestionado de atención en redes sociales durante tres meses para Cliente de ejemplo, con un fee mensual único y un servicio opcional que amplía su capacidad."
+  },
+  "service": {
+    "name": "Servicio gestionado de atención en redes sociales por tres meses"
+  },
+  "scope": {
+    "title": [
+      "Un servicio completo,",
+      "con un solo fee."
+    ],
+    "intro": "Borrador de alcance. La cotización final debe especificar los canales, los horarios de atención y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Atención de la comunidad",
+        "text": "Respuesta a comentarios y mensajes en los canales acordados, con una persona dedicada al servicio."
+      },
+      {
+        "title": "Dirección del servicio",
+        "text": "Un líder que define criterios de respuesta, revisa la calidad y coordina con la contraparte del cliente."
+      },
+      {
+        "title": "Agentes y base de conocimiento",
+        "text": "Clasificación de los mensajes entrantes y mantenimiento de la base de conocimiento que usa el equipo."
+      },
+      {
+        "title": "Continuidad",
+        "text": "Cobertura de reemplazo y guardia de alertas incluidas en el fee del servicio."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de tres meses",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Inicio y operación",
+        "text": "Accesos, criterios de respuesta, base de conocimiento inicial y atención desde el primer día acordado."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Operación",
+        "text": "Atención continua de los canales y revisión quincenal de calidad con la contraparte del cliente."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Operación y balance",
+        "text": "Continuidad de la atención, resumen del periodo y acuerdo sobre la continuidad del servicio."
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."
+      },
+      {
+        "title": "Servicio opcional",
+        "text": "Amplía la capacidad del mismo equipo y sólo puede contratarse junto con el servicio. Su valor es neto, se suma al fee de cada mes en que se contrate y se acuerda por separado."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente entrega los lineamientos de respuesta, define los casos que escalan y facilita los accesos acordados a sus canales."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un fee mensual",
+      "por el servicio completo."
+    ],
+    "intro": "Valores en pesos chilenos (CLP) para tres meses de servicio. El fee incluye al equipo, sus herramientas y la continuidad del servicio.",
+    "summary": "Tres meses · Pesos chilenos · IVA no incluido en los valores netos",
+    "taxNote": "Los valores de cada línea son netos. El total incluye IVA y corresponde al servicio completo por tres meses. El servicio opcional no forma parte de ese total."
+  },
+  "lines": [
+    {
+      "label": "Servicio gestionado de atención en redes",
+      "detail": "Fee mensual, todo incluido",
+      "group": "Servicio",
+      "quantity": {
+        "value": 3,
+        "unit": "meses"
+      },
+      "unitNet": "5650000",
+      "net": "16950000"
+    }
+  ],
+  "net": "16950000",
+  "options": {
+    "title": "Servicio opcional",
+    "note": "La opción se contrata junto con el servicio y sólo si se solicita.",
+    "items": [
+      {
+        "label": "Bloque adicional de conversaciones",
+        "detail": "Más dedicación del líder del servicio para atender un mayor volumen de conversaciones.",
+        "net": "300000",
+        "unit": "al mes"
+      }
+    ]
+  },
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-69b97e5401bad85565a46f17",
+    "digest": "69b97e5401bad85565a46f172f20dd9290ad8aaf221a73ab89456cf0b614a96a",
+    "engineVersion": "pricing-v3-local/1.3.0",
+    "option1CalculationId": "composition-c78637d1c8d9b68c4154b016",
+    "option1Digest": "c78637d1c8d9b68c4154b0168586a2944ab6679088021e88e87c666c7e63cb9f",
+    "option1Basis": "increment"
+  }
+}

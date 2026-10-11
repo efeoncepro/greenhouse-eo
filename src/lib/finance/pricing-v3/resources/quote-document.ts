@@ -5,6 +5,7 @@ import { clientPaidDirectly } from '../catalog/client'
 import type { composeResourceQuote } from './composition'
 import { presentPaymentSchedule } from './engagement-view'
 import type { EngagementViewRejectionCode, PaymentMilestone } from './engagement-view'
+import type { QuoteIncrementReading } from './quote-increment'
 import { clientSafePeriodItems, clientSafeWaivedItems } from './readiness'
 import type { ClientSafeItemKind } from './readiness'
 
@@ -720,6 +721,24 @@ type Identity = { calculationId: string; replayDigest: string }
  */
 export type QuoteDocumentOption = { key: string; result: Composition; identity: Identity }
 
+/**
+ * An optional add-on that extends the quote of the document, priced as an increment: the reading of the difference
+ * between that quote and the frozen quote of the same service with the add-on in it (`readQuoteIncrement`, which
+ * verifies that the two are comparable). It takes the place of an option in every respect but where its price comes
+ * from: the net the add-on adds in a period, instead of the net of a quote of the add-on alone.
+ *
+ * The reading is internal, with the cost and the margin of the add-on. The document takes its price and nothing else.
+ */
+export type QuoteDocumentIncrement = { key: string; increment: QuoteIncrementReading }
+
+/** What a document prices an optional add-on by: its own frozen quote, or the increment over the quote it extends. */
+type OptionSource = QuoteDocumentOption | QuoteDocumentIncrement
+
+const isIncrement = (option: OptionSource): option is QuoteDocumentIncrement => 'increment' in option
+
+/** The frozen quote an option is priced by: its own, or the one of the service with the add-on in it. */
+const pricedBy = (option: OptionSource) => (isIncrement(option) ? option.increment.withAddOn : option.identity)
+
 const OPTION_KEY = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/
 
 /**
@@ -732,10 +751,18 @@ const OPTION_KEY = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/
  * - it declares no cost the client pays a supplier directly, which the one amount would leave out;
  * - it is another quote than the one of the document and than every other option.
  *
+ * An option priced as an increment (`QuoteDocumentIncrement`) answers to the same rules, read from the reading of
+ * its increment, whose rules of comparability already hold both quotes calculated and in one currency:
+ *
+ * - it is an increment over the quote of the document, and over no other;
+ * - the add-on adds the same net to every compared period, and that amount is one the template takes;
+ * - the add-on brings no cost the client pays a supplier directly that the quote of the document does not have;
+ * - the quote with the add-on is another quote than the one of the document and than the one of every other option.
+ *
  * An option is reported by its position in the list it was passed in, never by its key. Nothing of it reaches the
  * lines, the net, the tax or the total of the document: only its price, in a block of its own.
  */
-const readOptions = (options: readonly QuoteDocumentOption[], base: Identity, currency: string, precision: number) => {
+const readOptions = (options: readonly OptionSource[], base: Identity, currency: string, precision: number) => {
   const issues: QuoteDocumentIssue[] = []
 
   if (options.length > OPTION_LIMIT) issues.push({ path: 'options', rule: 'too_many' })
@@ -743,15 +770,51 @@ const readOptions = (options: readonly QuoteDocumentOption[], base: Identity, cu
   const read = options.map((option, index) => {
     const path = `options.${index}`
     const issue = (rule: string) => void issues.push({ path, rule })
-    const { quote } = option.result
-    const totals = quote.totals
 
     if (!OPTION_KEY.test(option.key)) issue('invalid_key')
     else if (options.findIndex(other => other.key === option.key) !== index) issue('duplicate_key')
 
-    if (option.identity.calculationId === base.calculationId) issue('same_as_quote')
-    else if (options.findIndex(other => other.identity.calculationId === option.identity.calculationId) !== index)
+    if (pricedBy(option).calculationId === base.calculationId) issue('same_as_quote')
+    else if (options.findIndex(other => pricedBy(other).calculationId === pricedBy(option).calculationId) !== index)
       issue('duplicate_option')
+
+    if (isIncrement(option)) {
+      const { increment } = option
+
+      if (
+        increment.base.calculationId !== base.calculationId ||
+        increment.base.replayDigest !== base.replayDigest
+      )
+        issue('increment_of_another_quote')
+      if (increment.currency !== currency) issue('currency_differs_from_quote')
+
+      // Declared by the quote with the add-on and not by the quote of the document: the one amount would leave it out.
+      if (increment.changed.thirdPartyCosts.some(cost => cost.settlement === 'client_direct'))
+        issue('client_pays_costs_directly')
+
+      const net = increment.netIncrementPerPeriod
+
+      if (net === null) {
+        issue('net_differs_between_periods')
+
+        return null
+      }
+
+      if (!representable(new Wide(net), precision) || new Wide(net).isZero()) issue('amount_not_representable')
+
+      return {
+        key: option.key,
+        // What the add-on adds to the net of one period, at the precision of the shared currency.
+        net,
+        periods: increment.comparison.comparedPeriods,
+        calculationId: increment.withAddOn.calculationId,
+        replayDigest: increment.withAddOn.replayDigest,
+        basis: 'increment' as const
+      }
+    }
+
+    const { quote } = option.result
+    const totals = quote.totals
 
     if (quote.calculationStatus !== 'calculated' || !totals || quote.periods.some(period => !period.result.totals)) {
       issue('not_calculated')
@@ -780,7 +843,9 @@ const readOptions = (options: readonly QuoteDocumentOption[], base: Identity, cu
       net: quote.periods[0].result.totals!.net,
       periods: nets.length,
       calculationId: option.identity.calculationId,
-      replayDigest: option.identity.replayDigest
+      replayDigest: option.identity.replayDigest,
+      // Absent: the price is the net of the option's own quote, as it was before an increment could price one.
+      basis: undefined
     }
   })
 
@@ -879,6 +944,13 @@ const engineOf = (result: Composition) =>
  *   the unit the brief gives it; the brief names exactly the options passed. Nothing of an option reaches the lines,
  *   the net, the tax or the total, and `source` records the calculation each price came from.
  *
+ *   An add-on that extends the quote (more dedication of people who are already its lines) is passed instead as a
+ *   `QuoteDocumentIncrement`: the reading of the difference between this quote and the frozen quote of the service
+ *   with the add-on in it. Its price is the net the add-on adds in one period, the same in every compared period.
+ *   It shares the block, the limit and the brief with the other options and is printed like them: a price, never
+ *   the cost or the margin of the increment. `source` records the quote with the add-on and that the price is an
+ *   increment over the quote of the document.
+ *
  * The document is emitted only if it says what the quote says, to the unit:
  *
  * - the lines add up to `totals.net` (`QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` otherwise);
@@ -889,7 +961,8 @@ const engineOf = (result: Composition) =>
  * - every amount is one the template can take in its currency, and the lines, the costs paid directly and the
  *   milestones are within its limits (`QUOTE_DOCUMENT_NOT_REPRESENTABLE`);
  * - every option is one amount that says all of it: calculated, in the currency of the quote, the same net in every
- *   period and no cost the client pays apart (`QUOTE_DOCUMENT_OPTION_INVALID` otherwise).
+ *   period and no cost the client pays apart; and an increment is one over this quote
+ *   (`QUOTE_DOCUMENT_OPTION_INVALID` otherwise).
  *
  * `status` is always `draft`: a composition is a simulation under review and this reading approves nothing.
  * `source` names the calculation the data came from; the template copies it to its manifest and prints none of it.
@@ -898,7 +971,7 @@ export function composeQuoteDocument(
   result: Composition,
   identity: Identity,
   brief: unknown,
-  options: readonly QuoteDocumentOption[] = []
+  options: readonly (QuoteDocumentOption | QuoteDocumentIncrement)[] = []
 ) {
   const read = readQuote(result)
 
@@ -1065,7 +1138,10 @@ export function composeQuoteDocument(
         ...Object.fromEntries(
           optionItems.flatMap(({ option }, index) => [
             [`option${index + 1}CalculationId`, option.calculationId],
-            [`option${index + 1}Digest`, option.replayDigest]
+            [`option${index + 1}Digest`, option.replayDigest],
+            // Only for an option priced as an increment: the calculation named is the quote with the add-on in it,
+            // and the price is its difference with the calculation of this document.
+            ...(option.basis ? [[`option${index + 1}Basis`, option.basis]] : [])
           ])
         )
       }
@@ -1087,12 +1163,13 @@ export type QuoteDocumentData = Extract<ReturnType<typeof composeQuoteDocument>,
  * Two lists appear only when there is something to list: `waived`, the lines the quote waives completely with the
  * reference value each would print if the brief marked it `courtesy: true` (none is in the brief of the scaffold: a
  * courtesy is asked for, never assumed); and `options`, the options passed with the run and the price of each, which
- * the brief of the scaffold names with a label and a unit to fill.
+ * the brief of the scaffold names with a label and a unit to fill. An option priced as an increment says so
+ * (`basis`), and its price is the net the add-on adds in a period.
  */
 export function scaffoldQuoteDocumentBrief(
   result: Composition,
   identity: Identity,
-  options: readonly QuoteDocumentOption[] = []
+  options: readonly (QuoteDocumentOption | QuoteDocumentIncrement)[] = []
 ) {
   const read = readQuote(result)
 
@@ -1157,7 +1234,8 @@ export function scaffoldQuoteDocumentBrief(
               net: option.net,
               currency: read.totals.currency,
               periods: option.periods,
-              calculationId: option.calculationId
+              calculationId: option.calculationId,
+              ...(option.basis ? { basis: option.basis } : {})
             }))
           }
         : {}),
@@ -1173,6 +1251,13 @@ export function scaffoldQuoteDocumentBrief(
           'true prints a line the quote waives completely as a courtesy: net zero and its reference value. Only for the keys listed under `waived`, with their label, detail and group like any line; a waived key that is not marked prints nothing.',
         options:
           '{ <key>: { label, unit, detail? } } for each option passed with `--option <key>=<artifact.json>`: its name, the unit its price is read in («al mes», «por campaña») and an optional second line. Exactly the options passed; the price of each is the net of one period of its own frozen quote.',
+        // Said only of a run that prices an option as an increment; every other scaffold keeps the entries it had.
+        ...(priced.options.some(option => option.basis)
+          ? {
+              'options (increment)':
+                'An option passed with `--increment <key>=<with-add-on.artifact.json>` is named in `options` like any other. Its price is the net the add-on adds in one period: the frozen quote of the service with the add-on in it, minus this quote. The cost and the margin of that increment are internal (`compose increment`) and never part of the document.'
+            }
+          : {}),
         optionsTexts: '{ title, note } of the block of options. Only with options.',
         paymentMilestones:
           'The list `compose schedule --milestones` takes: [{ id, label, share, periodId | when }]. Shares add up to 1; the amounts are derived from the net. Each milestone needs periodId or when.',

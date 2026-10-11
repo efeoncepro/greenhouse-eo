@@ -30,7 +30,11 @@ import {
   composeQuoteDocument,
   scaffoldQuoteDocumentBrief
 } from '../../src/lib/finance/pricing-v3/resources/quote-document'
-import type { QuoteDocumentOption } from '../../src/lib/finance/pricing-v3/resources/quote-document'
+import type {
+  QuoteDocumentIncrement,
+  QuoteDocumentOption
+} from '../../src/lib/finance/pricing-v3/resources/quote-document'
+import { readQuoteIncrement } from '../../src/lib/finance/pricing-v3/resources/quote-increment'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -99,14 +103,25 @@ const options = {
   tools: { type: 'string' },
   milestones: { type: 'string' },
   label: { type: 'string' },
-  // The one flag that repeats: `--option <key>=<artifact.json>`, once per optional add-on of a quote document.
+  // The two flags that repeat, once per optional add-on of a quote document: `--option <key>=<artifact.json>` for
+  // the frozen quote of the add-on alone and `--increment <key>=<artifact.json>` for the frozen quote of the service
+  // with the add-on in it.
   option: { type: 'string', multiple: true },
+  increment: { type: 'string', multiple: true },
+  base: { type: 'string' },
   current: { type: 'boolean' },
   'keep-blocked': { type: 'boolean' },
   help: { type: 'boolean' }
 } as const
 
 const SWITCHES = ['current', 'keep-blocked', 'help'] as const
+
+/** Flags that repeat. Both name an optional add-on of a quote document, so they share one list and one order. */
+const REPEATABLE = ['option', 'increment'] as const
+
+type Repeatable = (typeof REPEATABLE)[number]
+
+const isRepeatable = (option: string): option is Repeatable => REPEATABLE.some(name => name === option)
 
 type Switch = (typeof SWITCHES)[number]
 type ValueOption = Exclude<keyof typeof options, Switch>
@@ -120,8 +135,9 @@ const parseCli = () => {
   // Non-strict on purpose: an unknown flag arrives as a token we can name, not as Node prose we would have to parse.
   const { positionals, tokens } = parseArgs({ allowPositionals: true, strict: false, tokens: true, options })
   const values: Partial<Record<ValueOption, string>> & Partial<Record<Switch, boolean>> = {}
-  // Every `--option`, in the order given. `values.option` only says the flag was used, like any other.
-  const repeated: string[] = []
+  // Every `--option` and `--increment`, in the order given. `values.option` and `values.increment` only say the
+  // flag was used, like any other.
+  const repeated: { flag: Repeatable; value: string }[] = []
 
   for (const token of tokens) {
     if (token.kind !== 'option') continue
@@ -136,7 +152,7 @@ const parseCli = () => {
       if (token.value === undefined || (!token.inlineValue && token.value.startsWith('-')))
         throw new PricingV3Error('MISSING_ARGUMENT', { option })
       values[option] = token.value
-      if (option === 'option') repeated.push(token.value)
+      if (isRepeatable(option)) repeated.push({ flag: option, value: token.value })
     }
   }
 
@@ -258,6 +274,8 @@ try {
       'label',
       'milestones',
       'option',
+      'increment',
+      'base',
       'keep-blocked',
       'help'
     ],
@@ -368,7 +386,7 @@ try {
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json [--keep-blocked]] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json] | document --input artifact.json [--brief document-brief.json] [--out data.json] [--option key=option.artifact.json]...',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json [--keep-blocked]] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json] | document --input artifact.json [--brief document-brief.json] [--out data.json] [--option key=option.artifact.json]... [--increment key=with-add-on.artifact.json]... | increment --input with-add-on.artifact.json --base base.artifact.json [--out increment.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
           current:
@@ -395,6 +413,15 @@ try {
             '--option <key>=<artifact.json>, repeatable (at most 8): the frozen quote of one optional add-on alone, verified by replay like --input. Its price is the net of one of its periods: it must be calculated, in the currency of the quote, with the same net in every period and no cost the client pays apart. The brief names exactly the options passed (`options.<key>`: label, unit, detail). They are printed in a block of their own and enter no line, net, tax or total of the quote.',
           courtesy:
             'A line the quote waives completely (net zero through a discount or an agreed net) prints nothing. `lines.<key>.courtesy: true` in the brief prints it with net zero and its reference value, the price it had before the waiver, taken from the frozen quote. The scaffold lists those keys under `waived`. The mark on a line with a net is rejected.'
+        },
+        quoteIncrement: {
+          command:
+            '`compose increment --input with-add-on.artifact.json --base base.artifact.json` prices an add-on that extends a quote as the difference between two frozen quotes: the base, and the base with the add-on in it. It prints, per compared period and in total, the increment of net, cost and margin, its margin rate, and what changed (lines added or with more dedication, tools whose cost moved, third-party costs added). Both artifacts are verified by replay. Exit 3. It is an internal reading: it holds cost and margin.',
+          why: 'The quote of an add-on alone is a new line: when the add-on only adds dedication to people who are already lines of the base, it takes again every cost charged once per line (the platform fee, a part of the base tools), so its cost is overstated and its margin understated. In the quote of the base with the add-on in it each person is one line with the summed dedication, and nothing is charged twice.',
+          comparable:
+            'The two quotes are subtracted only when the difference can mean the add-on alone; otherwise the run is rejected with the rule that failed and nothing is approximated. Both calculated (QUOTE_INCREMENT_REQUIRES_CALCULATED_QUOTES); same currency, offer, commercial unit, account, tax treatment, form and code of engagement, market, quote date, mode and contingency declaration (QUOTE_INCREMENT_CONTEXT_DIFFERS); same catalog, resource policy and credit catalog, by version and by content (QUOTE_INCREMENT_VERSIONS_DIFFER); the same periods, or a single representative period of a base that is the same in every period (QUOTE_INCREMENT_PERIODS_NOT_COMPARABLE); every line, third-party cost and tool of the base still in the quote with the add-on, each line with its profile, country, allocation mode and basis and at least its people and dedication (QUOTE_INCREMENT_BASE_NOT_CONTAINED); and a net that grows in every compared period (QUOTE_INCREMENT_NET_NOT_POSITIVE).',
+          document:
+            '`compose document --increment <key>=<with-add-on.artifact.json>`, repeatable: an optional add-on priced as an increment over the quote of the document. It shares the limit of 8, the block and the brief (`options.<key>`: label, unit, detail) with --option. The price printed is the net the add-on adds in one period, which must be the same in every compared period; the cost and the margin of the increment never reach the document. Like an option, it enters no line, net, tax or total of the quote.'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
@@ -485,6 +512,7 @@ try {
         'cash',
         'commitments',
         'document',
+        'increment',
         'workload'
       ].includes(subcommand) ||
       positionals.length !== 2
@@ -500,8 +528,10 @@ try {
           : ['cash', 'commitments'].includes(subcommand)
             ? ['input', 'out', 'help']
             : subcommand === 'document'
-              ? ['input', 'brief', 'option', 'out', 'help']
-              : subcommand === 'workload'
+              ? ['input', 'brief', 'option', 'increment', 'out', 'help']
+              : subcommand === 'increment'
+                ? ['input', 'base', 'out', 'help']
+                : subcommand === 'workload'
                 ? ['input', 'brief', 'out', 'help']
                 : subcommand === 'scaffold'
                   ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
@@ -617,13 +647,21 @@ try {
       // document comes from the verified result. The brief only brings the texts and the presentation of the lines.
       const artifact = replayResourceComposition(load('input'))
 
+      // The flag an option of the document was passed with, from the place the reader gave it in the list: an
+      // option rejected by the document is corrected under `--option` or under `--increment`.
+      const flagOf = (issues: { path: string }[]) => {
+        const place = /^options\.(\d+)(\.|$)/.exec(issues[0]?.path ?? '')
+
+        return (place && repeated[Number(place[1])]?.flag) || 'option'
+      }
+
       // What the caller corrects: the brief (its texts, its line keys, its milestones), an option or the quote itself.
       const reject = (outcome: { code: PricingV3Error['code']; issues: { path: string; rule: string }[] }) =>
         new PricingV3Error(outcome.code, {
           option: ['QUOTE_DOCUMENT_BRIEF_INVALID', 'SCHEDULE_MILESTONES_INVALID'].includes(outcome.code)
             ? 'brief'
             : outcome.code === 'QUOTE_DOCUMENT_OPTION_INVALID'
-              ? 'option'
+              ? flagOf(outcome.issues)
               : 'input',
           issues: outcome.issues
         })
@@ -632,32 +670,51 @@ try {
       // key the brief names it by. Each is verified by replay exactly like `--input`; what an option must be for a
       // document to print it, and how many a document takes, are the reader's rules, and its rejections name the
       // option by its place in this list.
-      const optionQuotes: QuoteDocumentOption[] = repeated.map((argument, index) => {
-        const separator = argument.indexOf('=')
-        const key = argument.slice(0, separator)
-        const path = argument.slice(separator + 1)
+      //
+      // `--increment <key>=<artifact.json>` is an option too, priced another way: the artifact is the frozen quote
+      // of the service with the add-on in it, and the price is what it adds to the quote of the document. Whether
+      // the two can be subtracted is the rule of the increment reader; a pair that cannot is rejected here with its
+      // code, under the place the flag has in the same list.
+      const optionQuotes: (QuoteDocumentOption | QuoteDocumentIncrement)[] = repeated.map(
+        ({ flag, value: argument }, index) => {
+          const separator = argument.indexOf('=')
+          const key = argument.slice(0, separator)
+          const path = argument.slice(separator + 1)
 
-        if (
-          separator < 1 ||
-          !path ||
-          !/^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/.test(key) ||
-          repeated.findIndex(other => other.startsWith(`${key}=`)) !== index
-        )
-          throw new PricingV3Error('INVALID_ARGUMENT', { option: 'option' })
+          if (
+            separator < 1 ||
+            !path ||
+            !/^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/.test(key) ||
+            repeated.findIndex(other => other.value.startsWith(`${key}=`)) !== index
+          )
+            throw new PricingV3Error('INVALID_ARGUMENT', { option: flag })
 
-        try {
-          const frozen = replayResourceComposition(readJson('option', path))
+          let frozen: ReturnType<typeof replayResourceComposition>
 
-          return { key, result: frozen.semantic.result, identity: frozen }
-        } catch (error) {
-          // With several artifacts in one run, the report says which flag holds the one that failed.
-          const failure = classify(error)
+          try {
+            frozen = replayResourceComposition(readJson(flag, path))
+          } catch (error) {
+            // With several artifacts in one run, the report says which flag holds the one that failed.
+            const failure = classify(error)
 
-          if (!failure) throw error
+            if (!failure) throw error
 
-          throw new PricingV3Error(failure.code, { ...failure.detail, option: 'option' })
+            throw new PricingV3Error(failure.code, { ...failure.detail, option: flag })
+          }
+
+          if (flag === 'option') return { key, result: frozen.semantic.result, identity: frozen }
+
+          const outcome = readQuoteIncrement(artifact, frozen)
+
+          if (!outcome.ok)
+            throw new PricingV3Error(outcome.code, {
+              option: flag,
+              issues: outcome.issues.map(issue => ({ path: `options.${index}.${issue.path}`, rule: issue.rule }))
+            })
+
+          return { key, increment: outcome.reading }
         }
-      })
+      )
 
       if (values.brief) {
         const outcome = composeQuoteDocument(
@@ -684,6 +741,36 @@ try {
         process.stdout.write(json(outcome.reading))
         process.exitCode = 2
       }
+    } else if (subcommand === 'increment') {
+      // A reading of two frozen quotes: the base, and the base with an add-on in it. Each is verified by replay
+      // before anything is subtracted, and the report of a failure says which of the two flags holds the artifact.
+      const verified = (option: 'input' | 'base') => {
+        try {
+          return replayResourceComposition(readJson(option, required(option)))
+        } catch (error) {
+          const failure = classify(error)
+
+          if (!failure) throw error
+
+          throw new PricingV3Error(failure.code, { ...failure.detail, option })
+        }
+      }
+
+      const withAddOn = verified('input')
+      const outcome = readQuoteIncrement(verified('base'), withAddOn)
+
+      // What the caller corrects is the quote with the add-on, which is built to extend the base; the base only
+      // when nothing but the base is at fault.
+      if (!outcome.ok)
+        throw new PricingV3Error(outcome.code, {
+          option: outcome.issues.length && outcome.issues.every(issue => issue.path === 'base') ? 'base' : 'input',
+          issues: outcome.issues
+        })
+
+      if (values.out) writeNew(values.out, json(outcome.reading))
+      process.stdout.write(json(outcome.reading))
+      // Two compositions under review, read together: like every reading of one. A rejection exits 1.
+      process.exitCode = 3
     } else if (subcommand === 'commitments') {
       // Needs the frozen policy, demand and catalog besides the result: alternatives and declared contract terms
       // live there. It reports; whether a commitment is acceptable is the operator's call.
