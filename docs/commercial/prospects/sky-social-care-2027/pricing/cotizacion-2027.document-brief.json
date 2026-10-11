@@ -64,7 +64,7 @@
   },
   "schedule": {
     "title": "Cómo se pone en marcha",
-    "note": "Desde la fecha de inicio que defina SKY",
+    "note": "Contrato a 12 meses",
     "phases": [
       {
         "label": "Seis semanas",
@@ -90,7 +90,7 @@
     ],
     "intro": "Valores netos en pesos chilenos (CLP) para doce meses de servicio.",
     "summary": "Doce meses · Pesos chilenos · IVA no incluido",
-    "taxNote": "Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027, desde la fecha de inicio que defina SKY. Contrato a 12 meses."
+    "taxNote": "Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027. Contrato a 12 meses."
   },
   "conditions": {
     "title": [
@@ -99,8 +99,8 @@
     ],
     "rows": [
       {
-        "title": "Plazo e inicio",
-        "text": "Contrato a 12 meses. La fecha de inicio la define SKY dentro de 2027; la preparación toma seis semanas desde esa definición."
+        "title": "Plazo",
+        "text": "Contrato a 12 meses, con seis semanas de preparación antes de la operación."
       },
       {
         "title": "Qué es una conversación",

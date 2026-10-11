@@ -50,7 +50,7 @@ Lecturas anteriores a la decisión, con un asiento propio para la persona de ref
 - Siguen siendo estimaciones: costos de las personas, provisiones de reemplazo y alerta, consumo de agentes, plan de
   Sprout sin contratar y las horas por conversación.
 
-## Versión vigente: `cotizacion-2027.*` y `../cotizacion/v3/` (11/10/2026, noche)
+## Versión vigente: `cotizacion-2027.*` y `../cotizacion/v4/` (11/10/2026, noche)
 
 El cotizador ya permite declarar el asiento compartido como lo que es. `cotizacion-2027.demand.json` dice lo mismo que
 la decisión del CEO, sin rodeos: cuenta mensual, un asiento, y en los cinco meses de campaña la persona dedicada y la
@@ -79,10 +79,12 @@ entra en el neto ni en el total. Cada uno sale de su propia cotización congelad
 
 `cotizacion-2027.document-brief.json` (texto, tomado de la propuesta entregada) →
 `cotizacion-2027.document.json` (datos emitidos por el cotizador; no se editan a mano) →
-`../cotizacion/v3/` (HTML, PDF de cinco páginas, manifiesto y capturas de revisión). Es la versión vigente.
+`../cotizacion/v4/` (HTML, PDF de cinco páginas, manifiesto y capturas de revisión). Es la versión vigente.
 
-`../cotizacion/v1/` y `../cotizacion/v2/` son emisiones anteriores, sin los opcionales con precio. El neto, el IVA y el
-total son los mismos en las tres.
+`../cotizacion/v1/` y `../cotizacion/v2/` son emisiones anteriores, sin los opcionales con precio; `../cotizacion/v3/`
+tiene los opcionales pero todavía decía que la fecha de inicio la define el cliente. Por indicación del CEO
+(11/10/2026) el documento no menciona la fecha de inicio: se sobreentiende. El neto, el IVA y el total son los mismos
+en las cuatro.
 
 Es un borrador: sin número de cotización, firma ni verificación. El RUT del cliente figura «por confirmar». La forma y
 el plazo de pago, el reajuste y la salida anticipada siguen abiertos.
