@@ -410,5 +410,7 @@ estimaciones propuestas por el agente y aceptadas por el CEO. 🔴 Con terceros 
 compara contra el del trabajo propio (`ownWork`), nunca contra el mezclado, que baja con todo lo refacturado cerca del
 costo. La caja nueva a proveedores incluye lo refacturado; la reserva no es caja ni pasivo. Sin modelar: cuándo se le
 paga al proveedor, una compra que obliga más allá del encargo (derechos de uso), comisión sobre lo que paga el cliente,
-tarifario de proveedores, el buffer de un On-Going de licitación con multas y la duración del contrato. El precio de
+tarifario de proveedores y el buffer de un On-Going de licitación con multas. La duración del contrato y la fecha de
+inicio del servicio no son un pendiente: están fuera del cotizador por decisión del CEO (2026-10-11; una cotización
+no es un contrato). El precio de
 HubSpot no es un insumo pendiente (CEO: hoy no se necesita en cotizaciones).

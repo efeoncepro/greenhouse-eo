@@ -173,7 +173,7 @@ Desde la raíz del repo, copiar el JSON de ejemplo al expediente, reemplazar tod
 node scripts/documents/render-cotizacion-a4.mjs --data ruta/cotizacion.json --out ruta/cotizacion-v1
 ```
 
-Si el precio viene de una cotización del Cotizador V3, las cifras **no se digitan**: `pnpm --silent pricing:v3 compose document` emite los datos versión 2 desde la cotización congelada y el agente sólo escribe los textos en un brief. Nunca editar una cifra en ese brief ni en los datos emitidos; si un número debe cambiar, se cambia la cotización y se vuelve a correr. Pasos y rechazos: [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre). Ese documento puede llevar además **servicios opcionales** (cada uno es una cotización V3 propia, pasada con `--option`; se imprimen en un bloque aparte, fuera del neto, del impuesto y del total de la oferta) y una **línea de cortesía** («Bonificado», con su valor de referencia) cuando la cotización bonifica una fila y el brief la marca `courtesy: true`. Ni el precio de una opción ni un valor de referencia se digitan. Un precio aprobado fuera de V3 se sigue digitando en el JSON, con su fuente en el expediente.
+Si el precio viene de una cotización del Cotizador V3, las cifras **no se digitan**: `pnpm --silent pricing:v3 compose document` emite los datos versión 2 desde la cotización congelada y el agente sólo escribe los textos en un brief. Nunca editar una cifra en ese brief ni en los datos emitidos; si un número debe cambiar, se cambia la cotización y se vuelve a correr. Pasos y rechazos: [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre). Ese documento puede llevar además **servicios opcionales** (cada uno es una cotización V3 propia, pasada con `--option`, o —si sólo amplía a personas que ya están en la cotización base— la cotización de la base con el opcional adentro, pasada con `--increment` y leída con `compose increment`; se imprimen en un bloque aparte, fuera del neto, del impuesto y del total de la oferta) y una **línea de cortesía** («Bonificado», con su valor de referencia) cuando la cotización bonifica una fila y el brief la marca `courtesy: true`. Ni el precio de una opción ni un valor de referencia se digitan. Un precio aprobado fuera de V3 se sigue digitando en el JSON, con su fuente en el expediente.
 
 `status: draft` es preparación documental; no es un estado de quote persistida ni prueba falta de aprobación del precio. Los data slots y el JSON son datos del documento. El generador calcula neto/IVA/total, pero **no crea `quoteId`, valida costos/margen, aprueba el precio, ejecuta maker-checker, registra CRM/facturación ni envía la oferta**. Registrar por separado fuente y autoridad del alcance/precio y cada acción posterior. Revisar todos los folios del PDF final; conservar los bytes de documentos firmados o presentados.
 
@@ -269,8 +269,10 @@ directo es una nota sin total. 🔴 Con terceros el piso se lee sobre el margen 
 sobre el mezclado: juzgar por el mezclado rechaza una oferta sana o lleva a bajarle el precio al equipo. Un servicio
 gestionado declarado On-Demand lleva una reserva de contingencia de 12% del costo de personas, que sale sólo por una
 renuncia declarada con motivo. Sin modelar: el buffer de un servicio On-Going con multas (el caso típico de una
-licitación), cuándo se le paga al proveedor, derechos de uso que sobreviven al encargo y el plazo del contrato:
-costéalos aparte y declara el supuesto.
+licitación), cuándo se le paga al proveedor y derechos de uso que sobreviven al encargo:
+costéalos aparte y declara el supuesto. El plazo del contrato y la fecha de inicio del servicio no son un pendiente
+del cotizador: están fuera de él por decisión del CEO (2026-10-11; una cotización no es un contrato). La cotización
+lleva los periodos que se cotizan; el plazo y el inicio que fijan las bases son materia del contrato.
 
 Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
 gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. `compose document` emite desde esa

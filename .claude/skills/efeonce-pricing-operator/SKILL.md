@@ -181,6 +181,15 @@ plegado por meses, impuesto, rechazos y ejemplos:
 El documento también imprime **servicios opcionales** (cada uno es su propia cotización, pasada con `--option`;
 fuera del neto y del total) y una **cortesía** (`courtesy: true` sobre una fila que la demanda bonifica): ni el precio
 de una opción ni un valor de referencia se digitan.
+Un opcional que amplía a personas que ya están en la cotización base (más dedicación, más consumo) no se lee en una
+cotización propia, que vuelve a cobrar lo que se cobra una vez por línea y subestima su margen: se cotiza **la base
+con el opcional adentro**, `compose increment --input con-opcional.artifact.json --base base.artifact.json` da su
+precio, costo y margen como diferencia (lectura interna) y el documento lo imprime con
+`--increment <clave>=<con-opcional.artifact.json>`:
+[referencia](references/cotizador-v3-agent-workflow.md#opcional-que-amplía-la-base-incremento-delta-2026-10-11-cierre).
+La fecha de inicio del servicio y la duración del contrato no son insumos del cotizador, por decisión del CEO
+(2026-10-11: una cotización no es un contrato): no se piden para cotizar, no se listan como pendiente y el documento
+no dice lo obvio (por ejemplo, quién define la fecha de inicio).
 Puesta en marcha por
 persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
 licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.

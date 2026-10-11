@@ -21,8 +21,10 @@ aún no se emite. `estimateExposure` ordena qué insumo estimado confirmar prime
 herramienta no vence (los seats se declaran por cotización, como se compran: varios planes en un periodo, un seat
 pagado sin uso con `idleSeats` o uno que usan varias personas con `seatSharing`, cada uno con su motivo; nunca le
 quites una tarea a una persona —p. ej. al refuerzo de campaña— para que la cuenta de seats cuadre). Un servicio
-opcional se cotiza aparte y el documento lo imprime fuera del total (`--option`); una cortesía se bonifica en la
-demanda y el documento la muestra con su valor de referencia: ninguno de los dos importes se digita.
+opcional se cotiza aparte y el documento lo imprime fuera del total (`--option`); si el opcional sólo amplía a
+personas que ya están en la cotización base, se cotiza la base con el opcional adentro y su costo y margen se leen
+como incremento (`compose increment`, `--increment`), nunca en una cotización propia; una cortesía se bonifica en la
+demanda y el documento la muestra con su valor de referencia: ninguno de esos importes se digita.
 
 > **La regla que ordena todo el módulo:**
 > **Un precio sin loaded cost detrás no es un precio: es una corazonada con decimales.**
@@ -294,7 +296,9 @@ trabajo sano o, peor, lleva a bajarle el precio al equipo. Un servicio gestionad
 contingencia del §4. Cómo declararlo y leerlo:
 [contrato V3](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md). Sin modelar: cuándo se le
 paga al proveedor, una compra que obliga más allá del encargo (derechos de uso que lo sobreviven), comisión sobre lo
-que paga el cliente, tarifario de proveedores recurrentes, duración del contrato y períodos menores a un mes.
+que paga el cliente, tarifario de proveedores recurrentes y períodos menores a un mes. La duración del contrato y la
+fecha de inicio del servicio no son un pendiente: están fuera del cotizador por decisión del CEO (2026-10-11; una
+cotización no es un contrato) y se resuelven en el contrato.
 
 ### (c) Ad-hoc / trabajo fuera del plan
 🩸 **BUG (oferta original del blog SKY, superseded 2026-09-23):** el ad-hoc (**CLP 260.000/artículo**) era **más barato que el marginal del plan

@@ -24,8 +24,9 @@ con el margen de la oferta y el 10% On-Demand) y sale sólo con una renuncia dec
 se compran y refacturan van como filas propias (producción, talento e impresión +10% con piso 5%; medios y licencias
 al costo), con el piso de 45% leído sobre el margen del trabajo propio (`ownWork`), nunca sobre el mezclado. Las dos
 son estimaciones aceptadas por el CEO. Sin modelar: el buffer de un On-Going ganado en licitación con multas (§4),
-cuándo se le paga al proveedor, una compra que obliga más allá del encargo, duración del contrato, períodos bajo un
-mes y la regla del ad-hoc (bug 2). Los perfiles de contenido llevan
+cuándo se le paga al proveedor, una compra que obliga más allá del encargo, períodos bajo un
+mes y la regla del ad-hoc (bug 2). La duración del contrato y la fecha de inicio del servicio no son un pendiente:
+están fuera del cotizador por decisión del CEO (2026-10-11; una cotización no es un contrato). Los perfiles de contenido llevan
 Adobe Express (CEO): declara su reparto o excluye la tarea con motivo.
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
@@ -38,8 +39,10 @@ aún no se emite. `estimateExposure` ordena qué insumo estimado confirmar prime
 herramienta no vence (los seats se declaran por cotización, como se compran: varios planes en un periodo, un seat
 pagado sin uso con `idleSeats` o uno que usan varias personas con `seatSharing`, cada uno con su motivo; nunca le
 quites una tarea a una persona para que la cuenta de seats cuadre). Un servicio opcional se cotiza aparte y el
-documento lo imprime fuera del total (`--option`); una cortesía se bonifica en la demanda y el documento la muestra
-con su valor de referencia: ninguno de los dos importes se digita.
+documento lo imprime fuera del total (`--option`); si el opcional sólo amplía a personas que ya están en la
+cotización base, se cotiza la base con el opcional adentro y su costo y margen se leen como incremento
+(`compose increment`, `--increment`), nunca en una cotización propia; una cortesía se bonifica en la demanda y el
+documento la muestra con su valor de referencia: ninguno de esos importes se digita.
 
 > **Estado, dicho sin adornos (operador, 2026-07-13):** *"actualmente no tenemos una metodología o método para
 > fijar precios; tampoco lo del margen"*.
