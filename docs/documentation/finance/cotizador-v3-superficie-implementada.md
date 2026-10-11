@@ -6,14 +6,17 @@ El [manual operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agente
 Claude. El [cotizador canónico](cotizador.md) conserva su API, permisos, lifecycle y consumidores actuales.
 Los párrafos fechados 2026-10-10 describen el endurecimiento posterior de la CLI (errores tipados, resumen
 derivado y veredicto de piso); el resto conserva el estado verificado del 2026-10-09.
+Los párrafos marcados «motor 1.1» describen el cambio posterior del mismo 2026-10-10: contrato 1.1.0 del kernel,
+neto pactado, redondeo comercial y catálogo v4
+([ADR](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)).
 
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
 | ------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request `1.0.0` y snapshot resuelto; cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
-| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes         |
-| Brief                     | `pricing-v3-brief/1`                                        | Necesidad y selecciones; el resolver devuelve bindings, supuestos y pendientes                 |
+| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0` o `1.1.0` (motor 1.1); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
+| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`) |
+| Brief                     | `pricing-v3-brief/1`                                        | Necesidad, selecciones y ajustes comerciales (`discount`, `agreed_net`); el resolver devuelve bindings, supuestos, pendientes y el contrato que emite al kernel |
 | Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`         |
 | Demanda compuesta         | `pricing-v3-composition-demand/1`                           | Brief, trabajo, usuarios, tareas, IA, allocations, presupuestos y cobertura cliente            |
 | Plan                      | `pricing-v3-operating-plan/1`                               | Demanda y portfolio opcional; produce demanda resuelta sin elegir reparto arbitrario           |
@@ -23,12 +26,14 @@ derivado y veredicto de piso); el resto conserva el estado verificado del 2026-1
 | Mantenimiento de recursos | `pricing-v3-resource-change/1`                              | Replacement completo `policy` o `credits`; preview con impacto y sucesor nuevo                 |
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
-| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada       |
+| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding` |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
+| Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`; cada uno con su `precisionPolicy` |
+| Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
 
 Fuentes ejecutables: [dominio](../../../src/lib/finance/pricing-v3/),
 [CLI](../../../scripts/commercial/pricing-v3.ts), [fixtures operativas](../../../data/pricing/v3-operating/README.md).
-Versiones de reproducción: motor `pricing-v3-local/1.0.0`, artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`.
+Versiones de reproducción: motor `pricing-v3-local/1.0.0` y, desde el motor 1.1, también `pricing-v3-local/1.1.0` (cada artefacto se reproduce con el que lo firmó; `ENGINE_VERSION` ya no existe), artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`. Las tres versiones de artefacto no cambiaron.
 Las propiedades desconocidas de los inputs estrictos se rechazan. Versiones o hashes incompatibles no se
 reinterpretan con la versión más reciente.
 
@@ -72,10 +77,23 @@ se distribuye por base elegible con residual por mayor resto y desempate por `li
 adicional ni cadena arbitraria de ajustes. Fee genérico de contratación/pagos, Assurance, gestión y setup son
 recursos/coberturas explícitos: no porcentajes laborales o reservas escondidas ni una dependencia del nombre Deel.
 
+Motor 1.1 (2026-10-10): el párrafo anterior describe el contrato 1.0.0, que sigue igual. En el contrato 1.1.0 sí hay
+redondeo comercial y varios ajustes. Cada fila facturable con precio mayor que cero se eleva al múltiplo de la regla
+`price_rounding` vigente para la moneda de salida, antes de los ajustes y nunca hacia abajo; una fila que cumplía su
+piso antes de redondear lo sigue cumpliendo. Los ajustes son hasta 10, `discount` por tasa o `agreed_net` (neto
+pactado por período; el motor deriva `discount` o `uplift` y llega al monto exacto), y cada fila recibe a lo más uno:
+sigue sin haber cadena de ajustes sobre una misma fila. Margen final = `(neto − costo) / neto` sobre el neto después
+de redondeo, descuento y recargo. Detalle: [contrato 1.1.0](cotizador-v3-contrato-y-validacion.md#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10).
+
 FX conserva par, tasa, fecha, fuente e IDs; convertir exige la dirección seleccionada, sin invertir o cruzar
 automáticamente. La referencia EUR→USD de la fixture operativa es 1.1206 al 09-10-2026; permite simular Magnific,
 no fija una tasa contractual. Impuestos pueden quedar pendientes con `tax=null` y `grandTotal=null`, no cero.
 El kernel no infiere obligaciones fiscales por país.
+
+Motor 1.1 (2026-10-10): en `catalog.review-v4.json` el tipo de cambio de cotización es un valor de política decidido
+por el operador, con USD como moneda de referencia y un margen prudencial sobre el spot; no es una tasa observada ni
+contractual. La referencia EUR→USD sigue fechada sólo el 2026-10-09: una cotización posterior que necesite EUR no
+tiene tasa vigente. USD→CLF sigue siendo un valor estimado de 2025.
 
 ## Herramientas, personas y servicio
 
@@ -172,6 +190,10 @@ se redondean a CLP enteros por separado y una línea al piso puede quedar bajo �
 marca y nunca sube el precio. En el ejemplo `managed-care.*` las seis líneas quedan cortas por 0,1 a 0,5 CLP;
 `marginAmountShortOfFloor` distingue esa brecha de redondeo de un incumplimiento real.
 
+Motor 1.1 (2026-10-10): lo anterior es el contrato 1.0.0 (el ejemplo con `catalog.review-v3`). Con una regla de
+redondeo vigente, el contrato 1.1.0 conserva el piso de toda fila que lo cumplía antes de redondear: el mismo ejemplo
+con `catalog.review-v4` no marca ninguna línea. `assess` no cambió; sigue leyendo sólo `MARGIN_BELOW_FLOOR`.
+
 `compose preview` admite simulación calculada en revisión y entrega JSON/Markdown con allowlist. Excluye
 costos, margen, IDs/fuentes privados, providers, drivers y países de talento. No autoriza publicación o envío.
 Desde el 2026-10-10, en `managed_service` los importes derivados (fee del período e implementación) conservan la
@@ -212,12 +234,54 @@ Delta 2026-10-10, qué imprime cada comando. Códigos de salida, flags, digests 
   (`brief.adjustments[]`, `kind: "discount"`, con `rate`, `lineIds` y `reason`); así el artefacto lleva el neto, el
   margen y el veredicto de piso reales. Decisiones, alternativas descartadas y el primer caso:
   [delta del ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-10--endurecimiento-de-la-cli-errores-tipados-resumen-derivado-y-veredicto-de-piso).
+  Corrección del mismo día (motor 1.1): el precio pactado se declara como `agreed_net`, sin calcular una tasa, y el
+  brief admite hasta 10 ajustes sobre filas disjuntas. El método de la tasa queda como evidencia del contrato 1.0.0.
+
+Motor 1.1 (2026-10-10), qué imprime cada comando. No hay comandos, flags ni códigos de salida nuevos.
+
+- `compose prepare|quote` y `replay` de una composición: el mismo resumen `pricing-v3-composition-summary/1`, con
+  tres claves aditivas. `engineVersion` es el motor del contrato con que se resolvió (`null` si la resolución no
+  produjo ningún período); `commercialAdjustments` son los ajustes tal como los declara el brief congelado;
+  `priceRounding` es la regla
+  aplicada, `{ currency, multiple, scope: "offer" | "general", offerId, recordId, revision, sourceStatus }`, o `null`.
+  En una quote 1.1.0, `totals` y los totales por período agregan `roundingAdjustment` y `uplift`; en una 1.0.0 esas
+  claves no existen.
+- `explain` (catálogo y composición) agrega `commercialAdjustments`: los dos datos anteriores, la identidad
+  `net = undiscountedPrice + uplift − discount` y `rows[]` con el recorrido de precio por fila y período
+  (`undiscountedPrice`, `roundingAdjustment`, `discount`, `uplift`, `net`; las dos claves nuevas sólo en filas 1.1.0).
+- `prepare|quote` del carril de catálogo y `calculate` del kernel entregan el resultado completo como antes, con las
+  claves nuevas cuando el contrato es 1.1.0.
+- `compare` de dos artefactos de snapshot compara `roundingAdjustment` y `uplift` sólo si ambos lados los traen.
+- `catalog search|show` aceptan `--kind price_rounding`.
+- `compose preview`, `export` y la proyección cliente no cambian de forma: muestran el neto final, ya redondeado y
+  ajustado, y nunca el desglose de redondeo, descuento o recargo.
+- Un error de ajuste del kernel (`OVERLAPPING_ADJUSTMENTS`, `INVALID_AGREED_AMOUNT`, `AGREED_NET_WITHOUT_BASE`,
+  `INVALID_PRICE_ROUNDING`, `DUPLICATE_ID`) sale en composición como bloqueo en `diagnostics` del resumen, con
+  `totals` nulo y exit 2; en `quote` del carril de catálogo queda bajo `periods[].diagnostics` con
+  `calculationStatus: needs_input`. `AMBIGUOUS_PRICE_ROUNDING` y un neto de `setup` que no cae en ningún período
+  (`AGREED_NET_WITHOUT_BASE`, ruta `adjustments.<adjustmentId>`) son bloqueos de resolución.
 
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
 día bajo `data/pricing/` (16) y en la carpeta del caso SKY (13). Los conteos de TASK-2022 siguen siendo la evidencia
 fechada de ese cierre; `verification.cli.json` registra sólo operación y código de salida, así que sigue vigente.
+Readback del 2026-10-10 tras el motor 1.1 y el catálogo v4: `pnpm pricing:v3:test` con 12 archivos y 320 pruebas V3,
+ESLint y `pnpm typecheck` limpios, y `verified: true` en todos los `*.artifact.json` en disco: 16 bajo
+`data/pricing/` y 14 en la carpeta del caso SKY (30). La guarda permanente cubre los versionados: 17 en el commit
+`9e397278c` y 18 desde `72fbf10d4`, que agregó `acordado-neto.artifact.json`, el primero firmado por el motor 1.1.0.
+Cotizaciones de prueba de ese día con `catalog.review-v4` + `resources.review-v5`:
+
+| Caso | Contrato | Resultado |
+| --- | --- | --- |
+| SKY social care con `agreed_net` 4.990.000 | 1.1.0 | `undiscountedPrice` 5.430.000 (redondeo 9.855), `discount` 440.000, `net` 4.990.000 exacto; margen 0,402589; tres líneas marcadas, 236.579 CLP al mes bajo el piso en total |
+| SKY al piso, sin precio pactado | 1.0.0 en v3 → 1.1.0 en v4 | 5.420.145 → 5.430.000; en v4, margen 0,450998 y ninguna línea marcada |
+| `managed-care.demand.json` en v3 (CLP) | 1.0.0 | 9.508.946; seis líneas marcadas por fracciones de peso |
+| `managed-care.demand.json` en v4 | 1.1.0 | CLP 9.530.000 · USD 9.530,00 · COP 34.900.000 · MXN 183.300,00 · PEN 35.300,00; todos múltiplos de su regla, ninguna línea marcada |
+
+Los archivos `acordado-neto.*` del caso SKY están junto al
+[registro de la excepción](../../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
 vigentes, medición de provisiones, policy comercial y términos reales siguen en
 [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json). Cambios salariales por periodo,

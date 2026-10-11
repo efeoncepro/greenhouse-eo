@@ -16,6 +16,7 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 
 | Decision | Status | Scope | Canonical doc | Source / notes |
 | --- | --- | --- | --- | --- |
+| Pricing V3: motor 1.1 con precio acordado, redondeo comercial y contratos de entrada convivientes | Accepted local 2026-10-10 — aprobado por el operador (CEO) | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md) | Contrato 1.0.0 intacto y 1.1.0 aditivo, cada uno con su motor en un registro cerrado; `agreed_net`, ajustes disjuntos y redondeo por moneda como dato de catálogo; guarda permanente de artefactos congelados. Sin canon/API/DB ni aprobación comercial. |
 | Pricing V3: operación local para agentes | Accepted local2026-10-09 | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) | Catálogo/reglas, portfolio declarado, planes/versiones con impacto, readiness y preview redactado; sin canon/API/DB ni aprobación comercial. |
 | Excel pricing CLI local para agentes | Accepted 2026-10-09 | Commercial / Finance / Agent tooling | [GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md](GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md) | Extracción trazable, costeo multirol editable y comparación de márgenes sin UI/DB; no catálogo aprobado ni emisión de quotes. |
 | Capacidad especializada regional de CRM y RevOps | Accepted 2026-10-09 — dirección del operador; oferta en validación | RevOps & CRM / Commercial / Talent / Finance / Legal | [EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md](EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) + [servicio](../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) | Staff Augmentation y operación gestionada con responsabilidades distintas; estándar regional, configuración contractual/capacidad/pricing por validar. Sin nuevos contratos ni rollout. |
@@ -333,3 +334,10 @@ acceso cliente por ventana, bundles/seats, readiness, preview allowlisted y actu
 policy/créditos. TASK-2017 mantiene economía parcial; Quote API Parity sigue canónica en V2. El
 [mapa de promoción](../documentation/finance/cotizador-v3-promocion-canonica.md) prepara su futura integración;
 no acredita nueva API/UI/MCP, despliegue, emisión o pricing aprobado.
+
+[Motor 1.1: precio acordado, redondeo comercial y versiones convivientes](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md):
+Accepted local 2026-10-10, aprobado por el operador (CEO); el ADR no declara unidad de trabajo. El kernel mantiene el contrato 1.0.0 byte a
+byte y agrega 1.1.0 (neto pactado por período, ajustes sobre filas disjuntas y redondeo hacia arriba con conservación
+del piso); la resolución emite 1.1.0 sólo cuando lo congelado usa una capacidad nueva y una guarda reproduce cada
+artefacto congelado. Resuelve lo que el delta de endurecimiento de la CLI del ADR operativo dejaba como «cambio de
+motor». No promueve nada al cotizador canónico.

@@ -8,7 +8,7 @@
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
 
-Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites del contrato local 1.0.0. El cotizador canónico no cambia.
+Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0 y, desde el 2026-10-10, 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)). El cotizador canónico no cambia.
 
 ## Bloque 2 — Contrato del prototipo
 
@@ -33,14 +33,14 @@ Se distinguen `request` (qué se quiere cotizar), `resolvedContext` (datos y pol
 
 | Campo de `request`                           | Regla                                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `schemaVersion`                              | Obligatorio; versión inicial propuesta `1.0.0`; rechazar versión no soportada                                                   |
+| `schemaVersion`                              | Obligatorio; versión inicial `1.0.0`; desde el 2026-10-10 también `1.1.0`, con su propio motor; rechazar versión no soportada   |
 | `quoteDate`                                  | Fecha ISO `YYYY-MM-DD`, válida y explícita; el agente puede proponer la fecha actual, pero la registra en la solicitud          |
 | `offerId`, `deliveryModel`, `engagementCode` | Oferta, modalidad de entrega y engagement separados; resolver desde catálogo, sin crear otra oferta por usar Staff Augmentation |
 | `offerMarketCountry`                         | País/mercado de venta confirmado, código ISO de país; mercados regionales requieren futura extensión expresa                    |
 | `outputCurrency`                             | Moneda explícita y habilitada en el registro de monedas; ninguna moneda se deduce del país                                      |
 | `duration`                                   | En V1: `{ unit: "month", periods: entero positivo }`; meses completos, sin prorrateo de días implícito                          |
 | `lines[]`                                    | Al menos una línea; cada línea con `lineId` único, perfil resuelto y cantidades válidas                                         |
-| `adjustments[]`                              | Opcional; ausencia significa ninguna modificación solicitada, sin desactivar reglas automáticas explícitas del paquete          |
+| `adjustments[]`                              | Opcional; ausencia significa ninguna modificación solicitada, sin desactivar reglas automáticas explícitas del paquete. `1.0.0`: a lo más un `discount`; `1.1.0`: hasta 10, `discount` o `agreed_net`, sobre filas disjuntas |
 | `taxTreatment`                               | `not_resolved`, `not_applicable` con fundamento, o política resuelta; simulación neta permitida con impuestos pendientes        |
 
 Por cada línea de talento:
@@ -72,7 +72,7 @@ Los importes, FX, factores y tasas del contrato son cadenas decimales exactas. `
 
 Los cálculos usan aritmética decimal sin redondeos intermedios de dinero; una división periódica conserva al menos 12 decimales con precisión y estrategia versionadas. Implementación local: decimal.js 10.6.0, precisión 80, conforme al ADR del prototipo. Redondeo contable inicial definido: `HALF_UP` a la precisión monetaria del registro de moneda, al consolidar cada línea facturable. Los totales monetarios son suma de líneas redondeadas. Un descuento global se distribuye proporcionalmente sobre sus líneas elegibles; el residuo de unidades mínimas se asigna por mayor resto y, en empate, `lineId`, con trazabilidad.
 
-Redondeo comercial adicional —por ejemplo, elevar a un múltiplo de precio— requiere una política del bloque 1 y aparece como ajuste separado. No se hereda automáticamente del Excel. Los costos se consolidan con la misma precisión monetaria para calcular el margen final contra el neto cotizable; se conserva el valor de cálculo previo. Los controles usan el margen sin redondearlo a un porcentaje de presentación.
+Redondeo comercial adicional —por ejemplo, elevar a un múltiplo de precio— requiere una política del bloque 1 y aparece como ajuste separado. No se hereda automáticamente del Excel. Desde el 2026-10-10 esa política existe en el contrato 1.1.0: registro `price_rounding` del catálogo y campo `roundingAdjustment` del resultado; el contrato 1.0.0 sigue sin redondeo comercial. Los costos se consolidan con la misma precisión monetaria para calcular el margen final contra el neto cotizable; se conserva el valor de cálculo previo. Los controles usan el margen sin redondearlo a un porcentaje de presentación.
 
 Cada periodo mensual tiene resultado propio. Si la configuración es homogénea, se muestra fee mensual uniforme; si varían costos o cargos, se muestra calendario por periodo, sin afirmar una recurrencia uniforme. Setup y otros cargos únicos se contabilizan una vez. Una amortización exige política explícita y no convive con el cobro íntegro del mismo setup. Costeo mensual de licencia anual y compromiso de caja anual aparecen separados.
 
@@ -100,7 +100,7 @@ Envelope interno propuesto:
 
 `needs_input` devuelve todas las rutas faltantes detectables en la pasada. Los totales finales, margen agregado y total convertido quedan `null`; se pueden conservar componentes ya resueltos, nunca presentarlos como precio completo. `invalid` cubre contradicciones/formato/reglas imposibles; `failed` corresponde a un fallo inesperado del adaptador/ejecución, sin convertirlo en dato comercial faltante.
 
-`requires_review` conserva los importes calculados y razones: margen bajo piso, excepción de capacidad, fuente no validada comercialmente u otra condición configurada. El sistema no eleva el precio, altera el costo ni aprueba automáticamente la excepción. `not_evaluated` aplica cuando no se completó el cálculo.
+`requires_review` conserva los importes calculados y razones: margen bajo piso, excepción de capacidad, fuente no validada comercialmente u otra condición configurada. El sistema no eleva el precio, altera el costo ni aprueba automáticamente la excepción. El redondeo comercial del contrato 1.1.0 no contradice esto: es política de catálogo aplicada antes de los ajustes y del control, no una corrección de una fila marcada. `not_evaluated` aplica cuando no se completó el cálculo.
 
 El estado de autorización comercial pertenece a un registro/proceso separado. El prototipo no crea `approved` ni `issued`. Una aprobación posterior referencia el digest exacto; un cambio de alcance, configuración o importe requiere una nueva revisión del resultado cambiado.
 
@@ -132,6 +132,58 @@ La vista comercial permite alcance, perfiles, dedicación, calendario/precio, se
 Un artefacto interno conserva solicitud, configuración completa necesaria o contenido direccionado por hash, motor exacto, contrato, políticas de precisión/redondeo, FX y resultado. Referencias sin contenido recuperable no bastan para replay. El digest cubre el payload semántico con serialización estable; timestamps de ejecución y correlación se guardan fuera de ese payload.
 
 Mismas entradas/configuración y motor producen el mismo resultado y digest independientemente del consumidor. El adaptador puede tener otro timestamp/request ID. `explain` lee la evidencia original; `replay` usa la versión original disponible y valida digest; si no está disponible, informa incompatibilidad, no recalcula silenciosamente con la última. Un recálculo actual crea otro resultado y conserva referencia al anterior.
+
+### Contrato 1.1.0 — ajustes comerciales y redondeo (2026-10-10)
+
+Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Todo lo anterior de este bloque describe el contrato 1.0.0, que no cambió; esta sección describe lo que agrega 1.1.0. Fuentes ejecutables: [`schemas.ts`](../../../src/lib/finance/pricing-v3/schemas.ts), [`calculate.ts`](../../../src/lib/finance/pricing-v3/calculate.ts) y [`catalog/resolve.ts`](../../../src/lib/finance/pricing-v3/catalog/resolve.ts).
+
+**Versiones.** El kernel acepta dos contratos de entrada y firma cada resultado con el motor de su contrato. El registro cerrado es `PRICING_V3_ENGINES` (`schemas.ts`); `ENGINE_VERSION` dejó de existir. Cada contrato nombra su propia aritmética en `precisionPolicy` (`PRICING_V3_PRECISION_POLICIES`, `calculate.ts`).
+
+| `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué admite |
+| --- | --- | --- |
+| `1.0.0` | `pricing-v3-local/1.0.0` | Lo de siempre, byte a byte: a lo más un `discount`, sin redondeo comercial. Rechaza cualquier campo nuevo |
+| `1.1.0` | `pricing-v3-local/1.1.0` | Hasta 10 ajustes (`discount` o `agreed_net`) sobre filas disjuntas y `snapshot.priceRounding` opcional |
+
+- La versión la declara la entrada, y request y snapshot llevan la misma. El motor no la infiere ni la sube. Una entrada que no declara `1.1.0` (otra versión, ninguna o un documento mal formado) se juzga con el esquema 1.0.0 y conserva los diagnósticos de siempre.
+- En el carril de catálogo y composición el que llama no elige contrato: la resolución emite `1.1.0` sólo si el brief trae un ajuste que no sea un único `discount`, más de un ajuste, o si el catálogo tiene una regla `price_rounding` vigente a `quoteDate` para la moneda de salida. En cualquier otro caso emite `1.0.0`. La decisión depende sólo de lo congelado, así que una cotización anterior vuelve a resolver al mismo contrato y al mismo digest.
+- Un cambio futuro de comportamiento agrega contrato y motor al registro; nunca modifica un contrato ya usado.
+
+**Ajustes.** En el kernel van en `request.adjustments`; en catálogo y composición, en `brief.adjustments`.
+
+```jsonc
+{ "adjustmentId": "…", "kind": "discount", "rate": "0.05", "lineIds": ["a"], "reason": "…" }
+{ "adjustmentId": "…", "kind": "agreed_net", "amount": "4990000", "billing": "monthly", "lineIds": ["a", "b"], "reason": "…" }
+```
+
+- `discount` no cambia: rebaja por tasa sobre las filas mensuales y de implementación de sus líneas.
+- `agreed_net` es el neto pactado en la moneda de salida para las filas de la clase `billing` (`monthly` o `setup`) de sus líneas, **por período**. El motor reparte la diferencia contra el precio de esas filas por mayor resto con desempate por `lineId` y deja el neto exactamente en `amount`: si lo pactado es menor, la diferencia es `discount`; si es mayor, `uplift`.
+- Una fila facturable es el par línea × clase en cada período y recibe a lo más un ajuste. Un `discount` reclama las dos clases de sus líneas; un `agreed_net`, sólo la suya.
+- Un `agreed_net` de `setup` se envía sólo a los períodos donde alguna de sus líneas tiene un recurso de cobro único. Si no cae en ningún período, la resolución lo bloquea.
+- `reason` es obligatorio. Un ajuste no aprueba nada: el control de piso corre sobre el neto final.
+
+**Redondeo comercial.** La regla es un registro `price_rounding` del catálogo, por moneda: `{ "currency", "multiple", "offerId"? }`, con fuente y vigencia. La de una oferta prevalece sobre la general de su moneda; sin regla vigente para la moneda de salida no hay redondeo. Cada moneda declara su múltiplo: no se convierte el de otra por tipo de cambio, así que la misma oferta en dos monedas no da precios que sean conversión exacta uno del otro.
+
+- Se aplica a cada fila facturable con precio mayor que cero, **antes** de los ajustes y siempre hacia arriba. El precio de política se calcula como en 1.0.0 (`HALF_UP` a la precisión de la moneda) y se eleva al múltiplo; la diferencia queda en `roundingAdjustment`.
+- Conservación del piso: si la fila cumplía su `minimumMargin` antes de redondear, el precio redondeado es el menor múltiplo que también lo cumple sobre los importes presentados. Si no lo cumplía, sólo sube al múltiplo siguiente: el redondeo no repara una política que vende bajo su piso.
+- «Cumplía antes de redondear» se lee sobre los importes sin redondear, a 60 de los 80 dígitos de trabajo. `MARGIN_BELOW_FLOOR` sigue comparando sin tolerancia alguna.
+
+**Forma del resultado.** Filas y totales de un resultado 1.1.0 agregan `roundingAdjustment` y `uplift`. Identidad: `net = undiscountedPrice + uplift − discount`, y `undiscountedPrice` ya incluye el redondeo (precio de política = `undiscountedPrice − roundingAdjustment`). Un resultado 1.0.0 no tiene ninguna de las dos claves: no van en cero, no van, porque agregarlas cambiaría el digest de los artefactos anteriores. Los totales de una quote de catálogo o composición suman las dos claves sólo cuando la quote es 1.1.0.
+
+**Diagnósticos nuevos.** Todos son `error` del kernel y dejan el período en `invalid`; no son rechazos del registro de `errors.ts`.
+
+| Código | Cuándo |
+| --- | --- |
+| `OVERLAPPING_ADJUSTMENTS` | Dos ajustes apuntan a la misma fila facturable |
+| `INVALID_AGREED_AMOUNT` | `amount` con más decimales que la moneda de salida |
+| `AGREED_NET_WITHOUT_BASE` | Un `agreed_net` sin filas a las que aplicarse, o con precio base cero y monto positivo |
+| `INVALID_PRICE_ROUNDING` | `multiple` no es un número entero de unidades mínimas de la moneda |
+| `DUPLICATE_ID` | `adjustmentId` repetido |
+
+En composición suben a `diagnostics` del resumen como bloqueos, con totales nulos y exit 2. En `quote` del carril de catálogo quedan bajo `periods[].diagnostics` con `calculationStatus: needs_input`, como cualquier período fallido. La resolución agrega dos bloqueos propios: `AMBIGUOUS_PRICE_ROUNDING` (dos reglas aplicables del mismo nivel) y `AGREED_NET_WITHOUT_BASE` con ruta `adjustments.<adjustmentId>` (un neto de `setup` que no cae en ningún período). La validación del catálogo rechaza una regla con moneda no registrada (`PRICE_ROUNDING_CURRENCY_NOT_REGISTERED`) o con un múltiplo que no es entero en unidades mínimas (`INVALID_PRICE_ROUNDING_MULTIPLE`); esos sí son rechazos del [registro](../../../src/lib/finance/pricing-v3/errors.ts).
+
+**Replay y guarda.** El replay acepta cualquier motor del registro y verifica por recálculo y digest; un motor fuera del registro es `REPLAY_MISMATCH`. [`pricing-v3-frozen-artifacts.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-frozen-artifacts.test.ts) reproduce cada artefacto congelado y exige al menos uno firmado por cada motor registrado.
+
+**Fuera de 1.1.0.** Redondeo sobre el total del período, terminaciones comerciales (se expresan como `agreed_net`), ajustes de otra clase y ajustes encadenados sobre una misma fila.
 
 ## Bloque 3 — Pruebas y convergencia
 
@@ -227,4 +279,4 @@ Esta definición conserva el contrato objetivo de los bloques 2 y 3. Los ADRs lo
 
 TASK-2016 implementa cálculo mensual Staffing, costos humanos y recursos explícitos, países separados, FX, markup/margen objetivo, un descuento global, periodos variables de recursos, impuestos explícitos, snapshots/replay y exportación redactada. [ADR local](../../architecture/GREENHOUSE_PRICING_V3_LOCAL_PROTOTYPE_DECISION_V1.md), [schema ejecutable](../../../src/lib/finance/pricing-v3/schemas.ts), [manual y límites](../../manual-de-uso/finance/cotizar-v3-por-cli.md), [evidencia](../../audits/commercial/2026-10-09-pricing-v3-local-prototype.md).
 
-El contrato funcional anterior conserva la dirección objetivo; no todos sus casos equivalen a capacidades habilitadas. Quedan fuera del contrato local: costOverride en request, salarios variables por periodo, consumo AI medido, fees porcentuales sobre ingresos, setups amortizados, rounding comercial, múltiples ajustes y servicios compuestos. Los inputs no implementados se rechazan, sin simular soporte. No se ha contrastado todo V2/V3, adoptado catálogo operativo ni integrado consumers UI/API/MCP/Nexa. La combinación Colombia→Chile devuelve pendientes honestos.
+El contrato funcional anterior conserva la dirección objetivo; no todos sus casos equivalen a capacidades habilitadas. Quedan fuera del contrato local: costOverride en request, salarios variables por periodo, consumo AI medido, fees porcentuales sobre ingresos, setups amortizados, rounding comercial, múltiples ajustes y servicios compuestos. Los inputs no implementados se rechazan, sin simular soporte. Corrección del 2026-10-10: esa lista describe el contrato 1.0.0. El redondeo comercial y varios ajustes sobre filas disjuntas, incluido el neto pactado, existen en el contrato 1.1.0; el resto de la lista sigue fuera de ambos. No se ha contrastado todo V2/V3, adoptado catálogo operativo ni integrado consumers UI/API/MCP/Nexa. La combinación Colombia→Chile devuelve pendientes honestos.

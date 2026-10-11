@@ -5,6 +5,8 @@ TASK-2022, 2026-10-09. Prototipo local ejecutable. Entrada:
 [ADR](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md).
 [Referencia funcional de todo lo implementado](../../documentation/finance/cotizador-v3-superficie-implementada.md):
 contratos, fórmulas, periodos, selección, costos, evidencia, mantenimiento y límites.
+Desde el 2026-10-10: motor 1.1 (precio acordado y redondeo comercial) y catálogo v4
+([decisión](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)).
 
 El operador puede pedir «cotiza un diseñador senior al 50%, talento Colombia, mercado Chile».
 El agente consulta perfiles y recursos, interpreta las tareas, completa una demanda explícita y usa la CLI.
@@ -13,29 +15,54 @@ Una simulación calculada sigue pendiente de revisión comercial.
 
 ## Archivos y comandos
 
-Desde la raíz del repo; variables de esta sesión, sin cambiar el catálogo predeterminado:
+### Versiones vigentes
+
+Toda cotización nueva usa este trío, desde la raíz del repo. Son variables de la sesión y las usan los comandos de
+este manual; la CLI no elige sola la versión más reciente (sin `--catalog` cae en la baseline histórica
+`review-2026-10-09-v1`).
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v2.json
-pricing_policy=data/pricing/v3-operating/resources.review-v2.json
+pricing_catalog=data/pricing/v3-operating/catalog.review-v4.json
+pricing_policy=data/pricing/v3-operating/resources.review-v5.json
 pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
 
-pnpm --silent pricing:v3 resources inspect --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-09 --query diseñador
+pnpm --silent pricing:v3 catalog validate --catalog "$pricing_catalog"
+```
 
-pnpm --silent pricing:v3 compose scaffold --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --input data/pricing/v3-operating/writer.brief.json
+`catalog validate` debe responder `"version": "operating-review-2026-10-10-v4"` con exit 0. El catálogo v4 agrega el
+redondeo comercial por moneda, el tipo de cambio de cotización y los 32 costos de persona confirmados; rigen para
+demandas con `quoteDate` 2026-10-10 o posterior. `catalog.review-v2.json`, `catalog.review-v3.json` y las policies
+`resources.review-v2` a `-v4` son padres congelados: las cotizaciones hechas con ellos se siguen reproduciendo igual
+con `replay`, y en este manual sólo se nombran para repetir un ejemplo anterior.
 
-pnpm --silent pricing:v3 resources portfolio --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --date 2026-10-09 \
+### Secuencia de comandos
+
+La secuencia es la misma para cualquier pedido. El ejemplo del diseñador está fechado el 2026-10-09 y usa una
+herramienta con precio en EUR, cuya única referencia de cambio es de ese día; por eso se reproduce con las versiones
+que regían esa fecha, en variables aparte (`ejemplo_*`). Con el trío vigente ese mismo plan devuelve exit 2
+(`RESOURCE_POLICY_NOT_EFFECTIVE`: la policy v5 rige desde el 2026-10-10). Para un pedido nuevo son las mismas órdenes
+con `$pricing_catalog` y `$pricing_policy`, y la fecha del día en `quoteDate` y `--date`.
+
+```bash
+ejemplo_catalog=data/pricing/v3-operating/catalog.review-v2.json
+ejemplo_policy=data/pricing/v3-operating/resources.review-v2.json
+
+pnpm --silent pricing:v3 resources inspect --catalog "$ejemplo_catalog" \
+  --policy "$ejemplo_policy" --credits "$pricing_credits" --date 2026-10-09 --query diseñador
+
+pnpm --silent pricing:v3 compose scaffold --catalog "$ejemplo_catalog" \
+  --policy "$ejemplo_policy" --input data/pricing/v3-operating/writer.brief.json
+
+pnpm --silent pricing:v3 resources portfolio --catalog "$ejemplo_catalog" \
+  --policy "$ejemplo_policy" --date 2026-10-09 \
   --input data/pricing/v3-operating/portfolio.example.json
 
-pnpm --silent pricing:v3 compose plan --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --credits "$pricing_credits" \
+pnpm --silent pricing:v3 compose plan --catalog "$ejemplo_catalog" \
+  --policy "$ejemplo_policy" --credits "$pricing_credits" \
   --input data/pricing/v3-operating/designer.plan.json --out /tmp/demanda-v3-nueva.json
 
-pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --credits "$pricing_credits" \
+pnpm --silent pricing:v3 compose quote --catalog "$ejemplo_catalog" \
+  --policy "$ejemplo_policy" --credits "$pricing_credits" \
   --input /tmp/demanda-v3-nueva.json --out /tmp/cotizacion-v3-nueva.json
 
 pnpm --silent pricing:v3 explain --input /tmp/cotizacion-v3-nueva.json
@@ -44,6 +71,10 @@ pnpm --silent pricing:v3 compose assess --input /tmp/cotizacion-v3-nueva.json
 pnpm --silent pricing:v3 compose preview --input /tmp/cotizacion-v3-nueva.json \
   --format markdown --out /tmp/preview-v3-nuevo.md
 ```
+
+En este ejemplo `inspect` devuelve exit 0, `scaffold` exit 2 (siempre deja preguntas) y los demás exit 3. El resumen
+de `compose quote` trae `engineVersion` `pricing-v3-local/1.0.0` y `priceRounding: null`: es una cotización anterior
+al redondeo.
 
 Las rutas `--out` deben ser nuevas; nunca sobrescriben un padre o artefacto. JSON en stdout es interfaz para agentes.
 Exit 0: operación técnica verificada. Exit 2: falta información. Exit 3: preparado/calculado en revisión;
@@ -85,7 +116,8 @@ con `explain` sobre ese archivo (salida grande; pedirla sólo cuando haga falta 
 composición responde `{ verified, calculationId, summary }`: verifica el archivo y devuelve su resumen, no el
 resultado entero. `compose assess` añade un gap `MARGIN_BELOW_POLICY_FLOOR` por cada línea que el kernel marcó bajo
 el piso de su política y las lista en `margin.policyFloor.linesBelowFloor`; sus 40 %/35 % genéricos no cambian.
-`compose preview` imprime los importes derivados en la escala de la moneda (CLP sin decimales). Los carriles
+`compose preview` imprime los importes derivados en la escala de la moneda (CLP sin decimales) y sólo el neto final:
+no detalla redondeo, descuento ni recargo. Los carriles
 `prepare`/`quote` de catálogo y `calculate` del núcleo conservan su salida. Opciones ajenas al subcomando se rechazan
 con `INVALID_ARGUMENT` y el nombre de la opción; no se interpretan como ejecutadas. Para actualizar el catálogo
 monetario, obtener `digest` con `catalog validate`; para policy/créditos, usar `policyDigest`/`creditCatalogDigest`
@@ -170,7 +202,8 @@ de otra cotización sin un presupuesto/inventario explícito. Créditos de herra
 
 ## Actualizar valores sin alterar cotizaciones anteriores
 
-Salarios, cargos, factores país/mercado y FX: [mantenimiento del catálogo monetario](catalogo-v3-seleccion-y-actualizacion.md).
+Salarios, cargos, factores país/mercado, FX de cotización y reglas de redondeo:
+[mantenimiento del catálogo monetario](catalogo-v3-seleccion-y-actualizacion.md#cambiar-el-redondeo-o-el-fx-de-cotización).
 Planes/reglas o packsIA: `resources preview` / `resources apply`. Change-set completo:
 
 ```json
@@ -208,21 +241,27 @@ replay de la vieja usa sus inputs congelados. Renovación Adobe sigue condiciona
 ## Cotizar un servicio gestionado por volumen
 
 Para un servicio que se vende por capacidad y se dimensiona por volumen (social care, soporte, producción recurrente),
-usar las versiones `catalog.review-v3.json` y `resources.review-v5.json` y la oferta `creative-managed-service`.
+usar el trío vigente (`catalog.review-v4.json`, `resources.review-v5.json`, `ai-credits.review-v1.json`) y la oferta
+`creative-managed-service`.
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v3.json
+# El trío vigente, el mismo de «Versiones vigentes».
+pricing_catalog=data/pricing/v3-operating/catalog.review-v4.json
 pricing_policy=data/pricing/v3-operating/resources.review-v5.json
 pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
 
 # 1. Volumen → dedicación. Sin --brief sólo calcula; con --brief escribe un brief nuevo.
 pnpm --silent pricing:v3 compose workload --input data/pricing/v3-operating/managed-care.workload.json \
-  --brief data/pricing/v3-operating/managed-care.brief.json --out /ruta/nueva/brief-dimensionado.json
+  --brief data/pricing/v3-operating/managed-care.brief.json --out /tmp/brief-dimensionado.json
 
-# 2. Completar la demanda sobre el brief dimensionado y cotizar.
+# 2. Completar la demanda sobre el brief dimensionado y cotizar: artefacto en --out, resumen en stdout.
 pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" --policy "$pricing_policy" \
-  --credits "$pricing_credits" --input data/pricing/v3-operating/managed-care.demand.json --out /ruta/nueva/artefacto.json
+  --credits "$pricing_credits" --input data/pricing/v3-operating/managed-care.demand.json \
+  --out /tmp/servicio-gestionado.artifact.json > /tmp/servicio-gestionado.summary.json
 ```
+
+El paso 1 devuelve exit 0 y el paso 2 exit 3 (calculado, en revisión). Si una ruta de `--out` ya existe la CLI rechaza
+con `OUTPUT_EXISTS`: elegir otro nombre.
 
 Qué declarar en el workload (`pricing-v3-workload/1`):
 
@@ -250,120 +289,237 @@ En la demanda:
 - El consumo de agentes se declara en `serviceToolIds: ["agent-runtime-usage"]` con una asignación cuya cantidad es
   el número de bloques de 1.000 ítems procesados al mes.
 
-El precio sale al piso de la práctica (margen objetivo 45 %, mínimo 45 %). Sigue siendo una simulación en revisión:
-las provisiones y el consumo de agentes son estimaciones declaradas, y los costos de las personas son históricos.
+La política pone cada fila al piso (margen objetivo 45 %, mínimo 45 %) y el catálogo v4 la sube al múltiplo de su
+moneda: el ejemplo sale en CLP 9.530.000 al mes, de ellos 21.054 de redondeo, con margen `0.451214` y ninguna línea
+bajo el piso. El 45 % es el piso de margen de los servicios gestionados (decisión del CEO, 2026-10-10): un servicio
+donde se puede ganar más sube su margen objetivo en su propia política, no el piso.
+
+Sigue siendo una simulación en revisión. Las provisiones y el consumo de agentes son hipótesis declaradas y el plan
+de Sprout es precio público. Los 32 costos de persona están confirmados por su autor (el CEO) con los montos del
+Excel, pero ningún registro declara su país: la herramienta los sigue informando como `ESTIMATED_SOURCE`, con el
+supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. No es un error ni pide confirmar los montos otra vez; se cierra
+declarando el país de cada registro.
 
 ## Leer el resumen
 
 `compose prepare` y `compose quote` imprimen el resumen `pricing-v3-composition-summary/1`; `replay` de una
 composición lo devuelve dentro de `summary`. Es una lectura derivada del resultado congelado: cuenta, agrupa y
-quita repeticiones, no decide nada. Con las tres variables de la sección anterior (`catalog.review-v3`,
-`resources.review-v5`, `ai-credits.review-v1`):
+quita repeticiones, no decide nada. El paso 2 de la sección anterior dejó el resumen en
+`/tmp/servicio-gestionado.summary.json` y el artefacto en `/tmp/servicio-gestionado.artifact.json`; sobre ese artefacto:
 
 ```bash
-pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" --policy "$pricing_policy" \
-  --credits "$pricing_credits" --input data/pricing/v3-operating/managed-care.demand.json \
-  --out /tmp/servicio-gestionado.artifact.json > /tmp/servicio-gestionado.summary.json
-
 pnpm --silent pricing:v3 replay --input /tmp/servicio-gestionado.artifact.json
 pnpm --silent pricing:v3 explain --input /tmp/servicio-gestionado.artifact.json
 ```
 
-Los tres devuelven exit 3 en este ejemplo. El resumen pesa unos 15 KB; `explain` del mismo artefacto, unos 234 KB.
+Los dos devuelven exit 3 en este ejemplo, igual que el `compose quote` que lo generó. El resumen pesa unos 13 KB;
+`explain` del mismo artefacto, unos 237 KB.
 
-| Parte                                                                   | Qué dice                                                                                                                                                                               | Qué hacer                                                                                                                      |
-| ----------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `calculationId`, `replayDigest`                                         | Identidad del cálculo. `replayDigest` sólo aparece en `quote` y en `replay`: es lo que una reproducción debe igualar                                                                   | Citarlos al registrar o compartir el caso                                                                                      |
-| `calculationStatus`, `diagnostics`                                      | `diagnostics` son los **bloqueos**, completos. Si no está vacío, el estado es `needs_input`, `totals` es `null` y el exit es 2                                                         | Resolver cada bloqueo en la demanda (su `path` dice dónde) y volver a correr. No presentar precio                              |
-| `reviewStatus`, `quoteReviewStatus`                                     | Revisión de la composición (siempre `requires_review`) y revisión que devuelve el kernel                                                                                               | Tratar el número como simulación; ninguno de los dos es una aprobación                                                         |
-| `totals`, `marginRateRoundedDown`                                       | Costo, precio sin descuento, descuento, neto, margen, impuestos y moneda del plazo. `marginRateRoundedDown` es el margen a 6 decimales, redondeado hacia abajo                         | Leer el margen de aquí, no recalcularlo. `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero               |
-| `periods[]`                                                             | Estado y totales de cada periodo                                                                                                                                                       | Revisar que ningún periodo quede sin calcular y si el neto varía entre meses                                                   |
-| `assumptions`                                                           | Supuestos con que se resolvió el pedido (ej. costo histórico asumido para un país)                                                                                                     | Declararlos al explicar el precio                                                                                              |
-| `reviewSignals[]`                                                       | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales                                     | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`…); `paths` dice qué dato lo origina |
-| `marginFloor.lines[]`                                                   | Líneas que el kernel marcó bajo el piso de su política: `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` y `marginAmountShortOfFloor` (margen que falta al neto actual) | Ver «Redondeo o incumplimiento» abajo                                                                                          |
-| `toolSelections`                                                        | `counts` y las herramientas incluidas, las que aporta el cliente y las excluidas con motivo                                                                                            | Confirmar que cada herramienta incluida corresponde al alcance y que cada exclusión tiene un motivo defendible                 |
-| `attributions`                                                          | Por herramienta y precio: estado de la fuente, cantidad, parte del servicio y costo mensual completo, atribuido y sin asignar                                                          | Revisar fuentes no confirmadas y el costo que queda sin asignar                                                                |
-| `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` | Presupuesto de créditos y caja. Costo atribuido no es dinero nuevo por pagar; `cashMeaning` lo explica                                                                                 | No presentar `cashCommitment` como factura ni como compra                                                                      |
-| `fullDetail`                                                            | Recuerda que el detalle vive en el artefacto, bajo `semantic.result`                                                                                                                   | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea               |
+| Parte                                                                   | Qué dice                                                                                                                                                                                                                                                                                                                                                                                                                                               | Qué hacer                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `calculationId`, `replayDigest`                                         | Identidad del cálculo. `replayDigest` sólo aparece en `quote` y en `replay`: es lo que una reproducción debe igualar                                                                                                                                                                                                                                                                                                                                   | Citarlos al registrar o compartir el caso                                                                                                                                                                                                                             |
+| `calculationStatus`, `diagnostics`                                      | `diagnostics` son los **bloqueos**, completos. Si no está vacío, el estado es `needs_input`, `totals` es `null` y el exit es 2                                                                                                                                                                                                                                                                                                                         | Resolver cada bloqueo en la demanda (su `path` dice dónde) y volver a correr. No presentar precio                                                                                                                                                                     |
+| `reviewStatus`, `quoteReviewStatus`                                     | Revisión de la composición (siempre `requires_review`) y revisión que devuelve el kernel                                                                                                                                                                                                                                                                                                                                                               | Tratar el número como simulación; ninguno de los dos es una aprobación                                                                                                                                                                                                |
+| `engineVersion`                                                         | Motor que calculó: `pricing-v3-local/1.1.0` si la cotización usa un neto acordado, varios ajustes o una regla de redondeo para su moneda; `pricing-v3-local/1.0.0` en los demás casos. `null` si la demanda quedó bloqueada antes de llegar al motor                                                                                                                                                                                                   | No se elige: sale de la demanda y del catálogo. Dice qué lectura de `totals` y del piso aplica                                                                                                                                                                        |
+| `totals`, `marginRateRoundedDown`                                       | Del plazo: `cost`, `undiscountedPrice` (precio calculado; ya incluye el redondeo), `discount`, `net`, margen, impuestos y moneda. Con el motor 1.1.0 se agregan `roundingAdjustment` (lo que sumó el redondeo) y `uplift` (recargo de un neto acordado sobre el precio); en una cotización 1.0.0 esas dos claves no existen. `net = undiscountedPrice + uplift − discount`. `marginRateRoundedDown` es el margen a 6 decimales, redondeado hacia abajo | Leer el margen de aquí, no recalcularlo. `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero                                                                                                                                                      |
+| `commercialAdjustments`                                                 | Los ajustes tal como los declara el `brief` congelado: neto acordado (`agreed_net`) o descuento por tasa (`discount`), con su `reason`. `[]` si no hay                                                                                                                                                                                                                                                                                                 | Comprobar que el monto y el motivo son los que aprobó el operador ([Registrar el precio acordado](#registrar-el-precio-acordado))                                                                                                                                     |
+| `priceRounding`                                                         | Regla de redondeo aplicada a la moneda de salida: `{ currency, multiple, scope, offerId, recordId, revision, sourceStatus }`; `scope` es `general` (regla de la moneda) u `offer` (regla propia de la oferta, que prevalece). `null`: esta cotización no redondea                                                                                                                                                                                      | Con valor, una línea marcada es un incumplimiento real; con `null`, leer «Redondeo o incumplimiento» abajo                                                                                                                                                            |
+| `periods[]`                                                             | Estado y totales de cada periodo                                                                                                                                                                                                                                                                                                                                                                                                                       | Revisar que ningún periodo quede sin calcular y si el neto varía entre meses                                                                                                                                                                                          |
+| `assumptions`                                                           | Supuestos con que se resolvió el pedido (ej. `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`: el costo no declara país y se asume para el de la línea)                                                                                                                                                                                                                                                                                                          | Declararlos al explicar el precio                                                                                                                                                                                                                                     |
+| `reviewSignals[]`                                                       | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales                                                                                                                                                                                                                                                                                                     | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`…); `paths` dice qué dato lo origina                                                                                                                                        |
+| `marginFloor.lines[]`                                                   | Líneas que el kernel marcó bajo el piso de su política: `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` y `marginAmountShortOfFloor` (margen que falta al neto actual)                                                                                                                                                                                                                                                                 | Ver «Redondeo o incumplimiento» abajo                                                                                                                                                                                                                                 |
+| `toolSelections`                                                        | `counts` y las herramientas incluidas, las que aporta el cliente y las excluidas con motivo                                                                                                                                                                                                                                                                                                                                                            | Confirmar que cada herramienta incluida corresponde al alcance y que cada exclusión tiene un motivo defendible                                                                                                                                                        |
+| `attributions`                                                          | Por herramienta y precio: estado de la fuente, cantidad, parte del servicio y costo mensual completo, atribuido y sin asignar                                                                                                                                                                                                                                                                                                                          | Revisar fuentes no confirmadas y el costo que queda sin asignar                                                                                                                                                                                                       |
+| `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` | Presupuesto de créditos y caja. Costo atribuido no es dinero nuevo por pagar; `cashMeaning` lo explica                                                                                                                                                                                                                                                                                                                                                 | No presentar `cashCommitment` como factura ni como compra                                                                                                                                                                                                             |
+| `fullDetail`                                                            | Recuerda que el detalle vive en el artefacto, bajo `semantic.result`                                                                                                                                                                                                                                                                                                                                                                                   | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea. `explain.commercialAdjustments.rows` trae el recorrido del precio por fila: `undiscountedPrice`, `roundingAdjustment`, `discount`, `uplift` y `net` |
 
 Las filas que sólo difieren por periodo se agrupan en una con `periodIds`.
 
-**Redondeo o incumplimiento.** El kernel compara cada línea con el piso de su política y la marca; nunca sube el
-precio. En `creative-managed-service` el objetivo y el mínimo son ambos 0,45, y el costo y el precio se redondean a
-pesos enteros por separado: una línea cotizada exactamente al piso puede quedar bajo él por menos de un peso. En el
-ejemplo `managed-care` las seis líneas salen marcadas con `marginAmountShortOfFloor` entre 0,1 y 0,5.
+**Redondeo o incumplimiento.** El kernel compara el margen del neto final de cada línea con el piso de su política y
+la marca (`MARGIN_BELOW_FLOOR`); nunca corrige un incumplimiento. Qué significa una línea marcada depende de
+`priceRounding`:
 
-- Faltan **fracciones de peso** en una cotización sin descuento: es el redondeo del precio al piso. Decirlo así; no es
-  una excepción ni requiere decisión.
-- Faltan **miles de pesos**: el precio está de verdad bajo el piso. Requiere una decisión del operador antes de
-  presentarlo ([Registrar el precio acordado](#registrar-el-precio-acordado)).
+- **Con regla de redondeo** (`priceRounding` con valor, `engineVersion` `pricing-v3-local/1.1.0`): es toda cotización
+  nueva sobre el catálogo v4 en CLP, USD, COP, MXN o PEN. El precio de cada fila facturable se sube al múltiplo
+  siguiente de su moneda antes de aplicar ajustes; lo agregado queda en `roundingAdjustment` y nunca se redondea hacia
+  abajo. Una fila que cumplía su piso antes de redondear lo sigue cumpliendo después, así que una línea cotizada al
+  piso ya no sale marcada: en el ejemplo `managed-care`, `marginFloor.lines` está vacío. **Una línea marcada es un
+  incumplimiento real** —un neto acordado o un descuento la dejó bajo el piso— y requiere una decisión del operador
+  antes de presentarla ([Registrar el precio acordado](#registrar-el-precio-acordado)). El redondeo no se usa para
+  «cumplir» un piso.
+- **Sin regla** (`priceRounding: null`): cotizaciones congeladas sobre catálogos anteriores al v4, donde
+  `engineVersion` es `pricing-v3-local/1.0.0`, y monedas sin regla, como CLF. Rige la lectura anterior: costo y precio
+  se redondean por separado a la unidad de la moneda y una línea al piso puede quedar bajo él por menos de una unidad
+  (el mismo `managed-care` sobre el catálogo v3 marca seis líneas con `marginAmountShortOfFloor` entre 0,1 y 0,5).
+  Faltan fracciones sin ningún ajuste: es redondeo, decirlo así, no es una excepción. Faltan miles: incumplimiento
+  real.
+
+## Cotizar en otra moneda
+
+La moneda de la cotización es `brief.outputCurrency`: `CLP`, `USD`, `COP`, `MXN` o `PEN`. Un archivo versionado no se
+edita: copiar la demanda a una ruta nueva y cambiar ese campo. Con el trío vigente:
+
+```bash
+sed 's/"outputCurrency": "CLP"/"outputCurrency": "USD"/' \
+  data/pricing/v3-operating/managed-care.demand.json > /tmp/servicio-gestionado-usd.demand.json
+
+pnpm --silent pricing:v3 compose prepare --catalog "$pricing_catalog" --policy "$pricing_policy" \
+  --credits "$pricing_credits" --input /tmp/servicio-gestionado-usd.demand.json
+```
+
+Devuelve exit 3 con `totals.net` `9530.00` y `totals.currency` `USD`.
+
+- **USD es la moneda de referencia.** Los costos se calculan en USD y se convierten al final con el FX de cotización
+  del catálogo (`catalog search --kind fx --catalog "$pricing_catalog" --date 2026-10-10` lo lista). No se deriva un
+  FX inverso ni cruzado.
+- **El FX de cotización es una política, no el tipo de cambio del día.** Lo decidió el CEO el 2026-10-10 con un margen
+  prudencial sobre el mercado, para sostener un precio durante el plazo:
+
+  | Par     | FX de cotización | Mercado observado |
+  | ------- | ---------------- | ----------------- |
+  | USD→CLP | `1000`           | cerca de 937      |
+  | USD→COP | `3650`           | cerca de 3219     |
+  | USD→MXN | `19.25`          | cerca de 17,98    |
+  | USD→PEN | `3.70`           | cerca de 3,435    |
+
+  No presentarlo como tipo de cambio de mercado ni usarlo para liquidar un pago. Su revisión es decisión del operador
+  (`QUOTE_FX_REVIEW` en el ledger).
+
+- **Cada moneda redondea a su propio múltiplo**, por fila facturable y siempre hacia arriba: CLP 10.000, USD 10,
+  COP 50.000, MXN 100 y PEN 50 (`catalog search --kind price_rounding --catalog "$pricing_catalog" --date 2026-10-10`).
+  Por eso la misma oferta en dos monedas **no es la conversión exacta** una de la otra, y eso es lo esperado. El
+  ejemplo `managed-care`, cotizado en cada moneda el 2026-10-10 (todas `calculated`, exit 3, motor 1.1.0, ninguna
+  línea bajo el piso):
+
+  | Moneda | `totals.net` | `totals.roundingAdjustment` |
+  | ------ | ------------ | --------------------------- |
+  | CLP    | 9530000      | 21054                       |
+  | USD    | 9530.00      | 21.05                       |
+  | COP    | 34900000     | 192348                      |
+  | MXN    | 183300.00    | 252.82                      |
+  | PEN    | 35300.00     | 116.91                      |
+
+  USD 9.530 al FX de cotización serían COP 34.784.500; cotizado en COP sale 34.900.000. Para dar el precio en una
+  moneda, cotizar en esa moneda; no convertir a mano el resultado de otra.
+
+- **Un precio acordado va en la moneda de salida**: el `amount` de un `agreed_net` se declara en esa moneda y con sus
+  decimales (CLP y COP, ninguno; USD, MXN y PEN, hasta dos).
+- **Moneda sin regla de redondeo** (hoy CLF): calcula, pero sin redondear (`priceRounding: null`, motor 1.0.0) y con un
+  FX USD→CLF estimado de 2025; las líneas al piso vuelven a salir marcadas por fracciones. No presentar un precio en
+  CLF mientras el operador no decida su FX y su múltiplo (`QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`).
+- **Moneda sin FX** (EUR, o cualquier otra): exit 2, `calculationStatus` `needs_input`, `totals` `null` y en
+  `diagnostics` un `MISSING_CATALOG_SELECTION` en `fx.USD:<moneda>`. No hay precio y no se inventa una tasa: el FX se
+  agrega al catálogo ([mantenimiento](catalogo-v3-seleccion-y-actualizacion.md#cambiar-el-redondeo-o-el-fx-de-cotización)).
+- **Herramienta con precio en EUR** (Magnific): la referencia EUR→USD del catálogo rige sólo el 2026-10-09. Una
+  cotización con fecha posterior que la necesite devuelve exit 2 con `RESOURCE_FX_SELECTION_REQUIRED` hasta que el
+  catálogo reciba una referencia vigente.
 
 ## Registrar el precio acordado
 
 El precio que el operador acuerda de verdad tiene que pasar por el motor. Si se anota sólo en la propuesta, el
-artefacto congelado sigue mostrando el precio al piso y nadie comprueba el piso contra el precio real.
+artefacto congelado sigue mostrando el precio calculado y nadie comprueba el piso contra el precio real. El precio se
+declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a mano.
 
-1. Cotizar sin descuento y leer `totals.undiscountedPrice` (precio al piso).
-2. Calcular la tasa: `1 − neto acordado ÷ undiscountedPrice`, con siete decimales.
-3. Copiar la demanda a un archivo nuevo y declarar el descuento dentro de `brief`:
+1. Cotizar sin ajustes con el trío vigente y leer `totals.undiscountedPrice`: es el precio calculado, ya redondeado.
+2. Copiar la demanda a un archivo nuevo y declarar el acuerdo dentro de `brief`:
 
    ```json
    "adjustments": [
      {
        "adjustmentId": "sky-precio-acordado",
-       "kind": "discount",
-       "rate": "0.0793605",
+       "kind": "agreed_net",
+       "amount": "4990000",
+       "billing": "monthly",
        "lineIds": ["titular", "lider", "agentes"],
        "reason": "Precio base acordado CLP 4.990.000 más IVA al mes, todo incluido. Excepción al piso de 45 % aprobada por el CEO el 2026-10-10 por ser cliente vigente."
      }
    ]
    ```
 
-   Se admite un solo ajuste; `rate` es una cadena; `lineIds` son los IDs de las líneas del brief que reciben el
-   descuento; `reason` es obligatorio y debe decir qué se acordó, quién lo aprobó y cuándo. Sin `reason`, o con dos
-   ajustes, la CLI rechaza con `SCHEMA_INVALID`.
+   - `amount`: el neto acordado antes de impuestos, en la moneda de salida, como cadena y sin más decimales que los de
+     la moneda.
+   - Es **por periodo**: con `billing: "monthly"` es lo que se factura cada mes por esas líneas, no el total del plazo.
+     En doce meses, el plazo suma doce veces `amount`.
+   - `billing`: `monthly` acuerda las filas mensuales de esas líneas; `setup`, las de implementación (cobro único), y
+     sólo rige en los periodos que tienen filas de implementación. Acordar las dos cosas son dos ajustes.
+   - `lineIds`: los IDs de las líneas del brief que cubre el acuerdo. El motor reparte la diferencia entre sus filas
+     en proporción al precio de cada una.
+   - `reason`: obligatorio. Dice qué se acordó, quién lo aprobó y cuándo.
+   - El monto puede quedar bajo o sobre el precio calculado. Si es menor, la diferencia sale como `discount` (rebaja);
+     si es mayor, como `uplift` (recargo). En ambos casos el neto de esas filas es exactamente `amount`.
 
-4. Volver a correr y comprobar que `totals.net` es exactamente el monto acordado. Si difiere por pesos, faltan
-   decimales en la tasa: ajustarla y repetir (en el caso real, `0.07936` da 4.990.002 y `0.0793605` da 4.990.000).
+3. Volver a correr con `compose prepare` y comprobar en el resumen: el neto de cada periodo (`periods[].totals.net`;
+   `totals.net` suma todo el plazo) es el monto acordado más lo que facturen las filas que el acuerdo no cubre,
+   `commercialAdjustments` trae el ajuste con su motivo y `engineVersion` es `pricing-v3-local/1.1.0`. El motor no
+   juzga si el monto es razonable (acepta incluso `"0"`): revisar la cifra antes de congelar.
+4. Leer el margen real en `marginRateRoundedDown` y las líneas bajo el piso en `marginFloor.lines[]`
+   (`marginAmountShortOfFloor` es el margen que falta en cada una). Una línea marcada es un incumplimiento real: se
+   lleva al operador antes de congelar.
 5. Congelar con `compose quote --out` en una ruta nueva, guardar el resumen y correr `compose assess` sobre el
    artefacto. Conservar los cuatro archivos junto al expediente, con una nota de la decisión.
-6. Leer `marginRateRoundedDown` y `marginFloor.lines[]`: ese es el margen real y lo que falta para el piso.
 
-Caso real, SKY social care 2027: acordado CLP 4.990.000 al mes sobre un precio al piso de 5.420.145 → tasa
-0,0793605 → neto 4.990.000, margen 40,26 %, tres líneas marcadas y CLP 236.579 al mes de margen bajo el piso en
-total. Archivos en `docs/commercial/prospects/sky-social-care-2027/pricing/`: `acordado.demand.json`,
-`acordado.artifact.json`, `acordado.summary.json`, `acordado.assessment.json` y la
-[nota de la excepción](../../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
-Con las mismas tres variables (los tres comandos devuelven exit 3):
+Se admiten hasta 10 ajustes y cada fila facturable recibe a lo más uno. Un `discount` (rebaja por tasa, para un
+descuento que de verdad se pacta como porcentaje) toma las filas mensuales y las de implementación de sus líneas, así
+que no convive con un `agreed_net` sobre la misma línea. Ningún ajuste aprueba nada: el piso se controla sobre el neto
+final. Si el ajuste está mal declarado no hay precio:
+
+| Qué devuelve                                               | Causa                                                                                 | Arreglo                                                      |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Exit 2, `diagnostics` con `OVERLAPPING_ADJUSTMENTS`        | Dos ajustes apuntan a la misma fila                                                   | Dejar un ajuste por fila; separar por líneas o por `billing` |
+| Exit 2, `diagnostics` con `INVALID_AGREED_AMOUNT`          | `amount` tiene más decimales que la moneda                                            | Escribir el monto en la escala de la moneda                  |
+| Exit 2, `diagnostics` con `AGREED_NET_WITHOUT_BASE`        | No hay filas de esa clase que acordar (ej. `setup` en un servicio sin implementación) | Corregir `billing` o `lineIds`                               |
+| Exit 2, `diagnostics` con `DUPLICATE_ID`                   | `adjustmentId` repetido                                                               | Un ID distinto por ajuste                                    |
+| Exit 2, `diagnostics` con `INVALID_ADJUSTMENT_LINE`        | Un `lineId` no existe en el brief                                                     | Usar los IDs de `brief.lines`                                |
+| Exit 1, `SCHEMA_INVALID` en stderr (`issues` da el `path`) | Falta `reason`, `amount` no es una cadena, un campo sobra o hay más de 10 ajustes     | Corregir cada `path`                                         |
+
+El método anterior —un `discount` cuya tasa `1 − neto ÷ precio` se calculaba a mano con siete decimales— sólo sirve
+para leer artefactos congelados antes del motor 1.1 (`acordado.*` de SKY); no se usa para registrar un acuerdo nuevo.
+
+Caso real, SKY social care 2027, sobre el trío vigente: precio calculado CLP 5.430.000 al mes (incluye 9.855 de
+redondeo), acordado 4.990.000 → el motor deriva una rebaja de 440.000 y el neto es exactamente 4.990.000; margen
+40,26 % (`0.402589`), tres líneas marcadas y CLP 236.579 al mes de margen bajo el piso en total. Archivos en
+`docs/commercial/prospects/sky-social-care-2027/pricing/`: `acordado-neto.demand.json`,
+`acordado-neto.artifact.json`, `acordado-neto.summary.json`, `acordado-neto.assessment.json` y la
+[nota de la excepción](../../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md). Los
+`acordado.*` anteriores (tasa 0,0793605 sobre el catálogo v3, precio al piso 5.420.145, mismo neto y mismo margen)
+siguen siendo válidos y reproducibles. Sin precio acordado, la misma demanda (`final.demand.json`) da 5.430.000 y
+ninguna línea marcada. Con las tres variables vigentes (los tres comandos devuelven exit 3):
 
 ```bash
 pnpm --silent pricing:v3 compose prepare --catalog "$pricing_catalog" --policy "$pricing_policy" \
   --credits "$pricing_credits" \
-  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.demand.json
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado-neto.demand.json
 
 pnpm --silent pricing:v3 replay \
-  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado-neto.artifact.json
 
 pnpm --silent pricing:v3 compose assess \
-  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json
+  --input docs/commercial/prospects/sky-social-care-2027/pricing/acordado-neto.artifact.json
 ```
 
-**Quién decide.** Márgenes, pisos, precios y excepciones al piso son decisión del operador (CEO y dueño). El agente
-le lleva el margen real que entrega el motor y una recomendación; no aprueba, no «redondea» una excepción ni la da
-por implícita, y `compose assess` tampoco la aprueba. Aprobada la excepción, se registra con su motivo en `reason` y
-en una nota junto al artefacto. Confirmado el 2026-10-10: el piso de 45 % sigue siendo la norma para servicios
-gestionados de la práctica creativa; SKY social care es una excepción por ser cliente vigente; la política se
-mantiene en 45/45. No usar el precio de SKY como referencia de margen para otro cliente.
+**Quién decide.** Márgenes, pisos, precios, cifras comerciales y excepciones al piso son decisión del operador (CEO y
+dueño). El agente le lleva el margen real que entrega el motor y una recomendación; no aprueba, no da una excepción
+por implícita ni usa el redondeo o un ajuste para «cumplir» un piso, y `compose assess` tampoco la aprueba. Aprobada
+la excepción, se registra con su motivo en `reason` y en una nota junto al artefacto. Confirmado el 2026-10-10: el
+45 % es el piso de margen de los servicios gestionados, y un servicio donde se puede ganar más sube su margen
+objetivo, no el piso; la política `creative-managed-service` se mantiene en objetivo 0,45 y mínimo 0,45; SKY social
+care es una excepción aprobada por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro
+cliente.
 
-Sin decidir, registrado en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json):
-una regla que redondee el precio hacia arriba (`FLOOR_PRICE_ROUNDS_UNDER_FLOOR`), un ajuste que reciba el neto
-acordado directamente (`AGREED_PRICE_OUTSIDE_ENGINE`) y si el piso de 45 % rige servicios gestionados fuera de la
-práctica creativa (`MARGIN_FLOOR_SCOPE`). No resolverlos por cuenta propia en una cotización.
+Abierto, registrado en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json): la
+revisión del FX de cotización cuando el mercado se mueva más allá de su margen, más el FX de CLF y la referencia EUR
+(`QUOTE_FX_REVIEW`); los múltiplos de redondeo para otras monedas o para una oferta que deba redondear distinto
+(`COMMERCIAL_ROUNDING_SCOPE`); y el país de cada costo de persona (`LOCALIZED_TALENT_COSTS`). El alcance del piso
+(`MARGIN_FLOOR_SCOPE`) quedó decidido. Tampoco se decidió, a propósito, redondear sobre el total del periodo en vez
+de por fila ni redondear a terminaciones comerciales como 990.000: un precio así se registra como neto acordado. No
+resolver nada de esto por cuenta propia en una cotización.
 
 ## Pendientes que permanecen visibles
 
 `compose assess` separa cálculo y evidencia: salario/localización, provisionesAssurance/operación/onboarding,
 planes actuales, acceso/usuarios, capacidad real, margen comercial, entidad/impuestos y alcance del servicio.
+Desde el catálogo v4 los montos de los 32 costos de persona están confirmados; `assess` sigue emitiendo
+`HUMAN_COST_EVIDENCE_REQUIRED` por línea porque falta el país de cada registro, no el monto.
 Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Creative Practice mantiene 45% bruto aprobado; `assess` no sustituye ese piso ni aprueba una excepción. Consultar la práctica dueña antes de presentar precio. El preview está redactado, local y marcado como simulación;
 no es oferta emitida. La promoción futura tiene [mapa de integración](../../documentation/finance/cotizador-v3-promocion-canonica.md),
 con la autoridad y lifecycle del cotizador vigente. Este trabajo no despliega ni escribe API/DB/CRM.

@@ -8,7 +8,9 @@ Código: `catalog/contracts.ts`, `catalog/catalog.ts`, `adapters/catalog-local.t
 
 ## Ownership y revisión
 
-- Finance/Commercial mantiene costo humano, moneda/FX, fees, margen/markup y factores de mercado.
+- Finance/Commercial mantiene costo humano, moneda/FX, fees, margen/markup y factores de mercado. Desde el
+  2026-10-10 también el redondeo comercial; piso de margen, tipo de cambio de cotización, múltiplos de redondeo y
+  excepciones los decide el operador (CEO) y se registran con su decisión como fuente.
 - Operations mantiene perfiles, kits, capacidad/asignación y costos de Talent Assurance/operación.
 - Platform mantiene schemas, compatibilidad y consumers.
 
@@ -23,7 +25,8 @@ estimado continúa revisión. Confirmar significado de una celda no confirma cos
 `effectiveUntil`, `status=confirmed|estimated|pending`; ventanas son inclusivas y fechas ISO. Un cero necesita
 `zeroReason` en componentes humanos para modo commercial_draft y justificación según contrato del motor; null/pending no se transforma en cero.
 
-Kinds: profile, cost, resource, kit, allocation, pricing, talent_factor, market_factor, fx. Perfil no incorpora fee,
+Kinds: profile, cost, resource, kit, allocation, pricing, talent_factor, market_factor, fx y, desde el 2026-10-10,
+price_rounding ([detalle](#redondeo-tipo-de-cambio-de-cotización-y-costos-confirmados-2026-10-10)). Perfil no incorpora fee,
 software ni margen dentro de salario. Cost conserva componentes/coberturas y país específico, referencia con factor
 u origen desconocido; kits describen cómo asignar recursos. Datos de unidad/scope/moneda son parte del valor.
 El catálogo declara países/monedas con precisión explícita y evidence/hashes de los antecedentes.
@@ -85,3 +88,64 @@ referencia y packs/costosIA cambian con evidencia nueva. Reglas review-only no s
 La fecha de una renovación desconocida no se inventa. Adobe306 permanece como variante condicional explícita;
 180 combinado no agrega Express por separado. Versionar por separado portfolio/capacidad y una nueva demanda.
 Snapshots previos conservan policy/precios/créditos/FX; ninguna actualización recalcula una quote existente.
+
+## Redondeo, tipo de cambio de cotización y costos confirmados (2026-10-10)
+
+Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+Datos: `catalog.review-v4.json` y su change-set `rounding-fx-confirmed-costs.change.json` en
+[`data/pricing/v3-operating/`](../../../data/pricing/v3-operating/README.md). Esquema del registro:
+[`catalog/contracts.ts`](../../../src/lib/finance/pricing-v3/catalog/contracts.ts).
+
+### Registro `price_rounding`
+
+`value` es `{ "currency", "multiple", "offerId"? }`; `source` y vigencia como cualquier otro registro. Identidad:
+moneda más oferta (o general cuando no lleva `offerId`).
+
+- Una regla general por moneda de cotización. Una regla con `offerId` gobierna esa oferta y prevalece sobre la general
+  de su moneda. Sin regla vigente a `quoteDate` para la moneda de salida, esa moneda no se redondea.
+- Cada moneda declara su propio múltiplo. No derivar el de una moneda convirtiendo el de otra por tipo de cambio.
+- El catálogo se rechaza al validarse si la moneda no está registrada en `currencies`
+  (`PRICE_ROUNDING_CURRENCY_NOT_REGISTERED`) o si el múltiplo no es un número entero de unidades mínimas de esa moneda
+  (`INVALID_PRICE_ROUNDING_MULTIPLE`).
+- Dos registros distintos aplicables al mismo nivel (dos generales de una moneda, o dos de la misma oferta) no los
+  rechaza la validación, que sólo impide revisiones solapadas de un mismo `recordId`: bloquean la cotización en la
+  resolución con `AMBIGUOUS_PRICE_ROUNDING`. Cambiar un múltiplo es un `replace` del registro existente, no un `add`.
+- Agregar la primera regla vigente de una moneda cambia el contrato de las cotizaciones **nuevas** en esa moneda: la
+  resolución pasa a emitir `1.1.0` y los precios salen redondeados. No toca ninguna cotización congelada, que lleva su
+  catálogo dentro. Por eso una regla nueva entra siempre en un sucesor, nunca editando un catálogo ya usado.
+- Consultar: `pricing:v3 catalog search|show --kind price_rounding --catalog <archivo> --date YYYY-MM-DD`.
+
+### Tipo de cambio de cotización como valor de política
+
+En v4 los registros `fx` desde USD hacia CLP, COP, MXN y PEN son valores de política decididos por el operador, con
+USD como moneda de referencia y un margen prudencial sobre el spot observado. Su `source.reference` nombra la
+decisión, no un mercado, y su `status` es `confirmed` porque lo confirmado es la decisión. No son una tasa observada,
+contractual ni futura.
+
+- Se revisan cuando el mercado se mueve más allá de ese margen (`QUOTE_FX_REVIEW` en el ledger). Cambiar uno es un
+  `replace` con referencia nueva; la revisión anterior queda con su ventana cerrada.
+- La dirección sigue siendo explícita: no se invierten ni se cruzan tasas.
+- Fuera de esta decisión: USD→CLF sigue como valor estimado de 2025 y la referencia EUR→USD del BCE está fechada
+  sólo el 2026-10-09, de modo que una cotización posterior que necesite EUR no tiene tasa vigente hasta que se
+  registre una.
+
+### Costos confirmados por su autor
+
+Los 32 registros de costo humano pasaron a `confirmed` con la declaración del operador, autor del workbook, como
+fuente. Los importes no cambiaron. Confirmar el valor no localiza el costo: `localization` sigue en `null`, y la
+resolución reporta ese costo como `ESTIMATED_SOURCE` con el supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` aunque la
+fuente esté confirmada. Lo que cierra ese aviso es declarar el país de cada registro (`LOCALIZED_TALENT_COSTS`), no
+volver a confirmar el importe.
+
+### Sucesor v4
+
+`catalog.review-v4.json` (versión `operating-review-2026-10-10-v4`) se emitió desde `catalog.review-v3.json` con
+`catalog preview` y `catalog apply` sobre `rounding-fx-confirmed-costs.change.json`. El change-set hace tres cosas:
+`add` de cinco reglas generales de redondeo (CLP, USD, PEN, COP, MXN), `replace` de cuatro registros `fx` y `replace`
+de los 32 costos. Todas las operaciones rigen desde el 2026-10-10; las revisiones anteriores de `fx` y de costo se
+conservan en el sucesor con su ventana cerrada el día previo. La selección es por `quoteDate`: las reglas de redondeo
+no aplican a una fecha anterior a su inicio. Los valores viven en el JSON y en su `audit`; este documento no los copia.
+
+Para cotizaciones nuevas el par es `catalog.review-v4.json` + `resources.review-v5.json`, más
+`data/pricing/v3-resources/ai-credits.review-v1.json`. v2 y v3 no se editan ni se retiran: son los padres congelados
+de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.

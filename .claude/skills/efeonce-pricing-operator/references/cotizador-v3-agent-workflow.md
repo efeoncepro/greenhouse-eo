@@ -1,7 +1,8 @@
 # Cotizador V3: contrato operativo para agentes
 
 Referencia load-on-demand compartida Codex/Claude. Estado verificado 2026-10-09: prototipo local opt-in;
-catálogo, kernel Decimal, mantenimiento, créditos, composición y flujo operativo implementados. El canon de
+catálogo, kernel Decimal, mantenimiento, créditos, composición y flujo operativo implementados; desde 2026-10-10,
+motor 1.1 (precio acordado, redondeo comercial) y catálogo v4 con cotización en CLP, USD, COP, MXN y PEN. El canon de
 cotizaciones Greenhouse conserva autoridad, permisos y lifecycle. Esta referencia interpreta sus contratos;
 los schemas y primitives de `src/lib/finance/pricing-v3/` calculan.
 
@@ -13,7 +14,9 @@ los schemas y primitives de `src/lib/finance/pricing-v3/` calculan.
 - [Composición](../../../../docs/manual-de-uso/finance/componer-cotizacion-v3-con-herramientas.md) y
   [créditos](../../../../docs/manual-de-uso/finance/presupuestar-creditos-ia-v3.md).
 - [Mantenimiento](../../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md): owners, vigencia y cadencia.
-- [ADR operativo](../../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y
+- [ADR operativo](../../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md),
+  [ADR motor 1.1](../../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)
+  (precio acordado, redondeo comercial, contratos convivientes; 2026-10-10) y
   [promoción futura](../../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
 
 Para interpretar un pedido, identificar unidad comercial, variante/seniority/tier, país del talento, mercado del
@@ -27,20 +30,25 @@ Copywriter añade SEMrush cuando corresponde, sin cambiarlo al costo de SEO Spec
 
 ## Secuencia verificable por CLI
 
-Desde la raíz, seleccionar las tres versiones explícitamente:
+Desde la raíz, seleccionar las tres versiones explícitamente. **Trío vigente para cotizaciones nuevas** (desde
+2026-10-10): `catalog.review-v4.json` (`operating-review-2026-10-10-v4`: redondeo por moneda, FX de cotización, 32
+costos de persona confirmados) + `resources.review-v5.json` + `ai-credits.review-v1.json`, con `quoteDate` 2026-10-10
+o posterior. `catalog.review-v2|v3` y `resources.review-v2…v4` son padres congelados: sus cotizaciones se siguen
+reproduciendo igual y sólo se nombran para repetir un ejemplo anterior (`designer.plan.json`, fechado 2026-10-09,
+corre con v2 + v2; con el trío vigente devuelve `RESOURCE_POLICY_NOT_EFFECTIVE`).
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v2.json
-pricing_policy=data/pricing/v3-operating/resources.review-v2.json
+pricing_catalog=data/pricing/v3-operating/catalog.review-v4.json
+pricing_policy=data/pricing/v3-operating/resources.review-v5.json
 pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
 
 pnpm --silent pricing:v3 catalog search --catalog "$pricing_catalog" --query consultor
 pnpm --silent pricing:v3 resources inspect --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-09
+  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-10
 pnpm --silent pricing:v3 compose scaffold --catalog "$pricing_catalog" \
   --policy "$pricing_policy" --input pedido.json
 pnpm --silent pricing:v3 resources portfolio --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --date 2026-10-09 --input cartera.json
+  --policy "$pricing_policy" --date 2026-10-10 --input cartera.json
 pnpm --silent pricing:v3 compose plan --catalog "$pricing_catalog" \
   --policy "$pricing_policy" --credits "$pricing_credits" --input plan.json --out demanda-nueva.json
 pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" \
@@ -139,7 +147,8 @@ Magnific o Studio Credits de Globe. Las capturas no autorizan crear equivalencia
 Provisiones Assurance/operación/onboarding deben costear actividades reales, no porcentaje residual para cuadrar
 precio. `trial-*` de la baseline son placeholders no medidos. Fee genérico de plataforma del Excel (ETG-017) queda
 separado de tools y sin marcaDeel; verificar coberturas laborales/EOR para evitar duplicar cargas/plataforma.
-El salario declarado10400USD mensual del Consultor HubSpot conserva origen histórico, no costo local vigente.
+El salario declarado10400USD mensual del Consultor HubSpot viene del Excel: en el catálogo v4 el monto está confirmado
+por su autor, sin país declarado; no es un costo local verificado.
 
 ## Precio, evidencia, redacción y mantenimiento
 
@@ -166,6 +175,9 @@ ninguna de esas operaciones emite cotización, maker-checker, CRMwrite, factura,
 
 Mantenimiento monetario usa change-set `add/replace/retire`, fuente/vigencia/actor/motivo, `baseDigest`,
 `nextVersion`; `catalog preview` con impacto de briefs y `catalog apply --confirm previewDigest --out sucesor.json`.
+Reglas de redondeo (`price_rounding`) y FX de cotización son registros de ese catálogo y cambian por la misma vía;
+el valor lo decide el operador. Pasos y ejemplo real (`rounding-fx-confirmed-costs.change.json`, v3 → v4) en
+[«Cambiar el redondeo o el FX de cotización»](../../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md#cambiar-el-redondeo-o-el-fx-de-cotización).
 Policy/packs usan `pricing-v3-resource-change/1` con `kind=policy|credits`, baseDigest, motivo y `replacement`
 **completo válido**. `resources inspect --credits` devuelve digests; `resources preview|apply` recibe las tres bases
 explicitamente y `--impact` array de demandas. Confirmación ata catálogo/policy/créditos (`contextDigests`), base,
@@ -182,9 +194,10 @@ No crear fórmulas o autoridad independientes en cada consumer ni dar por desple
 
 ## Servicio gestionado por volumen (delta 2026-10-10)
 
-Para un servicio que se dimensiona por volumen (social care, soporte, producción recurrente) usar los sucesores
-`catalog.review-v3.json` + `resources.review-v5.json` (bandeja = Sprout Social Advanced por asiento) y la oferta `creative-managed-service`; ejemplo completo en
-`data/pricing/v3-operating/managed-care.*` y pasos en el manual («Cotizar un servicio gestionado por volumen»).
+Para un servicio que se dimensiona por volumen (social care, soporte, producción recurrente) usar el trío vigente
+`catalog.review-v4.json` + `resources.review-v5.json` (bandeja = Sprout Social Advanced por asiento) y la oferta
+`creative-managed-service`; ejemplo completo en `data/pricing/v3-operating/managed-care.*` y pasos en el manual
+(«Cotizar un servicio gestionado por volumen»). Ese ejemplo da CLP 9.530.000 al mes, sin líneas bajo el piso.
 
 - **Dedicación desde el volumen:** `pricing:v3 compose workload --input workload.json [--brief brief.json --out nuevo.json]`
   (`pricing-v3-workload/1`). Driver = unidades/mes × minutos; más horas fijas y horas de presencia por línea. La
@@ -194,69 +207,112 @@ Para un servicio que se dimensiona por volumen (social care, soporte, producció
 - **Receta del perfil que no aplica:** `work[].excludedProfileTasks: [{ task, reason }]`. Nunca editar la receta ni
   declarar una herramienta que el servicio no usa para «pasar» la validación. Sólo se excluye lo que la receta agrega.
 - **Piso de margen:** la política `creative-managed-service` usa `target_margin` 0,45 y `minimumMargin` 0,45 en los
-  32 perfiles. `talent-assurance-staffing` sigue con el recargo histórico (margen ~25 %): no usarla para un servicio
-  gestionado. `assess` mantiene sus 40/35 como propuestas no aprobadas.
+  32 perfiles. Decidido por el CEO el 2026-10-10: 45 % es el piso de margen de los servicios gestionados; un servicio
+  donde se puede ganar más sube su objetivo en su propia política, no el piso. `talent-assurance-staffing` sigue con
+  el recargo histórico (margen ~25 %): no usarla para un servicio gestionado. `assess` mantiene sus 40/35 como
+  propuestas no aprobadas.
 - **Kit y provisiones:** `kitId: "managed-service-core"` en cada línea; provisiones opcionales por `choices`
   (`provision-backfill-coverage`, `provision-on-call-alert-guard`), declaradas en una sola línea. Son estimaciones.
 - **Consumo de agentes:** `serviceToolIds: ["agent-runtime-usage"]` + asignación con cantidad = bloques de 1.000 ítems
-  al mes. Hipótesis sin medir. La bandeja (`social-inbox`) tiene precios reportados y plan vigente pendiente.
+  al mes. Hipótesis sin medir. La bandeja (`social-inbox`) lleva el precio público de Sprout; plan contratado,
+  asientos y quién paga siguen sin confirmar.
 - **Lo que la CLI aporta y un cálculo a mano no:** herramientas base y licencias mínimas con su costo (Notion,
-  Microsoft 365), fee de contratación completo por persona y FX registrado. Por eso el precio se saca de la CLI.
+  Microsoft 365), fee de contratación completo por persona, FX de cotización y redondeo comercial. Por eso el precio
+  se saca de la CLI.
+- **Costos de persona:** los 32 registros están confirmados por su autor (el CEO, 2026-10-10) con los montos del Excel.
+  Ninguno declara su país, así que la herramienta sigue informando `ESTIMATED_SOURCE`, el supuesto
+  `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` y, en `assess`, `HUMAN_COST_EVIDENCE_REQUIRED`: no pedir los montos otra vez.
 - Brechas abiertas en `operational-gaps.json`: provisiones sin medir, consumo sin medidor, bandeja sin contratar,
-  setup no paramétrico, alcance del piso de 45 % y costos salariales localizados.
+  setup no paramétrico, país de cada costo de persona (`LOCALIZED_TALENT_COSTS`), revisión del FX de cotización con
+  CLF y EUR sin decidir (`QUOTE_FX_REVIEW`) y múltiplos de redondeo para otras monedas u ofertas
+  (`COMMERCIAL_ROUNDING_SCOPE`). El alcance del piso (`MARGIN_FLOOR_SCOPE`) quedó decidido.
 
 ## Resumen, piso y precio acordado (delta 2026-10-10)
 
 Campos del resumen y qué hacer con cada uno: manual,
 [«Leer el resumen»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#leer-el-resumen). Aquí
-sólo las reglas de lectura.
+sólo las reglas de lectura. Desde el motor 1.1 y el catálogo v4 (mismo día, más tarde) el precio acordado y el
+redondeo ocurren dentro del motor.
 
 - **Bloqueo o señal:** `diagnostics` son los bloqueos, completos; si no está vacío → `needs_input`, `totals: null`,
   exit 2, sin precio. `reviewSignals[]` agrupa los diagnósticos de periodo por código y severidad; no bloquean
   totales, pero cada código presente se explica. `reviewStatus` de la composición siempre es `requires_review`.
 - **Margen:** leerlo de `totals` / `marginRateRoundedDown` (6 decimales, hacia abajo). No recalcularlo a mano.
-- **Redondeo o incumplimiento real:** `marginFloor.lines[]` lista las líneas que el kernel marcó bajo el piso, con
-  `marginAmountShortOfFloor`. Con objetivo y mínimo ambos 0,45, costo y precio se redondean a pesos enteros por
-  separado y una línea al piso puede quedar bajo él por menos de un peso; el kernel la marca y nunca sube el precio.
-  Faltan fracciones de peso sin descuento = redondeo del precio al piso (en `managed-care.demand.json`, seis líneas
-  entre 0,1 y 0,5): decirlo, no tratarlo como excepción. Faltan miles de pesos = incumplimiento: requiere decisión.
-- **Registrar el precio acordado:** el precio real pasa por el motor o el artefacto congelado muestra el precio al
-  piso y el piso nunca se comprueba. En `brief`, único ajuste admitido:
-  `"adjustments": [{ "adjustmentId", "kind": "discount", "rate", "lineIds": [líneas del brief], "reason" }]`;
-  `reason` obligatorio. `rate = 1 − neto acordado ÷ totals.undiscountedPrice`, con decimales suficientes para caer en
-  el monto exacto; volver a correr y comprobar `totals.net`. Después `compose quote --out` nuevo + resumen + `assess`
-  junto al expediente. Pasos y JSON en el manual
+- **Claves del motor 1.1:** `engineVersion`, `commercialAdjustments` (los ajustes del brief) y `priceRounding`
+  (`{ currency, multiple, scope: 'offer'|'general', offerId, recordId, revision, sourceStatus }` o `null`). `totals`
+  suma `roundingAdjustment` y `uplift` sólo en una cotización 1.1.0; `net = undiscountedPrice + uplift − discount` y
+  `undiscountedPrice` ya incluye el redondeo. `explain.commercialAdjustments.rows` trae el recorrido por fila;
+  `compose preview` y la proyección cliente muestran sólo el neto final.
+- **Versión del motor:** conviven dos contratos. Una cotización usa 1.1.0 sólo si necesita un neto acordado, varios
+  ajustes o una regla de redondeo para su moneda; si no, 1.0.0. El agente no la elige: se lee en `engineVersion`.
+- **Redondeo por moneda:** registros `price_rounding` del catálogo v4, una regla general por moneda para toda oferta:
+  CLP 10000, USD 10, PEN 50, COP 50000, MXN 100 (`catalog search --kind price_rounding --catalog … --date 2026-10-10`).
+  Cada fila facturable sube al múltiplo siguiente antes de los ajustes; nunca baja; una fila que cumplía su piso
+  antes de redondear lo sigue cumpliendo. Una regla con `offerId` prevalece sobre la general. Moneda sin regla: no se
+  redondea.
+- **Línea bajo el piso:** con `priceRounding` presente, una línea en `marginFloor.lines[]` es un **incumplimiento
+  real** (un neto acordado o un descuento la dejó bajo el piso): requiere decisión del operador. La lectura
+  «fracciones = redondeo» vale sólo cuando `priceRounding` es `null`: cotizaciones congeladas sobre catálogos
+  anteriores (`engineVersion` `pricing-v3-local/1.0.0`) o una moneda sin regla.
+- **Otra moneda:** `brief.outputCurrency` = CLP, USD, COP, MXN o PEN, en una **copia** de la demanda (no editar la
+  versionada). USD es la moneda de referencia: costos en USD, conversión al final con el FX de cotización del
+  catálogo, que es política del CEO con margen prudencial y no tipo de cambio de mercado (USD→CLP 1000, COP 3650,
+  MXN 19.25, PEN 3.70). Cada moneda redondea a su múltiplo, así que la misma oferta en dos monedas no es una
+  conversión exacta: cotizar en la moneda pedida, nunca convertir a mano. Sin FX (EUR u otra) → `needs_input` con
+  `MISSING_CATALOG_SELECTION` en `fx.USD:<moneda>`. CLF calcula sin redondeo y con un FX estimado de 2025: no
+  presentarlo. Herramienta con precio en EUR en una cotización posterior al 2026-10-09 →
+  `RESOURCE_FX_SELECTION_REQUIRED`. Detalle y cifras:
+  [«Cotizar en otra moneda»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#cotizar-en-otra-moneda).
+- **Registrar el precio acordado:** el precio real pasa por el motor, declarado directo en `brief.adjustments`:
+  `{ "adjustmentId", "kind": "agreed_net", "amount", "billing": "monthly"|"setup", "lineIds": [líneas del brief], "reason" }`.
+  `amount` = neto de las filas de esa clase de esas líneas, **por periodo**, en la moneda de salida, como cadena y
+  sin más decimales que la moneda. El motor deriva `discount` (acordado bajo el precio) o `uplift` (sobre el precio)
+  y cae en el monto exacto. Hasta 10 ajustes, a lo más uno por fila facturable (un `discount` toma filas mensuales y
+  de implementación de sus líneas); `reason` obligatorio; `setup` rige sólo en periodos con filas de implementación.
+  **NUNCA** calcular una tasa a mano para llegar a un precio: el `discount` con tasa `1 − neto ÷ precio` sólo sirve
+  para leer artefactos anteriores al motor 1.1. Mal declarado → exit 2 con el código en `diagnostics`:
+  `OVERLAPPING_ADJUSTMENTS`, `INVALID_AGREED_AMOUNT`, `AGREED_NET_WITHOUT_BASE`, `DUPLICATE_ID`,
+  `INVALID_ADJUSTMENT_LINE`; un documento que no cumple el schema sigue siendo `SCHEMA_INVALID` (exit 1). Después:
+  comprobar `totals.net`, `compose quote --out` nuevo + resumen + `assess` junto al expediente. Pasos y JSON en el
+  manual
   ([«Registrar el precio acordado»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#registrar-el-precio-acordado)).
-- **Caso SKY social care 2027:** acordado CLP 4.990.000/mes sobre precio al piso 5.420.145 → tasa 0,0793605 → neto
-  exacto, margen 40,26 %, tres líneas marcadas, CLP 236.579/mes bajo el piso. Archivos `acordado.*` y
+- **Caso SKY social care 2027** (v4 + v5): precio calculado CLP 5.430.000 (9.855 de redondeo), `agreed_net` 4.990.000
+  → descuento derivado 440.000, neto exacto, margen `0.402589`, tres líneas marcadas, CLP 236.579/mes bajo el piso.
+  Archivos `acordado-neto.*` y
   [nota de la excepción](../../../../docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
-  `final.artifact.json` de ese expediente contiene el precio al piso, no el acordado.
-- **Quién decide:** el operador es CEO y dueño; márgenes, pisos, precios y excepciones al piso son su decisión. El
-  agente le lleva el margen real del motor y una recomendación, y registra la excepción con su motivo junto al
-  artefacto; no la aprueba ni la da por implícita. Confirmado 2026-10-10: el piso de 45 % sigue siendo la norma para
-  servicios gestionados de la práctica creativa; SKY es excepción por ser cliente vigente; la política queda 45/45.
-  No usar el precio de SKY como referencia de margen para otro cliente.
-- **Sin decidir** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)): regla que
-  redondee el precio hacia arriba (`FLOOR_PRICE_ROUNDS_UNDER_FLOOR`), ajuste que reciba el neto acordado
-  (`AGREED_PRICE_OUTSIDE_ENGINE`), alcance del piso fuera de la práctica creativa (`MARGIN_FLOOR_SCOPE`) y evidencia de
-  costos (salarios históricos, provisiones estimadas, consumo de agentes sin medir). No resolverlos en una cotización.
-- Sin cambio: aritmética del kernel, versión de motor, digests, códigos de salida, flags y escritura exclusiva.
+  Los `acordado.*` anteriores (tasa 0,0793605, catálogo v3, motor 1.0.0) siguen válidos y reproducibles.
+  `final.artifact.json` de ese expediente contiene el precio sin el acuerdo.
+- **Quién decide:** el operador es CEO y dueño; márgenes, pisos, precios, cifras comerciales (FX de cotización,
+  múltiplos) y excepciones al piso son su decisión. El agente le lleva el margen real del motor y una recomendación,
+  y registra la excepción con su motivo junto al artefacto; no la aprueba, no la da por implícita ni usa el redondeo
+  o un ajuste para «cumplir» un piso. Confirmado 2026-10-10: 45 % es el piso de los servicios gestionados y un
+  servicio que puede ganar más sube su objetivo, no el piso; la política queda 0,45/0,45; SKY es excepción aprobada
+  por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro cliente.
+- **Abierto** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)):
+  `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`, `LOCALIZED_TALENT_COSTS`, provisiones estimadas y consumo de agentes
+  sin medir. `MARGIN_FLOOR_SCOPE` quedó decidido; `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE` se
+  resolvieron y salieron del ledger. No decidido a propósito: redondear sobre el total del periodo en vez de por
+  fila, terminaciones comerciales como 990.000 (hoy es un neto acordado) y múltiplos para CLF y EUR. No resolverlos
+  en una cotización.
+- Sin cambio: códigos de salida, flags, contrato de errores y escritura exclusiva. El contrato 1.0.0 no se movió:
+  todo artefacto congelado se sigue reproduciendo con `replay` (`verified: true`).
 
 ## Mapa de implementación y evidencia reusable
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
-| Kernel puro, markup/margen, factores, coberturas, FX, rounding | `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` |
+| Kernel puro, markup/margen, factores, coberturas, FX, rounding; contratos 1.0.0/1.1.0, ajustes (`discount`, `agreed_net`), redondeo comercial y registro de motores | `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` |
 | Registro cerrado de rechazos (dominio y adaptador) | `src/lib/finance/pricing-v3/errors.ts` |
-| Registros/brief/resolución/quote/explicación | `src/lib/finance/pricing-v3/catalog/{contracts,catalog,resolve,quote,explain}.ts` |
+| Registros (incluye `price_rounding`)/brief/resolución/quote/explicación; elección del contrato por cotización y recorrido del precio por fila | `src/lib/finance/pricing-v3/catalog/{contracts,catalog,resolve,quote,explain}.ts` |
 | Demanda/policy y atribuciones | `src/lib/finance/pricing-v3/resources/{composition-contracts,composition}.ts` |
 | Packs/costo base/caja/caducidad | `src/lib/finance/pricing-v3/resources/credit-budget.ts` |
 | Discovery/scaffold/portfolio/plan | `src/lib/finance/pricing-v3/resources/operating.ts` |
 | Volumen → dedicación (`compose workload`) | `src/lib/finance/pricing-v3/resources/workload.ts` |
-| Resumen derivado (`compose prepare`, `compose quote`, `replay`) y líneas bajo el piso | `src/lib/finance/pricing-v3/resources/summary.ts` |
+| Resumen derivado (`compose prepare`, `compose quote`, `replay`): líneas bajo el piso, `engineVersion`, `commercialAdjustments`, `priceRounding` | `src/lib/finance/pricing-v3/resources/summary.ts` |
 | Gaps económicos, veredicto del piso por línea y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
 | Snapshots/digests/IO/mantenimiento local | `src/lib/finance/pricing-v3/adapters/{local-snapshot,catalog-local,resource-composition,resource-maintenance}.ts` |
 | Adapter CLI, flags, exit, clasificación de errores y escritura exclusiva | `scripts/commercial/pricing-v3.ts` |
+| Guarda permanente: replay de todo artefacto congelado (`data/pricing/**` + SKY `acordado*`) | `src/lib/finance/pricing-v3/__tests__/pricing-v3-frozen-artifacts.test.ts` |
 | Regresiones y negativos | `src/lib/finance/pricing-v3/__tests__/`, `pnpm pricing:v3:test` |
 
 Versionar y conservar originales: `data/pricing/v3-catalog/` y `v3-composition/` son fixtures previas; sucesores y

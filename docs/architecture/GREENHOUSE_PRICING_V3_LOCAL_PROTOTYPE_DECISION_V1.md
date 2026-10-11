@@ -53,6 +53,12 @@ calendarios, recursos/IA, reparto declarado, mantenimiento y proyección `role_c
 La segunda unidad agrupa el fee por período y setup en un preview local; no implementa SOW, receta comercial
 validada, facturación por entregable ni gobierno de delivery. La aritmética de roles sigue como costeo interno.
 
+Desde el 2026-10-10 «el motor» es un registro cerrado de contratos de entrada, no una versión única: `1.0.0`
+(el de esta decisión, intacto) y `1.1.0` (precio acordado, ajustes disjuntos y redondeo comercial), cada uno con su
+motor. Donde este documento dice que el replay «verifica contenido y versión», la versión es la del motor registrado
+que firmó el artefacto, y la verificación sigue siendo por recálculo y digest. Contratos, reglas y guarda:
+[ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+
 El [ADR operativo vigente](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica módulos,
 fuentes y límites. [TASK-2022](../tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md) está completa
 localmente; [TASK-2017](../tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md) permanece parcial

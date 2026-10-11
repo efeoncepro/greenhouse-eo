@@ -75,6 +75,18 @@ anteriores intactos. Nunca se modifica el comportamiento de un contrato ya usado
   (`INVALID_AGREED_AMOUNT`); un `agreed_net` sin filas a las que aplicarse o con precio base cero y monto positivo
   (`AGREED_NET_WITHOUT_BASE`); `adjustmentId` repetido (`DUPLICATE_ID`).
 - `reason` sigue siendo obligatorio. Un ajuste no aprueba nada: el control de piso corre sobre el neto final.
+- En el carril de catálogo y composición los ajustes se declaran en `brief.adjustments` (mismo esquema y mismo tope)
+  y la resolución los copia al request de cada período. Un `discount` reclama las dos clases de fila de sus líneas;
+  un `agreed_net`, sólo la clase que declara.
+- **Neto pactado de implementación.** La resolución arma una entrada del kernel por período y las filas `setup`
+  existen sólo donde se cobra un recurso de una vez. Un `agreed_net` con `billing: "setup"` se envía únicamente a los
+  períodos en que alguna de sus líneas tiene esa fila; si no cae en ningún período, la resolución bloquea con
+  `AGREED_NET_WITHOUT_BASE` (ruta `adjustments.<adjustmentId>`), la misma condición que nombra el kernel vista sobre
+  todo el plazo.
+- **Dónde aparecen estos errores.** El kernel los reporta como diagnósticos `error` del período (estado `invalid`).
+  En composición suben a `diagnostics` del resumen como bloqueos (`periods.<n>.request.adjustments`), con totales
+  nulos, `needs_input` y exit 2. En `quote` del carril de catálogo quedan bajo `periods[].diagnostics`, con
+  `calculationStatus: needs_input` y `diagnostics` de la quote vacío, como siempre ocurrió con un período fallido.
 
 ### 3. Redondeo comercial (contrato 1.1.0)
 
@@ -88,7 +100,9 @@ anteriores intactos. Nunca se modifica el comportamiento de un contrato ya usado
   `ceil(max(precio, costo_presentado / (1 − minimumMargin)) / múltiplo) × múltiplo`. El redondeo no puede convertir
   una fila que cumple en una fila marcada. Si la fila **no** cumplía antes de redondear, sólo se eleva al múltiplo
   siguiente: el redondeo no corrige una política que vende bajo su piso.
-- `multiple` debe ser un múltiplo entero de la unidad mínima de la moneda (`INVALID_PRICE_ROUNDING` si no).
+- `multiple` debe ser un múltiplo entero de la unidad mínima de la moneda (`INVALID_PRICE_ROUNDING` si no). El
+  catálogo lo rechaza antes, al validarse: moneda no registrada (`PRICE_ROUNDING_CURRENCY_NOT_REGISTERED`) o múltiplo
+  que no es un número entero de unidades mínimas (`INVALID_PRICE_ROUNDING_MULTIPLE`).
 - «Cumplía antes de redondear» se lee sobre los importes sin redondear, a 60 de los 80 dígitos de trabajo. Un precio
   construido como `costo / (1 − piso)` queda un pelo sobre o bajo el piso por el último dígito de la división; leerlo
   a 60 dígitos lo vuelve determinista. El control `MARGIN_BELOW_FLOOR` no usa tolerancia alguna.
@@ -96,7 +110,9 @@ anteriores intactos. Nunca se modifica el comportamiento de un contrato ya usado
   otro registro: `{ "currency": "CLP", "multiple": "10000" }`. Un registro puede llevar además `offerId`; la regla de
   una oferta prevalece sobre la general de su moneda. Cada moneda de cotización declara su propio múltiplo: no se
   convierte el múltiplo de otra moneda por tipo de cambio. Sin registro vigente para la moneda de salida no hay
-  redondeo en esa moneda. Más de una regla aplicable del mismo nivel es un bloqueo (`AMBIGUOUS_PRICE_ROUNDING`).
+  redondeo en esa moneda. Más de una regla aplicable del mismo nivel es un bloqueo de resolución
+  (`AMBIGUOUS_PRICE_ROUNDING`); la validación del catálogo sólo rechaza revisiones solapadas de un mismo `recordId`,
+  como en cualquier otra clase de registro.
 - Una misma oferta cotizada en dos monedas redondea cada una a su múltiplo: los dos precios no son la conversión
   exacta uno del otro, y eso es lo esperado.
 
@@ -112,6 +128,14 @@ nombre propio de la versión. El control `MARGIN_BELOW_FLOOR` no cambia: compara
 Una prueba reproduce **todos** los artefactos congelados versionados bajo `data/pricing/**` y exige
 `verified: true`. La lista se obtiene por búsqueda, no se escribe a mano. Es el verificador real de que el contrato
 1.0.0 no se movió: cualquier cambio futuro del motor la corre.
+
+Implementada en
+[`pricing-v3-frozen-artifacts.test.ts`](../../src/lib/finance/pricing-v3/__tests__/pricing-v3-frozen-artifacts.test.ts):
+recorre `data/pricing/**` buscando `*.artifact.json`, suma los dos artefactos versionados del caso SKY social care
+(el acuerdo como descuento por tasa en 1.0.0 y como neto pactado en 1.1.0), reproduce cada uno con el replay de su
+carril y compara digest e identidad. Exige además al menos un artefacto congelado firmado por **cada** motor del
+registro: un motor registrado sin artefacto no tiene nada que lo proteja. Un artefacto de un carril que la guarda no
+sabe reproducir es una falla, nunca un salto.
 
 ## Alternativas descartadas
 

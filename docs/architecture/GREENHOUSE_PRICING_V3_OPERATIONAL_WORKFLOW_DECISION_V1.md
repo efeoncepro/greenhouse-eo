@@ -15,19 +15,21 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
-| Aritmética comercial: costo, markup/margen, ajustes, descuento, FX y redondeo | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
-| Catálogo monetario, resolución de perfiles/variantes y calendario | `src/lib/finance/pricing-v3/catalog/` |
+| Aritmética comercial: costo, markup/margen, descuento, neto pactado, FX, redondeo contable y redondeo comercial, por contrato de entrada (`1.0.0` y `1.1.0`); registro cerrado de motores `PRICING_V3_ENGINES` | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
+| Catálogo monetario (incluida la regla de redondeo por moneda), resolución de perfiles/variantes y calendario, y elección del contrato de entrada que se emite al kernel | `src/lib/finance/pricing-v3/catalog/` |
 | Selección de recursos por trabajo y atribución a snapshots | `resources/composition.ts` y `composition-contracts.ts` |
 | Presupuesto discreto de créditos y caducidad | `resources/credit-budget.ts` |
 | Discovery, scaffold, portfolio y plan | `resources/operating.ts` |
 | Preparación comercial y preview allowlisted | `resources/readiness.ts` |
-| Resumen derivado de una composición y líneas que el kernel marcó bajo su piso | `resources/summary.ts` |
+| Resumen derivado de una composición: motor que calculó, ajustes y regla de redondeo aplicados, y líneas que el kernel marcó bajo su piso | `resources/summary.ts` |
 | Registro cerrado de rechazos (dominio y adaptador) y el único detalle que pueden llevar | `errors.ts` |
-| Digests, artefactos, replay y mantenimiento local | `adapters/`; filesystem y hashing fuera de la aritmética |
+| Digests, artefactos, replay con el motor registrado que firmó cada uno y mantenimiento local | `adapters/`; filesystem y hashing fuera de la aritmética |
 | Primer consumer local | `scripts/commercial/pricing-v3.ts` |
 
 Estas rutas son relativas a la raíz del repositorio. No incorporan DB, Next.js, identidad remota, Excel ni SDK
 al núcleo; su extracción futura conserva contratos y pruebas. No se crea otro pricing engine por consumer.
+La tabla refleja el estado tras el [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)
+(2026-10-10): los dos contratos conviven en el mismo módulo, no hay un segundo kernel.
 
 ## Contrato de entradas y selección
 
@@ -192,7 +194,19 @@ el motor** (el margen mínimo sale de la política; las herramientas excluidas, 
 `operational-gaps.json`); medición del consumo de agentes; si el piso de 45 % rige igual para toda oferta gestionada
 fuera de la práctica creativa; y la promoción de todo esto al canon de cotizaciones.
 
+> Nota 2026-10-10 (posterior): el alcance del piso quedó decidido por el operador (CEO). 45 % es el piso de margen de
+> los servicios gestionados; un servicio en el que se puede ganar más sube su objetivo, no el piso. Ver el delta del
+> motor 1.1 más abajo y `MARGIN_FLOOR_SCOPE` en el ledger.
+
 ## Delta 2026-10-10 — endurecimiento de la CLI: errores tipados, resumen derivado y veredicto de piso
+
+> **Leer con el delta del motor 1.1 (mismo día, posterior).** Esta sección se conserva como se escribió. Cuatro de
+> sus afirmaciones dejaron de describir el estado vigente y llevan una nota fechada en el lugar: el precio acordado
+> por tasa (punto 5 y sus dos reglas duras), el redondeo que deja una línea al piso bajo él, la alternativa
+> descartada de cambiar el kernel y el párrafo «No decidido a propósito». Lo que las reemplaza está en el
+> [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Errores tipados,
+> resumen derivado, veredicto de piso en `assess` y escala de moneda en `preview` siguen vigentes sin cambios.
+> `ENGINE_VERSION`, que este delta nombra, ya no existe: lo reemplaza el registro `PRICING_V3_ENGINES`.
 
 **Decisión.** Tres contratos salen del adaptador CLI y pasan al dominio, para que el próximo consumidor (API, MCP o
 UI) los reutilice en vez de redefinirlos. No cambian la aritmética del kernel, `ENGINE_VERSION`, los digests, los
@@ -237,12 +251,19 @@ códigos de salida 0/2/3/1, los flags ni el escritor exclusivo `wx`/0600.
    CLP 4.990.000 al mes acordados → tasa 0,0793605 sobre el precio al piso de 5.420.145 → neto exacto de 4.990.000,
    margen 40,26 %, tres líneas marcadas y CLP 236.579 al mes de margen faltante para llegar al piso
    ([registro de la excepción](../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md)).
+   *Nota 2026-10-10 (motor 1.1):* el método de la tasa quedó sustituido. Un precio pactado se declara como
+   `agreed_net` y el motor deriva el descuento o el recargo; `brief.adjustments[]` admite hasta 10 ajustes sobre filas
+   disjuntas. El artefacto `acordado.artifact.json` de este caso se conserva como evidencia del contrato 1.0.0 y el
+   mismo acuerdo quedó re-congelado como `acordado-neto.artifact.json` en 1.1.0.
 
 **Comportamiento conocido que no se cambia.** `creative-managed-service` tiene margen objetivo 0,45 y mínimo 0,45.
 Costo y precio se redondean a CLP enteros por separado, así que una línea cotizada exactamente al piso puede quedar
 bajo él por menos de 1 CLP, y el kernel la marca, como dice su contrato: nunca sube el precio. En el ejemplo
 `managed-care.*` las seis líneas quedan cortas por 0,1 a 0,5 CLP. `marginAmountShortOfFloor` es lo que separa esa
 brecha de redondeo de un incumplimiento real (en el caso SKY, entre unos 24 mil y 175 mil CLP por línea).
+*Nota 2026-10-10 (motor 1.1):* sigue siendo el comportamiento del contrato 1.0.0, que no se tocó. En 1.1.0, con una
+regla de redondeo vigente para la moneda, una fila que cumplía su piso antes de redondear lo sigue cumpliendo después
+(regla de conservación del piso); con `catalog.review-v4.json` el mismo ejemplo `managed-care.*` no marca ninguna línea.
 
 **Decisión comercial del operador (CEO, 2026-10-10).** El piso de 45 % sigue siendo la norma para servicios
 gestionados de la práctica creativa; el social care de SKY es una excepción aprobada por ser cliente vigente; la
@@ -253,6 +274,8 @@ política de precio queda 45/45. Las cifras comerciales y las excepciones al pis
 - *Cambiar el redondeo del kernel o la comparación de piso.* El kernel cumple su contrato escrito. Replay recalcula
   con el motor actual y sólo acepta la versión actual del motor: tocar el kernel rompería el replay de todo artefacto
   congelado. Requiere versión nueva del motor más replay multi-versión, es decir, un ADR propio.
+  *Nota 2026-10-10 (motor 1.1):* ese ADR existe. No cambió el contrato 1.0.0: agregó el contrato 1.1.0 con su propio
+  motor y el replay acepta cualquier motor del registro. La alternativa «cambiar el motor actual» sigue descartada.
 - *Subir los diagnósticos de período a `quote.diagnostics`.* Esa lista es de carga: cuando no está vacía,
   `catalog/quote.ts` anula los totales y deja `needs_input`. Una señal de revisión bloquearía el cálculo.
 - *Cambiar el exit 3 a 0.* El exit distinto de cero es una compuerta fail-closed contra encadenar `quote && enviar`,
@@ -299,6 +322,9 @@ rechazos desde la CLI y verifica que no lleven contenido.
   moneda es redondeo; más es una decisión de precio que necesita dueño.
 - **SIEMPRE** pasar el precio acordado como el descuento del brief, con su motivo, y conservar el artefacto resultante
   junto a la decisión de excepción cuando cruce el piso.
+  *Nota 2026-10-10 (motor 1.1):* la forma vigente es `agreed_net`, no el descuento por tasa; la regla del ADR del
+  motor 1.1 prohíbe calcular una tasa a mano para llegar a un precio pactado. Motivo y artefacto junto a la excepción
+  se mantienen.
 - **SIEMPRE** tomar el detalle completo del artefacto escrito con `--out` o de `explain`; el stdout de
   `compose prepare|quote` ya no lo trae.
 
@@ -312,9 +338,57 @@ sus entradas anteriores (`LOCALIZED_TALENT_COSTS`, `MANAGED_SERVICE_PROVISIONS_U
 `AGENT_RUNTIME_USAGE_UNMETERED`). `designer.assessment.json` y `service.assessment.json` son evidencia fechada del
 2026-10-09 y no traen el campo aditivo `margin.policyFloor`; no se regeneraron.
 
+> Nota 2026-10-10 (motor 1.1): los dos primeros puntos quedaron decididos e implementados (redondeo comercial hacia
+> arriba como dato de catálogo y `agreed_net`), y el tercero quedó decidido por el operador. `FLOOR_PRICE_ROUNDS_UNDER_FLOOR`
+> y `AGREED_PRICE_OUTSIDE_ENGINE` se retiraron del ledger como resueltos; `MARGIN_FLOOR_SCOPE` quedó actualizado y se
+> agregaron `QUOTE_FX_REVIEW` y `COMMERCIAL_ROUNDING_SCOPE`. La evidencia de costo sigue abierta en lo que el delta
+> siguiente detalla.
+
 **Verificación (2026-10-10, local).** `pnpm pricing:v3:test`: 9 archivos y 179 pruebas; ESLint limpio en el módulo,
 el script y la configuración; `pnpm typecheck` limpio; `pricing:v3 replay` con `verified: true` sobre cada
 `*.artifact.json` presente bajo `data/pricing/` y en la carpeta del caso SKY. Esta evidencia es local.
+
+## Delta 2026-10-10 — motor 1.1 y catálogo v4: qué cambia en el flujo operativo
+
+Decisión, alternativas y reglas duras: [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay comandos, flags ni códigos de salida nuevos.
+
+- **Precio pactado.** Se declara en `brief.adjustments[]` como `agreed_net` (monto, `billing` `monthly|setup`, líneas
+  y motivo), por período. El motor llega al monto exacto y registra la diferencia como `discount` o `uplift`. La tasa
+  calculada a mano del delta anterior deja de usarse; un `discount` por tasa sigue disponible cuando lo acordado es de
+  verdad un porcentaje.
+- **Redondeo comercial.** Es un registro `price_rounding` del catálogo monetario, por moneda de salida y vigente a la
+  fecha de cotización; no es un paso del agente ni del consumidor. Se mantiene con el mismo `catalog preview|apply`.
+- **Qué contrato calcula.** La resolución emite `1.1.0` sólo si el brief trae algo que `1.0.0` no expresa (un ajuste
+  que no sea un único `discount`, o más de uno) o si hay una regla de redondeo vigente para la moneda de salida. Toda
+  demanda congelada antes vuelve a resolver a `1.0.0` y a su digest. `engineVersion` del resumen dice cuál firmó.
+- **Catálogo vigente para cotizar.** `catalog.review-v4.json` + `resources.review-v5.json` (+ el catálogo de
+  créditos). Con v4 una cotización nueva en CLP, USD, COP, MXN o PEN fechada desde el 2026-10-10 sale en `1.1.0` y
+  redondeada; v2 y v3 quedan como padres congelados de los artefactos que los usaron.
+- **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
+  `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
+  muestran sólo el neto final.
+- **Errores de un ajuste.** `OVERLAPPING_ADJUSTMENTS`, `INVALID_AGREED_AMOUNT`, `AGREED_NET_WITHOUT_BASE`,
+  `INVALID_PRICE_ROUNDING` y `DUPLICATE_ID` son diagnósticos del kernel, no rechazos del registro de `errors.ts`: en
+  composición bloquean (`diagnostics` del resumen, exit 2). `AMBIGUOUS_PRICE_ROUNDING` es un bloqueo de resolución.
+- **Guarda.** Tocar `calculate.ts`, `schemas.ts` o la resolución exige correr
+  `pricing-v3-frozen-artifacts.test.ts`, que reproduce cada artefacto congelado.
+
+**Decisiones del operador (CEO, 2026-10-10)** registradas como datos del catálogo v4 y del ledger, no como código:
+45 % es el piso de los servicios gestionados y un servicio con más margen posible sube su objetivo, no el piso; los
+sueldos del workbook son válidos (es su autor), sin cambio de importes; el tipo de cambio de cotización lleva un margen
+prudencial sobre el spot, con USD como moneda de referencia; y el redondeo rige para toda oferta con un múltiplo por
+moneda. El social care de SKY sigue siendo una excepción aprobada.
+
+**Sigue abierto.** Un costo cuyo registro no declara país se reporta `ESTIMATED_SOURCE` con el supuesto
+`UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` aunque su fuente esté confirmada (`LOCALIZED_TALENT_COSTS`). La referencia
+EUR→USD del BCE está fechada sólo el 2026-10-09: una cotización posterior que necesite EUR no tiene tasa vigente.
+USD→CLF sigue siendo un valor estimado de 2025 (`QUOTE_FX_REVIEW`). Múltiplos para otras monedas u ofertas que
+redondeen distinto: `COMMERCIAL_ROUNDING_SCOPE`.
+
+**Verificación (2026-10-10, local).** `pnpm pricing:v3:test`: 12 archivos y 320 pruebas; ESLint y `pnpm typecheck`
+limpios; todos los artefactos congelados en disco responden `verified: true` (la guarda cubre los versionados).
+[Readback con cifras](../documentation/finance/cotizador-v3-superficie-implementada.md).
 
 ## Evidencia y rutas de operación
 

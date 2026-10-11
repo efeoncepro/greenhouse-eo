@@ -151,15 +151,20 @@ canónicas y comandos exactos; leerla antes de completar demanda o actualizar pr
 
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
 `compose prepare|quote` → `explain|replay` → `compose assess|preview`. El sucesor operativo es opt-in;
-no cambiar defaults ni sobrescribir artifacts. Exit0=técnico,2=faltante,3=revisión,1=rechazo.
+no cambiar defaults ni sobrescribir artifacts. Para cotizaciones nuevas el catálogo vigente es
+`data/pricing/v3-operating/catalog.review-v4.json`, con `resources.review-v5.json` y
+`data/pricing/v3-resources/ai-credits.review-v1.json`; se puede cotizar en CLP, USD, COP, MXN y PEN
+(`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo.
+Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 `compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
 el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo
 deja stdout vacío y trae en stderr `error.code` de un registro cerrado, con `option`/`issues` para ubicar el
 arreglo; `ADAPTER_FAILURE` es una falla sin clasificar de la herramienta, no del pedido.
 Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
 validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
-no sustituyen pisos de práctica aprobados. El precio que se acuerda se registra en la demanda como el
-descuento del brief, con motivo, y se vuelve a correr: el margen real y el veredicto del piso salen del motor.
-Faltar fracciones de peso al piso es redondeo; faltar miles es una excepción que decide el operador (CEO),
-nunca el agente. Mantener la frontera de
+no sustituyen pisos de práctica aprobados. El precio que se acuerda se declara directo en la demanda como
+neto acordado (`agreed_net` en `brief.adjustments`, por periodo, con motivo), sin calcular tasas a mano, y se
+vuelve a correr: el margen real y el veredicto del piso salen del motor. El catálogo vigente redondea cada
+precio hacia arriba al múltiplo de su moneda, así que una línea al piso ya no sale marcada: una línea bajo el
+piso es un incumplimiento real y la excepción la decide el operador (CEO), nunca el agente. Mantener la frontera de
 [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

@@ -30,6 +30,11 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
   10/10/2026) y USD 499 con facturación mensual (guías de terceros). El plan contratado sigue pendiente.
 - `resources.review-v5.json` (cambio `sprout-professional-plan.change.json`): agrega Sprout Professional (USD 299 por
   asiento, perfiles ilimitados, sin API ni informes de atención). Es la versión vigente para servicios gestionados.
+- `catalog.review-v4.json` (change-set `rounding-fx-confirmed-costs.change.json`, aplicado sobre v3 con
+  `catalog preview|apply`): cinco reglas generales de redondeo comercial (`price_rounding`, una por moneda: CLP, USD,
+  PEN, COP, MXN), tipo de cambio de cotización desde USD como valor de política con margen prudencial, y los 32
+  costos del workbook confirmados por su autor sin cambio de importes. Es el catálogo vigente para cotizaciones
+  nuevas, junto con `resources.review-v5.json`; v2 y v3 se conservan como padres congelados.
 - `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
   dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
@@ -82,6 +87,7 @@ respondiendo `verified: true` a `pricing:v3 replay`.
 - `verification.cli.json` registra sólo operación y código de salida; los códigos no cambiaron, así que sigue vigente.
 - `operational-gaps.json` suma `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE`, y actualiza
   `MARGIN_FLOOR_SCOPE` (owner CEO; el piso de 45 % sigue siendo la norma y SKY social care 2027 es excepción aprobada).
+  *Corrección del mismo día (motor 1.1):* esos dos códigos ya no están en el ledger; se retiraron como resueltos.
 - `compose prepare|quote` sobre una demanda de esta carpeta imprime el resumen `pricing-v3-composition-summary/1`
   (`diagnostics`, `reviewSignals`, `marginFloor`, `toolSelections`, atribuciones y caja); el detalle completo queda en
   el artefacto de `--out`. `replay` de una composición responde `{ verified, calculationId, summary }`.
@@ -89,8 +95,44 @@ respondiendo `verified: true` a `pricing:v3 replay`.
   (`catalog.review-v3` + `resources.review-v5`) son las seis líneas, cortas por 0,1 a 0,5 CLP: objetivo y mínimo son
   0,45 y costo y precio se redondean a CLP enteros por separado. `marginAmountShortOfFloor` separa ese redondeo de un
   incumplimiento real; el kernel nunca sube el precio.
+  *Corrección del mismo día (motor 1.1):* eso vale para `catalog.review-v3` (contrato 1.0.0). Con `catalog.review-v4`
+  la misma demanda se redondea y no marca ninguna línea.
 - Un precio acordado se registra como el descuento del brief (`brief.adjustments[]`), no editando un artefacto. Primer
   caso, fuera de esta carpeta:
   [excepción SKY](../../../docs/commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+  *Corrección del mismo día (motor 1.1):* el ajuste vigente para un precio pactado es `agreed_net`, no un descuento
+  con la tasa calculada a mano.
 - Los rechazos de la CLI salen por stderr con un `code` del registro `src/lib/finance/pricing-v3/errors.ts`
   (`INPUT_NOT_FOUND`, `OUTPUT_EXISTS`, `SCHEMA_INVALID`…); `ADAPTER_FAILURE` significa caso sin clasificar.
+
+## Delta 2026-10-10 — motor 1.1 y catálogo v4
+
+Decisión: [ADR del motor 1.1](../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
+
+- **Archivos nuevos.** `catalog.review-v4.json` (versión `operating-review-2026-10-10-v4`) y
+  `rounding-fx-confirmed-costs.change.json`, el change-set que lo produjo desde `catalog.review-v3.json`.
+- **Qué usar para cotizar hoy.** `catalog.review-v4.json` + `resources.review-v5.json` +
+  `../v3-resources/ai-credits.review-v1.json`. Con v4 toda cotización nueva en CLP, USD, COP, MXN o PEN fechada desde
+  el 2026-10-10 se calcula con el contrato 1.1.0 y sale redondeada al múltiplo de su moneda. La CLI sin `--catalog`
+  sigue leyendo review-v1: hay que pasar la ruta.
+- **Qué no se toca.** `catalog.review-v2.json` y `catalog.review-v3.json` son los padres congelados de los artefactos
+  que los usaron. Ningún artefacto de esta carpeta se regeneró: cada uno lleva su catálogo dentro, vuelve a resolver al
+  contrato 1.0.0 y responde `verified: true`. La prueba `pricing-v3-frozen-artifacts.test.ts` los reproduce a todos en
+  cada corrida.
+- **Precio pactado.** Se declara en `brief.adjustments[]` como
+  `{ "adjustmentId", "kind": "agreed_net", "amount", "billing": "monthly" | "setup", "lineIds", "reason" }`. El motor
+  llega al monto exacto y registra la diferencia como `discount` o `uplift`.
+- **Redondeo.** No se declara en la demanda: sale de la regla `price_rounding` del catálogo para la moneda de salida.
+  El resumen la reporta en `priceRounding` y el monto en `totals.roundingAdjustment`.
+- **Tipo de cambio.** Los `fx` de v4 desde USD son valores de política del operador, no cotizaciones de mercado. La
+  referencia EUR→USD sigue fechada sólo el 2026-10-09 y USD→CLF sigue estimado: una demanda posterior que necesite
+  EUR queda sin tasa vigente.
+- **Costos.** Los 32 costos quedaron confirmados en su importe pero siguen sin país declarado; la resolución los sigue
+  reportando como `ESTIMATED_SOURCE` con el supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`.
+- **Ledger.** `operational-gaps.json` retiró `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE`,
+  agregó `QUOTE_FX_REVIEW` y `COMMERCIAL_ROUNDING_SCOPE`, y actualizó `MARGIN_FLOOR_SCOPE` y `LOCALIZED_TALENT_COSTS`.
+- **Corrida del 2026-10-10** con v4 + v5 sobre `managed-care.demand.json`: CLP 9.530.000, y cambiando sólo la moneda
+  de salida, USD 9.530,00, COP 34.900.000, MXN 183.300,00 y PEN 35.300,00; todas calculadas, múltiplos de su regla y
+  sin líneas marcadas. Con v3 la misma demanda da CLP 9.508.946 y seis líneas marcadas. Evidencia fechada, no fixture:
+  la demanda versionada está en CLP y no se escribieron artefactos nuevos en esta carpeta.
