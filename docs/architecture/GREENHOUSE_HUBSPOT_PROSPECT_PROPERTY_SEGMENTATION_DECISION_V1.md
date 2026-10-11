@@ -7,7 +7,7 @@
 - **Scope:** operación directa del portal Efeonce `48713323`, cohortes de empresas/contactos y segmentos nativos.
 - **Reversibility:** two-way; conservar prestate de atributos y filtros para restaurarlos sin borrar registros.
 - **Confidence:** high en el contrato; implementación y membresía requieren readback independiente.
-- **Validated as of:** 2026-10-06; cuatro definiciones por Agent CLI `0.15.1`, cohorte 81/81 tras Sika y 19 membresías completas por lector MCP independiente. Catálogo y deltas fechados enlazados abajo.
+- **Validated as of:** 2026-10-11 para el límite por fecha (ver Delta 2026-10-11); 2026-10-06 para el contrato original: cuatro definiciones por Agent CLI `0.15.1`, cohorte 81/81 tras Sika y 19 membresías completas por lector MCP independiente. Catálogo y deltas fechados enlazados abajo.
 
 ## Context
 
@@ -92,6 +92,36 @@ sin reemplazar cohortes ni reglas previas. ACTIVE 178 clasifica personas con/sin
 ronda; ACTIVE 179 selecciona sus empresas. Se verificaron conjuntos completos de dos contactos y dos empresas,
 asociaciones Primary y notas de fuente. 178 no acredita disponibilidad/entregabilidad de correo ni autorización
 de envío. [Auditoría y expresiones](../audits/commercial/2026-10-08-creative-prospect-intake.md).
+
+### Delta 2026-10-11 — la fecha de investigación sustituye a las cohortes fechadas
+
+Decisión del operador (Julio Reyes, 2026-10-11): una opción de enum por día de trabajo no escala, porque cada
+ronda exige un cambio de esquema. Desde esta fecha el universo de prospección se delimita con una propiedad de
+fecha, no con una opción nueva.
+
+| Objeto | Propiedad | Tipo | Regla |
+| --- | --- | --- | --- |
+| Company, Contact | `efeonce_prospecting_researched_on` | date | Fecha de la investigación más reciente. Se escribe en cada alta o reinvestigación, en ambos objetos por separado. |
+| Company, Contact | `efeonce_prospecting_cohorts` | enumeration | **Histórica.** Conserva sus cuatro opciones (06, 08, 09 y 10 de octubre) y sus valores; no recibe opciones ni asignaciones nuevas. |
+
+- Los ACTIVE **180–187** («Prospección continua») conservan ID y cambian su límite de
+  `efeonce_prospecting_cohorts IS NOT NULL` a `efeonce_prospecting_researched_on IS NOT NULL`; el resto de cada
+  expresión no cambió.
+- Los ACTIVE por ronda **159–179** quedan intactos sobre la propiedad histórica. No se crean segmentos por ronda
+  nuevos: una vista por período es un filtro de fecha sobre la propiedad, no una opción ni un segmento.
+- La fecha guarda sólo la última investigación. El historial de rondas de un registro reinvestigado vive en sus
+  notas CRM, que ya registran cada señal con fuente y fecha.
+- Alternativa descartada de nuevo: fecha de creación del CRM. La propiedad nueva se escribe de forma explícita
+  al investigar, así que cubre empresas preexistentes reinvestigadas.
+
+Aplicación verificada el 2026-10-11 con Agent CLI `0.15.1`: definición creada en ambos objetos; **96 contactos y
+91 empresas** fechados desde su cohorte (la empresa con dos cohortes tomó la más reciente), con cero faltantes,
+cero extras, cero fechas distintas a la esperada y cero cohortes alteradas; ocho definiciones leídas de vuelta
+idénticas a lo previsto. Totales de membresía por lector MCP antes → después: 180 **96 → 97**, 181 **78 → 78**,
+182 **59 → 59**, 183 **31 → 31**, 184 **9 → 10**, 185+186 **9 → 9**, 187 **91 → 92**. Las diferencias corresponden
+al único alta del día (un contacto sin email y su empresa), que entró sólo por fecha, sin cohorte. Los totales
+son conteos; no se enumeraron los conjuntos completos de membresía. Recuperación: restaurar las ocho expresiones
+desde el prestate; la propiedad histórica no se modificó salvo su etiqueta.
 
 ## Revisit when
 

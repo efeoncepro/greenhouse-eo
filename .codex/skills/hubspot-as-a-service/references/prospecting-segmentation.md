@@ -4,6 +4,20 @@ Use for researching, enriching and segmenting approved prospects in an independe
 portal. This is CRM preparation. It does not authorize outreach, publishing, workflow activation or changes to
 subscriptions, marketing-contact status or permissions.
 
+## Current rule (2026-10-11): research date, not dated cohorts
+
+Operator decision: a new enum option per working day does not scale. Every intake or re-research now writes
+`efeonce_prospecting_researched_on` (date, `YYYY-MM-DD`) on BOTH Company and Contact; one does not populate the
+other. That date is the universe boundary of the continuous segments **180–187**
+(`efeonce_prospecting_researched_on IS NOT NULL` AND attributes). `efeonce_prospecting_cohorts` is historical:
+it keeps its four October options and values, feeds only segments 159–179, and receives no new options or
+assignments. Do not create a cohort option or a per-round segment for a new intake; a period view is a date-range
+filter. The date holds the latest research only; round history lives in the associated CRM notes. Wherever the
+text below says to populate a cohort for a new intake, populate the research date instead; the cohort rules
+still describe the historical rounds. In Agent CLI 0.15.1 the single-record `objects update <ID> --property`
+form hung without writing in a non-interactive shell: use JSONL on stdin (preview + digest) or the MCP connector.
+[Decision delta and verification](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
+
 ## Entry points and deployed configuration
 
 Read the [functional model](../../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md),
@@ -77,6 +91,7 @@ Verified portal dictionary (2026-10-06; revalidate before use):
 | Company and Contact | `efeonce_prospecting_cohorts`      | checkbox; `research_2026_10_06`                                                       |
 | Contact             | `efeonce_prospecting_contact_kind` | select; `individual_email`, `individual_no_email`, `shared_inbox`, `identity_pending` |
 | Contact             | `efeonce_prospecting_service_fit`  | checkbox; `creative`, `hubspot_crm`                                                   |
+| Company and Contact | `efeonce_prospecting_researched_on` | date; latest research date. Boundary of 180–187 since 2026-10-11                     |
 
 Group: `efeonce_prospecting` / Prospección Efeonce. Future rounds require a defined option and authorized universe;
 records may carry multiple rounds. Do not label the entire historical CRM as a current research cohort.

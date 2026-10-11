@@ -5,6 +5,16 @@ Operación: [manual](../../manual-de-uso/hubspot/segmentar-prospeccion-por-cohor
 Las expresiones completas, nombres e IDs leídos en HubSpot están en el
 [catálogo fechado](../../operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json). Es evidencia de configuración; HubSpot sigue siendo la fuente viva.
 
+## Vigente desde el 2026-10-11: se incorpora por fecha de investigación
+
+Las rondas dejaron de modelarse como opciones de una lista. Cada alta o reinvestigación escribe
+`efeonce_prospecting_researched_on` (fecha) en empresa y contacto, y esa fecha es la que incorpora el registro a
+los segmentos de «Prospección continua» **180–187**. `efeonce_prospecting_cohorts` queda como histórico de las
+rondas del 06 al 10 de octubre y de los segmentos **159–179**; no recibe opciones ni registros nuevos. La fecha
+guarda la última investigación; el historial queda en las notas. Las secciones siguientes describen las rondas
+históricas y siguen siendo válidas para ellas.
+[Decisión y verificación](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--la-fecha-de-investigación-sustituye-a-las-cohortes-fechadas).
+
 ## Ronda adicional — 2026-10-08
 
 Se añadió research_2026_10_08 como opción en Company y Contact para dos oportunidades autorizadas.
@@ -23,7 +33,8 @@ retirar al registro del segmento correspondiente; el recálculo es asíncrono.
 
 | Registro | Propiedad | Qué cargar |
 | --- | --- | --- |
-| Company y Contact, por separado | `efeonce_prospecting_cohorts` | Opción `research_2026_10_06` sólo para el universo autorizado de esa ronda y sus ampliaciones explícitas; conservar otras cohortes |
+| Company y Contact, por separado | `efeonce_prospecting_researched_on` | Fecha de la investigación (`AAAA-MM-DD`). Es el límite del universo de prospección continua desde el 2026-10-11 |
+| Company y Contact, por separado | `efeonce_prospecting_cohorts` | Histórica: sólo las rondas del 06 al 10 de octubre. No añadir opciones ni asignarla a registros nuevos |
 | Contact | `efeonce_prospecting_contact_kind` | `individual_email`, `individual_no_email`, `shared_inbox` o `identity_pending`, según la identidad/canal respaldados |
 | Contact | `efeonce_prospecting_service_fit` | `creative`, `hubspot_crm` o ambas cuando haya evidencia; conservar valores compatibles previos |
 | Company | `industry`, `country`, `hs_employee_range` | Industria y datos de cuenta respaldados, usando las opciones exactas existentes |

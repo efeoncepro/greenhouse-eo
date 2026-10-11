@@ -5,6 +5,12 @@ Manual de operador. Método verificado el 2026-10-06 en portal Efeonce `48713323
 Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md) y
 [skill de prospección y segmentación](../../../.codex/skills/hubspot-as-a-service/references/prospecting-segmentation.md).
 
+> **Vigente desde el 11/10/2026:** ya no se crean opciones de cohorte por fecha. En cada alta o reinvestigación
+> se escribe `efeonce_prospecting_researched_on` (fecha, `AAAA-MM-DD`) en empresa **y** contacto. Esa fecha es
+> lo que incorpora el registro a los segmentos de «Prospección continua» **180–187**. La propiedad
+> `efeonce_prospecting_cohorts` queda como histórico de las rondas del 06 al 10 de octubre: no añadirle opciones
+> ni asignarla a registros nuevos. Detalle en la sección 7; lo anterior describe las rondas históricas.
+
 ## Arranque rápido para cualquier agente
 
 1. Cargar [modelo funcional y catálogo](../../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) y la [decisión](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
@@ -279,3 +285,31 @@ Prospecting Agent admite inscripción manual filtrada por segmento y automatizac
 La incorporación al segmento no ejecuta ninguna de ellas por sí sola. Al 08/10, la guía está activada y exige
 revisión; la cuenta agotó 3.000/3.000 créditos y muestra consumo en pausa, con reposición el 29/10.
 [Procedimiento observado, límites y evidencia](../../audits/commercial/2026-10-08-prospecting-agent-active-segments.md).
+
+## 7. Fecha de investigación en lugar de cohortes fechadas — 11/10/2026
+
+Una opción nueva por día obligaba a cambiar el esquema en cada ronda. El alta ahora es:
+
+1. Reconciliar empresa y contacto existentes; crear sólo lo que falte.
+2. Escribir `efeonce_prospecting_researched_on` con la fecha de la investigación en empresa y contacto. Una no
+   copia a la otra. Si el registro ya tenía fecha, reemplazarla por la nueva: guarda la última investigación.
+3. Clasificar `efeonce_prospecting_contact_kind` y `efeonce_prospecting_service_fit` en el contacto, con evidencia.
+4. Dejar la señal, fuente y fecha en la nota asociada. La nota es también el historial cuando hay más de una ronda.
+5. Leer de vuelta propiedades, asociaciones y pertenencia a 180–187.
+
+```bash
+printf '{"id":"<CONTACT_ID>","properties":{"efeonce_prospecting_researched_on":"2026-10-11","efeonce_prospecting_contact_kind":"individual_no_email","efeonce_prospecting_service_fit":"creative"}}\n' \
+  | hubspot objects update --type contacts --dry-run
+```
+
+El modo de un solo registro (`hubspot objects update --type contacts <ID> --property …`) se quedó esperando sin
+escribir en la CLI `0.15.1` cuando se ejecutó sin terminal interactiva; no dejó cambios. Usar la entrada JSONL
+por stdin, que devuelve preview y digest, o el conector MCP.
+
+Los segmentos 180–187 usan `efeonce_prospecting_researched_on IS NOT NULL` como límite. Para ver un período
+(«lo investigado esta semana») filtrar por rango de esa fecha en una vista; no crear una opción ni un segmento
+por ronda. Los segmentos 159–179 siguen leyendo la propiedad histórica y no reciben registros nuevos.
+
+Estado verificado el 11/10: 97 contactos y 92 empresas con fecha; 180 = **97**, 181 = **78**, 182 = **59**,
+183 = **31**, 184 = **10**, 185 + 186 = **9**, 187 = **92**. Son conteos del lector MCP, no una enumeración de
+miembros. Evidencia local (prestate, backfill, definiciones antes y después) fuera del repositorio; no copiar PII.

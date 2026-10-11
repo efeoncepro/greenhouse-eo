@@ -64,8 +64,9 @@ and the [operator manual](../../../docs/manual-de-uso/hubspot/segmentar-prospecc
 The [functional model](../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) and
 [dated native filter catalog](../../../docs/operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json) identify
 which existing segment consumes each property. Revalidate the live definition/member set; never recreate the
-four existing properties or assign the current cohort to all future prospects. Company and Contact need their
-own cohort values. Reuse existing ACTIVE segments; populate the properties they consume instead of creating
+existing properties. Since 2026-10-11 an intake writes the research date
+`efeonce_prospecting_researched_on` on Company and Contact separately; dated cohort options are historical and
+are never added or assigned again. Reuse existing ACTIVE segments; populate the properties they consume instead of creating
 duplicates. Research remains a lead until effective qualification; preserve existing Deals the operator asks
 to leave unchanged. A successful CRM create is incomplete until automatic membership and associations are read back.
 
@@ -155,7 +156,7 @@ Run `intake -> inventory -> design -> propose -> approve -> dry-run/draft -> exe
 
 - Never create a property because an email names a field. Confirm object, internal name, type, options, source, owner, requiredness, backfill and downstream consumers.
 - Keep research origin, service fit, observed purchase intent and email eligibility separate. A fresh CRM create date does not prove current employment, a live purchase process or a deliverable address. Cohort segments must retain their origin restriction in every OR branch; preparing segments does not authorize sending email or activating workflows/sequences.
-- Every approved prospect intake must populate authorized cohort and evidence-backed classification properties on company/contact records. Native ACTIVE segments consume those properties and incorporate qualifying records automatically; static-base enrollment is not the normal intake step. A contact/lead/note create alone is incomplete until properties and actual memberships are independently verified. Apply [prospecting-segmentation.md](references/prospecting-segmentation.md); preserve prior cohort values and do not force incompatible intent enums.
+- Every approved prospect intake must populate the research date (`efeonce_prospecting_researched_on`, on both company and contact) and evidence-backed classification properties. Native ACTIVE segments consume those properties and incorporate qualifying records automatically; static-base enrollment is not the normal intake step. A contact/lead/note create alone is incomplete until properties and actual memberships are independently verified. Apply [prospecting-segmentation.md](references/prospecting-segmentation.md); preserve prior cohort values and do not force incompatible intent enums.
 - Never treat Customer Agent persona, knowledge, actions and handoff as one prompt. They are separate contracts.
 - Never conflate Customer Agent `Deployment > Workflows and bots` with agent knowledge, Customer Agent actions, or
   a workflow action that invokes an agent managed through Agent Hub/Agent Builder. Names and eligibility can change;
