@@ -357,8 +357,15 @@ For execution work, also include:
 Para costear roles/servicios con licencias, plataforma o créditos, cargar
 [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md) y
 [manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
-Finance conserva ownership de salario/coberturas, provisiones, impuestos, FX, caja y reconciliación;
-el kernel Decimal calcula desde fuentes versionadas. Factor del talento y factor del mercado son ejes distintos.
+Finance conserva ownership de nómina real/coberturas, provisiones, impuestos, FX contable, caja y reconciliación;
+el kernel Decimal calcula desde fuentes versionadas. **El costo de personas del cotizador no es la nómina:** es el
+nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), así que el margen real en personas hoy
+es mayor que el que muestra V3. No «corregirlo» con payroll ni proponer conectarlo, y nunca escribir el pago de una
+persona en un artefacto o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de
+talento, base Chile; fuera de Chile son estimaciones propuestas por un agente) y el del cliente cambia el **precio**
+de la parte humana (factor de mercado). El FX de cotización es política del CEO con USD de referencia (CLP 1000 ·
+COP 3650 · MXN 19,25 · PEN 3,70), no el tipo contable ni spot; cada moneda redondea hacia arriba (CLP 10.000 ·
+USD 10 · PEN 50 · COP 50.000 · MXN 100) y en EUR aún no se emite.
 No introducir cifras del expediente como costos centrales sin fuente/fecha/mantenimiento gobernado.
 
 Portfolio reconcilia cuentas + interno + sin asignar contra capacidad declarada; no inventa clientes ni reparte
@@ -368,6 +375,8 @@ créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y r
 FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
 `trial-*` son costos no medidos y no provisiones aprobadas. Margen sobre venta y markup no son intercambiables;
 40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
+El piso 45% es la norma del servicio gestionado creativo; la cifra y sus excepciones las decide el CEO (SKY social
+care 2027, 40,26%, es una y no es referencia): el agente lleva una recomendación verificada contra sus datos.
 
 Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con
 preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca repricea artifacts. Este carril no

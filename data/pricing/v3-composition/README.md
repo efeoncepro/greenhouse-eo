@@ -11,6 +11,9 @@ Policy inicial para Copywriter, diseñador senior y SEO Specialist; otros perfil
 Base común Notion/Microsoft 365; tareas/perfil agregan SEMrush o Adobe; IA por selección justificada o tarea
 visual; plataforma según servicio. Costos desde referencias de catálogo o variantes declaradas con fuente.
 Cambiar policy/precios requiere versión nueva explícita; no altera artifacts existentes.
+Desde el 2026-10-11 la policy vigente no es la de esta carpeta: la nombra el puntero
+[`../v3-operating/current.json`](../v3-operating/current.json) y se usa con `--current`. En ella un precio unitario
+de herramienta no vence; rige hasta que una versión nueva lo reemplaza y lleva una fecha de revisión que sólo avisa.
 
 ## Casos de simulación verificados
 

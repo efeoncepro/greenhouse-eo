@@ -304,6 +304,15 @@ rates, margen y país del talento quedan internos. Esa proyección respeta la un
 de equipo en suficiencia de delivery ni sustituye lane, RACI, derechos, aceptación o capacidad financiada.
 El piso bruto 45% de esta práctica se conserva: la propuesta 40%/35% del piloto de capacidad no lo reemplaza.
 
+Delta 2026-10-11 — decisiones del operador (CEO). El 45% es la norma de los servicios gestionados de la práctica
+creativa: donde se puede ganar más se sube el margen objetivo de esa oferta, no el piso. Una excepción bajo el piso
+la decide el CEO para un cliente concreto y nunca sirve de referencia de margen para otro. El costo de las personas
+en el cotizador es el nivel salarial objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella: el
+margen real sobre personas hoy es mayor que el simulado. El país de cada persona ajusta su costo y el país del
+cliente ajusta el precio del componente humano; donde ese factor baja el precio, el piso se lee sobre el precio del
+mercado base. Cada moneda redondea a su múltiplo, el tipo de cambio de cotización es un valor de política y todavía
+no se puede cotizar en EUR; los valores vigentes están en el manual.
+
 Explicación/replay usan snapshots congelados. Readiness distingue cálculo de validación económica y aprobación.
 Portfolio declara clientes, interno y no asignado; no prueba inventario real. Cambios de salarios/licencias/packs
 crean sucesores con impacto, sin modificar quotes o contratos anteriores. Estado permanece `Approved for validation`;

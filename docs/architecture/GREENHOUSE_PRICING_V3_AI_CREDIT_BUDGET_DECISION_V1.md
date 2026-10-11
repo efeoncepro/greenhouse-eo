@@ -50,3 +50,18 @@ reutiliza remanente entre clientes/períodos. Caducidad de créditos y vigencia 
 El [ADR operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
 [ADR de mantenimiento](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md) conservan fuente/digest,
 impactos y sucesores; esta integración no habilita ledger, inventario o consumer canónico.
+
+**Delta 2026-10-11.** El catálogo de créditos vigente ya no se nombra a mano: lo nombra, con versión y digest, el
+puntero `data/pricing/v3-operating/current.json` (hoy `ai-credits.review-v1.json`). Con `--current`, `compose` y
+`resources` reciben ese catálogo como `--credits`, y `resources budget` lo recibe como `--catalog`, que en esa
+operación es el catálogo de créditos y no el monetario. Sin `--current` los flags siguen siendo obligatorios. Una
+versión nueva (`ai-credits.review-vN.json` en `data/pricing/v3-resources/`) exige mover el puntero con `current set`
+en el mismo cambio; si no, `pnpm pricing:v3:test` falla.
+[Decisión](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--puntero-a-las-versiones-vigentes).
+
+La decisión del 2026-10-11 de que un precio unitario no vence aplica a los precios de herramienta de la policy de
+recursos, no a los paquetes de créditos. Un proveedor de este catálogo puede declarar `priceValidUntil`; cuando lo
+declara es una vigencia dura para la compra incremental (`TOPUP_PRICE_EXPIRED` si la fecha de compra es posterior)
+y aparece en `priceReview` de `resources inspect`. En
+`ai-credits.review-v1.json` ningún proveedor la declara (`priceValidUntil: null`): la validez de esas promociones no
+está verificada, no es que sean indefinidas. La caducidad de los créditos comprados sigue siendo otro dato.

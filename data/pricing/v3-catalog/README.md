@@ -14,6 +14,9 @@ fees por perfil, kits y policies de simulación. No habilitado comercialmente ni
 Agentes consultan registros y kits, preparan brief sin costos inline, resuelven y cotizan. Inputs presupuestarios
 de un expediente no son catálogo. Fuentes/hashes, vigencia, unidades y supuestos conservan trazabilidad.
 Mantenimiento crea versión nueva mediante preview/apply; requiere seleccionar `--catalog` para usarla.
+Desde el 2026-10-11 el catálogo operativo vigente no vive aquí ni se nombra a mano: lo nombra el puntero
+[`../v3-operating/current.json`](../v3-operating/current.json) y se usa con `--current`. Esta baseline review-v1
+sigue siendo lo que la CLI lee cuando no pasas `--catalog` ni `--current`, y no es el catálogo para cotizar hoy.
 No ejecutar el Excel, no modificar baseline in-place, no inventar costos ausentes o interpretar historical como vigente.
 
 Las licencias usan precio completo del paquete histórico: permisos de compartir/plan/seat count aún pendientes.

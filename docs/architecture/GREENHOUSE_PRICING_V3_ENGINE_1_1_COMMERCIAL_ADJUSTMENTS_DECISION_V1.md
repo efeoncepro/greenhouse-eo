@@ -278,11 +278,14 @@ fuentes y cuáles son estimaciones: el JSON, su `audit` y
   que cuesta una persona: son hechos distintos y se declaran por separado.
 - **SIEMPRE** que exista el costo real de un perfil en un país, registrarlo como costo específico; el factor de
   talento es la aproximación para cuando ese dato no existe.
+  *Nota 2026-10-11 (posterior):* «costo real» es aquí el costo objetivo de ese perfil en ese país, no lo que hoy se
+  paga por nómina. Ver la nota de cierre de este delta.
 
 **No decidido a propósito.** Factores por tipo de cliente (pyme, licitación, cliente estratégico), que hoy se
 expresan como precio pactado; factores de talento por perfil o seniority, que hoy se expresan como costo específico;
 y regla de redondeo y tipo de cambio para EUR, sin los cuales todavía no se puede cotizar en EUR a un cliente de
 España (la resolución lo bloquea por falta de tasa USD→EUR).
+*Nota 2026-10-11 (posterior):* sigue igual con el catálogo v6. Lo que v6 agrega es EUR→USD, para costos en EUR.
 
 **Verificación (2026-10-11, local).** `pnpm pricing:v3:test`: 13 archivos y 407 pruebas; ESLint limpio. Todos los
 artefactos congelados en disco responden `verified: true` (31 en esta máquina); la guarda permanente exige además
@@ -291,6 +294,31 @@ uno firmado por cada motor del registro, y el de `1.2.0` es
 (cliente y equipo en Colombia, COP). Medido con el catálogo v5: esa cotización sale a precio de política con margen
 real 0,4152 y ninguna línea marcada; antes de `floorBasis`, la misma cotización con factor 0,90 marcaba las seis.
 [Readback con cifras](../documentation/finance/cotizador-v3-superficie-implementada.md).
+
+**Nota 2026-10-11 (posterior) — lo que cambió después sin tocar el motor.** El registro sigue
+teniendo tres contratos (`1.0.0`, `1.1.0`, `1.2.0`); `calculate.ts`, `schemas.ts` y la resolución no cambiaron.
+
+- **Base de costo (decisión del operador, CEO).** Los costos por persona del catálogo son el costo objetivo: el
+  nivel de remuneración que quiere alcanzar para el equipo, tomado del Excel de pricing. Decidió expresamente que el
+  cotizador no use el costo real de nómina. La nómina actual está por debajo, así que el margen real de hoy
+  sobre las personas es mayor que el que muestra el cotizador. Un costo `specific` se registra sólo donde el costo
+  objetivo de un perfil en un país se aparta de la referencia de Chile por el factor de talento. **NUNCA** proponer
+  conectar la nómina real, describir el costo del catálogo como lo que Efeonce paga hoy, ni escribir la
+  remuneración de una persona.
+- **Catálogo v6.** Agrega un tipo de cambio de cotización EUR→USD de 1,20 (referencia del BCE: 1,1206), vigente
+  desde el 2026-10-11, sin fecha de término y marcado como estimado. Lo eligió el agente bajo la instrucción del
+  operador de usar un margen prudencial; no fue decidido expresamente para EUR. No hay USD→EUR ni regla de redondeo
+  para EUR.
+- **Factores de talento.** Chile vale 1 por definición. Los de Colombia, Perú, México, España y Estados Unidos los
+  propuso el agente y siguen marcados como estimados; no son una decisión del operador.
+- **Lectura.** El resumen agrega `estimateExposure` (dónde pesa más un dato estimado; en la cotización de Colombia
+  el factor de talento lleva el 64,7 % del costo) y, cuando corresponde, `runNotices`. Ninguna de las dos claves es
+  del motor ni entra al resultado que firma.
+- **Versiones vigentes.** Ya no se nombran a mano: las nombra el puntero `current.json` y se usan con `--current`.
+
+Decisiones, alternativas y reglas:
+[delta del flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones).
+`pnpm pricing:v3:test` al cierre de esa ronda: 16 archivos y 501 pruebas.
 
 ## No decidido a propósito
 

@@ -1,11 +1,13 @@
 # Cotizador V3: selección y actualización para agentes
 
 Estado: prototipo local ejecutable, 2026-10-09; catálogo histórico de simulación, no tarifas comerciales vigentes.
-Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; Platform para contrato.
+Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; Platform para contrato. Las cifras
+comerciales del catálogo operativo (márgenes, pisos, FX de cotización, múltiplos, factores de país) las decide el
+operador (CEO).
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
-Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización) y [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país), que operan sobre el catálogo operativo vigente (`catalog.review-v5.json`).
+Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Versiones vigentes: el puntero `current.json`](#versiones-vigentes-el-puntero-currentjson), [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización) y [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país), que operan sobre el catálogo operativo vigente: el que nombra el puntero y se carga con `--current`.
 
 ## Qué hace el agente
 
@@ -15,7 +17,7 @@ elegido y comprobar que cubre esas necesidades; si falta una, preparar actualiza
 cotizar, sin dar por hecho que la CLI lee el registro del operador. Claude Team tiene referencia pública,
 no plan/cantidad de Efeonce confirmados. Conservar razón de inclusiones/omisiones y reparto explícito.
 
-1. Consultar catálogo/perfiles/variantes y kits. Elegir versión explícita con `--catalog`; sin esa opción usa la baseline `catalog.review-v1.json`, NO descubre automáticamente una versión más reciente.
+1. Consultar catálogo/perfiles/variantes y kits. Sin `--catalog` ni `--current` la CLI usa la baseline `catalog.review-v1.json`, que es la de los ejemplos de esta sección; NO descubre automáticamente una versión más reciente. El catálogo operativo vigente se carga con `--current`.
 2. Traducir el pedido a brief: país del talento y mercado cliente, perfil, dedicación/horas, headcount, modalidad, duración, kit y alternativas. No introducir precios ni porcentajes inline.
 3. Preparar selección y resolver diagnósticos. No elegir el más barato si hay variantes; no usar cero por dato ausente.
 4. Cotizar con el mismo catálogo. Guardar el artefacto: contiene catálogo, brief, bindings, snapshots, calendario y resultados.
@@ -106,9 +108,88 @@ pnpm --silent pricing:v3 quote --catalog /tmp/catalogo-v3-ejemplo-v2.json --inpu
 ```
 
 `DIGEST_DEL_PREVIEW` y `BRIEF_CON_FECHA_2026_10_10` son placeholders que el agente sustituye; no copiar literalmente.
-El fixture sólo ilustra alza de Adobe 80→88 y salario base 950→1045 desde 10-10. No afirma incremento real.
+El fixture sólo ilustra un alza de 10 % desde 10-10 en Adobe (80→88) y en el salario base del perfil. No afirma incremento real.
 Con los mismos supuestos cambia el neto de tres meses 4334,20→4550,65; una quote del 09-10 conserva el importe anterior.
 La versión nueva sólo se usa cuando se selecciona con `--catalog`; aplicar no publica, factura ni activa catálogo canónico.
+En el catálogo operativo, una versión nueva queda vigente cuando se mueve el puntero (sección siguiente).
+
+## Versiones vigentes: el puntero `current.json`
+
+**Para qué sirve.** Cada versión del catálogo monetario, de la policy de recursos y del catálogo de créditos es un
+archivo que no se edita ni se borra, porque las cotizaciones congeladas dependen de las anteriores. «Vigente» no
+puede ser entonces un nombre de archivo: lo dice un único documento, `data/pricing/v3-operating/current.json`
+(`pricing-v3-current/1`), que nombra las tres fuentes por ruta relativa al repo, versión y digest, con `updatedAt` y
+`reason`. Los comandos lo leen con `--current`
+([cómo se usa al cotizar](operar-cotizador-v3-con-agentes.md#versiones-vigentes)).
+
+**Ver el puntero.**
+
+```bash
+pnpm --silent pricing:v3 current show
+```
+
+Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, `path`, `status` y lo que se encontró
+en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
+coincide. Hoy apunta a `data/pricing/v3-operating/catalog.review-v6.json` y
+`data/pricing/v3-operating/resources.review-v6.json` (ambos `operating-review-2026-10-11-v6`) y a
+`data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`).
+
+| `status`           | Qué significa                                                              |
+| ------------------ | -------------------------------------------------------------------------- |
+| `match`            | El archivo tiene la versión y el digest que dice el puntero                |
+| `version_mismatch` | El archivo declara otra versión                                            |
+| `digest_mismatch`  | Misma versión, otro contenido: alguien editó un archivo versionado         |
+| `invalid`          | El archivo no cumple su schema                                             |
+| `unreadable`       | El archivo no existe o no es JSON                                          |
+
+**Regla de mantenimiento.** Una versión se emite con `catalog apply` o `resources apply` y, acto seguido, se mueve el
+puntero. `apply` nunca lo mueve. Una guarda de `pnpm pricing:v3:test` exige que el puntero nombre la versión de
+número más alto presente en cada carpeta (`catalog.review-vN.json` y `resources.review-vN.json` en
+`data/pricing/v3-operating/`, `ai-credits.review-vN.json` en `data/pricing/v3-resources/`): una versión emitida sin
+mover el puntero deja esa suite en rojo.
+
+**Mover el puntero, paso a paso.**
+
+1. Emitir la versión con `--out` en su carpeta y con el número siguiente, y guardar junto a ella su change-set.
+2. Probar el sucesor antes de dejarlo vigente: una opción escrita a mano gana sobre el puntero, así que
+   `compose prepare --catalog <sucesor> --current --input <demanda>` cotiza con el catálogo nuevo y con la policy y
+   los créditos vigentes. Correr un caso por cada país, moneda u oferta que el cambio toca.
+3. Leer el puntero actual con `current show` y copiar su `pointerDigest` y las rutas de las fuentes que no cambian.
+4. Reemplazarlo, con la misma confirmación del operador que autorizó el `apply`:
+
+   ```bash
+   pnpm --silent pricing:v3 current set \
+     --catalog data/pricing/v3-operating/catalog.review-vN.json \
+     --policy data/pricing/v3-operating/resources.review-v6.json \
+     --credits data/pricing/v3-resources/ai-credits.review-v1.json \
+     --reason "Qué cambió, quién lo decidió y cuándo" \
+     --confirm POINTER_DIGEST_ACTUAL
+   ```
+
+   - Las tres rutas son obligatorias, van escritas (`current set` no acepta `--current`) y deben quedar dentro del
+     repo. Versión y digest no se escriben: la CLI los calcula de los archivos que nombran las rutas.
+   - `--reason` es obligatorio y queda en el puntero.
+   - `--confirm` es el `pointerDigest` del puntero que se reemplaza. Si no coincide —alguien lo movió entre medio—
+     rechaza con `CURRENT_VERSIONS_CONFLICT`; si falta, con `MISSING_ARGUMENT` (`option: "confirm"`).
+   - `--out otro.json` escribe el puntero nuevo en otra ruta para revisarlo, sin tocar el vigente; se inspecciona
+     con `current show --input otro.json`. En una ruta que todavía no existe no se pasa `--confirm`.
+   - Responde `{ updated, replaced, pointerDigest, pointer }`; `updatedAt` es la fecha local del día.
+5. Verificar: `current show` devuelve exit 0 con `consistent: true`, y `pnpm pricing:v3:test` pasa.
+6. Volver a cotizar con `--current` los casos abiertos que el cambio afecta, y actualizar las versiones que citan
+   [«Versiones vigentes»](operar-cotizador-v3-con-agentes.md#versiones-vigentes) y la referencia de la skill.
+
+**Qué no hacer.**
+
+- No editar `current.json` a mano: versión y digest tienen que coincidir con los archivos, y la siguiente corrida
+  con `--current` rechaza con `CURRENT_VERSIONS_MISMATCH`.
+- No editar ni borrar una versión anterior, ni «corregir» la vigente en su archivo: se emite otra versión.
+- No emitir una versión y dejar el puntero para después.
+- No mover el puntero a una versión que no se probó cotizando (paso 2): un registro duplicado pasa `preview` y
+  `apply` y recién bloquea al cotizar ([Problemas comunes](#problemas-comunes)).
+
+Mover el puntero no cambia ninguna cotización congelada: `replay` usa las fuentes que el artefacto lleva dentro. Si
+una versión emitida resultó mala, se corrige con otra versión; para cotizar mientras tanto con la anterior se nombran
+sus rutas a mano y se dice en el resultado.
 
 ## Cambiar el redondeo o el FX de cotización
 
@@ -118,11 +199,9 @@ el agente prepara el change-set, le muestra el preview y aplica sólo con su con
 [Cotizar en otra moneda](operar-cotizador-v3-con-agentes.md#cotizar-en-otra-moneda). Para ver lo vigente:
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v5.json
-
-pnpm --silent pricing:v3 catalog validate --catalog "$pricing_catalog"
-pnpm --silent pricing:v3 catalog search --kind price_rounding --catalog "$pricing_catalog" --date 2026-10-11
-pnpm --silent pricing:v3 catalog search --kind fx --catalog "$pricing_catalog" --date 2026-10-11
+pnpm --silent pricing:v3 catalog validate --current
+pnpm --silent pricing:v3 catalog search --kind price_rounding --current --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind fx --current --date 2026-10-11
 ```
 
 Los tres devuelven exit 0. `catalog validate` entrega el `digest` de la base, que va en `baseDigest` del change-set.
@@ -136,7 +215,8 @@ En `search`, `"resolution": "ambiguous"` sólo dice que la consulta devolvió va
 - **FX de cotización** (`kind: "fx"`): `value` es `{ "from": "USD", "to": "COP", "rate": "3650" }`, con `recordId`
   `fx:USD:<MONEDA>`. USD es la moneda de referencia: un registro por par USD→moneda. Es un valor de política con
   margen prudencial, no un tipo de cambio de mercado; `note` debe decir quién lo decidió, cuándo y contra qué
-  observación.
+  observación. El único registro en otro sentido es `fx:EUR:USD` (EUR→USD), que convierte a USD el costo de una
+  herramienta con precio en EUR. No hay USD→EUR ni regla de redondeo para EUR: una cotización no se emite en EUR.
 
 Cada cambio es una entrada de `changes` en un change-set `pricing-v3-catalog-change/1`:
 
@@ -192,10 +272,28 @@ pnpm --silent pricing:v3 catalog apply --catalog data/pricing/v3-operating/catal
 
 `preview` devuelve exit 0 con `previewDigest` (el valor de `--confirm`) y `differences`: 41 entradas con el antes y el
 después de cada registro. `apply` devuelve exit 0 y escribe un archivo idéntico a `catalog.review-v4.json`
-(`version` `operating-review-2026-10-10-v4`). Un cambio nuevo se construye sobre el catálogo vigente: su `baseDigest`
-es el `digest` de `catalog.review-v5.json` y `--catalog` apunta a ese archivo. `--impact` acepta un arreglo de briefs
-del carril de catálogo para ver el efecto en casos concretos; una demanda de composición se compara cotizándola con
-la base y con el sucesor.
+(`version` `operating-review-2026-10-10-v4`). Aquí las rutas van escritas porque se repite un cambio sobre la base
+que tenía entonces.
+
+Un cambio nuevo se construye sobre el catálogo vigente: su `baseDigest` es el `digest` que devuelve
+`catalog validate --current`, y `preview` y `apply` llevan `--current`:
+
+```bash
+pnpm --silent pricing:v3 catalog preview --current --input mi-cambio.change.json
+
+pnpm --silent pricing:v3 catalog apply --current --input mi-cambio.change.json \
+  --confirm DIGEST_DEL_PREVIEW --out data/pricing/v3-operating/catalog.review-vN.json
+```
+
+`mi-cambio.change.json`, `DIGEST_DEL_PREVIEW` y `vN` son marcadores. `--impact` acepta un arreglo de briefs del
+carril de catálogo para ver el efecto en casos concretos; una demanda de composición se compara cotizándola con la
+base y con el sucesor.
+
+El cambio más reciente es [`eur-quote-fx.change.json`](../../../data/pricing/v3-operating/eur-quote-fx.change.json),
+que produjo `catalog.review-v6.json` desde `catalog.review-v5.json`: un solo `add`, el FX de cotización `fx:EUR:USD`
+de `1.20` desde el 2026-10-11, sin fecha de término y marcado `estimated`. Lo propuso el agente aplicando al EUR el
+margen prudencial que el operador fijó para las otras monedas (referencia ECB `1.1206`); el operador no lo decidió de
+forma explícita para EUR, y por eso no está `confirmed`.
 
 Rechazos (exit 1, `error.code` en stderr): `CATALOG_BASE_CONFLICT` (el `baseDigest` no es el de la base entregada),
 `CATALOG_PREVIEW_CONFLICT` (el `--confirm` no es el del preview vigente: repetir el preview),
@@ -206,11 +304,10 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 
 **Un cambio es siempre una versión nueva del catálogo.** `apply` escribe un sucesor en una ruta nueva y no toca la
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
-conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor sólo si se elige con
-`--catalog`. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente
-(hoy sería `catalog.review-v6.json`) junto a su change-set, volver a cotizar los casos afectados y actualizar la ruta en
-[«Versiones vigentes»](operar-cotizador-v3-con-agentes.md#versiones-vigentes) y en la referencia de la skill, para
-que agentes y operador usen el mismo catálogo.
+conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor cuando el puntero lo
+nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente (hoy sería
+`catalog.review-v7.json`) junto a su change-set, probarlo con los casos afectados y mover el puntero
+([pasos](#versiones-vigentes-el-puntero-currentjson)), para que agentes y operador usen el mismo catálogo.
 
 ## Cambiar un factor de país o registrar el costo de un perfil en un país
 
@@ -220,11 +317,9 @@ Los valores los decide el operador (CEO); el agente prepara el change-set, le mu
 confirmación. Para ver lo vigente (los tres devuelven exit 0):
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v5.json
-
-pnpm --silent pricing:v3 catalog search --kind talent_factor --catalog "$pricing_catalog" --date 2026-10-11
-pnpm --silent pricing:v3 catalog search --kind market_factor --catalog "$pricing_catalog" --date 2026-10-11
-pnpm --silent pricing:v3 catalog search --kind cost --query ECG-007 --catalog "$pricing_catalog" --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind talent_factor --current --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind market_factor --current --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind cost --query ECG-007 --current --date 2026-10-11
 ```
 
 - **Factor de talento** (`kind: "talent_factor"`, `recordId` `talent:<PAÍS>:CL`): `value` es
@@ -235,8 +330,10 @@ pnpm --silent pricing:v3 catalog search --kind cost --query ECG-007 --catalog "$
   parte humana para un cliente de ese país. Uno por país.
 - **Costo de un perfil** (`kind: "cost"`): los 32 registros `cost:<perfil>:unknown` llevan
   `"localization": { "kind": "reference_adjusted", "referenceCountry": "CL" }`: son el costo en Chile y reciben el
-  factor de talento. Un registro con `"localization": { "kind": "specific", "country": "CO" }` es el costo real de
-  ese perfil en ese país: no recibe factor y, para las personas de ese país, reemplaza al de referencia.
+  factor de talento. Un registro con `"localization": { "kind": "specific", "country": "CO" }` es el costo propio de
+  ese perfil en ese país: no recibe factor y, para las personas de ese país, reemplaza al de referencia. En los dos
+  casos el monto es el **costo objetivo** del perfil (el nivel de sueldo que el operador quiere alcanzar), no la
+  nómina actual ([base de costo](operar-cotizador-v3-con-agentes.md#selección-y-asignación)).
 
 ### Cambiar un factor
 
@@ -281,15 +378,17 @@ de mercado de Colombia en el change-set real (era `1`, revisión 1):
   con `UNSUPPORTED_COUNTRY`. Un país con factor de mercado y sin factor de talento sirve para un cliente de ese país,
   no para una persona en él.
 - **Un solo factor por país.** Para cambiar un valor se reemplaza el registro; agregar un segundo registro con otro
-  `recordId` pasa el preview y después bloquea las cotizaciones de ese país con `AMBIGUOUS_SELECTION`.
+  `recordId` pasa `preview` y `apply` y después bloquea las cotizaciones de ese país con `AMBIGUOUS_SELECTION`
+  ([cómo se detecta y se corrige](#problemas-comunes)).
 - No se usa el factor de talento para representar lo que paga un mercado ni el de mercado para representar lo que
   cuesta una persona. Factores por tipo de cliente no existen en el catálogo: se registran como neto acordado.
 
-### Registrar el costo real de un perfil en un país
+### Registrar el costo específico de un perfil en un país
 
-Cuándo conviene: [manual operativo](operar-cotizador-v3-con-agentes.md#cuándo-registrar-el-costo-real-de-un-perfil-en-un-país).
+Cuándo conviene: [manual operativo](operar-cotizador-v3-con-agentes.md#cuándo-registrar-el-costo-específico-de-un-perfil-en-un-país).
 Es un `add` de un registro `cost` nuevo; el de referencia no se toca. Los montos de este ejemplo son marcadores:
-se reemplazan por el costo mensual real.
+se reemplazan por el costo mensual objetivo que el operador decide para ese perfil en ese país. No se copia la nómina
+de una persona.
 
 ```json
 {
@@ -306,7 +405,7 @@ se reemplazan por el costo mensual real.
       "effectiveUntil": "9999-12-31",
       "status": "confirmed"
     },
-    "note": "Qué evidencia respalda el costo (contratación, oferta, contrato), de qué fecha y quién lo confirmó.",
+    "note": "Qué decisión o evidencia respalda el costo objetivo de ese perfil en ese país, de qué fecha y quién lo confirmó.",
     "value": {
       "profileId": "ECG-007",
       "seniorityCode": "not_specified",
@@ -326,12 +425,13 @@ se reemplazan por el costo mensual real.
 ```
 
 - `profileId` y `seniorityCode` son los del perfil
-  (`catalog show --kind profile --query ECG-007 --catalog "$pricing_catalog" --date 2026-10-11` los muestra); con otro
+  (`catalog show --kind profile --query ECG-007 --current --date 2026-10-11` los muestra); con otro
   `seniorityCode` el registro no se asocia a ese perfil.
 - `components` lleva las mismas coberturas que el registro de referencia del perfil (el `search --kind cost` de arriba
   las lista), cada una con su monto mensual como cadena, en la moneda de `currency`. Un componente que es cero se
   escribe `"0"`.
-- `reference` nombra la evidencia sin copiarla: contratos, liquidaciones y datos personales no entran al repo.
+- `reference` nombra la decisión o la evidencia sin copiarla: contratos, liquidaciones, sueldos de personas y datos
+  personales no entran al repo.
 - Efecto, desde `effectiveFrom`: una línea con ese perfil y `talentCountry` de ese país usa este costo y no recibe
   factor de talento. El mismo perfil en otro país sigue con el costo de Chile por su factor. Para corregir el monto
   después se hace `replace` de este registro, no un segundo `add`.
@@ -339,7 +439,8 @@ se reemplazan por el costo mensual real.
 ### El change-set real y su reproducción
 
 [`country-factors.change.json`](../../../data/pricing/v3-operating/country-factors.change.json) es el change-set
-que produjo `catalog.review-v5.json` desde `catalog.review-v4.json` con las decisiones del CEO del 2026-10-11:
+que produjo `catalog.review-v5.json` desde `catalog.review-v4.json` con las decisiones del CEO del 2026-10-11 y con
+los estimados que propuso el agente (marcados `estimated`):
 `dimensions.countriesAdd` con `ES`; 32 `replace` de costos de persona, que pasan a ser el costo en Chile sin cambiar
 ningún monto; seis `add` de factor de talento (CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3 y US 5, estimados); cinco
 `replace` de factor de mercado (CL 1, CO 0.90 con `floorBasis`, US 1.10, decididos; PE 0.95 con `floorBasis` y MX 1,
@@ -366,10 +467,26 @@ Como todo cambio, es una versión nueva del catálogo y rige por fecha:
 - Las cotizaciones congeladas lo ignoran: `replay` las recalcula con el catálogo y el contrato que llevan dentro. Un
   artefacto anterior al v5 no tiene `floorBasis` y se sigue verificando con su motor.
 - Una demanda con `quoteDate` anterior al `effectiveFrom` del cambio resuelve con el valor previo aunque se cotice
-  con el catálogo nuevo. Con el v5, una demanda fechada 2026-10-10 no recibe ningún factor de país.
-- Después de aplicar: volver a cotizar los casos abiertos de ese país con la fecha del día y comparar el neto y
-  `marginRateRoundedDown` con la base. El `--impact` de `catalog preview` sólo acepta briefs del carril de catálogo;
-  una demanda de composición se compara cotizándola con la base y con el sucesor.
+  con el catálogo nuevo. Con el catálogo vigente, una demanda fechada 2026-10-10 no recibe ningún factor de país, y
+  `compose prepare|quote` lo avisa en `runNotices.laterCatalogValues`.
+- Después de aplicar: mover el puntero ([pasos](#versiones-vigentes-el-puntero-currentjson)), volver a cotizar los
+  casos abiertos de ese país con la fecha del día y comparar el neto y `marginRateRoundedDown` con la base. El
+  `--impact` de `catalog preview` sólo acepta briefs del carril de catálogo; una demanda de composición se compara
+  cotizándola con la base y con el sucesor.
+
+## Problemas comunes
+
+| Síntoma                                                                                                  | Causa                                                                                                                                                 | Qué hacer                                                                                                                                                                                                                                             |
+| -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exit 1, `CURRENT_VERSIONS_MISMATCH` (`option: "current"`) en cualquier comando con `--current`           | El puntero y un archivo no coinciden: se editó un archivo versionado o el puntero a mano                                                              | `current show` (exit 2) nombra la fuente y su `status`. Restaurar el archivo versionado; si el que quedó atrás es el puntero, moverlo con `current set`. No cotizar con rutas a mano para saltarlo                                                      |
+| Exit 1, `CURRENT_VERSIONS_CONFLICT` (`option: "confirm"`) en `current set`                               | `--confirm` no es el `pointerDigest` del puntero que se reemplaza, o se pasó `--confirm` para una ruta de `--out` que no existe                       | Leer otra vez con `current show`, comprobar que el puntero actual es el que esperabas y repetir                                                                                                                                                       |
+| Exit 1, `MISSING_ARGUMENT` (`option: "confirm"` o `"reason"`) en `current set`                           | Falta `--confirm` al reemplazar un puntero que existe, o falta `--reason`                                                                             | Agregar la opción                                                                                                                                                                                                                                     |
+| `pnpm pricing:v3:test` en rojo después de un `catalog apply` o `resources apply`                         | El puntero no nombra la versión de número más alto de su carpeta                                                                                      | Mover el puntero ([pasos](#versiones-vigentes-el-puntero-currentjson))                                                                                                                                                                                |
+| Una cotización con el catálogo nuevo da el precio de antes y trae `runNotices.laterCatalogValues`        | La demanda está fechada antes del `effectiveFrom` del cambio: los valores se toman por `quoteDate`, no por el archivo                                 | Copiar la demanda con la fecha del día y volver a correr                                                                                                                                                                                              |
+| Exit 2, `AMBIGUOUS_SELECTION` en `lines.<lineId>.talentFactor` en toda cotización de un país             | Un segundo registro de factor con otro `recordId` para el mismo país. `catalog preview` y `catalog apply` lo aceptan; bloquea recién al cotizar       | Se detecta probando el sucesor antes de mover el puntero. Para corregir: versión nueva con `{ "operation": "retire", "recordId": "<duplicado>", "effectiveFrom": "<fecha posterior a su inicio>" }` y mover el puntero. Las fechas en que el duplicado estuvo vigente siguen ambiguas |
+| Exit 2, `AMBIGUOUS_PRICE_ROUNDING` en toda cotización de una moneda                                      | Una segunda regla general de redondeo para la misma moneda                                                                                            | El múltiplo se cambia con `replace` de la regla existente, no con un segundo `add`                                                                                                                                                                    |
+| Exit 2, `UNSUPPORTED_COUNTRY` con un país recién agregado                                                | Faltó `dimensions.countriesAdd` en el change-set                                                                                                      | Versión nueva que declare el país                                                                                                                                                                                                                     |
+| Exit 1, `CATALOG_BASE_CONFLICT` o `CATALOG_PREVIEW_CONFLICT`                                             | El `baseDigest` no es el de la base cargada, o el `--confirm` no es el del preview vigente                                                            | Tomar `digest` de `catalog validate --current`, repetir `preview` y usar su `previewDigest`                                                                                                                                                           |
 
 ## Límites y futuros consumers
 

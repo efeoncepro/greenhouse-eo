@@ -6,6 +6,16 @@ Fecha: 2026-10-09. Dueños: Commercial / Finance / People / Creative Operations.
 Unidad: [TASK-2017](../../tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md).
 Estado: ficha y simulación histórica ejecutable preparadas; validación económica parcial. Precio comercial: pendiente.
 
+> Nota 2026-10-11. Este documento conserva el piloto del 2026-10-09: sus cifras, supuestos y artefactos no se
+> recalcularon. Tres cosas que aquí figuran como ausentes ya existen en el catálogo operativo. El costo del perfil
+> se declaró como referencia de Chile y la persona en Colombia se costea con un factor de talento (0,80, estimado).
+> El mercado Chile tiene factor 1, confirmado. Y hay tipo de cambio de cotización USD→CLP decidido por el operador.
+> Por decisión del CEO el costo de las personas es además un costo objetivo: «conseguir el costo colombiano» ya no
+> significa traer la nómina real. Una simulación nueva de este caso usa las versiones vigentes con `--current` y da
+> otras cifras; sigue sin ser un precio aprobado. Estado vigente:
+> [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11) y
+> [base de costo](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+
 ## Alcance confirmado y supuestos
 
 El operador confirmó diseñador senior al 50%, talento en Colombia y mercado Chile.

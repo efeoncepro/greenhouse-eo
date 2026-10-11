@@ -12,6 +12,39 @@ neto pactado, redondeo comercial y catálogo v4
 Los párrafos marcados «motor 1.2» describen el cambio del 2026-10-11: contrato 1.2.0 del kernel (el piso acompaña al
 factor de mercado), factores de país con valor y catálogo v5
 ([delta del ADR](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado)).
+Los párrafos marcados «versiones vigentes (2026-10-11)» describen el cambio posterior de ese mismo día, que no toca
+ningún contrato del kernel: un puntero que dice qué versiones son las vigentes, precios unitarios que no vencen,
+avisos de la corrida, la lectura de qué dato estimado pesa más y el catálogo v6. El resumen para leer primero está
+en [Qué versiones se usan hoy](#qué-versiones-se-usan-hoy-2026-10-11).
+
+## Qué versiones se usan hoy (2026-10-11)
+
+Esta sección resume, en lenguaje simple, lo que cambia para quien cotiza. El detalle de cada punto está más abajo o
+en el documento que se enlaza.
+
+- **Un puntero dice cuáles son las versiones vigentes.** El archivo `data/pricing/v3-operating/current.json` nombra
+  el catálogo de precios, la policy de recursos (las reglas y precios de herramientas) y el catálogo de créditos IA
+  que se usan hoy. Al cotizar agregas `--current` y la CLI toma esas tres fuentes sin que escribas el nombre de
+  ningún archivo. Ya no hace falta saber si «la vigente es la v5 o la v6»: `pnpm --silent pricing:v3 current show`
+  lo responde. Cómo se mueve el puntero: [mantenimiento](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
+- **Un precio unitario no vence.** El precio de una licencia vale hasta que alguien lo reemplaza por otro. Lo que sí
+  tiene es una fecha de revisión, que avisa cuando toca volver a mirarlo y nunca bloquea una cotización. La cantidad
+  de licencias no es parte del precio: se declara en cada cotización.
+- **El resumen puede traer avisos de la corrida.** Son notas sobre el momento en que se cotizó (por ejemplo, que la
+  fecha de la cotización es anterior a valores más nuevos del catálogo). No forman parte de la cotización congelada
+  y no bloquean. Claves y forma: [contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
+- **El resumen ordena qué datos estimados cargan más costo.** Para cada dato estimado dice cuánto costo descansa en
+  él y cuántos puntos de margen se perderían si ese dato fuera 10 % más alto. Sirve para decidir qué confirmar
+  primero. Cómo leerlo: [provisiones y costos](cotizador-v3-provisiones-y-costos.md#qué-dato-estimado-conviene-confirmar-primero-2026-10-11).
+- **El costo de las personas es un costo objetivo.** Sale del Excel de pricing y representa el nivel salarial al que
+  el CEO quiere llevar al equipo; no es la nómina de hoy. Por eso el margen real actual sobre las personas es mayor
+  que el que muestra el cotizador. Detalle y límites:
+  [provisiones y costos](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+- **Todavía no se puede emitir una cotización en EUR.** El catálogo v6 permite convertir a USD una herramienta que se
+  paga en EUR, pero no existe la tasa inversa ni una regla de redondeo para EUR. A un cliente de España se le cotiza
+  en USD.
+
+Nada de esto convierte una simulación en un precio aprobado, un costo validado o una cotización emitida.
 
 ## Las piezas y sus versiones
 
@@ -20,7 +53,9 @@ factor de mercado), factores de país con valor y catálogo v5
 | Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0`, `1.1.0` (motor 1.1) o `1.2.0` (motor 1.2); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
 | Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`); desde el motor 1.2, `floorBasis` opcional en `market_factor` |
 | Brief                     | `pricing-v3-brief/1`                                        | Necesidad, selecciones y ajustes comerciales (`discount`, `agreed_net`); el resolver devuelve bindings, supuestos, pendientes y el contrato que emite al kernel |
-| Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`         |
+| Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`. Versiones vigentes (2026-10-11): cada precio admite `reviewBy`, una fecha de revisión que avisa y no bloquea |
+| Puntero de versiones vigentes | `pricing-v3-current/1` (`adapters/current-versions.ts`) | Versiones vigentes (2026-10-11): `data/pricing/v3-operating/current.json` nombra catálogo, policy y catálogo de créditos por ruta, versión y digest; `--current` lo usa y `current show\|set` lo lee y lo reemplaza |
+| Fechas de los precios     | `resources/price-review.ts`                                 | Versiones vigentes (2026-10-11): lectura derivada de qué fechas de revisión pasaron, cuáles vencen pronto y qué vigencias ya terminaron; no cambia ningún precio ni resultado |
 | Demanda compuesta         | `pricing-v3-composition-demand/1`                           | Brief, trabajo, usuarios, tareas, IA, allocations, presupuestos y cobertura cliente            |
 | Plan                      | `pricing-v3-operating-plan/1`                               | Demanda y portfolio opcional; produce demanda resuelta sin elegir reparto arbitrario           |
 | Portfolio                 | `pricing-v3-resource-portfolio/1`                           | Capacidad de clientes, interna y sin asignar; genera allocations y reconciliación              |
@@ -29,7 +64,7 @@ factor de mercado), factores de país con valor y catálogo v5
 | Mantenimiento de recursos | `pricing-v3-resource-change/1`                              | Replacement completo `policy` o `credits`; preview con impacto y sucesor nuevo                 |
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
-| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada |
+| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
 | Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
@@ -116,6 +151,15 @@ por el operador, con USD como moneda de referencia y un margen prudencial sobre 
 contractual. La referencia EUR→USD sigue fechada sólo el 2026-10-09: una cotización posterior que necesite EUR no
 tiene tasa vigente. USD→CLF sigue siendo un valor estimado de 2025.
 
+Versiones vigentes (2026-10-11): el catálogo v6 cierra ese hueco para las herramientas que se pagan en EUR. Agrega
+una tasa de cotización EUR→USD de 1,20, sin fecha de término y marcada como estimada (la referencia del BCE era
+1,1206). La eligió el agente aplicando la instrucción del operador de usar un margen prudencial sobre el spot; el
+operador no la decidió expresamente para EUR. Con ella el catálogo tiene una tasa EUR→USD vigente en cualquier fecha
+posterior; la demanda que la necesita, por ejemplo por Magnific, la nombra en `fxRecordIds` (registro `fx:EUR:USD`).
+Lo que sigue faltando es el camino inverso: no hay tasa USD→EUR ni regla de redondeo para EUR, así que una
+cotización con salida en EUR queda `needs_input` (`MISSING_CATALOG_SELECTION` en `fx.USD:EUR`). La referencia del BCE
+anterior sigue apareciendo como vencida en `resources inspect`; es un pendiente conocido.
+
 ## Herramientas, personas y servicio
 
 La selección combina Notion/Microsoft 365 comunes, tareas de perfil y tareas adicionales, IA explícita y
@@ -133,6 +177,17 @@ Adobe 180 USD/mes cubre el paquete 3 CC Teams+3 Express confirmado por el operad
 paquete; no se divide el costo entre seis usuarios equivalentes. `bundledToolIds` impide sumar Express aparte
 cuando se selecciona ese paquete. 306 USD es escenario del alza 70% con fecha desconocida; no se activa al renovar
 sin evidencia. Fuentes de precio y fechas de revisión son datos de selección, no garantía contractual futura.
+
+Versiones vigentes (2026-10-11): un precio unitario no vence. Por decisión del operador (CEO), el precio de una
+licencia es estable —en sus palabras, Notion o Microsoft 365 no cambian su precio—; lo que cambia es cuántas
+licencias se contratan, y esa cantidad se declara en cada cotización. Hasta la policy `resources.review-v5` cada
+precio de herramienta tenía una fecha de término cercana (casi todos, 30 días después de su evidencia) y una
+cotización con fecha posterior quedaba bloqueada con `RESOURCE_PRICE_NOT_EFFECTIVE`. En la policy v6 los 25 precios
+con importe propio valen hasta que se reemplacen y cada uno lleva una fecha de revisión, `reviewBy`, hoy el
+2027-04-11. Esa fecha la eligió el agente (seis meses), no el operador. Pasada la fecha, la cotización se calcula
+igual y el resumen lo avisa; el precio sólo cambia cuando se emite una versión nueva de la policy. La mayoría sigue
+siendo precio de lista público marcado como estimado: que no venza no significa que esté confirmado. Cómo se revisan:
+[mantenimiento](cotizador-v3-mantenimiento-catalogo.md#precios-unitarios-vigencia-y-fecha-de-revisión-2026-10-11).
 
 `role_capacity` mantiene funciones como unidad de la simulación. `managed_service` usa las mismas funciones
 como costo interno y proyecta un fee por periodo más implementación. No convierte una suma de roles en SOW:
@@ -182,15 +237,33 @@ distintos. Notion tiene factura 9 Business×24 USD más 30 USD por 3000 crédito
 facturado no significa pagado. Microsoft 365, SEMrush, ChatGPT y Claude tienen variantes públicas explícitas;
 no prueban plan, número de usuarios ni gasto actual de Efeonce. Ventana interna de revisión no es promesa de precio.
 
+Versiones vigentes (2026-10-11): los costos de persona del catálogo son un **costo objetivo**, no lo que Efeonce
+paga hoy. Vienen del Excel de pricing y representan el nivel salarial al que el CEO quiere llevar al equipo; por
+decisión suya el cotizador no usa la nómina real, que hoy es más baja. La consecuencia es que el margen real actual
+sobre las personas es mayor que el que muestra una cotización. Conectar la nómina real no es una mejora pendiente.
+[Explicación completa](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+
 Mantenimiento monetario y de recursos son carriles distintos. Preview valida schema/referencias/base, calcula
 impactos y digest; apply reconstruye el mismo contexto/impacto y exige ese digest. Un cambio confirmado de importe
 no hereda evidencia vieja. Change-set monetario retiene actor/audit; cambio de policy/créditos conserva reason y
 preview y exige nueva versión completa. Ninguno activa automáticamente un archivo, compra, reajusta contratos
 o modifica artefactos. Elegir sucesor requiere rutas explícitas. El CLI sin `--catalog` conserva review-v1.
 
+Versiones vigentes (2026-10-11): ya no hace falta escribir las rutas a mano para usar lo vigente. Un puntero,
+`data/pricing/v3-operating/current.json`, nombra el catálogo, la policy y el catálogo de créditos vigentes, cada uno
+con su ruta, versión y digest (la huella de su contenido). Con `--current`, la CLI toma de ahí cada fuente que no
+pasaste; si pasas una ruta explícita, gana la ruta. Antes de usar el puntero lo comprueba contra los archivos: si la
+versión o el digest no coinciden, rechaza con `CURRENT_VERSIONS_MISMATCH` en vez de seguirlo. Sin `--current` todo
+sigue como antes: sin `--catalog` se lee review-v1 y `--policy` y `--credits` son obligatorios. Hoy el puntero nombra
+`catalog.review-v6.json`, `resources.review-v6.json` y `ai-credits.review-v1.json`; esa frase envejece, así que
+confírmalo con `pnpm --silent pricing:v3 current show`. Emitir una versión nueva no mueve el puntero: es un paso
+aparte. [Cómo se mueve](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
+
 Un artefacto de composición congela catálogo, policy, créditos, demanda y resultado; `createdAt` queda fuera
 del digest semántico. Replay verifica integridad y vuelve a calcular con la versión soportada disponible.
 Explicación, comparación y nuevas versiones preservan lo anterior; no siguen punteros a precios actuales.
+Eso vale también para el puntero de versiones vigentes: sólo se consulta al cotizar con `--current`. Un artefacto ya
+congelado lleva sus tres fuentes dentro y nunca lo sigue; por eso las versiones anteriores no se borran ni se editan.
 El presupuesto IA separado posee su propio formato: no es una quote válida para replay.
 [Mantenimiento completo](cotizador-v3-mantenimiento-catalogo.md).
 
@@ -220,6 +293,13 @@ Motor 1.2 (2026-10-11): `assess` sigue leyendo sólo `MARGIN_BELOW_FLOOR` y el t
 fila 1.2.0 trae `floorNet` y `netShortOfFloor`. `modeledRate` es el margen real: con un factor de mercado cuyo piso
 acompaña al mercado base puede estar bajo el mínimo de la política con `linesBelowFloor` vacío. `proposedTarget` y
 `proposedFloor` siguen siendo la propuesta genérica y no conocen el factor de mercado.
+
+Versiones vigentes (2026-10-11): `assess` agrega `costEvidencePriority`, el orden en que conviene confirmar los
+datos estimados del costo. Trae `currency`, `estimatedCost`, `confirmedCost`, `estimatedShareOfCost` y
+`confirmFirst`, que son los cinco primeros datos del mismo ranking que el resumen publica en `estimateExposure`. No
+es una brecha nueva ni cambia el estado: es una lectura para priorizar. Pendiente conocido: `assess` todavía no
+lista como brecha propia que un factor de país sea estimado; hoy eso se ve en `reviewSignals` (`ESTIMATED_SOURCE`) y
+en este ranking.
 
 `compose preview` admite simulación calculada en revisión y entrega JSON/Markdown con allowlist. Excluye
 costos, margen, IDs/fuentes privados, providers, drivers y países de talento. No autoriza publicación o envío.
@@ -317,6 +397,41 @@ Motor 1.2 (2026-10-11), qué imprime cada comando. No hay comandos, flags ni có
   `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` y el costo de la persona ya no sale como `ESTIMATED_SOURCE`; los factores de
   talento y de mercado estimados sí salen como `ESTIMATED_SOURCE` en `reviewSignals`.
 
+Versiones vigentes (2026-10-11), qué imprime cada comando. Hay un comando nuevo (`current`), un interruptor nuevo
+(`--current`) y dos códigos de rechazo nuevos; los códigos de salida 0, 1, 2 y 3 significan lo mismo que antes.
+
+- `--current` es un interruptor sin valor. Lo aceptan todas las operaciones que reciben `--catalog`, `--policy` o
+  `--credits`: `prepare` y `quote` del carril de catálogo, `catalog search|show|validate|preview|apply`,
+  `resources inspect|portfolio|budget|preview|apply` y `compose scaffold|plan|prepare|quote`. Llena sólo las fuentes
+  que no pasaste. En `resources budget`, que recibe el catálogo de créditos por `--catalog`, llena ese. `compose
+  assess|preview`, `explain`, `replay`, `compare` y `export` no lo aceptan: leen un artefacto que ya lleva sus
+  fuentes dentro. La forma recomendada de cotizar pasa a ser:
+
+  ```bash
+  pnpm --silent pricing:v3 compose quote --input demand.json --current --out artifact.json
+  ```
+
+- `current show` imprime el puntero, su `pointerDigest`, el estado de cada fuente (`match`, `version_mismatch`,
+  `digest_mismatch`, `invalid` o `unreadable`) y `consistent`. Sale con 0 si las tres coinciden y con 2 si no.
+  `current show --input otro.json` revisa un puntero que no es el versionado.
+- `current set --catalog A --policy B --credits C --reason "…" --confirm <pointerDigest>` reemplaza el puntero. El
+  detalle del candado está en
+  [mantenimiento](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
+- `compose prepare|quote`: el resumen agrega `estimateExposure`, que ordena los datos estimados por el costo que
+  descansa en cada uno. `replay` de una composición lo imprime igual, porque se deriva del resultado congelado.
+- `compose prepare|quote` pueden agregar `runNotices`, con `laterCatalogValues`, `priceDates` o ambos. Describe la
+  corrida, no la cotización: no se guarda en el artefacto, `replay` no lo imprime y la clave no existe cuando no hay
+  nada que avisar. Nunca bloquea; se informa al operador junto al resultado. Forma de las dos claves:
+  [contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
+- `resources inspect` agrega `priceReview` (`{ withinDays, reviewDue, dueSoon, expired }`): fechas de revisión ya
+  pasadas, fechas que caen en los próximos 30 días y vigencias que ya terminaron. Sólo estas últimas bloquean una
+  cotización de esa fecha. Con `--current` incluye además el digest del catálogo de créditos.
+- `compose assess` agrega `costEvidencePriority`, descrito en la sección de evaluación.
+- Rechazos nuevos del [registro](../../../src/lib/finance/pricing-v3/errors.ts), ambos con salida 1:
+  `CURRENT_VERSIONS_MISMATCH` (el puntero y un archivo que nombra no coinciden) y `CURRENT_VERSIONS_CONFLICT` (el
+  `--confirm` de `current set` no es el digest del puntero que se reemplaza, o se pasó un `--confirm` cuando el
+  puntero de destino todavía no existe). Reemplazar un puntero existente sin `--confirm` es `MISSING_ARGUMENT`.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -379,6 +494,23 @@ Cotizaciones de prueba de ese día con `catalog.review-v5` + `resources.review-v
   rigen desde el 2026-10-11.
 - Una cotización en EUR para un cliente de España queda `needs_input` (falta la tasa USD→EUR vigente): no hay tipo
   de cambio ni regla de redondeo para EUR.
+
+Readback del 2026-10-11 tras el puntero de versiones vigentes, la policy v6 y el catálogo v6, hecho con la CLI:
+`current show` responde `consistent: true` con las tres fuentes en `match`, y `replay` da `verified: true` en los 31
+`*.artifact.json` en disco (17 bajo `data/pricing/` y 14 en la carpeta del caso SKY). Corridas de ese día con
+`--current`:
+
+| Caso | Salida | Resultado |
+| --- | --- | --- |
+| `managed-care-colombia.demand.json` (cliente y equipo en Colombia, COP, fecha 2026-10-11) | 3 | Contrato 1.2.0; neto 28.100.000, costo 16.432.006, margen real 0,4152; ninguna línea marcada; sin `runNotices` |
+| Su `estimateExposure` | — | 98,7 % del costo descansa en datos estimados. Primero el factor de talento Colombia sobre Chile: 64,7 % del costo y 3,8 puntos de margen si fuera 10 % más alto. Después la bandeja de Sprout: 17,7 % y 1,0 punto |
+| `managed-care.demand.json` (fecha 2026-10-10) | 3 | Contrato 1.1.0; CLP 9.530.000; `runNotices.laterCatalogValues` avisa 45 registros que rigen desde el 2026-10-11 (32 costos, 6 factores de talento, 6 de mercado y 1 tipo de cambio) |
+| La demanda de Colombia con fecha 2026-12-15 | 3 | Calcula igual sobre la policy v6. La misma fecha con `--policy` en `resources.review-v5.json` queda `needs_input` por `RESOURCE_PRICE_NOT_EFFECTIVE` |
+| La demanda de Colombia con fecha 2027-05-01 | 3 | Calcula igual; `runNotices.priceDates.reviewDue` lista los cuatro precios usados cuya fecha de revisión ya pasó |
+| La demanda de Colombia con salida en EUR | 2 | `needs_input`: `MISSING_CATALOG_SELECTION` en `fx.USD:EUR` |
+
+Las tres últimas filas usan copias de la demanda con un solo campo cambiado; no están versionadas. La exposición es
+una lectura de sensibilidad sobre el resultado congelado, no un pronóstico ni una validación de esos datos.
 
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios

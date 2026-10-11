@@ -4,6 +4,8 @@ Fecha: 2026-10-09. Propuesta interna ligada a TASK-2017; no valores aprobados ni
 [Pricing Integrity Pack](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) posee las recomendaciones de política.
 [Inputs de revisión](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/driver-inputs.json) registran drivers, unknowns y destinos en el catálogo candidato. No se pasan directamente a la CLI.
 
+Actualización 2026-10-11: dos definiciones posteriores cambian cómo se lee el costo en el cotizador y están al final de este documento. [La base de costo de las personas es un costo objetivo](#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11), no la nómina de hoy, y el resumen de una cotización ordena [qué dato estimado conviene confirmar primero](#qué-dato-estimado-conviene-confirmar-primero-2026-10-11). El resto del documento conserva la propuesta del 2026-10-09.
+
 ## Perímetro y fórmula de cada componente
 
 | Componente           | Base de cálculo propuesta                                                              | Tratamiento y prevención de doble costo                                                                                      |
@@ -39,7 +41,7 @@ Para reemplazo, preparar downside con un evento realista cuyo costo desglosa sel
 1. Revisión contiene fórmula/driver, responsable, cobertura y evidencia requerida; importes actuales ausentes siguen null.
 2. Finance convierte cada driver medido en un monto de recurso con moneda/unidad/fuente y vigencia, o registra exclusión/zeroReason fundamentado.
 3. Change-set agrega/reemplaza esos registros y el kit. No pegar costos o reservas del expediente en el brief.
-4. Preview muestra impacto; apply produce nueva versión. El agente selecciona `--catalog`, resuelve el brief y ejecuta quote/explain/replay.
+4. Preview muestra impacto; apply produce nueva versión. El agente selecciona `--catalog`, resuelve el brief y ejecuta quote/explain/replay. Desde el 2026-10-11, cuando esa versión pasa a ser la vigente se mueve el [puntero de versiones vigentes](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11) y se cotiza con `--current`, sin nombrar el archivo.
 5. Revisar costo completo, margen tras ajustes, caja, recruitability y alcance antes de aprobación comercial.
 
 El [catálogo candidato](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/catalog.proposed.json) mantiene pendientes separados para formación/verificación, backup/reemplazo, gestión, infraestructura, setup, financiación y anualidades. No reutiliza trial-assurance 25/operations 25 para aparentar cobertura comercial.
@@ -69,3 +71,66 @@ Tratamiento propuesto para revisar con Finance/Operations:
 En servicio gestionado, equipo/esfuerzo/licencias/IA/plataforma son inputs internos de costo; la unidad comercial conserva alcance, cadencia y límites acordados. El rol/capacidad ofertado especifica su dedicación y cobertura. El kernel staffing actual no adquiere soporte de composición comercial de servicios por registrar estos antecedentes.
 
 [Flujo operativo implementado](cotizador-v3-superficie-implementada.md): portfolio por capacidad declarada aprobado como método, parte interna/sin asignar reconciliada, fuenteFX EUR referencial explícita, créditoIA agregado y evaluación de evidencias. Notion conserva factura 24 USD/seat y 30 USD de créditos por periodo; otras variantes públicas no acreditan gasto real. Datos operativos pendientes: asignaciones por persona/cuenta, permisos/planes actuales, fechas de renovación, compromiso/plazo, consumo y capacidad real. Las formulas de actividad de este documento siguen siendo propuesta; no se ejecutan ni se convierten en provisión contable por correr la CLI. Baseline/quotes previas quedan intactas y no se modifica runtime cloud.
+
+## La base de costo de las personas es un costo objetivo (2026-10-11)
+
+Decisión del operador (CEO) del 2026-10-11. Registro: `LOCALIZED_TALENT_COSTS` en el [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json).
+
+**Qué es el costo de una persona en el cotizador.** Es el importe del Excel de pricing (`efeonce-pricing-model-v1.xlsx`), que construyó el propio CEO. Representa el nivel salarial al que quiere llevar al equipo. El catálogo lo declara como el costo de cada perfil en Chile; el país de la persona lo ajusta con un factor de talento por país.
+
+**Qué no es.** No es la nómina de hoy. El CEO decidió expresamente que el cotizador **no** use el costo real de nómina, que actualmente es más bajo que el del catálogo.
+
+**Qué consecuencia tiene.** El margen real actual sobre las personas es mayor que el que muestra una cotización. El cotizador cotiza como si el equipo ya ganara el nivel objetivo; mientras la nómina real esté por debajo, la diferencia queda como margen adicional que el cotizador no muestra.
+
+Cómo leerlo y qué evitar:
+
+- El margen de una cotización es el margen **contra el costo objetivo**. No es el margen contable del mes ni el realizado. Los demás documentos del cotizador llaman «margen real» al margen del neto final contra el costo del catálogo; ese término no se refiere a la nómina.
+- El piso de 45 % de los servicios gestionados de la práctica creativa se lee sobre ese mismo costo objetivo. Esta decisión no cambió el piso.
+- No describas el costo del catálogo como «lo que Efeonce paga hoy».
+- No propongas «conectar la nómina real» como mejora del cotizador. No es un pendiente: es una decisión tomada.
+- No escribas la cifra salarial de ninguna persona en documentos, briefs ni salidas para clientes.
+- Que la fuente de esos costos esté marcada `confirmed` significa que su autor confirma el valor objetivo. No significa que ese importe se pague hoy.
+
+Qué sí queda abierto: un registro de costo específico (`specific`) sólo donde el costo objetivo de un perfil en un país se aparte del costo de Chile por el factor de talento de ese país. Los factores de talento de Colombia, Perú, México, España y Estados Unidos siguen siendo estimaciones (`COUNTRY_FACTORS_UNVALIDATED`); validarlos es distinto de cambiar la base de costo.
+
+Esta definición aplica al costo humano. Las demás filas de la tabla de componentes —formación, QA, respaldo, reemplazo, gestión, licencias, infraestructura— siguen como propuesta por medir.
+
+## Qué dato estimado conviene confirmar primero (2026-10-11)
+
+Una cotización casi siempre mezcla datos confirmados y datos estimados. Hasta ahora el resumen avisaba que había estimados (`ESTIMATED_SOURCE`), pero todos los avisos se leían igual. Desde el 2026-10-11 el resumen de `compose prepare|quote` trae `estimateExposure`, que los **ordena por el costo que descansa en cada uno**. Fuente ejecutable: [`resources/summary.ts`](../../../src/lib/finance/pricing-v3/resources/summary.ts).
+
+Lo que responde, en lenguaje simple:
+
+| Pregunta | Dónde mirar |
+| --- | --- |
+| ¿Qué parte del costo depende de algún dato estimado? | `estimatedShareOfCost` (y los importes `estimatedCost` y `confirmedCost`) |
+| ¿Cuál es el dato estimado que más pesa? | El primero de `costInputs[]`; la lista va de mayor a menor |
+| ¿Cuánto costo descansa en ese dato? | `costAtRisk` y `shareOfCost` |
+| ¿Cuánto margen está en juego? | `marginRateLostIfTenPctHigher`: puntos de margen que se perderían si ese dato fuera 10 % más alto y el precio no cambiara |
+
+La cuenta del margen en juego es `0,10 × costAtRisk ÷ neto`. Un valor de `0.037825` se lee como 3,8 puntos de margen.
+
+Ejemplo medido el 2026-10-11 con las versiones vigentes: servicio gestionado sintético para un cliente de Colombia con equipo en Colombia, COP 28.100.000 al mes y margen de 41,5 % sobre el costo del catálogo. Es una simulación de prueba, no una cotización emitida.
+
+| Dato estimado | Parte del costo | Margen en juego si fuera 10 % más alto |
+| --- | --- | --- |
+| Todos los datos estimados juntos | 98,7 % | — |
+| Factor de talento de Colombia sobre la referencia Chile | 64,7 % | 3,8 puntos |
+| Bandeja de atención de Sprout Social (precio de lista) | 17,7 % | 1,0 punto |
+| Reserva de cobertura por ausencias (hipótesis sin medir) | 4,4 % | 0,3 puntos |
+
+Lectura: en esa cotización lo primero que conviene validar es el factor de talento de Colombia, no el precio de una licencia. La misma demanda con equipo y cliente en Chile da otra lectura: sólo el 29,3 % del costo descansa en estimados y el primero de la lista es la bandeja de Sprout (15,3 % del costo, 0,8 puntos), porque el factor de talento de Chile es 1 por definición y el costo de las personas es el objetivo ya confirmado por su autor.
+
+Reglas para leerlo bien:
+
+- Es una lectura de **sensibilidad**, no un pronóstico. No dice que el dato vaya a subir 10 % ni que esté mal.
+- No valida nada. Un dato sigue estimado hasta que alguien lo confirma con evidencia y se emite una versión nueva.
+- No recalcula la cotización: se deriva del resultado ya congelado, y `replay` lo muestra igual.
+- «Confirmado» en esta lectura significa que la fuente del dato está confirmada. Para el costo de una persona eso es el costo objetivo de la sección anterior, no un costo medido contra la nómina.
+- Un componente que depende de dos datos estimados cuenta una sola vez en el total estimado. Por eso la suma de la lista puede ser mayor que `estimatedCost`.
+- Un factor de mercado estimado aparece aparte, en `priceInputs[]`: mueve el precio, no el costo.
+- Las políticas estimadas que son reglas y no importes (capacidad facturada, política de precio, redondeo, impuesto) aparecen en `estimatedRules[]` y quedan fuera del ranking.
+
+`compose assess` muestra los cinco primeros en `costEvidencePriority.confirmFirst`, junto a las brechas de evidencia. Pendiente conocido: `assess` todavía no lista como brecha propia que un factor de país sea estimado; hoy se ve en este ranking y en `reviewSignals`.
+
+Claves completas: [contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).

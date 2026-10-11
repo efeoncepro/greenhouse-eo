@@ -10,6 +10,17 @@
 - Contrato definido y plan de pruebas/convergencia: [bloques 2 y 3](cotizador-v3-contrato-y-validacion.md); contrato objetivo con primera vertical local ejecutable; parámetros comerciales del bloque 1 pendientes.
 - Preparación del bloque 1: [catálogo y parámetros piloto](cotizador-v3-parametros-piloto.md), con variantes HubSpot separadas y controles históricos; datos operativos pendientes.
 
+> Nota 2026-10-11. Este documento es el diseño del 2026-10-09 y se conserva como tal: donde dice «pendiente»,
+> «propuesta» o «todavía no disponible» describe ese día. Varias de esas definiciones ya existen en el prototipo
+> local. Los comandos reales son `pnpm pricing:v3 …`, no la sintaxis `cotizador …` propuesta más abajo. Los dos
+> factores de país tienen valores (varios todavía estimados), hay tipo de cambio de cotización y redondeo comercial
+> por moneda, y el piso de los servicios gestionados de la práctica creativa es 45 %. Las versiones vigentes del
+> catálogo las nombra un puntero y se usan con `--current`. Un precio unitario de herramienta ya no vence: tiene una
+> fecha de revisión que avisa sin bloquear. El costo de las personas es un costo objetivo decidido por el CEO, no la
+> nómina de hoy. Todavía no se puede emitir una cotización en EUR. Estado vigente:
+> [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11). Lo que no
+> cambió: sigue siendo un prototipo local, y una simulación no es un precio aprobado ni una cotización emitida.
+
 ## Dirección confirmada por el operador
 
 El Excel es el antecedente funcional, no una dependencia de ejecución del nuevo motor. Sus reglas funcionales sirven como antecedente; las notas incompletas requieren definición propia. El prototipo se desarrolla en paralelo al cotizador vigente para validar V3; la CLI es su primer consumidor. La independencia respecto del Excel y de la UI no define otro producto canónico permanente.

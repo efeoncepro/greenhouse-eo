@@ -8,6 +8,17 @@
 - Datos para agentes: [parámetros](../../../data/pricing/v3-pilot/parameters.json) y [cálculos de referencia](../../../data/pricing/v3-pilot/reference-calculations.json).
 - Diseño: [modelo V3](cotizador-cli-modelo-propuesto.md) y [contrato/pruebas](cotizador-v3-contrato-y-validacion.md).
 
+> Nota 2026-10-11. Este documento conserva el catálogo piloto tal como estaba el 2026-10-09; sus tablas no se
+> recalcularon y no son tarifas vigentes. Varios parámetros que abajo figuran como «pendiente» ya tienen valor en el
+> catálogo operativo: los costos de perfil se declararon como costo de referencia de Chile, hay un factor de talento
+> y un factor de mercado por país (algunos confirmados, otros estimados), tipo de cambio de cotización desde USD
+> decidido por el operador (distinto del FX histórico de este documento), redondeo comercial por moneda y piso de
+> 45 % para los servicios gestionados de la práctica creativa. Además, por decisión del CEO esos costos de perfil se
+> leen como costo objetivo, no como la nómina de hoy. Estado vigente:
+> [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11),
+> [factores y versiones](cotizador-v3-mantenimiento-catalogo.md) y
+> [base de costo](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+
 ## Procedencia y estados
 
 Fuente histórica: [libro original](../../../data/pricing/efeonce-pricing-model-v1.xlsx), SHA-256 `68a0c361e7ec3b188419cc5d5c7b758419e4d4d499eba5d9242b3f78a1c78d1b`. Lectura directa de celdas cacheadas y reconciliación decimal de los componentes el 2026-10-09. Archivo intacto. Su fecha de modificación no determina la fecha efectiva de costos.

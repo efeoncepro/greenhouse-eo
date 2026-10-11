@@ -1,6 +1,8 @@
 # Commercial Audits
 
 - [Composición local V3 — 09/10/2026](2026-10-09-pricing-v3-resource-composition.md): herramientas por trabajo, pools/créditos integrados, 108 tests y tres simulaciones reproducibles.
+- Otros registros del Cotizador V3 del 09/10/2026: [prototipo local](2026-10-09-pricing-v3-local-prototype.md), [selección y mantenimiento](2026-10-09-pricing-v3-catalog-selection-maintenance.md), [presupuesto IA](2026-10-09-pricing-v3-ai-credit-budget.md), [política económica](2026-10-09-pricing-v3-economic-policy-preparation.md), [flujo operativo](2026-10-09-pricing-v3-operating-workflow.md) y [consolidación documental](2026-10-09-pricing-v3-docs-skills-consolidation.md).
+- Las auditorías V3 son registros fechados: sus versiones de catálogo, conteos de tests, tipos de cambio y márgenes propuestos son los de ese día. El estado vigente está en el [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
 
 - [Lógica del prototipo de cotizador — 09/10/2026](2026-10-09-pricing-workbook-logic-analysis.md): 13 hojas, dependencias, dos rutas de cálculo, casos conciliados y reglas incompletas para una CLI independiente.
 - [CLI de Excel/costeo local — 09/10/2026](2026-10-09-pricing-workbook-cli.md): 23 tests, extracción conciliada y alternativa sin UI/DB.

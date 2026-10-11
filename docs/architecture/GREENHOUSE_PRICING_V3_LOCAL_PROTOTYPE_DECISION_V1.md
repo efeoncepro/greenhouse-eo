@@ -57,7 +57,23 @@ Desde el 2026-10-10 «el motor» es un registro cerrado de contratos de entrada,
 (el de esta decisión, intacto) y `1.1.0` (precio acordado, ajustes disjuntos y redondeo comercial), cada uno con su
 motor. Donde este documento dice que el replay «verifica contenido y versión», la versión es la del motor registrado
 que firmó el artefacto, y la verificación sigue siendo por recálculo y digest. Contratos, reglas y guarda:
-[ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md).
+[ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Desde el 2026-10-11
+el registro tiene un tercer contrato, `1.2.0` (el piso de margen acompaña al factor de mercado que lo declara),
+agregado con el mismo patrón.
+
+Tres precisiones del 2026-10-11 sobre lo que este documento dice arriba:
+
+- «La ejecución usa snapshots completos proporcionados explícitamente» sigue valiendo para el kernel. En los
+  carriles de catálogo y composición, las versiones vigentes del catálogo, la policy y los créditos las nombra un
+  puntero verificado (`data/pricing/v3-operating/current.json`) que se usa con `--current`; sin ese interruptor el
+  comportamiento es el de siempre.
+  [Decisión](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--puntero-a-las-versiones-vigentes).
+- «Costo humano localizado o referencia con factor»: los costos por persona del catálogo son el costo objetivo que
+  el operador (CEO) quiere alcanzar para el equipo, no la nómina actual, y decidió que el cotizador no use la
+  nómina. El margen real de hoy sobre las personas es mayor que el que muestra el cotizador.
+- El operador declaró el 2026-10-11 que este cotizador está pensado para reemplazar con el tiempo al cotizador de
+  Greenhouse. Es una dirección, no una migración hecha: el prototipo sigue sin DB, API ni escritura en el CRM, y la
+  frontera de promoción de abajo sigue vigente.
 
 El [ADR operativo vigente](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica módulos,
 fuentes y límites. [TASK-2022](../tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md) está completa

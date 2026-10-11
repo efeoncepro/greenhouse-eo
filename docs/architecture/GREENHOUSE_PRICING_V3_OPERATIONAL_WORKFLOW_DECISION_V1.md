@@ -15,13 +15,15 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
-| Aritmética comercial: costo, markup/margen, descuento, neto pactado, FX, redondeo contable y redondeo comercial, por contrato de entrada (`1.0.0` y `1.1.0`); registro cerrado de motores `PRICING_V3_ENGINES` | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
+| Aritmética comercial: costo, markup/margen, descuento, neto pactado, FX, redondeo contable y redondeo comercial, por contrato de entrada (`1.0.0`, `1.1.0` y `1.2.0`); registro cerrado de motores `PRICING_V3_ENGINES` | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
 | Catálogo monetario (incluida la regla de redondeo por moneda), resolución de perfiles/variantes y calendario, y elección del contrato de entrada que se emite al kernel | `src/lib/finance/pricing-v3/catalog/` |
 | Selección de recursos por trabajo y atribución a snapshots | `resources/composition.ts` y `composition-contracts.ts` |
 | Presupuesto discreto de créditos y caducidad | `resources/credit-budget.ts` |
 | Discovery, scaffold, portfolio y plan | `resources/operating.ts` |
 | Preparación comercial y preview allowlisted | `resources/readiness.ts` |
-| Resumen derivado de una composición: motor que calculó, ajustes y regla de redondeo aplicados, y líneas que el kernel marcó bajo su piso | `resources/summary.ts` |
+| Resumen derivado de una composición: motor que calculó, ajustes y regla de redondeo aplicados, líneas que el kernel marcó bajo su piso y exposición a datos estimados (`estimateExposure`) | `resources/summary.ts` |
+| Fechas de los precios: vigencias duras que bloquean y fechas de revisión que sólo avisan (`pricing-v3-price-review/1`) | `resources/price-review.ts` |
+| Puntero a las versiones vigentes (`pricing-v3-current/1`): verificación por versión y digest, sin leer ni escribir archivos | `adapters/current-versions.ts` |
 | Registro cerrado de rechazos (dominio y adaptador) y el único detalle que pueden llevar | `errors.ts` |
 | Digests, artefactos, replay con el motor registrado que firmó cada uno y mantenimiento local | `adapters/`; filesystem y hashing fuera de la aritmética |
 | Primer consumer local | `scripts/commercial/pricing-v3.ts` |
@@ -29,7 +31,9 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 Estas rutas son relativas a la raíz del repositorio. No incorporan DB, Next.js, identidad remota, Excel ni SDK
 al núcleo; su extracción futura conserva contratos y pruebas. No se crea otro pricing engine por consumer.
 La tabla refleja el estado tras el [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)
-(2026-10-10): los dos contratos conviven en el mismo módulo, no hay un segundo kernel.
+(2026-10-10) y su delta del 2026-10-11: los tres contratos conviven en el mismo módulo, no hay un segundo kernel. Las
+filas de fechas de los precios y del puntero, y la mención de `estimateExposure` en la del resumen, vienen del
+[delta del 2026-10-11](#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones).
 
 ## Contrato de entradas y selección
 
@@ -94,6 +98,13 @@ La policy sucesora y [manifest de evidencia](../../data/pricing/v3-operating/evi
 Los importes y ventanas ejecutables viven en los JSON, no en copias de tablas en otros documentos. Cambiar fuente
 o fecha requiere sucesor y revisión; la existencia de la variante no prueba disponibilidad después de su ventana.
 
+> Nota 2026-10-11: las ventanas que esta lista nombra (Notion hasta el 20 de octubre, la referencia EUR→USD de un
+> solo día) son las de las policies v2 a v5 y del catálogo hasta v5, que se conservan intactos. Desde la policy v6
+> ningún precio unitario de herramienta termina por fecha: rige hasta que una versión nueva lo reemplaza y lleva una
+> fecha de revisión que avisa sin bloquear. El catálogo v6 agrega además un tipo de cambio de cotización EUR→USD sin
+> fecha de término. Decisión y reglas:
+> [modelo de revisión de precios](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--un-precio-unitario-no-vence-vigencia-dura-y-fecha-de-revisión).
+
 Demanda de créditos se agrega por proveedor/mes antes de seleccionar packs. Suscripción atribuida deriva de
 créditos normales asignados sobre créditos incluidos; disponibilidad se declara, no se infiere del plan. La compra
 incremental cubre el déficit con paquetes enteros, remanente y caja visibles. `cashCommitment` del kernel es
@@ -111,7 +122,9 @@ defaults mantienen los digests previos; no se actualizan artifacts existentes.
 `compose assess` devuelve brechas con campo/owner: costo humano localizado, provisiones medidas, acceso/seats,
 planes reales, denominadores simulados, impuestos/entidad, alcance y aprobación comercial. Siempre conserva
 `binding=false` y `requires_review`; cálculo completo no aprueba tarifa. Objetivo 40% y piso 35% son propuestas
-de TASK-2017, no política aprobada ni sustitución de guardrails de otra práctica.
+de TASK-2017, no política aprobada ni sustitución de guardrails de otra práctica. Desde el 2026-10-11 agrega
+`costEvidencePriority`: el orden en que conviene confirmar los datos de costo estimados
+([delta](#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones)).
 
 `compose preview` proyecta sólo moneda, neto por período/unidad comercial, impuestos/totales disponibles y estado
 de simulación. En `role_capacity` conserva los conceptos comerciales; en `managed_service` agrega fee del período
@@ -130,6 +143,9 @@ conserva padre/artifacts y no concede aprobación comercial.
 [TASK-2017](../tasks/in-progress/TASK-2017-pricing-v3-colombia-chile-economics.md) conserva las brechas económicas;
 [operational-gaps.json](../../data/pricing/v3-operating/operational-gaps.json) enumera sus owners. No volver a pedir
 al operador salarios que ya indicó no tener. Datos desconocidos siguen pendientes; nunca se completan con cero.
+*Nota 2026-10-11:* la base de costo quedó decidida por el operador: el costo objetivo del Excel de pricing, no la
+nómina. No hay salarios que pedir ni nómina que conectar
+([delta](#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones)).
 
 Quote API Parity y TASK-1211/1212 conservan la autoridad productiva V2. Promoción V3 requiere unidad propia,
 contraste V2/V3, auth/tenancy/audiencias, snapshots/lifecycle y cutover/rollback. UI/API/MCP no pueden eludir esos
@@ -367,6 +383,8 @@ Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay coman
   redondeada; v2 y v3 quedan como padres congelados de los artefactos que los usaron.
   *Nota 2026-10-11:* el catálogo vigente para cotizaciones nuevas pasó a ser `catalog.review-v5.json`; v4 queda
   también como padre congelado. Ver el delta del 2026-10-11, más abajo.
+  *Nota 2026-10-11 (posterior):* las versiones vigentes ya no se nombran en este documento. Las nombra el puntero
+  `data/pricing/v3-operating/current.json` y se usan con `--current`; hoy son catálogo v6 y policy v6.
 - **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
   `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
   muestran sólo el neto final.
@@ -392,6 +410,11 @@ redondeen distinto: `COMMERCIAL_ROUNDING_SCOPE`.
 > referencia de Chile. Con v5 y fecha de cotización desde el 2026-10-11 ya no aparece el supuesto
 > `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` ni `ESTIMATED_SOURCE` sobre el costo de la persona. EUR, CLF y los
 > múltiplos de otras monedas siguen abiertos.
+>
+> Nota 2026-10-11 (posterior): el catálogo v6 agrega un tipo de cambio de cotización EUR→USD de 1,20, sin fecha de
+> término y marcado como estimado, así que un costo en EUR vuelve a tener tasa en cualquier fecha desde el
+> 2026-10-11. El registro del BCE de un solo día se conserva. Sigue sin existir USD→EUR ni regla de redondeo para
+> EUR: no se emite una cotización en EUR.
 
 **Verificación (2026-10-10, local).** `pnpm pricing:v3:test`: 12 archivos y 320 pruebas; ESLint y `pnpm typecheck`
 limpios; todos los artefactos congelados en disco responden `verified: true` (la guarda cubre los versionados).
@@ -412,6 +435,9 @@ y la demanda no gana campos: los dos países que ya declaraba pasan a tener efec
 - **Catálogo vigente para cotizar.** `catalog.review-v5.json` + `resources.review-v5.json` (+ el catálogo de
   créditos). v2, v3 y v4 quedan como padres congelados. Los valores nuevos rigen desde el 2026-10-11: una demanda
   con fecha anterior sobre v5 sigue resolviendo los valores de la época de v4.
+  *Nota 2026-10-11 (posterior):* el mismo día se emitieron el catálogo v6 y la policy v6, y las versiones vigentes
+  pasaron a nombrarse en el puntero `current.json`. Con la policy v5 una cotización fechada después del
+  2026-10-20 se bloquea con `RESOURCE_PRICE_NOT_EFFECTIVE`; con v6 no. Ver el delta siguiente.
 - **Qué contrato calcula.** A las reglas del delta anterior se suma una: la resolución emite `1.2.0` si y sólo si el
   factor de mercado elegido declara `floorBasis: "base_market"` (en v5, Colombia y Perú). En ese mercado el piso de
   cada fila acompaña al factor, de modo que una cotización a precio de política no sale marcada aunque su margen
@@ -427,6 +453,8 @@ y la demanda no gana campos: los dos países que ya declaraba pasan a tener efec
 - **Costo real por perfil y país.** Cuando exista, se registra como costo `specific` de ese país con el flujo de
   mantenimiento de siempre y reemplaza al factor para ese perfil; el factor de talento es la aproximación para
   cuando ese dato no existe.
+  *Nota 2026-10-11 (posterior):* «costo real» aquí es el costo objetivo de ese perfil en ese país, no lo que hoy
+  se paga por nómina. Ver «Base de costo» en el delta siguiente.
 
 **Decisiones del operador (CEO, 2026-10-11)**, registradas como datos del catálogo v5 y del ledger: el precio sigue
 al país del cliente y el costo al país de la persona, con las dos palancas configuradas; en los mercados con factor
@@ -438,9 +466,180 @@ servicios gestionados en el mercado base.
 factores de talento por perfil o seniority, que hoy se expresan como costo específico (`LOCALIZED_TALENT_COSTS`).
 Regla de redondeo y tipo de cambio para EUR: todavía no se puede cotizar en EUR a un cliente de España.
 
+> Nota 2026-10-11 (posterior): sigue igual después del catálogo v6. El tipo de cambio que v6 agrega es EUR→USD,
+> para costos en EUR; cotizar en EUR necesita USD→EUR y una regla de redondeo, que no existen. España se cotiza en
+> USD.
+
 **Verificación (2026-10-11, local).** `pnpm pricing:v3:test`: 13 archivos y 407 pruebas; ESLint limpio; todos los
 artefactos congelados en disco responden `verified: true`.
 [Readback con cifras](../documentation/finance/cotizador-v3-superficie-implementada.md).
+
+## Delta 2026-10-11 — versiones vigentes por puntero, avisos de la corrida y exposición a estimaciones
+
+Posterior al delta anterior del mismo día. Son cinco cambios. Dos tienen su decisión en el ADR
+dueño del tema y aquí sólo se anota su efecto sobre el flujo; los otros tres se deciden aquí.
+
+| Cambio | Dónde está la decisión |
+| --- | --- |
+| Puntero a las versiones vigentes y `--current` | [ADR de mantenimiento](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--puntero-a-las-versiones-vigentes) |
+| Un precio unitario no vence; `reviewBy` y `priceReview` | [ADR de composición](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--un-precio-unitario-no-vence-vigencia-dura-y-fecha-de-revisión) |
+| `runNotices`: avisos de la corrida, fuera del artefacto | este delta |
+| `estimateExposure` y `costEvidencePriority` | este delta |
+| Base de costo: costo objetivo, no nómina | este delta |
+
+### Efecto sobre el flujo
+
+- **Los comandos dejan de nombrar versiones.** Una cotización nueva se pide así:
+
+  ```bash
+  pnpm --silent pricing:v3 current show
+  pnpm --silent pricing:v3 compose quote --input demand.json --current --out artifact.json
+  ```
+
+  `--current` es un interruptor sin valor. Completa cada una de `--catalog`, `--policy` y `--credits` que no pasaste,
+  después de verificar el puntero contra los archivos; un flag explícito gana. Lo aceptan las operaciones que reciben
+  esas fuentes: `prepare`, `quote`, `catalog *`, `resources *` y `compose scaffold|plan|prepare|quote`. Las que leen
+  un artefacto congelado (`compose assess|preview`, `explain`, `replay`) no lo aceptan: responden `INVALID_ARGUMENT`.
+- **Sin `--current` nada cambió.** Sin `--catalog` la CLI lee la baseline histórica
+  `data/pricing/v3-catalog/catalog.review-v1.json`, y `--policy` y `--credits` siguen siendo obligatorios.
+- **Qué nombra hoy el puntero.** `catalog.review-v6.json`, `resources.review-v6.json` y
+  `../v3-resources/ai-credits.review-v1.json`. Es un dato fechado: la fuente es `current show`, no este párrafo.
+- **Una fecha de cotización posterior ya no se bloquea por la vigencia de un precio de herramienta.** Medido con la
+  demanda `managed-care-colombia` fechada el 2026-12-15: con la policy v6 calcula; con la v5 queda `needs_input` con
+  `RESOURCE_PRICE_NOT_EFFECTIVE` en Notion, Microsoft 365 y la bandeja social.
+- **El resumen trae dos lecturas nuevas**, descritas abajo: `runNotices` (sólo cuando hay algo que decir) y
+  `estimateExposure`.
+
+### `runNotices`: lo que describe la corrida, no la cotización
+
+**Decisión.** `compose prepare|quote` agregan al resumen que imprimen en stdout una clave `runNotices`, ausente cuando
+no hay nada que informar. No entra en el artefacto congelado ni en su digest, y `replay` no la imprime: el resto del
+resumen es lo que un replay reproduce; `runNotices` es lo que vale para esta corrida. Tiene hasta dos miembros:
+
+- `laterCatalogValues` (`{ quoteDate, newestEffectiveFrom, records, byKind }`): registros del catálogo que entran en
+  vigencia después de la fecha de la cotización. La demanda conservó una fecha anterior a valores más nuevos y se
+  calculó, sin error, con los de su fecha. Hasta este cambio la clave iba en la raíz del resumen.
+- `priceDates` (`{ withinDays, reviewDue, dueSoon, expired }`): las fechas de los precios que esta cotización usó de
+  verdad (precios de herramienta de sus atribuciones, registros de catálogo que enlazó, proveedores de crédito que
+  presupuestó y la policy), leídas a la fecha de la cotización. `reviewDue` son fechas de revisión ya pasadas;
+  `dueSoon`, vigencias duras o revisiones dentro de `withinDays` (30) días; `expired`, vigencias duras ya pasadas.
+
+Medido: `managed-care.demand.json` (fecha 2026-10-10) con `--current` calcula y trae `laterCatalogValues` con 45
+registros vigentes desde el 2026-10-11; la demanda de Colombia (2026-10-11) no trae `runNotices`.
+
+**Alternativas descartadas.**
+
+- *Guardar los avisos dentro del resultado congelado.* Un aviso no es parte del cálculo: agregarlo cambiaría la forma
+  y el digest del resultado por algo que no mueve ninguna cifra.
+- *Dejar `laterCatalogValues` en la raíz del resumen.* Mezclaba lo que un replay vuelve a imprimir con lo que sólo
+  describe una corrida; un lector no podía distinguirlos.
+- *Bloquear cuando hay valores posteriores o una revisión vencida.* Cotizar con una fecha anterior es legítimo y una
+  fecha de revisión es un recordatorio. Lo que bloquea sigue siendo sólo una vigencia dura vencida, como diagnóstico.
+
+**Reglas duras.**
+
+- **NUNCA** tratar `runNotices` como bloqueo ni como parte de la cotización: no cambia estado, totales ni código de
+  salida.
+- **NUNCA** buscar `laterCatalogValues` en la raíz del resumen ni dentro del artefacto: vive en `runNotices`.
+- **SIEMPRE** informar `runNotices` al operador junto al resultado cuando la clave existe.
+
+### `estimateExposure`: dónde pesa más un dato estimado
+
+**Decisión.** El resumen lleva la clave `estimateExposure`, derivada del resultado congelado sin recalcular nada, y
+`compose assess` expone el mismo orden en `costEvidencePriority`. Sirve para decidir qué dato estimado conviene
+confirmar primero. No es un pronóstico ni una validación.
+
+- Claves: `totalCost`, `net`, `estimatedCost`, `confirmedCost`, `estimatedShareOfCost`, `costInputs[]`,
+  `priceInputs[]` y `estimatedRules[]`. Sin totales (cotización bloqueada) la clave vale `null`.
+- `costInputs[]` lista los datos de costo estimados que la cotización usó, ordenados por `costAtRisk` (el costo que
+  descansa sobre ese dato), con `shareOfCost` y `marginRateLostIfTenPctHigher` = 0,10 × `costAtRisk` ÷ `net`,
+  redondeado hacia arriba: los puntos de margen que se pierden si el dato resulta 10 % más alto y el neto no cambia.
+- Un componente cuenta como estimado si al menos uno de los importes o factores que lo componen lo es, y cuenta una
+  sola vez. Por eso `estimatedCost + confirmedCost = totalCost`, y la suma de los `costAtRisk` puede ser mayor.
+- `priceInputs[]` son los factores de mercado estimados: mueven precio, nunca costo, y no entran al orden.
+  `estimatedRules[]` son políticas estimadas que son reglas y no importes (capacidad facturada, margen objetivo,
+  redondeo, impuesto); la lectura «10 % más alto» no les aplica.
+- `costEvidencePriority` es `{ currency, estimatedCost, confirmedCost, estimatedShareOfCost, confirmFirst }`, donde
+  `confirmFirst` son los cinco primeros `costInputs`.
+
+Medido con la cotización de Colombia (`managed-care-colombia.demand.json` con `--current`: COP 28.100.000 al mes,
+margen 41,5 %, ninguna línea marcada): el 98,7 % del costo descansa sobre datos estimados. El factor de talento de
+Colombia sobre la referencia de Chile lleva el 64,7 % del costo y costaría 3,8 puntos de margen si fuera 10 % más
+alto; la bandeja de Sprout, el 17,7 % y 1,0 punto.
+
+**Alternativas descartadas.**
+
+- *Recalcular una sensibilidad volviendo a correr el motor con el dato más alto.* Exige un segundo cálculo con una
+  entrada que nadie declaró y que no queda congelada; no se reproduce desde el artefacto y se lee como pronóstico.
+  El costo es una suma de componentes y cada componente un producto, así que la parte del costo que lleva un dato es
+  exactamente lo que se mueve, en proporción, cuando ese dato se mueve: se lee del resultado ya congelado.
+- *Dejar en `assess` sólo la lista de brechas de evidencia.* Todas se leen igual y no dicen por cuál empezar.
+- *Tratar un dato estimado como bloqueo.* Hoy casi todo el costo descansa sobre estimaciones; bloquearía todo.
+
+**Reglas duras.**
+
+- **NUNCA** presentar `estimateExposure` como pronóstico, como margen esperado ni como validación de un costo.
+- **NUNCA** recalcular la exposición en un consumidor ni volver a correr el motor para estimarla: se lee del resumen
+  o de `assess`.
+- **NUNCA** sumar `priceInputs` ni `estimatedRules` al orden de los datos de costo.
+- **SIEMPRE** usar `costInputs` (o `confirmFirst`) para proponer qué dato estimado confirmar primero.
+
+### Base de costo: el costo objetivo, no la nómina
+
+**Decisión del operador (CEO, 2026-10-11).** Los costos por persona del cotizador salen del Excel de pricing y
+representan el nivel de remuneración que quiere alcanzar para el equipo. Decidió expresamente que el cotizador no
+use el costo real de nómina. La nómina actual está por debajo del costo del catálogo, así que el margen real de
+hoy sobre las personas es mayor que el que muestra el cotizador. Un costo `specific` se registra sólo donde el costo
+objetivo de un perfil en un país se aparta de la referencia de Chile por el factor de talento.
+
+**Reglas duras.**
+
+- **NUNCA** proponer «conectar la nómina real» como mejora ni reemplazar un costo del catálogo por uno de nómina.
+- **NUNCA** describir el costo del catálogo como lo que Efeonce paga hoy.
+- **NUNCA** escribir la remuneración de una persona en un documento, una skill o un artefacto.
+
+### Datos de esta ronda
+
+- `catalog.review-v6.json` (versión `operating-review-2026-10-11-v6`; change-set `eur-quote-fx.change.json` sobre
+  v5): agrega un registro, el tipo de cambio de cotización EUR→USD de 1,20 (referencia del BCE: 1,1206), vigente desde
+  el 2026-10-11, sin fecha de término y marcado como estimado. El valor lo eligió el agente bajo la instrucción del
+  operador de usar un margen prudencial sobre el spot; el operador no lo decidió expresamente para EUR.
+- `resources.review-v6.json` (versión `operating-review-2026-10-11-v6`; cambio `stable-unit-prices.change.json`
+  sobre v5): los 25 precios de herramienta rigen hasta que se los reemplace y cada uno lleva `reviewBy` 2027-04-11.
+  Ningún importe, moneda, unidad ni referencia de fuente cambió. La fecha de revisión a seis meses la eligió el
+  agente.
+- `current.json`: el puntero, que nombra esas dos versiones y el catálogo de créditos v1.
+- Ledger: `operational-gaps.json` agregó `UNIT_PRICE_REVIEW` y actualizó `QUOTE_FX_REVIEW` y
+  `LOCALIZED_TALENT_COSTS`.
+
+### Cuatro pilares
+
+- *Seguridad:* nada sale del prototipo local. El puntero y `current show` informan versiones y digests, nunca el
+  contenido de una fuente. Un puntero que no coincide con sus archivos se rechaza, no se sigue. Avisos y exposición
+  no aprueban nada: `binding=false` y `requires_review` se conservan.
+- *Robustez:* el puntero se construye desde los tres documentos, así que no puede nombrar una versión o un digest que
+  nadie calculó; reemplazarlo exige el digest del que se leyó; y una prueba falla si queda apuntando a una versión
+  que ya no es la más alta de su carpeta.
+- *Resiliencia:* ninguna versión anterior ni artefacto congelado se tocó. Volver atrás es mover el puntero a las
+  versiones previas o pasar los flags explícitos. El puntero se reemplaza con archivo temporal y `rename`.
+- *Escalabilidad:* emitir una versión nueva ya no obliga a editar comandos en manuales y skills. La exposición es una
+  función del dominio sobre el resultado congelado, con dos lectores (`summary` y `assess`).
+
+### Sigue abierto
+
+- Un registro de factor duplicado pasa `catalog preview` y `apply`, y recién bloquea al cotizar, con
+  `AMBIGUOUS_SELECTION` (ruta `lines.<lineId>.talentFactor`).
+- `compose assess` no lista los factores de país estimados como brecha de preparación; aparecen sólo en la
+  exposición.
+- El registro EUR→USD del BCE de un solo día sigue saliendo como `expired` en `resources inspect`.
+- CLF no tiene regla de redondeo ni tipo de cambio de cotización revisado. No hay USD→EUR ni redondeo para EUR.
+- No se modelan factores por tipo de cliente ni factores de talento por perfil.
+- La mayoría de los precios de herramienta siguen siendo precios públicos de lista marcados como estimados
+  (`UNIT_PRICE_REVIEW`).
+
+**Verificación (2026-10-11, local).** `pnpm pricing:v3:test`: 16 archivos y 501 pruebas; ESLint limpio en el módulo
+y el script; la guarda de artefactos congelados pasa; `current show` responde `consistent: true`. La corrida de
+Colombia con `--current` termina con exit 3 (calculada, requiere revisión), motor `pricing-v3-local/1.2.0`.
 
 ## Evidencia y rutas de operación
 

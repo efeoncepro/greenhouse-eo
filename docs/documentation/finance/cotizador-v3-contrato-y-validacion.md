@@ -8,7 +8,7 @@
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
 
-Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)). El cotizador canónico no cambia.
+Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)). El cotizador canónico no cambia. Las claves del resumen que imprime la CLI, los avisos de la corrida y la lectura de exposición a datos estimados, también del 2026-10-11, están en [Resumen: avisos de la corrida y exposición a estimados](#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
 
 ## Bloque 2 — Contrato del prototipo
 
@@ -234,6 +234,63 @@ Identidades: `net = undiscountedPrice + uplift − discount`, sin cambio, y `und
 **Lectura.** El resumen `pricing-v3-composition-summary/1` suma claves de forma aditiva. `marketFactor` (`{ country, factor, floorBasis, recordId, revision, sourceStatus }`) aparece en la raíz sólo cuando el factor elegido cambia algo —factor distinto de 1 o `floorBasis` declarado—; con el factor neutral la clave no existe. Cada línea marcada de una fila 1.2.0 trae `floorNet` y `netShortOfFloor` (`floorNet − net`); si su `ρ` es menor que 1, `marginAmountShortOfFloor` es `null`, y si es 1 se conserva. Detalle por comando en la [superficie implementada](cotizador-v3-superficie-implementada.md).
 
 **Fuera de 1.2.0.** Factores por tipo de cliente (se expresan como `agreed_net`), factores de talento por perfil o seniority (se expresan como costo `specific`), un piso distinto por país escrito a mano y cualquier otra base del piso.
+
+### Resumen: avisos de la corrida y exposición a estimados (2026-10-11)
+
+Este cambio no agrega contrato ni motor: los tres contratos del kernel (`1.0.0`, `1.1.0`, `1.2.0`) y los artefactos congelados quedan iguales. Cambia lo que la CLI **lee y avisa** alrededor del cálculo. Fuentes ejecutables: [`resources/summary.ts`](../../../src/lib/finance/pricing-v3/resources/summary.ts), [`resources/price-review.ts`](../../../src/lib/finance/pricing-v3/resources/price-review.ts), [`adapters/current-versions.ts`](../../../src/lib/finance/pricing-v3/adapters/current-versions.ts) y [la CLI](../../../scripts/commercial/pricing-v3.ts).
+
+**Qué versiones entran al cálculo.** Un puntero, `data/pricing/v3-operating/current.json` (`pricing-v3-current/1`), nombra el catálogo, la policy y el catálogo de créditos vigentes. Con `--current` la CLI toma de ahí las fuentes que no se pasaron y las verifica antes de usarlas. El contrato del kernel no conoce el puntero: recibe, como siempre, fuentes ya resueltas, y el artefacto congela las tres dentro. Operación del puntero: [mantenimiento del catálogo](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
+
+**Claves del resumen.** `compose prepare|quote` imprimen el resumen `pricing-v3-composition-summary/1`; el detalle completo vive sólo en el artefacto de `--out`. Sus claves, agrupadas por lo que responden:
+
+| Pregunta | Claves |
+| --- | --- |
+| ¿Qué corrida es y con qué motor? | `schemaVersion`, `version`, `binding` (siempre `false`), `commercialUnit`, `calculationId`, `replayDigest` (sólo `quote`), `engineVersion` |
+| ¿En qué estado quedó? | `calculationStatus`, `reviewStatus`, `quoteReviewStatus`, `diagnostics` (bloqueos), `assumptions`, `reviewSignals` |
+| ¿Cuánto da? | `totals`, `periods`, `marginRateRoundedDown`, `commercialAdjustments`, `priceRounding`, `marketFactor` (sólo si el factor de mercado cambia algo) |
+| ¿Cumple el piso? | `marginFloor` |
+| ¿Qué herramientas y qué caja? | `toolSelections`, `attributions`, `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` |
+| ¿Qué dato estimado pesa más? | `estimateExposure` |
+| ¿Dónde está el detalle? | `fullDetail` |
+| ¿Hay algo que avisar de esta corrida? | `runNotices` (sólo cuando hay algo) |
+
+**`runNotices`: describe la corrida, no la cotización.** Es la única clave que no sale del resultado congelado. La CLI la agrega al imprimir, comparando lo que se usó con las fuentes que tiene a la vista en ese momento.
+
+- No se guarda en el artefacto, y `replay` del mismo artefacto no la imprime.
+- No existe cuando no hay nada que avisar: no va vacía ni en `null`.
+- Nunca bloquea y no cambia el código de salida. Quien cotiza la informa al operador junto al resultado.
+- Tiene hasta dos miembros, cada uno presente sólo si aplica:
+
+| Miembro | Forma | Qué dice |
+| --- | --- | --- |
+| `laterCatalogValues` | `{ quoteDate, newestEffectiveFrom, records, byKind }` | El catálogo tiene registros que empiezan a regir después de la fecha de la cotización. La cotización se calculó con los valores de su fecha, que es lo correcto para una cotización de ese día y un error silencioso si la demanda conservó una fecha vieja |
+| `priceDates` | `{ withinDays, reviewDue, dueSoon, expired }` | Fechas de los precios que esta cotización usa: revisiones ya pasadas, fechas que caen dentro de `withinDays` (30 días) y vigencias terminadas |
+
+Cada aviso de `priceDates` trae `kind` (`hard_expiry`: vigencia, bloquea al pasar; `review`: fecha de revisión, nunca bloquea), `subject` (`tool_price`, `resource_policy`, `catalog_record` o `credit_provider`), `ref`, `label`, `date`, `daysLeft` y `blocksWith` (el diagnóstico que daría una vigencia pasada; `null` en una revisión).
+
+`laterCatalogValues` nació ese mismo día en la raíz del resumen y se movió a `runNotices`, porque mezclaba lo que un replay vuelve a imprimir con lo que depende del momento de la corrida. Un consumidor que lea esa nota la busca dentro de `runNotices`; ya no está en la raíz del resumen y nunca estuvo en el artefacto.
+
+**Vigencia y revisión de un precio.** Son dos fechas distintas. La vigencia (`effectiveUntil` de la fuente) sigue siendo dura: pasada esa fecha el dato no se selecciona y la cotización queda `needs_input`, como dice [Defaults permitidos y datos ausentes](#defaults-permitidos-y-datos-ausentes). La fecha de revisión (`reviewBy`, opcional, por precio de herramienta en la policy) sólo avisa. Desde la policy v6 los precios unitarios de herramientas tienen vigencia abierta y fecha de revisión: una cotización con fecha posterior ya no se bloquea por eso. Detalle: [precios unitarios](cotizador-v3-mantenimiento-catalogo.md#precios-unitarios-vigencia-y-fecha-de-revisión-2026-10-11).
+
+**`estimateExposure`: dónde pesa un dato estimado.** Se deriva del resultado congelado, sin recalcular nada, así que `replay` la imprime igual. Es `null` cuando la cotización no llegó a un total.
+
+| Clave | Qué es |
+| --- | --- |
+| `currency`, `totalCost`, `net` | Moneda de salida, costo total y neto del resultado |
+| `estimatedCost`, `confirmedCost` | Parte del costo que descansa en al menos un dato estimado y parte que no; suman `totalCost` |
+| `estimatedShareOfCost` | `estimatedCost ÷ totalCost` |
+| `costInputs[]` | Datos estimados del lado del costo, de mayor a menor `costAtRisk`. Cada uno trae `kind`, `id`, `label`, líneas y períodos, `costAtRisk`, `shareOfCost` y `marginRateLostIfTenPctHigher` |
+| `priceInputs[]` | Un factor de mercado estimado: mueve precio, nunca costo, y por eso no entra al ranking de costo |
+| `estimatedRules[]` | Políticas estimadas que son reglas y no importes (capacidad facturada, política de precio, redondeo, impuesto); no admiten la lectura «10 % más alto» |
+
+- `costAtRisk` es el costo que descansa en ese dato. `marginRateLostIfTenPctHigher` = 0,10 × `costAtRisk` ÷ `net`: los puntos de margen que se perderían si ese dato fuera 10 % más alto y el neto no cambiara. Se redondea hacia arriba para no mostrar una pérdida menor que la real.
+- Un componente cuenta una sola vez en `estimatedCost` aunque dependa de dos datos estimados (por ejemplo, costo de la persona y factor de talento). Por eso la suma de `costInputs` puede superar `estimatedCost`.
+- `compose assess` publica los cinco primeros en `costEvidencePriority.confirmFirst`.
+- Es una lectura de sensibilidad. No es un pronóstico, no valida ningún dato y no cambia el estado de revisión.
+
+**Rechazos y salidas.** El [registro](../../../src/lib/finance/pricing-v3/errors.ts) suma dos códigos de adaptador, ambos con salida 1: `CURRENT_VERSIONS_MISMATCH` (el puntero y un archivo que nombra no coinciden; `option: "current"`) y `CURRENT_VERSIONS_CONFLICT` (el `--confirm` de `current set` no es el digest del puntero que se reemplaza, o se ofreció un `--confirm` cuando el puntero de destino todavía no existe). Reemplazar un puntero existente sin `--confirm` es `MISSING_ARGUMENT` con `option: "confirm"`, no un conflicto. `current show` usa la convención de siempre: 0 si el puntero es consistente con sus archivos, 2 si no. Los códigos 0, 1, 2 y 3 de la tabla de la CLI no cambian de significado.
+
+**Límites que este cambio no mueve.** No hay tasa USD→EUR ni regla de redondeo para EUR: una cotización con salida en EUR queda `needs_input`. El costo de las personas es un costo objetivo y no la nómina real ([provisiones y costos](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11)). Un resumen con avisos, o sin ellos, sigue siendo una simulación: no es un precio aprobado, un costo validado ni una cotización emitida.
 
 ## Bloque 3 — Pruebas y convergencia
 

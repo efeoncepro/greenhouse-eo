@@ -94,3 +94,6 @@ El prototipo local conserva cálculo puro/adapters/snapshots y revisión económ
 promoción de la fila anterior para límites, owners y evidencia; reutilizar primitives de simulación/redacción/submit
 canónicos antes de crear consumers. Una salidaCLI, preview redactado o change-set local no prueba cutover,
 autoridad comercial, tenancy, inventario o rollout. El overlay sólo enruta estos contratos, no mantiene otra spec.
+Las versiones vigentes las nombra un puntero verificado (`data/pricing/v3-operating/current.json`, `--current`); no
+resolver «la última» por nombre de archivo ni borrar versiones viejas. El costo de personas del catálogo es el nivel
+salarial objetivo, no la nómina (decisión del CEO, 2026-10-11): no diseñar la extracción conectando nómina real.

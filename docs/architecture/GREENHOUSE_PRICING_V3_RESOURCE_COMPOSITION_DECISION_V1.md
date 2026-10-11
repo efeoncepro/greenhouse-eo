@@ -67,3 +67,70 @@ funciones consumidoras; no inferir dedicación real a partir de esa distribució
 asignación por usuario y no se convierte en pool de cartera. `assess` separa cálculo y preparación económica;
 `preview` proyecta únicamente datos comerciales allowlisted y estado de simulación. Nuevas versiones de policy
 no cambian quotes existentes y ninguna de estas guardas demuestra compra, acceso real o reserva global.
+
+## Delta 2026-10-11 — un precio unitario no vence: vigencia dura y fecha de revisión
+
+**Contexto.** Cada precio de herramienta de la policy lleva una fuente con vigencia (`price.source.effectiveFrom` y
+`effectiveUntil`), y una cotización fechada fuera de ella se bloquea con `RESOURCE_PRICE_NOT_EFFECTIVE`. Hasta la
+policy v5 esa vigencia era una ventana corta de revisión: 30 días desde la evidencia en casi todos los precios y el
+período facturado en Notion. El cotizador dejaba de calcular por sí solo: con v5, una cotización fechada desde el
+2026-10-21 se bloquea en Notion, que es base común de todo trabajo.
+
+**Decisión del operador (CEO, 2026-10-11).** Un precio unitario no vence. En sus términos: Notion o Microsoft 365 no
+cambian su precio; lo que cambia es cuántas licencias se contratan.
+
+- El precio unitario rige hasta que se lo reemplaza (`effectiveUntil` `9999-12-31`) y cambia sólo emitiendo una
+  versión nueva de la policy. La cantidad de asientos se declara por cotización; no es parte del precio.
+- Quedan dos fechas con significado distinto:
+
+  | Campo | Qué es | Efecto |
+  | --- | --- | --- |
+  | `price.source.effectiveUntil` | Vigencia dura | Pasada, bloquea la cotización (`RESOURCE_PRICE_NOT_EFFECTIVE`) |
+  | `reviewBy` (opcional, por entrada de precio) | Fecha para volver a mirar el precio | Avisa; nunca bloquea ni cambia un resultado |
+
+- `reviewBy` vive en la entrada de precio y no en `price.source`, porque ese objeto es la fuente estricta que recibe
+  el kernel. No llega a ningún cálculo ni a un resultado congelado. Una entrada con `pendingReason` (un precio que
+  todavía nadie tiene) no admite `reviewBy`.
+- **Lectura** (`resources/price-review.ts`, contrato `pricing-v3-price-review/1`, derivada y sin efecto sobre
+  precios ni cálculos). `resources inspect` devuelve un bloque `priceReview` con `withinDays` (30), `reviewDue`
+  (revisiones ya pasadas), `dueSoon` (vigencias duras o revisiones dentro de la ventana) y `expired` (vigencias duras
+  ya pasadas: una cotización con esa fecha no puede usarlas), leídas a la fecha de `--date`. Cada aviso trae `kind` (`hard_expiry | review`),
+  `subject` (`tool_price | resource_policy | catalog_record | credit_provider`), `ref`, `date`, `daysLeft` y
+  `blocksWith`: el diagnóstico que recibirá una cotización cuando pase esa vigencia dura, o `null` en una revisión.
+  Incluye las vigencias duras del catálogo monetario que recibe y, con `--credits` o `--current`, las de los
+  proveedores de crédito. Un registro de catálogo que termina porque empieza su siguiente revisión, o que fue
+  retirado, no se lista. Para una cotización, lo mismo filtrado a lo que usó sale en `runNotices.priceDates`
+  ([flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones)).
+
+**Datos.** `resources.review-v6.json` (versión `operating-review-2026-10-11-v6`, cambio
+`stable-unit-prices.change.json` sobre v5): los 25 precios de herramienta quedan sin fecha de término y cada uno
+lleva `reviewBy` 2027-04-11. Ningún importe, moneda, unidad ni referencia de fuente cambió. La fecha a seis meses la
+eligió el agente; el operador decidió que el precio no vence, no esa fecha. La mayoría de esos precios siguen siendo
+precios públicos de lista marcados como estimados: que no venzan no los confirma.
+
+**Alternativas descartadas.**
+
+- *Mantener vencimientos de 30 días y avisar antes.* El aviso no evita el bloqueo: cada mes habría que reemitir la
+  policy sin que ningún precio hubiera cambiado, y una cotización con fecha futura seguiría sin poder calcularse.
+- *Quitar toda fecha.* Un precio de lista sin fecha de revisión se queda viejo sin que nadie lo note.
+- *Poner la fecha de revisión dentro de `price.source`.* Ese objeto es la fuente estricta que recibe el kernel; un
+  campo nuevo ahí exigiría cambiar su contrato de entrada por un dato que no participa del cálculo.
+- *Que la revisión vencida degrade el estado de la cotización.* Mezcla un recordatorio de mantenimiento con el
+  resultado; el estado ya es `requires_review` y los datos estimados ya se informan aparte.
+
+**Reglas duras.**
+
+- **NUNCA** tratar una fecha de revisión pasada (`reviewDue`) como bloqueo ni cambiar una cifra por ella.
+- **NUNCA** dar a un precio unitario una vigencia corta «para forzar la revisión»: la vigencia dura es para un precio
+  que de verdad deja de regir en una fecha; la revisión va en `reviewBy`.
+- **NUNCA** cambiar un precio o su `reviewBy` editando una policy emitida: se emite una versión nueva y se mueve el
+  puntero.
+- **NUNCA** leer «no vence» como «confirmado»: el estado de la fuente (`estimated | confirmed`) no cambió.
+- **SIEMPRE** declarar la cantidad de asientos en la demanda; nunca dentro del precio.
+- **SIEMPRE** informar al operador las revisiones vencidas o próximas que traiga `runNotices.priceDates`, junto al
+  resultado.
+
+**Sigue abierto.** Confirmar el plan contratado donde el precio es público de lista y revisar cada precio en su
+fecha: `UNIT_PRICE_REVIEW` en [operational-gaps.json](../../data/pricing/v3-operating/operational-gaps.json). El
+registro EUR→USD del BCE, válido un solo día, sigue saliendo como `expired` en `resources inspect` aunque el
+catálogo v6 ya tiene un tipo de cambio de cotización EUR→USD sin fecha de término.

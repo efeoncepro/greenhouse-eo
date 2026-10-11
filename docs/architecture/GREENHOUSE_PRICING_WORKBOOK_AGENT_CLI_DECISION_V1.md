@@ -82,3 +82,11 @@ V3 no lee XLSX ni la extracción para calcular: consume catálogos, policy y dem
 Los valores históricos conservan su procedencia; registrar el costo mensual de un consultor no fusiona sus
 escalas ni acredita costo localizado vigente. El libro sigue intacto y sirve para investigar, no para operar
 como base mutable del cotizador. La autoridad canónica de emisión continúa en Quote API Parity.
+
+Nota 2026-10-11. En V3 los 32 costos por perfil del libro quedaron confirmados por su autor (el operador, CEO) y
+declarados como costo de referencia de Chile desde el catálogo v5. Son el costo objetivo: el nivel de remuneración
+que quiere alcanzar para el equipo, no la nómina actual, que está por debajo. Decidió expresamente que el cotizador
+no use el costo real de nómina, así que «conectar payroll» (mencionado arriba como condición de revisión de esta
+CLI) no es una mejora pendiente de V3. Donde este documento dice que los costos son «históricos hasta verificación
+independiente» habla de la consulta del libro; en V3 el estado de cada costo lo declara el catálogo vigente, que se
+usa con `--current` ([flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md)).

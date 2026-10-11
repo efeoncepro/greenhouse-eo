@@ -1294,6 +1294,7 @@ Para incorporar una simulación local de costos/precio, cargar
 [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
 Usar preview redactado para cifras presentables pendientes de revisión; artifact/explain permanecen internos.
 No convertir el costo de las funciones de `managed_service` en horas o roles vendidos: conservar fee/plazo/setup
-y alcance de servicio. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
+y alcance de servicio. Otra moneda es otra cotización (FX de política y redondeo propios), nunca una conversión a
+mano en la lámina; en EUR aún no se emite. Una lámina renderizada no valida salarios, herramientas, reparto, margen, impuestos,
 SOW o aprobación comercial; seguir la autoridad del expediente y documentar estado de simulación cuando aplique.
 No borrar ese estado, emitir precio ni enviar propuesta por generar el deck. Mantener piso y contratos de la práctica.

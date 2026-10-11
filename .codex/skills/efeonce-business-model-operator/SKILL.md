@@ -116,7 +116,9 @@ costear un servicio no implican vender horas/personas. Talent Assurance sigue di
 sus actividades y el caso comercial requieren evidencia. Herramientas base/específicas, crédito incremental,
 plataforma, setup, riesgos y límites deben estar en economics aunque la proyección comercial sea un fee.
 
-Portfolio usa capacidad declarada y separa cliente/interno/sin asignar; salario/factor talento/mercado no se
-validan por estar en Excel. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
+Portfolio usa capacidad declarada y separa cliente/interno/sin asignar. Los salarios del Excel de pricing son
+válidos como costo objetivo (los fijó el CEO; no son la nómina actual: el margen real en personas hoy es mayor que
+el que muestra V3 y no se propone conectar payroll); los factores de talento fuera de Chile y los de mercado de
+PE/MX/ES siguen siendo estimaciones. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
 quote lifecycle ni integración API/UI/MCP; el [handoff de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
 conserva esos gates. No presentar los ejemplos o propuestas de margen como oferta aprobada.

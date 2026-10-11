@@ -134,3 +134,9 @@ no sustituyen el feasibility gate de Talent Assurance ni implementan TASK-1607/E
 localmente; TASK-2017 conserva costos/asignaciones/terms pendientes. Cambios de salarios, licencias o reservas
 crean versiones con impactos y nueva evidencia, nunca alteran snapshots aprobados ni contratos en vigor por
 inferencia. [Manual de operación](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+
+Delta 2026-10-11 — decisión del operador (CEO): en el cotizador, el costo de cada persona es el nivel salarial
+objetivo del Excel de pricing (costo del perfil en Chile, ajustado por el factor de talento del país de la persona),
+no la nómina actual, y no se conecta a ella. El margen real sobre personas hoy es mayor que el simulado; ese margen
+simulado no mide lo que Efeonce paga ni reemplaza la evidencia de recruitability de este gate. Las cifras
+comerciales y las excepciones al piso las decide el operador; `compose assess` no las aprueba.

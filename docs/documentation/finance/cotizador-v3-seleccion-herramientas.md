@@ -88,3 +88,11 @@ Adobe 180 USD cubre 3 CC+3 Express (operador confirmado),306 es escenario sin fe
 créditos 30 USD tienen respaldo de factura por periodo; públicoM365/SEMrush/ChatGPT/Claude sigue separado de gasto
 real. EUR/FX referencial explícito permite simularMagnific. Planes, salarios, usuarios y cartera reales pendientes
 quedan en evaluación; no inventario live o integración canónica. Legacy permanece intacto y TASK-2017 parcial.
+
+Nota 2026-10-11, precio y cantidad son dos cosas distintas. Por decisión del operador (CEO), el precio unitario de
+una herramienta no vence: vale hasta que se reemplaza por otro y lleva una fecha de revisión que avisa sin bloquear.
+Lo que cambia de una cotización a otra es la cantidad de licencias, que se declara en cada cotización junto con las
+asignaciones. Esto no confirma ningún precio: la mayoría sigue siendo precio de lista público marcado como estimado,
+y el plan realmente contratado sigue pendiente. La policy vigente la nombra el puntero de versiones y se usa con
+`--current`. Detalle: [precios unitarios](cotizador-v3-mantenimiento-catalogo.md#precios-unitarios-vigencia-y-fecha-de-revisión-2026-10-11)
+y [puntero](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).

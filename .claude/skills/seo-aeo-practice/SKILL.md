@@ -572,3 +572,6 @@ aprobaciones de §2 y `modules/04_PRICING.md`. SEO→SEMrush, baseNotion/M365, I
 conservar variante salarial, países, dedicación y fuente real. Reparto declarado no acredita inventario.
 `managed_service` agrega fee sin publicar costos/horas internos. Readiness40/35 son propuestas genéricas, **no
 reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
+El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del
+CEO, 2026-10-11): el margen real en personas hoy es mayor que el que muestra V3. Una excepción bajo el piso la decide
+sólo el CEO y ninguna sirve de referencia para otra cuenta. Moneda, FX de cotización y redondeo: `modules/04_PRICING.md`.

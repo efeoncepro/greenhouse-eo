@@ -80,7 +80,9 @@ Capacidad vendible = capacidad laboral disponible − compromisos − aprendizaj
 ```
 
 Finance define la base de costos y piso de margen; Commercial/Pricing valida disposición de pago y value
-metric. No hay porcentajes, salarios, rate card ni descuentos autorizados en este modelo. Si el costo no
+metric. Las cifras comerciales y las excepciones las aprueba el operador (CEO); la base de costo de personas del
+cotizador ya está decidida (delta en «Costeo local por rol o servicio»).
+No hay porcentajes, salarios, rate card ni descuentos autorizados en este modelo. Si el costo no
 financia el estándar: re-price, reducir alcance/dedicación con promesa explícita, cambiar composición,
 borrow con respaldo o no-go. Un piloto pagado no puede esconder pérdidas sin aprobación económica específica.
 
@@ -122,7 +124,14 @@ precios después de calibrar resultados. Oferta aprobada ≠ demanda validada �
 preparar perfiles, tareas, recursos y créditos, calcular y explicar sin depender de la UI ni del Excel.
 Las escalas de consultoría HubSpot/Salesforce conservan IDs y costos separados; elegir la variante adecuada
 no es fusionarlas por especialización o tomar la más barata. País de talento/costo y mercado de oferta/precio
-se modelan de forma independiente. Los costos históricos sólo sirven como hipótesis explícitas.
+se modelan de forma independiente: el país de la persona ajusta el costo (Chile es la base) y el país del cliente
+ajusta el precio del componente humano. Provisiones y valores de prueba siguen siendo hipótesis explícitas.
+
+Delta 2026-10-11 — decisión del operador (CEO): el costo de las personas en el cotizador es el nivel salarial
+objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella; el margen real sobre personas hoy es
+mayor que el simulado. Esa base de costo ya está decidida. Esta oferta sigue sin piso ni porcentaje aprobado: el 45%
+es la norma de los servicios gestionados de la práctica creativa y el 40%/35% del pack de capacidad es una
+propuesta sin aprobar; ambos se deciden con el operador, no por analogía.
 
 `role_capacity` y `managed_service` distinguen presentación por capacidad y fee de servicio; roles siguen
 costeados internamente. La selección incluye base Notion/Microsoft 365, herramientas de CRM por trabajo y

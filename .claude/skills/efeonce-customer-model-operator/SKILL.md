@@ -61,7 +61,8 @@ research, pricing, finance, legal y operations.
 - GTM decide category, positioning, segmentación y motion.
 - Commercial ejecuta discovery, qualification, negociación y next steps.
 - Research diseña evidencia, VoC, entrevistas, triangulación y confidence.
-- Pricing/Finance decide WTP, packaging, margen, capacidad y economics.
+- Pricing/Finance calculan y recomiendan WTP, packaging, margen, capacidad y economics; la cifra comercial y sus
+  excepciones las decide el CEO.
 - Legal/Operations decide procurement, datos, IP, riesgo, contrato y delivery.
 
 La especialización de línea de negocio siempre conserva sus invariantes; esta skill aporta el modelo transversal.

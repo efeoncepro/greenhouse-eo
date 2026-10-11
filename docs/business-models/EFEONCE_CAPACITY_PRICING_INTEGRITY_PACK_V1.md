@@ -53,7 +53,7 @@ El método elegido es margen objetivo, ya soportado por el motor. Precio neto ob
 Un markup de 30% deja aproximadamente 23,08% de margen, no 30%. Una mejora del margen exige costos completos y valor defendible, no rebajar el salario para mantener la promesa.
 
 Con 40% objetivo y 35% piso, el límite aritmético de descuento es aproximadamente 7,69% **si costo/base no cambian**. No autoriza ese descuento: usar resultado exacto de CLI y precio final; preservar capacidad/continuidad.
-Un caso al 35% puede caer unas fracciones por debajo del piso por redondeo monetario. El motor lo señala; no tolerar automáticamente ni esconder la diferencia. Revisar precio explícitamente.
+Con el catálogo vigente el redondeo comercial sube cada fila al múltiplo de su moneda y no deja bajo el piso una fila que lo cumplía (§12). Una fila bajo piso por otra causa la señala el motor; no tolerar automáticamente ni esconder la diferencia. Revisar precio explícitamente.
 Bajo piso: `re-price | re-scope | no-go`; excepción sólo con razón, owner, plazo y financiación de validación separados.
 
 ## 4. Cómo se arma el costo
@@ -61,13 +61,14 @@ Bajo piso: `re-price | re-scope | no-go`; excepción sólo con razón, owner, pl
 [Contrato de componentes, provisiones y evidencias](../documentation/finance/cotizador-v3-provisiones-y-costos.md): humano con coberturas, licencias, plataforma, formación/verificación, backup/reemplazo, gestión, setup, infraestructura, costos financieros y exposición a compromisos.
 No insertar un 20% laboral ni una reserva 15% sin base. No transformar null en cero.
 Reserva de gestión, presupuesto de riesgo, devengo y provisión contable son conceptos diferentes. Este pack no registra contabilidad.
+Delta 2026-10-11 (decisión del operador, CEO): el costo de las personas en el cotizador es el nivel salarial objetivo del Excel de pricing, no la nómina actual, y no se conecta a ella. El margen real sobre personas hoy es mayor que el simulado.
 
 ## 5. País, mercado y monedas
 
 Costo específico de talento por país/contrato: usar fuente localizada y coberturas, sin factor salarial adicional. Referencia ajustada: país de origen y factor con método/fecha; la moneda USD no identifica país.
 Mercado de oferta: política separada de precio humano; calibrar con ofertas comparables, pérdidas/ganancias y entrevistas de buyer. No descontar licencias/fees al aplicar un factor de mercado.
-Mantener factor Chile 1 sólo en escenarios de aislamiento, como hipótesis. Un recargo no prueba disposición de pago; un descuento no puede cruzar el piso.
-Moneda contractual/entidad/impuestos y FX requieren evidencia; no usar la tasa histórica 1.000 CLP/USD como actual.
+Chile es la base de ambos ejes (factor 1). Un recargo no prueba disposición de pago; donde el factor de mercado es menor que 1 (hoy CO y PE) el piso se lee sobre el precio del mercado base (§12).
+Moneda contractual/entidad/impuestos requieren evidencia. El FX de cotización es un valor de política del CEO con USD de referencia (§12), no una observación de mercado ni la tasa de una transacción.
 El esquema sirve para CL/CO/PE/MX/US; cada configuración necesita datos y responsabilidades propios. No trasladar un loaded cost o dictamen de un país a otro.
 
 ## 6. Herramientas y consumo
@@ -155,3 +156,35 @@ de simulación. Ninguno garantiza cierre de los gates de esta práctica; 40%/35%
 Actualizar catálogos/policy/packs usa preview de impacto y apply a sucesor, sin reprecificar quotes anteriores
 ni imponer cambios al cliente. [Brechas por owner](../../data/pricing/v3-operating/operational-gaps.json):
 economía parcial en TASK-2017; funcionamiento local completo en TASK-2022; integración canónica pendiente.
+
+## 12. Delta 2026-10-11 — decisiones del operador que acotan este pack
+
+Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CEO). Este pack conserva su estado
+`Proposed / hypothesis_only`; lo siguiente corrige lo que el texto del 2026-10-09 ya no describe bien.
+
+- **Margen.** El 40%/35% de §3 sigue siendo una propuesta sin aprobar y nunca se usa como piso; su decisión (§9)
+  corresponde al operador, con costo completo y evidencia de comprador de Commercial y Finance. El piso de 45% es la
+  norma de los servicios gestionados de la práctica creativa (política `creative-managed-service`, objetivo 45% y
+  mínimo 45%): donde se puede ganar más se sube el objetivo de esa oferta, no el piso. Una excepción bajo el piso es
+  una decisión explícita del CEO para un cliente (la aprobada el 2026-10-10 está registrada en el expediente comercial de
+  ese cliente) y nunca sirve de referencia de margen para otro.
+- **Costo de personas.** Los 32 costos de perfil del catálogo vienen del Excel de pricing, confirmados por su autor
+  como el costo de cada perfil en Chile; son el nivel objetivo descrito en §4. La fila «Costo y modalidad en
+  Colombia» de §9 ya no espera una base de costo: queda validar el factor de talento estimado y la recruitability, o
+  registrar un costo específico cuando el costo objetivo de un perfil en un país se aparte de esa referencia.
+- **País.** El país de la persona cambia el costo (factor de talento; Chile es la base con 1; CO 0,80 · PE 0,85 ·
+  MX 0,90 · ES 3 · US 5 son estimaciones propuestas por un agente y marcadas como estimadas). El país del cliente
+  cambia el precio del componente humano (factor de mercado: CL 1 · CO 0,90 · US 1,10 confirmados; PE 0,95 · MX 1 ·
+  ES 1,10 estimados). Donde el factor declara `floorBasis: base_market` (CO y PE) el piso se lee sobre el precio del
+  mercado base. No hay factores por tipo de cliente ni factores de talento por perfil.
+- **Monedas.** El redondeo comercial sube cada fila al múltiplo de su moneda: CLP 10.000 · USD 10 · PEN 50 ·
+  COP 50.000 · MXN 100. El FX de cotización es política del CEO, con USD de referencia y margen prudencial sobre el
+  spot: USD→CLP 1.000 · COP 3.650 · MXN 19,25 · PEN 3,70. Todavía no se puede emitir una cotización en EUR (no hay
+  FX USD→EUR ni regla de redondeo); a un cliente español se le cotiza en USD. CLF tampoco tiene redondeo ni FX revisado.
+- **Herramientas.** Un precio unitario no vence: rige hasta que una versión nueva de la policy lo reemplaza y lleva
+  una fecha de revisión que avisa sin bloquear. Lo que varía es la cantidad de seats, que se declara en cada
+  cotización. La mayoría sigue siendo precio público de lista marcado como estimado (§6).
+- **Resultados de §8.** Son el registro del piloto del 2026-10-09, anterior al redondeo comercial, al FX de política y
+  a los factores de país; una cotización nueva con las versiones vigentes no tiene por qué repetir esas cifras.
+- **Comandos.** Usa `--current` en lugar de nombrar a mano las versiones de catálogo, policy y créditos; los pasos y
+  los valores vigentes están en el [manual](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).

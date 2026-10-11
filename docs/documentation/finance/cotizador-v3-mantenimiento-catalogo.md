@@ -62,6 +62,10 @@ incluye audit con actor/motivo/baseDigest/previewDigest y cambios completos, tam
 Duplicar `changeId` en el sucesor se rechaza. Las versiones se retienen; rollback consiste en seleccionar el padre
 para nuevas simulaciones, sin editar artefactos ni usar tarifas retiradas como vigentes.
 
+> Nota 2026-10-11: `apply` sigue sin elegir el sucesor, pero ya no hay que nombrarlo a mano en cada cotización.
+> Después de emitir una versión nueva se mueve el puntero de versiones vigentes y las cotizaciones usan `--current`.
+> Ver [puntero de versiones vigentes](#puntero-de-versiones-vigentes-2026-10-11).
+
 ## Invariantes de cotización
 
 - Resolver selecciona valores por quoteDate; no aplica alzas futuras antes de su fecha.
@@ -91,6 +95,11 @@ referencia y packs/costosIA cambian con evidencia nueva. Reglas review-only no s
 La fecha de una renovación desconocida no se inventa. Adobe306 permanece como variante condicional explícita;
 180 combinado no agrega Express por separado. Versionar por separado portfolio/capacidad y una nueva demanda.
 Snapshots previos conservan policy/precios/créditos/FX; ninguna actualización recalcula una quote existente.
+
+> Nota 2026-10-11: una versión nueva de la policy o del catálogo de créditos tampoco se activa sola; se vuelve la
+> vigente cuando se mueve el [puntero](#puntero-de-versiones-vigentes-2026-10-11). Los precios de herramienta ya no
+> tienen fecha de término corta: ver
+> [vigencia y fecha de revisión](#precios-unitarios-vigencia-y-fecha-de-revisión-2026-10-11).
 
 ## Redondeo, tipo de cambio de cotización y costos confirmados (2026-10-10)
 
@@ -132,6 +141,9 @@ contractual ni futura.
   sólo el 2026-10-09, de modo que una cotización posterior que necesite EUR no tiene tasa vigente hasta que se
   registre una.
 
+> Nota 2026-10-11: el catálogo v6 registró esa tasa (EUR→USD 1,20, estimada, sin fecha de término). Ver
+> [sucesor v6](#sucesor-v6-tipo-de-cambio-eur-de-cotización-2026-10-11).
+
 ### Costos confirmados por su autor
 
 Los 32 registros de costo humano pasaron a `confirmed` con la declaración del operador, autor del workbook, como
@@ -158,7 +170,8 @@ Para cotizaciones nuevas el par es `catalog.review-v4.json` + `resources.review-
 de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.
 
 > Nota 2026-10-11: el par para cotizaciones nuevas pasó a ser `catalog.review-v5.json` + `resources.review-v5.json`.
-> v4 se suma a los padres congelados y tampoco se edita.
+> v4 se suma a los padres congelados y tampoco se edita. Ese mismo día, más tarde, las versiones vigentes dejaron de
+> nombrarse a mano: las dice el [puntero](#puntero-de-versiones-vigentes-2026-10-11), que hoy apunta a v6.
 
 ## Factores de país: talento y mercado (2026-10-11)
 
@@ -182,7 +195,9 @@ costo de referencia de `referenceCountry`. `source` y vigencia como cualquier ot
 - Debe existir un registro vigente por cada par (país de la persona, país de referencia) que se quiera cotizar,
   incluido el del país de referencia consigo mismo, con factor 1. No se asume un factor neutral: sin registro la
   resolución bloquea con `MISSING_CATALOG_SELECTION` en `lines.<lineId>.talentFactor`, y con más de uno aplicable,
-  con `AMBIGUOUS_SELECTION`.
+  con `AMBIGUOUS_SELECTION`. Pendiente conocido al 2026-10-11: ni `catalog preview` ni `catalog apply` detectan un
+  factor duplicado (otro `recordId` para el mismo par); el change-set pasa los dos y el problema aparece recién al
+  cotizar. Cambiar un factor es un `replace` del registro existente, no un `add`.
 - Es un solo factor por país para todos los perfiles. Donde un perfil o un seniority se aparta de él, lo que se
   registra es su costo específico (más abajo), no otro factor.
 - No requiere contrato nuevo del kernel: existe desde 1.0.0. Agregarlo o cambiarlo no cambia el contrato que emite la
@@ -267,3 +282,201 @@ Valores al 2026-10-11; la fuente es el JSON y su `audit`, y cambian por `replace
 Para cotizaciones nuevas el par es `catalog.review-v5.json` + `resources.review-v5.json`, más
 `data/pricing/v3-resources/ai-credits.review-v1.json`. v2, v3 y v4 no se editan ni se retiran: son los padres
 congelados de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.
+
+> Nota 2026-10-11: ese párrafo describe el momento en que se emitió v5. Desde ese mismo día las versiones vigentes
+> las nombra el puntero, que hoy apunta a `catalog.review-v6.json` y `resources.review-v6.json`; v5 pasó a ser un
+> padre congelado más. Las tres secciones siguientes describen el estado vigente.
+
+## Puntero de versiones vigentes (2026-10-11)
+
+Cada versión del catálogo, de la policy de recursos y del catálogo de créditos es un archivo que no se vuelve a
+tocar, porque las cotizaciones ya congeladas dependen de las anteriores. Por eso «la versión vigente» no puede ser
+un nombre de archivo: es un documento aparte, el único que sí cambia. Fuente ejecutable:
+[`adapters/current-versions.ts`](../../../src/lib/finance/pricing-v3/adapters/current-versions.ts).
+
+### Qué es
+
+`data/pricing/v3-operating/current.json`, con `schemaVersion: pricing-v3-current/1`. Nombra tres fuentes —`catalog`,
+`policy` y `credits`— y de cada una guarda la ruta relativa al repositorio, la versión y el digest (la huella del
+contenido). Guarda además `updatedAt` (el día en que se movió) y `reason` (por qué).
+
+Al 2026-10-11 nombra `data/pricing/v3-operating/catalog.review-v6.json`,
+`data/pricing/v3-operating/resources.review-v6.json` y `data/pricing/v3-resources/ai-credits.review-v1.json`. La
+fuente de esa respuesta es el propio puntero, no este documento.
+
+### Cómo se usa al cotizar
+
+Agrega `--current` a la operación. La CLI toma del puntero cada fuente que no hayas pasado con `--catalog`,
+`--policy` o `--credits`; una ruta explícita siempre gana. Antes de usar una fuente la comprueba: lee el archivo y
+compara su versión y su digest con los del puntero. Si no coinciden, rechaza con `CURRENT_VERSIONS_MISMATCH` y no
+calcula nada. Un puntero desactualizado se rechaza, nunca se sigue.
+
+```bash
+pnpm --silent pricing:v3 compose quote --input demand.json --current --out artifact.json
+```
+
+Sin `--current` nada cambió: sin `--catalog` se lee la baseline histórica review-v1, y `--policy` y `--credits`
+siguen siendo obligatorios donde lo eran.
+
+### Cómo se consulta
+
+```bash
+pnpm --silent pricing:v3 current show
+```
+
+Imprime el puntero, su `pointerDigest` y, por cada fuente, un `status`:
+
+| `status` | Qué significa |
+| --- | --- |
+| `match` | El archivo existe y su versión y digest son los del puntero |
+| `version_mismatch` | El archivo declara otra versión |
+| `digest_mismatch` | Misma versión, contenido distinto |
+| `invalid` | El archivo no pasa su propia validación |
+| `unreadable` | No se pudo leer el archivo |
+
+`consistent` es `true` sólo si las tres están en `match`; el comando sale con 0 en ese caso y con 2 en cualquier
+otro. `current show --input otro.json` revisa un puntero distinto del versionado, por ejemplo uno escrito con
+`--out` para revisarlo antes.
+
+### Cómo se mueve
+
+```bash
+pnpm --silent pricing:v3 current set --catalog A.json --policy B.json --credits C.json \
+  --reason "por qué cambia" --confirm <pointerDigest>
+```
+
+- Las tres rutas y `--reason` son obligatorias. Las rutas deben quedar dentro del repositorio.
+- La versión y el digest de cada fuente no se escriben a mano: la CLI los calcula desde los archivos, así que el
+  puntero no puede nombrar algo que nadie leyó.
+- `--confirm` es el `pointerDigest` del puntero que vas a reemplazar, tal como lo muestra `current show`. Es el
+  mismo candado que `catalog apply`: sólo reemplazas lo que leíste. Si otra persona o sesión movió el puntero entre
+  tu lectura y tu escritura, el digest ya no coincide y la CLI rechaza con `CURRENT_VERSIONS_CONFLICT`. Si falta
+  `--confirm` rechaza con `MISSING_ARGUMENT`.
+- `--out otro.json` escribe el puntero en otra ruta para revisarlo, sin tocar el versionado. Si esa ruta no existe
+  no hay nada que confirmar, y pasar `--confirm` ahí también es `CURRENT_VERSIONS_CONFLICT`.
+- Mover el puntero no aprueba nada. Dice cuál es la versión que se usa por defecto; no convierte un precio estimado
+  en confirmado ni una simulación en un precio aprobado.
+
+### Regla de mantenimiento
+
+Después de que `catalog apply` o `resources apply` emite una versión nueva, mueve el puntero con `current set`. Una
+prueba permanente ([`pricing-v3-current-versions.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-current-versions.test.ts))
+exige que el puntero nombre la versión de número más alto presente en cada carpeta. Si alguien emite una versión y
+olvida mover el puntero, `pnpm pricing:v3:test` queda en rojo.
+
+Las versiones anteriores no se borran ni se editan: los artefactos congelados dependen de ellas. Para simular con
+una versión anterior pásala con su ruta explícita (`--catalog`, `--policy`, `--credits`), que gana sobre el puntero.
+El puntero mismo no se devuelve a una versión anterior mientras exista una más nueva en la carpeta: la misma prueba
+lo marcaría en rojo. Corregir un valor es emitir otra versión.
+
+## Precios unitarios: vigencia y fecha de revisión (2026-10-11)
+
+Decisión del operador (CEO) del 2026-10-11: **un precio unitario no vence**. En sus palabras, Notion o Microsoft 365
+no cambian su precio; lo que cambia es cuántas licencias se contratan. Datos: `resources.review-v6.json` (versión
+`operating-review-2026-10-11-v6`) y su cambio `stable-unit-prices.change.json`. Esquema:
+[`composition-contracts.ts`](../../../src/lib/finance/pricing-v3/resources/composition-contracts.ts).
+
+Un precio de herramienta tiene ahora dos fechas con funciones distintas:
+
+| Fecha | Dónde vive | Qué hace cuando pasa |
+| --- | --- | --- |
+| Vigencia (`price.source.effectiveUntil`) | En la fuente del precio | **Bloquea**: una cotización con fecha posterior queda `needs_input` con `RESOURCE_PRICE_NOT_EFFECTIVE` |
+| Revisión (`reviewBy`) | En la entrada del precio, opcional | **Avisa**: la cotización se calcula igual y el aviso aparece en el resumen |
+
+- Antes de v6 cada precio tenía una vigencia corta, casi siempre 30 días desde su evidencia. Cotizar con una fecha
+  posterior quedaba bloqueado aunque el precio no hubiera cambiado.
+- En v6 los 25 precios con importe propio tienen vigencia abierta (`9999-12-31`) y `reviewBy: 2027-04-11`. Ningún
+  importe, moneda, unidad ni referencia de fuente cambió.
+- La fecha de revisión a seis meses la eligió el agente; el operador decidió que el precio no vence, no esa fecha.
+- `reviewBy` no entra en ningún cálculo y nunca cambia un resultado: sólo alimenta avisos. Un precio cambia
+  únicamente cuando se emite una versión nueva de la policy con `resources preview|apply` y se mueve el puntero.
+- Un plan que todavía no tiene precio (`pendingReason`) no admite `reviewBy`: no hay nada que revisar.
+- La cantidad de licencias no es parte del precio. Se declara en cada cotización, en las asignaciones de la demanda.
+- Que un precio no venza no lo confirma. De los 25, 23 siguen marcados como estimados (en su mayoría precio de
+  lista público) y 2 como confirmados. Confirmar el plan realmente contratado es el pendiente `UNIT_PRICE_REVIEW`
+  del [ledger](../../../data/pricing/v3-operating/operational-gaps.json), a cargo de Operations.
+
+### Cómo saber qué toca revisar
+
+```bash
+pnpm --silent pricing:v3 resources inspect --current --date 2026-10-11
+```
+
+La respuesta trae `priceReview`, leído a la fecha que pasas:
+
+| Clave | Contenido | ¿Bloquea? |
+| --- | --- | --- |
+| `reviewDue` | Fechas de revisión que ya pasaron | No |
+| `dueSoon` | Vigencias o fechas de revisión que caen dentro de `withinDays` (30 días) | Todavía no |
+| `expired` | Vigencias que ya terminaron | Sí, a una cotización de esa fecha que use ese dato |
+
+Cada aviso dice si es una vigencia (`hard_expiry`) o una revisión (`review`), a qué se refiere (un precio de
+herramienta, la policy, un registro del catálogo o un proveedor de créditos), su fecha, los días que faltan y, cuando
+bloquea, con qué diagnóstico. Al cotizar, `compose prepare|quote` muestran los mismos avisos sólo para los precios que
+esa cotización usa, bajo `runNotices.priceDates`
+([contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11)).
+
+Al 2026-10-11 la única entrada en `expired` es la referencia EUR→USD del BCE, que valía sólo el 2026-10-09. El
+catálogo v6 ya tiene otra tasa para ese par; que la anterior siga listada es un pendiente conocido.
+
+## Sucesor v6: tipo de cambio EUR de cotización (2026-10-11)
+
+`catalog.review-v6.json` (versión `operating-review-2026-10-11-v6`) se emitió desde `catalog.review-v5.json` con
+`catalog preview` y `catalog apply` sobre `eur-quote-fx.change.json`. El change-set hace una sola cosa: `add` del
+registro `fx:EUR:USD`, con tasa 1,20, vigencia desde el 2026-10-11 sin fecha de término y `status: estimated`.
+
+- Por qué: la única tasa EUR→USD del catálogo era la referencia del BCE (1,1206), válida sólo el 2026-10-09. Una
+  cotización de fecha posterior con una herramienta que se paga en EUR no tenía tasa.
+- Quién la eligió: el agente, aplicando la instrucción del operador del 2026-10-10 de usar un margen prudencial
+  sobre el spot. El operador no decidió una tasa para EUR; por eso el registro es estimado y su revisión está en
+  `QUOTE_FX_REVIEW` del [ledger](../../../data/pricing/v3-operating/operational-gaps.json). Como esta tasa convierte
+  costos, el lado prudente es una tasa más alta.
+- Qué no agrega: no hay tasa USD→EUR ni regla de redondeo para EUR. **Todavía no se puede emitir una cotización en
+  EUR**; a un cliente de España se le cotiza en USD. Las tasas no se invierten ni se cruzan solas.
+- CLF sigue igual: sin regla de redondeo y con USD→CLF como valor estimado de 2025.
+
+Los demás registros de v5 —costos, factores de país, redondeo y tipos de cambio desde USD— no cambiaron.
+
+## Valores de política vigentes al 2026-10-11
+
+Resumen para leer sin abrir el JSON. La fuente es el catálogo que nombra el puntero y su `audit`; estos valores
+cambian sólo con una versión nueva. Los factores de país están en la tabla de
+[sucesor v5](#sucesor-v5).
+
+**Margen.** El piso de 45 % es la norma para los servicios gestionados de la práctica creativa: la política
+`creative-managed-service` tiene margen objetivo 0,45 y mínimo 0,45 para los 32 perfiles. Donde se puede ganar más,
+se sube el objetivo de esa oferta, no el piso. Ese piso vive sólo en esos 32 registros: no cubre todas las ofertas
+del catálogo. Los 32 registros de `talent-assurance-staffing` conservan un markup histórico con margen mínimo 0, así
+que una cotización por capacidad de roles no tiene hoy un piso que el motor haga cumplir, y que no marque ninguna
+línea no prueba que cumpla un piso. El 40 %/35 % que muestra `compose assess` es una propuesta genérica
+sin aprobar, nunca un piso. Un precio bajo el piso queda marcado y requiere una excepción explícita del CEO,
+registrada caso por caso. La que consta en el ledger (`MARGIN_FLOOR_SCOPE`), SKY social care 2027, se aprobó porque
+SKY ya es cliente; no es referencia de margen para ningún otro cliente.
+
+**Redondeo comercial** (decisión del CEO, 2026-10-10; todas las ofertas; cada fila facturable sube a su múltiplo):
+
+| Moneda | Múltiplo |
+| --- | --- |
+| CLP | 10.000 |
+| USD | 10 |
+| PEN | 50 |
+| COP | 50.000 |
+| MXN | 100 |
+| CLF, EUR | Sin regla: no se redondean |
+
+**Tipo de cambio de cotización** (USD es la moneda de referencia; valor de política con margen prudencial sobre el
+spot, no una tasa observada):
+
+| Par | Tasa | Desde | Quién lo decidió |
+| --- | --- | --- | --- |
+| USD→CLP | 1.000 | 2026-10-10 | CEO |
+| USD→COP | 3.650 | 2026-10-10 | CEO |
+| USD→MXN | 19,25 | 2026-10-10 | CEO |
+| USD→PEN | 3,70 | 2026-10-10 | CEO |
+| USD→CLF | 0,024 | 2026-10-09 | Nadie: valor estimado de 2025, sin revisar |
+| EUR→USD | 1,20 | 2026-10-11 | El agente, bajo la instrucción de margen prudencial; estimado |
+| USD→EUR | No existe | — | Por eso no se puede emitir en EUR |
+
+Pendientes abiertos sobre estos valores, con su responsable, en el
+[ledger](../../../data/pricing/v3-operating/operational-gaps.json): `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`,
+`COUNTRY_FACTORS_UNVALIDATED` y `UNIT_PRICE_REVIEW`.

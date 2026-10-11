@@ -20,7 +20,7 @@ pnpm --silent pricing:v3 catalog show --query ECG-027
 pnpm --silent pricing:v3 validate --input data/pricing/v3-pilot/scenarios/colombia-chile-design-needs-input.json
 ```
 
-El catálogo busca candidatos dentro de [parámetros de revisión](../../../data/pricing/v3-pilot/parameters.json). `ambiguous` conserva todas las opciones; `candidate` no equivale a perfil operativo aprobado. Esta CLI interna puede mostrar referencias de costo: no entregar su salida de catálogo a clientes.
+El catálogo busca candidatos dentro de [parámetros de revisión](../../../data/pricing/v3-pilot/parameters.json). Sin `--catalog` ni `--current`, `catalog search` y `catalog show` consultan la baseline histórica (`review-2026-10-09-v1`); con `--current` consultan el catálogo operativo vigente. `ambiguous` conserva todas las opciones; `candidate` no equivale a perfil operativo aprobado. Esta CLI interna puede mostrar referencias de costo: no entregar su salida de catálogo a clientes.
 
 ## Demostración completa, sin valores comerciales
 
@@ -140,3 +140,5 @@ Verificación: `pnpm pricing:v3:test`, `pnpm pricing:workbook:test`, lint focal 
 ## Selección desde catálogo y mantenimiento
 
 [Recorrido para agentes y actualización versionada](catalogo-v3-seleccion-y-actualizacion.md): `catalog`, `prepare`, `quote`, explicación/replay y preview/apply. Este flujo usa catálogos locales, sin montar snapshots a mano ni incorporar provisiones de un expediente. Los comandos de snapshot anteriores siguen disponibles.
+
+Para cotizar un pedido nuevo con los datos vigentes no se usa este carril ni se nombran versiones a mano: el [manual operativo](operar-cotizador-v3-con-agentes.md#versiones-vigentes) carga catálogo, policy y créditos con `--current`, desde el puntero `data/pricing/v3-operating/current.json`. `calculate`, `validate`, `explain`, `replay`, `compare` y `export` no aceptan `--current`: reciben un snapshot o un artefacto que ya lleva sus valores.

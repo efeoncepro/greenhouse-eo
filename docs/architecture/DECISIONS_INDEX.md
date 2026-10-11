@@ -17,7 +17,7 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 | Decision | Status | Scope | Canonical doc | Source / notes |
 | --- | --- | --- | --- | --- |
 | Pricing V3: motor 1.1 con precio acordado, redondeo comercial y contratos de entrada convivientes | Accepted local 2026-10-10 — aprobado por el operador (CEO) | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md) | Contrato 1.0.0 intacto y 1.1.0 aditivo, cada uno con su motor en un registro cerrado; `agreed_net`, ajustes disjuntos y redondeo por moneda como dato de catálogo; guarda permanente de artefactos congelados. Delta 2026-10-11: contrato 1.2.0 (el piso de margen acompaña al factor de mercado que declara `floorBasis`) y factores de país en el catálogo v5 (talento sobre el costo, mercado sobre el precio humano). Sin canon/API/DB ni aprobación comercial. |
-| Pricing V3: operación local para agentes | Accepted local2026-10-09 | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) | Catálogo/reglas, portfolio declarado, planes/versiones con impacto, readiness y preview redactado; sin canon/API/DB ni aprobación comercial. |
+| Pricing V3: operación local para agentes | Accepted local2026-10-09 | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) | Catálogo/reglas, portfolio declarado, planes/versiones con impacto, readiness y preview redactado; sin canon/API/DB ni aprobación comercial. Delta 2026-10-11: versiones vigentes por puntero verificado (`current.json`, `--current`), avisos de la corrida fuera del artefacto (`runNotices`), exposición a datos estimados derivada del resultado congelado (`estimateExposure`, `costEvidencePriority`) y base de costo = costo objetivo, no nómina (decisión del CEO). |
 | Excel pricing CLI local para agentes | Accepted 2026-10-09 | Commercial / Finance / Agent tooling | [GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md](GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md) | Extracción trazable, costeo multirol editable y comparación de márgenes sin UI/DB; no catálogo aprobado ni emisión de quotes. |
 | Capacidad especializada regional de CRM y RevOps | Accepted 2026-10-09 — dirección del operador; oferta en validación | RevOps & CRM / Commercial / Talent / Finance / Legal | [EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md](EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) + [servicio](../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) | Staff Augmentation y operación gestionada con responsabilidades distintas; estándar regional, configuración contractual/capacidad/pricing por validar. Sin nuevos contratos ni rollout. |
 | Efeonce Talent Assurance: evidencia, formación, desempeño y continuidad | Accepted 2026-10-09 — aprobación explícita del operador | Talent / Hiring / Workforce / CX / Delivery / Finance / Agent Runtime | [Decision V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md) + [Architecture V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md) + [EPIC-038](../epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md) | Estándar, arquitectura objetivo y guardrails aceptados; policy de claims, revisión cross-domain y sistema integrado pendientes. Sin sello público, claims ni promoción de autonomía por esta aceptación. |
@@ -323,10 +323,20 @@ Estas decisiones existen en runtime o docs, pero pueden merecer ADR mas explicit
 ## Pricing V3 — 2026-10-09
 
 [Catálogo, resolución y mantenimiento local](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md): Accepted, TASK-2019; versiones locales y cálculo congelado, sin promoción canónica.
+Delta 2026-10-11: las versiones vigentes de catálogo, policy y créditos las nombra un puntero verificado por
+versión y digest (`data/pricing/v3-operating/current.json`), opt-in con `--current` y gestionado con
+`current show|set`; `apply` sigue sin activar y una prueba exige mover el puntero al emitir una versión. Descarta
+symlink `latest`, convención de nombre y cambio del default de la CLI.
 
 [Presupuesto de créditos IA y recargas](GREENHOUSE_PRICING_V3_AI_CREDIT_BUDGET_DECISION_V1.md): Accepted para prototipo local, TASK-2020; paquetes observados, costo/caja y caducidad separados, sin compra; binding local a quote mediante TASK-2021/2022, sin inventario live.
+Delta 2026-10-11: el catálogo de créditos vigente lo nombra el mismo puntero; «un precio unitario no vence» no
+aplica a los paquetes de créditos.
 
 [Composición de recursos por demanda](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md): Accepted local, TASK-2021; base común, tareas, asignaciones/IA y quote/explain/replay, sin inventario live ni aprobación comercial.
+Delta 2026-10-11, decisión del operador (CEO): un precio unitario de herramienta no vence; rige hasta que una
+versión nueva de la policy lo reemplaza. La vigencia dura (`effectiveUntil`, bloquea) queda separada de la fecha de
+revisión (`reviewBy`, avisa y nunca bloquea), con lectura derivada `priceReview` en `resources inspect`. Policy v6;
+la fecha de revisión a seis meses la eligió el agente.
 
 [Operación local para agentes](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md): Accepted local,
 TASK-2022; reglas de revisión para 32 perfiles, discovery/scaffold/plan, reparto de cartera declarada,
@@ -334,6 +344,12 @@ acceso cliente por ventana, bundles/seats, readiness, preview allowlisted y actu
 policy/créditos. TASK-2017 mantiene economía parcial; Quote API Parity sigue canónica en V2. El
 [mapa de promoción](../documentation/finance/cotizador-v3-promocion-canonica.md) prepara su futura integración;
 no acredita nueva API/UI/MCP, despliegue, emisión o pricing aprobado.
+Delta 2026-10-11: los comandos dejan de nombrar versiones y usan `--current`; el resumen de
+`compose prepare|quote` separa en `runNotices` lo que describe la corrida (valores de catálogo posteriores a la
+fecha, fechas de los precios usados) y agrega `estimateExposure`, que ordena los datos de costo estimados por el
+costo que descansa sobre cada uno sin recalcular nada (`costEvidencePriority` en `assess`). Decisión del operador
+(CEO): el costo por persona del cotizador es el costo objetivo, no la nómina. Catálogo v6 agrega un tipo de
+cambio de cotización EUR→USD estimado, elegido por el agente.
 
 [Motor 1.1: precio acordado, redondeo comercial y versiones convivientes](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md):
 Accepted local 2026-10-10, aprobado por el operador (CEO); el ADR no declara unidad de trabajo. El kernel mantiene el contrato 1.0.0 byte a

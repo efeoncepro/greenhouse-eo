@@ -74,6 +74,11 @@ plataforma, tareas e IA con motivo. Accesos aportados por el cliente requieren e
 no eliminan la base interna. Las provisiones de formación, respaldo y gestión requieren costo/capacidad
 explícitos, sin convertir estimaciones del prototipo en garantía de Talent Assurance.
 
+Delta 2026-10-11 — decisión del operador (CEO): el costo de las personas en el cotizador es el nivel salarial
+objetivo del Excel de pricing, no la nómina actual; no lo reemplaces por costos de nómina ni propongas conectarlos.
+El margen real sobre personas hoy es mayor que el simulado. Usa `--current` para tomar catálogo, policy y créditos
+vigentes en vez de nombrar versiones a mano. Las cifras y excepciones de la etapa 5 las aprueba el operador.
+
 El reparto por capacidad declarada mantiene cliente, interno y sin asignar reconciliados; no acredita
 ocupación ni acceso reales. El desglose congelado y la evaluación de pendientes respaldan la revisión de
 Finance/Commercial. El preview es una simulación interna; contratos, emisión y aprobación conservan el

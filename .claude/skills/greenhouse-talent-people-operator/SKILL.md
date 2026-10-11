@@ -1043,7 +1043,13 @@ not current status for future runs). Do not repeat the closed operation during d
 Para simular una persona o squad con costos y herramientas, cargar
 [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
 Talent define perfil/variante/seniority, país del talento, % dedicación, headcount, tareas e IDs estables sin PII;
-Commercial conserva el mercado del comprador y Finance las cifras. Mantener escalas de consultoría separadas:
+Commercial conserva el mercado del comprador; las cifras salen del catálogo versionado y el precio lo decide el CEO.
+**El costo del cotizador no es la nómina actual:** es el nivel salarial objetivo del Excel de pricing (decisión del
+CEO, 2026-10-11), así que el margen real en personas hoy es mayor que el que muestra V3. No proponer conectarlo a
+payroll, no leerlo como lo que Efeonce paga hoy y nunca escribir el pago de una persona en un blueprint, artefacto
+o documento de cotización. Dos ejes de país: el de la persona cambia el **costo** (factor de talento, base Chile;
+fuera de Chile son estimaciones propuestas por un agente, sin validar con contrataciones reales) y el del cliente
+cambia el **precio** de la parte humana (factor de mercado). Mantener escalas de consultoría separadas:
 una necesidad SEO o CRM no autoriza sustituir el salario de la variante elegida. `planned-*` son slots,
 no personas contratadas, licencias asignadas ni capacidad disponible. No promover demanda local a Hiring por inferencia.
 

@@ -6,7 +6,7 @@ Para incorporar este presupuesto al precio de roles o servicios y conservar expl
 
 ## Antes de calcular
 
-1. Seleccionar catálogo explícito. No poner precio en el request ni usar el promedio mensual para extras.
+1. Usar el catálogo de créditos vigente con `--current`: en `resources budget` rellena `--catalog` con el catálogo de créditos que nombra el [puntero](catalogo-v3-seleccion-y-actualizacion.md#versiones-vigentes-el-puntero-currentjson). Una ruta escrita en `--catalog` queda sólo para repetir un presupuesto con una versión anterior. No poner precio en el request ni usar el promedio mensual para extras.
 2. Determinar proveedor, cliente, fecha de compra estimada y fecha máxima de consumo. Revalidar precio/impuesto/condiciones antes de compromiso.
 3. Declarar demanda y créditos normales asignados/disponibles con evidencia o como hipótesis explícita. No confundir paquete incluido con saldo libre; otras cotizaciones pueden reservarlo fuera de este planner.
 4. Confirmar suscripción activa cuando aplique. Repetir un pack sólo con supuesto consciente `allowRepeatedPacks=true`; defaultfalse permite una unidad de cada paquete distinto.
@@ -14,8 +14,8 @@ Para incorporar este presupuesto al precio de roles o servicios y conservar expl
 ## Calcular
 
 ```bash
-pnpm --silent pricing:v3 resources budget --catalog data/pricing/v3-resources/ai-credits.review-v1.json --input data/pricing/v3-resources/examples/higgsfield.request.json
-pnpm --silent pricing:v3 resources budget --catalog data/pricing/v3-resources/ai-credits.review-v1.json --input data/pricing/v3-resources/examples/magnific.request.json --out /tmp/mi-presupuesto-magnific.json
+pnpm --silent pricing:v3 resources budget --current --input data/pricing/v3-resources/examples/higgsfield.request.json
+pnpm --silent pricing:v3 resources budget --current --input data/pricing/v3-resources/examples/magnific.request.json --out /tmp/mi-presupuesto-magnific.json
 ```
 
 Los ejemplos son hipotéticos. Request lleva schemaVersion, mode=simulation, accountRef/providerId, purchaseDate/useBy, requestedCredits, subscriptionCreditsAllocated, subscriptionCreditsAvailable, activeSubscription y allowRepeatedPacks. Normales asignados no superan demanda/disponibilidad y ésta no supera paquete mensual incluido.
@@ -28,7 +28,7 @@ Los ejemplos son hipotéticos. Request lleva schemaVersion, mode=simulation, acc
 - `totalBudgetCost` y `incrementalCash`: costo atribuido más compra vs pago nuevo. No son precio ni margen.
 - Resultado guarda catálogo/request/método; para reproducir, extraer sus dos inputs y llamar el mismo primitive/CLI. No usar `pricing:v3 replay` de quotes: éste no es artefacto de cotización ni tiene su checksum.
 
-Exit3=calculado con revisión; exit2=needs_input con diagnóstico, sin breakdown; exit1=rechazo con `error.code` en stderr ([qué hacer con cada error](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error)). `--out` exige archivo nuevo y escribe0600; no sobrescribe.
+Los dos ejemplos devuelven exit 3. Exit3=calculado con revisión; exit2=needs_input con diagnóstico, sin breakdown; exit1=rechazo con `error.code` en stderr ([qué hacer con cada error](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error)); con `--current`, un puntero desalineado rechaza con `CURRENT_VERSIONS_MISMATCH`. `--out` exige archivo nuevo y escribe0600; no sobrescribe.
 
 Diagnósticos: proveedor desconocido, capacidad disponible fuera del paquete, suscripción requerida, normales fuera de mes, compra antes de observación/precio vencido, créditos vencidos antes de uso, capacidad discreta/límite de estados. Corregir input/fecha o confirmar nuevo catálogo; no convertir falta en cero ni inventar paquete.
 

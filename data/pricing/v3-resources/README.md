@@ -12,3 +12,11 @@ TASK-2020. [Catálogo observado](ai-credits.review-v1.json):7 packsHiggsfield y 
 Disponibilidad y fechas de ejemplo son hipótesis, no saldo real/reserva. El planner usa catálogo, no Excel o precios escritos por agente. Mismo pack repetido sólo por supuesto explícito; no click/compra. El resultado conserva fuente/método/request/catálogo, sin checksum de quote ni aprobación.
 
 Catálogo separado del monetario actual, no `--catalog` de `quote`. [Compositor integrado](../v3-composition/README.md) une estos presupuestos al kernel/quote y recursos monetarios por demanda. El [flujo operativo sucesor](../v3-operating/README.md) añade FX EUR referencial explícito y mantenimiento versionado de estos packs con impacto. Inventario/cartera/reservas live, FXcontractual y planes/asignaciones reales siguen pendientes. Baseline histórica y cotizaciones congeladas intactas.
+
+Desde el 2026-10-11 el catálogo de créditos vigente lo nombra el puntero
+[`../v3-operating/current.json`](../v3-operating/current.json), hoy `ai-credits.review-v1.json`. Con `--current`,
+`compose` y `resources` lo reciben como `--credits`, y `resources budget` lo recibe como `--catalog`. Si agregas un
+`ai-credits.review-vN.json` en esta carpeta, mueve el puntero con `pricing:v3 current set` en el mismo cambio: una
+prueba exige que nombre la versión de número más alto y, si no, `pnpm pricing:v3:test` falla. El catálogo v6 del
+flujo operativo agrega además un tipo de cambio de cotización EUR→USD de 1,20 (estimado) que rige desde el
+2026-10-11 sin fecha de término; la referencia del BCE anterior valía sólo el 2026-10-09.

@@ -150,11 +150,11 @@ preview redactado y mantenimiento con preview/apply/digests/impacto. La referenc
 canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
 
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
-`compose prepare|quote` → `explain|replay` → `compose assess|preview`. El sucesor operativo es opt-in;
-no cambiar defaults ni sobrescribir artifacts. Para cotizaciones nuevas el catálogo vigente es
-`data/pricing/v3-operating/catalog.review-v5.json`, con `resources.review-v5.json` y
-`data/pricing/v3-resources/ai-credits.review-v1.json`; se puede cotizar en CLP, USD, COP, MXN y PEN
-(`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo.
+`compose prepare|quote` → `explain|replay` → `compose assess|preview`. Las versiones vigentes no se nombran a
+mano: las nombra el puntero `data/pricing/v3-operating/current.json` y los comandos las cargan con `--current`
+(`current show` lo muestra). Una versión nueva se emite con `catalog apply`/`resources apply` y después se
+mueve el puntero con `current set`; no sobrescribir artifacts. Se puede cotizar en CLP, USD, COP, MXN y PEN
+(`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo; no en EUR (España se cotiza en USD).
 El país entra por dos campos distintos de la demanda y rige con `quoteDate` 2026-10-11 o posterior:
 `brief.offerMarketCountry` (país del cliente) ajusta el precio de la parte humana y `brief.lines[].talentCountry`
 (país de cada persona) ajusta el costo; país no es moneda y varios factores son estimados. Con cliente en Colombia o
@@ -165,6 +165,10 @@ Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo
 deja stdout vacío y trae en stderr `error.code` de un registro cerrado, con `option`/`issues` para ubicar el
 arreglo; `ADAPTER_FAILURE` es una falla sin clasificar de la herramienta, no del pedido.
+El resumen trae además `runNotices` (avisos de la corrida: nunca bloquean y se informan al operador junto al
+resultado) y `estimateExposure` (qué dato estimado confirmar primero; es sensibilidad, no validación).
+Los costos de persona son el costo objetivo que fijó el CEO, no la nómina: no proponer conectar la nómina ni
+llamarlos «lo que Efeonce paga»; el margen real de hoy sobre personas es mayor que el mostrado.
 Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
 validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
 no sustituyen pisos de práctica aprobados. El precio que se acuerda se declara directo en la demanda como

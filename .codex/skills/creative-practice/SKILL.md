@@ -486,5 +486,11 @@ Notion/M365 son base; GCP/Vercel se atribuyen desde capacidad declarada, dejando
 `managed_service` conserva funciones de diseño/dirección/cuenta como costos internos y preview agrega fee;
 no cambia la política de vender capacidad/lane ni SOW/rights/QA. **Los40/35 propuestos por readiness V3 no
 reemplazan el piso creativo45% aprobado en esta skill.** `assess` sólo reporta gaps, nunca aprueba excepción.
+Una excepción bajo el piso la decide sólo el CEO, caso a caso: SKY social care 2027 (40,26%) es una y nunca sirve
+de referencia para otra cuenta; donde se puede ganar más se sube el objetivo de esa oferta, no el piso.
+El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no
+la nómina actual: el margen real en personas hoy es mayor que el que muestra V3; no proponer «conectar nómina real»
+ni escribir el pago de una persona. El resumen trae `estimateExposure` (qué insumo estimado carga más costo:
+confirma ése primero); el precio unitario de una herramienta no vence y los seats se declaran por cotización.
 No presentar simulación o costo histórico como tarifa vigente/entrega garantizada. Explain/replay internos y
 preview redactado son estados distintos de quote emitida. Aprobación/ejecución/publicación conservan sus gates.

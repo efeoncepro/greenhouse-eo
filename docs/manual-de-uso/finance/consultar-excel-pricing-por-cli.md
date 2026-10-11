@@ -1,6 +1,6 @@
 # Usar el modelo de pricing por CLI
 
-Este carril consulta el prototipo histórico y sus celdas cacheadas. Para cotizar sin depender del archivo Excel, usar el [flujo operativo Cotizador V3](operar-cotizador-v3-con-agentes.md); [superficie y límites](../../documentation/finance/cotizador-v3-superficie-implementada.md). Conserva el workbook como evidencia, sin importarlo como tarifas vigentes.
+Este carril consulta el prototipo histórico y sus celdas cacheadas. Para cotizar sin depender del archivo Excel, usar el [flujo operativo Cotizador V3](operar-cotizador-v3-con-agentes.md); [superficie y límites](../../documentation/finance/cotizador-v3-superficie-implementada.md). Conserva el workbook como evidencia, sin importarlo como tarifas vigentes. Los costos de persona del catálogo V3 son los montos de este Excel, confirmados por su autor (el CEO): representan el costo objetivo de cada perfil —el nivel de sueldo que quiere alcanzar para el equipo—, no la nómina actual, y por decisión suya el cotizador no usa la nómina real.
 
 Requiere checkout interno, Node y dependencias del repo (`pnpm install` si no están instaladas).
 Ejecutar desde la raíz. No requiere portal, UI, credenciales ni conexión DB.

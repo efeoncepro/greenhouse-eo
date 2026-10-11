@@ -41,3 +41,73 @@ La actualización técnica no aprueba tarifa, gasto o alza contractual. Conserva
 ventana y versiones en cada familia; no reescribir artifacts o baseline. El
 [ADR operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) y el
 [manual](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) gobiernan el recorrido completo.
+
+## Delta 2026-10-11 — puntero a las versiones vigentes
+
+**Contexto.** Cada versión del catálogo monetario, de la policy de recursos y del catálogo de créditos es un archivo
+inmutable, porque las cotizaciones congeladas dependen de las anteriores. `apply` escribe el sucesor y no lo activa
+(«la próxima cotización lo selecciona expresamente»). Seleccionarlo significaba escribir a mano
+`catalog.review-vN.json` y `resources.review-vN.json` en cada comando, manual y skill. Entre el 2026-10-09 y el
+2026-10-11 se emitieron cinco versiones del catálogo operativo y cinco de la policy (v2 a v6); cada emisión dejaba
+comandos documentados apuntando a la versión anterior, que seguían cotizando sin error con valores viejos.
+
+**Decisión.** «Vigente» no puede ser un nombre de archivo. Es un único documento mutable junto a las versiones:
+`data/pricing/v3-operating/current.json` (`pricing-v3-current/1`). Nombra el catálogo, la policy y el catálogo de
+créditos vigentes, cada uno por ruta relativa a la raíz del repositorio, versión y digest, más `updatedAt` y `reason`.
+El código vive en `adapters/current-versions.ts` (funciones puras) y la lectura y escritura en la CLI.
+
+- **Usarlo.** `--current` es un interruptor sin valor. Completa cada una de `--catalog`, `--policy` y `--credits`
+  que no pasaste, en toda operación que recibe esas fuentes. Antes de usar una fuente, la CLI recalcula su versión y
+  su digest con el mismo parser del comando y exige que coincidan con el puntero; si no, rechaza con
+  `CURRENT_VERSIONS_MISMATCH` (exit 1) y no usa nada. Un flag explícito gana y no pasa por el puntero. En
+  `resources budget`, `--current` completa `--catalog` con el catálogo de créditos.
+- **Sin `--current` nada cambió.** Sin `--catalog` se lee la baseline histórica `v3-catalog/catalog.review-v1.json`,
+  y `--policy` y `--credits` siguen siendo obligatorios. El puntero es opt-in, no un default silencioso.
+- **Verlo.** `pnpm --silent pricing:v3 current show` imprime el puntero, su `pointerDigest`, el `status` de cada
+  fuente (`match | version_mismatch | digest_mismatch | invalid | unreadable`) y `consistent`. Exit 0 si coincide
+  todo; exit 2 si no. Informa versiones y digests, nunca contenido. `--input otro.json` revisa un puntero que no es
+  el versionado.
+- **Moverlo.**
+  `pnpm --silent pricing:v3 current set --catalog A --policy B --credits C --reason "…" --confirm <pointerDigest>`.
+  Las tres fuentes y el motivo son obligatorios, y las fuentes deben estar dentro del repositorio. El puntero se
+  construye desde los tres documentos: versión y digest se calculan, no se escriben. `--confirm` es el
+  `pointerDigest` del puntero que se reemplaza, tomado de `current show`: si falta, `MISSING_ARGUMENT`; si no
+  coincide, `CURRENT_VERSIONS_CONFLICT`. `--out otro.json` escribe en otra ruta para revisión; si esa ruta todavía no
+  existe no hay nada que confirmar, y ofrecer `--confirm` también es `CURRENT_VERSIONS_CONFLICT`.
+- **Mantenimiento.** `apply` sigue sin activar nada. Después de que `catalog apply` o `resources apply` emite una
+  versión, se mueve el puntero con `current set`, con su motivo. Una prueba
+  (`pricing-v3-current-versions.test.ts`) exige que el puntero nombre la versión de número más alto presente en
+  cada familia: `catalog.review-vN.json` y `resources.review-vN.json` en `data/pricing/v3-operating/`, y
+  `ai-credits.review-vN.json` en `data/pricing/v3-resources/`. Una versión emitida ahí sin mover el puntero deja
+  `pnpm pricing:v3:test` en rojo, y la falla trae el comando que lo corrige.
+- **Versiones anteriores.** No se borran ni se editan: son los padres de los artefactos congelados que se
+  calcularon con ellas y la base (`baseDigest`) de cada change-set posterior.
+
+**Alternativas descartadas.**
+
+- *Un symlink o una copia `latest`.* No lleva versión ni digest, así que no puede verificarse contra el archivo que
+  dice nombrar: un archivo editado en su lugar o un enlace movido pasan inadvertidos. Tampoco deja motivo ni fecha.
+- *Una convención de nombre («el número más alto es el vigente»).* Resuelve listando un directorio, no detecta un
+  archivo editado en su lugar y convierte «emitir» en «activar» sin motivo registrado. La convención sobrevive sólo
+  como guarda: la prueba exige que puntero y número más alto coincidan, pero lo que se usa es el puntero verificado.
+- *Cambiar el default de la CLI a la versión más nueva.* Cambiaría en silencio lo que calcula un comando ya escrito;
+  sin `--catalog` la CLI sigue leyendo la baseline histórica, como antes.
+- *Seguir nombrando la versión en manuales y skills.* Es lo que había, con el resultado descrito en el contexto.
+
+**Reglas duras.**
+
+- **NUNCA** nombrar a mano `catalog.review-vN.json` o `resources.review-vN.json` para cotizar con lo vigente: se usa
+  `--current`. El flag explícito queda para reproducir o comparar con una versión determinada.
+- **NUNCA** editar `current.json` a mano: se reemplaza con `current set`.
+- **NUNCA** emitir una versión en `v3-operating/` o `v3-resources/` sin mover el puntero en el mismo cambio. Un
+  sucesor que todavía no debe ser el vigente se escribe con `--out` en otra carpeta.
+- **NUNCA** borrar ni editar una versión anterior.
+- **NUNCA** seguir un puntero inconsistente ni «corregirlo» retocando un digest: `current show` dice qué fuente no
+  coincide y se corrige esa causa.
+- **SIEMPRE** correr `current show` antes de `current set` y pasar su `pointerDigest` en `--confirm`.
+- **SIEMPRE** escribir en `--reason` por qué cambian las versiones vigentes.
+
+**Límites.** Nombrar una versión como vigente no valida sus costos ni aprueba un precio. El puntero es local a este
+repositorio: no es un registro del runtime de Greenhouse ni un default del cotizador canónico. La revisión periódica
+que esta decisión proponía por calendario tiene desde hoy una fecha por precio de herramienta (`reviewBy`):
+[modelo de revisión de precios](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--un-precio-unitario-no-vence-vigencia-dura-y-fecha-de-revisión).

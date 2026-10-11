@@ -5,6 +5,14 @@
 Fecha: 2026-10-09. Estado: prueba histórica local ejecutada; costos y precio comercial no validados.
 Unidad: [TASK-2018](../../tasks/complete/TASK-2018-pricing-v3-pibank-team-simulation.md).
 
+> Nota 2026-10-11. Esta prueba conserva sus cifras y supuestos del 2026-10-09; nada se recalculó. Cuando se hizo no
+> había factores de país con valor, y por eso dice que no agrega ajuste por Perú ni por Chile. Hoy el catálogo
+> operativo tiene un factor de talento por país de la persona y un factor de mercado por país del cliente (los de
+> Perú, todavía estimados), y por decisión del CEO el costo de las personas se lee como costo objetivo, no como
+> nómina. Una simulación nueva de este caso daría otras cifras y seguiría sin ser un precio aprobado. El 40 % de
+> esta prueba fue una sensibilidad del ensayo, no un margen de referencia ni un piso. Estado vigente:
+> [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11).
+
 ## Caso usado
 
 El operador pidió usar lo necesario para la licitación de Pibank como otra prueba del motor.
