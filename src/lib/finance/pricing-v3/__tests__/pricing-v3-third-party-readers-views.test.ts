@@ -526,13 +526,13 @@ describe('compose preview: a supplier is never presented as fee, and nothing of 
   })
 })
 
-describe('compose assess: the generic floor is read on own work, and what suppliers add is a gap of its own', () => {
+describe('compose assess: the verdict is the floor of each row, and what suppliers add is a gap of its own', () => {
   it('exposes the margin of own work next to the blended one, only from contract 1.4.0 on', () => {
     const margin = assessCompositionReadiness(full).margin!
     const totals = totalsOf(full)
 
     expect(margin.modeledRate).toBe(totals.marginRate)
-    expect(margin).toMatchObject({ ownWorkRate: totals.ownWorkMarginRate, proposedFloorReadOn: 'ownWorkRate' })
+    expect(margin).toMatchObject({ ownWorkRate: totals.ownWorkMarginRate })
     // The margin of own work is the margin of the same quote without suppliers.
     expect(new D(totals.ownWorkMarginRate!).eq(assessCompositionReadiness(teamOnly).margin!.modeledRate!)).toBe(true)
     expect(assessCompositionReadiness(teamOnly).margin).toMatchObject({
@@ -543,8 +543,22 @@ describe('compose assess: the generic floor is read on own work, and what suppli
     const earlier = assessCompositionReadiness(plain).margin!
 
     expect(earlier).not.toHaveProperty('ownWorkRate')
-    expect(earlier).not.toHaveProperty('proposedFloorReadOn')
-    expect(earlier.belowProposedFloor).toBe(new D(plain.quote.totals!.marginRate!).lt(earlier.proposedFloor))
+    expect(earlier).not.toHaveProperty('thirdPartyPolicies')
+
+    // No generic target or floor is compared in any contract: the verdict is the kernel's, row by row.
+    for (const reading of [margin, earlier]) {
+      expect(reading).not.toHaveProperty('proposedFloor')
+      expect(reading).not.toHaveProperty('proposedTarget')
+      expect(reading).not.toHaveProperty('belowProposedFloor')
+      expect(reading.belowPolicyFloor).toBe(reading.policyFloor.linesBelowFloor.length > 0)
+    }
+
+    // What a third-party row is judged with is the rule of its category, listed apart from the pricing policies.
+    expect(margin.thirdPartyPolicies!.flatMap(policy => policy.costIds).sort()).toEqual(
+      supplierRows(full)
+        .map(row => row.parentLineId)
+        .sort()
+    )
   })
 
   it('a quote that is mostly pass-through with healthy own work is not flagged for its blended margin', () => {
@@ -555,17 +569,24 @@ describe('compose assess: the generic floor is read on own work, and what suppli
 
     const totals = totalsOf(passThrough)
     const margin = assessCompositionReadiness(passThrough).margin!
+    // The floor the team rows were priced with, read from the policy the quote froze.
+    const floors = margin.pricingPolicies.map(policy => new D(policy.minimumMargin))
 
     expect(new D(totals.thirdPartyNet).div(totals.net).gt('0.6')).toBe(true)
-    expect(new D(totals.marginRate!).lt(margin.proposedFloor)).toBe(true)
-    expect(new D(totals.ownWorkMarginRate!).gte(margin.proposedFloor)).toBe(true)
-    expect(margin.belowProposedFloor).toBe(false)
+
+    // Blended, the quote sits under the floor of its own offer; its own work does not.
+    for (const floor of floors) {
+      expect(new D(totals.marginRate!).lt(floor)).toBe(true)
+      expect(new D(totals.ownWorkMarginRate!).gte(floor)).toBe(true)
+    }
+
+    expect(margin.belowPolicyFloor).toBe(false)
     // The team rows hold their floor, and the kernel flags none: the reading agrees with it.
     expect(margin.policyFloor.linesBelowFloor).toEqual([])
     expect(gapCodes(passThrough)).not.toContain('MARGIN_BELOW_POLICY_FLOOR')
   })
 
-  it('own work under the generic floor is flagged, whatever the suppliers add on top', () => {
+  it('own work under the floor of its policy is flagged, whatever the suppliers add on top', () => {
     const lineIds = (managed.brief.lines as { lineId: string }[]).map(line => line.lineId)
 
     const discounted = compose(
@@ -581,8 +602,13 @@ describe('compose assess: the generic floor is read on own work, and what suppli
 
     const margin = assessCompositionReadiness(discounted).margin!
 
-    expect(new D(totalsOf(discounted).ownWorkMarginRate!).lt(margin.proposedFloor)).toBe(true)
-    expect(margin.belowProposedFloor).toBe(true)
+    for (const policy of margin.pricingPolicies)
+      expect(new D(totalsOf(discounted).ownWorkMarginRate!).lt(policy.minimumMargin)).toBe(true)
+
+    expect(margin.belowPolicyFloor).toBe(true)
+    // Every flagged row is a team row: the discount never reached what the supplier charges.
+    expect(margin.policyFloor.linesBelowFloor.length).toBeGreaterThan(0)
+    expect(margin.policyFloor.linesBelowFloor.every(line => lineIds.includes(line.parentLineId!))).toBe(true)
   })
 
   it('evidence that is not confirmed is a gap on that cost, and on no other', () => {

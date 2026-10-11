@@ -29,6 +29,7 @@ const MILESTONE_LIMIT = 12
 const OPTION_LIMIT = 8
 const QUANTITY_LIMIT = 9999
 const TAX_RATE_DECIMALS = 4
+const TAX_PERIOD_LIMIT = 120
 
 const ISSUE_LIMIT = 20
 
@@ -40,7 +41,12 @@ export const QUOTE_DOCUMENT_DEFAULT_GROUPS: Record<ClientSafeItemKind, string> =
   third_party: 'Costos de terceros'
 }
 
-/** Texts of the payment calendar when the brief gives none. True of any calendar this reading can emit. */
+/**
+ * Texts of the payment calendar when the brief gives none. The note is true of a calendar of nets, and is the
+ * default of one: a calendar whose milestones carry their tax and their total (a quote with an exclusive rate) gets
+ * no note unless the brief writes it, because this one would say «sin impuestos» over a table that prints them and
+ * the table needs no sentence to be read.
+ */
 export const QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS = {
   title: 'Calendario de pagos',
   note: 'Importes netos, sin impuestos. La suma de los hitos es el valor neto de esta cotización.'
@@ -141,7 +147,8 @@ export const quoteDocumentBriefSchema = z
     buyer: z
       .object({
         name: line,
-        unit: line,
+        // The area or team the document is addressed to. Optional: a buyer with none is not given its own name twice.
+        unit: line.optional(),
         taxId: line,
         // The template never downloads a logo: a local file and the official source it was taken from.
         logo: z
@@ -154,14 +161,16 @@ export const quoteDocumentBriefSchema = z
           .optional()
       })
       .strict(),
-    cover: z.object({ label: line, title, subtitle: paragraph }).strict(),
+    // `netLabel` names the net printed on the cover («Valor neto del proyecto») in place of the template's default.
+    cover: z.object({ label: line, title, subtitle: paragraph, netLabel: line.optional() }).strict(),
     service: z.object({ name: line }).strict(),
     scope: z.object({ title, intro: paragraph, rows: rows(7) }).strict(),
     // The calendar of the work. The calendar of payments is `paymentMilestones`, below.
     schedule: z
       .object({
         title: line,
-        note: paragraph,
+        // A line next to the title. Optional: a calendar with nothing to add says nothing there.
+        note: paragraph.optional(),
         phases: z
           .array(z.object({ label: line, title: line, text: paragraph }).strict())
           .min(1)
@@ -187,6 +196,10 @@ export const quoteDocumentBriefSchema = z
     // are data of one quote, not of this schema. Besides its texts, a line the quote waives completely may be marked
     // `courtesy: true` to be printed with its reference value: a choice of presentation, never a figure.
     lines: z.unknown().optional(),
+    // Keys printed together as one line, a price for the whole of them («1 programa»): a list of
+    // { keys, label, unit, detail?, group? }. Checked against the quote, below, like `lines`. A choice of presentation:
+    // the net of the line is the sum the quote froze for those keys, and this block has no place for one.
+    combine: z.unknown().optional(),
     // Name, detail and unit of each optional add-on, by the key its frozen quote was passed under. Checked against
     // the options of the run, below: like the keys of the lines, they are data of one run and not of this schema.
     // The price of an option comes from its own frozen quote; this block has no place for one.
@@ -221,8 +234,16 @@ const isLine = (value: unknown): value is string =>
  * waived key exists for a brief only to be marked `courtesy: true`: without the mark its line prints nothing, so
  * there is nothing to dress and the key is as unknown as before the mark existed. The mark on a key the quote
  * charges for is rejected: a line with a net is never presented as a courtesy.
+ *
+ * `combined` are the keys the brief prints inside a combination (`readCombinations`). Such a key has no line of its
+ * own, so an entry for it here would dress nothing and be silently dropped: it is rejected instead.
  */
-const readOverrides = (declared: unknown, charged: ReadonlySet<string>, waived: ReadonlySet<string>) => {
+const readOverrides = (
+  declared: unknown,
+  charged: ReadonlySet<string>,
+  waived: ReadonlySet<string>,
+  combined: ReadonlySet<string>
+) => {
   const overrides = new Map<string, LineOverride>()
   const issues: QuoteDocumentIssue[] = []
 
@@ -236,6 +257,12 @@ const readOverrides = (declared: unknown, charged: ReadonlySet<string>, waived: 
 
     if (!charged.has(key) && !(waived.has(key) && marked)) {
       issues.push({ path, rule: 'unknown_key' })
+
+      return
+    }
+
+    if (combined.has(key)) {
+      issues.push({ path, rule: 'key_is_combined' })
 
       return
     }
@@ -269,6 +296,96 @@ const readOverrides = (declared: unknown, charged: ReadonlySet<string>, waived: 
   })
 
   return { overrides, issues }
+}
+
+/** Keys the brief prints together as one line, with the texts of that line. */
+type Combination = { keys: string[]; label: string; detail?: string; group?: string; unit: string }
+
+const COMBINATION_FIELDS: readonly string[] = ['keys', 'label', 'detail', 'group', 'unit']
+
+/**
+ * Combinations of the brief, checked against the keys of this quote. A combination is one printed line for several
+ * keys of the quote, or for one: a price for the whole of them over the whole term («1 programa», «1 proyecto»),
+ * where the default prints each key folded by months. It is a choice of presentation: it names keys and texts, never
+ * an amount.
+ *
+ * A combination can neither hide a key nor count one twice, and each case is rejected with its own rule:
+ *
+ * - `unknown_key`: the quote has no such key;
+ * - `key_not_charged`: the quote waives the key completely. It has no net to add, and a line that listed it would
+ *   present as part of a price something the quote gives away; a courtesy is printed by its own mark in `lines`;
+ * - `duplicate_key`: the key is already in this combination or in an earlier one.
+ *
+ * A key printed in a combination has no line of its own; `readOverrides` rejects an entry of `lines` for it.
+ *
+ * An entry is reported by its position in the list, and a key by its position in the entry: never by its name or
+ * content. `combined` are the keys that found their place, whatever else of their entry was wrong.
+ */
+const readCombinations = (declared: unknown, charged: ReadonlySet<string>, waived: ReadonlySet<string>) => {
+  const combinations: Combination[] = []
+  const combined = new Set<string>()
+  const issues: QuoteDocumentIssue[] = []
+
+  if (declared === undefined) return { combinations, combined, issues }
+
+  const fault = (rule: string) => ({ combinations, combined, issues: [{ path: 'combine', rule }] })
+
+  if (!Array.isArray(declared)) return fault('not_an_array')
+  if (!declared.length) return fault('empty')
+  if (declared.length > LINE_LIMIT) return fault('too_many')
+
+  declared.forEach((value: unknown, index) => {
+    const path = `combine.${index}`
+    const before = issues.length
+
+    if (!isRecord(value)) {
+      issues.push({ path, rule: 'not_an_object' })
+
+      return
+    }
+
+    if (Object.keys(value).some(field => !COMBINATION_FIELDS.includes(field)))
+      issues.push({ path, rule: 'unknown_field' })
+
+    const keys: string[] = []
+
+    if (!Array.isArray(value.keys) || !value.keys.length || value.keys.length > LINE_LIMIT)
+      issues.push({ path: `${path}.keys`, rule: 'invalid_keys' })
+    else
+      value.keys.forEach((key: unknown, position) => {
+        const at = `${path}.keys.${position}`
+
+        if (typeof key !== 'string') issues.push({ path: at, rule: 'invalid_key' })
+        else if (combined.has(key)) issues.push({ path: at, rule: 'duplicate_key' })
+        else if (!charged.has(key)) issues.push({ path: at, rule: waived.has(key) ? 'key_not_charged' : 'unknown_key' })
+        else {
+          combined.add(key)
+          keys.push(key)
+        }
+      })
+
+    for (const field of ['label', 'unit'] as const) {
+      const text = value[field]
+
+      if (!isLine(text))
+        issues.push({ path: `${path}.${field}`, rule: text === undefined ? `missing_${field}` : `invalid_${field}` })
+    }
+
+    for (const field of ['detail', 'group'] as const)
+      if (value[field] !== undefined && !isLine(value[field]))
+        issues.push({ path: `${path}.${field}`, rule: `invalid_${field}` })
+
+    if (issues.length === before)
+      combinations.push({
+        keys,
+        label: value.label as string,
+        ...(value.detail !== undefined ? { detail: value.detail as string } : {}),
+        ...(value.group !== undefined ? { group: value.group as string } : {}),
+        unit: value.unit as string
+      })
+  })
+
+  return { combinations, combined, issues }
 }
 
 // ---- what the template can represent ----
@@ -448,7 +565,11 @@ type DocumentLine = {
   referenceNet?: string
 }
 
-/** A line of the document with what the reading keeps of it: its key and kind, never printed, and its exact net. */
+/**
+ * A line of the document with what the reading keeps of it: its key and kind, never printed, and its exact net. A
+ * combined line keeps the key and the kind of the first key it names; the scaffold, the one reader of the two,
+ * prints the lines as they fold with no brief and so never holds one.
+ */
 type LineEntry = { key: string; kind: ClientSafeItemKind; courtesy: boolean; net: Decimal; line: DocumentLine }
 
 /** Months a run covers, and how a line counts them: a one-off payment or a number of months. */
@@ -474,41 +595,82 @@ const quantityOfRun = (kind: ClientSafeItemKind, run: { from: number; periods: n
  * `courtesies` are the concepts the quote waives completely and the brief marked: each run is a line with a net of
  * zero, no unit value and `referenceNet`, the sum of what its months would have been charged for. It is counted like
  * the line it replaces and sits where that line would be; it adds nothing to any sum.
+ *
+ * `combinations` are the keys the brief prints together (`readCombinations`, which already holds each key to one
+ * place). Each is one line: a quantity of one of the unit the brief names, no unit value, and for net the exact sum
+ * of every run of every key it names, over the whole term. Those keys print no line of their own, so the lines add
+ * up to the same net whatever is combined. The line sits where the first of its keys appears in the quote and, with
+ * no group of its own, under the default group of the first key the brief lists.
  */
 const presentLines = (
   concepts: KeyedConcept[],
   courtesies: WaivedConcept[],
   overrides: ReadonlyMap<string, LineOverride>,
-  scale: number
+  scale: number,
+  combinations: readonly Combination[] = []
 ) => {
   const money = (value: Decimal) => value.toFixed(scale)
+  const byKey = new Map(concepts.map(concept => [concept.key, concept]))
+  const inCombination = new Set(combinations.flatMap(combination => combination.keys))
 
-  const charged = concepts.map(concept => {
-    const override = overrides.get(concept.key)
+  const combined = combinations.map(combination => {
+    const members = combination.keys.map(key => byKey.get(key)!)
+
+    const net = members
+      .flatMap(concept => concept.runs)
+      .reduce((total, run) => total.plus(run.unitNet.mul(run.periods)), new Wide(0))
+
+    const entry: LineEntry = {
+      key: members[0].key,
+      kind: members[0].kind,
+      courtesy: false,
+      net,
+      line: {
+        label: combination.label,
+        ...(combination.detail !== undefined ? { detail: combination.detail } : {}),
+        group: combination.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[members[0].kind],
+        quantity: { value: 1, unit: combination.unit },
+        net: money(net)
+      }
+    }
 
     return {
-      rank: concept.rank,
-      lines: concept.runs.map((run): LineEntry => {
-        const { once, months, quantity } = quantityOfRun(concept.kind, run)
-        const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
-
-        return {
-          key: concept.key,
-          kind: concept.kind,
-          courtesy: false,
-          net: run.unitNet.mul(run.periods),
-          line: {
-            label: override?.label ?? concept.label,
-            ...(detail !== undefined ? { detail } : {}),
-            group: override?.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind],
-            quantity,
-            ...(once ? {} : { unitNet: money(run.unitNet) }),
-            net: money(run.unitNet.mul(run.periods))
-          }
-        }
-      })
+      // Where the earliest of its keys first appears in the quote.
+      rank: members
+        .map(concept => concept.rank)
+        .reduce((first, rank) => ((rank[0] - first[0] || rank[1] - first[1]) < 0 ? rank : first)),
+      lines: [entry]
     }
   })
+
+  const charged = concepts
+    .filter(concept => !inCombination.has(concept.key))
+    .map(concept => {
+      const override = overrides.get(concept.key)
+
+      return {
+        rank: concept.rank,
+        lines: concept.runs.map((run): LineEntry => {
+          const { once, months, quantity } = quantityOfRun(concept.kind, run)
+          const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
+
+          return {
+            key: concept.key,
+            kind: concept.kind,
+            courtesy: false,
+            net: run.unitNet.mul(run.periods),
+            line: {
+              label: override?.label ?? concept.label,
+              ...(detail !== undefined ? { detail } : {}),
+              group: override?.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind],
+              quantity,
+              ...(once ? {} : { unitNet: money(run.unitNet) }),
+              net: money(run.unitNet.mul(run.periods))
+            }
+          }
+        })
+      }
+    })
 
   const waived = courtesies.map(concept => {
     const override = overrides.get(concept.key)
@@ -539,7 +701,7 @@ const presentLines = (
 
   // A courtesy takes the place its line would have if it were charged: before whatever is listed at that place.
   // With no courtesy this is the order of `concepts`, untouched (the sort is stable).
-  const lines = [...waived, ...charged]
+  const lines = [...waived, ...charged, ...combined]
     .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1])
     .flatMap(concept => concept.lines)
 
@@ -601,7 +763,13 @@ const checkLines = (lines: ReturnType<typeof presentLines>, net: Decimal) => {
   return null
 }
 
-type TaxOfDocument = { vatRate: number | null; taxAmount?: string; taxStatus?: 'not_applicable' }
+type TaxOfDocument = {
+  vatRate: number | null
+  taxAmount?: string
+  /** Only with `taxAmount`: the periods of the quote, over which the kernel rounded that tax one by one. */
+  taxPeriods?: number
+  taxStatus?: 'not_applicable'
+}
 
 /**
  * Tax of the document, from the treatment the quote was frozen with and the totals it produced.
@@ -612,13 +780,18 @@ type TaxOfDocument = { vatRate: number | null; taxAmount?: string; taxStatus?: '
  * tax of the whole net rounded once is another figure whenever a period net times the rate is not whole.
  *
  * The frozen tax is still held to the rate, with the guard the template applies: it may differ from the tax
- * computed once on the net (half up at the precision of the currency) by at most one minor unit per month or
- * payment the lines count (`quantityOfLines`, the sum of their quantities), which is what per-period rounding can
- * add up to. Beyond that the amount is not the tax of that rate on that net and the document is rejected, as is a
- * rate with more decimals than the template takes. A quote without a resolved tax hands over no rate and no amount.
+ * computed once on the net (half up at the precision of the currency) by at most one minor unit per period of the
+ * quote, which is what per-period rounding can add up to. The count is a fact of the quote and travels with the
+ * amount as `taxPeriods`, so the template applies the same bound: how the lines are presented (folded by months, or
+ * several months combined into one price) never changes whether a tax is accepted. Beyond that bound the amount is
+ * not the tax of that rate on that net and the document is rejected, as is a rate with more decimals, or a quote
+ * with more periods, than the template takes. A quote without a resolved tax hands over no rate, amount or count.
+ *
+ * `rate` is the exclusive rate as an exact decimal, or null when the document prints no tax amount.
  */
-const readTax = (result: Composition, net: Decimal, precision: number, quantityOfLines: number) => {
+const readTax = (result: Composition, net: Decimal, precision: number) => {
   const totals = result.quote.totals!
+  const periods = result.quote.periods.length
   const treatment = result.quote.resolution.inputs[0]?.input.request.taxTreatment
 
   const inconsistent = () =>
@@ -630,7 +803,7 @@ const readTax = (result: Composition, net: Decimal, precision: number, quantityO
     // No rate is assumed: the template prints the tax as pending.
     if (totals.tax !== null || totals.grandTotal !== null) return inconsistent()
 
-    return { ok: true as const, tax: { vatRate: null } satisfies TaxOfDocument }
+    return { ok: true as const, rate: null, tax: { vatRate: null } satisfies TaxOfDocument }
   }
 
   if (totals.tax === null || totals.grandTotal === null) return inconsistent()
@@ -641,7 +814,11 @@ const readTax = (result: Composition, net: Decimal, precision: number, quantityO
   if (treatment.kind === 'not_applicable') {
     if (!tax.isZero() || !grandTotal.eq(net)) return inconsistent()
 
-    return { ok: true as const, tax: { vatRate: null, taxStatus: 'not_applicable' } satisfies TaxOfDocument }
+    return {
+      ok: true as const,
+      rate: null,
+      tax: { vatRate: null, taxStatus: 'not_applicable' } satisfies TaxOfDocument
+    }
   }
 
   const rate = new Wide(treatment.rate)
@@ -654,9 +831,12 @@ const readTax = (result: Composition, net: Decimal, precision: number, quantityO
   if (!representable(tax, precision))
     return rejected('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE', [{ path: 'totals.tax', rule: 'amount_not_representable' }])
 
+  if (periods < 1 || periods > TAX_PERIOD_LIMIT)
+    return rejected('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE', [{ path: 'periods', rule: 'too_many' }])
+
   // What the template computes when it is given no amount, and how far from it the frozen tax may be.
   const computedOnce = net.mul(rate).toDecimalPlaces(precision, Wide.ROUND_HALF_UP)
-  const tolerance = new Wide(10).pow(-precision).mul(quantityOfLines)
+  const tolerance = new Wide(10).pow(-precision).mul(periods)
 
   if (tax.minus(computedOnce).abs().gt(tolerance))
     return rejected('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE', [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }])
@@ -669,16 +849,11 @@ const readTax = (result: Composition, net: Decimal, precision: number, quantityO
 
   return {
     ok: true as const,
-    tax: { vatRate: rate.toNumber(), taxAmount: totals.tax } satisfies TaxOfDocument
+    // The rate as the quote froze it, exact: what the tax of a payment milestone is held to. Never printed.
+    rate,
+    tax: { vatRate: rate.toNumber(), taxAmount: totals.tax, taxPeriods: periods } satisfies TaxOfDocument
   }
 }
-
-/**
- * Months and payments the charged lines count: the `N` of the tax guard. A courtesy has no net and no tax to round,
- * so it lends the guard nothing: the bound is never looser than the one the template applies to the same lines.
- */
-const quantityOf = (lines: ReturnType<typeof presentLines>) =>
-  lines.reduce((total, entry) => total + (entry.courtesy ? 0 : entry.line.quantity.value), 0)
 
 /**
  * Costs the brief of the quote declares as paid by the client to their supplier, as the client-shaped view of the
@@ -925,8 +1100,10 @@ const engineOf = (result: Composition) =>
  * - **The quote** gives every figure: currency, date, the lines and their net, the tax treatment, the costs the
  *   client pays directly and, through `presentPaymentSchedule`, the amounts of a payment calendar.
  * - **The document brief** gives every text (who issues it and for whom, cover, scope, calendar of the work, texts of
- *   the price section, conditions) and the presentation of the lines (label, detail and group per key). Its schema
- *   has no amount, currency, tax rate or date, so it cannot contradict the quote.
+ *   the price section, conditions) and the presentation of the lines (label, detail and group per key, and which
+ *   keys are printed together). Its schema has no amount, currency, tax rate or date, so it cannot contradict the
+ *   quote. A text that would only state what any quote implies is left out: the area of the buyer, the note of the
+ *   calendar of the work and the label of the net on the cover are optional.
  *
  * What a client may see is decided by one function, `clientSafePeriodItems` in readiness.ts, which the preview
  * prints period by period and this reading folds over the term. Nothing else of the result is read for a line: no
@@ -951,13 +1128,26 @@ const engineOf = (result: Composition) =>
  *   the cost or the margin of the increment. `source` records the quote with the add-on and that the price is an
  *   increment over the quote of the document.
  *
+ * Two readings of the same figures, where the brief or the quote ask for them. Neither adds a figure of its own:
+ *
+ * - **A price printed as what it is.** By default every key is folded by months («3 meses» at the net of one). A
+ *   brief may `combine` keys into one line, a price for the whole of them («1 programa»): quantity one of the unit it
+ *   names, no unit value, and for net the exact sum the quote froze for those keys over the whole term. Each key is
+ *   printed once: in one combination at most, and then in no line of its own (`readCombinations`). The lines add up
+ *   to the same net either way.
+ * - **Milestones with their tax.** When the quote has an exclusive rate, each milestone of the payment calendar
+ *   carries the part of the frozen tax `presentPaymentSchedule` gives it and its total; the parts add up to the tax
+ *   and the total of the quote. Without a resolved tax, or with one that does not apply, a milestone is its net.
+ *
  * The document is emitted only if it says what the quote says, to the unit:
  *
  * - the lines add up to `totals.net` (`QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` otherwise);
  * - the tax and the total it prints are `totals.tax` and `totals.grandTotal`: an exclusive rate travels with the
- *   frozen tax as `taxAmount`, which must be the tax of that rate on that net within the rounding of its periods
+ *   frozen tax as `taxAmount` and with `taxPeriods`, the periods of the quote; the amount must be the tax of that
+ *   rate on that net within one unit of rounding per period, however the lines are presented
  *   (`QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE` otherwise);
- * - the milestones of a payment calendar add up to `totals.net`, by `presentPaymentSchedule`;
+ * - the milestones of a payment calendar add up to `totals.net`, by `presentPaymentSchedule`, and, when they carry
+ *   tax, to `totals.tax` and `totals.grandTotal`;
  * - every amount is one the template can take in its currency, and the lines, the costs paid directly and the
  *   milestones are within its limits (`QUOTE_DOCUMENT_NOT_REPRESENTABLE`);
  * - every option is one amount that says all of it: calculated, in the currency of the quote, the same net in every
@@ -991,12 +1181,14 @@ export function composeQuoteDocument(
     )
 
   const text = parsed.data
+  const chargedKeys = new Set(read.concepts.map(concept => concept.key))
+  const waivedKeys = new Set(read.waived.map(concept => concept.key))
 
-  const { overrides, issues } = readOverrides(
-    text.lines,
-    new Set(read.concepts.map(concept => concept.key)),
-    new Set(read.waived.map(concept => concept.key))
-  )
+  // Read first: a key printed in a combination is one `lines` may not also dress.
+  const combine = readCombinations(text.combine, chargedKeys, waivedKeys)
+  const { overrides, issues } = readOverrides(text.lines, chargedKeys, waivedKeys, combine.combined)
+
+  issues.push(...combine.issues)
 
   const optionTexts = readOptionTexts(
     text.options,
@@ -1023,12 +1215,12 @@ export function composeQuoteDocument(
       }
     ])
 
-  const lines = presentLines(read.concepts, courtesies, overrides, read.scale)
+  const lines = presentLines(read.concepts, courtesies, overrides, read.scale, combine.combinations)
   const unfit = checkLines(lines, read.net)
 
   if (unfit) return unfit
 
-  const tax = readTax(result, read.net, read.precision, quantityOf(lines))
+  const tax = readTax(result, read.net, read.precision)
 
   if (!tax.ok) return tax
 
@@ -1038,8 +1230,8 @@ export function composeQuoteDocument(
 
   let paymentSchedule: {
     title: string
-    note: string
-    milestones: { label: string; when: string; net: string }[]
+    note?: string
+    milestones: { label: string; when: string; net: string; tax?: string; total?: string }[]
   } | null = null
 
   if (text.paymentMilestones) {
@@ -1065,21 +1257,70 @@ export function composeQuoteDocument(
 
     if (untimed.length) return rejected('QUOTE_DOCUMENT_BRIEF_INVALID', untimed)
 
+    // A quote with an exclusive rate prints a tax and a total, so each milestone says its own: the part of the frozen
+    // tax the calendar reader gives it, and its net plus that part. A quote whose tax is not resolved, or does not
+    // apply, has no tax to state on a payment and its milestones are a net, as before.
+    const { rate } = tax
+
     const milestones = outcome.reading.milestones.map(milestone => ({
       label: milestone.label,
       when: milestone.periodId !== undefined ? monthsLabel([milestone.periodId]) : (milestone.when as string),
-      net: milestone.amount
+      net: milestone.amount,
+      ...(rate ? { tax: milestone.tax ?? undefined, total: milestone.total ?? undefined } : {})
     }))
 
+    const sumOf = (amounts: (string | undefined)[]) =>
+      amounts.reduce<Decimal>((sum, amount) => sum.plus(amount ?? 0), new Wide(0))
+
     // Already guaranteed by the calendar reader; checked where the document is assembled so it cannot drift.
-    if (!milestones.reduce((sum, milestone) => sum.plus(milestone.net), new Wide(0)).eq(read.net))
+    if (!sumOf(milestones.map(milestone => milestone.net)).eq(read.net))
       return rejected('QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP', [
         { path: 'paymentSchedule.milestones', rule: 'sum_differs_from_net' }
       ])
 
+    if (rate) {
+      // The same holds of the tax, with the guards the template applies. Every milestone has a tax the template
+      // takes, and its total is its net plus that tax. The tax of a milestone is the one of the rate on its net,
+      // within what the frozen tax of the whole quote is allowed (one unit per period of the quote) plus one unit
+      // for the rounding of the distribution. And the parts add up to the tax and to the total the quote froze.
+      // Never emitted otherwise.
+      const tolerance = new Wide(10).pow(-read.precision).mul(result.quote.periods.length + 1)
+
+      const unfitTax = milestones.flatMap((milestone, index) => {
+        const path = `paymentSchedule.milestones.${index}`
+
+        if (
+          milestone.tax === undefined ||
+          milestone.total === undefined ||
+          !representable(new Wide(milestone.tax), read.precision) ||
+          !new Wide(milestone.net).plus(milestone.tax).eq(milestone.total)
+        )
+          return [{ path, rule: 'tax_not_representable' }]
+
+        const onItsNet = new Wide(milestone.net).mul(rate).toDecimalPlaces(read.precision, Wide.ROUND_HALF_UP)
+
+        return new Wide(milestone.tax).minus(onItsNet).abs().gt(tolerance)
+          ? [{ path, rule: 'tax_differs_from_rate' }]
+          : []
+      })
+
+      if (unfitTax.length) return rejected('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE', unfitTax)
+
+      if (
+        !sumOf(milestones.map(milestone => milestone.tax)).eq(read.totals.tax!) ||
+        !sumOf(milestones.map(milestone => milestone.total)).eq(read.totals.grandTotal!)
+      )
+        return rejected('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE', [
+          { path: 'paymentSchedule.milestones', rule: 'tax_differs_from_quote' }
+        ])
+    }
+
+    // The default note says the amounts carry no tax: it is the note of a calendar of nets and of no other.
+    const note = text.paymentScheduleTexts?.note ?? (rate ? undefined : QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS.note)
+
     paymentSchedule = {
       title: text.paymentScheduleTexts?.title ?? QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS.title,
-      note: text.paymentScheduleTexts?.note ?? QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS.note,
+      ...(note !== undefined ? { note } : {}),
       milestones
     }
   }
@@ -1194,7 +1435,7 @@ export function scaffoldQuoteDocumentBrief(
 
   if (unfit) return unfit
 
-  const tax = readTax(result, read.net, read.precision, quantityOf(lines))
+  const tax = readTax(result, read.net, read.precision)
 
   if (!tax.ok) return tax
 
@@ -1241,7 +1482,13 @@ export function scaffoldQuoteDocumentBrief(
         : {}),
       optional: {
         locale: 'BCP 47 locale the template formats with. Absent, the template chooses it from the currency.',
+        'buyer.unit':
+          'The area or team of the buyer the document is addressed to. Leave it out when there is none: never the name of the buyer again.',
         'buyer.logo': '{ path, source }: a local image file and the official HTTPS source it was taken from.',
+        'cover.netLabel':
+          'Name of the net printed on the cover, in place of the one of the template: «Valor neto del proyecto», «Valor neto del programa». A text, never an amount.',
+        'schedule.note':
+          'A line next to the title of the calendar of the work. Leave it out when it would only say what any quote implies, such as that the work starts when agreed.',
         'pricing.taxLabel': 'Name of the tax when it is not the default of the template.',
         'pricing.monthly':
           '{ months, note }: prints the monthly equivalent of the totals. A count of months, not an amount.',
@@ -1249,6 +1496,8 @@ export function scaffoldQuoteDocumentBrief(
           'Second line of a concept. A concept whose net changes over the term says which months each line covers unless a detail is given.',
         'lines.<key>.courtesy':
           'true prints a line the quote waives completely as a courtesy: net zero and its reference value. Only for the keys listed under `waived`, with their label, detail and group like any line; a waived key that is not marked prints nothing.',
+        combine:
+          '[{ keys, label, unit, detail?, group? }]: prints the keys of `keys` as one line, a price for the whole of them («1 programa», «1 proyecto», «1 servicio»): quantity 1 of `unit`, no unit value, and for net the sum the quote froze for those keys over the whole term. One key alone may be combined (a fee printed as a programme price instead of months). A key goes in one combination at most and then has no entry in `lines`; a key the quote waives cannot be combined. Without it every key prints folded by months, as listed under `lines`.',
         options:
           '{ <key>: { label, unit, detail? } } for each option passed with `--option <key>=<artifact.json>`: its name, the unit its price is read in («al mes», «por campaña») and an optional second line. Exactly the options passed; the price of each is the net of one period of its own frozen quote.',
         // Said only of a run that prices an option as an increment; every other scaffold keeps the entries it had.
@@ -1260,18 +1509,21 @@ export function scaffoldQuoteDocumentBrief(
           : {}),
         optionsTexts: '{ title, note } of the block of options. Only with options.',
         paymentMilestones:
-          'The list `compose schedule --milestones` takes: [{ id, label, share, periodId | when }]. Shares add up to 1; the amounts are derived from the net. Each milestone needs periodId or when.',
-        paymentScheduleTexts: '{ title, note } of the payment calendar. Only with paymentMilestones.'
+          'The list `compose schedule --milestones` takes: [{ id, label, share, periodId | when }]. Shares add up to 1; the amounts are derived from the net. Each milestone needs periodId or when. When the quote has an exclusive tax rate, each milestone is printed with its part of the frozen tax and its total.',
+        paymentScheduleTexts:
+          '{ title, note } of the payment calendar. Only with paymentMilestones. Without a note, a calendar of nets says that its amounts carry no tax, and one whose milestones carry their tax prints none.'
       },
       brief: {
         schemaVersion: QUOTE_DOCUMENT_BRIEF_VERSION,
         reference: '',
         supplier: { name: '', taxId: '', contact: '', email: '', phone: '' },
-        buyer: { name: '', unit: '', taxId: '' },
+        // No slot for `buyer.unit`, `schedule.note` or `cover.netLabel`: they are optional (above), and an empty slot
+        // asks to be filled with something.
+        buyer: { name: '', taxId: '' },
         cover: { label: '', title: [''], subtitle: '' },
         service: { name: '' },
         scope: { title: [''], intro: '', rows: [row] },
-        schedule: { title: '', note: '', phases: [{ label: '', title: '', text: '' }] },
+        schedule: { title: '', phases: [{ label: '', title: '', text: '' }] },
         pricing: { title: [''], intro: '', summary: '', taxNote: '' },
         conditions: { title: [''], rows: [row] },
         lines: Object.fromEntries(

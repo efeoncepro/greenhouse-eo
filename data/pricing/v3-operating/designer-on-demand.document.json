@@ -56,7 +56,6 @@
   },
   "schedule": {
     "title": "Calendario de un mes",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Semana 1",
@@ -81,10 +80,6 @@
       "y condiciones de cobro."
     ],
     "rows": [
-      {
-        "title": "Plazo e inicio",
-        "text": "Un mes desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el mes."
-      },
       {
         "title": "Facturación y pago",
         "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."

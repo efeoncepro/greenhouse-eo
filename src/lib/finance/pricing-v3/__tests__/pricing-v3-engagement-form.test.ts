@@ -862,13 +862,19 @@ describe('resolution: one record per form, the offer record first, never a silen
   it('a form the catalog does not hold on the quote date is a missing selection that names the field', () => {
     const missing = { code: 'MISSING_CATALOG_SELECTION', path: 'engagementForm', candidates: [] }
 
-    // No record at all, a record of another form, and a record that starts after the quote date.
+    // No record at all and a record of another form: the catalog does not hold the form.
     expect(applied(designerCatalog).diagnostics).toEqual([missing])
     expect(applied(withForms(designerCatalog, [ON_GOING])).diagnostics).toEqual([missing])
+    // A record that starts after the quote date: the same missing selection, which says the date is the cause.
     expect(
       applied(withForms(designerCatalog, [formRecord('on_demand', '1.10', { effectiveFrom: '2026-12-01' })]))
         .diagnostics
-    ).toEqual([missing])
+    ).toEqual([
+      {
+        ...missing,
+        detail: 'The quote date is before the first date a record for this selection is in force, which is 2026-12-01.'
+      }
+    ])
 
     const quote = calculateCatalogQuote(designerCatalog, brief('on_demand'))
 

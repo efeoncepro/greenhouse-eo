@@ -47,7 +47,12 @@ type DemandDoc = {
     outputCurrency: string
     offerMarketCountry: string
     periods: number
-    lines: { lineId: string; talentCountry: string; dedication: { unit: string; value: string } }[]
+    lines: {
+      lineId: string
+      talentCountry: string
+      dedication: { unit: string; value: string }
+      dedicationEvidence?: Source & { reference: string }
+    }[]
   }
   allocations: { periodId: number }[]
   work: { creditDemand: { toolId: string; credits: number }[] }[]
@@ -303,13 +308,20 @@ describe('shares, order and the union of estimated cost', () => {
     }
   })
 
-  it('estimated plus confirmed is the total cost of the quote, to the unit', () => {
+  it('estimated, not evidenced and confirmed are the total cost of the quote, to the unit', () => {
     for (const { r } of all) {
       const reading = estimateExposure(r)!
 
       expect(reading.totalCost).toBe(totalsOf(r).cost)
       expect(reading.net).toBe(totalsOf(r).net)
-      expect(new D(reading.estimatedCost).plus(reading.confirmedCost).eq(totalsOf(r).cost)).toBe(true)
+      // What a dedication without evidence governs is a part of its own: never estimated twice, never confirmed.
+      expect(
+        new D(reading.estimatedCost)
+          .plus(reading.dedicationNotEvidenced.cost)
+          .plus(reading.confirmedCost)
+          .eq(totalsOf(r).cost)
+      ).toBe(true)
+      expect(new D(reading.dedicationNotEvidenced.cost).gte(0)).toBe(true)
       expect(new D(reading.confirmedCost).gte(0)).toBe(true)
     }
   })
@@ -363,6 +375,22 @@ describe('shares, order and the union of estimated cost', () => {
     for (const tool of confirmed.policy.tools)
       for (const price of tool.prices) if (price.price) price.price.source.status = 'confirmed'
 
+    // Nothing estimated is not yet everything confirmed: the dedication of each line has to be evidenced too.
+    const unevidenced = estimateExposure(compose(confirmed))!
+
+    expect(new D(unevidenced.estimatedCost).isZero()).toBe(true)
+    expect(unevidenced.dedicationNotEvidenced.lineIds).toEqual(confirmed.demand.brief.lines.map(line => line.lineId))
+    expect(new D(unevidenced.dedicationNotEvidenced.cost).gt(0)).toBe(true)
+    expect(new D(unevidenced.confirmedCost).lt(unevidenced.totalCost)).toBe(true)
+
+    for (const line of confirmed.demand.brief.lines)
+      line.dedicationEvidence = {
+        reference: 'test:dedication-confirmed',
+        effectiveFrom: '2026-01-01',
+        effectiveUntil: '2027-12-31',
+        status: 'confirmed'
+      }
+
     const r = compose(confirmed)
     const reading = estimateExposure(r)!
 
@@ -373,9 +401,18 @@ describe('shares, order and the union of estimated cost', () => {
     expect(reading.priceInputs).toEqual([])
     expect(reading.estimatedRules).toEqual([])
     expect(new D(reading.estimatedCost).isZero()).toBe(true)
+    expect(reading.dedicationNotEvidenced.lineIds).toEqual([])
+    expect(new D(reading.dedicationNotEvidenced.cost).isZero()).toBe(true)
     expect(reading.confirmedCost).toBe(totalsOf(r).cost)
-    // The cost still rests on inputs; they are just all confirmed.
-    expect(costInputExposure(r)!.costInputs.length).toBe(costInputExposure(compose(colombia))!.costInputs.length)
+
+    // The cost still rests on inputs; they are just all confirmed: the ones it always had, and a dedication a line.
+    const kinds = (c: Composition) =>
+      costInputExposure(c)!
+        .costInputs.map(i => i.kind)
+        .sort()
+
+    expect(kinds(r).filter(kind => kind !== 'dedication')).toEqual(kinds(compose(colombia)))
+    expect(kinds(r).filter(kind => kind === 'dedication')).toHaveLength(confirmed.demand.brief.lines.length)
   })
 
   it('a quote without totals has no reading', () => {
@@ -816,7 +853,12 @@ describe('several periods are one entry per input, not one per period', () => {
       )
     }
 
-    expect(new D(long.estimatedCost).plus(long.confirmedCost).eq(totalsOf(twelve).cost)).toBe(true)
+    expect(
+      new D(long.estimatedCost)
+        .plus(long.dedicationNotEvidenced.cost)
+        .plus(long.confirmedCost)
+        .eq(totalsOf(twelve).cost)
+    ).toBe(true)
   })
 
   it('the reading barely grows with the horizon', () => {
@@ -842,6 +884,7 @@ describe('summary and readiness show the same reading and change nothing', () =>
       estimatedCost: reading.estimatedCost,
       confirmedCost: reading.confirmedCost,
       estimatedShareOfCost: reading.estimatedShareOfCost,
+      dedicationNotEvidenced: reading.dedicationNotEvidenced,
       confirmFirst: reading.costInputs.slice(0, 5)
     })
     expect(catalogDigest(r)).toBe(before)

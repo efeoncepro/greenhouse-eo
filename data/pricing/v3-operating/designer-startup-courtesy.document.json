@@ -6,6 +6,7 @@
   "currency": "CLP",
   "vatRate": 0.19,
   "taxAmount": "1453500",
+  "taxPeriods": 3,
   "supplier": {
     "name": "Efeonce Group SpA",
     "taxId": "RUT 77.357.182-1",
@@ -58,7 +59,6 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Mes 1",
@@ -83,10 +83,6 @@
       "y condiciones de cobro."
     ],
     "rows": [
-      {
-        "title": "Plazo e inicio",
-        "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."
-      },
       {
         "title": "Bonificación",
         "text": "La puesta en marcha se bonifica con el compromiso de tres meses. Su valor de referencia se informa en la tabla de precios y no forma parte del neto ni del total."

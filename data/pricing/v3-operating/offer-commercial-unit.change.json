@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-offer-commercial-unit-2026-10-11",
+  "baseDigest": "9a3bbf4eea14e1e0b7782b829b1a7dbde3effba28c1ced9f0b8f07029d2d3f91",
+  "nextVersion": "operating-review-2026-10-11-v11",
+  "actor": "operator-authorized-agent",
+  "reason": "What each offer is sold as becomes a fact of the catalog (record kind offer), one record per offer, in force from the first date the offer has a pricing policy. The two managed services are sold as one fee and never as their team; staff augmentation is sold line by line. No price, cost, factor or policy changes: a demand that declares another unit than its offer is rejected, and the scaffold of a demand reads the unit from here instead of assuming one.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "offer:creative-managed-service",
+      "effectiveFrom": "2026-10-10",
+      "record": {
+        "recordId": "offer:creative-managed-service",
+        "revision": 1,
+        "kind": "offer",
+        "value": {
+          "offerId": "creative-managed-service",
+          "label": "Managed service of the Creative practice",
+          "commercialUnit": "managed_service"
+        },
+        "source": {
+          "reference": "policy:offer-commercial-unit-2026-10-11",
+          "effectiveFrom": "2026-10-10",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Sold as one managed-service fee: the client sees the service and its price, never its team, hours or roles. Decided with the offer; declared in the catalog on 2026-10-11 after a managed-service quote was scaffolded as role capacity."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "offer:seo-aeo-managed-service",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "offer:seo-aeo-managed-service",
+        "revision": 1,
+        "kind": "offer",
+        "value": {
+          "offerId": "seo-aeo-managed-service",
+          "label": "Managed service of the SEO/AEO practice",
+          "commercialUnit": "managed_service"
+        },
+        "source": {
+          "reference": "policy:offer-commercial-unit-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Sold as one managed-service fee: the client sees the service and its price, never its team, hours or roles. Decided with the offer; declared in the catalog on 2026-10-11 after a managed-service quote was scaffolded as role capacity."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "offer:talent-assurance-staffing",
+      "effectiveFrom": "2026-10-09",
+      "record": {
+        "recordId": "offer:talent-assurance-staffing",
+        "revision": 1,
+        "kind": "offer",
+        "value": {
+          "offerId": "talent-assurance-staffing",
+          "label": "Staff augmentation: a person sold by dedication",
+          "commercialUnit": "role_capacity"
+        },
+        "source": {
+          "reference": "policy:offer-commercial-unit-2026-10-11",
+          "effectiveFrom": "2026-10-09",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Sold line by line: each person and dedication is a line of the quote with its own price. Decided with the offer; declared in the catalog on 2026-10-11."
+      }
+    }
+  ]
+}

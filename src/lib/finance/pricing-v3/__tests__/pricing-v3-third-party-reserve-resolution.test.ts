@@ -877,18 +877,29 @@ describe('selection of the rule of a category: the offer record first, never a s
   })
 
   it('a category without a rule in force is a missing selection that names the cost', () => {
-    for (const cat of [
-      designerCatalog,
-      withRecords(designerCatalog, [POLICIES[0]]),
-      // In force only after the quote date.
-      withRecords(designerCatalog, [policyRecord('media', { rate: '0' }, { effectiveFrom: '2026-10-10' })])
-    ]) {
+    const missing = { code: 'MISSING_CATALOG_SELECTION', path: 'thirdPartyCosts.media.policy', candidates: [] }
+
+    // In force only after the quote date: the same missing selection, which says the date is the cause.
+    const startsLater = withRecords(designerCatalog, [
+      policyRecord('media', { rate: '0' }, { effectiveFrom: '2026-10-10' })
+    ])
+
+    for (const [cat, expected] of [
+      [designerCatalog, missing],
+      [withRecords(designerCatalog, [POLICIES[0]]), missing],
+      [
+        startsLater,
+        {
+          ...missing,
+          detail:
+            'The quote date is before the first date a record for this selection is in force, which is 2026-10-10.'
+        }
+      ]
+    ] as const) {
       const resolution = resolved(cat)
 
       expect(resolution.status).toBe('needs_input')
-      expect(resolution.diagnostics).toEqual([
-        { code: 'MISSING_CATALOG_SELECTION', path: 'thirdPartyCosts.media.policy', candidates: [] }
-      ])
+      expect(resolution.diagnostics).toEqual([expected])
       expect(calculateCatalogQuote(cat, brief({ costs: [media] })).totals).toBeNull()
     }
   })

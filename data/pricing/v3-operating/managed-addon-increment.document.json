@@ -6,6 +6,7 @@
   "currency": "CLP",
   "vatRate": 0.19,
   "taxAmount": "3220500",
+  "taxPeriods": 3,
   "supplier": {
     "name": "Efeonce Group SpA",
     "taxId": "RUT 77.357.182-1",
@@ -58,12 +59,11 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Mes 1",
         "title": "Inicio y operación",
-        "text": "Accesos, criterios de respuesta, base de conocimiento inicial y atención desde el primer día acordado."
+        "text": "Accesos, criterios de respuesta, base de conocimiento inicial y comienzo de la atención."
       },
       {
         "label": "Mes 2",
@@ -83,10 +83,6 @@
       "y condiciones de cobro."
     ],
     "rows": [
-      {
-        "title": "Plazo e inicio",
-        "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."
-      },
       {
         "title": "Servicio opcional",
         "text": "Amplía la capacidad del mismo equipo y sólo puede contratarse junto con el servicio. Su valor es neto, se suma al fee de cada mes en que se contrate y se acuerda por separado."

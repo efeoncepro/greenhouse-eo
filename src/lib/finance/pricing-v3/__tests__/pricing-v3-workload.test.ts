@@ -132,7 +132,22 @@ describe('managed service example (volume → dedication → quote at the practi
     const dimensioned = applyWorkloadToBrief(read(`${dir}/managed-care.brief.json`), read(`${dir}/managed-care.workload.json`))
 
     expect(dimensioned.status).toBe('prepared')
-    expect(dimensioned.brief).toEqual(demand.brief)
+
+    // The demand was frozen before a dimensioned brief carried the evidence of its dedication: it is the same brief
+    // without it, line by line, and every line the workload dimensioned says today where its dedication comes from.
+    const mentioned = dimensioned.workload.lines.map(line => line.lineId)
+
+    expect(dimensioned.brief!.lines.filter(line => line.dedicationEvidence).map(line => line.lineId)).toEqual(
+      demand.brief.lines.map(line => line.lineId).filter(lineId => mentioned.includes(lineId))
+    )
+    expect({
+      ...dimensioned.brief!,
+      lines: dimensioned.brief!.lines.map(({ dedicationEvidence, ...line }) => {
+        void dedicationEvidence
+
+        return line
+      })
+    }).toEqual(demand.brief)
   })
 
   it('prices every line at or above the minimum margin its own policy declares', () => {

@@ -6,6 +6,7 @@
   "currency": "CLP",
   "vatRate": 0.19,
   "taxAmount": "1514300",
+  "taxPeriods": 3,
   "supplier": {
     "name": "Efeonce Group SpA",
     "taxId": "RUT 77.357.182-1",
@@ -58,7 +59,6 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Mes 1",
@@ -83,10 +83,6 @@
       "y condiciones de cobro."
     ],
     "rows": [
-      {
-        "title": "Plazo e inicio",
-        "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."
-      },
       {
         "title": "Facturación y pago",
         "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."

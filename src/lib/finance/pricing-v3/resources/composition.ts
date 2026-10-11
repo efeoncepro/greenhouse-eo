@@ -27,8 +27,8 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
   const demand = compositionDemandSchema.parse(demandRaw)
   const diagnostics: Diagnostic[] = []
 
-  const issue = (code: string, path: string, detail?: string) =>
-    diagnostics.push({ code, path, ...(detail ? { detail } : {}) })
+  const issue = (code: string, path: string, detail?: string, candidates?: string[]) =>
+    diagnostics.push({ code, path, ...(candidates ? { candidates } : {}), ...(detail ? { detail } : {}) })
 
   // Demand entries one period at a time: an entry declared once for several periods is read as one per period.
   const allocations = eachPeriod(demand.allocations)
@@ -50,7 +50,14 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
     issue('DUPLICATE_POLICY_RULE', 'policy')
   if (!unique(policy.tools.filter(t => t.providerId).map(t => t.providerId)))
     issue('DUPLICATE_PROVIDER_TOOL', 'policy.tools')
-  if (!effective(policy.source)) issue('RESOURCE_POLICY_NOT_EFFECTIVE', 'policy.source')
+  if (!effective(policy.source))
+    issue(
+      'RESOURCE_POLICY_NOT_EFFECTIVE',
+      'policy.source',
+      asOf < policy.source.effectiveFrom
+        ? `The quote date is before the first date this resource policy is in force, which is ${policy.source.effectiveFrom}.`
+        : `The quote date is after the last date this resource policy is in force, which is ${policy.source.effectiveUntil}.`
+    )
   if (demand.brief.mode !== 'simulation') issue('COMPOSITION_REVIEW_ONLY', 'brief.mode')
 
   for (const tool of policy.tools) {
@@ -172,6 +179,18 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
   }
 
   const resolution = resolveBrief(baseCatalog, baseBrief)
+
+  // What the offer is sold as is a fact of the catalog, bound by resolution when the catalog states it. A demand
+  // that declares another unit would calculate all the same and then be presented as what it is not: a managed
+  // service printed line by line, or a person sold as a fee. A catalog that does not say holds the demand to nothing.
+  const offer = resolution.bindings.find(b => b.purpose === 'offer')?.record
+
+  if (offer?.kind === 'offer' && offer.value.commercialUnit !== demand.commercialUnit)
+    issue(
+      'COMMERCIAL_UNIT_CONTRADICTS_OFFER',
+      'commercialUnit',
+      `The demand declares ${demand.commercialUnit} and the catalog sells this offer as ${offer.value.commercialUnit} (record ${offer.recordId}, revision ${offer.revision}).`
+    )
   const selections: { periodId: number; lineId: string; toolId: string; included: boolean; reasons: string[] }[] = []
 
   const attributions: {
@@ -231,13 +250,24 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
     const from = c.periodId === 1 ? asOf : start.toISOString().slice(0, 10)
     const until = end.toISOString().slice(0, 10)
 
-    if (
-      c.evidence.effectiveFrom > from ||
-      c.evidence.effectiveUntil < until ||
-      c.evidence.status !== 'confirmed' ||
-      !unique(c.lineIds)
-    )
-      issue('CLIENT_ACCESS_EVIDENCE_REQUIRED', c.toolId)
+    // One code for one requirement (confirmed evidence that covers the whole period, on lines named once); the
+    // detail says which part of it fails, by rule and never by the dates or the reference the demand wrote.
+    const failed = [
+      ...(c.evidence.status !== 'confirmed' ? ['the evidence is not confirmed'] : []),
+      ...(c.evidence.effectiveFrom > from
+        ? [
+            c.periodId === 1
+              ? 'the evidence starts after the quote date, the first day period 1 has to be covered'
+              : 'the evidence starts after the first day of the month of the period'
+          ]
+        : []),
+      ...(c.evidence.effectiveUntil < until
+        ? ['the evidence ends before the last day of the month of the period']
+        : []),
+      ...(!unique(c.lineIds) ? ['lineIds names a line more than once'] : [])
+    ]
+
+    if (failed.length) issue('CLIENT_ACCESS_EVIDENCE_REQUIRED', c.toolId, `Period ${c.periodId}: ${failed.join('; ')}.`)
   }
 
   for (const period of resolution.inputs) {
@@ -441,8 +471,16 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           a => consumers.length || a.idleSeats !== undefined || a.bornByLineIds !== undefined
         )
 
+        // Prices of the tool an allocation can name: the ones that hold a value, by the id the policy gives them.
+        const usablePrices = tool.prices.filter(p => !p.pendingReason).map(p => p.priceId)
+
         if (!declared.length) {
-          issue('RESOURCE_ALLOCATION_REQUIRED', key)
+          issue(
+            'RESOURCE_ALLOCATION_REQUIRED',
+            key,
+            'The work of the period uses this tool and the demand declares no allocation of it: declare one for the period under one of the candidate prices.',
+            usablePrices
+          )
           continue
         }
 
@@ -480,7 +518,12 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           const price = tool.prices.find(p => p.priceId === allocation.priceId)
 
           if (!price) {
-            issue('RESOURCE_PRICE_SELECTION_REQUIRED', path)
+            issue(
+              'RESOURCE_PRICE_SELECTION_REQUIRED',
+              path,
+              'The allocation names a price this tool does not have: name one of the candidate prices.',
+              usablePrices
+            )
             continue
           }
 
@@ -871,22 +914,30 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
     }
   }
 
-  for (const a of allocations)
-    if (!usedAllocations.has(`${a.periodId}:${a.toolId}:${a.priceId}`))
-      issue('UNUSED_RESOURCE_ALLOCATION', holdingPath(a))
-  for (const s of seatSharing)
-    if (!usedSharing.has(`${s.periodId}:${s.toolId}`)) issue('UNUSED_SEAT_SHARING', `${s.periodId}:${s.toolId}`)
-  for (const b of demand.creditBudgets)
-    if (!usedBudgets.has(`${b.periodId}:${b.toolId}`)) issue('UNUSED_CREDIT_BUDGET', `${b.periodId}:${b.toolId}`)
-  for (const w of demand.work)
-    for (const d of creditDemandOf.get(w)!)
-      if (!usedDemand.has(`${w.lineId}:${d.periodId}:${d.toolId}`))
-        issue('UNUSED_CREDIT_DEMAND', `${w.lineId}:${d.periodId}:${d.toolId}`)
-  for (const id of demand.fxRecordIds) if (!usedFx.has(id)) issue('UNUSED_FX_SELECTION', id)
-  for (const c of clientCoverages)
-    for (const lineId of c.lineIds)
-      if (!usedClient.has(`${c.periodId}:${c.toolId}:${lineId}`))
-        issue('UNUSED_CLIENT_TOOL_COVERAGE', `${c.periodId}:${c.toolId}:${lineId}`)
+  // When resolution built no period at all (a quote dated before its catalog, an offer with no policy in force),
+  // nothing of the demand was read: reporting each of its entries as unused would bury the cause, which resolution
+  // already named, under its consequences. An entry is unused only against periods that were walked.
+  const nothingResolved = resolution.inputs.length === 0
+
+  if (!nothingResolved) {
+    for (const a of allocations)
+      if (!usedAllocations.has(`${a.periodId}:${a.toolId}:${a.priceId}`))
+        issue('UNUSED_RESOURCE_ALLOCATION', holdingPath(a))
+    for (const s of seatSharing)
+      if (!usedSharing.has(`${s.periodId}:${s.toolId}`)) issue('UNUSED_SEAT_SHARING', `${s.periodId}:${s.toolId}`)
+    for (const b of demand.creditBudgets)
+      if (!usedBudgets.has(`${b.periodId}:${b.toolId}`)) issue('UNUSED_CREDIT_BUDGET', `${b.periodId}:${b.toolId}`)
+    for (const w of demand.work)
+      for (const d of creditDemandOf.get(w)!)
+        if (!usedDemand.has(`${w.lineId}:${d.periodId}:${d.toolId}`))
+          issue('UNUSED_CREDIT_DEMAND', `${w.lineId}:${d.periodId}:${d.toolId}`)
+    for (const id of demand.fxRecordIds) if (!usedFx.has(id)) issue('UNUSED_FX_SELECTION', id)
+    for (const c of clientCoverages)
+      for (const lineId of c.lineIds)
+        if (!usedClient.has(`${c.periodId}:${c.toolId}:${lineId}`))
+          issue('UNUSED_CLIENT_TOOL_COVERAGE', `${c.periodId}:${c.toolId}:${lineId}`)
+  }
+
   resolution.diagnostics.push(...diagnostics)
   if (diagnostics.length) resolution.status = 'needs_input'
   const quote = calculateResolvedQuote(resolution)

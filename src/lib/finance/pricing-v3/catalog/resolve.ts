@@ -3,8 +3,8 @@ import Decimal from 'decimal.js'
 import { PRICING_V3_MARKET_FLOOR_BASIS, PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV14 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
-import { briefSchema } from './contracts'
-import type { CatalogRecord, Diagnostic } from './contracts'
+import { AGREED_TOTAL_BILLING_CLASSES, briefSchema } from './contracts'
+import type { Brief, CatalogRecord, Diagnostic } from './contracts'
 
 const D = Decimal.clone({ precision: 80 })
 
@@ -19,6 +19,43 @@ type KitAssignment = {
   requirement: Row<'kit'>['value']['requirements'][number]
   resource: Row<'resource'> | undefined
   reason: string | undefined
+}
+
+type Adjustment = Brief['adjustments'][number]
+type AgreedTotal = Extract<Adjustment, { kind: 'agreed_total' }>
+
+const isAgreedTotal = (adjustment: Adjustment): adjustment is AgreedTotal => adjustment.kind === 'agreed_total'
+
+/**
+ * An agreed total as resolution carries it. `distribution` is null until the second pass settles it
+ * (`settleAgreedTotals`): then it holds, per period and billing class, the policy net the first pass read and the
+ * agreed net handed to the kernel, which add up to `amount` to the unit.
+ */
+export type ResolvedAgreedTotal = {
+  adjustmentId: string
+  amount: string
+  currency: string
+  lineIds: string[]
+  reason: string
+  policyNet: string | null
+  /**
+   * The unit every share but the last is a multiple of, and why that one. `tax_exact`: the unit in which the
+   * exclusive rate of the quote taxes a share with nothing to round, so the tax of the quote is the tax of the total.
+   * `currency_precision`: the minor unit of the currency, for a quote whose tax is not resolved or does not apply.
+   * `currency_precision_fallback`: the minor unit too, because the tax-exact unit is larger than the part of some
+   * group; the tax of the quote may then differ from the tax of the total by a unit per period.
+   */
+  distributionUnit: string | null
+  distributionUnitBasis: 'tax_exact' | 'currency_precision' | 'currency_precision_fallback' | null
+  distribution:
+    | {
+        periodId: number
+        billing: (typeof AGREED_TOTAL_BILLING_CLASSES)[number]
+        lineIds: string[]
+        policyNet: string
+        agreedNet: string
+      }[]
+    | null
 }
 
 export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
@@ -42,14 +79,58 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     }
   const brief = parsed.data
   const rows = activeRecords(catalog, brief.quoteDate)
+
+  // Values that start after the quote date. They are never selected; they say why a selection found nothing.
+  const startingLater = catalog.records.filter(r => !r.retiredAt && r.source.effectiveFrom > brief.quoteDate)
+
+  const firstStart = (records: CatalogRecord[]) =>
+    records
+      .map(r => r.source.effectiveFrom)
+      .sort()
+      .at(0)
+
+  // A quote dated before the catalog holds anything in force resolves nothing at all: every selection below would
+  // report its own missing record, and none of them would be the cause. It is said once, with the date to move to.
+  if (!rows.length && startingLater.length)
+    return {
+      status: 'needs_input' as const,
+      brief,
+      catalog: { catalogId: catalog.catalogId, version: catalog.version },
+      diagnostics: [
+        {
+          code: 'QUOTE_DATE_BEFORE_CATALOG',
+          path: 'quoteDate',
+          detail: `The quote date is before the first date this catalog is in force, which is ${firstStart(startingLater)}: no value of it applies on the quote date.`
+        }
+      ],
+      assumptions,
+      bindings,
+      inputs
+    }
+
   const kind = <K extends CatalogRecord['kind']>(name: K) => rows.filter(r => r.kind === name) as Row<K>[]
 
-  const unique = <T extends CatalogRecord>(candidates: T[], path: string): T | undefined => {
+  /** Records of a kind that start after the quote date and that a selection would have taken, had they started. */
+  const later = <K extends CatalogRecord['kind']>(name: K, match: (r: Row<K>) => boolean) =>
+    (startingLater.filter(r => r.kind === name) as Row<K>[]).filter(match)
+
+  // `startsLater`: what the same selection finds among the records that start after the quote date. With nothing in
+  // force and one of those, the record is not missing from the catalog: the quote is dated before it, and it says so.
+  const unique = <T extends CatalogRecord>(
+    candidates: T[],
+    path: string,
+    startsLater: CatalogRecord[] = []
+  ): T | undefined => {
     if (candidates.length !== 1) {
       diagnostics.push({
         code: candidates.length ? 'AMBIGUOUS_SELECTION' : 'MISSING_CATALOG_SELECTION',
         path,
-        candidates: candidates.map(r => r.recordId)
+        candidates: candidates.map(r => r.recordId),
+        ...(!candidates.length && startsLater.length
+          ? {
+              detail: `The quote date is before the first date a record for this selection is in force, which is ${firstStart(startsLater)}.`
+            }
+          : {})
       })
 
       return undefined
@@ -90,24 +171,78 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     diagnostics.push({ code: 'DUPLICATE_THIRD_PARTY_COST_ID', path: 'thirdPartyCosts' })
 
   // A discount and an agreed net of a team billing class name lines; an agreed net of third-party costs names
-  // re-invoiced costs, the only ones that have a row.
+  // re-invoiced costs, the only ones that have a row. An agreed total names lines and, to bring them into the price,
+  // re-invoiced costs: the two share one namespace, so an id is never both.
   if (
     brief.adjustments.some(a =>
       a.lineIds.some(id =>
-        a.kind === 'agreed_net' && a.billing === PRICING_V3_THIRD_PARTY_BILLING
-          ? !reinvoiced.some(c => c.costId === id)
-          : !brief.lines.some(l => l.lineId === id)
+        isAgreedTotal(a)
+          ? !brief.lines.some(l => l.lineId === id) && !reinvoiced.some(c => c.costId === id)
+          : a.kind === 'agreed_net' && a.billing === PRICING_V3_THIRD_PARTY_BILLING
+            ? !reinvoiced.some(c => c.costId === id)
+            : !brief.lines.some(l => l.lineId === id)
       )
     )
   )
     diagnostics.push({ code: 'INVALID_ADJUSTMENT_LINE', path: 'adjustments' })
 
-  const market = unique(
-    kind('market_factor').filter(r => r.value.country === brief.offerMarketCountry),
-    'offerMarketCountry'
-  )
+  // An agreed total is the price of everything it names, in every period and billing class: nothing else may adjust
+  // a line or a cost it names, whatever the class, and it names each once. The kernel would refuse the rows that
+  // overlap (`OVERLAPPING_ADJUSTMENTS`) without saying which declaration to drop; this names it.
+  const agreedTotals = brief.adjustments.filter(isAgreedTotal)
+
+  for (const total of agreedTotals) {
+    const others = brief.adjustments.filter(a => a !== total)
+
+    if (
+      new Set(total.lineIds).size !== total.lineIds.length ||
+      total.lineIds.some(id => others.some(a => a.lineIds.includes(id)))
+    )
+      diagnostics.push({
+        code: 'AGREED_TOTAL_OVERLAPS_ADJUSTMENT',
+        path: `adjustments.${total.adjustmentId}`,
+        detail:
+          'An agreed total is the price of the lines and re-invoiced costs it names, for the whole term: none of them may be named twice in it or by another adjustment (discount, agreed net or agreed total).'
+      })
+  }
+
+  // The agreed nets of an agreed total are named after it (`<adjustmentId>:<billing class>`), so the ids of a brief
+  // that declares one are checked here, with those names: the kernel only ever sees what a period was handed.
+  if (agreedTotals.length) {
+    const names = brief.adjustments.flatMap(a =>
+      isAgreedTotal(a)
+        ? [a.adjustmentId, ...AGREED_TOTAL_BILLING_CLASSES.map(billing => `${a.adjustmentId}:${billing}`)]
+        : [a.adjustmentId]
+    )
+
+    if (new Set(names).size !== names.length) diagnostics.push({ code: 'DUPLICATE_ADJUSTMENT_ID', path: 'adjustments' })
+  }
+
+  const ofMarket = (r: Row<'market_factor'>) => r.value.country === brief.offerMarketCountry
+  const market = unique(kind('market_factor').filter(ofMarket), 'offerMarketCountry', later('market_factor', ofMarket))
 
   if (market) bind('*', 'market_factor', market)
+
+  // What the offer is sold as, when the catalog says so: one record per offer. A catalog that holds none for this
+  // offer states nothing and binds nothing; two in force cannot be ranked and block like any other selection.
+  const offers = kind('offer').filter(r => r.value.offerId === brief.offerId)
+  const offer = offers.length ? unique(offers, 'offerId') : undefined
+
+  if (offer) bind('*', 'offer', offer)
+
+  // The pricing policy of an offer has a first date of its own. A quote dated before it would miss the policy of
+  // every line, one diagnostic each, and read as if the profiles had none: it is said once, with the date.
+  const ofThisOffer = (r: CatalogRecord): r is Row<'pricing'> =>
+    r.kind === 'pricing' && r.value.offerId === brief.offerId && r.value.engagementCode === brief.engagementCode
+
+  const laterPolicies = rows.some(ofThisOffer) ? [] : startingLater.filter(ofThisOffer)
+
+  if (laterPolicies.length)
+    diagnostics.push({
+      code: 'QUOTE_DATE_BEFORE_OFFER_POLICY',
+      path: 'offerId',
+      detail: `The quote date is before the first date the pricing policy of this offer and engagement code is in force, which is ${firstStart(laterPolicies)}.`
+    })
 
   // Commercial rounding is per output currency; the rule of the offer prevails over the general one. No rule, no
   // rounding. Two rules of the prevailing level cannot be ranked, so they block instead of picking one.
@@ -141,7 +276,11 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   const engagement =
     brief.engagementForm === undefined
       ? undefined
-      : unique(offerForms.length ? offerForms : formRecords.filter(r => !r.value.offerId), 'engagementForm')
+      : unique(
+          offerForms.length ? offerForms : formRecords.filter(r => !r.value.offerId),
+          'engagementForm',
+          later('engagement_factor', r => r.value.form === brief.engagementForm)
+        )
 
   if (engagement) bind('*', 'engagement_factor', engagement)
 
@@ -156,7 +295,8 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
 
     const policy = unique(
       ofOffer.length ? ofOffer : candidates.filter(r => !r.value.offerId),
-      `thirdPartyCosts.${cost.costId}.policy`
+      `thirdPartyCosts.${cost.costId}.policy`,
+      later('third_party_policy', r => r.value.category === cost.category)
     )
 
     if (policy) {
@@ -256,7 +396,29 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       diagnostics.push({ code: 'INVALID_SCHEDULE', path })
     if (new Set(line.choices.map(c => c.requirementId)).size !== line.choices.length)
       diagnostics.push({ code: 'DUPLICATE_RESOURCE_CHOICE', path })
-    const exact = kind('profile').filter(r => r.value.profileId === line.profile)
+
+    // The evidence of a dedication is held to what every other evidence is: in force on the quote date, never
+    // pending, and confirmed in a commercial draft. An estimate is an assumption of the quote, so it is under review.
+    const evidence = line.dedicationEvidence
+
+    if (evidence) {
+      const at = `${path}.dedicationEvidence`
+
+      if (evidence.effectiveFrom > brief.quoteDate || evidence.effectiveUntil < brief.quoteDate)
+        diagnostics.push({ code: 'DEDICATION_EVIDENCE_NOT_EFFECTIVE', path: at })
+      if (evidence.status === 'pending') diagnostics.push({ code: 'PENDING_DEDICATION_EVIDENCE', path: at })
+      else if (evidence.status !== 'confirmed' && brief.mode === 'commercial_draft')
+        diagnostics.push({ code: 'UNCONFIRMED_DEDICATION_EVIDENCE', path: at })
+      else if (evidence.status === 'estimated')
+        assumptions.push({
+          code: 'DEDICATION_ESTIMATED',
+          path: at,
+          detail: 'The dedication of this line is an estimate: the cost it governs is counted as estimated.'
+        })
+    }
+
+    const isProfile = (r: Row<'profile'>) => r.value.profileId === line.profile
+    const exact = kind('profile').filter(isProfile)
 
     const profile = unique(
       (exact.length
@@ -265,7 +427,8 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
             [r.value.label, ...r.value.aliases].some(a => normalize(a).includes(normalize(line.profile)))
           )
       ).filter(r => !line.seniorityCode || r.value.seniorityCode === line.seniorityCode),
-      `${path}.profile`
+      `${path}.profile`,
+      later('profile', isProfile)
     )
 
     if (!profile) return []
@@ -286,31 +449,34 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       `${path}.cost`
     )
 
+    const isAllocation = (r: Row<'allocation'>) =>
+      r.value.policyId === line.allocationPolicyId && r.value.mode === line.allocationMode
+
     const allocation = unique(
-      kind('allocation').filter(
-        r => r.value.policyId === line.allocationPolicyId && r.value.mode === line.allocationMode
-      ),
-      `${path}.allocation`
+      kind('allocation').filter(isAllocation),
+      `${path}.allocation`,
+      later('allocation', isAllocation)
     )
 
-    const pricing = unique(
-      kind('pricing').filter(
-        r =>
-          r.value.profileId === profile.value.profileId &&
-          r.value.tierCode === profile.value.tierCode &&
-          r.value.offerId === brief.offerId &&
-          r.value.engagementCode === brief.engagementCode &&
-          (!line.pricingPolicyId || r.recordId === line.pricingPolicyId)
-      ),
-      `${path}.pricing`
-    )
+    const isPricing = (r: Row<'pricing'>) =>
+      r.value.profileId === profile.value.profileId &&
+      r.value.tierCode === profile.value.tierCode &&
+      r.value.offerId === brief.offerId &&
+      r.value.engagementCode === brief.engagementCode &&
+      (!line.pricingPolicyId || r.recordId === line.pricingPolicyId)
+
+    // Said once for the offer above when its policy starts after the quote date; never again per line.
+    const pricing = laterPolicies.length
+      ? undefined
+      : unique(kind('pricing').filter(isPricing), `${path}.pricing`, later('pricing', isPricing))
 
     const kitId = line.kitId ?? profile.value.defaultKitId
 
     const kit = kitId
       ? unique(
           kind('kit').filter(r => r.value.kitId === kitId),
-          `${path}.kit`
+          `${path}.kit`,
+          later('kit', r => r.value.kitId === kitId)
         )
       : undefined
 
@@ -367,9 +533,12 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
         return []
       }
 
+      const isResource = (r: Row<'resource'>) => r.value.resourceId === (choice?.resourceId ?? candidates[0])
+
       const resource = unique(
-        kind('resource').filter(r => r.value.resourceId === (choice?.resourceId ?? candidates[0])),
-        `${path}.${requirement.requirementId}`
+        kind('resource').filter(isResource),
+        `${path}.${requirement.requirementId}`,
+        later('resource', isResource)
       )
 
       if (!resource) return []
@@ -396,11 +565,13 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     if (s.cost.value.localization?.kind === 'reference_adjusted') {
       const origin = s.cost.value.localization.referenceCountry
 
+      const isFactor = (r: Row<'talent_factor'>) =>
+        r.value.country === s.line.talentCountry && r.value.referenceCountry === origin
+
       const factor = unique(
-        kind('talent_factor').filter(
-          r => r.value.country === s.line.talentCountry && r.value.referenceCountry === origin
-        ),
-        `lines.${s.line.lineId}.talentFactor`
+        kind('talent_factor').filter(isFactor),
+        `lines.${s.line.lineId}.talentFactor`,
+        later('talent_factor', isFactor)
       )
 
       if (factor && !talentFactors.some(r => r.recordId === factor.recordId)) {
@@ -433,10 +604,8 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   for (const pair of fxPairs) {
     const [from, to] = pair.split(':')
 
-    const rate = unique(
-      kind('fx').filter(r => r.value.from === from && r.value.to === to),
-      `fx.${pair}`
-    )
+    const isRate = (r: Row<'fx'>) => r.value.from === from && r.value.to === to
+    const rate = unique(kind('fx').filter(isRate), `fx.${pair}`, later('fx', isRate))
 
     if (rate) {
       fx.push(rate)
@@ -542,7 +711,9 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       outputCurrency: brief.outputCurrency,
       duration: { unit: 'month', periods: 1 },
       lines: [],
+      // An agreed total is not a kernel adjustment: the second pass hands each period the agreed nets it resolves to.
       adjustments: brief.adjustments
+        .flatMap(a => (isAgreedTotal(a) ? [] : [a]))
         .map(a => ({
           ...a,
           lineIds: a.lineIds.filter(id =>
@@ -726,13 +897,34 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       if (!landed.has(a.adjustmentId))
         diagnostics.push({ code: 'AGREED_NET_WITHOUT_BASE', path: `adjustments.${a.adjustmentId}` })
 
-  return {
-    status: diagnostics.length ? ('needs_input' as const) : ('resolved' as const),
-    brief,
-    catalog: { catalogId: catalog.catalogId, version: catalog.version },
-    diagnostics,
-    assumptions,
-    bindings,
-    inputs
-  }
+  // Declared here, settled by the second pass once every cost of the quote is in its inputs (`settleAgreedTotals`).
+  // The key exists only for a brief that declares an agreed total: every other resolution keeps the keys it had.
+  const declaredTotals: ResolvedAgreedTotal[] = agreedTotals.map(total => ({
+    adjustmentId: total.adjustmentId,
+    amount: total.amount,
+    currency: brief.outputCurrency,
+    lineIds: total.lineIds,
+    reason: total.reason,
+    policyNet: null,
+    distributionUnit: null,
+    distributionUnitBasis: null,
+    distribution: null
+  }))
+
+  const status = diagnostics.length ? ('needs_input' as const) : ('resolved' as const)
+  const catalogRef = { catalogId: catalog.catalogId, version: catalog.version }
+
+  if (declaredTotals.length)
+    return {
+      status,
+      brief,
+      catalog: catalogRef,
+      diagnostics,
+      assumptions,
+      bindings,
+      inputs,
+      agreedTotals: declaredTotals
+    }
+
+  return { status, brief, catalog: catalogRef, diagnostics, assumptions, bindings, inputs }
 }

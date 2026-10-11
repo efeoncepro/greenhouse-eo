@@ -113,15 +113,42 @@ describe('margin floor of the selected pricing policy', () => {
     }
   })
 
-  it('keeps the generic proposals untouched next to the policy verdict', () => {
+  it('judges the quote against the floor of the policy its lines were priced with, and against no other', () => {
     const margin = assessCompositionReadiness(managed()).margin!
 
     expect(margin.approved).toBe(false)
     expect(margin.modeledRate).toBe(managed().quote.totals!.marginRate)
-    expect(margin.belowProposedFloor).toBe(new Decimal(margin.modeledRate!).lt(margin.proposedFloor))
-    // The case that motivated the field: above the generic proposal and still under the policy's own floor.
-    expect(margin.belowProposedFloor).toBe(false)
+    // No generic target or floor stands next to the verdict: a quote answers to its own offer.
+    expect(margin).not.toHaveProperty('proposedTarget')
+    expect(margin).not.toHaveProperty('proposedFloor')
+    expect(margin).not.toHaveProperty('belowProposedFloor')
+
+    const offerId = managedDemand().brief.offerId
+    const policies = offerPricing(managedCatalog(), offerId)
+
+    // The rule listed is the one of the pricing records the brief selected, with every line it priced.
+    expect(margin.pricingPolicies.flatMap(policy => policy.lineIds).sort()).toEqual(
+      managedDemand()
+        .brief.lines.map((l: { lineId: string }) => l.lineId)
+        .sort()
+    )
+
+    for (const policy of margin.pricingPolicies)
+      for (const lineId of policy.lineIds) {
+        const profile = managedDemand().brief.lines.find((l: { lineId: string }) => l.lineId === lineId).profile
+        const record = policies.find(p => p.value.profileId === profile)!.value
+
+        expect([policy.offerId, policy.method, policy.rate, policy.minimumMargin]).toEqual([
+          offerId,
+          record.method,
+          record.rate,
+          record.minimumMargin
+        ])
+      }
+
+    // The verdict is the kernel's: lines under the floor of their own policy.
     expect(margin.policyFloor.linesBelowFloor.length).toBeGreaterThan(0)
+    expect(margin.belowPolicyFloor).toBe(true)
   })
 
   it('reports nothing when the selected policy has no floor to break', () => {

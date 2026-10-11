@@ -75,8 +75,14 @@ describe('compose quote: --out holds a calculated quote or nothing', () => {
     expect(blockedRun.stderr).toBe('')
     expect(summary.calculationStatus).toBe('needs_input')
     expect(summary.totals).toBeNull()
-    // What the operator needs to correct the demand is all there.
-    expect(summary.diagnostics).toContainEqual({ code: 'RESOURCE_ALLOCATION_REQUIRED', path: '1:adobe' })
+    // What the operator needs to correct the demand is all there: where, and the prices an allocation can name.
+    const blocker = summary.diagnostics.find((d: { code: string }) => d.code === 'RESOURCE_ALLOCATION_REQUIRED')
+
+    expect(blocker).toMatchObject({ code: 'RESOURCE_ALLOCATION_REQUIRED', path: '1:adobe' })
+    expect(blocker.candidates.length).toBeGreaterThan(0)
+    expect(blocker.candidates).toContain(
+      read(`${EXAMPLE}.demand.json`).allocations.find((a: { toolId: string }) => a.toolId === 'adobe').priceId
+    )
     expect(blockedLeftAFile).toBe(false)
     expect(summary.runNotices.output).toMatchObject({ option: 'out', written: false, reason: 'QUOTE_NOT_CALCULATED' })
     expect(summary.runNotices.output.statement).toContain('--keep-blocked')

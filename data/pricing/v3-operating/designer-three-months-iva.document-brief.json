@@ -34,7 +34,6 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {"label": "Mes 1", "title": "Puesta en marcha y producción", "text": "Accesos, lineamientos de marca, flujo de solicitudes y primeras piezas."},
       {"label": "Mes 2", "title": "Producción", "text": "Atención de la cola de solicitudes según las prioridades acordadas cada semana."},
@@ -50,7 +49,6 @@
   "conditions": {
     "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
     "rows": [
-      {"title": "Plazo e inicio", "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."},
       {"title": "Facturación y pago", "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."},
       {"title": "Aprobaciones y accesos", "text": "El cliente entrega los lineamientos de marca, prioriza las solicitudes y aprueba las piezas. Facilita los accesos acordados."},
       {"title": "Límites del alcance", "text": "Producción audiovisual, fotografía, licencias de terceros e impresión requieren un alcance independiente."},

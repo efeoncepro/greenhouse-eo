@@ -1,0 +1,151 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-11",
+  "reference": "Borrador · Programa de atención en redes sociales",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "taxAmount": "3220500",
+  "taxPeriods": 3,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Atención en",
+      "redes sociales,",
+      "como programa."
+    ],
+    "subtitle": "Un programa de atención en redes sociales para Cliente de ejemplo, con un precio único por el programa completo.",
+    "netLabel": "Valor neto del programa"
+  },
+  "service": {
+    "name": "Programa de atención en redes sociales"
+  },
+  "scope": {
+    "title": [
+      "Un programa completo,",
+      "con un solo precio."
+    ],
+    "intro": "Borrador de alcance. La cotización final debe especificar los canales, los horarios de atención y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Atención de la comunidad",
+        "text": "Respuesta a comentarios y mensajes en los canales acordados, con una persona dedicada al programa."
+      },
+      {
+        "title": "Dirección del programa",
+        "text": "Un líder que define criterios de respuesta, revisa la calidad y coordina con la contraparte del cliente."
+      },
+      {
+        "title": "Agentes y base de conocimiento",
+        "text": "Clasificación de los mensajes entrantes y mantenimiento de la base de conocimiento que usa el equipo."
+      },
+      {
+        "title": "Continuidad",
+        "text": "Cobertura de reemplazo y guardia de alertas incluidas en el precio del programa."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario del programa",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Puesta en marcha y operación",
+        "text": "Accesos, criterios de respuesta, base de conocimiento inicial y comienzo de la atención."
+      },
+      {
+        "label": "Mes 2",
+        "title": "Operación",
+        "text": "Atención continua de los canales y revisión quincenal de calidad con la contraparte del cliente."
+      },
+      {
+        "label": "Mes 3",
+        "title": "Operación y balance",
+        "text": "Continuidad de la atención, resumen del programa y recomendaciones."
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Precio del programa",
+        "text": "Un precio único por el alcance descrito. Los cambios de alcance, de canales o de horarios de atención se cotizan antes de ejecutarse."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Cada hito del calendario de pagos se factura al cumplirse. Las condiciones de pago se acuerdan antes de emitir la cotización final."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente entrega los lineamientos de respuesta, define los casos que escalan y facilita los accesos acordados a sus canales."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un precio por",
+      "el programa completo."
+    ],
+    "intro": "Valores en pesos chilenos (CLP). El precio es por el programa completo e incluye al equipo, sus herramientas y la continuidad de la atención.",
+    "summary": "Programa completo · Pesos chilenos · IVA no incluido en el valor neto",
+    "taxNote": "El valor del programa es neto. El total incluye IVA. Cada hito de pago se informa con su valor neto, su IVA y su total."
+  },
+  "lines": [
+    {
+      "label": "Programa de atención en redes sociales",
+      "detail": "Equipo, herramientas y continuidad de la atención",
+      "group": "Servicio",
+      "quantity": {
+        "value": 1,
+        "unit": "programa"
+      },
+      "net": "16950000"
+    }
+  ],
+  "net": "16950000",
+  "paymentSchedule": {
+    "title": "Calendario de pagos",
+    "milestones": [
+      {
+        "label": "Anticipo",
+        "when": "A la aceptación de la cotización",
+        "net": "8480000",
+        "tax": "1611200",
+        "total": "10091200"
+      },
+      {
+        "label": "Saldo",
+        "when": "Contra la entrega del balance del programa",
+        "net": "8470000",
+        "tax": "1609300",
+        "total": "10079300"
+      }
+    ]
+  },
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-69b97e5401bad85565a46f17",
+    "digest": "69b97e5401bad85565a46f172f20dd9290ad8aaf221a73ab89456cf0b614a96a",
+    "engineVersion": "pricing-v3-local/1.3.0"
+  }
+}

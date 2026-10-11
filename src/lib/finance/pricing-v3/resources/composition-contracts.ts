@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 import { z } from 'zod'
 
-import { briefSchema } from '../catalog/contracts'
+import { COMMERCIAL_UNITS, briefSchema } from '../catalog/contracts'
 import { pricingV3RequestSchema, sourceSchema } from '../schemas'
 
 const id = z.string().min(1).max(80)
@@ -102,7 +102,9 @@ export const compositionPolicySchema = z
 export const compositionDemandSchema = z
   .object({
     schemaVersion: z.literal('pricing-v3-composition-demand/1'),
-    commercialUnit: z.enum(['role_capacity', 'managed_service']),
+    // What the quote is sold as. From the `offer` record on the catalog says which, and the composition rejects a
+    // demand that contradicts it; a catalog that does not say leaves it to this declaration.
+    commercialUnit: z.enum(COMMERCIAL_UNITS),
     brief: briefSchema,
     work: z
       .array(

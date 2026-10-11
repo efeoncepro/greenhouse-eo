@@ -85,13 +85,29 @@ export type PricingV3ErrorCode =
 
 /**
  * The only context an error may carry. It names where the problem is, never what the content was: salaries, costs,
- * file paths and raw parser or validator messages stay out of the error surface by construction.
+ * file paths and raw parser or validator messages stay out of the error surface by construction. What a contract or
+ * the tool itself accepts at that place (a limit, a closed list) is not content and may be named.
  */
 export type PricingV3ErrorDetail = {
   /** Command-line option (or equivalent transport field) the caller must correct, without its value. */
   option?: string
+  /** Values `option` accepts, when they are a closed list of the tool itself. Never anything the caller sent. */
+  allowed?: readonly string[]
   /** Structural locations inside the rejected document, with the validator's rule name and nothing else. */
-  issues?: { path: string; rule: string }[]
+  issues?: PricingV3ErrorIssue[]
+}
+
+/**
+ * One location of a rejected document. Beyond `path` and `rule`, an issue may state what the schema asked for at that
+ * place, which is a constant of the contract and never the value received: the bound a size or a number broke
+ * (`limit`), the closed list a value had to come from (`allowed`) or the type it had to be (`expected`).
+ */
+export type PricingV3ErrorIssue = {
+  path: string
+  rule: string
+  limit?: number
+  allowed?: readonly string[]
+  expected?: string
 }
 
 export class PricingV3Error extends Error {

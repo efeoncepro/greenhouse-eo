@@ -20,7 +20,8 @@ afterAll(() => rmSync(dir, { recursive: true, force: true }))
 const cli = (...args: string[]) =>
   spawnSync('node', ['--import', 'tsx', 'scripts/commercial/pricing-v3.ts', ...args], { encoding: 'utf8' })
 
-type Report = { code: string; message: string; option?: string; issues?: { path: string; rule: string }[] }
+type Issue = { path: string; rule: string; limit?: number; allowed?: string[]; expected?: string }
+type Report = { code: string; message: string; option?: string; allowed?: string[]; issues?: Issue[] }
 
 /** Every rejection shares one envelope: exit 1, nothing on stdout, and no field beyond the registered detail. */
 const rejection = (...args: string[]) => {
@@ -33,7 +34,7 @@ const rejection = (...args: string[]) => {
 
   expect(Object.keys(report)).toEqual(['error', 'binding'])
   expect(report.binding).toBe(false)
-  expect(['code', 'message', 'option', 'issues']).toEqual(expect.arrayContaining(Object.keys(report.error)))
+  expect(['code', 'message', 'option', 'allowed', 'issues']).toEqual(expect.arrayContaining(Object.keys(report.error)))
 
   return { stderr: run.stderr, error: report.error }
 }
@@ -163,7 +164,7 @@ describe('Pricing V3 CLI rejections never carry content', () => {
     expectNoLeak(stderr)
   })
 
-  it('reports a schema failure as paths and rule names only, capped', () => {
+  it('reports a schema failure as paths, rule names and what the contract asked for there, capped', () => {
     const catalog = JSON.parse(readFileSync('data/pricing/v3-catalog/catalog.review-v1.json', 'utf8'))
     const records = Array.from({ length: 60 }, () => SENTINEL)
 
@@ -180,12 +181,27 @@ describe('Pricing V3 CLI rejections never carry content', () => {
     expect(error.issues!.length).toBeLessThan(records.length)
 
     for (const issue of error.issues!) {
-      expect(Object.keys(issue).sort()).toEqual(['path', 'rule'])
+      // Where and which rule, always; beyond them only what the schema itself states at that place.
+      expect(Object.keys(issue)).toEqual(expect.arrayContaining(['path', 'rule']))
+      expect(['path', 'rule', 'limit', 'allowed', 'expected']).toEqual(expect.arrayContaining(Object.keys(issue)))
       expect(issue.path).toMatch(/^[\w.]*$/)
       expect(issue.rule).toMatch(/^[a-z_]+$/)
     }
 
+    // The version is far longer than the contract takes: the report says the bound, and nothing of what was sent.
+    expect(error.issues).toContainEqual({ path: 'version', rule: 'too_big', limit: 120 })
     expectNoLeak(stderr)
+  })
+
+  it('names the kinds a catalog holds when asked for one it does not have, and not what was typed', () => {
+    const { error, stderr } = rejection('catalog', 'search', '--kind', SENTINEL)
+
+    expect(error).toMatchObject({ code: 'INVALID_ARGUMENT', option: 'kind' })
+    expect(error.allowed).toEqual(expect.arrayContaining(['profile', 'pricing', 'kit', 'offer']))
+    expectNoLeak(stderr)
+
+    // Every kind it names is one the same command accepts.
+    for (const kind of error.allowed!) expect(cli('catalog', 'search', '--kind', kind).stderr).toBe('')
   })
 })
 

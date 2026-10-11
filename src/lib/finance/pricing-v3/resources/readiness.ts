@@ -1,17 +1,13 @@
 import Decimal from 'decimal.js'
 
 import { clientPaidDirectly } from '../catalog/client'
-import { describeEngagementForm, describeMarketFactor } from '../catalog/explain'
+import { describeEngagementForm, describeMarketFactor, describeThirdPartyPolicies } from '../catalog/explain'
 import { PricingV3Error } from '../errors'
 import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 import { estimateExposure, linesBelowPolicyFloor } from './summary'
 
 type Composition = ReturnType<typeof composeResourceQuote>
-
-// Generic references, never approved: the margin a quote is held against before anyone has decided its policy.
-const PROPOSED_MARGIN_TARGET = '0.40'
-const PROPOSED_MARGIN_FLOOR = '0.35'
 
 /** Economic evidence gaps are separate from mathematical completion and never grant commercial authority. */
 export function assessCompositionReadiness(result: Composition) {
@@ -92,6 +88,24 @@ export function assessCompositionReadiness(result: Composition) {
         'The demand declares people who use one named seat between them in the period. Confirm the terms of the supplier allow it; a declared share is not a licence, and without it each person needs a seat.'
       )
   }
+
+  // The dedication of a line governs what the line is charged by its capacity. The brief the quote froze says where
+  // each one comes from, or says nothing: a dedication without evidence is named as such, never taken as confirmed.
+  for (const line of result.quote.resolution.brief?.lines ?? [])
+    if (!line.dedicationEvidence)
+      gap(
+        'DEDICATION_NOT_EVIDENCED',
+        `lines.${line.lineId}.dedication`,
+        'Practice/Operations',
+        'The dedication of this line carries no evidence, so the cost it governs is not counted as confirmed. Declare where it comes from in `dedicationEvidence` (a workload dimensioned with `compose workload` writes it; a dedication agreed with the client is declared with its reference) and whether it is confirmed or an estimate.'
+      )
+    else if (line.dedicationEvidence.status !== 'confirmed')
+      gap(
+        'DEDICATION_EVIDENCE_REVIEW',
+        `lines.${line.lineId}.dedicationEvidence`,
+        'Practice/Operations',
+        'The dedication of this line is an estimate, and the cost it governs is counted as estimated. Confirm the volumes and hours behind it before issuing; a dedication that turns out higher is cost the price does not cover.'
+      )
 
   if (result.quote.totals?.tax === null)
     gap(
@@ -199,9 +213,55 @@ export function assessCompositionReadiness(result: Composition) {
   // The ranking is the summary's (`estimateExposure`); readiness only points at where the evidence matters most.
   const exposure = estimateExposure(result)
 
-  // Null when the quote sells no own work at a net above zero: there is no margin of own work to hold to a floor.
+  // Null when the quote sells no own work at a net above zero: there is no margin of own work to read.
   const ownWorkRate = totals && 'ownWorkMarginRate' in totals ? (totals.ownWorkMarginRate ?? null) : undefined
-  const heldAgainstFloor = ownWorkRate !== undefined ? ownWorkRate : (totals?.marginRate ?? null)
+
+  // The target and the floor a row is priced and judged with are the ones of its own pricing policy, as resolution
+  // bound it and the quote froze it: one entry per distinct rule, with the lines it priced. An offer has its own
+  // (a staffing line at its target is not under any floor because another offer asks for more).
+  const pricingPolicies = new Map<
+    string,
+    {
+      offerId: string
+      engagementCode: string
+      method: 'markup' | 'target_margin'
+      rate: string
+      basis: 'all_costs' | 'human'
+      minimumMargin: string
+      sourceStatus: 'confirmed' | 'estimated' | 'pending'
+      lineIds: string[]
+    }
+  >()
+
+  for (const { lineId, purpose, record } of result.quote.resolution.bindings) {
+    if (purpose !== 'pricing' || record.kind !== 'pricing') continue
+
+    const { offerId, engagementCode, method, rate, basis, minimumMargin } = record.value
+    const key = [offerId, engagementCode, method, rate, basis, minimumMargin, record.source.status].join('\n')
+
+    const policy = pricingPolicies.get(key) ?? {
+      offerId,
+      engagementCode,
+      method,
+      rate,
+      basis,
+      minimumMargin,
+      sourceStatus: record.source.status,
+      lineIds: []
+    }
+
+    pricingPolicies.set(key, policy)
+    policy.lineIds.push(lineId)
+  }
+
+  const thirdPartyPolicies = describeThirdPartyPolicies(result.quote.resolution).map(policy => ({
+    category: policy.category,
+    method: policy.method,
+    rate: policy.rate,
+    minimumMargin: policy.minimumMargin,
+    sourceStatus: policy.sourceStatus,
+    costIds: policy.costIds
+  }))
 
   return {
     calculationStatus: result.quote.calculationStatus,
@@ -215,6 +275,8 @@ export function assessCompositionReadiness(result: Composition) {
           estimatedCost: exposure.estimatedCost,
           confirmedCost: exposure.confirmedCost,
           estimatedShareOfCost: exposure.estimatedShareOfCost,
+          // Cost governed by a dedication the demand does not evidence: neither estimated nor confirmed.
+          dedicationNotEvidenced: exposure.dedicationNotEvidenced,
           confirmFirst: exposure.costInputs.slice(0, 5)
         }
       : null,
@@ -223,19 +285,24 @@ export function assessCompositionReadiness(result: Composition) {
           // The real margin of the whole quote, third-party rows included.
           modeledRate: totals.marginRate,
           // From contract 1.4.0: the margin of the quote without its third-party rows. A cost re-invoiced at or near
-          // cost dilutes `modeledRate` and not this one, so the generic floor below is read on it. Absent for a
-          // quote of an earlier contract, which has no third-party row and one margin.
-          ...(ownWorkRate !== undefined ? { ownWorkRate, proposedFloorReadOn: 'ownWorkRate' as const } : {}),
-          proposedTarget: PROPOSED_MARGIN_TARGET,
-          proposedFloor: PROPOSED_MARGIN_FLOOR,
+          // cost dilutes `modeledRate` and not this one. Absent for a quote of an earlier contract, which has no
+          // third-party row and one margin.
+          ...(ownWorkRate !== undefined ? { ownWorkRate } : {}),
           approved: false,
-          belowProposedFloor:
-            heldAgainstFloor === null ? null : new Decimal(heldAgainstFloor).lt(PROPOSED_MARGIN_FLOOR),
-          // Per-line floors of the pricing policy actually selected, as judged by the kernel. Independent of the
-          // generic proposals above, which stay unapproved references. With a market factor whose floor follows the
-          // base market, `modeledRate` (the real margin) can sit under the policy minimum with no line flagged. The
-          // form of the engagement moves the net and never the floor: a ratio under 1 can be why a line is flagged.
-          // A third-party row is listed here on the floor of its category, never on the floor of a pricing policy.
+          // What the quote was priced with and is judged against: the rule of the pricing policy of each line.
+          // `rate` is the target margin when `method` is `target_margin` and the markup otherwise; `minimumMargin`
+          // is the floor. No generic target or floor is compared here: a quote answers to its own offer.
+          pricingPolicies: [...pricingPolicies.values()],
+          // Only when the quote re-invoices third-party costs: the rule of each category, which has its own floor.
+          ...(thirdPartyPolicies.length ? { thirdPartyPolicies } : {}),
+          // The verdict. True when the kernel flagged at least one row under the floor of the policy it was priced
+          // with; the rows are listed below. It is never read on a margin of the whole quote.
+          belowPolicyFloor: belowPolicyFloor.length > 0,
+          // Per-line floors of the pricing policy actually selected, as judged by the kernel. With a market factor
+          // whose floor follows the base market, `modeledRate` (the real margin) can sit under the policy minimum
+          // with no line flagged. The form of the engagement moves the net and never the floor: a ratio under 1 can
+          // be why a line is flagged. A third-party row is listed here on the floor of its category, never on the
+          // floor of a pricing policy.
           policyFloor: {
             source: 'kernel:MARGIN_BELOW_FLOOR',
             ...(marketFactor ? { marketFactor } : {}),

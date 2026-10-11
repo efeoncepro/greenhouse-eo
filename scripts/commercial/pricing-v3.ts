@@ -7,7 +7,9 @@ import { ZodError } from 'zod'
 
 import { validateCatalog, searchCatalog, valuesEffectiveAfter } from '../../src/lib/finance/pricing-v3/catalog/catalog'
 import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
-import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
+import { settleAgreedTotals } from '../../src/lib/finance/pricing-v3/catalog/agreed-total'
+import { describeAgreedTotals } from '../../src/lib/finance/pricing-v3/catalog/explain'
+import { briefSchema, catalogRecordSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
 import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
 import { projectCatalogQuote, catalogQuoteMarkdown } from '../../src/lib/finance/pricing-v3/catalog/client'
 import {
@@ -72,6 +74,8 @@ import {
   PricingV3Error,
   isPricingV3Error
 } from '../../src/lib/finance/pricing-v3/errors'
+
+import type { PricingV3ErrorIssue } from '../../src/lib/finance/pricing-v3/errors'
 
 import type { calculatePricingV3 } from '../../src/lib/finance/pricing-v3'
 import { pricingV3ClientMarkdown, projectPricingV3ForClient } from '../../src/lib/finance/pricing-v3'
@@ -218,16 +222,31 @@ const replacePointer = (path: string, body: string) => {
 const ISSUE_LIMIT = 20
 
 /**
- * Derived, never listed: a registered rejection reports its own code. A schema failure contributes path and rule
- * only, because the validator's message can quote the received value. Anything else stays unclassified.
+ * A schema issue as it is reported: where, which rule and, when the rule has one, what the schema asked for there.
+ * The bound of a size or a number, the closed list of an enum or of a discriminator and the expected type are
+ * constants of the contract. The value received and the validator's message, which can quote it, are never read.
+ */
+const schemaIssue = (issue: ZodError['issues'][number]): PricingV3ErrorIssue => ({
+  path: issue.path.join('.'),
+  rule: issue.code,
+  ...(issue.code === 'too_big' ? { limit: Number(issue.maximum) } : {}),
+  ...(issue.code === 'too_small' ? { limit: Number(issue.minimum) } : {}),
+  ...(issue.code === 'invalid_enum_value' || issue.code === 'invalid_union_discriminator'
+    ? { allowed: issue.options.map(String) }
+    : {}),
+  ...(issue.code === 'invalid_type' ? { expected: String(issue.expected) } : {})
+})
+
+/**
+ * Derived, never listed: a registered rejection reports its own code. A schema failure contributes what `schemaIssue`
+ * reads and nothing else, because the validator's message can quote the received value. Anything else stays
+ * unclassified.
  */
 const classify = (error: unknown) =>
   isPricingV3Error(error)
     ? error
     : error instanceof ZodError
-      ? new PricingV3Error('SCHEMA_INVALID', {
-          issues: error.issues.slice(0, ISSUE_LIMIT).map(issue => ({ path: issue.path.join('.'), rule: issue.code }))
-        })
+      ? new PricingV3Error('SCHEMA_INVALID', { issues: error.issues.slice(0, ISSUE_LIMIT).map(schemaIssue) })
       : undefined
 
 const exitFor = (result: ReturnType<typeof calculatePricingV3>) =>
@@ -402,13 +421,40 @@ try {
           keepBlocked:
             '--keep-blocked writes the artifact of a run that did not calculate, for the readings that take one (explain, replay, compose assess, compose commitments). It needs --out, and a path of its own: the file is not a quote.'
         },
+        agreedTotal: {
+          declaration:
+            'One price for the whole quote is declared in `brief.adjustments` as { adjustmentId, kind: "agreed_total", amount, lineIds, reason }: the net of the named lines for the whole term, every period and every billing class together (fee and start-up). `lineIds` may also name re-invoiced third-party costs by costId, which brings them into the price; unnamed, they stay outside it. An `agreed_net` remains an amount per period and per billing class.',
+          resolution:
+            'The quote is priced once without the agreement to read the policy net of each period and billing class; the total is distributed in proportion to it, each share cut down to a multiple of the distribution unit, and the last group with a price takes what is left, so the groups add up to the total exactly. The kernel receives one `agreed_net` per period and class, named `<adjustmentId>:<billing class>`. The summary reports it under `agreedTotals`: amount, policy net, the unit and the distribution.',
+          tax: 'With an exclusive tax rate p/q in lowest terms, the distribution unit is q minor units of the currency (100 pesos or 1.00 dollar at 19 %; 400 pesos at 19.25 %): a share of that many units has a tax with nothing to round, so the taxes of the periods add up to the tax of the rate on the total, rounded once (`distributionUnitBasis: tax_exact`). It holds for a quote whose rows are all inside one agreed total. When that unit is larger than the part of some group, the distribution falls back to the minor unit instead of handing the group nothing (`currency_precision_fallback`), and the tax may then differ from the tax of the total by a unit per period. With a tax that is not resolved or does not apply the unit is the minor unit (`currency_precision`).',
+          rules:
+            'A line or cost named by an agreed total may not be named twice in it or by any other adjustment (AGREED_TOTAL_OVERLAPS_ADJUSTMENT). A total with more decimals than the currency holds is rejected (AGREED_TOTAL_NOT_REPRESENTABLE), and so is one above zero over rows that price at zero (AGREED_TOTAL_WITHOUT_BASE). Floors stay per row: a row under its floor is flagged as always.'
+        },
+        dedicationEvidence: {
+          declaration:
+            '`brief.lines[].dedicationEvidence` says where the dedication of a line comes from and whether it is confirmed or an estimate: { reference, effectiveFrom, effectiveUntil, status }. `compose workload --brief` writes it from the sources of the workload. It must be in force on the quote date and never pending.',
+          readings:
+            'A line whose dedication is an estimate counts as an estimated input in `estimateExposure.costInputs` (kind `dedication`) with the cost it governs. A line with no evidence is listed under `estimateExposure.dedicationNotEvidenced`: that cost is in neither `estimatedCost` nor `confirmedCost`.'
+        },
+        commercialUnit: {
+          rule: 'What an offer is sold as is a fact of the catalog (record kind `offer`): `managed_service` or `role_capacity`. `compose scaffold` reads it; when the catalog does not state it the scaffold leaves `commercialUnit` null and asks (COMMERCIAL_UNIT_REQUIRED). A demand that declares another unit than its offer is rejected (COMMERCIAL_UNIT_CONTRADICTS_OFFER).'
+        },
         quoteDocument: {
           command:
             '`compose document` turns a frozen quote into version 2 of the data of the A4 quote template (docs/commercial/templates/cotizacion-a4). Render it with `node scripts/documents/render-cotizacion-a4.mjs --data data.json --out folder`. Exit 3: the document is a draft of a quote under review.',
           withoutBrief:
             'Prints the scaffold of the document brief (every line of the quote under its key, with its default label and group, and the texts to fill) and exits 2. --out keeps the brief alone.',
           brief:
-            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote, and the tax printed is the frozen tax of the quote, which must correspond to its rate within the rounding of its months; otherwise no data is emitted.',
+            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote. The tax printed is the frozen tax of the quote itself, accepted within one minor unit per period of the quote of the tax of its rate on the net (see `tax`); otherwise no data is emitted. `buyer.unit` (the area the document is addressed to), `schedule.note` (a line next to the title of the calendar of the work) and `cover.netLabel` are optional and the scaffold leaves no empty slot for them: leave them out rather than fill them with what any quote implies.',
+          lines:
+            'By default every key of the quote is one concept folded by months («3 meses» at the net of one), and a concept whose net changes over the term prints one line per stretch. `lines.<key>` sets its label, detail and group. The keys are the ones the scaffold lists: a key the quote does not have is rejected (`unknown_key`).',
+          combine:
+            '`combine: [{ keys, label, unit, detail?, group? }]` prints several keys as one line, a price for the whole of them: quantity 1 of `unit` («programa», «proyecto», «servicio»), no unit value, and for net the exact sum the quote froze for those keys over the whole term. One key alone may be combined (a fee printed as a programme price instead of months). A key goes in one combination at most (`duplicate_key`) and then has no entry in `lines` (`key_is_combined`); a key the quote waives completely cannot be combined (`key_not_charged`). The lines add up to the same net either way. At most 40 entries.',
+          cover:
+            '`cover.netLabel` names the net printed on the cover in place of the one of the template («Valor neto del proyecto», «Valor neto del programa»). A text, never an amount: the figure is the net of the quote.',
+          paymentMilestones:
+            '`paymentMilestones` is the list `compose schedule --milestones` takes: [{ id, label, share, periodId | when }], at most 12, shares adding up to 1; the amounts are derived from the net and add up to it. When the quote resolved its tax at an exclusive rate, each milestone is printed with its net, its part of the frozen tax and its total, and the parts add up to the tax and the total of the quote. With a tax that is not resolved or does not apply, a milestone is its net. `paymentScheduleTexts` ({ title, note }) only goes with it.',
+          tax: 'The tax and the total printed are the ones the quote froze, never recomputed. A quote with an exclusive rate hands the template its rate, its frozen tax (`taxAmount`) and `taxPeriods`, the number of periods of the quote: the kernel rounds the tax of each period and the quote adds them up, so the frozen tax is accepted within one minor unit per period of the tax of the rate on the net computed once, however the lines are presented. Beyond that bound, with a rate of more than 4 decimals or with more than 120 periods, the run is rejected (QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE). A quote sold at an `agreed_total` is distributed so that its tax is exactly the tax of the rate on the total (see `agreedTotal`). A tax that is not resolved prints as pending; one that does not apply prints none.',
           options:
             '--option <key>=<artifact.json>, repeatable (at most 8): the frozen quote of one optional add-on alone, verified by replay like --input. Its price is the net of one of its periods: it must be calculated, in the currency of the quote, with the same net in every period and no cost the client pays apart. The brief names exactly the options passed (`options.<key>`: label, unit, detail). They are printed in a block of their own and enter no line, net, tax or total of the quote.',
           courtesy:
@@ -922,31 +968,14 @@ try {
         throw new PricingV3Error('INVALID_ARGUMENT', { option: 'date' })
       if (subcommand === 'show') required('query')
 
-      const kinds = [
-        'profile',
-        'cost',
-        'resource',
-        'kit',
-        'allocation',
-        'pricing',
-        'talent_factor',
-        'market_factor',
-        'fx',
-        'price_rounding',
-        'engagement_factor',
-        'third_party_policy',
-        'contingency_reserve'
-      ] as const
+      // The kinds a catalog holds, read from its own contract: a kind added there is searchable without a list here.
+      const kinds = catalogRecordSchema.options.map(option => option.shape.kind.value)
+      const kind = kinds.find(name => name === (values.kind ?? 'profile'))
 
-      if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number]))
-        throw new PricingV3Error('INVALID_ARGUMENT', { option: 'kind' })
+      // The list of kinds is the tool's own, so the rejection names it; what was typed is never echoed.
+      if (!kind) throw new PricingV3Error('INVALID_ARGUMENT', { option: 'kind', allowed: kinds })
 
-      const rows = searchCatalog(
-        catalog,
-        subcommand === 'search' ? (values.query ?? '') : '',
-        (values.kind ?? 'profile') as (typeof kinds)[number],
-        values.date
-      )
+      const rows = searchCatalog(catalog, subcommand === 'search' ? (values.query ?? '') : '', kind, values.date)
 
       const candidates =
         subcommand === 'search'
@@ -956,7 +985,8 @@ try {
                 r.recordId === required('query') ||
                 ('profileId' in r.value && r.value.profileId === values.query) ||
                 ('resourceId' in r.value && r.value.resourceId === values.query) ||
-                ('kitId' in r.value && r.value.kitId === values.query)
+                ('kitId' in r.value && r.value.kitId === values.query) ||
+                (r.kind === 'offer' && r.value.offerId === values.query)
             )
 
       process.stdout.write(
@@ -977,7 +1007,8 @@ try {
     const brief = load('input')
 
     if (command === 'prepare') {
-      const selection = resolveBrief(catalog, brief)
+      // The selection `quote` would calculate: an agreed total of the brief is already the agreed nets of each period.
+      const selection = settleAgreedTotals(resolveBrief(catalog, brief))
 
       if (values.out) writeNew(values.out, json(selection))
       process.stdout.write(json(selection))
@@ -986,6 +1017,7 @@ try {
       const artifact = runCatalogQuote(catalog, brief)
       const result = artifact.semantic.result
       const output = freezeQuote(artifact, result.calculationStatus === 'calculated')
+      const agreedTotals = describeAgreedTotals(result.resolution)
 
       process.stdout.write(
         json({
@@ -994,6 +1026,8 @@ try {
           calculationStatus: result.calculationStatus,
           reviewStatus: result.reviewStatus,
           totals: result.totals,
+          // Only for a brief that declares an agreed total: what it was distributed over, period by period.
+          ...(agreedTotals ? { agreedTotals } : {}),
           diagnostics: result.diagnostics,
           assumptions: result.resolution.assumptions,
           periods: result.periods.map(p => ({
@@ -1122,15 +1156,17 @@ try {
   } else throw new PricingV3Error('UNKNOWN_COMMAND')
 } catch (error) {
   const failure = classify(error)
-  const { option, issues } = failure?.detail ?? {}
+  const { option, allowed, issues } = failure?.detail ?? {}
 
   process.stderr.write(
     json({
       error: {
         code: failure?.code ?? PRICING_V3_UNCLASSIFIED_ERROR_CODE,
         // Static by contract: nothing an exception says is ever copied into the report.
-        message: 'Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it.',
+        message:
+          'Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.',
         ...(option ? { option } : {}),
+        ...(allowed ? { allowed } : {}),
         ...(issues ? { issues } : {})
       },
       binding: false

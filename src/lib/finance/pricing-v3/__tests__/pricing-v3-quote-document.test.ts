@@ -14,14 +14,17 @@
 //     generator is the real consumer of the data; nothing here asserts what its code says;
 //   - for the reference value of a courtesy, the same demand quoted without the waiver: what a waived line «would
 //     have been charged for» is what the kernel charges for it when nothing waives it;
-//   - for the price of an option, the period totals of the option's own frozen artifact.
+//   - for the price of an option, the period totals of the option's own frozen artifact;
+//   - for a combined line, the client-safe items again: its net is what the firewall charges for the keys it names,
+//     added over the term, and every other line is the one the same quote prints with no combination;
+//   - for the tax and the total of a payment milestone, `presentPaymentSchedule` and the totals the quote froze.
 //
 // Quotes over several periods are composed in memory from the frozen inputs of the two committed examples, with the
 // demand edited where an operator would edit it. Where the reading must reject a result the kernel cannot produce
 // (lines that do not add up, two rows on one key), a frozen result is copied and edited: the reader takes any
 // result of that shape and is the last check before a document exists. Nothing is written under data/.
 import { spawnSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs'
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, relative, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -73,6 +76,11 @@ const EXAMPLES = [DESIGNER, MANAGED, THREE_MONTHS]
 // frozen quote of each option alone. Its document needs the options, so it is read by cases of its own.
 const COURTESY = `${OPERATING}/designer-startup-courtesy`
 const SERVICE = `${OPERATING}/service`
+// The example of a price printed as what it is: a managed service of three months as one programme price, with two
+// payment milestones and their tax. It is another document of the artifact of the add-on example, so its artifact
+// does not carry its name and it is read by cases of its own.
+const PROGRAMME = `${OPERATING}/managed-addon-increment.programme-price`
+const PROGRAMME_ARTIFACT = `${OPERATING}/managed-addon-increment.artifact.json`
 const IDENTITY = { calculationId: 'composition-under-test', replayDigest: 'digest-under-test' }
 
 const artifacts = new Map<string, Artifact>()
@@ -216,6 +224,22 @@ const designerWithTax = (rate: string) =>
       demand.brief.taxTreatment = exclusive(rate)
     })
   )
+
+/**
+ * A programme of twelve months with a supplier re-invoiced every month at a net that is not a multiple of anything:
+ * the kernel rounds the tax of each of the twelve months, and their sum is several units away from the tax of the
+ * whole net rounded once.
+ */
+const twelveMonthsTaxRoundedByMonth = calculated(
+  recompose(MANAGED, demand => {
+    over(demand, 12)
+    demand.brief.thirdPartyCosts!.find(cost => cost.costId === 'tp-media')!.periodIds = Array.from(
+      { length: 12 },
+      (_, index) => index + 1
+    )
+    demand.brief.taxTreatment = exclusive('0.19')
+  })
+)
 
 /**
  * Three months with a supplier re-invoiced at a net that is not a multiple of anything: the kernel rounds the tax of
@@ -396,6 +420,27 @@ const rejection = (result: Composition, brief: unknown = texts(), options: Quote
 
 const totalsOf = (result: Composition) => result.quote.totals!
 
+/** The tax of the whole net of a quote, rounded once: what a reader computes from the rate with no amount given. */
+const taxRoundedOnce = (result: Composition, rate: string) =>
+  new D(totalsOf(result).net)
+    .mul(rate)
+    .toDecimalPlaces(totalsOf(result).net.split('.')[1]?.length ?? 0, D.ROUND_HALF_UP)
+
+/** The same quote with its frozen tax set to `tax`, and its total with it: a result no kernel run produces. */
+const withTax = (result: Composition, tax: Decimal) => {
+  const edited = clone(result)
+  const totals = edited.quote.totals!
+  const scale = totals.net.split('.')[1]?.length ?? 0
+
+  totals.tax = tax.toFixed(scale)
+  totals.grandTotal = new D(totals.net).plus(totals.tax).toFixed(scale)
+
+  return edited
+}
+
+/** The same quote with its frozen tax moved by `units` of the currency, and its total with it. */
+const withTaxMovedBy = (result: Composition, units: number) => withTax(result, new D(totalsOf(result).tax!).plus(units))
+
 /** Rows of the kernel with the month of the quote each belongs to (a period is calculated on its own, as period 1). */
 const rowsOf = (result: Composition) =>
   result.quote.periods.flatMap(period => period.result.lines.map(row => ({ ...row, month: period.periodId })))
@@ -489,7 +534,12 @@ describe('the frozen examples and the files committed next to them', () => {
     if (totals.tax === null) {
       expect(data.vatRate).toBeNull()
       expect(data).not.toHaveProperty('taxAmount')
-    } else expect(data.taxAmount).toBe(totals.tax)
+      expect(data).not.toHaveProperty('taxPeriods')
+    } else {
+      expect(data.taxAmount).toBe(totals.tax)
+      // With the frozen tax, the periods it was rounded over: the ones of the quote.
+      expect(data.taxPeriods).toBe(artifact.semantic.result.quote.periods.length)
+    }
   })
 
   it('designer for three months with IVA: the months folded, the start-up once, and the tax and total of the quote', () => {
@@ -961,25 +1011,11 @@ describe('the brief carries texts, never figures', () => {
 })
 
 describe('tax and total are the ones the quote froze', () => {
-  /** Months and payments the lines of a document count: the `N` of the tax guard. */
-  const quantityOfLines = (result: Composition) =>
-    scaffold(result).lines.reduce((total, line) => total + line.quantity.value, 0)
-
-  /** The same quote with its frozen tax moved by `units` of the currency, and its total with it. */
-  const withTaxMovedBy = (result: Composition, units: number) => {
-    const edited = clone(result)
-    const totals = edited.quote.totals!
-
-    totals.tax = new D(totals.tax!).plus(units).toFixed(0)
-    totals.grandTotal = new D(totals.net).plus(totals.tax).toFixed(0)
-
-    return edited
-  }
-
   it('not resolved: no rate and no amount are assumed', () => {
     expect(totalsOf(designer).tax).toBeNull()
     expect(emitted(designer).vatRate).toBeNull()
     expect(emitted(designer)).not.toHaveProperty('taxAmount')
+    expect(emitted(designer)).not.toHaveProperty('taxPeriods')
     expect(emitted(designer)).not.toHaveProperty('taxStatus')
   })
 
@@ -990,6 +1026,9 @@ describe('tax and total are the ones the quote froze', () => {
 
     expect(data.vatRate).toBe(0.19)
     expect(data.taxAmount).toBe(totals.tax)
+    // The periods of the quote: one, whatever its two lines count.
+    expect(result.quote.periods.length).toBe(1)
+    expect(data.taxPeriods).toBe(1)
     expect(data).not.toHaveProperty('taxStatus')
     expect(new D(data.net).plus(data.taxAmount!).toFixed()).toBe(totals.grandTotal)
   })
@@ -1018,33 +1057,77 @@ describe('tax and total are the ones the quote froze', () => {
 
     expect(data.vatRate).toBe(0.19)
     expect(data.taxAmount).toBe(totals.tax)
+    expect(data.taxPeriods).toBe(3)
     expect(data.taxAmount).not.toBe(roundedOnce.toFixed(0))
     expect(new D(data.net).plus(data.taxAmount!).toFixed()).toBe(totals.grandTotal)
     expect(scaffold(taxRoundedByMonth).quote).toMatchObject({ vatRate: 0.19, taxAmount: totals.tax })
   })
 
-  it('the frozen tax is held to the rate: one unit per month or payment of the lines, and no more', () => {
-    const result = designerWithTax('0.19')
-    const totals = totalsOf(result)
-    const allowed = quantityOfLines(result)
+  it('the frozen tax is held to the rate: one unit per period of the quote, and no more', () => {
+    // [the quote, its rate]: one period with two lines, three periods with four units of lines, and two periods
+    // with a month off between them.
+    const cases = [
+      [designerWithTax('0.19'), 1],
+      [frozen(`${THREE_MONTHS}.artifact.json`).semantic.result, 3],
+      [
+        calculated(
+          recompose(DESIGNER, demand => {
+            withoutCreditTools(demand)
+            over(demand, 3)
+            demand.brief.lines[0].activePeriods = [1, 3]
+            demand.allocations = demand.allocations.filter(allocation => allocation.periodId !== 2)
+            demand.brief.taxTreatment = exclusive('0.19')
+          })
+        ),
+        2
+      ]
+    ] as const
 
-    // Premise: this quote is taxed once on its net, so its tax is exactly the one of the rate.
-    expect(new D(totals.net).mul('0.19').toDecimalPlaces(0, D.ROUND_HALF_UP).toFixed()).toBe(totals.tax)
-    expect(allowed).toBe(2)
+    for (const [result, periods] of cases) {
+      const once = taxRoundedOnce(result, '0.19')
 
-    for (const units of [allowed, -allowed])
-      expect(emitted(withTaxMovedBy(result, units)).taxAmount).toBe(new D(totals.tax!).plus(units).toFixed(0))
+      // Premise: the bound is the periods of the quote, which is not what its lines happen to count.
+      expect(result.quote.periods.length).toBe(periods)
+      expect(scaffold(result).lines.reduce((total, line) => total + line.quantity.value, 0)).not.toBe(periods)
 
-    for (const units of [allowed + 1, -(allowed + 1)]) {
-      const outcome = rejection(withTaxMovedBy(result, units))
+      for (const units of [periods, -periods]) {
+        const data = emitted(withTax(result, once.plus(units)))
 
-      expect(outcome.code).toBe('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE')
-      expect(outcome.issues).toEqual([{ path: 'totals.tax', rule: 'tax_differs_from_rate' }])
-      expect(scaffoldQuoteDocumentBrief(withTaxMovedBy(result, units), IDENTITY)).toMatchObject({
-        ok: false,
-        code: outcome.code
-      })
+        expect(data.taxAmount).toBe(once.plus(units).toFixed(0))
+        expect(data.taxPeriods).toBe(periods)
+      }
+
+      for (const units of [periods + 1, -(periods + 1)]) {
+        const edited = withTax(result, once.plus(units))
+        const outcome = rejection(edited)
+
+        expect(outcome.code).toBe('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE')
+        expect(outcome.issues).toEqual([{ path: 'totals.tax', rule: 'tax_differs_from_rate' }])
+        expect(scaffoldQuoteDocumentBrief(edited, IDENTITY)).toMatchObject({ ok: false, code: outcome.code })
+      }
     }
+  })
+
+  it('a quote of more periods than the template counts a tax over is rejected', () => {
+    const periodsOf = (count: number) => {
+      const edited = clone(designerWithTax('0.19'))
+      const [period] = edited.quote.periods
+      const totals = edited.quote.totals!
+
+      // One period repeated, with totals that follow: only the count of periods is under test.
+      edited.quote.periods = Array.from({ length: count }, (_, index) => ({ ...period, periodId: index + 1 }))
+      totals.net = new D(period.result.totals!.net).mul(count).toFixed(0)
+      totals.tax = new D(period.result.totals!.tax!).mul(count).toFixed(0)
+      totals.grandTotal = new D(totals.net).plus(totals.tax).toFixed(0)
+
+      return edited
+    }
+
+    expect(emitted(periodsOf(120)).taxPeriods).toBe(120)
+    expect(rejection(periodsOf(121))).toMatchObject({
+      code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
+      issues: [{ path: 'periods', rule: 'too_many' }]
+    })
   })
 
   it('a total that is not the net plus the frozen tax is rejected', () => {
@@ -1151,6 +1234,77 @@ describe('payment calendar: the amounts are the ones of the schedule reader', ()
 
     expect(tooMany.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
     expect(tooMany.issues).toEqual([{ path: 'paymentMilestones', rule: 'too_big' }])
+  })
+
+  it('with an exclusive rate each milestone carries its part of the frozen tax and its total', () => {
+    // Three months whose tax the kernel rounded month by month: the tax of the quote is not the one of its net
+    // rounded once, so a milestone tax computed here from the rate would not add up to it.
+    const totals = totalsOf(taxRoundedByMonth)
+    const reading = presentPaymentSchedule(taxRoundedByMonth, IDENTITY, list)
+
+    if (!reading.ok) throw new Error('schedule rejected')
+
+    const data = emitted(taxRoundedByMonth, { ...texts(), paymentMilestones: list })
+    const milestones = data.paymentSchedule!.milestones
+
+    expect(milestones).toEqual(
+      reading.reading.milestones.map((milestone, index) => ({
+        label: list[index].label,
+        when: index === 1 ? 'Mes 2' : list[index].when,
+        net: milestone.amount,
+        tax: milestone.tax,
+        total: milestone.total
+      }))
+    )
+
+    // What a reader adds up from the table is what the quote froze: its net, its tax and its grand total.
+    expect(sum(milestones.map(milestone => milestone.net)).toFixed()).toBe(new D(totals.net).toFixed())
+    expect(sum(milestones.map(milestone => milestone.tax!)).toFixed()).toBe(new D(totals.tax!).toFixed())
+    expect(sum(milestones.map(milestone => milestone.total!)).toFixed()).toBe(new D(totals.grandTotal!).toFixed())
+    for (const milestone of milestones)
+      expect(new D(milestone.net).plus(milestone.tax!).toFixed()).toBe(new D(milestone.total!).toFixed())
+    expect(data.taxAmount).toBe(totals.tax)
+
+    // The default note says the amounts carry no tax: it is not printed over a table that states it, and nothing
+    // takes its place. A note of the brief is printed as written.
+    expect(data.paymentSchedule).toEqual({ title: QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS.title, milestones })
+    expect(
+      emitted(taxRoundedByMonth, {
+        ...texts(),
+        paymentMilestones: list,
+        paymentScheduleTexts: { note: 'Cada hito se factura al cumplirse.' }
+      }).paymentSchedule
+    ).toEqual({
+      title: QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS.title,
+      note: 'Cada hito se factura al cumplirse.',
+      milestones
+    })
+  })
+
+  it('without a resolved tax, or with one that does not apply, a milestone is its net', () => {
+    const two: PaymentMilestone[] = [
+      { id: 'a', label: 'Anticipo', share: '0.5', when: 'A la aceptación' },
+      { id: 'b', label: 'Saldo', share: '0.5', when: 'Al cierre' }
+    ]
+
+    for (const result of [designer, designerTaxNotApplicable]) {
+      const reading = presentPaymentSchedule(result, IDENTITY, two)
+
+      if (!reading.ok) throw new Error('schedule rejected')
+
+      const data = emitted(result, { ...texts(), paymentMilestones: two })
+
+      // The document prints no tax amount for this quote, so a payment states none either.
+      expect(data).not.toHaveProperty('taxAmount')
+      expect(data.paymentSchedule).toEqual({
+        ...QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS,
+        milestones: reading.reading.milestones.map(milestone => ({
+          label: milestone.label,
+          when: milestone.when,
+          net: milestone.amount
+        }))
+      })
+    }
   })
 })
 
@@ -1285,6 +1439,7 @@ describe('nothing the client-safe view does not expose reaches the document', ()
     'locale',
     'vatRate',
     'taxAmount',
+    'taxPeriods',
     'taxStatus',
     'supplier',
     'buyer',
@@ -1383,8 +1538,11 @@ describe('nothing the client-safe view does not expose reaches the document', ()
     for (const line of data.lines) expect(Object.keys(line).every(key => LINE_KEYS.includes(key))).toBe(true)
     for (const item of data.clientPaidDirectly ?? [])
       expect(Object.keys(item)).toEqual(['label', 'amount', 'currency', 'detail'])
+    // A milestone is a net; with the tax of the quote resolved to a rate, also its part of that tax and its total.
     for (const milestone of data.paymentSchedule!.milestones)
-      expect(Object.keys(milestone)).toEqual(['label', 'when', 'net'])
+      expect(Object.keys(milestone)).toEqual(
+        totalsOf(result).tax === null ? ['label', 'when', 'net'] : ['label', 'when', 'net', 'tax', 'total']
+      )
     expect(Object.keys(data.source)).toEqual(['system', 'calculationId', 'digest', 'engineVersion'])
 
     // `supplier` is the issuer of the document, written by the brief; `vatRate` is the tax of the quote. Beyond
@@ -1469,6 +1627,53 @@ describe('nothing the client-safe view does not expose reaches the document', ()
       expect(printed).not.toContain(adjustment.reason)
       expect(printed).not.toContain(adjustment.adjustmentId)
     }
+  })
+
+  it('with keys combined and milestones with their tax: sums of what the firewall exposes, and nothing internal', () => {
+    const result = taxRoundedByMonth
+    const keys = [...chargedByKey(result).keys()]
+    const supplierKeys = keys.filter(key => key !== 'fee')
+
+    // Premise: a fee and re-invoiced supplier costs, whose keys carry the ids of those costs.
+    expect(keys).toContain('fee')
+    expect(supplierKeys.length).toBeGreaterThan(1)
+
+    const data = emitted(result, {
+      ...texts(),
+      combine: [
+        { keys: ['fee'], label: 'Programa', unit: 'programa' },
+        { keys: supplierKeys, label: 'Producción y medios', unit: 'campaña' }
+      ],
+      paymentMilestones: milestones
+    })
+
+    // The contract of the data is the one it had: a combined line is a line, with fewer keys than a folded one.
+    expect(Object.keys(data).every(key => CONTRACT_KEYS.includes(key))).toBe(true)
+    expect(data.lines.map(line => Object.keys(line))).toEqual([
+      ['label', 'group', 'quantity', 'net'],
+      ['label', 'group', 'quantity', 'net']
+    ])
+    for (const milestone of data.paymentSchedule!.milestones)
+      expect(Object.keys(milestone)).toEqual(['label', 'when', 'net', 'tax', 'total'])
+    for (const key of keysOf({ lines: data.lines, paymentSchedule: data.paymentSchedule, source: data.source }))
+      expect(key).not.toMatch(/cost|margin|rate|supplier|policy|profile|floor|markup|key|kind|combine/i)
+
+    // Each net is a sum of nets the firewall exposes; no cost, margin or name of the result is in the data, and
+    // neither are the keys the brief named the lines by.
+    const charged = chargedByKey(result)
+    const netOf = (names: string[]) => sum(names.flatMap(key => charged.get(key)!.map(period => period.net))).toFixed(0)
+
+    expect(data.lines.map(line => line.net)).toEqual([netOf(['fee']), netOf(supplierKeys)])
+
+    const internals = internalsOf(result)
+    const values = leaves(data)
+    const printed = JSON.stringify(data)
+
+    expect(internals.amounts.length).toBeGreaterThan(3)
+    for (const amount of internals.amounts) expect(values, 'the data holds an internal amount').not.toContain(amount)
+    for (const internal of internals.names) expect(printed, 'the data holds an internal name').not.toContain(internal)
+    for (const key of supplierKeys) expect(printed).not.toContain(key)
+    expect(printed).not.toMatch(/third_party|ECG-|allocation:/)
   })
 
   it('the preview is the same firewall, printed by concept and net, and did not move', () => {
@@ -1882,32 +2087,27 @@ describe('a courtesy is printed only where the brief asks, with the reference va
     for (const result of [designer, managed, linesThreeMonths]) expect(scaffold(result)).not.toHaveProperty('waived')
   })
 
-  it('a courtesy lends the tax guard nothing: the frozen tax is held to the months that are charged', () => {
+  it('a courtesy lends the tax guard nothing: the frozen tax is held to the periods of the quote', () => {
     const totals = totalsOf(startupWaived)
-    const charged = scaffold(startupWaived).lines.reduce((total, line) => total + line.quantity.value, 0)
+    const periods = startupWaived.quote.periods.length
+    const printed = emitted(startupWaived, courtesy('design:setup'))
 
-    // Premise: three charged months, and a courtesy that would count a fourth unit if it were counted.
-    expect(charged).toBe(3)
-    expect(emitted(startupWaived, courtesy('design:setup')).lines.reduce((n, line) => n + line.quantity.value, 0)).toBe(
-      4
-    )
+    // Premise: three periods, and lines that count a fourth unit once the courtesy is printed.
+    expect(periods).toBe(3)
+    expect(printed.lines.reduce((count, line) => count + line.quantity.value, 0)).toBe(4)
+    expect(printed.taxPeriods).toBe(3)
+    expect(taxRoundedOnce(startupWaived, '0.19').toFixed(0)).toBe(totals.tax)
 
-    const shifted = (units: number) => {
-      const edited = clone(startupWaived)
-
-      edited.quote.totals!.tax = new D(totals.tax!).plus(units).toFixed(0)
-      edited.quote.totals!.grandTotal = new D(totals.grandTotal!).plus(units).toFixed(0)
-
-      return edited
+    // With the courtesy printed or not, the bound is the same three units.
+    for (const brief of [texts(), courtesy('design:setup')]) {
+      expect(emitted(withTaxMovedBy(startupWaived, periods), brief).taxAmount).toBe(
+        new D(totals.tax!).plus(periods).toFixed(0)
+      )
+      expect(rejection(withTaxMovedBy(startupWaived, periods + 1), brief)).toMatchObject({
+        code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
+        issues: [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }]
+      })
     }
-
-    expect(emitted(shifted(charged), courtesy('design:setup')).taxAmount).toBe(
-      new D(totals.tax!).plus(charged).toFixed(0)
-    )
-    expect(rejection(shifted(charged + 1), courtesy('design:setup'))).toMatchObject({
-      code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
-      issues: [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }]
-    })
   })
 })
 
@@ -2176,6 +2376,479 @@ describe('optional add-ons: each priced by its own frozen quote, printed apart, 
   })
 })
 
+describe('a price printed as what it is: keys combined into one line', () => {
+  /** What the firewall charges for `keys`, added over the whole term: the verifier of the net of a combined line. */
+  const chargedFor = (result: Composition, keys: string[]) =>
+    sum(keys.flatMap(key => (chargedByKey(result).get(key) ?? []).map(period => period.net)))
+
+  const combining = (entries: unknown, more: Json = {}): Json => ({ ...texts(), ...more, combine: entries })
+
+  /** The lines a quote prints with no brief, without the keys the scaffold lists them by. */
+  const foldedLines = (result: Composition) =>
+    scaffold(result).lines.map(({ key, kind, ...line }) => (void kind, { key, line }))
+
+  const threeMonthsWithTax = frozen(`${THREE_MONTHS}.artifact.json`).semantic.result
+
+  it('two keys of a quote sold by lines: one line, a quantity of one, no unit value and the exact sum', () => {
+    const rows = rowsOf(threeMonthsWithTax)
+
+    // Premise, from the kernel rows: three monthly rows and one setup row, and nothing else.
+    expect(rows.map(row => row.kind).sort()).toEqual(['monthly', 'monthly', 'monthly', 'setup'])
+
+    const data = emitted(
+      threeMonthsWithTax,
+      combining([{ keys: ['design', 'design:setup'], label: 'Diseño visual, todo incluido', unit: 'servicio' }])
+    )
+
+    expect(data.lines).toEqual([
+      {
+        label: 'Diseño visual, todo incluido',
+        group: 'Servicio',
+        quantity: { value: 1, unit: 'servicio' },
+        net: sum(rows.map(row => row.net)).toFixed(0)
+      }
+    ])
+    expect(data.lines[0].net).toBe(totalsOf(threeMonthsWithTax).net)
+
+    // A combination moves the lines and nothing else: net, tax, total and every text are the ones of the quote.
+    expect({ ...data, lines: undefined }).toEqual({ ...emitted(threeMonthsWithTax), lines: undefined })
+    expect(data.taxAmount).toBe(totalsOf(threeMonthsWithTax).tax)
+  })
+
+  it('one key alone: a fee printed as a programme price, and every other line as it was', () => {
+    const plain = emitted(managedSuppliersOverTheTerm)
+    const fees = clientSafePeriodItems(managedSuppliersOverTheTerm).map(period => period.items[0])
+
+    // Premise: three months of fee, which fold into «3 meses» when nothing is combined.
+    expect(fees.map(item => item.key)).toEqual(['fee', 'fee', 'fee'])
+    expect(plain.lines[0]).toMatchObject({ quantity: { value: 3, unit: 'meses' } })
+
+    const data = emitted(
+      managedSuppliersOverTheTerm,
+      combining([{ keys: ['fee'], label: 'Programa de contenidos', detail: 'Equipo y reportes', unit: 'programa' }])
+    )
+
+    expect(data.lines[0]).toEqual({
+      label: 'Programa de contenidos',
+      detail: 'Equipo y reportes',
+      group: 'Servicio',
+      quantity: { value: 1, unit: 'programa' },
+      net: sum(fees.map(item => item.net)).toFixed(0)
+    })
+    expect(data.lines.slice(1)).toEqual(plain.lines.slice(1))
+    expect(sum(data.lines.map(line => line.net)).toFixed()).toBe(
+      new D(totalsOf(managedSuppliersOverTheTerm).net).toFixed()
+    )
+  })
+
+  it('a net that changes over the term, or a month off, is still one sum', () => {
+    const fees = clientSafePeriodItems(managedFeeChanges).map(period => period.items[0].net)
+
+    // Premise: folded, this fee is two lines, because its net changes in the third month.
+    expect(emitted(managedFeeChanges).lines.filter(line => line.group === 'Servicio').length).toBe(2)
+    expect(new Set(fees).size).toBe(2)
+
+    const changing = emitted(managedFeeChanges, combining([{ keys: ['fee'], label: 'Programa', unit: 'programa' }]))
+
+    expect(changing.lines.filter(line => line.group === 'Servicio')).toEqual([
+      { label: 'Programa', group: 'Servicio', quantity: { value: 1, unit: 'programa' }, net: sum(fees).toFixed(0) }
+    ])
+
+    // Months 1 and 3 only: the line has no months to name and its net is the two of them.
+    const monthly = rowsOf(designerWithGap).filter(row => row.kind === 'monthly')
+    const withGap = emitted(designerWithGap, combining([{ keys: ['design'], label: 'Diseño', unit: 'servicio' }]))
+
+    expect(monthly.map(row => row.month)).toEqual([1, 3])
+    expect(withGap.lines.filter(line => line.label === 'Diseño')).toEqual([
+      {
+        label: 'Diseño',
+        group: 'Servicio',
+        quantity: { value: 1, unit: 'servicio' },
+        net: sum(monthly.map(row => row.net)).toFixed(0)
+      }
+    ])
+  })
+
+  it.each(corpus)('%s: each key combined alone, and all of them together, say what the firewall charges', path => {
+    const result = frozen(path).semantic.result
+    const folded = foldedLines(result)
+    const keys = [...chargedByKey(result).keys()]
+    const scale = totalsOf(result).net.split('.')[1]?.length ?? 0
+
+    expect(keys.length).toBeGreaterThan(0)
+
+    for (const key of keys) {
+      const data = emitted(result, combining([{ keys: [key], label: 'Línea combinada', unit: 'programa' }]))
+      const first = folded.findIndex(entry => entry.key === key)
+
+      // The lines of the key give way to one line, where the first of them was; every other line is untouched.
+      expect(data.lines).toEqual(
+        folded.flatMap((entry, index) =>
+          entry.key !== key
+            ? [entry.line]
+            : index === first
+              ? [
+                  {
+                    label: 'Línea combinada',
+                    group: entry.line.group,
+                    quantity: { value: 1, unit: 'programa' },
+                    net: chargedFor(result, [key]).toFixed(scale)
+                  }
+                ]
+              : []
+        )
+      )
+    }
+
+    const whole = emitted(result, combining([{ keys, label: 'Precio del programa', unit: 'programa' }]))
+
+    expect(whole.lines.length).toBe(1)
+    expect(whole.lines[0]).toMatchObject({ quantity: { value: 1, unit: 'programa' }, net: totalsOf(result).net })
+    expect(whole.lines[0]).not.toHaveProperty('unitNet')
+    expect(chargedFor(result, keys).toFixed()).toBe(new D(totalsOf(result).net).toFixed())
+  })
+
+  it('amounts keep the decimals the kernel gave the currency', () => {
+    const data = emitted(
+      designerInDollars,
+      combining([{ keys: ['design:setup', 'design'], label: 'Design', unit: 'servicio' }])
+    )
+
+    expect(totalsOf(designerInDollars).net).toMatch(/\.\d{2}$/)
+    expect(data.lines.map(line => line.net)).toEqual([totalsOf(designerInDollars).net])
+  })
+
+  it('the line sits where the first of its keys appears, under the group of the first key listed or its own', () => {
+    const plain = emitted(managed)
+    const [fee, production, talent, media] = plain.lines
+
+    // Premise: the fee and three supplier costs, in two groups.
+    expect(plain.lines.map(line => line.group)).toEqual([
+      'Servicio',
+      'Costos de terceros',
+      'Costos de terceros',
+      'Costos de terceros'
+    ])
+    expect(talent.label).toBe(rowsOf(managed).find(row => row.parentLineId === 'tp-talent')!.label)
+
+    const net = new D(fee.net).plus(talent.net).toFixed(0)
+    const line = { label: 'Servicio y locución', quantity: { value: 1, unit: 'servicio' }, net }
+    const entry = { label: 'Servicio y locución', unit: 'servicio' }
+
+    // The fee is the first item of the quote: the line takes its place whichever key is written first.
+    expect(emitted(managed, combining([{ ...entry, keys: ['fee', 'third_party:tp-talent'] }])).lines).toEqual([
+      { ...line, group: 'Servicio' },
+      production,
+      media
+    ])
+    expect(emitted(managed, combining([{ ...entry, keys: ['third_party:tp-talent', 'fee'] }])).lines).toEqual([
+      { ...line, group: 'Costos de terceros' },
+      production,
+      media
+    ])
+    expect(
+      emitted(managed, combining([{ ...entry, keys: ['third_party:tp-talent', 'fee'], group: 'Programa' }])).lines
+    ).toEqual([{ ...line, group: 'Programa' }, production, media])
+
+    // Two supplier costs as one line, where the first of them was; the fee keeps its months.
+    const suppliers = emitted(
+      managed,
+      combining([{ keys: ['third_party:tp-media', 'third_party:tp-production'], label: 'Campaña', unit: 'campaña' }])
+    )
+
+    expect(suppliers.lines).toEqual([
+      fee,
+      {
+        label: 'Campaña',
+        group: 'Costos de terceros',
+        quantity: { value: 1, unit: 'campaña' },
+        net: new D(production.net).plus(media.net).toFixed(0)
+      },
+      talent
+    ])
+  })
+
+  it('a key is printed once: unknown, waived, repeated or also dressed in `lines`, it is rejected by position', () => {
+    const sentinel = `leak-probe-${process.pid}`
+    const entry = { label: 'Diseño', unit: 'servicio' }
+
+    // Premise: the example charges for `design` and waives `design:setup` completely.
+    expect([...chargedByKey(startupWaived).keys()]).toEqual(['design'])
+    expect(clientSafeWaivedItems(startupWaived)[0].items.map(item => item.key)).toEqual(['design:setup'])
+
+    const cases: [Json, { path: string; rule: string }[]][] = [
+      [combining([{ ...entry, keys: [sentinel] }]), [{ path: 'combine.0.keys.0', rule: 'unknown_key' }]],
+      // A waived key has no net to add: listed, it would pass for part of the price.
+      [
+        combining([{ ...entry, keys: ['design', 'design:setup'] }]),
+        [{ path: 'combine.0.keys.1', rule: 'key_not_charged' }]
+      ],
+      // Marked as a courtesy or not: a courtesy is printed by its own line, never inside another.
+      [
+        combining([{ ...entry, keys: ['design', 'design:setup'] }], { lines: { 'design:setup': { courtesy: true } } }),
+        [{ path: 'combine.0.keys.1', rule: 'key_not_charged' }]
+      ],
+      [combining([{ ...entry, keys: ['design', 'design'] }]), [{ path: 'combine.0.keys.1', rule: 'duplicate_key' }]],
+      [
+        combining([
+          { ...entry, keys: ['design'] },
+          { ...entry, keys: ['design'] }
+        ]),
+        [{ path: 'combine.1.keys.0', rule: 'duplicate_key' }]
+      ],
+      // A combined key has no line of its own: a label for it in `lines` would be dropped without a word.
+      [
+        combining([{ ...entry, keys: ['design'] }], { lines: { design: { label: 'Diseñador' } } }),
+        [{ path: 'lines.0', rule: 'key_is_combined' }]
+      ]
+    ]
+
+    for (const [brief, issues] of cases) {
+      const outcome = rejection(startupWaived, brief)
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toEqual(issues)
+      expect(JSON.stringify(outcome)).not.toContain(sentinel)
+    }
+
+    // The scaffold lists every key under `lines`: a brief that combines one takes it out of there.
+    const { brief } = scaffold(managed)
+    const keys = Object.keys(brief.lines)
+
+    expect(
+      rejection(managed, combining([{ keys, label: 'Programa', unit: 'programa' }], { lines: brief.lines })).issues
+    ).toEqual(keys.map((_, index) => ({ path: `lines.${index}`, rule: 'key_is_combined' })))
+    expect(brief).not.toHaveProperty('combine')
+  })
+
+  it('a combination names keys and texts; anything else is rejected, naming where', () => {
+    const entry = { keys: ['fee'], label: 'Programa', unit: 'programa' }
+
+    const cases: [unknown, { path: string; rule: string }][] = [
+      [{ fee: entry }, { path: 'combine', rule: 'not_an_array' }],
+      [[], { path: 'combine', rule: 'empty' }],
+      [Array.from({ length: 41 }, () => entry), { path: 'combine', rule: 'too_many' }],
+      [['fee'], { path: 'combine.0', rule: 'not_an_object' }],
+      // No figure has a place in it: the net of the line is the one the quote froze.
+      [[{ ...entry, net: '1000' }], { path: 'combine.0', rule: 'unknown_field' }],
+      [[{ ...entry, unitNet: '1000' }], { path: 'combine.0', rule: 'unknown_field' }],
+      [[{ ...entry, quantity: { value: 3, unit: 'meses' } }], { path: 'combine.0', rule: 'unknown_field' }],
+      [[{ ...entry, courtesy: true }], { path: 'combine.0', rule: 'unknown_field' }],
+      [[{ ...entry, keys: 'fee' }], { path: 'combine.0.keys', rule: 'invalid_keys' }],
+      [[{ ...entry, keys: [] }], { path: 'combine.0.keys', rule: 'invalid_keys' }],
+      [[{ ...entry, keys: [1] }], { path: 'combine.0.keys.0', rule: 'invalid_key' }],
+      [[{ keys: ['fee'], unit: 'programa' }], { path: 'combine.0.label', rule: 'missing_label' }],
+      [[{ ...entry, label: '   ' }], { path: 'combine.0.label', rule: 'invalid_label' }],
+      [[{ keys: ['fee'], label: 'Programa' }], { path: 'combine.0.unit', rule: 'missing_unit' }],
+      [[{ ...entry, unit: 5 }], { path: 'combine.0.unit', rule: 'invalid_unit' }],
+      [[{ ...entry, detail: 'Uno\nDos' }], { path: 'combine.0.detail', rule: 'invalid_detail' }],
+      [[{ ...entry, group: '' }], { path: 'combine.0.group', rule: 'invalid_group' }]
+    ]
+
+    for (const [combine, issue] of cases) {
+      const outcome = rejection(managed, combining(combine))
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toContainEqual(issue)
+    }
+
+    // Premise of the cases above: the entry they break is one the reading takes.
+    expect(emitted(managed, combining([entry])).lines[0]).toMatchObject({
+      label: 'Programa',
+      net: emitted(managed).lines[0].net
+    })
+  })
+
+  it('how the lines are printed never changes whether the tax is accepted', () => {
+    const totals = totalsOf(threeMonthsWithTax)
+    const whole = combining([{ keys: ['design', 'design:setup'], label: 'Diseño', unit: 'servicio' }])
+
+    // Premise: three periods; the frozen tax is the one of the rate on the net; folded, the lines count four units
+    // (three months and a payment) and combined they count one.
+    expect(threeMonthsWithTax.quote.periods.length).toBe(3)
+    expect(taxRoundedOnce(threeMonthsWithTax, '0.19').toFixed(0)).toBe(totals.tax)
+    expect(emitted(threeMonthsWithTax).lines.map(line => line.quantity.value)).toEqual([3, 1])
+    expect(emitted(threeMonthsWithTax, whole).lines.map(line => line.quantity.value)).toEqual([1])
+
+    // Up to one unit per period, either way, with the same tax and the same count of periods in the data.
+    for (const units of [1, 2, 3, -3])
+      for (const brief of [texts(), whole])
+        expect(emitted(withTaxMovedBy(threeMonthsWithTax, units), brief)).toMatchObject({
+          taxAmount: new D(totals.tax!).plus(units).toFixed(0),
+          taxPeriods: 3
+        })
+
+    // And beyond it neither: a fault of the quote, never of the way its lines are printed.
+    for (const units of [4, -4])
+      for (const brief of [texts(), whole])
+        expect(rejection(withTaxMovedBy(threeMonthsWithTax, units), brief)).toMatchObject({
+          code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
+          issues: [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }]
+        })
+  })
+
+  it('a programme of twelve months with its tax rounded month by month is one line', () => {
+    const result = twelveMonthsTaxRoundedByMonth
+    const totals = totalsOf(result)
+    const once = taxRoundedOnce(result, '0.19')
+    const gap = once.minus(totals.tax!).abs()
+    const keys = [...chargedByKey(result).keys()]
+    const whole = combining([{ keys, label: 'Programa anual', unit: 'programa' }])
+
+    // Premise, from the kernel: twelve periods, a tax that is the sum of the twelve it rounded, and more than one
+    // unit away from the tax of the whole net. One line could not carry that gap if lines were what counted.
+    expect(result.quote.periods.length).toBe(12)
+    expect(sum(result.quote.periods.map(period => period.result.totals!.tax!)).toFixed()).toBe(totals.tax)
+    expect(gap.gt(1) && gap.lte(12)).toBe(true)
+
+    const data = emitted(result, whole)
+
+    expect(data.lines).toEqual([
+      { label: 'Programa anual', group: 'Servicio', quantity: { value: 1, unit: 'programa' }, net: totals.net }
+    ])
+    expect(data).toMatchObject({ vatRate: 0.19, taxAmount: totals.tax, taxPeriods: 12 })
+    expect(new D(data.net).plus(data.taxAmount!).toFixed()).toBe(totals.grandTotal)
+
+    // The same tax, folded by months: the presentation moved the lines and nothing else.
+    expect({ ...data, lines: undefined }).toEqual({ ...emitted(result), lines: undefined })
+
+    // A tax beyond the count of periods is still rejected, combined or not.
+    for (const units of [12, -12]) expect(emitted(withTax(result, once.plus(units)), whole).taxPeriods).toBe(12)
+
+    for (const units of [13, -13])
+      for (const brief of [texts(), whole])
+        expect(rejection(withTax(result, once.plus(units)), brief)).toMatchObject({
+          code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
+          issues: [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }]
+        })
+  })
+
+  it('the committed example: a managed service of three months as one programme price, each payment with its tax', () => {
+    const artifact = frozen(PROGRAMME_ARTIFACT)
+    const result = artifact.semantic.result
+    const totals = totalsOf(result)
+    const brief = read(`${PROGRAMME}.document-brief.json`)
+    const outcome = composeQuoteDocument(result, artifact, brief)
+
+    if (!outcome.ok) throw new Error(`document rejected: ${outcome.code} ${JSON.stringify(outcome.issues)}`)
+
+    // The example files are kept in step with the reading: a change of either shows here.
+    expect(clone(outcome.reading)).toEqual(read(`${PROGRAMME}.document.json`))
+
+    const data = outcome.reading
+    const fees = clientSafePeriodItems(result).map(period => period.items)
+
+    // Premise, from the firewall: three months, each of them one fee.
+    expect(fees.map(items => items.map(item => item.key))).toEqual([['fee'], ['fee'], ['fee']])
+
+    expect(data.lines.map(({ label, detail, ...figures }) => (void label, void detail, figures))).toEqual([
+      {
+        group: 'Servicio',
+        quantity: { value: 1, unit: 'programa' },
+        net: sum(fees.map(items => items[0].net)).toFixed(0)
+      }
+    ])
+    expect(data.net).toBe(totals.net)
+    expect(data.taxAmount).toBe(totals.tax)
+
+    const schedule = presentPaymentSchedule(result, artifact, brief.paymentMilestones)
+
+    if (!schedule.ok) throw new Error('schedule rejected')
+
+    expect(data.paymentSchedule!.milestones.map(({ net, tax, total }) => ({ net, tax, total }))).toEqual(
+      schedule.reading.milestones.map(milestone => ({
+        net: milestone.amount,
+        tax: milestone.tax,
+        total: milestone.total
+      }))
+    )
+    expect(sum(data.paymentSchedule!.milestones.map(milestone => milestone.total!)).toFixed()).toBe(
+      new D(totals.grandTotal!).toFixed()
+    )
+
+    // It says nothing it has no reason to say: no area of the buyer, no note of the calendar of the work.
+    expect(data.buyer).toEqual({ name: 'Cliente de ejemplo', taxId: brief.buyer.taxId, logo: null })
+    expect(data.schedule).not.toHaveProperty('note')
+    expect(data.cover.netLabel).toBe(brief.cover.netLabel)
+    expect(data.source).toMatchObject({ calculationId: artifact.calculationId, digest: artifact.replayDigest })
+  })
+})
+
+describe('a text that would only state the obvious is optional', () => {
+  const lean = (): Json => {
+    const { buyer, schedule, ...rest } = texts() as { buyer: Json; schedule: Json } & Json
+    const { unit, ...buyerWithoutUnit } = buyer
+    const { note, ...scheduleWithoutNote } = schedule
+
+    // Premise: the two texts are in the brief the other cases use.
+    expect([unit, note]).toEqual(['Equipo de marketing', 'Nota.'])
+
+    return { ...rest, buyer: buyerWithoutUnit, schedule: scheduleWithoutNote }
+  }
+
+  it('the area of the buyer and the note of the calendar of the work: absent, the data has neither', () => {
+    const data = emitted(managedThreeMonths, lean())
+    const full = emitted(managedThreeMonths)
+
+    expect(data.buyer).toEqual({ name: 'Cliente de ejemplo', taxId: 'Identificación por confirmar' })
+    expect(data.schedule).toEqual({
+      title: 'Calendario',
+      phases: [{ label: 'Inicio', title: 'Fase', text: 'Descripción.' }]
+    })
+
+    // Nothing else of the document depends on them.
+    expect({ ...data, buyer: undefined, schedule: undefined }).toEqual({
+      ...full,
+      buyer: undefined,
+      schedule: undefined
+    })
+    expect(full.buyer.unit).toBe('Equipo de marketing')
+    expect(full.schedule.note).toBe('Nota.')
+  })
+
+  it('the label of the net on the cover is a text of the brief, and no figure rides on it', () => {
+    const cover = texts().cover as Json
+    const data = emitted(managed, { ...texts(), cover: { ...cover, netLabel: 'Valor neto del proyecto' } })
+
+    expect(data.cover).toEqual({ ...cover, netLabel: 'Valor neto del proyecto' })
+    expect(emitted(managed).cover).toEqual(cover)
+    expect({ ...data, cover: undefined }).toEqual({ ...emitted(managed), cover: undefined })
+
+    expect(rejection(managed, { ...texts(), cover: { ...cover, net: '1000' } }).issues).toEqual([
+      { path: 'cover', rule: 'unrecognized_keys' }
+    ])
+  })
+
+  it('present, each is a text like any other: empty or malformed is rejected', () => {
+    const base = texts() as { buyer: Json; schedule: Json; cover: Json } & Json
+
+    const cases: [Json, { path: string; rule: string }][] = [
+      [{ buyer: { ...base.buyer, unit: '   ' } }, { path: 'buyer.unit', rule: 'custom' }],
+      [{ schedule: { ...base.schedule, note: '' } }, { path: 'schedule.note', rule: 'custom' }],
+      [{ cover: { ...base.cover, netLabel: 'Uno\nDos' } }, { path: 'cover.netLabel', rule: 'custom' }],
+      [{ cover: { ...base.cover, netLabel: 1000 } }, { path: 'cover.netLabel', rule: 'invalid_type' }]
+    ]
+
+    for (const [change, issue] of cases) {
+      const outcome = rejection(managed, { ...texts(), ...change })
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toContainEqual(issue)
+    }
+  })
+
+  it('the scaffold leaves no empty slot for them: what is not asked for is not filled in', () => {
+    const { brief } = scaffold(managed)
+
+    expect(brief.buyer).toEqual({ name: '', taxId: '' })
+    expect(brief.cover).toEqual({ label: '', title: [''], subtitle: '' })
+    expect(brief.schedule).toEqual({ title: '', phases: [{ label: '', title: '', text: '' }] })
+
+    // Filled with the texts it does ask for, and nothing else, it is a document.
+    expect(emitted(managed, { ...lean(), lines: brief.lines }).lines).toEqual(emitted(managed).lines)
+  })
+})
+
 // The generator of the A4 quote is the consumer of the data. It is loaded by path at run time, so this module does
 // not become part of the typed program of the kernel: only the two functions the data must satisfy are named.
 type Template = {
@@ -2270,6 +2943,136 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
       await expectTotalsOfTheQuote(result, data)
     }
   )
+
+  // A price printed as what it is: one line for several keys, or for one. The template is given no unit value and
+  // holds the frozen tax to one unit of rounding per line it counts, which is the guard the reading applied.
+  const whole = (result: Composition): Json => ({
+    ...texts(),
+    combine: [{ keys: [...chargedByKey(result).keys()], label: 'Precio del programa', unit: 'programa' }]
+  })
+
+  const feeAsProgramme: Json = { ...texts(), combine: [{ keys: ['fee'], label: 'Programa', unit: 'programa' }] }
+
+  it.each([
+    ['one line for a quote sold by lines', designerThreeMonths, whole(designerThreeMonths)],
+    ['one line for the three-month example with IVA', frozen(`${THREE_MONTHS}.artifact.json`).semantic.result, null],
+    ['one line for a quote whose tax was rounded month by month', taxRoundedByMonth, whole(taxRoundedByMonth)],
+    ['a fee as a programme price next to its supplier costs', managedSuppliersOverTheTerm, feeAsProgramme],
+    ['a fee that changes over the term as one price', managedFeeChanges, feeAsProgramme],
+    ['one line in dollars', designerInDollars, whole(designerInDollars)]
+  ] as const)('%s: the template accepts the data and computes the totals of the quote', async (_, result, brief) => {
+    const data = emitted(result, brief ?? whole(result))
+
+    // Premise: the data does carry a combined line, a quantity of one with no unit value.
+    expect(data.lines.some(line => line.quantity.unit === 'programa' && line.unitNet === undefined)).toBe(true)
+    await expectTotalsOfTheQuote(result, data)
+  })
+
+  // Keys of version 2 that the reading emits and the template takes: the tax and the total of each payment
+  // milestone, a document with no area of the buyer and no note of the calendar of the work, and the label of the
+  // net on the cover.
+  const withoutOptionalTexts = (): Json => {
+    const { buyer, schedule } = texts() as { buyer: Json; schedule: Json }
+
+    return {
+      ...texts(),
+      buyer: { name: buyer.name, taxId: buyer.taxId },
+      schedule: { title: schedule.title, phases: schedule.phases }
+    }
+  }
+
+  it.each([
+    ['milestones with their tax', taxRoundedByMonth, { ...texts(), paymentMilestones: milestones }],
+    [
+      'a combined line and milestones with their tax',
+      frozen(`${THREE_MONTHS}.artifact.json`).semantic.result,
+      { ...whole(frozen(`${THREE_MONTHS}.artifact.json`).semantic.result), paymentMilestones: milestones }
+    ],
+    ['no area of the buyer and no note of the calendar of the work', managed, withoutOptionalTexts()],
+    [
+      'a label of the net on the cover',
+      designerWithTax('0.19'),
+      { ...texts(), cover: { ...(texts().cover as Json), netLabel: 'Valor neto del proyecto' } }
+    ],
+    [
+      'all of them at once',
+      taxRoundedByMonth,
+      {
+        ...withoutOptionalTexts(),
+        cover: { ...(texts().cover as Json), netLabel: 'Valor neto del programa' },
+        combine: [{ keys: ['fee'], label: 'Programa', unit: 'programa' }],
+        paymentMilestones: milestones
+      }
+    ]
+  ] as const)('%s: the template accepts the data and computes the totals of the quote', async (_, result, brief) => {
+    const data = emitted(result, brief)
+
+    // Premise: the data does carry what the case is about.
+    expect(
+      data.paymentSchedule?.milestones.every(
+        milestone => milestone.tax !== undefined && milestone.total !== undefined
+      ) ||
+        data.buyer.unit === undefined ||
+        data.cover.netLabel !== undefined
+    ).toBe(true)
+    await expectTotalsOfTheQuote(result, data)
+  })
+
+  // The bound of the tax is the count of periods the data carries (`taxPeriods`), for the reading and for the
+  // template alike: a line that prints several months as one price is accepted with the gap its months add up to.
+  it.each([2, 3, -3])(
+    'a combined line with a tax %i units from the tax of its net: the template accepts the data',
+    async units => {
+      const result = withTaxMovedBy(frozen(`${THREE_MONTHS}.artifact.json`).semantic.result, units)
+      const data = emitted(result, whole(result))
+
+      // Premise: three periods printed as one line, and a tax that is not the one of the rate on the net.
+      expect(data.lines.map(line => line.quantity.value)).toEqual([1])
+      expect(data.taxPeriods).toBe(3)
+      expect(taxRoundedOnce(result, '0.19').minus(data.taxAmount!).abs().toFixed()).toBe(String(Math.abs(units)))
+      await expectTotalsOfTheQuote(result, data)
+    }
+  )
+
+  it('twelve months as one programme line, with the tax the kernel rounded month by month and its milestones', async () => {
+    const result = twelveMonthsTaxRoundedByMonth
+    const data = emitted(result, { ...whole(result), paymentMilestones: milestones })
+
+    expect(data.lines.map(line => line.quantity)).toEqual([{ value: 1, unit: 'programa' }])
+    expect(taxRoundedOnce(result, '0.19').minus(data.taxAmount!).abs().gt(1)).toBe(true)
+    expect(data.paymentSchedule!.milestones.every(milestone => milestone.tax !== undefined)).toBe(true)
+    await expectTotalsOfTheQuote(result, data)
+  })
+
+  it('the template holds the tax to the same count of periods: one unit more and it refuses the data', async () => {
+    const { validateQuote, quoteAmounts } = await template()
+    const three = frozen(`${THREE_MONTHS}.artifact.json`).semantic.result
+    const taken = (data: unknown) => () => (validateQuote(data), quoteAmounts(data))
+
+    // The furthest tax the reading emits for three periods, printed as one line.
+    const accepted = JSON.parse(JSON.stringify(emitted(withTaxMovedBy(three, 3), whole(three))))
+
+    expect(taken(accepted)).not.toThrow()
+    // What the reading refuses to emit (`tax_differs_from_rate`), handed to the template anyway.
+    expect(rejection(withTaxMovedBy(three, 4), whole(three)).code).toBe('QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE')
+    expect(taken({ ...accepted, taxAmount: new D(accepted.taxAmount).plus(1).toFixed(0) })).toThrow()
+    // And why the reading always sends the count: without it the template counts the units of the lines, one here.
+    expect(taken({ ...accepted, taxPeriods: undefined })).toThrow()
+  })
+
+  it('the committed example of a programme price is accepted by the template as committed', async () => {
+    const { validateQuote, quoteAmounts } = await template()
+    const data = read(`${PROGRAMME}.document.json`)
+    const totals = totalsOf(frozen(PROGRAMME_ARTIFACT).semantic.result)
+
+    expect(() => validateQuote(data)).not.toThrow()
+
+    const amounts = quoteAmounts(data)
+
+    expect(new D(amounts.net).toFixed()).toBe(new D(totals.net).toFixed())
+    expect(new D(amounts.vat!).toFixed()).toBe(new D(totals.tax!).toFixed())
+    expect(new D(amounts.total!).toFixed()).toBe(new D(totals.grandTotal!).toFixed())
+  })
 
   it.each([...EXAMPLES, COURTESY])('%s.document.json is accepted by the template as committed', async example => {
     const { validateQuote, quoteAmounts } = await template()
@@ -2454,6 +3257,32 @@ describe('compose document (CLI)', () => {
     ).toMatchObject({ code: 'INVALID_ARGUMENT', option: 'option' })
   })
 
+  it('a combined line and milestones with their tax: the committed example is what the command prints', () => {
+    const base = ['compose', 'document', '--input', PROGRAMME_ARTIFACT]
+    const run = cli(...base, '--brief', `${PROGRAMME}.document-brief.json`)
+
+    expect(run.status).toBe(3)
+    expect(run.stdout).toBe(readFileSync(`${PROGRAMME}.document.json`, 'utf8'))
+
+    // The same brief with a label for the key it combines: a fault of the brief, corrected under --brief.
+    const dressed = join(dir, 'combined-and-dressed.json')
+
+    writeFileSync(
+      dressed,
+      print({ ...read(`${PROGRAMME}.document-brief.json`), lines: { fee: { label: 'Fee mensual' } } })
+    )
+
+    const rejected = cli(...base, '--brief', dressed)
+
+    expect(rejected.status).toBe(1)
+    expect(rejected.stdout).toBe('')
+    expect(JSON.parse(rejected.stderr).error).toMatchObject({
+      code: 'QUOTE_DOCUMENT_BRIEF_INVALID',
+      option: 'brief',
+      issues: [{ path: 'lines.0', rule: 'key_is_combined' }]
+    })
+  })
+
   it('is listed in the usage the tool prints', () => {
     const usage = JSON.parse(cli('help').stdout)
 
@@ -2461,6 +3290,10 @@ describe('compose document (CLI)', () => {
       'document --input artifact.json [--brief document-brief.json] [--out data.json]'
     )
     expect(usage.operations.compose).toContain('[--option key=option.artifact.json]...')
-    expect(Object.keys(usage.quoteDocument)).toEqual(['command', 'withoutBrief', 'brief', 'options', 'courtesy'])
+    // The entries the usage must keep. It may say more: what a brief can ask of the lines and of the payment
+    // calendar is explained there by whoever owns the tool.
+    expect(Object.keys(usage.quoteDocument)).toEqual(
+      expect.arrayContaining(['command', 'withoutBrief', 'brief', 'options', 'courtesy'])
+    )
   })
 })

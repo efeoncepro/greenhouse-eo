@@ -1,13 +1,15 @@
 import { z } from 'zod'
 
 import {
+  PRICING_V3_MAX_ADJUSTMENTS_V11,
   PRICING_V3_MAX_THIRD_PARTY_COSTS,
+  PRICING_V3_THIRD_PARTY_BILLING,
+  pricingV3AdjustmentSchemaV14,
   pricingV3ContingencyReserveSchemaV14,
   pricingV3EngagementFactorSchemaV13,
   pricingV3MarketFactorSchemaV12,
   pricingV3PriceRoundingSchema,
   pricingV3RequestSchema,
-  pricingV3RequestSchemaV14,
   pricingV3SnapshotSchema,
   pricingV3ThirdPartyCostSchemaV14,
   pricingV3ThirdPartyPolicySchemaV14,
@@ -29,6 +31,9 @@ const envelope = {
 
 const record = <K extends string, T extends z.ZodTypeAny>(kind: K, value: T) =>
   z.object({ ...envelope, kind: z.literal(kind), value }).strict()
+
+/** What a quote is sold as. A demand declares one and, from the `offer` record on, the catalog says which. */
+export const COMMERCIAL_UNITS = ['role_capacity', 'managed_service'] as const
 
 export const catalogRecordSchema = z.union([
   record(
@@ -134,6 +139,21 @@ export const catalogRecordSchema = z.union([
         engagementForm: id.optional()
       })
       .strict()
+  ),
+  // What an offer is sold as: one record per offer, the single source of its commercial unit. `managed_service` is
+  // sold as one fee and never as its team; `role_capacity` is sold line by line. It is a fact of the offer and not
+  // of each pricing policy, which is one record per profile and tier and would let an offer contradict itself. No
+  // kernel input carries it: the composition holds a demand to it and the scaffold of a demand reads it. A catalog
+  // without the record states nothing about the offer, and every quote resolves as it always did.
+  record(
+    'offer',
+    z
+      .object({
+        offerId: id,
+        label: z.string().min(1).max(120),
+        commercialUnit: z.enum(COMMERCIAL_UNITS)
+      })
+      .strict()
   )
 ])
 
@@ -179,6 +199,24 @@ const thirdPartyCost = pricingV3ThirdPartyCostSchemaV14
   .omit({ source: true })
   .extend({ supplier: z.string().min(1).max(200) })
 
+/** Billing classes of the kernel rows an agreed total is distributed over, by the suffix of the adjustment each gets. */
+export const AGREED_TOTAL_BILLING_CLASSES = ['monthly', 'setup', PRICING_V3_THIRD_PARTY_BILLING] as const
+
+// The agreed price of the whole quote: the net of the rows of `lineIds` over the whole term, every period and every
+// billing class together, in the output currency. `lineIds` names lines and, to bring them into the price,
+// re-invoiced third-party costs by `costId`. The kernel never receives it: resolution turns it into the kernel's own
+// agreed nets, one per period and billing class (`agreed-total.ts`), each named `<adjustmentId>:<billing class>`.
+// The id is bounded so that name always fits the id of the kernel (120 characters).
+const agreedTotalAdjustment = z
+  .object({
+    adjustmentId: z.string().min(1).max(100),
+    kind: z.literal('agreed_total'),
+    amount: decimal,
+    lineIds: z.array(id).min(1),
+    reason: z.string().min(1)
+  })
+  .strict()
+
 export const briefSchema = z
   .object({
     schemaVersion: z.literal('pricing-v3-brief/1'),
@@ -203,6 +241,13 @@ export const briefSchema = z
             talentCountry: z.string().regex(/^[A-Z]{2}$/),
             headcount: z.number().int().min(1).max(100),
             dedication,
+            // Where the dedication of the line comes from and whether it is confirmed or an estimate: the source
+            // shape of every other evidence. `compose workload` writes it from the sources of the volumes it
+            // dimensioned; a dedication agreed with the client is declared here by hand. It never reaches the kernel:
+            // the readings of the frozen quote count the cost the dedication governs by it. A line without it has a
+            // dedication nobody evidenced, which is read as such and never as confirmed. No default, for the reason
+            // `thirdPartyCosts` has none.
+            dedicationEvidence: sourceSchema.optional(),
             allocationMode: z.enum(['shared', 'dedicated']),
             allocationPolicyId: id,
             pricingPolicyId: id.optional(),
@@ -236,8 +281,12 @@ export const briefSchema = z
       .max(100),
     // The 1.1.0 union is a superset: a brief with no adjustment or one discount parses to what it always did, and
     // resolution only declares contract 1.1.0 when the brief uses more than that. Contract 1.4.0 widens it once more:
-    // an agreed net of billing `third_party` names third-party costs by `costId`.
-    adjustments: pricingV3RequestSchemaV14.shape.adjustments.default([]),
+    // an agreed net of billing `third_party` names third-party costs by `costId`. `agreed_total` is of the brief
+    // alone: the kernel is handed the agreed nets it resolves to, never the declaration.
+    adjustments: z
+      .array(z.discriminatedUnion('kind', [...pricingV3AdjustmentSchemaV14.options, agreedTotalAdjustment]))
+      .max(PRICING_V3_MAX_ADJUSTMENTS_V11)
+      .default([]),
     taxTreatment: pricingV3RequestSchema.shape.taxTreatment.default({ kind: 'not_resolved' }),
     // Third-party costs of the engagement (contract 1.4.0). The quote declares the amount and its evidence; the price
     // rule comes from the `third_party_policy` of `category` and is never written here. `reinvoiced`: Efeonce buys

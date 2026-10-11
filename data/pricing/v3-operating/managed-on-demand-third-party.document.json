@@ -61,7 +61,6 @@
   },
   "schedule": {
     "title": "Calendario de un mes",
-    "note": "Desde el inicio acordado",
     "phases": [
       {
         "label": "Semana 1",
@@ -86,10 +85,6 @@
       "y condiciones de cobro."
     ],
     "rows": [
-      {
-        "title": "Plazo e inicio",
-        "text": "Un mes desde la fecha acordada. El calendario de entregas y de publicación se define con la contraparte del cliente."
-      },
       {
         "title": "Costos de terceros",
         "text": "La producción, el talento y los medios se contratan una vez aceptada la cotización. Sus valores dependen de la vigencia de la oferta de cada proveedor."

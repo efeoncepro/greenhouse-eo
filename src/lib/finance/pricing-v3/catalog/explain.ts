@@ -290,14 +290,66 @@ export function describeContingencyReserve(resolution: Quote['resolution']) {
 }
 
 /**
+ * Agreed totals of a frozen quote and what resolution turned each into: the total its brief declares, the policy net
+ * of the rows it names (what they add up to without the agreement) and its distribution, one entry per billing class
+ * and agreed net, with the periods that carry it. The agreed nets add up to `amount` to the unit; the last period
+ * takes what the proportion left over, so it may stand apart from the others. Null when the brief declares none.
+ * `policyNet` and `distribution` are null for a quote whose total could not be distributed: its diagnostics say why.
+ *
+ * `distributionUnit` is the unit every share but the last is a multiple of and `distributionUnitBasis` why that one:
+ * `tax_exact` when it is the unit in which the exclusive rate of the quote taxes a share with nothing to round (the
+ * tax of the quote is then the tax of the rate on the total), `currency_precision` when the tax is not resolved or
+ * does not apply, and `currency_precision_fallback` when the tax-exact unit was larger than the part of some group,
+ * in which case the tax of the quote may differ from the tax of the total by a unit per period.
+ */
+export function describeAgreedTotals(resolution: Quote['resolution']) {
+  const totals = 'agreedTotals' in resolution ? resolution.agreedTotals : undefined
+
+  if (!totals?.length) return null
+
+  return totals.map(total => {
+    const groups = new Map<
+      string,
+      { billing: string; lineIds: string[]; policyNet: string; agreedNet: string; periodIds: number[] }
+    >()
+
+    for (const { periodId, ...row } of total.distribution ?? []) {
+      const key = JSON.stringify(row)
+      const group = groups.get(key)
+
+      if (group) group.periodIds.push(periodId)
+      else groups.set(key, { ...row, periodIds: [periodId] })
+    }
+
+    return {
+      adjustmentId: total.adjustmentId,
+      currency: total.currency,
+      amount: total.amount,
+      policyNet: total.policyNet,
+      // What the agreement moved against the policy price of the same rows: negative when it sells under it.
+      differenceFromPolicyNet:
+        total.policyNet === null
+          ? null
+          : new D(total.amount).minus(total.policyNet).toFixed(total.policyNet.split('.')[1]?.length ?? 0),
+      distributionUnit: total.distributionUnit,
+      distributionUnitBasis: total.distributionUnitBasis,
+      distribution: total.distribution ? [...groups.values()] : null
+    }
+  })
+}
+
+/**
  * Commercial terms a frozen quote was resolved with: the adjustments its brief declares and the rounding rule
- * resolution bound for the output currency. A selection readout; every amount stays the kernel's.
+ * resolution bound for the output currency. A selection readout; every amount stays the kernel's. A brief that
+ * declares an agreed total also carries `agreedTotals`: the agreed nets each total resolved to.
  */
 export function describeCommercialTerms(resolution: Quote['resolution']) {
   const rule = resolution.bindings.find(b => b.purpose === 'price_rounding')?.record
+  const agreedTotals = describeAgreedTotals(resolution)
 
   return {
     commercialAdjustments: resolution.brief?.adjustments ?? [],
+    ...(agreedTotals ? { agreedTotals } : {}),
     priceRounding:
       rule?.kind === 'price_rounding'
         ? {

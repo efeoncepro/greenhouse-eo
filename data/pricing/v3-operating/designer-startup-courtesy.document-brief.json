@@ -34,7 +34,6 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
       {"label": "Mes 1", "title": "Puesta en marcha y producción", "text": "Accesos, lineamientos de marca, flujo de solicitudes y primeras piezas."},
       {"label": "Mes 2", "title": "Producción", "text": "Atención de la cola de solicitudes según las prioridades acordadas cada semana."},
@@ -50,7 +49,6 @@
   "conditions": {
     "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
     "rows": [
-      {"title": "Plazo e inicio", "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."},
       {"title": "Bonificación", "text": "La puesta en marcha se bonifica con el compromiso de tres meses. Su valor de referencia se informa en la tabla de precios y no forma parte del neto ni del total."},
       {"title": "Servicios opcionales", "text": "Se informan con su valor neto para facilitar la decisión. Cada uno se acuerda por separado y se cotiza con su propio alcance antes de contratarse."},
       {"title": "Facturación y pago", "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."},

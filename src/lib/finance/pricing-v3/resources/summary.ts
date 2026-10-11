@@ -103,6 +103,7 @@ type KernelRow = Composition['quote']['periods'][number]['result']['lines'][numb
 type SourceStatus = 'confirmed' | 'estimated' | 'pending'
 
 type CostInputKind =
+  | 'dedication'
   | 'person_cost'
   | 'talent_factor'
   | 'fx'
@@ -158,6 +159,15 @@ const partsCost = (parts: Map<string, RowPart>) =>
  * - The contingency reserve is NOT an input. It is `rate x base` of its own row, so it moves with the components it
  *   is computed from and with nothing else: the cost that rests on each of them is `cost x (1 + rate)`, and the
  *   reserve is estimated exactly where they are. The rate itself is a rule, reported in `estimatedRules`.
+ *
+ * The dedication of a line is an input too (`dedication`, by `lineId`), read from the brief the quote froze. It
+ * governs what the line is charged by its capacity: its person cost, and every resource of its kit that is shared by
+ * the capacity of the line (`shareMode: fte`). With evidence (`dedicationEvidence`) it is an input with the status of
+ * that evidence, estimated or confirmed like any other. Without it, the cost it governs is nobody's to call
+ * confirmed: it is reported apart, under `dedicationNotEvidenced`, and is in neither `estimatedCost` nor
+ * `confirmedCost` unless another estimated input already put it in the first. `capacitySetByRule` marks the
+ * dedication of a line whose capacity the allocation rule set (a dedicated line, a minimum billed FTE): its cost is
+ * the same cost, but it does not move in proportion to the dedication, which is why it is said.
  */
 export function costInputExposure(result: Composition) {
   const { quote } = result
@@ -178,11 +188,21 @@ export function costInputExposure(result: Composition) {
     category?: string
     label: string
     billing?: 'month' | 'year' | 'once' | 'credit_packs'
+    /**
+     * Dedication only, and only when true: the allocation rule, not the dedication, set the capacity charged on the
+     * line in some period (a dedicated line, a minimum billed FTE). The cost is still what the line is charged by its
+     * capacity, but it does not follow a change of the dedication in proportion.
+     */
+    capacitySetByRule?: true
     sourceStatus: SourceStatus
   }
 
   const inputs = new Map<string, { meta: Meta; lineIds: string[]; periodIds: number[]; parts: Map<string, RowPart> }>()
   const estimated = new Map<string, RowPart>()
+  // Everything that cannot be called confirmed: what is estimated, and what a dedication without evidence governs.
+  const unconfirmed = new Map<string, RowPart>()
+  const dedicationNotEvidencedOn: string[] = []
+  const declaredLines = quote.resolution.brief?.lines ?? []
 
   type Rule = {
     kind:
@@ -279,6 +299,21 @@ export function costInputExposure(result: Composition) {
       }
     }
 
+    // Lines of the period whose capacity charged is the one the allocation rule sets, whatever dedication they ask
+    // for: a dedicated line, or one the kernel billed at another capacity than the one requested.
+    const capacitySetByRule = new Set(
+      period.result.lines.flatMap(row => {
+        const line = request.lines.find(l => l.lineId === row.parentLineId)
+        const human = row.components.find(c => c.kind === 'human')
+
+        return line &&
+          human &&
+          (line.allocationMode === 'dedicated' || human.trace.billedFte !== human.trace.requestedFte)
+          ? [line.lineId]
+          : []
+      })
+    )
+
     for (const row of period.result.lines) {
       const line = request.lines.find(l => l.lineId === row.parentLineId)
       const profile = line && snapshot.profiles.find(p => p.profileId === line.profileId)
@@ -292,6 +327,10 @@ export function costInputExposure(result: Composition) {
 
       if (reserve && reserveId) rule('contingency_reserve', 'cost', reserveId, row.parentLineId)
 
+      // Declared on the line of the brief; undefined for a third-party row, which is no line, and for a line whose
+      // dedication nobody evidenced.
+      const dedicationEvidence = declaredLines.find(l => l.lineId === row.parentLineId)?.dedicationEvidence
+
       for (const component of own) {
         const outputFx = new D(component.trace.outputFx ?? 1)
 
@@ -304,6 +343,8 @@ export function costInputExposure(result: Composition) {
             : ownCost
 
         const carried: { key: string; meta: Meta }[] = []
+        // Charged by the capacity of the line, so it moves with its dedication. Set below, where each kind is read.
+        let byCapacity = false
 
         const carriesFx = (from: string, to: string) => {
           const source = fxSource(from, to)
@@ -371,6 +412,7 @@ export function costInputExposure(result: Composition) {
             })
 
           carriesFx(profile.cost.currency, calculation)
+          byCapacity = true
 
           const allocation = snapshot.allocationPolicies.find(a => a.policyId === line.allocationPolicyRef)
 
@@ -479,14 +521,46 @@ export function costInputExposure(result: Composition) {
             }
           })
           carriesFx(resource.currency, calculation)
+
+          // A resource of the kit of the line whose requirement shares it by the capacity of the line. A tool the
+          // composition attributed is shared by seats and use, never by capacity.
+          const kit = bindings.find(b => b.lineId === line.lineId && b.purpose === 'kit')?.record
+
+          const requirementId = attribution
+            ? undefined
+            : bindings.find(
+                b =>
+                  b.lineId === line.lineId &&
+                  b.record.kind === 'resource' &&
+                  b.record.value.resourceId === resource.resourceId
+              )?.purpose
+
+          byCapacity =
+            kit?.kind === 'kit' &&
+            kit.value.requirements.some(r => r.requirementId === requirementId && r.shareMode === 'fte')
         }
 
         // Every component the kernel priced in the calculation currency; a third-party one said above what it carries.
         if (component.kind !== PRICING_V3_THIRD_PARTY_BILLING) carriesFx(calculation, request.outputCurrency)
 
+        if (byCapacity && line && dedicationEvidence)
+          carried.push({
+            key: `dedication\n${line.lineId}`,
+            meta: {
+              kind: 'dedication',
+              id: line.lineId,
+              recordId: null,
+              label: profile?.label ?? line.lineId,
+              ...(capacitySetByRule.has(line.lineId) ? { capacitySetByRule: true } : {}),
+              sourceStatus: dedicationEvidence.status
+            }
+          })
+
         for (const { key, meta } of carried) {
           const entry = inputs.get(key) ?? { meta, lineIds: [], periodIds: [], parts: new Map<string, RowPart>() }
 
+          // An input is one entry over the whole term: what a later period says of its capacity is said of it once.
+          if (meta.capacitySetByRule) entry.meta = meta
           inputs.set(key, entry)
           note(entry.lineIds, row.parentLineId)
           note(entry.periodIds, period.periodId)
@@ -494,7 +568,13 @@ export function costInputExposure(result: Composition) {
         }
 
         // Union: a component counts once however many of its inputs are estimated.
-        if (carried.some(c => c.meta.sourceStatus === 'estimated')) addPart(estimated, rowKey, row, cost, own.length)
+        const isEstimated = carried.some(c => c.meta.sourceStatus === 'estimated')
+        const notEvidenced = byCapacity && !dedicationEvidence
+
+        if (isEstimated) addPart(estimated, rowKey, row, cost, own.length)
+        // The wider union, counted the same way, so a row is never counted beyond its cost between the two.
+        if (isEstimated || notEvidenced) addPart(unconfirmed, rowKey, row, cost, own.length)
+        if (notEvidenced) note(dedicationNotEvidencedOn, row.parentLineId)
       }
     }
   }
@@ -506,6 +586,9 @@ export function costInputExposure(result: Composition) {
     totalCost.gt(0) ? new D(amount).div(totalCost).toFixed(RATIO_DISPLAY_DECIMALS) : null
 
   const estimatedCost = money(partsCost(estimated))
+  const unconfirmedCost = money(partsCost(unconfirmed))
+  // The wider union contains the estimated one row by row, so this is never negative.
+  const dedicationNotEvidencedCost = money(new D(unconfirmedCost).minus(estimatedCost))
 
   const costInputs = [...inputs.values()]
     .map(({ meta, lineIds, periodIds, parts }) => ({ meta, lineIds, periodIds, atRisk: partsCost(parts) }))
@@ -535,9 +618,15 @@ export function costInputExposure(result: Composition) {
     totalCost: totals.cost,
     net: totals.net,
     estimatedCost,
-    // By construction: estimatedCost + confirmedCost = totalCost.
-    confirmedCost: money(totalCost.minus(estimatedCost)),
+    // By construction: estimatedCost + dedicationNotEvidenced.cost + confirmedCost = totalCost.
+    confirmedCost: money(totalCost.minus(unconfirmedCost)),
     estimatedShareOfCost: share(estimatedCost),
+    // Lines whose dedication carries no evidence, and the cost it governs that no estimated input already counts.
+    dedicationNotEvidenced: {
+      lineIds: dedicationNotEvidencedOn,
+      cost: dedicationNotEvidencedCost,
+      shareOfCost: share(dedicationNotEvidencedCost)
+    },
     costInputs,
     priceInputs: marketMeta.map(meta => ({
       kind: 'market_factor' as const,
@@ -567,6 +656,12 @@ export function costInputExposure(result: Composition) {
  * - `estimatedCost` / `confirmedCost`: the union. A component counts as estimated when at least one of the amounts or
  *   factors it is the product of is estimated, and it counts once: an estimated person cost and an estimated talent
  *   factor on the same line do not add up twice. That is also why the entries of `costInputs` can add up to more.
+ * - `dedicationNotEvidenced`: the lines whose dedication the demand does not evidence, and the cost that dedication
+ *   governs (the person, and what the kit shares by capacity) wherever no estimated input already counts it. It is
+ *   not an estimate anybody declared and it is never read as confirmed: `confirmedCost` is what is left of the cost
+ *   once `estimatedCost` and this are taken out. A line whose dedication is declared as an estimate is an entry of
+ *   `costInputs` (`kind: dedication`, `id` its `lineId`) with the cost it governs, like any estimated input; with
+ *   `capacitySetByRule` the "10 % higher" reading does not apply to it, for the reason it does not on those lines.
  * - `priceInputs`: an estimated market factor moves price, never cost, and is never ranked with the cost inputs.
  * - `estimatedRules`: estimated policies that are rules, not amounts (capacity billed, target margin, rounding, tax,
  *   the price rule of a category of third-party cost, the contingency reserve). A "10 % higher" reading does not

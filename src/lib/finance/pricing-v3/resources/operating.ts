@@ -2,7 +2,7 @@ import Decimal from 'decimal.js'
 import { z } from 'zod'
 
 import { activeRecords, validateCatalog } from '../catalog/catalog'
-import { briefSchema } from '../catalog/contracts'
+import { COMMERCIAL_UNITS, briefSchema } from '../catalog/contracts'
 import { PricingV3Error } from '../errors'
 import { compositionDemandSchema, compositionPolicySchema, declaredOnce, periodsOf } from './composition-contracts'
 import { composeResourceQuote } from './composition'
@@ -296,9 +296,29 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     }
   })
 
-  const demand = compositionDemandSchema.parse({
+  // What the offer is sold as is a fact of the catalog (its `offer` record), never a default of this scaffold: a
+  // managed service scaffolded as role capacity calculates and is then presented as a team with prices. When the
+  // catalog states it, the demand carries it; when it does not, or two records in force cannot be ranked, the demand
+  // carries no unit (`null`, which no quote accepts) and the question says who decides.
+  const offers = activeRecords(validateCatalog(catalogRaw), brief.quoteDate).flatMap(r =>
+    r.kind === 'offer' && r.value.offerId === brief.offerId ? [r] : []
+  )
+
+  const commercialUnit = offers.length === 1 ? offers[0].value.commercialUnit : null
+
+  if (!commercialUnit)
+    questions.push({
+      code: 'COMMERCIAL_UNIT_REQUIRED',
+      path: 'commercialUnit',
+      prompt: offers.length
+        ? 'The catalog holds more than one record in force for this offer, so it does not say what the offer is sold as. Resolve the catalog; until then declare the commercial unit the operator confirms.'
+        : 'The catalog does not say what this offer is sold as. Declare the commercial unit the operator confirms: managed_service is sold as one fee and never as its team; role_capacity is sold line by line.',
+      candidates: [...COMMERCIAL_UNITS]
+    })
+
+  // Everything but the unit is validated as a demand; the unit is the catalog's, or the question above.
+  const { schemaVersion, ...declared } = compositionDemandSchema.omit({ commercialUnit: true }).parse({
     schemaVersion: 'pricing-v3-composition-demand/1',
-    commercialUnit: 'role_capacity',
     brief,
     work,
     serviceToolIds: [],
@@ -306,6 +326,9 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     creditBudgets: [],
     fxRecordIds: []
   })
+
+  // In the place a demand declares it, so a missing unit is the second thing read in the file.
+  const demand = { schemaVersion, commercialUnit, ...declared }
 
   const toolIds = [
     ...new Set(
@@ -330,7 +353,9 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     binding: false,
     demand,
     questions,
-    note: 'Planning slots are not existing users or purchased seats. Confirm commercialUnit and service scope; no implicit service recipe.'
+    note: commercialUnit
+      ? 'Planning slots are not existing users or purchased seats. commercialUnit is the one the catalog states for this offer; confirm the service scope: there is no implicit service recipe.'
+      : 'Planning slots are not existing users or purchased seats. commercialUnit is not set: the catalog does not state it for this offer, and a demand without it is not quoted. Confirm it and the service scope; no implicit service recipe.'
   }
 }
 

@@ -34,9 +34,8 @@
   },
   "schedule": {
     "title": "Calendario de tres meses",
-    "note": "Desde el inicio acordado",
     "phases": [
-      {"label": "Mes 1", "title": "Inicio y operación", "text": "Accesos, criterios de respuesta, base de conocimiento inicial y atención desde el primer día acordado."},
+      {"label": "Mes 1", "title": "Inicio y operación", "text": "Accesos, criterios de respuesta, base de conocimiento inicial y comienzo de la atención."},
       {"label": "Mes 2", "title": "Operación", "text": "Atención continua de los canales y revisión quincenal de calidad con la contraparte del cliente."},
       {"label": "Mes 3", "title": "Operación y balance", "text": "Continuidad de la atención, resumen del periodo y acuerdo sobre la continuidad del servicio."}
     ]
@@ -50,7 +49,6 @@
   "conditions": {
     "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
     "rows": [
-      {"title": "Plazo e inicio", "text": "Tres meses desde la fecha acordada. La continuidad del servicio se acuerda antes de que termine el tercer mes."},
       {"title": "Servicio opcional", "text": "Amplía la capacidad del mismo equipo y sólo puede contratarse junto con el servicio. Su valor es neto, se suma al fee de cada mes en que se contrate y se acuerda por separado."},
       {"title": "Facturación y pago", "text": "Las condiciones de facturación y pago se acuerdan antes de emitir la cotización final. Este borrador no establece un calendario de cobro."},
       {"title": "Aprobaciones y accesos", "text": "El cliente entrega los lineamientos de respuesta, define los casos que escalan y facilita los accesos acordados a sus canales."},

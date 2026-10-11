@@ -658,7 +658,7 @@ describe('estimate exposure of a 1.4.0 quote', () => {
   ]
 
   it.each(cases)(
-    '$name: every cost component rests on an input, and estimated plus confirmed is the total',
+    '$name: every cost component rests on an input, and estimated, not evidenced and confirmed are the total',
     ({ r }) => {
       const map = costInputExposure(calculated(r))!
       const reading = estimateExposure(r)!
@@ -666,7 +666,14 @@ describe('estimate exposure of a 1.4.0 quote', () => {
       expect(map.unmappedComponents).toBe(0)
       expect(reading).not.toHaveProperty('unmappedComponents')
       expect(reading.totalCost).toBe(totalsOf(r).cost)
-      expect(eq(new D(reading.estimatedCost).plus(reading.confirmedCost), totalsOf(r).cost)).toBe(true)
+      // Three parts and no other: what a dedication without evidence governs is in neither of the other two.
+      expect(
+        eq(
+          new D(reading.estimatedCost).plus(reading.dedicationNotEvidenced.cost).plus(reading.confirmedCost),
+          totalsOf(r).cost
+        )
+      ).toBe(true)
+      expect(new D(reading.dedicationNotEvidenced.cost).gte(0)).toBe(true)
       expect(new D(reading.confirmedCost).gte(0)).toBe(true)
       for (const input of map.costInputs) expect(new D(input.costAtRisk).lte(totalsOf(r).cost)).toBe(true)
     }
@@ -844,6 +851,16 @@ describe('estimate exposure of a 1.4.0 quote', () => {
       if (record.kind === 'talent_factor') record.source.status = 'confirmed'
 
     const input = demandOf(colombia, { form: 'on_demand' })
+
+    // Confirmed means confirmed in full: the dedication of every line is evidenced too. Without that the person
+    // cost, and the reserve on it, would be nobody's to call confirmed (`dedicationNotEvidenced`).
+    for (const line of input.brief.lines as { dedicationEvidence?: unknown }[])
+      line.dedicationEvidence = {
+        reference: 'test:dedication-confirmed',
+        effectiveFrom: '2026-01-01',
+        effectiveUntil: '2027-12-31',
+        status: 'confirmed'
+      }
 
     const pair = (cat: CatalogDoc) => ({
       without: calculated(compose(withRecords(cat, FORMS), input)),

@@ -35,7 +35,6 @@
   },
   "schedule": {
     "title": "Calendario de un mes",
-    "note": "Desde el inicio acordado",
     "phases": [
       {"label": "Semana 1", "title": "Inicio y planificación", "text": "Accesos, plan de contenidos, plan de medios y preparación de la producción."},
       {"label": "Semanas 2 y 3", "title": "Producción y operación", "text": "Producción audiovisual, publicación de contenidos, gestión de comunidad y activación de medios."},
@@ -51,7 +50,6 @@
   "conditions": {
     "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
     "rows": [
-      {"title": "Plazo e inicio", "text": "Un mes desde la fecha acordada. El calendario de entregas y de publicación se define con la contraparte del cliente."},
       {"title": "Costos de terceros", "text": "La producción, el talento y los medios se contratan una vez aceptada la cotización. Sus valores dependen de la vigencia de la oferta de cada proveedor."},
       {"title": "Pagos directos del cliente", "text": "Lo que el cliente contrata y paga directamente a su proveedor no forma parte de esta cotización ni de sus totales."},
       {"title": "Aprobaciones y accesos", "text": "El cliente aprueba el plan de contenidos, las piezas y el plan de medios antes de su publicación. Facilita los accesos acordados."},

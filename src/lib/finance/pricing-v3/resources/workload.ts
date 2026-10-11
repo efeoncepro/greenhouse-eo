@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { briefSchema } from '../catalog/contracts'
 import { sourceSchema } from '../schemas'
+import type { PricingV3Source } from '../schemas'
 
 const D = Decimal.clone({ precision: 80 })
 const id = z.string().min(1).max(80)
@@ -76,6 +77,30 @@ const unique = <T>(items: T[]) => new Set(items).size === items.length
 // Reported hours are rounded for reading; dedication is always computed from the unrounded values.
 const hours = (value: Decimal) => value.toDecimalPlaces(6).toFixed()
 
+/**
+ * Evidence of a dimensioned dedication: one source that says what the sources it was derived from say together. It
+ * is as weak as the weakest of them (pending, then estimated, then confirmed), and in force only while all of them
+ * are. A workload declared as a simulation is an estimate whatever its sources say. Null when no date has all of
+ * them in force: there is then no day on which the dedication is evidenced.
+ */
+const evidenceOf = (workload: Workload, sources: PricingV3Source[]): PricingV3Source | null => {
+  const effectiveFrom = sources.map(s => s.effectiveFrom).reduce((a, b) => (a > b ? a : b))
+  const effectiveUntil = sources.map(s => s.effectiveUntil).reduce((a, b) => (a < b ? a : b))
+
+  if (effectiveFrom > effectiveUntil) return null
+
+  return {
+    reference: `workload:${workload.version}`,
+    effectiveFrom,
+    effectiveUntil,
+    status: sources.some(s => s.status === 'pending')
+      ? 'pending'
+      : workload.mode === 'simulation' || sources.some(s => s.status === 'estimated')
+        ? 'estimated'
+        : 'confirmed'
+  }
+}
+
 /** Pure derivation. It dimensions capacity; it does not check that the people or the hours exist. */
 export function dimensionWorkload(raw: unknown) {
   const workload = workloadSchema.parse(raw)
@@ -143,6 +168,16 @@ export function dimensionWorkload(raw: unknown) {
 
     if (fte.isZero()) issue('WORKLOAD_LINE_WITHOUT_DEMAND', line.lineId)
 
+    // What the dedication of the line was derived from: the capacity of a month and every volume and block of
+    // hours the line takes a share of. Presence hours are declared on the line itself and have no source of theirs.
+    const evidence = evidenceOf(workload, [
+      capacity.source,
+      ...workload.drivers.filter(d => line.driverShares.some(s => s.driverId === d.driverId)).map(d => d.source),
+      ...workload.fixedWork.filter(w => line.fixedWorkShares.some(s => s.workId === w.workId)).map(w => w.source)
+    ])
+
+    if (!evidence) issue('WORKLOAD_SOURCES_NOT_CONCURRENT', line.lineId)
+
     return {
       lineId: line.lineId,
       workHours: hours(workHours),
@@ -151,7 +186,9 @@ export function dimensionWorkload(raw: unknown) {
       fteByPresence: fteByPresence.toDecimalPlaces(6).toString(),
       fte: fte.toFixed(),
       bindingConstraint: fteByPresence.gt(fteByWork) ? ('presence' as const) : ('work' as const),
-      reason: line.reason
+      reason: line.reason,
+      // Where this dedication comes from, in the shape a brief carries it (`dedicationEvidence`).
+      evidence
     }
   })
 
@@ -178,8 +215,10 @@ export function dimensionWorkload(raw: unknown) {
 }
 
 /**
- * Writes the dimensioned dedication into a brief. A line the workload does not mention keeps the dedication the
- * brief already declares; a workload line the brief does not have is an error, never a silently dropped hour.
+ * Writes the dimensioned dedication into a brief, with its evidence: where it comes from (this workload) and whether
+ * the volumes behind it are confirmed or estimated, so the quote freezes it and its readings count it. A line the
+ * workload does not mention keeps the dedication and the evidence the brief already declares; a workload line the
+ * brief does not have is an error, never a silently dropped hour.
  */
 export function applyWorkloadToBrief(briefRaw: unknown, workloadRaw: unknown) {
   const brief = briefSchema.parse(briefRaw)
@@ -205,8 +244,10 @@ export function applyWorkloadToBrief(briefRaw: unknown, workloadRaw: unknown) {
       continue
     }
 
-    if (!perPerson.isZero())
+    if (!perPerson.isZero() && result.evidence) {
       line.dedication = { unit: 'fte', value: perPerson.toDecimalPlaces(18, D.ROUND_UP).toFixed() }
+      line.dedicationEvidence = result.evidence
+    }
   }
 
   const prepared = diagnostics.length === 0

@@ -212,6 +212,8 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
             return `${r.value.category}:${r.value.offerId ?? '*'}`
           case 'contingency_reserve':
             return `${r.value.offerId ?? '*'}:${r.value.engagementForm ?? '*'}`
+          case 'offer':
+            return r.value.offerId
 
           default: {
             // Every kind states what a revision may not change. A kind added to the record union without a case

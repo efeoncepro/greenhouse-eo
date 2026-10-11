@@ -3,6 +3,7 @@ import Decimal from 'decimal.js'
 import { calculatePricingV3 } from '../calculate'
 import type { PricingV3TotalsV14 } from '../calculate'
 import { PRICING_V3_ENGINES, PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
+import { settleAgreedTotals } from './agreed-total'
 import { resolveBrief } from './resolve'
 import type { Diagnostic } from './contracts'
 
@@ -19,6 +20,10 @@ export function calculateCatalogQuote(catalog: unknown, brief: unknown) {
 
 /** Shared orchestration for resolved catalog and composed resource snapshots. */
 export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrief>) {
+  // The inputs are final here, also for a composition, which adds the cost of its tools after resolving: an agreed
+  // total of the brief is turned into the agreed nets of each period now. Without one this changes nothing.
+  settleAgreedTotals(resolution)
+
   const diagnostics: Diagnostic[] = [...resolution.diagnostics]
 
   const periods =
