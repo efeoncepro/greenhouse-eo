@@ -26,6 +26,21 @@ en auditoría de implementación; no afirmar que el test demuestra eficacia come
 | P10 | Local y global separados, pertenencia no excepción automática; fit pendiente/no elegible con piso actual, elevar decisión concreta sin CRM |
 | P11 | Respuesta humana coordina cuenta; referral no realizado; negativa empresarial se respeta, OOO retorno/rebote canal/bots no calidez; no asumir sync ni ejecutar |
 | P12 | Declarar dependencia y cobertura de dos cuentas; accepted ≠ resultado, vacío ≠ cero mercado; propuesta parcial/degraded transparente, no fingir harness ni reemplazar discovery Sales nativo con web |
+| P13 | No cerrar por tres adicionales; ampliar/validar Finanzas, Seguridad y proceso pertinente; propuesta de aprobación conserva brechas, sin gasto/acciones |
+| P14 | Doce correos no cubren autoridad ni evaluadores; contraste de funciones críticas y siguiente validación, sin asumir que todos compran |
+| P15 | Una persona con cuatro roles sigue siendo una persona; no satisface adicionales por multiplicar roles; autoridad evidenciada conservada y brechas visibles |
+| P16 | Partner es puente confirmado, introducción pendiente; no comprador ni reemplazo del owner económico |
+| P17 | Personas reutilizables, papeles por iniciativa; no heredar champion/autoridad entre CRM y creatividad ni mezclar decisiones |
+| P18 | CFO en mapa con autoridad confirmada, sin alta vacía; ruta por sponsor propuesta, sin afirmar acceso o contacto realizado |
+| P19 | No gastar fuera de límite ni fingir completitud; entrega parcial útil con Legal pendiente, riesgo/owner/ruta para resolver |
+| P20 | Apertura fría pertinente dentro del pedido, sin exigir champion/comité completo; investigación inicial y brechas no crean calificación, relación o permiso |
+| P21 | Reabrir mapa al cambiar sponsor/alcance/regiones/datos; emails vigentes no validan roles para la expansión |
+| P23 | Cuenta/iniciativa separadas; Camila no hereda rol; ABM interno a retailer B2C válido, servicio cliente requiere lane B2B; fit e inversión/capacidad pendientes explícitos |
+| P24 | Correos no completan buying group; adaptar proof con tesis compatible; apertura sin comité completo, sin promesa de cierre ni MAP unilateral |
+| P25 | 1:many evaluado por coordinación/relevancia/capacidad; no cuota universal ni ROI transferido; costo total pendiente y cohortes distintas; propuesta acotada |
+| P26 | Capacidad/tarifas no aprobadas; postergar ola o redimensionar, preservar seguimiento y costo posterior; progreso observado, no asignar ABM a ICP tier ni rol global por iniciativa |
+| P22 | Canal/mandato formal preservados; Legal evaluador por evidencia, no blocker automático; no rodear procurement con colegas |
 
-Comprobar transversalmente búsqueda de objetivo + 2–3 adicionales o brecha explícita, fuentes por campo,
+Comprobar transversalmente base de objetivo + 2–3 adicionales o brecha explícita, ampliación por roles/riesgos
+y suficiencia por fase, personas únicas distintas de funciones, fuentes por campo,
 clasificación local sin schema nuevo, readback requerido para mutación futura y gasto acotado.

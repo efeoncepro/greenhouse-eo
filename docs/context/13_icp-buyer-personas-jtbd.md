@@ -57,8 +57,10 @@ fuente y fecha; estas bandas no son una clasificación legal de PYME.
 | `201+` | Candidata a prospección prioritaria si hay trigger, problema y buying group identificable. |
 
 Para ofertas Spot o recurrentes del plan outbound, el gate económico vigente es capacidad razonable de comprar
-**USD 8.000–15.000 Spot** o **USD 3.000–5.000 MRR**, además de señal verificable y 2–3 integrantes del buying group
-([plan de pipeline §5](../commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md#5-micro-icp-y-puertas-de-entrada-outbound)).
+**USD 8.000–15.000 Spot** o **USD 3.000–5.000 MRR**, además de señal verificable y mapa de roles críticos
+del buying group para la decisión/fase. Buscar al objetivo y 2–3 adicionales como base ampliable, nunca como
+techo ni prueba de grupo completo; [método vigente](../manual-de-uso/comercial/operar-prospeccion-b2b.md).
+Fuente del gate económico: [plan de pipeline §5](../commercial/PIPELINE_GENERATION_AND_OUTBOUND_PLAN_2027_V1.md#5-micro-icp-y-puertas-de-entrada-outbound).
 Ese gate económico se aplica **después** del piso de 50 personas; una banda grande tampoco demuestra por sí sola
 capacidad de compra. Para una respuesta inbound o warm, aclarar primero la entidad compradora y su tamaño;
 diagnóstico y propuesta sólo tras confirmar fit, alcance y orden de magnitud del presupuesto.

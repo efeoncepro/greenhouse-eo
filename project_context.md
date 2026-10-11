@@ -22,7 +22,7 @@ CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Comercial](docs/commercial/README.md). [Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
+[Comercial](docs/commercial/README.md). [Prospección por roles](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 

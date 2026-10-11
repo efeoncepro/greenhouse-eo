@@ -22,11 +22,13 @@ No importar cuotas, tasas o economics de estudios enterprise extranjeros como me
 | Métrica | Denominador y evidencia |
 | --- | --- |
 | Elegibilidad | Cuentas investigadas vs cuentas con hard filters resueltos; mantener desconocidas |
-| Cobertura | Objetivo investigado y número de adyacentes elegibles; encontrados ≠ correos accionables |
+| Personas | Objetivo y base de adicionales buscados/ampliación; personas únicas identificadas, elegibles, con acceso e involucradas, por separado |
+| Cobertura funcional | Roles críticos para la decisión/fase con participación/autoridad contrastadas frente a los aplicables; desconocidos y no aplicables justificados |
+| Brechas | Funciones críticas ausentes, riesgo, owner, ruta y siguiente validación; no declarar grupo completo por cantidad de emails |
 | Conversación útil | Respuesta humana pertinente/derivación/contexto vs cuentas contactadas según ventana |
 | Próximo paso | Acuerdo bilateral con owner/fecha; reunión realizada distinta de agendada |
 | Oportunidad | Criterio Commercial y evidencia, no Lead/stage/registro automático |
-| Costo | Créditos consumidos, horas/preventa y gasto por cuenta/conversación/resultado con ventana |
+| Costo | Personas con tarifa cargada, preventa, créditos, terceros y herramientas existentes/nuevas asignadas; costo total distinto de caja incremental, por cuenta/resultado y ventana |
 
 Separar negativas, bajas, OOO, rebotes, respuestas automáticas y bots. Open/click son diagnósticos limitados
 por scanners/precarga, nunca criterio de calidez. No declarar éxito por un unsubscribe o auto-reply.
@@ -35,3 +37,11 @@ Línea/país/canal/relación/fecha son cohortes locales de análisis, no schema 
 Conservar resultados, hipótesis refutada, explicación y próxima decisión. Volver a fuentes del provider cuando
 cambie plan/campo/comportamiento; refrescar identidad/empleo y proceso antes de usar un dato histórico.
 No “optimizar” eliminando cuentas sin evidencia favorable o ocultando cobertura incompleta.
+
+## Medición account-based
+
+Cargar [ABM y ABS](abm-and-abs.md) para selección/inversión, reputación, relaciones y resultados. Medir
+criterios/hitos acordados, no decisión, contratos/ingresos/margen y retención/expansión; Spot/MRR/ARR
+conservan unidades distintas. Pipeline influenciado es atribución, no prueba de ingreso incremental.
+Cohortes de adquisición, expansión y relación se analizan separadas. Confirmar continuidad/costo después
+de la ventana del piloto; mantener capacidad máxima sin forzar abandono al iniciar otra ola.

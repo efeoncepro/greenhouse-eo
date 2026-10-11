@@ -110,8 +110,11 @@ ruta de expansión:
 Una cuenta entra al universo outbound si tiene **al menos 50 personas** según el
 [criterio de tamaño del ICP](../context/13_icp-buyer-personas-jtbd.md#tamaño-de-la-cuenta-en-la-calificación-comercial),
 razonablemente puede comprar **USD 8.000–15.000 Spot** o **USD 3.000–5.000 MRR**, existe una señal verificable y se
-pueden identificar 2–3 integrantes del buying group. Un presupuesto potencial no compensa estar bajo el piso de
-tamaño. Se excluyen listas genéricas de PYME sin trigger, fit económico o capacidad de decisión.
+puede mapear el buying group para el siguiente paso según el [método vigente](../../.codex/skills/efeonce-b2b-prospecting/SKILL.md):
+objetivo y base de 2–3 adicionales, ampliable por roles/riesgos; no comité completo por cantidad. El supuesto
+original de 2–3 integrantes se conserva como antecedente de planificación en §7, no techo de cobertura.
+Un presupuesto potencial no compensa estar bajo el piso de tamaño. Se excluyen listas genéricas de PYME
+sin trigger, fit económico o capacidad de decisión.
 
 ## 6. Baseline Apollo al corte
 
@@ -138,7 +141,12 @@ con HubSpot.
 | 3         |      70 |       210 |            700–850 |
 | **Total** | **150** |   **450** |    **1.500–1.800** |
 
-Cada cuenta incluye 2–3 stakeholders. La cadencia máxima por contacto es de **4 emails + 1 interacción LinkedIn +
+**Nota de método vigente (2026-10-11):** los conteos de integrantes/contactos de este plan siguen siendo supuestos
+de planificación propuestos, no techo ni requisito de grupo completo. La [skill de prospección](../../.codex/skills/efeonce-b2b-prospecting/SKILL.md)
+busca objetivo + 2–3 adicionales como base y amplía por funciones/riesgos de la oportunidad/fase. Esta nota no
+aprueba ni recalcula presupuesto, cadencias, metas, precios o inicio del piloto.
+
+En el supuesto original del plan, cada cuenta incluye 2–3 stakeholders. La cadencia máxima por contacto es de **4 emails + 1 interacción LinkedIn +
 1 llamada**, seis acciones en 2–4 semanas. Los pasos se adaptan al rol y a una señal concreta; no se automatizan
 afirmaciones que no estén respaldadas.
 

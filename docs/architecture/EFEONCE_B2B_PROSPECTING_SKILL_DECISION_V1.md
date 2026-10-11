@@ -22,8 +22,9 @@ el gate de correo individual. El trabajo reciente distingue necesidad pública, 
    evidencia, encaje, grupo comprador, rutas y siguiente decisión; referencias por fase, no carga completa.
 2. Mantener relación por persona/con quién y demanda/progreso/urgencia por oportunidad. Frío/tibio/cálido,
    referido, reactivación y expansión eligen recorridos; no son lifecycle CRM ni probabilidad de cierre.
-3. Buscar objetivo + 2–3 adicionales incluso con email del objetivo. Mantener brechas explícitas y búsqueda
-   acotada. No crear Contact/Lead sin correo corporativo individual verificado, inventar vínculo ni atribuir
+3. Buscar objetivo + 2–3 adicionales inicialmente, incluso con email del objetivo: base de búsqueda, no techo
+   ni prueba de grupo completo. Ampliar por roles, decisiones y riesgos de la oportunidad/fase; contar personas
+   únicas y cobertura funcional por separado. Mantener brechas, owner/ruta/validación y búsqueda acotada. No crear Contact/Lead sin correo corporativo individual verificado, inventar vínculo ni atribuir
    demanda del objetivo a adyacentes. Sin email, preservar investigación/nota de empresa autorizada.
 4. Una tesis/owner/historia por cuenta; valor adaptado al rol y prueba contextual proporcional. No rodear
    negativas o restricciones de proceso ni abrir cadencias por cada persona automáticamente.
@@ -41,6 +42,31 @@ el gate de correo individual. El trabajo reciente distingue necesidad pública, 
 8. Modo degradado explícito: `deep-research` no disponible en el preflight. Para investigación acotada se
    permite lectura/búsqueda directa y síntesis con fuentes/fechas; delegación sólo autorizada. Se conserva
    rigor de Research, sin afirmar ejecución de harness. Un encargo que exige esa harness queda pendiente.
+
+### Delta aceptado 2026-10-11 — cobertura del buying group
+
+El operador aprobó actualizar la skill con la [investigación](../audits/commercial/2026-10-11-buying-group-coverage-research.md).
+El mapa pertenece a una necesidad/decisión, aunque no exista Deal; una cuenta puede tener varios grupos y
+una persona varios roles. Comité formal se documenta con evidencia, no como sinónimo de organigrama.
+La suficiencia es para el siguiente paso: no exigir champion confirmado ni todo el comité antes de una primera
+conversación pertinente; no afirmar aprobación o calificación por cantidad de contactos. Identidad, participación,
+autoridad, correo, acceso e interacción se verifican por separado. Stakeholders críticos sin email permanecen
+en investigación, sin Contact/Lead vacío; externos son puentes o influencers según evidencia.
+Ampliación acotada por presupuesto/permiso; brechas críticas abiertas conservan cobertura parcial.
+No modifica pricing, ICP, metas outbound, schema, beta HubSpot ni autorizaciones externas.
+
+### Delta aceptado 2026-10-11 — ABM y ABS
+
+El operador aprobó incorporar la [investigación ABM/ABS](../audits/commercial/2026-10-11-abm-abs-research.md)
+y hacer commit de la skill. Se añade [módulo progresivo](../../.codex/skills/efeonce-b2b-prospecting/references/abm-and-abs.md):
+selección por cuenta y mapas por iniciativa; inversión/intensidad/purpose distintos de fit ICP y relación;
+coordinación ABM con Digital Marketing y ABS con Commercial; consenso/proof por función conservando una tesis;
+capacidad/costo total y métricas con denominador, atribución distinta de causalidad. 1:many es válido cuando
+conserva selección/relevancia/coordinación; no imponer rangos ni uplift de benchmarks. Se mantienen gates de
+correo/cobertura y owners. Templates, escenarios y fuentes comparten el espejo Codex/Claude.
+El escenario de piloto sigue propuesto: esta aprobación de método no reserva horas, aprueba gasto/inicio,
+crea oferta ABM para clientes ni habilita comunicaciones/schema/proveedores. La eficacia local está pendiente.
+[Verificación de actualización](../audits/commercial/2026-10-11-abm-abs-skill-update.md).
 
 ## Alternatives Considered
 

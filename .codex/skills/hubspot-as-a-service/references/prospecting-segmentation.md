@@ -21,8 +21,11 @@ form hung without writing in a non-interactive shell: use JSONL on stdin (previe
 ## Current admission rule (2026-10-11): email and B2B account coverage
 
 Operator-approved canon: [actionable contacts and account coverage](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
-Research the target AND always seek **2–3 additional relevant people**, even when the target has email.
+Research the target AND always seek **an initial 2–3 additional relevant people**, even when the target has email.
+This search baseline is not a ceiling or a complete buying group. Expand for critical functions, approvals and
+risks of the opportunity/phase; document remaining gaps, owner and next validation within the authorized scope.
 Prioritize functional peers, area owners, management and related decision makers as routes to the target.
+Use the shared [buying-group method](../../efeonce-b2b-prospecting/references/buying-group-and-access.md).
 
 1. Reconcile the account and every person's identity, current role and source. Record why each adjacent person
    is relevant and whether the connection is confirmed or only a functional hypothesis. Same-company employment
@@ -42,9 +45,12 @@ Prioritize functional peers, area owners, management and related decision makers
    are access routes, not automatically interested buyers. Never create Deals or send outreach from this alone.
 6. Independently read back email, properties, Primary Company, source notes and native segment membership.
    Report target status and each additional person's role, email provenance/quality, relationship evidence and
-   route priority. If fewer than 2–3 actionable adjacent contacts are found, state missing coverage and exhausted
-   routes; eligible partial intake may proceed, but account research remains incomplete. Never fabricate contacts
-   or register people without email to meet the count.
+   route priority. Report distinct people and critical roles separately; mailbox count does not establish role
+   participation, authority or sufficient coverage. If the initial additional-contact search or a critical function
+   remains uncovered, state the gap, risk and next route. Eligible partial intake may proceed; do not present it
+   as a complete group or qualified opportunity. Never fabricate contacts or register people without email.
+   A critical stakeholder without email stays in research; a relevant access route may be documented without
+   creating that person. A first conversation does not require a confirmed champion or the entire committee.
 
 Historical `individual_no_email`, `shared_inbox` and `identity_pending` values remain readable classifications,
 not exceptions to new-contact admission. Preserve existing records and enums; this rule does not authorize

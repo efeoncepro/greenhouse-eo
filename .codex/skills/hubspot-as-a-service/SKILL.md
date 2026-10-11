@@ -63,8 +63,10 @@ For account research, contact discovery and access strategy, load
 [efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). It owns the prospecting method; this skill
 retains CRM identity, dedupe, dictionaries, associations, writes and independent readback.
 
-For B2B prospecting, research the target AND always seek 2–3 additional relevant account contacts with
-actionable corporate email. **Never create a prospect Contact/Lead without an individual corporate email
+For B2B prospecting, research the target AND always seek an initial 2–3 additional relevant account contacts
+with actionable corporate email. This is a search baseline, never a ceiling or proof of a complete buying group.
+Expand by opportunity, phase and critical decision roles/risks; report functional gaps, owners and access routes.
+Count distinct people separately from roles and distinguish participation, authority, email and engagement. **Never create a prospect Contact/Lead without an individual corporate email
 verified against that person's identity.** If the target has no email, keep the signal in research or a Company
 note and continue through adjacent people. Report missing coverage; do not invent addresses or relationships.
 Historical no-email records do not authorize new empty contacts. Credit spend and outreach retain their

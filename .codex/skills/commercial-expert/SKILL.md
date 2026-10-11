@@ -16,6 +16,8 @@ Customer Model y práctica disponible, declarar la limitación y no fingir módu
 
 - Descubrimiento, contactos, frío/tibio/cálido, referidos, reactivación y expansión →
   [Prospección B2B](../efeonce-b2b-prospecting/SKILL.md).
+- Coordinación ABM/ABS, intensidad por cuenta y buyer enablement →
+  [módulo compartido](../efeonce-b2b-prospecting/references/abm-and-abs.md); Commercial conserva ABS y Digital Marketing ABM.
 - ICP/JTBD y grupo comprador → [Customer Model](../efeonce-customer-model-operator/SKILL.md).
 - Empaquetado/precio → [Pricing](../efeonce-pricing-operator/SKILL.md) + Business Model/práctica.
 - Operaciones CRM → [HubSpot](../hubspot-as-a-service/SKILL.md).

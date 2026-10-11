@@ -23,11 +23,29 @@ Investigación, preparación, aprobación, escritura/readback y comunicación se
 | Expansión | Impacto/delivery y nueva necesidad separados de aceptación de otra oferta |
 | Licitación | Tenders gobierna admisión, canal y plazos; recuperación no es proceso abierto |
 
-Siempre investiga objetivo + 2–3 adicionales relevantes. Los contactos extra no heredan intención o
+Siempre investiga objetivo + una base inicial de 2–3 adicionales relevantes; amplía según roles, decisiones y
+riesgos de la oportunidad/fase. La base no es techo ni prueba de grupo completo. Cuenta personas únicas y
+funciones críticas por separado; una persona puede asumir varios roles y la cuenta tener varios grupos.
+La suficiencia es para el siguiente paso, con brechas/owner/ruta visibles; no exige todo el comité ni champion
+confirmado para la primera conversación. Identidad, participación, autoridad, correo y acceso son distintos.
+Un rol crítico sin email sigue en el mapa de investigación, sin alta vacía. Comité formal requiere evidencia.
+Sigue el [método de cobertura](../../../.codex/skills/efeonce-b2b-prospecting/references/buying-group-and-access.md). Los contactos extra no heredan intención o
 relación y no se contactan simultáneamente como efecto de haberlos encontrado. Sin correo corporativo
 individual verificado no hay nueva alta Contact/Lead; señal del objetivo permanece en investigación o nota
 Company autorizada. La cobertura parcial se entrega con brechas, sin rellenar datos ni gasto ilimitado.
 El historial sin correo permanece histórico, sin borrado o migración automática.
+
+## ABM y ABS
+
+El [módulo compartido](../../../.codex/skills/efeonce-b2b-prospecting/references/abm-and-abs.md) conecta ABM
+(marketing para cuentas seleccionadas) y ABS (relaciones y proceso comprador). La cuenta se selecciona;
+el problema/iniciativa y buying group se desarrollan con Commercial y Customer Model. Intensidad/inversión,
+fit ICP, tipo de cliente y relación son dimensiones separadas. Digital Marketing conserva el plan ABM.
+
+La salida incorpora tesis/proof por función, owners, capacidad/costo y progreso observable. Contenido,
+actividad y pipeline influenciado no prueban ingreso incremental; muestras/benchmarks no fijan cuotas ni ROI.
+[Investigación](../../audits/commercial/2026-10-11-abm-abs-research.md) y [verificación](../../audits/commercial/2026-10-11-abm-abs-skill-update.md).
+Método aprobado, piloto/eficacia local pendientes. Uso interno y una posible oferta ABM cliente son decisiones distintas.
 
 ## Roles y continuidad
 

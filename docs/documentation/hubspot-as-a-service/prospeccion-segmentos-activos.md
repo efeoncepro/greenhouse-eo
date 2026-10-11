@@ -17,8 +17,9 @@ históricas y siguen siendo válidas para ellas.
 
 ## Admisión vigente: correo y cobertura B2B de la cuenta
 
-Investigar al objetivo **y buscar siempre 2–3 contactos adicionales relevantes**, aunque el objetivo ya tenga
-correo. El resultado útil combina correo corporativo individual, cargo, fuente y una ruta razonada de acceso
+Investigar al objetivo **y buscar siempre inicialmente 2–3 contactos adicionales relevantes**, aunque tenga
+correo. La base no es techo: ampliar por roles/riesgos de la oportunidad/fase. Contar personas únicas y funciones
+por separado; suficiencia para el siguiente paso, no grupo completo por cantidad. Brechas con owner/ruta visibles. El resultado útil combina correo corporativo individual, cargo, fuente y una ruta razonada de acceso
 al objetivo. Distinguir relación confirmada de proximidad funcional; no atribuir a colegas su intención de compra.
 
 **No registrar nuevos contactos de prospección sin correo corporativo individual verificado.** Si el objetivo

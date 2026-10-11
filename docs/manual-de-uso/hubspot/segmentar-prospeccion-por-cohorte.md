@@ -15,13 +15,14 @@ Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.m
 
 1. Cargar [modelo funcional y catálogo](../../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) y la [decisión](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
 2. Revalidar `hubspot whoami` y la identidad/permisos del conector MCP; portal objetivo **48713323**.
-3. Resolver empresa/contactos existentes y el universo autorizado; investigar al objetivo y buscar siempre 2–3 personas adicionales relevantes. Aplicar el gate de correo siguiente antes del alta.
+3. Resolver empresa/contactos existentes y el universo autorizado; investigar al objetivo y buscar inicialmente 2–3 adicionales, ampliando por roles/riesgos de la oportunidad. Aplicar el gate de correo siguiente antes del alta.
 4. Preparar valores exactos y ejecutar dentro de la autorización del operador. Preservar multiselects previos; registrar señal y fuentes en nota asociada.
 5. Poblar fecha de investigación en **ambos** objetos; tipo y fit respaldados en Contact. Leer correo, propiedades, asociaciones Primary, notas y miembros reales después del recálculo. El alta no termina sólo por guardar el registro.
 
 ### Gate previo al alta: correo y contactos adyacentes
 
-- Investigar al objetivo **más 2–3 contactos relevantes** de la cuenta, incluso si ya tiene correo. Priorizar
+- Investigar al objetivo **más una base inicial de 2–3 contactos relevantes**, incluso si tiene correo.
+  Ampliar por roles críticos, decisiones y riesgos de la oportunidad/fase, sin techo numérico universal. Priorizar
   pares, responsables del área, jefatura y decisores relacionados; registrar fuente, rol y razón de acceso.
   Etiquetar la relación como confirmada o hipótesis funcional, sin inventar jefatura ni intención de compra.
 - **No crear Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a la persona.**
@@ -31,7 +32,10 @@ Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.m
   de Company y seguir por personas adyacentes. Un buzón compartido queda sólo como vía secundaria de cuenta.
 - Verificar autorización del conjunto acotado antes de gastar créditos; no extender un permiso individual.
   Crear sólo los contactos elegibles dentro del alcance autorizado y leerlos de vuelta. Si faltan contactos
-  accionables para cubrir 2–3 adicionales, reportar la brecha y vías agotadas; no cerrar como investigación completa.
+  accionables para la base inicial o falta una función crítica, reportar brecha/riesgo y owner/ruta de validación.
+  Personas únicas y funciones se cuentan por separado; correo no prueba autoridad ni participación.
+  Un stakeholder crítico sin correo puede permanecer en el mapa, sin alta vacía. La ronda puede terminar con
+  entrega parcial útil; no afirmar grupo completo ni exigir todo el comité para la primera conversación.
 
 [Canon de admisión y cobertura](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
 La clasificación de registros históricos sin correo se conserva; este cambio no elimina registros ni altera

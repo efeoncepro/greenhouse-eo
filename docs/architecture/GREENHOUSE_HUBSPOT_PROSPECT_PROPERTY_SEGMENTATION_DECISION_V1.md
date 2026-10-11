@@ -139,7 +139,7 @@ sin cambio de source of truth, permisos o propiedades. No altera 180–187 ni la
 ### Delta 2026-10-11 — contactos accionables y cobertura de la cuenta B2B
 
 **Accepted — instrucción explícita del operador, Julio Reyes.** La unidad de investigación es la cuenta y
-su grupo de compra: investigar al contacto objetivo **y buscar siempre 2–3 personas adicionales relevantes**,
+su grupo de compra: investigar al objetivo **y buscar siempre inicialmente 2–3 personas adicionales relevantes**,
 incluso cuando el objetivo ya tenga correo. Priorizar responsables del área, pares, jefatura y decisores
 relacionados con la necesidad. Registrar cargo, empresa, fuente, fecha y razón de acceso al objetivo; trabajar
 en la misma empresa no prueba relación personal ni jefatura. Distinguir vínculo confirmado de hipótesis funcional.
@@ -155,8 +155,13 @@ nota de la empresa, sin crear Contact/Lead para esa persona, y continuar por los
 `emails: []` detiene el alta de esa persona, no la investigación de la cuenta. Un buzón compartido puede quedar
 como vía secundaria en la nota de cuenta; no satisface el requisito ni se atribuye a una persona.
 
-El resultado debe identificar el objetivo y los 2–3 contactos adicionales con datos accionables, relación y
-fuente, o declarar qué falta y qué vías se agotaron. Los contactos que sí cumplan el requisito pueden darse de
+El resultado identifica objetivo, base de 2–3 adicionales y ampliación pertinente con datos accionables, relación
+y fuente, o declara brechas, riesgos y siguientes vías. La base nunca es techo ni prueba de grupo completo: ampliar
+por funciones críticas, decisiones y dependencias de la oportunidad/fase, conforme al
+[método aprobado](EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md#delta-aceptado-2026-10-11--cobertura-del-buying-group).
+Contar personas únicas y funciones por separado; un email no prueba participación o autoridad. El mapa puede
+incluir un stakeholder sin correo o un rol pendiente, sin crear Contact/Lead vacío. La suficiencia es para el
+siguiente paso, sin exigir comité completo/champion antes del primer acercamiento ni crear Deal para mapearlo. Los contactos que sí cumplan el requisito pueden darse de
 alta dentro del alcance autorizado; una cobertura parcial no se presenta como investigación completa ni se
 rellena con contactos vacíos. La solicitud del objetivo no se atribuye como intención de compra de sus colegas.
 

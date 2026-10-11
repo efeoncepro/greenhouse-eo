@@ -17,8 +17,11 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    y workflow específico instalado antes de su fase; no hacer instalación/call sólo para validar la skill.
 2. Verificar tamaño/encaje, señal y fecha con fuentes dueñas; distinguir hechos, hipótesis y demanda. No
    extrapolar headcount de grupo a filial, presupuesto por tamaño o tecnología/tier por un script visible.
-3. Investigar objetivo **y 2–3 adicionales**, sus funciones y rutas. Guardar relación con quién y vínculos
-   confirmados/hipotéticos. Si falta email del objetivo, continuar por adyacentes; mostrar cobertura faltante.
+3. Investigar objetivo **y una base inicial de 2–3 adicionales**, sus funciones y rutas. Amplíala si faltan
+   roles críticos, validadores, aprobadores u otras unidades de la oportunidad/fase: el número no es techo.
+   Separar personas únicas, funciones, participación/autoridad, correo, acceso e interacción. Guardar
+   vínculos confirmados/hipotéticos; para cada brecha, riesgo, owner/ruta y siguiente validación. Un rol
+   crítico sin email permanece en investigación. No exigir champion ni comité completo antes de conversar.
 4. Evaluar atribución, empleo y calidad de correo por separado. Revelación/enriquecimiento pagado requiere
    alcance explícito; no reiterar resultado vacío ni completar direcciones por patrón. Dirección general,
    personal o incierta no permite alta individual. Si faltan datos, entregar estado parcial y menor chequeo útil.
@@ -29,6 +32,17 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
    antes de repetir. Si sólo se autorizó investigar, entregar propuesta y no escribir.
 7. Entregar action pack a Commercial/seguimiento: estado observado, owner, próximo paso/fecha, fuentes y brechas.
    Mantener HSP e historial privados en radar existente; no cambiar scheduler ni crear otro.
+
+## Cuando el pedido involucra ABM / ABS
+
+Cargar [módulo account-based](../../../.codex/skills/efeonce-b2b-prospecting/references/abm-and-abs.md).
+Seleccionar cuenta por fit y decidir inversión por problema, acceso, margen/capacidad; documentar intensidad
+1:1/1:few/1:many y propósito sin cuotas universales ni sustituir el tier ICP. Mantener mapas por iniciativa,
+tesis compartida, owners marketing/comercial y proof que ayude a las distintas funciones a resolver una
+misma decisión. Business case/MAP se preparan según fase y evidencia bilateral, no como requisito de apertura.
+Dimensionar costo total, caja incremental y continuidad; medir progreso comprador, resultados/margen y
+cohortes con denominador. No adoptar uplift de proveedores como meta ni declarar efecto causal por atribución.
+El piloto del informe es propuesta y requiere parámetros/capacidad aprobados antes de ejecutarse.
 
 ## Problemas frecuentes
 
@@ -48,7 +62,7 @@ no hay que renovarla sólo porque cambie de fase el agente. Creación de skill/r
 
 Antes de completar: ¿entidad y fuente claras?, ¿objetivo + adicionales buscados?, ¿emails admitidos con evidencia?,
 ¿relación/demanda separadas?, ¿HOLD y procesos respetados?, ¿acción dentro de permiso?, ¿readback si hubo escritura?,
-¿siguiente decisión y brechas visibles? Outlook de Julio usa su política de firma/CCO y verificación de Enviados.
+¿siguiente decisión/fase y brechas críticas con owner/ruta visibles?, ¿suficiencia sin contar emails como roles? Outlook de Julio usa su política de firma/CCO y verificación de Enviados.
 
 Mantener método editando primero un bundle, sincronizar espejo y correr `pnpm skills:mirrors`, validación de
 frontmatter/rutas y eval offline sobre los escenarios afectados. Registrar decisiones/evidencia en documentación

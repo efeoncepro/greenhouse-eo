@@ -40,3 +40,9 @@ Preserva desconocidos sobre sponsor, economic buyer, champion y proceso; entusia
 
 No supongas sincronización de bajas entre Apollo y HubSpot. Un cambio en secuencias o futuras comunicaciones
 necesita autoridad y verificación del carril concreto; durante investigación entrega la parada propuesta.
+
+## Coordinación account-based
+
+ABM/ABS organiza selección, inversión y desarrollo por cuenta; relación y demanda mantienen su evidencia
+por persona/iniciativa. Para decidir intensidad, propósito, owners, proof, economía y medición, cargar
+[ABM y ABS](abm-and-abs.md). La modalidad 1:many no se descarta por tamaño; verificar relevancia y coordinación.

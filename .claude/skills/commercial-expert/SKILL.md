@@ -13,7 +13,13 @@ win/loss y deal tactics.
 
 Para prospección por cuenta, contactos y rutas frías/tibias/cálidas, cargar
 [efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). Esa skill conserva investigación, cobertura
-objetivo + 2–3 adicionales y entrega; Commercial conserva avance de venta. No cargar ambos recursivamente.
+objetivo + 2–3 adicionales como base ampliable por roles/riesgos de la oportunidad y entrega; Commercial conserva avance de venta. No cargar ambos recursivamente.
+
+Para ABM/ABS, cargar el [módulo compartido](../efeonce-b2b-prospecting/references/abm-and-abs.md):
+selección/intensidad por cuenta, mapas por iniciativa, consenso/proof y economía. Commercial conserva ABS;
+Digital Marketing el plan ABM. 1:many puede ser válido si conserva selección/relevancia/coordinación;
+no adoptar rangos ni resultados numéricos genéricos como metas Efeonce. Este método local gobierna si el
+bundle global carece del módulo referenciado; no afirmar que se cargó un archivo ausente.
 
 # commercial-expert — Greenhouse Overlay
 
