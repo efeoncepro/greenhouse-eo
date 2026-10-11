@@ -450,7 +450,9 @@ export function costInputExposure(result: Composition) {
             continue
           }
 
-          // A tool the composition priced from the resource policy reaches the kernel as `composed:<toolId>`.
+          // A tool the composition priced from the resource policy reaches the kernel as `composed:<toolId>`, or as
+          // `composed:<toolId>:<priceId>` when the demand holds it under several prices: each holding is then an
+          // input of its own, with its price and how it is billed.
           const attribution = result.attributions.find(
             a => a.periodId === period.periodId && a.resource.resourceId === resource.resourceId
           )
@@ -914,7 +916,27 @@ export function summarizeComposition(result: Composition, identity: { calculatio
           attributedMonthlyCost: a.attributedMonthlyCost,
           unallocatedMonthlyCost: a.unallocatedMonthlyCost,
           consumerCount: a.consumerIds.length,
-          lineIds: a.assignments.map(x => x.lineId)
+          lineIds: a.assignments.map(x => x.lineId),
+          // The three keys below exist only where the demand declared them; every other row keeps the keys it had.
+          // Seats of a named tool in the period, over every holding of it: people who need one (a group that shares
+          // a seat counts once), seats paid one by one and, of those, the ones declared idle. A tool held under
+          // several prices has one row per holding, each with its own `priceId`, and the same `seats` on all of them.
+          ...(a.seats
+            ? {
+                seats: {
+                  needed: a.seats.needed,
+                  paid: a.seats.paid,
+                  idle: a.seats.idle,
+                  ...(a.seats.packageCapacity !== undefined ? { packageCapacity: a.seats.packageCapacity } : {}),
+                  sharedSeats: a.seats.shared.map(g => ({ people: g.assigneeIds.length, reason: g.reason }))
+                }
+              }
+            : {}),
+          // Seats of this holding nobody uses in the period. Their cost is inside `attributedMonthlyCost`, in the
+          // currency of the tool, and is carried by the lines listed in `lineIds`.
+          ...(a.idle ? { idle: a.idle } : {}),
+          // Nobody uses the tool in the period: `lineIds` are the lines the demand named to bear its idle seats.
+          ...(a.bornByLineIds ? { bornByLineIds: a.bornByLineIds } : {})
         }
       }))
     ),

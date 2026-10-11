@@ -74,6 +74,23 @@ export function assessCompositionReadiness(result: Composition) {
         'Operations',
         'Confirm stable user IDs and licensed access.'
       )
+
+    // What the demand declares about seats is a declaration, like every allocation: it accounts for the seats, it
+    // does not prove them. A tool held under several prices raises each gap once per period, whatever the holding.
+    if (a.idle)
+      gap(
+        'IDLE_SEAT_COST_REVIEW',
+        `${a.periodId}:${a.toolId}`,
+        'Operations/Commercial',
+        'The demand declares paid seats of this tool that nobody uses in the period, and the quote carries their cost. Confirm the seats cannot be released, paused or reassigned for the period, and that the client is to bear them.'
+      )
+    if (a.seats?.shared.length)
+      gap(
+        'SHARED_SEAT_TERMS_REVIEW',
+        `${a.periodId}:${a.toolId}`,
+        'Operations/Legal',
+        'The demand declares people who use one named seat between them in the period. Confirm the terms of the supplier allow it; a declared share is not a licence, and without it each person needs a seat.'
+      )
   }
 
   if (result.quote.totals?.tax === null)
@@ -296,6 +313,110 @@ export function clientSafePeriodItems(result: Composition) {
           )
 
     return { periodId: p.periodId, items, net: p.result.totals.net }
+  })
+}
+
+/**
+ * The one figure a client may be shown beyond `clientSafePeriodItems`, and never by default: per period, the items
+ * the quote waives completely, each with the net it would have been charged for (`referenceNet`). It exists for a
+ * quote document that prints a courtesy («Bonificado», with its reference value) on the lines the operator marks one
+ * by one; nothing else reads it, and `clientSafePeriodItems` and the preview stay exactly as they are.
+ *
+ * An item is waived in a period when every kernel row behind its key has a net of zero that an explicit adjustment
+ * of the quote produced (a discount or an agreed net: `undiscountedPrice + uplift - discount` is zero on the row)
+ * and those rows had a price above zero. `referenceNet` is the sum of their `undiscountedPrice`: the net of the row
+ * after commercial rounding and before the adjustment, which is what the item would read with no waiver. A row that
+ * merely has no price, or a net of zero no adjustment explains, is not a waiver and is not listed.
+ *
+ * Like the items of the firewall, an entry carries a concept and one amount and nothing else of the rows it came
+ * from: no cost, margin, rate, supplier, policy or profile, and not the adjustment or its reason. `key`, `kind` and
+ * `label` are derived exactly as `clientSafePeriodItems` derives them, so a key names the same thing in both.
+ * `position` is the index the item has, or would have if it were charged, among the client-safe items of its
+ * period (the setup of a managed service is not listed there when it is zero: it would follow the fee); a
+ * presentation uses it to place a courtesy where the charged line would be. `key`, `kind` and `position` are never
+ * printed.
+ */
+export function clientSafeWaivedItems(result: Composition) {
+  if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
+    throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+  const D = Decimal.clone({ precision: 80 })
+  const managed = result.commercialUnit === 'managed_service'
+
+  return result.quote.periods.map(p => {
+    if (!p.result.totals) throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+    const lines = p.result.lines
+    const scale = p.result.totals.net.split('.')[1]?.length ?? 0
+
+    // Where each key sits among the client-safe items of this period. Sold by lines, an item is a row. A managed
+    // service lists its fee, then its setup when it charges one, then each third-party row.
+    const setupCharged = lines
+      .filter(l => l.kind === 'setup')
+      .reduce((s, l) => s.plus(l.net), new D(0))
+      .gt(0)
+
+    let thirdPartySeen = 0
+
+    const concepts = new Map<
+      string,
+      { kind: ClientSafeItemKind; label: string; position: number; rows: (typeof lines)[number][] }
+    >()
+
+    lines.forEach((l, index) => {
+      const thirdPartyIndex = l.kind === PRICING_V3_THIRD_PARTY_BILLING ? thirdPartySeen++ : 0
+
+      const concept =
+        l.kind === PRICING_V3_THIRD_PARTY_BILLING
+          ? {
+              key: `${PRICING_V3_THIRD_PARTY_BILLING}:${l.parentLineId}`,
+              kind: 'third_party' as const,
+              label: l.label,
+              position: managed ? (setupCharged ? 2 : 1) + thirdPartyIndex : index
+            }
+          : managed
+            ? l.kind === 'setup'
+              ? { key: 'setup', kind: 'setup' as const, label: 'Implementación inicial', position: 1 }
+              : { key: 'fee', kind: 'fee' as const, label: 'Servicio gestionado — fee del periodo', position: 0 }
+            : l.kind === 'setup'
+              ? {
+                  key: `${l.parentLineId}:setup`,
+                  kind: 'setup' as const,
+                  label: 'Implementación inicial',
+                  position: index
+                }
+              : { key: l.parentLineId, kind: 'line' as const, label: l.label, position: index }
+
+      const known = concepts.get(concept.key)
+
+      if (known) known.rows.push(l)
+      else concepts.set(concept.key, { ...concept, rows: [l] })
+    })
+
+    const items = [...concepts].flatMap(([key, concept]) => {
+      // Contract 1.0.0 rows have no uplift; from 1.1.0 on the identity of a row includes it.
+      const waivedByAdjustment = concept.rows.every(row => {
+        const uplift = 'uplift' in row && typeof row.uplift === 'string' ? row.uplift : '0'
+
+        return new D(row.net).isZero() && new D(row.undiscountedPrice).plus(uplift).minus(row.discount).isZero()
+      })
+
+      const reference = concept.rows.reduce((total, row) => total.plus(row.undiscountedPrice), new D(0))
+
+      return waivedByAdjustment && reference.gt(0)
+        ? [
+            {
+              key,
+              kind: concept.kind,
+              label: concept.label,
+              position: concept.position,
+              // At the scale the kernel gave the currency, and never rounded to it: a sum that does not fit that
+              // scale is handed over as it is, for the presentation to refuse.
+              referenceNet: reference.toFixed(Math.max(scale, reference.decimalPlaces()))
+            }
+          ]
+        : []
+    })
+
+    return { periodId: p.periodId, items }
   })
 }
 

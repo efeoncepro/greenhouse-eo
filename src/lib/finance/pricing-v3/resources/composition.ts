@@ -5,13 +5,19 @@ import type { CatalogRecord, Diagnostic } from '../catalog/contracts'
 import { calculateResolvedQuote } from '../catalog/quote'
 import { resolveBrief } from '../catalog/resolve'
 import type { PricingV3Input } from '../schemas'
-import { compositionDemandSchema, compositionPolicySchema } from './composition-contracts'
+import { compositionDemandSchema, compositionPolicySchema, eachPeriod } from './composition-contracts'
 import { creditBudgetRequestSchema, creditCatalogSchema, planCreditBudget } from './credit-budget'
 
 const D = Decimal.clone({ precision: 80 })
 
 type Resource = PricingV3Input['snapshot']['resources'][number]
 type PriceRecord = Extract<CatalogRecord, { kind: 'resource' }>
+
+/** A line that uses a tool in a period: its people, and the credits it asks for when the tool is bought in credits. */
+type Consumer = { lineId: string; assignees: string[]; credits: number }
+
+/** Longest id the kernel accepts for a resource, a coverage or an allocation (`id` in schemas.ts). */
+const KERNEL_ID_LENGTH = 120
 
 /** Select and attribute work resources; the existing kernel remains the only selling-price calculator. */
 export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, creditsRaw: unknown, demandRaw: unknown) {
@@ -23,6 +29,11 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
 
   const issue = (code: string, path: string, detail?: string) =>
     diagnostics.push({ code, path, ...(detail ? { detail } : {}) })
+
+  // Demand entries one period at a time: an entry declared once for several periods is read as one per period.
+  const allocations = eachPeriod(demand.allocations)
+  const seatSharing = eachPeriod(demand.seatSharing ?? [])
+  const creditDemandOf = new Map(demand.work.map(w => [w, eachPeriod(w.creditDemand)]))
 
   const toolIds = policy.tools.map(t => t.toolId)
   const unique = <T>(items: T[]) => new Set(items).size === items.length
@@ -75,9 +86,11 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
       issue('CONFLICTING_PROFILE_TASK_EXCLUSION', w.lineId)
     if (w.aiToolIds.some(id => !policy.tools.some(t => t.toolId === id && t.ai))) issue('UNKNOWN_AI_TOOL', w.lineId)
     if (w.aiToolIds.length && !w.aiSelectionReason) issue('AI_SELECTION_REASON_REQUIRED', w.lineId)
+    const creditDemand = creditDemandOf.get(w)!
+
     if (
-      !unique(w.creditDemand.map(d => `${d.periodId}:${d.toolId}`)) ||
-      w.creditDemand.some(
+      !unique(creditDemand.map(d => `${d.periodId}:${d.toolId}`)) ||
+      creditDemand.some(
         d =>
           d.periodId > demand.brief.periods || !policy.tools.some(t => t.toolId === d.toolId && t.access === 'credits')
       )
@@ -86,11 +99,44 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
   }
 
   if (demand.serviceToolIds.some(id => !toolIds.includes(id))) issue('UNKNOWN_SERVICE_TOOL', 'serviceToolIds')
+  // A tool may be held under several prices in one period (a seat bought for the year and one more by the month):
+  // each is a holding of its own. The same price twice in a period declares the same holding twice.
   if (
-    !unique(demand.allocations.map(a => `${a.periodId}:${a.toolId}`)) ||
+    !unique(allocations.map(a => `${a.periodId}:${a.toolId}:${a.priceId}`)) ||
     !unique(demand.creditBudgets.map(a => `${a.periodId}:${a.toolId}`))
   )
     issue('DUPLICATE_RESOURCE_ALLOCATION', 'allocations')
+
+  const holdingsOf = new Map<string, typeof allocations>()
+
+  for (const a of allocations) {
+    const key = `${a.periodId}:${a.toolId}`
+    const held = holdingsOf.get(key) ?? []
+
+    holdingsOf.set(key, held)
+    if (!held.some(h => h.priceId === a.priceId)) held.push(a)
+  }
+
+  // Identity of what the kernel is handed. A tool the demand holds under one price per period keeps the id of the
+  // tool, as it always had. A tool held under several prices in some period names each holding by its price, and
+  // does so in every period: the kernel then sees one resource and one coverage per holding (it adds up the shares
+  // of a coverage and accepts no more than the whole), and a seat bought for the year keeps one identity over the
+  // term, which is what annual continuity (quote.ts) follows.
+  const heldSeveral = new Set([...holdingsOf.values()].filter(held => held.length > 1).map(held => held[0].toolId))
+
+  const holdingRef = (toolId: string, priceId: string) => (heldSeveral.has(toolId) ? `${toolId}:${priceId}` : toolId)
+  const holdingSlot = (toolId: string, priceId: string) => (heldSeveral.has(toolId) ? `${toolId}-${priceId}` : toolId)
+
+  const holdingPath = (a: { periodId: number; toolId: string; priceId: string }) =>
+    `${a.periodId}:${holdingRef(a.toolId, a.priceId)}`
+
+  const sharingOf = new Map<string, typeof seatSharing>()
+
+  for (const s of seatSharing) {
+    const key = `${s.periodId}:${s.toolId}`
+
+    sharingOf.set(key, [...(sharingOf.get(key) ?? []), s])
+  }
 
   // Strip only tools from existing kits; salary, platform fee, assurance, operations and setup stay canonical.
   const baseCatalog = structuredClone(catalog)
@@ -142,15 +188,32 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
     attributedMonthlyCost: string
     unallocatedMonthlyCost: string
     assignments: { lineId: string; share: string; attributedCost: string }[]
+    /**
+     * Seats of a named tool in the period, over every holding of it: people who need one (a group that shares counts
+     * once), seats paid one by one, and of those the ones declared idle. Present only when the period declares idle
+     * or shared seats or holds the tool under several prices; the same on each holding of the tool in the period.
+     */
+    seats?: {
+      needed: number
+      paid: string
+      idle: number
+      packageCapacity?: number
+      shared: { assigneeIds: string[]; reason: string }[]
+    }
+    /** Seats of this holding nobody uses in the period, and their part of `attributedMonthlyCost`. */
+    idle?: { seats: number; reason: string; attributedMonthlyCost: string }
+    /** Only when nobody uses the tool in the period: the lines the demand names to bear the cost of its seats. */
+    bornByLineIds?: string[]
   }[] = []
 
   const budgets: { periodId: number; toolId: string; result: ReturnType<typeof planCreditBudget> }[] = []
   const usedAllocations = new Set<string>()
+  const usedSharing = new Set<string>()
   const usedBudgets = new Set<string>()
   const usedDemand = new Set<string>()
   const usedFx = new Set<string>()
   const usedClient = new Set<string>()
-  const clientCoverages = demand.clientProvidedTools ?? []
+  const clientCoverages = eachPeriod(demand.clientProvidedTools ?? [])
 
   if (!unique(clientCoverages.map(c => `${c.periodId}:${c.toolId}`)))
     issue('DUPLICATE_CLIENT_TOOL_COVERAGE', 'clientProvidedTools')
@@ -179,7 +242,7 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
 
   for (const period of resolution.inputs) {
     const { snapshot, request } = period.input
-    const selected = new Map<string, { lineId: string; assignees: string[]; credits: number }[]>()
+    const selected = new Map<string, Consumer[]>()
 
     for (const line of request.lines) {
       const w = demand.work.find(w => w.lineId === line.lineId)
@@ -233,7 +296,9 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           continue
         }
 
-        const d = w?.creditDemand.find(d => d.periodId === period.periodId && d.toolId === tool.toolId)
+        const d = (w ? creditDemandOf.get(w)! : []).find(
+          d => d.periodId === period.periodId && d.toolId === tool.toolId
+        )
 
         if (d) usedDemand.add(`${line.lineId}:${d.periodId}:${d.toolId}`)
         if (tool.access === 'credits' && !d)
@@ -245,17 +310,50 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
       }
     }
 
-    for (const [toolId, consumers] of selected) {
+    // Tools somebody uses in the period, and after them the tools nobody uses whose seats the demand declares idle:
+    // a seat paid in a month in which its person does not work is still a cost of the quote, and the demand says who
+    // bears it. An allocation nobody uses and that declares nothing idle stays what it was: unused.
+    const idleOnly = [
+      ...new Set(
+        allocations
+          .filter(
+            a =>
+              a.periodId === period.periodId &&
+              !selected.has(a.toolId) &&
+              (a.idleSeats !== undefined || a.bornByLineIds !== undefined)
+          )
+          .map(a => a.toolId)
+      )
+    ].filter(id => policy.tools.some(t => t.toolId === id && t.access !== 'credits'))
+
+    for (const [toolId, consumers] of [...selected, ...idleOnly.map((id): [string, Consumer[]] => [id, []])]) {
       const tool = policy.tools.find(t => t.toolId === toolId)!
       const key = `${period.periodId}:${toolId}`
       const consumerIds = [...new Set(consumers.flatMap(c => c.assignees))].sort()
-      let resource: Resource | undefined
-      let quantity = '1'
-      let serviceShare = '1'
-      let reason = ''
-      let priceId = ''
-      let driver: unknown = { unit: 'provider-credit-demand', totalUnits: consumers.reduce((s, c) => s + c.credits, 0) }
-      let weights: Decimal[] = []
+      const groups = consumers.length ? (sharingOf.get(key) ?? []) : []
+
+      // One entry per resource handed to the kernel: the pooled credit budget of a provider, or each holding of a tool.
+      const placements: {
+        path: string
+        slot: string
+        priceId: string
+        resource: Resource
+        quantity: string
+        serviceShare: string
+        reason: string
+        driver: unknown
+        bearers: { lineId: string; weight: Decimal }[]
+        described: Pick<(typeof attributions)[number], 'seats' | 'idle' | 'bornByLineIds'>
+      }[] = []
+
+      if (groups.length) {
+        usedSharing.add(key)
+
+        if (tool.access !== 'named') {
+          issue('INVALID_SEAT_SHARING', key, 'Only a tool with named seats has a seat to share.')
+          continue
+        }
+      }
 
       if (tool.access === 'credits') {
         const config = demand.creditBudgets.find(b => b.periodId === period.periodId && b.toolId === toolId)
@@ -309,52 +407,42 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
 
         const provider = creditCatalog.providers.find(p => p.providerId === tool.providerId)!
 
-        resource = {
-          resourceId: `composed:${toolId}`,
-          label: tool.label,
-          kind: 'tool',
-          amount: result.breakdown.totalBudgetCost,
-          currency: result.breakdown.currency,
-          unit: 'month',
-          scope: 'account',
-          covers: [`tool:${toolId}`],
-          source: {
-            reference: provider.source.reference,
-            effectiveFrom: asOf,
-            effectiveUntil: asOf,
-            status: 'estimated'
-          }
-        }
-        priceId = creditCatalog.version
-        reason =
-          'Pooled provider/month budget; cost distributed by declared credit demand, including whole extra packages.'
-        weights = consumers.map(c => new D(c.credits))
+        placements.push({
+          path: key,
+          slot: toolId,
+          priceId: creditCatalog.version,
+          resource: {
+            resourceId: `composed:${toolId}`,
+            label: tool.label,
+            kind: 'tool',
+            amount: result.breakdown.totalBudgetCost,
+            currency: result.breakdown.currency,
+            unit: 'month',
+            scope: 'account',
+            covers: [`tool:${toolId}`],
+            source: {
+              reference: provider.source.reference,
+              effectiveFrom: asOf,
+              effectiveUntil: asOf,
+              status: 'estimated'
+            }
+          },
+          quantity: '1',
+          serviceShare: '1',
+          reason:
+            'Pooled provider/month budget; cost distributed by declared credit demand, including whole extra packages.',
+          driver: { unit: 'provider-credit-demand', totalUnits: consumers.reduce((s, c) => s + c.credits, 0) },
+          bearers: consumers.map(c => ({ lineId: c.lineId, weight: new D(c.credits) })),
+          described: {}
+        })
       } else {
-        const allocation = demand.allocations.find(a => a.periodId === period.periodId && a.toolId === toolId)
+        // With nobody using the tool, only the holdings that declare their seats idle are read; the rest are unused.
+        const declared = (holdingsOf.get(key) ?? []).filter(
+          a => consumers.length || a.idleSeats !== undefined || a.bornByLineIds !== undefined
+        )
 
-        if (!allocation) {
+        if (!declared.length) {
           issue('RESOURCE_ALLOCATION_REQUIRED', key)
-          continue
-        }
-
-        usedAllocations.add(key)
-
-        const expectedShare = new D(allocation.driver.allocatedUnits)
-          .div(allocation.driver.totalUnits)
-          .toDecimalPlaces(18, D.ROUND_DOWN)
-
-        if (
-          new D(allocation.driver.allocatedUnits).gt(allocation.driver.totalUnits) ||
-          !new D(allocation.serviceShare).eq(expectedShare)
-        ) {
-          issue('ALLOCATION_DRIVER_MISMATCH', key)
-          continue
-        }
-
-        const price = tool.prices.find(p => p.priceId === allocation.priceId)
-
-        if (!price) {
-          issue('RESOURCE_PRICE_SELECTION_REQUIRED', key)
           continue
         }
 
@@ -363,201 +451,435 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
         // on the light product) is the normal shape of a mixed team, not a double count.
         const holders = new Set(consumers.flatMap(c => [`line:${c.lineId}`, ...c.assignees.map(a => `person:${a}`)]))
 
-        if (
-          price.bundledToolIds?.some(id =>
-            (selected.get(id) ?? []).some(
-              c => holders.has(`line:${c.lineId}`) || c.assignees.some(a => holders.has(`person:${a}`))
-            )
-          )
-        ) {
-          issue('BUNDLED_TOOL_DOUBLE_COUNT', key)
-          continue
-        }
+        const held: {
+          allocation: (typeof declared)[number]
+          path: string
+          price: (typeof tool.prices)[number]
+          value: NonNullable<(typeof tool.prices)[number]['price']>
+        }[] = []
 
-        if (tool.access === 'named' && !new D(allocation.quantity).isInteger()) {
-          issue('WHOLE_NAMED_LICENSE_REQUIRED', key)
-          continue
-        }
+        // Each holding is read on its own, as a single allocation always was: the first thing wrong with it is
+        // reported and the tool is left out of the period. Every holding is read, so each says what is wrong with it.
+        for (const allocation of declared) {
+          const path = holdingPath(allocation)
 
-        if (price.pendingReason) {
-          issue('RESOURCE_PRICE_PENDING', key, price.pendingReason)
-          continue
-        }
+          usedAllocations.add(`${key}:${allocation.priceId}`)
 
-        let value = price.price
-
-        if (price.catalogResourceId) {
-          const candidates = live.filter(
-            (r): r is PriceRecord => r.kind === 'resource' && r.value.resourceId === price.catalogResourceId
-          )
-
-          if (candidates.length !== 1 || candidates[0].value.amount === null) {
-            issue('CATALOG_RESOURCE_PRICE_REQUIRED', key)
-            continue
-          }
-
-          const record = candidates[0]
-
-          if (record.value.unit === 'once') {
-            issue('UNSUPPORTED_TOOL_PRICE_UNIT', key)
-            continue
-          }
-
-          value = {
-            amount: record.value.amount!,
-            currency: record.value.currency,
-            unit: record.value.unit,
-            source: record.source
-          }
-        }
-
-        if (!value || !effective(value.source)) {
-          issue('RESOURCE_PRICE_NOT_EFFECTIVE', key)
-          continue
-        }
-
-        if (
-          tool.access === 'named' &&
-          (price.basis === 'seat'
-            ? !new D(allocation.quantity).eq(consumerIds.length)
-            : !allocation.seatCapacity || allocation.seatCapacity < consumerIds.length)
-        ) {
-          issue('INSUFFICIENT_NAMED_SEAT_CAPACITY', key)
-          continue
-        }
-
-        if (
-          price.minimumContractSeats &&
-          (!allocation.contractSeatCount ||
-            allocation.contractSeatCount < Math.max(price.minimumContractSeats, consumerIds.length))
-        ) {
-          issue('TEAM_CONTRACT_CAPACITY_REQUIRED', key)
-          continue
-        }
-
-        if (
-          price.includedSeats &&
-          (!allocation.seatCapacity || allocation.seatCapacity > price.includedSeats * Number(allocation.quantity))
-        ) {
-          issue('PACKAGE_SEAT_CAPACITY_EXCEEDED', key)
-          continue
-        }
-
-        quantity = allocation.quantity
-        serviceShare = allocation.serviceShare
-        driver = allocation.driver
-        reason = allocation.reason
-        priceId = price.priceId
-        resource = {
-          ...value,
-          resourceId: `composed:${toolId}`,
-          label: tool.label,
-          kind: 'tool',
-          scope: 'account',
-          covers: [`tool:${toolId}`]
-        }
-        // A person counted across several functions contributes one seat, divided across those functions.
-        weights = consumers.map(c =>
-          c.assignees.reduce(
-            (s, id) => s.plus(new D(1).div(consumers.filter(x => x.assignees.includes(id)).length)),
-            new D(0)
-          )
-        )
-      }
-
-      if (!snapshot.currencies.some(c => c.code === resource.currency)) issue('RESOURCE_CURRENCY_NOT_CONFIGURED', key)
-
-      if (resource.currency !== snapshot.calculationCurrency) {
-        const matches = live.filter(
-          (r): r is Extract<CatalogRecord, { kind: 'fx' }> =>
-            r.kind === 'fx' &&
-            demand.fxRecordIds.includes(r.recordId) &&
-            r.value.from === resource.currency &&
-            r.value.to === snapshot.calculationCurrency
-        )
-
-        if (matches.length !== 1) issue('RESOURCE_FX_SELECTION_REQUIRED', key)
-        else {
-          const previous = snapshot.fx.find(f => f.from === resource!.currency && f.to === snapshot.calculationCurrency)
+          const expectedShare = new D(allocation.driver.allocatedUnits)
+            .div(allocation.driver.totalUnits)
+            .toDecimalPlaces(18, D.ROUND_DOWN)
 
           if (
-            previous &&
-            (previous.rate !== matches[0].value.rate || previous.source.reference !== matches[0].source.reference)
+            new D(allocation.driver.allocatedUnits).gt(allocation.driver.totalUnits) ||
+            !new D(allocation.serviceShare).eq(expectedShare)
+          ) {
+            issue('ALLOCATION_DRIVER_MISMATCH', path)
+            continue
+          }
+
+          const price = tool.prices.find(p => p.priceId === allocation.priceId)
+
+          if (!price) {
+            issue('RESOURCE_PRICE_SELECTION_REQUIRED', path)
+            continue
+          }
+
+          if (
+            price.bundledToolIds?.some(id =>
+              (selected.get(id) ?? []).some(
+                c => holders.has(`line:${c.lineId}`) || c.assignees.some(a => holders.has(`person:${a}`))
+              )
+            )
+          ) {
+            issue('BUNDLED_TOOL_DOUBLE_COUNT', path)
+            continue
+          }
+
+          if (tool.access === 'named' && !new D(allocation.quantity).isInteger()) {
+            issue('WHOLE_NAMED_LICENSE_REQUIRED', path)
+            continue
+          }
+
+          if (price.pendingReason) {
+            issue('RESOURCE_PRICE_PENDING', path, price.pendingReason)
+            continue
+          }
+
+          let value = price.price
+
+          if (price.catalogResourceId) {
+            const candidates = live.filter(
+              (r): r is PriceRecord => r.kind === 'resource' && r.value.resourceId === price.catalogResourceId
+            )
+
+            if (candidates.length !== 1 || candidates[0].value.amount === null) {
+              issue('CATALOG_RESOURCE_PRICE_REQUIRED', path)
+              continue
+            }
+
+            const record = candidates[0]
+
+            if (record.value.unit === 'once') {
+              issue('UNSUPPORTED_TOOL_PRICE_UNIT', path)
+              continue
+            }
+
+            value = {
+              amount: record.value.amount!,
+              currency: record.value.currency,
+              unit: record.value.unit,
+              source: record.source
+            }
+          }
+
+          if (!value || !effective(value.source)) {
+            issue('RESOURCE_PRICE_NOT_EFFECTIVE', path)
+            continue
+          }
+
+          // An idle seat is a seat: only a named tool sold by the seat has one to declare, and no more than it pays.
+          if (
+            allocation.idleSeats !== undefined &&
+            (tool.access !== 'named' || price.basis !== 'seat' || new D(allocation.quantity).lt(allocation.idleSeats))
+          ) {
+            issue(
+              'INVALID_IDLE_SEATS',
+              path,
+              'Idle seats are declared on a named tool priced per seat, up to the seats the entry pays.'
+            )
+            continue
+          }
+
+          // The kernel bounds its ids. A holding named by tool and price that would not fit says so here, by period
+          // and tool, instead of reaching the kernel as an input it rejects.
+          if (
+            `composed:${holdingRef(toolId, price.priceId)}`.length > KERNEL_ID_LENGTH ||
+            `composed-${holdingSlot(toolId, price.priceId)}-${request.lines.length}`.length > KERNEL_ID_LENGTH
+          ) {
+            issue(
+              'RESOURCE_HOLDING_ID_TOO_LONG',
+              path,
+              `A tool held under several prices is named by tool and price; together they exceed ${KERNEL_ID_LENGTH} characters.`
+            )
+            continue
+          }
+
+          held.push({ allocation, path, price, value })
+        }
+
+        if (held.length !== declared.length) continue
+
+        // People who share a seat count as one seat between them, and each carries that fraction of it.
+        const sharedBy = new Map(groups.flatMap(g => g.assigneeIds.map(id => [id, g.assigneeIds.length] as const)))
+
+        if (
+          groups.some(g => !unique(g.assigneeIds) || g.assigneeIds.some(id => !consumerIds.includes(id))) ||
+          !unique(groups.flatMap(g => g.assigneeIds))
+        ) {
+          issue(
+            'INVALID_SEAT_SHARING',
+            key,
+            'Every person of a group uses the tool in the period and belongs to one group at most.'
           )
-            issue('RESOURCE_FX_CONFLICT', key)
-          if (!previous) snapshot.fx.push({ ...matches[0].value, source: matches[0].source })
-          usedFx.add(matches[0].recordId)
+          continue
         }
-      }
 
-      const weightTotal = weights.reduce((s, w) => s.plus(w), new D(0))
+        const seatPriced = held.filter(h => h.price.basis === 'seat')
+        const packaged = held.filter(h => h.price.basis === 'package')
+        const needed = consumerIds.filter(id => !sharedBy.has(id)).length + groups.length
+        const paid = seatPriced.reduce((s, h) => s.plus(h.allocation.quantity), new D(0))
+        const idle = held.reduce((s, h) => s + (h.allocation.idleSeats ?? 0), 0)
+        const capacity = packaged.reduce((s, h) => s + (h.allocation.seatCapacity ?? 0), 0)
+        const inUse = paid.minus(idle)
 
-      if (!weightTotal.gt(0)) {
-        issue('RESOURCE_CONSUMERS_REQUIRED', key)
-        continue
-      }
+        // Seat accounting of a named tool, over every holding of it in the period. A seat paid one by one is used,
+        // shared or declared idle: one short is a person without a seat, one over is a seat paid that the demand
+        // does not account for. A package is capacity: it has to reach, with the seats in use, the people who need
+        // one. An idle seat is nobody's, so it is never counted as capacity for somebody.
+        if (tool.access === 'named') {
+          if (packaged.some(h => !h.allocation.seatCapacity) || inUse.plus(capacity).lt(needed)) {
+            issue('INSUFFICIENT_NAMED_SEAT_CAPACITY', key)
+            continue
+          }
 
-      snapshot.resources.push(resource)
-      let distributed = new D(0)
+          if (inUse.gt(needed)) {
+            issue(
+              'UNACCOUNTED_NAMED_SEATS',
+              key,
+              `${paid} seats are paid, ${idle} declared idle and ${needed} needed: every paid seat is used, shared (seatSharing) or declared idle (idleSeats, with its reason).`
+            )
+            continue
+          }
+        }
 
-      const assignments = consumers.map((c, i) => {
-        const share =
-          i === consumers.length - 1
-            ? new D(serviceShare).minus(distributed)
-            : weights[i].div(weightTotal).mul(serviceShare).toDecimalPlaces(18, D.ROUND_DOWN)
+        // Who bears a holding. With people using the tool, the lines that use it, by seat weight; `bornByLineIds`
+        // is then a second answer to a question the use already answers. With nobody, the lines the demand names.
+        const bearerIssue = held.flatMap(({ allocation, path }) => {
+          const named = allocation.bornByLineIds
 
-        distributed = distributed.plus(share)
-        const line = request.lines.find(l => l.lineId === c.lineId)!
+          if (consumers.length)
+            return named
+              ? [
+                  {
+                    code: 'IDLE_SEAT_BEARER_NOT_ALLOWED',
+                    path,
+                    detail:
+                      'The tool has users in the period: its cost, idle seats included, goes to the lines that use it.'
+                  }
+                ]
+              : []
 
-        line.assignments.push({
-          resourceId: resource!.resourceId,
-          allocationId: `composed-${toolId}-${i}`,
-          scope: 'account',
-          scopeRef: demand.brief.accountId,
-          quantity,
-          share: share.toString(),
-          cashTiming: resource!.unit === 'month' ? 'monthly' : 'start'
+          // Reached with every seat of the holding declared idle (the accounting above), or with a holding that
+          // has no seat to declare: a package or a shared tool nobody uses is an unused allocation, not an idle seat.
+          if (allocation.idleSeats === undefined)
+            return [
+              {
+                code: 'IDLE_SEAT_BEARER_NOT_ALLOWED',
+                path,
+                detail: 'bornByLineIds bears seats declared idle on a named tool priced per seat, and nothing else.'
+              }
+            ]
+
+          if (!named)
+            return [
+              {
+                code: 'IDLE_SEAT_BEARER_REQUIRED',
+                path,
+                detail:
+                  'Nobody uses the tool in the period: name in bornByLineIds the lines that bear the cost of its idle seats.'
+              }
+            ]
+
+          return unique(named) && named.every(id => request.lines.some(l => l.lineId === id))
+            ? []
+            : [
+                {
+                  code: 'INVALID_IDLE_SEAT_BEARER',
+                  path,
+                  detail: 'bornByLineIds names, once each, lines of the quote that are active in the period.'
+                }
+              ]
         })
-        snapshot.profiles.find(p => p.profileId === line.profileId)!.requiredCoverages.push(`tool:${toolId}`)
 
-        return {
-          lineId: c.lineId,
-          share: share.toString(),
-          attributedCost: new D(resource!.amount)
-            .mul(quantity)
-            .mul(share)
-            .div(resource!.unit === 'year' ? 12 : 1)
-            .toString()
+        if (bearerIssue.length) {
+          bearerIssue.forEach(i => issue(i.code, i.path, i.detail))
+          continue
         }
-      })
 
-      const fullMonthlyCost = new D(resource.amount).mul(quantity).div(resource.unit === 'year' ? 12 : 1)
+        // Seats a contract has to hold for this holding: what it pays one by one, or what its package has to seat.
+        const contractSeats = (h: (typeof held)[number]) =>
+          tool.access !== 'named'
+            ? new D(consumerIds.length)
+            : h.price.basis === 'seat'
+              ? new D(h.allocation.quantity)
+              : D.max(0, new D(needed).minus(inUse).minus(capacity - (h.allocation.seatCapacity ?? 0)))
 
-      attributions.push({
-        periodId: period.periodId,
-        toolId,
+        const capacityIssue = held.flatMap(h => {
+          const { allocation, price, path } = h
+
+          if (
+            price.minimumContractSeats &&
+            (!allocation.contractSeatCount ||
+              new D(allocation.contractSeatCount).lt(D.max(price.minimumContractSeats, contractSeats(h))))
+          )
+            return [{ code: 'TEAM_CONTRACT_CAPACITY_REQUIRED', path }]
+
+          if (
+            price.includedSeats &&
+            (!allocation.seatCapacity || allocation.seatCapacity > price.includedSeats * Number(allocation.quantity))
+          )
+            return [{ code: 'PACKAGE_SEAT_CAPACITY_EXCEEDED', path }]
+
+          return []
+        })
+
+        if (capacityIssue.length) {
+          capacityIssue.forEach(i => issue(i.code, i.path))
+          continue
+        }
+
+        // The cost of every holding of the tool is distributed alike, so the tool is one pool whatever it is bought
+        // as. A person counted across several functions contributes one seat, divided across those functions; a
+        // person who shares a seat contributes their part of it. The cost of an idle seat is in the pool.
+        const users = consumers.map(c => ({
+          lineId: c.lineId,
+          weight: c.assignees.reduce(
+            (s, id) =>
+              s.plus(
+                new D(1).div(new D(sharedBy.get(id) ?? 1).mul(consumers.filter(x => x.assignees.includes(id)).length))
+              ),
+            new D(0)
+          )
+        }))
+
+        const seats =
+          tool.access === 'named' && (groups.length || idle || held.length > 1)
+            ? {
+                needed,
+                paid: paid.toString(),
+                idle,
+                ...(packaged.length ? { packageCapacity: capacity } : {}),
+                shared: groups.map(g => ({ assigneeIds: [...g.assigneeIds].sort(), reason: g.reason }))
+              }
+            : undefined
+
+        for (const { allocation, path, price, value } of held) {
+          const monthly = new D(value.amount).mul(allocation.serviceShare).div(value.unit === 'year' ? 12 : 1)
+
+          placements.push({
+            path,
+            slot: holdingSlot(toolId, price.priceId),
+            priceId: price.priceId,
+            resource: {
+              ...value,
+              resourceId: `composed:${holdingRef(toolId, price.priceId)}`,
+              // Two holdings of one tool are told apart in every reading by what they are bought as.
+              label: heldSeveral.has(toolId) ? `${tool.label} (${price.priceId})` : tool.label,
+              kind: 'tool',
+              scope: 'account',
+              covers: [`tool:${holdingRef(toolId, price.priceId)}`]
+            },
+            quantity: allocation.quantity,
+            serviceShare: allocation.serviceShare,
+            reason: allocation.reason,
+            driver: allocation.driver,
+            bearers: consumers.length ? users : allocation.bornByLineIds!.map(lineId => ({ lineId, weight: new D(1) })),
+            described: {
+              ...(seats ? { seats } : {}),
+              ...(allocation.idleSeats !== undefined
+                ? {
+                    idle: {
+                      seats: allocation.idleSeats,
+                      reason: allocation.idleReason!,
+                      attributedMonthlyCost: monthly.mul(allocation.idleSeats).toString()
+                    }
+                  }
+                : {}),
+              ...(consumers.length ? {} : { bornByLineIds: [...allocation.bornByLineIds!] })
+            }
+          })
+
+          // The work of these lines does not need the tool; they carry a seat nobody uses, and the row says so.
+          if (!consumers.length)
+            for (const lineId of allocation.bornByLineIds!)
+              selections
+                .find(s => s.periodId === period.periodId && s.lineId === lineId && s.toolId === toolId)
+                ?.reasons.push(`bears-idle-seat:${allocation.idleReason}`)
+        }
+      }
+
+      for (const {
+        path,
+        slot,
         priceId,
         resource,
         quantity,
         serviceShare,
-        consumerIds,
         reason,
         driver,
-        fullMonthlyCost: fullMonthlyCost.toString(),
-        attributedMonthlyCost: fullMonthlyCost.mul(serviceShare).toString(),
-        unallocatedMonthlyCost: fullMonthlyCost.mul(new D(1).minus(serviceShare)).toString(),
-        assignments
-      })
+        bearers,
+        described
+      } of placements) {
+        if (!snapshot.currencies.some(c => c.code === resource.currency))
+          issue('RESOURCE_CURRENCY_NOT_CONFIGURED', path)
+
+        if (resource.currency !== snapshot.calculationCurrency) {
+          const matches = live.filter(
+            (r): r is Extract<CatalogRecord, { kind: 'fx' }> =>
+              r.kind === 'fx' &&
+              demand.fxRecordIds.includes(r.recordId) &&
+              r.value.from === resource.currency &&
+              r.value.to === snapshot.calculationCurrency
+          )
+
+          if (matches.length !== 1) issue('RESOURCE_FX_SELECTION_REQUIRED', path)
+          else {
+            const previous = snapshot.fx.find(
+              f => f.from === resource.currency && f.to === snapshot.calculationCurrency
+            )
+
+            if (
+              previous &&
+              (previous.rate !== matches[0].value.rate || previous.source.reference !== matches[0].source.reference)
+            )
+              issue('RESOURCE_FX_CONFLICT', path)
+            if (!previous) snapshot.fx.push({ ...matches[0].value, source: matches[0].source })
+            usedFx.add(matches[0].recordId)
+          }
+        }
+
+        const weightTotal = bearers.reduce((s, b) => s.plus(b.weight), new D(0))
+
+        if (!weightTotal.gt(0)) {
+          issue('RESOURCE_CONSUMERS_REQUIRED', path)
+          continue
+        }
+
+        snapshot.resources.push(resource)
+        let distributed = new D(0)
+
+        const assignments = bearers.map((b, i) => {
+          const share =
+            i === bearers.length - 1
+              ? new D(serviceShare).minus(distributed)
+              : b.weight.div(weightTotal).mul(serviceShare).toDecimalPlaces(18, D.ROUND_DOWN)
+
+          distributed = distributed.plus(share)
+          const line = request.lines.find(l => l.lineId === b.lineId)!
+
+          line.assignments.push({
+            resourceId: resource.resourceId,
+            allocationId: `composed-${slot}-${i}`,
+            scope: 'account',
+            scopeRef: demand.brief.accountId,
+            quantity,
+            share: share.toString(),
+            cashTiming: resource.unit === 'month' ? 'monthly' : 'start'
+          })
+          snapshot.profiles.find(p => p.profileId === line.profileId)!.requiredCoverages.push(resource.covers[0])
+
+          return {
+            lineId: b.lineId,
+            share: share.toString(),
+            attributedCost: new D(resource.amount)
+              .mul(quantity)
+              .mul(share)
+              .div(resource.unit === 'year' ? 12 : 1)
+              .toString()
+          }
+        })
+
+        const fullMonthlyCost = new D(resource.amount).mul(quantity).div(resource.unit === 'year' ? 12 : 1)
+
+        attributions.push({
+          periodId: period.periodId,
+          toolId,
+          priceId,
+          resource,
+          quantity,
+          serviceShare,
+          consumerIds,
+          reason,
+          driver,
+          fullMonthlyCost: fullMonthlyCost.toString(),
+          attributedMonthlyCost: fullMonthlyCost.mul(serviceShare).toString(),
+          unallocatedMonthlyCost: fullMonthlyCost.mul(new D(1).minus(serviceShare)).toString(),
+          assignments,
+          ...described
+        })
+      }
     }
   }
 
-  for (const a of demand.allocations)
-    if (!usedAllocations.has(`${a.periodId}:${a.toolId}`))
-      issue('UNUSED_RESOURCE_ALLOCATION', `${a.periodId}:${a.toolId}`)
+  for (const a of allocations)
+    if (!usedAllocations.has(`${a.periodId}:${a.toolId}:${a.priceId}`))
+      issue('UNUSED_RESOURCE_ALLOCATION', holdingPath(a))
+  for (const s of seatSharing)
+    if (!usedSharing.has(`${s.periodId}:${s.toolId}`)) issue('UNUSED_SEAT_SHARING', `${s.periodId}:${s.toolId}`)
   for (const b of demand.creditBudgets)
     if (!usedBudgets.has(`${b.periodId}:${b.toolId}`)) issue('UNUSED_CREDIT_BUDGET', `${b.periodId}:${b.toolId}`)
   for (const w of demand.work)
-    for (const d of w.creditDemand)
+    for (const d of creditDemandOf.get(w)!)
       if (!usedDemand.has(`${w.lineId}:${d.periodId}:${d.toolId}`))
         issue('UNUSED_CREDIT_DEMAND', `${w.lineId}:${d.periodId}:${d.toolId}`)
   for (const id of demand.fxRecordIds) if (!usedFx.has(id)) issue('UNUSED_FX_SELECTION', id)

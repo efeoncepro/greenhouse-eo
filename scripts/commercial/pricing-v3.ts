@@ -30,6 +30,7 @@ import {
   composeQuoteDocument,
   scaffoldQuoteDocumentBrief
 } from '../../src/lib/finance/pricing-v3/resources/quote-document'
+import type { QuoteDocumentOption } from '../../src/lib/finance/pricing-v3/resources/quote-document'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -98,12 +99,19 @@ const options = {
   tools: { type: 'string' },
   milestones: { type: 'string' },
   label: { type: 'string' },
+  // The one flag that repeats: `--option <key>=<artifact.json>`, once per optional add-on of a quote document.
+  option: { type: 'string', multiple: true },
   current: { type: 'boolean' },
+  'keep-blocked': { type: 'boolean' },
   help: { type: 'boolean' }
 } as const
 
-type Switch = 'current' | 'help'
+const SWITCHES = ['current', 'keep-blocked', 'help'] as const
+
+type Switch = (typeof SWITCHES)[number]
 type ValueOption = Exclude<keyof typeof options, Switch>
+
+const isSwitch = (option: keyof typeof options): option is Switch => SWITCHES.some(name => name === option)
 
 // An unknown flag is echoed only when it reads as a flag name, so a mistyped value cannot ride out as a "name".
 const named = (option: string) => (/^[a-z][a-z-]{0,31}$/i.test(option) ? { option } : {})
@@ -112,13 +120,15 @@ const parseCli = () => {
   // Non-strict on purpose: an unknown flag arrives as a token we can name, not as Node prose we would have to parse.
   const { positionals, tokens } = parseArgs({ allowPositionals: true, strict: false, tokens: true, options })
   const values: Partial<Record<ValueOption, string>> & Partial<Record<Switch, boolean>> = {}
+  // Every `--option`, in the order given. `values.option` only says the flag was used, like any other.
+  const repeated: string[] = []
 
   for (const token of tokens) {
     if (token.kind !== 'option') continue
     if (!Object.keys(options).includes(token.name)) throw new PricingV3Error('UNKNOWN_OPTION', named(token.name))
     const option = token.name as keyof typeof options
 
-    if (option === 'help' || option === 'current') {
+    if (isSwitch(option)) {
       if (token.value !== undefined) throw new PricingV3Error('INVALID_ARGUMENT', { option })
       values[option] = true
     } else {
@@ -126,10 +136,11 @@ const parseCli = () => {
       if (token.value === undefined || (!token.inlineValue && token.value.startsWith('-')))
         throw new PricingV3Error('MISSING_ARGUMENT', { option })
       values[option] = token.value
+      if (option === 'option') repeated.push(token.value)
     }
   }
 
-  return { positionals, values }
+  return { positionals, values, repeated }
 }
 
 // Only the option name leaves here: a path or a parser message could quote what the caller keeps private.
@@ -207,12 +218,12 @@ const exitFor = (result: ReturnType<typeof calculatePricingV3>) =>
   result.calculationStatus !== 'calculated' ? 2 : result.reviewStatus === 'requires_review' ? 3 : 0
 
 try {
-  const { positionals, values } = parseCli()
+  const { positionals, values, repeated } = parseCli()
 
   const [command, subcommand] = positionals
 
   const permitted: Record<string, string[]> = {
-    calculate: ['input', 'out', 'help'],
+    calculate: ['input', 'out', 'keep-blocked', 'help'],
     validate: ['input', 'help'],
     explain: ['input', 'help'],
     replay: ['input', 'help'],
@@ -220,7 +231,7 @@ try {
     export: ['input', 'out', 'format', 'help'],
     catalog: ['catalog', 'current', 'query', 'kind', 'date', 'input', 'impact', 'confirm', 'out', 'help'],
     prepare: ['catalog', 'current', 'input', 'out', 'help'],
-    quote: ['catalog', 'current', 'input', 'out', 'help'],
+    quote: ['catalog', 'current', 'input', 'out', 'keep-blocked', 'help'],
     resources: [
       'catalog',
       'policy',
@@ -246,6 +257,8 @@ try {
       'tools',
       'label',
       'milestones',
+      'option',
+      'keep-blocked',
       'help'
     ],
     current: ['catalog', 'policy', 'credits', 'reason', 'confirm', 'input', 'out', 'help'],
@@ -268,6 +281,44 @@ try {
   }
 
   if (command && permitted[command]) permit(permitted[command])
+
+  // The flag only changes what `--out` does: alone it would be ignored in silence.
+  if (values['keep-blocked'] && !values.out) throw new PricingV3Error('INVALID_ARGUMENT', { option: 'keep-blocked' })
+
+  /**
+   * The one writer of a quote artifact, for the three commands that freeze one (`calculate`, `quote` and
+   * `compose prepare|quote`). `--out` is always a calculated quote: a run that did not calculate writes nothing
+   * there, so the corrected run can take the same path instead of failing with OUTPUT_EXISTS against a file that was
+   * never a quote. What the run found is still printed in full, with a notice that says nothing was written.
+   *
+   * A blocked artifact has readers of its own (`explain`, `replay`, `compose assess`, `compose commitments`), so it
+   * stays reachable, by request: `--keep-blocked` writes it, and the notice says what the file is. Returns the
+   * notice to print under `runNotices.output`, or nothing when `--out` holds what it always holds.
+   */
+  const freezeQuote = (artifact: unknown, calculated: boolean) => {
+    if (!values.out) return undefined
+
+    if (!calculated && !values['keep-blocked'])
+      return {
+        option: 'out',
+        written: false,
+        reason: 'QUOTE_NOT_CALCULATED',
+        statement:
+          'Nothing was written to --out: the quote did not calculate, and --out only ever holds a calculated quote. Resolve what this output reports and run again with the same --out. To keep the blocked artifact for explain, replay, compose assess or compose commitments, add --keep-blocked and give it a path of its own.'
+      }
+
+    writeNew(values.out, json(artifact))
+
+    return calculated
+      ? undefined
+      : {
+          option: 'out',
+          written: true,
+          reason: 'KEPT_BLOCKED',
+          statement:
+            'Written because --keep-blocked asked for it: the file holds a quote that did not calculate. It is not a quote and no reading of a calculated quote accepts it; the corrected run needs another --out.'
+        }
+  }
 
   const catalogPath =
     values.catalog ?? fileURLToPath(new URL('../../data/pricing/v3-catalog/catalog.review-v1.json', import.meta.url))
@@ -306,18 +357,18 @@ try {
         tool: 'pricing-v3-local',
         binding: false,
         operations: {
-          calculate: '--input request-and-snapshot.json [--out frozen-artifact.json]',
+          calculate: '--input request-and-snapshot.json [--out frozen-artifact.json [--keep-blocked]]',
           validate: '--input request-and-snapshot.json',
           explain: '--input frozen-artifact.json',
           replay: '--input frozen-artifact.json',
           compare: '--left artifact.json --right artifact.json',
           export: '--input frozen-artifact.json --out draft.md [--format markdown|json]',
           prepare: '--input brief.json [--catalog catalog.json] [--out selection.json]',
-          quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json]',
+          quote: '--input brief.json [--catalog catalog.json] [--out quote.artifact.json [--keep-blocked]]',
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json] | document --input artifact.json [--brief document-brief.json] [--out data.json]',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json [--keep-blocked]] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json] | document --input artifact.json [--brief document-brief.json] [--out data.json] [--option key=option.artifact.json]...',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
           current:
@@ -328,13 +379,22 @@ try {
           flag: '--current fills each of --catalog, --policy and --credits the caller did not pass, on every operation that takes them. It is verified first (version and digest); an explicit flag wins. For `resources budget` it fills --catalog with the credit catalog.',
           withoutFlag: 'Unchanged: no --catalog means the historical baseline, and --policy/--credits stay mandatory.'
         },
+        quoteOutput: {
+          rule: '`--out` of `calculate`, `quote` and `compose prepare|quote` is always a calculated quote. A run that does not calculate (exit 2) writes nothing there and says so under `runNotices.output`; what it found is printed in full, and the corrected run takes the same --out.',
+          keepBlocked:
+            '--keep-blocked writes the artifact of a run that did not calculate, for the readings that take one (explain, replay, compose assess, compose commitments). It needs --out, and a path of its own: the file is not a quote.'
+        },
         quoteDocument: {
           command:
             '`compose document` turns a frozen quote into version 2 of the data of the A4 quote template (docs/commercial/templates/cotizacion-a4). Render it with `node scripts/documents/render-cotizacion-a4.mjs --data data.json --out folder`. Exit 3: the document is a draft of a quote under review.',
           withoutBrief:
             'Prints the scaffold of the document brief (every line of the quote under its key, with its default label and group, and the texts to fill) and exits 2. --out keeps the brief alone.',
           brief:
-            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote, and the tax printed is the frozen tax of the quote, which must correspond to its rate within the rounding of its months; otherwise no data is emitted.'
+            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote, and the tax printed is the frozen tax of the quote, which must correspond to its rate within the rounding of its months; otherwise no data is emitted.',
+          options:
+            '--option <key>=<artifact.json>, repeatable (at most 8): the frozen quote of one optional add-on alone, verified by replay like --input. Its price is the net of one of its periods: it must be calculated, in the currency of the quote, with the same net in every period and no cost the client pays apart. The brief names exactly the options passed (`options.<key>`: label, unit, detail). They are printed in a block of their own and enter no line, net, tax or total of the quote.',
+          courtesy:
+            'A line the quote waives completely (net zero through a discount or an agreed net) prints nothing. `lines.<key>.courtesy: true` in the brief prints it with net zero and its reference value, the price it had before the waiver, taken from the frozen quote. The scaffold lists those keys under `waived`. The mark on a line with a net is rejected.'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
@@ -440,12 +500,14 @@ try {
           : ['cash', 'commitments'].includes(subcommand)
             ? ['input', 'out', 'help']
             : subcommand === 'document'
-              ? ['input', 'brief', 'out', 'help']
+              ? ['input', 'brief', 'option', 'out', 'help']
               : subcommand === 'workload'
                 ? ['input', 'brief', 'out', 'help']
                 : subcommand === 'scaffold'
                   ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
-                  : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
+                  : subcommand === 'plan'
+                    ? ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
+                    : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'keep-blocked', 'help']
 
     permit(allowed)
 
@@ -555,17 +617,55 @@ try {
       // document comes from the verified result. The brief only brings the texts and the presentation of the lines.
       const artifact = replayResourceComposition(load('input'))
 
-      // What the caller corrects: the brief (its texts, its line keys, its milestones) or the quote itself.
+      // What the caller corrects: the brief (its texts, its line keys, its milestones), an option or the quote itself.
       const reject = (outcome: { code: PricingV3Error['code']; issues: { path: string; rule: string }[] }) =>
         new PricingV3Error(outcome.code, {
           option: ['QUOTE_DOCUMENT_BRIEF_INVALID', 'SCHEDULE_MILESTONES_INVALID'].includes(outcome.code)
             ? 'brief'
-            : 'input',
+            : outcome.code === 'QUOTE_DOCUMENT_OPTION_INVALID'
+              ? 'option'
+              : 'input',
           issues: outcome.issues
         })
 
+      // `--option <key>=<artifact.json>`, once per optional add-on: the frozen quote of the option alone, under the
+      // key the brief names it by. Each is verified by replay exactly like `--input`; what an option must be for a
+      // document to print it, and how many a document takes, are the reader's rules, and its rejections name the
+      // option by its place in this list.
+      const optionQuotes: QuoteDocumentOption[] = repeated.map((argument, index) => {
+        const separator = argument.indexOf('=')
+        const key = argument.slice(0, separator)
+        const path = argument.slice(separator + 1)
+
+        if (
+          separator < 1 ||
+          !path ||
+          !/^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/.test(key) ||
+          repeated.findIndex(other => other.startsWith(`${key}=`)) !== index
+        )
+          throw new PricingV3Error('INVALID_ARGUMENT', { option: 'option' })
+
+        try {
+          const frozen = replayResourceComposition(readJson('option', path))
+
+          return { key, result: frozen.semantic.result, identity: frozen }
+        } catch (error) {
+          // With several artifacts in one run, the report says which flag holds the one that failed.
+          const failure = classify(error)
+
+          if (!failure) throw error
+
+          throw new PricingV3Error(failure.code, { ...failure.detail, option: 'option' })
+        }
+      })
+
       if (values.brief) {
-        const outcome = composeQuoteDocument(artifact.semantic.result, artifact, readJson('brief', values.brief))
+        const outcome = composeQuoteDocument(
+          artifact.semantic.result,
+          artifact,
+          readJson('brief', values.brief),
+          optionQuotes
+        )
 
         if (!outcome.ok) throw reject(outcome)
 
@@ -576,7 +676,7 @@ try {
       } else {
         // No brief yet: the scaffold to fill, with the keys of this quote. Missing input, so exit 2 like `scaffold`;
         // `--out` keeps the brief alone, ready to edit.
-        const outcome = scaffoldQuoteDocumentBrief(artifact.semantic.result, artifact)
+        const outcome = scaffoldQuoteDocumentBrief(artifact.semantic.result, artifact, optionQuotes)
 
         if (!outcome.ok) throw reject(outcome)
 
@@ -596,8 +696,7 @@ try {
       const artifact = runResourceComposition(loadCatalog(), load('policy'), load('credits'), load('input'))
 
       const result = artifact.semantic.result
-
-      if (values.out) writeNew(values.out, json(artifact))
+      const output = freezeQuote(artifact, result.quote.calculationStatus === 'calculated')
 
       // A demand that kept an old date quotes with the values of that date and nothing fails. The catalog is in hand
       // here, so say it; this notice is about the run, not part of the frozen result.
@@ -631,13 +730,14 @@ try {
             calculationId: artifact.calculationId,
             ...(subcommand === 'quote' ? { replayDigest: artifact.replayDigest } : {})
           }),
-          // Everything under `runNotices` describes this run against today's sources; the rest is the summary of the
-          // result and is what a replay of the frozen artifact prints again.
-          ...(laterCatalogValues || priceDates
+          // Everything under `runNotices` describes this run against today's sources, and what it did with `--out`;
+          // the rest is the summary of the result and is what a replay of the frozen artifact prints again.
+          ...(laterCatalogValues || priceDates || output
             ? {
                 runNotices: {
                   ...(laterCatalogValues ? { laterCatalogValues } : {}),
-                  ...(priceDates ? { priceDates } : {})
+                  ...(priceDates ? { priceDates } : {}),
+                  ...(output ? { output } : {})
                 }
               }
             : {})
@@ -797,9 +897,8 @@ try {
       process.exitCode = selection.status === 'resolved' ? 0 : 2
     } else {
       const artifact = runCatalogQuote(catalog, brief)
-
-      if (values.out) writeNew(values.out, json(artifact))
       const result = artifact.semantic.result
+      const output = freezeQuote(artifact, result.calculationStatus === 'calculated')
 
       process.stdout.write(
         json({
@@ -814,7 +913,8 @@ try {
             periodId: p.periodId,
             totals: p.result.totals,
             diagnostics: p.result.diagnostics
-          }))
+          })),
+          ...(output ? { runNotices: { output } } : {})
         })
       )
       process.exitCode =
@@ -825,12 +925,17 @@ try {
     const input = load('input')
     const { result, artifact } = runPricingV3(input)
 
-    if (values.out && command === 'calculate') {
-      if (artifact) writeNew(values.out, json(artifact))
-    }
+    // An input the contract rejects yields no artifact at all, with or without `--keep-blocked`.
+    const output =
+      command === 'calculate' && artifact ? freezeQuote(artifact, result.calculationStatus === 'calculated') : undefined
 
     process.stdout.write(
-      json({ result, calculationId: artifact?.calculationId ?? null, replayDigest: artifact?.replayDigest ?? null })
+      json({
+        result,
+        calculationId: artifact?.calculationId ?? null,
+        replayDigest: artifact?.replayDigest ?? null,
+        ...(output ? { runNotices: { output } } : {})
+      })
     )
     process.exitCode = exitFor(result)
   } else if (['explain', 'replay', 'compare', 'export'].includes(command)) {

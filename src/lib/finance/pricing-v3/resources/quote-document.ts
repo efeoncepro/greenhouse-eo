@@ -5,7 +5,7 @@ import { clientPaidDirectly } from '../catalog/client'
 import type { composeResourceQuote } from './composition'
 import { presentPaymentSchedule } from './engagement-view'
 import type { EngagementViewRejectionCode, PaymentMilestone } from './engagement-view'
-import { clientSafePeriodItems } from './readiness'
+import { clientSafePeriodItems, clientSafeWaivedItems } from './readiness'
 import type { ClientSafeItemKind } from './readiness'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -25,6 +25,7 @@ export const QUOTE_DOCUMENT_DATA_VERSION = 2
 const LINE_LIMIT = 40
 const CLIENT_PAID_LIMIT = 8
 const MILESTONE_LIMIT = 12
+const OPTION_LIMIT = 8
 const QUANTITY_LIMIT = 9999
 const TAX_RATE_DECIMALS = 4
 
@@ -44,6 +45,15 @@ export const QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS = {
   note: 'Importes netos, sin impuestos. La suma de los hitos es el valor neto de esta cotización.'
 }
 
+/**
+ * Texts of the block of optional add-ons when the brief gives none. True of any block this reading can emit; the
+ * template states on its own that the options are outside the quote, its net and its total.
+ */
+export const QUOTE_DOCUMENT_DEFAULT_OPTIONS_TEXTS = {
+  title: 'Opciones adicionales',
+  note: 'Cada opción se contrata por separado y sólo si se solicita.'
+}
+
 /** Where a rejected input is wrong and which rule it broke; never the content that was sent. */
 export type QuoteDocumentIssue = { path: string; rule: string }
 
@@ -57,6 +67,7 @@ export type QuoteDocumentRejectionCode =
   | 'QUOTE_DOCUMENT_BRIEF_INVALID'
   | 'QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP'
   | 'QUOTE_DOCUMENT_NOT_REPRESENTABLE'
+  | 'QUOTE_DOCUMENT_OPTION_INVALID'
   | 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE'
   | EngagementViewRejectionCode
 
@@ -172,8 +183,14 @@ export const quoteDocumentBriefSchema = z
       .strict(),
     conditions: z.object({ title, rows: rows(6) }).strict(),
     // Presentation of the lines, by the key the scaffold lists for each. Checked against the quote, below: the keys
-    // are data of one quote, not of this schema.
+    // are data of one quote, not of this schema. Besides its texts, a line the quote waives completely may be marked
+    // `courtesy: true` to be printed with its reference value: a choice of presentation, never a figure.
     lines: z.unknown().optional(),
+    // Name, detail and unit of each optional add-on, by the key its frozen quote was passed under. Checked against
+    // the options of the run, below: like the keys of the lines, they are data of one run and not of this schema.
+    // The price of an option comes from its own frozen quote; this block has no place for one.
+    options: z.unknown().optional(),
+    optionsTexts: z.object({ title: line.optional(), note: paragraph.optional() }).strict().optional(),
     // The same list `compose schedule --milestones` takes: shares of the net, never amounts. Each milestone is
     // checked by the reader of the payment calendar, whose rejections are reported as they are.
     paymentMilestones: z.array(z.unknown()).min(1).max(MILESTONE_LIMIT).optional(),
@@ -183,9 +200,10 @@ export const quoteDocumentBriefSchema = z
 
 export type QuoteDocumentBrief = z.infer<typeof quoteDocumentBriefSchema>
 
-type LineOverride = { label?: string; detail?: string; group?: string }
+type LineOverride = { label?: string; detail?: string; group?: string; courtesy?: boolean }
 
-const LINE_OVERRIDE_FIELDS = ['label', 'detail', 'group'] as const
+const LINE_TEXT_FIELDS = ['label', 'detail', 'group'] as const
+const LINE_OVERRIDE_FIELDS: readonly string[] = [...LINE_TEXT_FIELDS, 'courtesy']
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
@@ -197,8 +215,13 @@ const isLine = (value: unknown): value is string =>
  * Overrides of the brief, checked against the keys of this quote. An entry is reported by its position in the map,
  * never by its key or its content: a key the quote does not have is an error, because a typo would otherwise leave
  * a line with the label nobody chose.
+ *
+ * `charged` are the keys the quote charges for and `waived` the ones it waives completely and charges nowhere. A
+ * waived key exists for a brief only to be marked `courtesy: true`: without the mark its line prints nothing, so
+ * there is nothing to dress and the key is as unknown as before the mark existed. The mark on a key the quote
+ * charges for is rejected: a line with a net is never presented as a courtesy.
  */
-const readOverrides = (declared: unknown, known: ReadonlySet<string>) => {
+const readOverrides = (declared: unknown, charged: ReadonlySet<string>, waived: ReadonlySet<string>) => {
   const overrides = new Map<string, LineOverride>()
   const issues: QuoteDocumentIssue[] = []
 
@@ -208,8 +231,9 @@ const readOverrides = (declared: unknown, known: ReadonlySet<string>) => {
 
   Object.entries(declared).forEach(([key, value], index) => {
     const path = `lines.${index}`
+    const marked = isRecord(value) && value.courtesy === true
 
-    if (!known.has(key)) {
+    if (!charged.has(key) && !(waived.has(key) && marked)) {
       issues.push({ path, rule: 'unknown_key' })
 
       return
@@ -221,17 +245,23 @@ const readOverrides = (declared: unknown, known: ReadonlySet<string>) => {
       return
     }
 
-    if (Object.keys(value).some(field => !LINE_OVERRIDE_FIELDS.some(known => known === field)))
+    if (Object.keys(value).some(field => !LINE_OVERRIDE_FIELDS.includes(field)))
       issues.push({ path, rule: 'unknown_field' })
 
     const override: LineOverride = {}
 
-    for (const field of LINE_OVERRIDE_FIELDS) {
+    for (const field of LINE_TEXT_FIELDS) {
       const text = value[field]
 
       if (text === undefined) continue
       if (isLine(text)) override[field] = text
       else issues.push({ path: `${path}.${field}`, rule: `invalid_${field}` })
+    }
+
+    if (value.courtesy !== undefined) {
+      if (typeof value.courtesy !== 'boolean') issues.push({ path: `${path}.courtesy`, rule: 'invalid_courtesy' })
+      else if (value.courtesy && charged.has(key)) issues.push({ path: `${path}.courtesy`, rule: 'line_is_charged' })
+      else override.courtesy = value.courtesy
     }
 
     overrides.set(key, override)
@@ -279,7 +309,13 @@ const monthsLabel = (periodIds: readonly number[]) => {
 /** Consecutive periods in which one key is charged the same net. */
 type Run = { from: number; to: number; periods: number; unitNet: Decimal }
 
-type KeyedConcept = { key: string; kind: ClientSafeItemKind; label: string; runs: Run[] }
+/**
+ * Where a concept first appears in the quote: the ordinal of the period and the place among its client-safe items.
+ * Concepts are printed in this order, which for the concepts a quote charges for is the order they first appear in.
+ */
+type Rank = readonly [period: number, position: number]
+
+type KeyedConcept = { key: string; kind: ClientSafeItemKind; label: string; rank: Rank; runs: Run[] }
 
 /**
  * The client-safe items of the quote (`clientSafePeriodItems`, the one firewall), followed over the term: per key,
@@ -293,7 +329,7 @@ const foldClientSafeItems = (result: Composition, precision: number) => {
   const concepts = new Map<string, KeyedConcept>()
   const issues: QuoteDocumentIssue[] = []
 
-  for (const period of clientSafePeriodItems(result)) {
+  clientSafePeriodItems(result).forEach((period, ordinal) => {
     const seen = new Set<string>()
 
     period.items.forEach((item, index) => {
@@ -318,7 +354,14 @@ const foldClientSafeItems = (result: Composition, precision: number) => {
 
       if (net.isZero()) return
 
-      const concept = known ?? { key: item.key, kind: item.kind, label: item.label, runs: [] }
+      const concept = known ?? {
+        key: item.key,
+        kind: item.kind,
+        label: item.label,
+        rank: [ordinal, index] as const,
+        runs: []
+      }
+
       const open = concept.runs[concept.runs.length - 1]
 
       if (open && open.to === period.periodId - 1 && open.unitNet.eq(net)) {
@@ -328,10 +371,69 @@ const foldClientSafeItems = (result: Composition, precision: number) => {
 
       concepts.set(item.key, concept)
     })
-  }
+  })
 
   // In the order each key first appears in the quote.
   return { concepts: [...concepts.values()], issues }
+}
+
+/** Consecutive periods in which one key is waived, and what it would have been charged for over them. */
+type WaivedRun = { from: number; to: number; periods: number; reference: Decimal }
+
+type WaivedConcept = {
+  key: string
+  kind: ClientSafeItemKind
+  label: string
+  rank: Rank
+  runs: WaivedRun[]
+  /** False when a reference value is not an amount the template takes in the currency of the quote. */
+  representable: boolean
+}
+
+/**
+ * The items the quote waives completely (`clientSafeWaivedItems`, the one place a reference value comes from),
+ * followed over the term: per key, the runs of consecutive periods it is waived in, each with the sum of what it
+ * would have been charged for. A key the quote charges for in any period is not a courtesy and is left out: its
+ * lines are the ones `foldClientSafeItems` gives, as before.
+ *
+ * Nothing here is printed unless the brief marks the key, and a quote with nothing waived yields an empty list.
+ */
+const foldWaivedItems = (result: Composition, precision: number, charged: ReadonlySet<string>) => {
+  const concepts = new Map<string, WaivedConcept>()
+
+  clientSafeWaivedItems(result).forEach((period, ordinal) => {
+    for (const item of period.items) {
+      if (charged.has(item.key)) continue
+
+      const reference = new Wide(item.referenceNet)
+
+      const concept = concepts.get(item.key) ?? {
+        key: item.key,
+        kind: item.kind,
+        label: item.label,
+        rank: [ordinal, item.position] as const,
+        runs: [],
+        representable: true
+      }
+
+      const open = concept.runs[concept.runs.length - 1]
+
+      if (!representable(reference, precision) || reference.isZero()) concept.representable = false
+
+      if (open && open.to === period.periodId - 1) {
+        open.to = period.periodId
+        open.periods += 1
+        open.reference = open.reference.plus(reference)
+      } else concept.runs.push({ from: period.periodId, to: period.periodId, periods: 1, reference })
+
+      concepts.set(item.key, concept)
+    }
+  })
+
+  return [...concepts.values()].map(concept => ({
+    ...concept,
+    representable: concept.representable && concept.runs.every(run => representable(run.reference, precision))
+  }))
 }
 
 type DocumentLine = {
@@ -341,6 +443,22 @@ type DocumentLine = {
   quantity: { value: number; unit: string }
   unitNet?: string
   net: string
+  /** Only on a courtesy: what the line would have been charged for. Its net is zero and it has no unit value. */
+  referenceNet?: string
+}
+
+/** A line of the document with what the reading keeps of it: its key and kind, never printed, and its exact net. */
+type LineEntry = { key: string; kind: ClientSafeItemKind; courtesy: boolean; net: Decimal; line: DocumentLine }
+
+/** Months a run covers, and how a line counts them: a one-off payment or a number of months. */
+const quantityOfRun = (kind: ClientSafeItemKind, run: { from: number; periods: number }) => {
+  const once = kind !== 'fee' && kind !== 'line' && run.periods === 1
+
+  return {
+    once,
+    months: Array.from({ length: run.periods }, (_, index) => run.from + index),
+    quantity: { value: run.periods, unit: once ? 'pago único' : run.periods === 1 ? 'mes' : 'meses' }
+  }
 }
 
 /**
@@ -351,34 +469,78 @@ type DocumentLine = {
  * A concept whose net changes over the term yields several lines, each saying which months it covers unless the
  * brief gives a detail of its own. Lines are ordered by the first appearance of their group and, inside it, of
  * their key, so that a heading of the price table is printed once.
+ *
+ * `courtesies` are the concepts the quote waives completely and the brief marked: each run is a line with a net of
+ * zero, no unit value and `referenceNet`, the sum of what its months would have been charged for. It is counted like
+ * the line it replaces and sits where that line would be; it adds nothing to any sum.
  */
-const presentLines = (concepts: KeyedConcept[], overrides: ReadonlyMap<string, LineOverride>, scale: number) => {
+const presentLines = (
+  concepts: KeyedConcept[],
+  courtesies: WaivedConcept[],
+  overrides: ReadonlyMap<string, LineOverride>,
+  scale: number
+) => {
   const money = (value: Decimal) => value.toFixed(scale)
 
-  const lines = concepts.flatMap(concept => {
+  const charged = concepts.map(concept => {
     const override = overrides.get(concept.key)
-    const recurring = concept.kind === 'fee' || concept.kind === 'line'
 
-    return concept.runs.map(run => {
-      const once = !recurring && run.periods === 1
-      const months = Array.from({ length: run.periods }, (_, index) => run.from + index)
-      const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
+    return {
+      rank: concept.rank,
+      lines: concept.runs.map((run): LineEntry => {
+        const { once, months, quantity } = quantityOfRun(concept.kind, run)
+        const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
 
-      return {
-        key: concept.key,
-        kind: concept.kind,
-        net: run.unitNet.mul(run.periods),
-        line: {
-          label: override?.label ?? concept.label,
-          ...(detail !== undefined ? { detail } : {}),
-          group: override?.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind],
-          quantity: { value: run.periods, unit: once ? 'pago único' : run.periods === 1 ? 'mes' : 'meses' },
-          ...(once ? {} : { unitNet: money(run.unitNet) }),
-          net: money(run.unitNet.mul(run.periods))
-        } satisfies DocumentLine
-      }
-    })
+        return {
+          key: concept.key,
+          kind: concept.kind,
+          courtesy: false,
+          net: run.unitNet.mul(run.periods),
+          line: {
+            label: override?.label ?? concept.label,
+            ...(detail !== undefined ? { detail } : {}),
+            group: override?.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind],
+            quantity,
+            ...(once ? {} : { unitNet: money(run.unitNet) }),
+            net: money(run.unitNet.mul(run.periods))
+          }
+        }
+      })
+    }
   })
+
+  const waived = courtesies.map(concept => {
+    const override = overrides.get(concept.key)
+
+    return {
+      rank: concept.rank,
+      lines: concept.runs.map((run): LineEntry => {
+        const { months, quantity } = quantityOfRun(concept.kind, run)
+        const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
+
+        return {
+          key: concept.key,
+          kind: concept.kind,
+          courtesy: true,
+          net: new Wide(0),
+          line: {
+            label: override?.label ?? concept.label,
+            ...(detail !== undefined ? { detail } : {}),
+            group: override?.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind],
+            quantity,
+            net: money(new Wide(0)),
+            referenceNet: money(run.reference)
+          }
+        }
+      })
+    }
+  })
+
+  // A courtesy takes the place its line would have if it were charged: before whatever is listed at that place.
+  // With no courtesy this is the order of `concepts`, untouched (the sort is stable).
+  const lines = [...waived, ...charged]
+    .sort((a, b) => a.rank[0] - b.rank[0] || a.rank[1] - b.rank[1])
+    .flatMap(concept => concept.lines)
 
   const groups = [...new Set(lines.map(entry => entry.line.group))]
 
@@ -411,7 +573,16 @@ const readQuote = (result: Composition) => {
 
   if (folded.issues.length) return rejected('QUOTE_DOCUMENT_NOT_REPRESENTABLE', folded.issues)
 
-  return { ok: true as const, totals, precision, net, scale: scaleOf(totals.net), concepts: folded.concepts }
+  return {
+    ok: true as const,
+    totals,
+    precision,
+    net,
+    scale: scaleOf(totals.net),
+    concepts: folded.concepts,
+    // What the quote waives completely. Empty for a quote that waives nothing; printed only where a brief asks.
+    waived: foldWaivedItems(result, precision, new Set(folded.concepts.map(concept => concept.key)))
+  }
 }
 
 /** Lines within the limits of the template and adding up to the net of the quote, to the unit, or a rejection. */
@@ -501,9 +672,12 @@ const readTax = (result: Composition, net: Decimal, precision: number, quantityO
   }
 }
 
-/** Months and payments the lines count: the `N` of the tax guard, as the template adds it up. */
+/**
+ * Months and payments the charged lines count: the `N` of the tax guard. A courtesy has no net and no tax to round,
+ * so it lends the guard nothing: the bound is never looser than the one the template applies to the same lines.
+ */
 const quantityOf = (lines: ReturnType<typeof presentLines>) =>
-  lines.reduce((total, entry) => total + entry.line.quantity.value, 0)
+  lines.reduce((total, entry) => total + (entry.courtesy ? 0 : entry.line.quantity.value), 0)
 
 /**
  * Costs the brief of the quote declares as paid by the client to their supplier, as the client-shaped view of the
@@ -538,6 +712,140 @@ const readClientPaidDirectly = (result: Composition) => {
   return issues.length ? rejected('QUOTE_DOCUMENT_NOT_REPRESENTABLE', issues) : { ok: true as const, items }
 }
 
+type Identity = { calculationId: string; replayDigest: string }
+
+/**
+ * An optional add-on of a document: the frozen quote of the option alone, already verified by replay like the quote
+ * of the document, under the key the document brief names it by. The key is never printed.
+ */
+export type QuoteDocumentOption = { key: string; result: Composition; identity: Identity }
+
+const OPTION_KEY = /^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/
+
+/**
+ * The price of each optional add-on, from its own frozen quote and from nothing else: the net of one of its periods.
+ * An option is shown as one amount and a unit («al mes», «por campaña»), so it is accepted only when that amount
+ * says all there is to say of it:
+ *
+ * - it is calculated, in the currency of the quote of the document, and its net is an amount the template takes;
+ * - every period has the same net, and the net of the option is that amount times its periods;
+ * - it declares no cost the client pays a supplier directly, which the one amount would leave out;
+ * - it is another quote than the one of the document and than every other option.
+ *
+ * An option is reported by its position in the list it was passed in, never by its key. Nothing of it reaches the
+ * lines, the net, the tax or the total of the document: only its price, in a block of its own.
+ */
+const readOptions = (options: readonly QuoteDocumentOption[], base: Identity, currency: string, precision: number) => {
+  const issues: QuoteDocumentIssue[] = []
+
+  if (options.length > OPTION_LIMIT) issues.push({ path: 'options', rule: 'too_many' })
+
+  const read = options.map((option, index) => {
+    const path = `options.${index}`
+    const issue = (rule: string) => void issues.push({ path, rule })
+    const { quote } = option.result
+    const totals = quote.totals
+
+    if (!OPTION_KEY.test(option.key)) issue('invalid_key')
+    else if (options.findIndex(other => other.key === option.key) !== index) issue('duplicate_key')
+
+    if (option.identity.calculationId === base.calculationId) issue('same_as_quote')
+    else if (options.findIndex(other => other.identity.calculationId === option.identity.calculationId) !== index)
+      issue('duplicate_option')
+
+    if (quote.calculationStatus !== 'calculated' || !totals || quote.periods.some(period => !period.result.totals)) {
+      issue('not_calculated')
+
+      return null
+    }
+
+    if (totals.currency !== currency) issue('currency_differs_from_quote')
+
+    const nets = quote.periods.map(period => new Wide(period.result.totals!.net))
+    const [net] = nets
+
+    if (!net || nets.some(other => !other.eq(net))) {
+      issue('net_differs_between_periods')
+
+      return null
+    }
+
+    if (!net.mul(nets.length).eq(totals.net)) issue('periods_differ_from_net')
+    if (!representable(net, precision) || net.isZero()) issue('amount_not_representable')
+    if (clientPaidDirectly(quote.resolution.brief).length) issue('client_pays_costs_directly')
+
+    return {
+      key: option.key,
+      // As the kernel froze it for a period of the option, at the precision of the shared currency.
+      net: quote.periods[0].result.totals!.net,
+      periods: nets.length,
+      calculationId: option.identity.calculationId,
+      replayDigest: option.identity.replayDigest
+    }
+  })
+
+  return issues.length
+    ? rejected('QUOTE_DOCUMENT_OPTION_INVALID', issues)
+    : { ok: true as const, options: read.filter(option => option !== null) }
+}
+
+type OptionText = { label: string; detail?: string; unit: string }
+
+const OPTION_TEXT_FIELDS = ['label', 'detail', 'unit'] as const
+
+/**
+ * Name, detail and unit of each option, as the brief gives them, checked against the options of the run: the brief
+ * names exactly the options passed, no more and no fewer, so no option is printed with a text nobody wrote and none
+ * that was priced is silently left out. An entry is reported by its position in the map, never by its key.
+ */
+const readOptionTexts = (declared: unknown, passed: readonly string[]) => {
+  const texts = new Map<string, OptionText>()
+  const issues: QuoteDocumentIssue[] = []
+
+  if (declared === undefined)
+    return { texts, issues: passed.length ? [{ path: 'options', rule: 'option_not_named' }] : issues }
+
+  if (!isRecord(declared)) return { texts, issues: [{ path: 'options', rule: 'not_an_object' }] }
+
+  const named = Object.keys(declared)
+
+  Object.entries(declared).forEach(([key, value], index) => {
+    const path = `options.${index}`
+
+    if (!passed.includes(key)) {
+      issues.push({ path, rule: 'unknown_key' })
+
+      return
+    }
+
+    if (!isRecord(value)) {
+      issues.push({ path, rule: 'not_an_object' })
+
+      return
+    }
+
+    if (Object.keys(value).some(field => !OPTION_TEXT_FIELDS.some(known => known === field)))
+      issues.push({ path, rule: 'unknown_field' })
+
+    for (const field of OPTION_TEXT_FIELDS) {
+      const text = value[field]
+
+      if (text === undefined ? field !== 'detail' : !isLine(text))
+        issues.push({ path: `${path}.${field}`, rule: text === undefined ? `missing_${field}` : `invalid_${field}` })
+    }
+
+    texts.set(key, {
+      label: value.label as string,
+      ...(value.detail !== undefined ? { detail: value.detail as string } : {}),
+      unit: value.unit as string
+    })
+  })
+
+  if (passed.some(key => !named.includes(key))) issues.push({ path: 'options', rule: 'option_not_named' })
+
+  return { texts, issues }
+}
+
 /** Engine that signed the quote. One contract resolves every period, so it is one name; never a guess if not. */
 const engineOf = (result: Composition) =>
   [...new Set(result.quote.periods.map(period => period.result.engineVersion))].join(' + ')
@@ -560,6 +868,17 @@ const engineOf = (result: Composition) =>
  * cost, margin, rate, supplier, policy or profile reaches the document, and a managed service is its fee, never its
  * team and hours. The keys a brief addresses lines by are never part of the data.
  *
+ * Two things are added to that view, each only where the operator asks for it and each from a frozen quote:
+ *
+ * - **A courtesy.** A line the quote waives completely prints nothing. When the brief marks its key
+ *   `courtesy: true`, it is printed with a net of zero and `referenceNet`, what it would have been charged for
+ *   (`clientSafeWaivedItems` in readiness.ts, the one place that figure comes from). A mark on a line the quote
+ *   charges for is rejected, and a courtesy adds nothing to the net, the tax or the total.
+ * - **Optional add-ons.** Each of `options` is the frozen quote of one option alone, verified like the quote of the
+ *   document. Its price is the net of one of its periods and is printed in a block of its own, with the name and
+ *   the unit the brief gives it; the brief names exactly the options passed. Nothing of an option reaches the lines,
+ *   the net, the tax or the total, and `source` records the calculation each price came from.
+ *
  * The document is emitted only if it says what the quote says, to the unit:
  *
  * - the lines add up to `totals.net` (`QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` otherwise);
@@ -568,19 +887,26 @@ const engineOf = (result: Composition) =>
  *   (`QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE` otherwise);
  * - the milestones of a payment calendar add up to `totals.net`, by `presentPaymentSchedule`;
  * - every amount is one the template can take in its currency, and the lines, the costs paid directly and the
- *   milestones are within its limits (`QUOTE_DOCUMENT_NOT_REPRESENTABLE`).
+ *   milestones are within its limits (`QUOTE_DOCUMENT_NOT_REPRESENTABLE`);
+ * - every option is one amount that says all of it: calculated, in the currency of the quote, the same net in every
+ *   period and no cost the client pays apart (`QUOTE_DOCUMENT_OPTION_INVALID` otherwise).
  *
  * `status` is always `draft`: a composition is a simulation under review and this reading approves nothing.
  * `source` names the calculation the data came from; the template copies it to its manifest and prints none of it.
  */
 export function composeQuoteDocument(
   result: Composition,
-  identity: { calculationId: string; replayDigest: string },
-  brief: unknown
+  identity: Identity,
+  brief: unknown,
+  options: readonly QuoteDocumentOption[] = []
 ) {
   const read = readQuote(result)
 
   if (!read.ok) return read
+
+  const priced = readOptions(options, identity, read.totals.currency, read.precision)
+
+  if (!priced.ok) return priced
 
   const parsed = quoteDocumentBriefSchema.safeParse(brief)
 
@@ -592,13 +918,39 @@ export function composeQuoteDocument(
     )
 
   const text = parsed.data
-  const { overrides, issues } = readOverrides(text.lines, new Set(read.concepts.map(concept => concept.key)))
+
+  const { overrides, issues } = readOverrides(
+    text.lines,
+    new Set(read.concepts.map(concept => concept.key)),
+    new Set(read.waived.map(concept => concept.key))
+  )
+
+  const optionTexts = readOptionTexts(
+    text.options,
+    priced.options.map(option => option.key)
+  )
+
+  issues.push(...optionTexts.issues)
 
   if (text.paymentScheduleTexts && !text.paymentMilestones)
     issues.push({ path: 'paymentScheduleTexts', rule: 'requires_payment_milestones' })
+  if (text.optionsTexts && !priced.options.length) issues.push({ path: 'optionsTexts', rule: 'requires_options' })
   if (issues.length) return rejected('QUOTE_DOCUMENT_BRIEF_INVALID', issues)
 
-  const lines = presentLines(read.concepts, overrides, read.scale)
+  // The courtesies the brief asked for, one by one. A reference value the template cannot take is a fault of the
+  // quote, named by the place its key has in the brief.
+  const courtesies = read.waived.filter(concept => overrides.get(concept.key)?.courtesy)
+  const unfitCourtesy = courtesies.find(concept => !concept.representable)
+
+  if (unfitCourtesy)
+    return rejected('QUOTE_DOCUMENT_NOT_REPRESENTABLE', [
+      {
+        path: `lines.${Object.keys(text.lines as Record<string, unknown>).indexOf(unfitCourtesy.key)}.courtesy`,
+        rule: 'reference_not_representable'
+      }
+    ])
+
+  const lines = presentLines(read.concepts, courtesies, overrides, read.scale)
   const unfit = checkLines(lines, read.net)
 
   if (unfit) return unfit
@@ -659,6 +1011,12 @@ export function composeQuoteDocument(
     }
   }
 
+  // In the order the brief names them: the order of a block is a choice of presentation.
+  const optionItems = [...optionTexts.texts].map(([key, named]) => ({
+    option: priced.options.find(option => option.key === key)!,
+    text: named
+  }))
+
   return {
     ok: true as const,
     reading: {
@@ -683,11 +1041,33 @@ export function composeQuoteDocument(
       net: read.totals.net,
       ...(paidDirectly.items.length ? { clientPaidDirectly: paidDirectly.items } : {}),
       ...(paymentSchedule ? { paymentSchedule } : {}),
+      ...(optionItems.length
+        ? {
+            options: {
+              title: text.optionsTexts?.title ?? QUOTE_DOCUMENT_DEFAULT_OPTIONS_TEXTS.title,
+              note: text.optionsTexts?.note ?? QUOTE_DOCUMENT_DEFAULT_OPTIONS_TEXTS.note,
+              items: optionItems.map(({ option, text: named }) => ({
+                label: named.label,
+                ...(named.detail !== undefined ? { detail: named.detail } : {}),
+                net: option.net,
+                unit: named.unit
+              }))
+            }
+          }
+        : {}),
       source: {
         system: 'pricing-v3',
         calculationId: identity.calculationId,
         digest: identity.replayDigest,
-        engineVersion: engineOf(result)
+        engineVersion: engineOf(result),
+        // The quote each option was priced by, in the order the options are printed. Flat texts, as the template
+        // takes its `source`; the keys of the brief are never part of the data.
+        ...Object.fromEntries(
+          optionItems.flatMap(({ option }, index) => [
+            [`option${index + 1}CalculationId`, option.calculationId],
+            [`option${index + 1}Digest`, option.replayDigest]
+          ])
+        )
       }
     }
   }
@@ -703,16 +1083,36 @@ export type QuoteDocumentData = Extract<ReturnType<typeof composeQuoteDocument>,
  * Next to it, what the document will say of the quote whatever the brief holds: its date, currency and totals, and
  * the lines as they fold over the term. Figures are listed here for the operator who writes the texts; none of them
  * belongs in the brief.
+ *
+ * Two lists appear only when there is something to list: `waived`, the lines the quote waives completely with the
+ * reference value each would print if the brief marked it `courtesy: true` (none is in the brief of the scaffold: a
+ * courtesy is asked for, never assumed); and `options`, the options passed with the run and the price of each, which
+ * the brief of the scaffold names with a label and a unit to fill.
  */
 export function scaffoldQuoteDocumentBrief(
   result: Composition,
-  identity: { calculationId: string; replayDigest: string }
+  identity: Identity,
+  options: readonly QuoteDocumentOption[] = []
 ) {
   const read = readQuote(result)
 
   if (!read.ok) return read
 
-  const lines = presentLines(read.concepts, new Map(), read.scale)
+  const priced = readOptions(options, identity, read.totals.currency, read.precision)
+
+  if (!priced.ok) return priced
+
+  const lines = presentLines(read.concepts, [], new Map(), read.scale)
+
+  // What the quote waives completely, as each would print if the brief marked it. Listed for the operator to choose;
+  // a key that is not marked prints nothing, and none of these is in the lines or in any sum.
+  const waived = presentLines(
+    [],
+    read.waived.filter(concept => concept.representable),
+    new Map(),
+    read.scale
+  )
+
   const unfit = checkLines(lines, read.net)
 
   if (unfit) return unfit
@@ -747,7 +1147,20 @@ export function scaffoldQuoteDocumentBrief(
       },
       // As they print with no override, with the key a brief addresses each by. A key is never printed.
       lines: lines.map(entry => ({ key: entry.key, kind: entry.kind, ...entry.line })),
+      ...(waived.length ? { waived: waived.map(entry => ({ key: entry.key, kind: entry.kind, ...entry.line })) } : {}),
       ...(paidDirectly.items.length ? { clientPaidDirectly: paidDirectly.items } : {}),
+      // The options passed with this run and the price of each, from its own frozen quote: the net of one period.
+      ...(priced.options.length
+        ? {
+            options: priced.options.map(option => ({
+              key: option.key,
+              net: option.net,
+              currency: read.totals.currency,
+              periods: option.periods,
+              calculationId: option.calculationId
+            }))
+          }
+        : {}),
       optional: {
         locale: 'BCP 47 locale the template formats with. Absent, the template chooses it from the currency.',
         'buyer.logo': '{ path, source }: a local image file and the official HTTPS source it was taken from.',
@@ -756,6 +1169,11 @@ export function scaffoldQuoteDocumentBrief(
           '{ months, note }: prints the monthly equivalent of the totals. A count of months, not an amount.',
         'lines.<key>.detail':
           'Second line of a concept. A concept whose net changes over the term says which months each line covers unless a detail is given.',
+        'lines.<key>.courtesy':
+          'true prints a line the quote waives completely as a courtesy: net zero and its reference value. Only for the keys listed under `waived`, with their label, detail and group like any line; a waived key that is not marked prints nothing.',
+        options:
+          '{ <key>: { label, unit, detail? } } for each option passed with `--option <key>=<artifact.json>`: its name, the unit its price is read in («al mes», «por campaña») and an optional second line. Exactly the options passed; the price of each is the net of one period of its own frozen quote.',
+        optionsTexts: '{ title, note } of the block of options. Only with options.',
         paymentMilestones:
           'The list `compose schedule --milestones` takes: [{ id, label, share, periodId | when }]. Shares add up to 1; the amounts are derived from the net. Each milestone needs periodId or when.',
         paymentScheduleTexts: '{ title, note } of the payment calendar. Only with paymentMilestones.'
@@ -776,7 +1194,10 @@ export function scaffoldQuoteDocumentBrief(
             concept.key,
             { label: concept.label, group: QUOTE_DOCUMENT_DEFAULT_GROUPS[concept.kind] }
           ])
-        )
+        ),
+        ...(priced.options.length
+          ? { options: Object.fromEntries(priced.options.map(option => [option.key, { label: '', unit: '' }])) }
+          : {})
       }
     }
   }

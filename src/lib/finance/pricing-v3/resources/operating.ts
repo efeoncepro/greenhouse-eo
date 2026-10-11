@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { activeRecords, validateCatalog } from '../catalog/catalog'
 import { briefSchema } from '../catalog/contracts'
 import { PricingV3Error } from '../errors'
-import { compositionDemandSchema, compositionPolicySchema } from './composition-contracts'
+import { compositionDemandSchema, compositionPolicySchema, declaredOnce, periodsOf } from './composition-contracts'
 import { composeResourceQuote } from './composition'
 import { creditCatalogSchema } from './credit-budget'
 import { reviewResourcePrices } from './price-review'
@@ -56,9 +56,10 @@ export function allocateResourcePortfolio(raw: unknown, policyRaw: unknown, cata
   const diagnostics: { code: string; path: string }[] = []
   const seen = new Set<string>()
 
+  // One allocation per resource, account and period: the portfolio is read period by period and stays that way here.
   const allocations: {
     accountId: string
-    allocation: z.infer<typeof compositionDemandSchema>['allocations'][number]
+    allocation: z.infer<typeof compositionDemandSchema>['allocations'][number] & { periodId: number }
   }[] = []
 
   const reconciliation: {
@@ -319,7 +320,8 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     questions.push({
       code: 'TOOL_PLAN_AND_ALLOCATION_REQUIRED',
       path: toolId,
-      prompt: 'Select priceId, quantity, named access/capacity and declared allocation for every active period.',
+      prompt:
+        'Select priceId, quantity, named access/capacity and declared allocation for every active period. Declare identical periods once with periodIds. A named tool priced per seat accounts for every paid seat: used, shared (seatSharing) or idle (idleSeats with idleReason).',
       candidates: policy.tools.find(t => t.toolId === toolId)?.prices.map(p => p.priceId)
     })
 
@@ -358,16 +360,21 @@ export function prepareOperatingPlan(catalog: unknown, policy: unknown, credits:
       questions: portfolio.diagnostics
     }
   const duplicates: { code: string; path: string }[] = []
+  const fromPortfolio: NonNullable<typeof portfolio>['allocations'][number]['allocation'][] = []
 
   for (const a of portfolio?.allocations ?? []) {
     if (a.accountId !== demand.brief.accountId) continue
-    if (demand.allocations.some(x => x.periodId === a.allocation.periodId && x.toolId === a.allocation.toolId))
+    if (demand.allocations.some(x => periodsOf(x).includes(a.allocation.periodId) && x.toolId === a.allocation.toolId))
       duplicates.push({ code: 'ALLOCATION_INPUT_CONFLICT', path: a.allocation.toolId })
-    else demand.allocations.push(a.allocation)
+    else fromPortfolio.push(a.allocation)
   }
 
   if (duplicates.length)
     return { status: 'needs_input', binding: false, demand: null, composition: null, portfolio, questions: duplicates }
+
+  // The demand this plan writes declares periods that are the same once (`periodIds`), after what the caller
+  // declared, which stays as it was written. It is the same demand as one entry per period.
+  demand.allocations.push(...declaredOnce(fromPortfolio))
   const composition = composeResourceQuote(catalog, policy, credits, demand)
 
   return {

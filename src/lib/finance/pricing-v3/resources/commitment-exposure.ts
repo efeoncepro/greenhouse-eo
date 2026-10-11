@@ -4,6 +4,7 @@ import { activeRecords } from '../catalog/catalog'
 import type { Catalog } from '../catalog/contracts'
 import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
+import { eachPeriod } from './composition-contracts'
 import type { CompositionDemand, CompositionPolicy } from './composition-contracts'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -137,6 +138,8 @@ type Signal = {
     | 'SHORTER_COMMITMENT_PRICE_IN_POLICY'
     | 'CREDITS_LEFT_OVER_AFTER_ENGAGEMENT'
     | 'CREDITS_LAPSE_WITHIN_ENGAGEMENT'
+    /** A seat the demand declares idle: paid in a quoted period and used by nobody in it. */
+    | 'PAID_SEAT_IDLE_WITHIN_ENGAGEMENT'
   toolId: string | null
   periodIds: number[]
   /** In the currency of the quote; null when the quote froze no FX for it. */
@@ -202,6 +205,16 @@ type Signal = {
  * here; those tools are listed in `notDerivable`. The engagement is the periods the quote prices: an agreement longer
  * than `brief.periods` is not in the artifact either.
  *
+ * A fourth kind is committed INSIDE the quoted periods, and is read apart from the three above:
+ *
+ * 4. A seat paid and not used. The demand may declare seats of a named tool idle in a period (`idleSeats`): a seat
+ *    bought for the year whose person works some months only. The quote pays for the seat, carries its cost on the
+ *    lines that use the tool (or on the lines the demand names when nobody does) and nobody uses it. `committed` is
+ *    that cost, a part of the cost the kernel stored for the holding in the period (idle seats over seats paid);
+ *    `coveredByUse` is zero. It is in no other entry: an annual price that also outlives the quote reports the
+ *    months after it, and this reports the idle seats inside it. A reading of a quote that declares no idle seat has
+ *    no such entry, signal or total.
+ *
  * Third-party costs (contract 1.4.0) are outside this reading. A cost the quote buys from a supplier and re-invoices
  * is a purchase for the job, due with it: the cash ledger holds it on the period it falls in
  * (`third-party:<costId>`), it is no resource priced per year or per month, and nothing in the artifact says it
@@ -219,6 +232,8 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
   const { catalog, policy, demand, result } = artifact.semantic
   const { quote } = result
   const brief = demand.brief
+  // The demand as frozen may declare an allocation once for several periods; it is read one period at a time.
+  const allocations = eachPeriod(demand.allocations)
   const quoteDate = brief.quoteDate
   const endsOn = lastDayOfPeriod(quoteDate, brief.periods)
   const currency = quote.totals?.currency ?? brief.outputCurrency
@@ -304,11 +319,7 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
 
       // What this price would itself commit: the quoted periods, or its own declared term when that is longer.
       const boundInQuote = sameBasis
-        ? toQuoteCurrency(
-            of.input,
-            perMonth.mul(Math.max(of.months, price.commitmentTermMonths ?? 0)),
-            value.currency
-          )
+        ? toQuoteCurrency(of.input, perMonth.mul(Math.max(of.months, price.commitmentTermMonths ?? 0)), value.currency)
         : null
 
       return [
@@ -361,13 +372,17 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
     const used = [...use.periods.values()]
     const sum = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new D(0))
 
-    // A tool the composition priced from the resource policy reaches the kernel as `composed:<toolId>`.
+    // A tool the composition priced from the resource policy reaches the kernel as `composed:<toolId>`, or as
+    // `composed:<toolId>:<priceId>` when the demand holds it under several prices: the year is read per holding.
     const attribution = result.attributions.find(
       a => a.periodId === first && a.resource.resourceId === resource.resourceId
     )
 
     const allocation =
-      attribution && demand.allocations.find(a => a.periodId === first && a.toolId === attribution.toolId)
+      attribution &&
+      allocations.find(
+        a => a.periodId === first && a.toolId === attribution.toolId && a.priceId === attribution.priceId
+      )
 
     const quoteShare = new D(attribution?.serviceShare ?? use.periods.get(first)!.share)
 
@@ -507,7 +522,11 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
     const periodIds = uses.map(a => a.periodId)
     const inTool = toolMoney(input, resource.currency)
     const sum = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new D(0))
-    const allocation = demand.allocations.find(a => a.periodId === held.periodId && a.toolId === tool.toolId)
+
+    const allocation = allocations.find(
+      a => a.periodId === held.periodId && a.toolId === tool.toolId && a.priceId === price.priceId
+    )
+
     const quoteShare = new D(held.serviceShare)
     const monthsBeyondQuote = running ? running.monthsBeyondQuote : termMonths - uses.length
 
@@ -739,9 +758,84 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
     }
   }
 
+  /**
+   * Seats of one holding (a tool under one price) the demand declares idle, over the quoted periods that declare
+   * them. `uses` are the attributions of those periods, in period order, and `kernelCost` gives the cost the kernel
+   * stored for the holding in a period, in the quote currency.
+   *
+   * The idle seats of a period are a part of what the holding pays in it: idle seats over seats paid. The amount in
+   * the currency of the tool is the one the attribution froze for them; the amount in the quote currency is that
+   * same part of the stored cost, so it is inside `totals.cost` and is never converted again.
+   */
+  const readIdleSeats = (uses: Attribution[], kernelCost: (attribution: Attribution) => Decimal | null) => {
+    const held = uses[0]
+    const { resource } = held
+    const input = inputOf(held.periodId)
+    const inTool = input ? toolMoney(input, resource.currency) : (value: Decimal) => value.toFixed(2, D.ROUND_HALF_UP)
+    const sum = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new D(0))
+    const stored = uses.map(a => kernelCost(a)?.mul(a.idle!.seats).div(a.quantity) ?? null)
+    const named = uses.flatMap(a => a.bornByLineIds ?? [])
+
+    const committed: Amount = {
+      inToolCurrency: inTool(sum(uses.map(a => new D(a.idle!.attributedMonthlyCost)))),
+      inQuoteCurrency: stored.some(value => value === null) ? null : money(sum(stored.map(value => value!)))
+    }
+
+    return {
+      kind: 'idle_seat' as const,
+      toolId: held.toolId,
+      resourceId: resource.resourceId,
+      priceId: held.priceId,
+      label: resource.label,
+      sourceStatus: resource.source.status,
+      // The quoted periods in which the demand declares seats of this holding idle.
+      periodIds: uses.map(a => a.periodId),
+      seats: {
+        unit: resource.unit,
+        unitPrice: resource.amount,
+        // Seats paid and seats idle in each of those periods, as the demand declares them.
+        byPeriod: uses.map(a => ({ periodId: a.periodId, paid: a.quantity, idle: a.idle!.seats })),
+        // One idle seat in one period counts one.
+        idleSeatMonths: uses.reduce((total, a) => total + a.idle!.seats, 0),
+        reasons: [...new Set(uses.map(a => a.idle!.reason))]
+      },
+      currency: resource.currency,
+      // Paid inside the quoted periods for seats nobody uses, at the share the demand gives this quote.
+      committed,
+      coveredByUse: { inToolCurrency: inTool(new D(0)), inQuoteCurrency: money(new D(0)) } satisfies Amount,
+      // The quote carries it: it is in its cost, on the lines that use the tool or on the ones the demand names.
+      carriedBy: named.length
+        ? { basis: 'lines_named_by_the_demand' as const, lineIds: [...new Set(named)] }
+        : { basis: 'lines_that_use_the_tool' as const },
+      // A cost the quote already holds is not new cash; see `notDerivable`.
+      incrementalCash: null,
+      notDerivable: [
+        {
+          field: 'incrementalCash',
+          reason:
+            'The cost of an idle seat is attributed cost of the quote: the artifact does not say whether the seat already exists and is paid, or has to be bought for this quote.'
+        },
+        {
+          field: 'seats.release',
+          reason:
+            'Whether the supplier lets the seat be released, paused or given to somebody else in the periods it sits idle is in the supplier contract, not in the artifact. The demand only declares that nobody uses it.'
+        },
+        ...(committed.inQuoteCurrency === null
+          ? [
+              {
+                field: 'committed.inQuoteCurrency',
+                reason: `The stored cost of the holding was not found in a period, so its idle seats have no amount in ${currency}.`
+              }
+            ]
+          : [])
+      ] satisfies NotDerivable[]
+    }
+  }
+
   const annualPrices: ReturnType<typeof readAnnualPrice>[] = []
   const termedMonthlyPrices: ReturnType<typeof readTermedMonthlyPrice>[] = []
   const creditPacks: ReturnType<typeof readCreditPack>[] = []
+  const idleSeats: ReturnType<typeof readIdleSeats>[] = []
   const notDerivable: { code: string; toolIds: string[]; reason: string }[] = []
   let annualPriceUses = 0
   let termedMonthlyPriceUses = 0
@@ -755,6 +849,8 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
     const annual = new Map<string, AnnualUse>()
     // Cost the kernel stored for each month-priced resource, by period, in the quote currency.
     const monthlyCost = new Map<string, Decimal>()
+    // The same for every resource priced per month or per year: what a holding costs the quote in a period.
+    const storedCost = new Map<string, Decimal>()
 
     for (const period of quote.periods) {
       const input = inputOf(period.periodId)
@@ -779,9 +875,14 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
 
           if (!assignment || !resource) continue
 
-          if (component.trace.unit === 'month') {
-            const at = `${period.periodId}:${assignment.resourceId}`
+          const at = `${period.periodId}:${assignment.resourceId}`
 
+          storedCost.set(
+            at,
+            (storedCost.get(at) ?? new D(0)).plus(new D(component.cost).mul(component.trace.outputFx ?? 1))
+          )
+
+          if (component.trace.unit === 'month') {
             monthlyCost.set(
               at,
               (monthlyCost.get(at) ?? new D(0)).plus(new D(component.cost).mul(component.trace.outputFx ?? 1))
@@ -823,10 +924,32 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       if (extra && extra.remainingCredits > 0) creditPacks.push(readCreditPack(budget))
     }
 
+    // Seats declared idle, by holding: the same tool and price the attribution names.
+    const idle = new Map<string, Attribution[]>()
+
+    for (const attribution of result.attributions) {
+      if (!attribution.idle) continue
+
+      const key = `${attribution.toolId}:${attribution.priceId}`
+
+      idle.set(key, [...(idle.get(key) ?? []), attribution])
+    }
+
+    for (const uses of idle.values())
+      idleSeats.push(
+        readIdleSeats(
+          uses.sort((a, b) => a.periodId - b.periodId),
+          a => storedCost.get(`${a.periodId}:${a.resource.resourceId}`) ?? null
+        )
+      )
+
     const budgeted = new Set(result.creditBudgets.map(b => b.toolId))
 
     // Month-priced tools by the policy price the quote selected: the same tool and price the attribution names.
-    const monthly = new Map<string, { tool: PolicyTool | undefined; price: ToolPrice | undefined; uses: Attribution[] }>()
+    const monthly = new Map<
+      string,
+      { tool: PolicyTool | undefined; price: ToolPrice | undefined; uses: Attribution[] }
+    >()
 
     for (const attribution of result.attributions) {
       if (attribution.resource.unit !== 'month' || budgeted.has(attribution.toolId)) continue
@@ -1034,7 +1157,15 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
           ? `${entry.label}: ${entry.credits.purchased} credits bought in packs, ${entry.credits.fromPacks} used. The ${entry.credits.leftOver} left over stay valid until ${entry.expiry.lastValidDay}, ${entry.expiry.daysPastEngagementEnd} days after the engagement ends on ${endsOn}.`
           : `${entry.label}: ${entry.credits.purchased} credits bought in packs, ${entry.credits.fromPacks} used. The ${entry.credits.leftOver} left over lapse on ${entry.expiry.lastValidDay}, before the engagement ends on ${endsOn}, and no later period plans to use them.`
       }
-    })
+    }),
+    ...idleSeats.map(entry => ({
+      code: 'PAID_SEAT_IDLE_WITHIN_ENGAGEMENT' as const,
+      toolId: entry.toolId,
+      periodIds: entry.periodIds,
+      amount: entry.committed.inQuoteCurrency,
+      currency,
+      detail: `${entry.label}: the demand declares ${entry.seats.idleSeatMonths} seat-months idle over ${entry.periodIds.length} quoted periods (${entry.committed.inQuoteCurrency ?? `${entry.committed.inToolCurrency} ${entry.currency}, stored cost not found in`} ${currency}). They are paid inside the engagement and covered by nobody's use; the quote carries them ${entry.carriedBy.basis === 'lines_named_by_the_demand' ? 'on the lines the demand names' : 'on the lines that use the tool'}. The amount is inside the cost of the quote, not an amount to add to it.`
+    }))
   ]
 
   return {
@@ -1063,12 +1194,18 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       // Stated only when a price of this reading declares the date, so a reading without one says what it always said.
       ...(renewalDatedPriceUses
         ? [
-            'termed monthly price with a renewal date: when the policy entry also declares the date the contract renews (commitmentRenewsOn), the term is read as running instead of opening with the quote. Renewals are that date and every term after it. The licence is bound until the first renewal strictly after the last day of the last quoted period that uses the price (commitment.boundUntil). monthsBeyondQuote = the calendar months after that period that begin before that renewal, a month the term only partly covers counted whole. unrecovered = monthsBeyondQuote x the monthly amount the quote is attributed in that last period; committed = attributedWithinPeriods + unrecovered, what the quote\'s use of the licence binds, not a full term. A renewal inside the quoted periods is crossed with the licence in use: the term after it binds.'
+            "termed monthly price with a renewal date: when the policy entry also declares the date the contract renews (commitmentRenewsOn), the term is read as running instead of opening with the quote. Renewals are that date and every term after it. The licence is bound until the first renewal strictly after the last day of the last quoted period that uses the price (commitment.boundUntil). monthsBeyondQuote = the calendar months after that period that begin before that renewal, a month the term only partly covers counted whole. unrecovered = monthsBeyondQuote x the monthly amount the quote is attributed in that last period; committed = attributedWithinPeriods + unrecovered, what the quote's use of the licence binds, not a full term. A renewal inside the quoted periods is crossed with the licence in use: the term after it binds."
           ]
         : []),
       'shorter-commitment prices: every price per month the frozen policy holds for the same tool on the quote date that binds for less than the price the quote uses, over the same periods, quantity and share. The policy does not link the prices of one plan.',
       'credit pack: the plan of the artifact (creditBudgets), never recomputed. incrementalCash is the cash of whole packs (resourceIncrementalCash); the subscription share is attributed cost with no new cash.',
       'amounts in the quote currency use the FX the quote froze; none of them is new cash unless it is named incrementalCash.',
+      // Stated only of a quote whose demand declares a seat idle, so every other reading says what it always said.
+      ...(idleSeats.length
+        ? [
+            'idle seat: a seat of a named tool the demand declares paid and used by nobody in a quoted period (idleSeats). It is inside the quoted periods, unlike every other entry: committed = idle seats / seats paid x the cost the kernel stored for the holding in each of those periods, already inside totals.cost; coveredByUse = 0. The quote carries it on the lines that use the tool, or on the lines the demand names when nobody does. It is never counted again in an annual or termed price, which read the months after the quote.'
+          ]
+        : []),
       // Stated only of a quote that re-invoices a third-party cost, so every other reading says what it always said.
       ...(thirdPartyPurchases
         ? [
@@ -1088,13 +1225,15 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       creditBudgetsWithPacks: result.creditBudgets.filter(b => (b.result.breakdown?.extra.purchasedCredits ?? 0) > 0)
         .length,
       // Re-invoiced third-party costs seen, one per cost and period, and left out on purpose. Absent when none.
-      ...(thirdPartyPurchases ? { thirdPartyPurchasesOutsideThisReading: thirdPartyPurchases } : {})
+      ...(thirdPartyPurchases ? { thirdPartyPurchasesOutsideThisReading: thirdPartyPurchases } : {}),
+      // Holdings with seats the demand declares idle in some quoted period. Absent when none does.
+      ...(idleSeats.length ? { holdingsWithIdleSeats: idleSeats.length } : {})
     },
-    commitments: [...annualPrices, ...termedMonthlyPrices, ...creditPacks],
+    commitments: [...annualPrices, ...termedMonthlyPrices, ...creditPacks, ...idleSeats],
     signals,
     totals: {
       currency,
-      commitments: annualPrices.length + termedMonthlyPrices.length + creditPacks.length,
+      commitments: annualPrices.length + termedMonthlyPrices.length + creditPacks.length + idleSeats.length,
       annualPrices: {
         count: annualPrices.length,
         committed: total(annualPrices.map(e => e.committed.inQuoteCurrency)),
@@ -1119,7 +1258,19 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         incrementalCash: total(creditPacks.map(e => e.incrementalCash.inQuoteCurrency)),
         paidForLeftOver: total(creditPacks.map(e => e.paidForLeftOver.inQuoteCurrency)),
         unrecovered: total(creditPacks.map(e => e.unrecovered.inQuoteCurrency))
-      }
+      },
+      // Inside the quoted periods and inside the cost of the quote: kept apart from what outlives it. Absent when the
+      // demand declares no seat idle.
+      ...(idleSeats.length
+        ? {
+            idleSeats: {
+              count: idleSeats.length,
+              idleSeatMonths: idleSeats.reduce((sum, e) => sum + e.seats.idleSeatMonths, 0),
+              committed: total(idleSeats.map(e => e.committed.inQuoteCurrency)),
+              coveredByUse: total(idleSeats.map(e => e.coveredByUse.inQuoteCurrency))
+            }
+          }
+        : {})
     },
     // What the artifact does not carry, by tool: read as "unknown", never as "none".
     notDerivable

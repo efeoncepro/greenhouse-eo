@@ -208,11 +208,12 @@ describe('the committed corpus covers the cases the readings have to hold in', (
     expect(facts.get(DESIGNER)).toMatchObject({ multiple: null, topUps: 2 })
     expect(facts.get(CRM)).toMatchObject({ multiple: null, topUps: 0 })
     expect([...facts.values()].every(f => f.tools > 0)).toBe(true)
-    // One committed quote spans several periods and resolves tax; for every other one both cases are composed in
-    // memory below.
-    expect([...facts].filter(([, f]) => f.periods !== 1 || f.tax !== null).map(([path]) => path)).toEqual([
+    // Committed quotes that span several periods and resolve tax exist, and this is the first of them. The cases
+    // below read each committed quote by what it froze (a resolved tax or none), never by a list of paths, and both
+    // cases are also composed in memory.
+    expect([...facts].filter(([, f]) => f.periods !== 1 && f.tax !== null).map(([path]) => path)).toContain(
       THREE_MONTHS_IVA
-    ])
+    )
     expect(facts.get(THREE_MONTHS_IVA)!.periods).toBe(3)
     expect(new D(facts.get(THREE_MONTHS_IVA)!.tax!).gt(0)).toBe(true)
   })
@@ -355,7 +356,15 @@ describe('payment schedule: tax is carried only when the quote resolved it', () 
       })
     )
 
-  it.each(corpus.filter(path => path !== THREE_MONTHS_IVA))(
+  // Each committed quote is read by what it froze: a tax or none. The two lists are the corpus, split by that fact.
+  const taxed = corpus.filter(path => frozen(path).semantic.result.quote.totals!.tax !== null)
+
+  it('the corpus holds quotes that froze a tax and quotes that did not', () => {
+    expect(taxed).toContain(THREE_MONTHS_IVA)
+    expect(corpus.length - taxed.length).toBeGreaterThan(3)
+  })
+
+  it.each(corpus.filter(path => !taxed.includes(path)))(
     '%s: an unresolved tax stays unresolved in every milestone',
     path => {
       const result = frozen(path).semantic.result
@@ -369,15 +378,21 @@ describe('payment schedule: tax is carried only when the quote resolved it', () 
     }
   )
 
-  it('the committed quote with a resolved tax: its milestones add up to the tax and the total it froze', () => {
-    const result = frozen(THREE_MONTHS_IVA).semantic.result
+  it.each(taxed)('%s: a resolved tax: its milestones add up to the tax and the total it froze', path => {
+    const { result, demand } = frozen(path).semantic
     const totals = result.quote.totals!
+    const treatment = demand.brief.taxTreatment
 
     expect(new D(totals.grandTotal!).eq(new D(totals.net).plus(totals.tax!))).toBe(true)
 
     const s = accepted(result, milestones(['0.5', '0.3', '0.2']))
 
-    expect(s.taxTreatment).toMatchObject({ kind: 'exclusive', rate: '0.19' })
+    // The treatment the demand of this quote declared, as its own artifact froze it.
+    expect(treatment.kind).toBe('exclusive')
+    expect(s.taxTreatment).toMatchObject({
+      kind: 'exclusive',
+      rate: treatment.kind === 'exclusive' ? treatment.rate : ''
+    })
     expect(sum(s.milestones.map(m => m.tax!)).eq(totals.tax!)).toBe(true)
     expect(sum(s.milestones.map(m => m.total!)).eq(totals.grandTotal!)).toBe(true)
   })

@@ -11,7 +11,10 @@
 //     client pays their supplier;
 //   - the template itself: `validateQuote` and `quoteAmounts` of scripts/documents/render-cotizacion-a4.mjs are run
 //     on the emitted data, and the net, tax and total they compute are compared with the totals of the quote. That
-//     generator is the real consumer of the data; nothing here asserts what its code says.
+//     generator is the real consumer of the data; nothing here asserts what its code says;
+//   - for the reference value of a courtesy, the same demand quoted without the waiver: what a waived line «would
+//     have been charged for» is what the kernel charges for it when nothing waives it;
+//   - for the price of an option, the period totals of the option's own frozen artifact.
 //
 // Quotes over several periods are composed in memory from the frozen inputs of the two committed examples, with the
 // demand edited where an operator would edit it. Where the reading must reject a result the kernel cannot produce
@@ -35,13 +38,19 @@ import type { PaymentMilestone } from '../resources/engagement-view'
 import {
   QUOTE_DOCUMENT_BRIEF_VERSION,
   QUOTE_DOCUMENT_DEFAULT_GROUPS,
+  QUOTE_DOCUMENT_DEFAULT_OPTIONS_TEXTS,
   QUOTE_DOCUMENT_DEFAULT_SCHEDULE_TEXTS,
   QUOTE_DOCUMENT_SCAFFOLD_VERSION,
   composeQuoteDocument,
   scaffoldQuoteDocumentBrief
 } from '../resources/quote-document'
-import type { QuoteDocumentData } from '../resources/quote-document'
-import { clientSafePeriodItems, compositionPreviewMarkdown, projectCompositionPreview } from '../resources/readiness'
+import type { QuoteDocumentData, QuoteDocumentOption } from '../resources/quote-document'
+import {
+  clientSafePeriodItems,
+  clientSafeWaivedItems,
+  compositionPreviewMarkdown,
+  projectCompositionPreview
+} from '../resources/readiness'
 
 type Composition = ReturnType<typeof composeResourceQuote>
 type Artifact = ReturnType<typeof replayResourceComposition>
@@ -60,6 +69,10 @@ const DESIGNER = `${OPERATING}/designer-on-demand`
 const MANAGED = `${OPERATING}/managed-on-demand-third-party`
 const THREE_MONTHS = `${OPERATING}/designer-three-months-iva`
 const EXAMPLES = [DESIGNER, MANAGED, THREE_MONTHS]
+// The example of a courtesy and of optional add-ons: the three-month designer with its start-up waived, and the
+// frozen quote of each option alone. Its document needs the options, so it is read by cases of its own.
+const COURTESY = `${OPERATING}/designer-startup-courtesy`
+const SERVICE = `${OPERATING}/service`
 const IDENTITY = { calculationId: 'composition-under-test', replayDigest: 'digest-under-test' }
 
 const artifacts = new Map<string, Artifact>()
@@ -232,6 +245,89 @@ const blocked = recompose(DESIGNER, demand => {
   demand.allocations = []
 })
 
+// ---- quotes that waive something, each next to the same demand quoted without the waiver ----
+
+type Adjustment = NonNullable<Demand['brief']['adjustments']>[number]
+
+/** The rows of `billing` class of `lineIds` at an agreed net of zero: the explicit way a quote waives them. */
+const waived = (billing: 'setup' | 'third_party', lineIds: string[]): Adjustment[] => [
+  { adjustmentId: 'waiver-under-test', kind: 'agreed_net', amount: '0', billing, lineIds, reason: 'Declared.' }
+]
+
+/** The committed example: three months with IVA and the start-up of its line waived by an agreed net of zero. */
+const startupWaived = frozen(`${COURTESY}.artifact.json`).semantic.result
+
+const startupCharged = calculated(
+  recompose(COURTESY, demand => {
+    demand.brief.adjustments = []
+  })
+)
+
+/** A team sold by lines over three months with its first line given away whole, by a discount of its full rate. */
+const lineWaived = calculated(
+  recompose(MANAGED, demand => {
+    over(demand, 3)
+    demand.commercialUnit = 'role_capacity'
+    demand.brief.adjustments = [
+      {
+        adjustmentId: 'waiver-under-test',
+        kind: 'discount',
+        rate: '1',
+        lineIds: [demand.brief.lines[0].lineId],
+        reason: 'Declared.'
+      }
+    ]
+  })
+)
+
+/** A managed service whose setup (two rows, one item of the firewall) is waived: the firewall stops listing it. */
+const serviceSetupWaived = calculated(
+  recompose(SERVICE, demand => {
+    demand.brief.adjustments = waived(
+      'setup',
+      demand.brief.lines.map(line => line.lineId)
+    )
+  })
+)
+
+const serviceSetupCharged = frozen(`${SERVICE}.artifact.json`).semantic.result
+
+/** A managed service that absorbs the first of its re-invoiced costs. */
+const supplierWaived = calculated(
+  recompose(MANAGED, demand => {
+    demand.brief.adjustments = waived('third_party', ['tp-production'])
+  })
+)
+
+const dollarsStartupWaived = calculated(
+  recompose(DESIGNER, demand => {
+    demand.brief.outputCurrency = 'USD'
+    demand.brief.adjustments = waived('setup', ['design'])
+  })
+)
+
+/** [name, the quote that waives, the same demand without the waiver, the keys of the firewall it waives] */
+const WAIVERS = [
+  ['a start-up, by an agreed net of zero', startupWaived, startupCharged, ['design:setup']],
+  ['a whole line, by a discount of its full rate', lineWaived, linesThreeMonths, ['primary']],
+  ['the setup of a managed service', serviceSetupWaived, serviceSetupCharged, ['setup']],
+  ['a re-invoiced cost the service absorbs', supplierWaived, managed, ['third_party:tp-production']],
+  ['a start-up in dollars', dollarsStartupWaived, designerInDollars, ['design:setup']]
+] as const
+
+// ---- options: the frozen quote of each alone, as the CLI hands them over ----
+
+/** A frozen quote as an option of a document, under `key`. Its identity is the one of its artifact. */
+const optionFrom = (key: string, path: string): QuoteDocumentOption => {
+  const artifact = frozen(path)
+
+  return { key, result: artifact.semantic.result, identity: artifact }
+}
+
+const copywriter = optionFrom('copywriter', `${COURTESY}.option-copywriter.artifact.json`)
+const motion = optionFrom('motion', `${COURTESY}.option-motion.artifact.json`)
+const OPTIONS = [copywriter, motion]
+
 // ---- briefs ----
 
 // No digit in any text: a figure found in the emitted data can only have come from the quote.
@@ -254,26 +350,37 @@ const texts = (): Json => ({
   conditions: { title: 'Condiciones', rows: [{ title: 'Plazo', text: 'Descripción.' }] }
 })
 
-const document = (result: Composition, brief: unknown = texts()) => composeQuoteDocument(result, IDENTITY, brief)
+/** The texts of the two options of the example, by key. No digit: a figure can only come from a frozen quote. */
+const optionTexts = (): Json => ({
+  copywriter: { label: 'Redacción creativa', unit: 'al mes' },
+  motion: { label: 'Edición de video', detail: 'Una persona durante la campaña.', unit: 'por campaña' }
+})
 
-const emitted = (result: Composition, brief: unknown = texts()): QuoteDocumentData => {
-  const outcome = document(result, brief)
+const document = (result: Composition, brief: unknown = texts(), options: QuoteDocumentOption[] = []) =>
+  composeQuoteDocument(result, IDENTITY, brief, options)
+
+const emitted = (
+  result: Composition,
+  brief: unknown = texts(),
+  options: QuoteDocumentOption[] = []
+): QuoteDocumentData => {
+  const outcome = document(result, brief, options)
 
   if (!outcome.ok) throw new Error(`document rejected: ${outcome.code} ${JSON.stringify(outcome.issues)}`)
 
   return outcome.reading
 }
 
-const scaffold = (result: Composition) => {
-  const outcome = scaffoldQuoteDocumentBrief(result, IDENTITY)
+const scaffold = (result: Composition, options: QuoteDocumentOption[] = []) => {
+  const outcome = scaffoldQuoteDocumentBrief(result, IDENTITY, options)
 
   if (!outcome.ok) throw new Error(`scaffold rejected: ${outcome.code} ${JSON.stringify(outcome.issues)}`)
 
   return outcome.reading
 }
 
-const rejection = (result: Composition, brief: unknown = texts()) => {
-  const outcome = document(result, brief)
+const rejection = (result: Composition, brief: unknown = texts(), options: QuoteDocumentOption[] = []) => {
+  const outcome = document(result, brief, options)
 
   if (outcome.ok) throw new Error('document accepted')
 
@@ -1194,6 +1301,8 @@ describe('nothing the client-safe view does not expose reaches the document', ()
     'source'
   ]
 
+  const LINE_KEYS = ['label', 'detail', 'group', 'quantity', 'unitNet', 'net']
+
   /** Everything of a result that is internal: what things cost, what they earn, who is paid and under which rule. */
   const internalsOf = (result: Composition) => {
     const amounts = new Set<string>()
@@ -1271,10 +1380,7 @@ describe('nothing the client-safe view does not expose reaches the document', ()
 
     // Only the keys of the data contract, at the top and in every block the quote fills.
     expect(Object.keys(data).every(key => CONTRACT_KEYS.includes(key))).toBe(true)
-    for (const line of data.lines)
-      expect(
-        Object.keys(line).every(key => ['label', 'detail', 'group', 'quantity', 'unitNet', 'net'].includes(key))
-      ).toBe(true)
+    for (const line of data.lines) expect(Object.keys(line).every(key => LINE_KEYS.includes(key))).toBe(true)
     for (const item of data.clientPaidDirectly ?? [])
       expect(Object.keys(item)).toEqual(['label', 'amount', 'currency', 'detail'])
     for (const milestone of data.paymentSchedule!.milestones)
@@ -1316,6 +1422,53 @@ describe('nothing the client-safe view does not expose reaches the document', ()
     }
 
     expect(JSON.stringify(data)).not.toMatch(/third_party|ECG-|allocation:/)
+  })
+
+  it('with a courtesy and options: one figure more per marked line and one per option, and nothing internal', () => {
+    const brief = {
+      ...texts(),
+      lines: { 'design:setup': { courtesy: true } },
+      options: optionTexts(),
+      paymentMilestones: milestones
+    }
+
+    const data = emitted(startupWaived, brief, OPTIONS)
+
+    // The two additions to the contract, and only them.
+    expect(Object.keys(data).filter(key => !CONTRACT_KEYS.includes(key))).toEqual(['options'])
+    expect(Object.keys(data.options!)).toEqual(['title', 'note', 'items'])
+    for (const item of data.options!.items)
+      expect(Object.keys(item).every(key => ['label', 'detail', 'net', 'unit'].includes(key))).toBe(true)
+    expect(data.lines.flatMap(line => Object.keys(line)).filter(key => !LINE_KEYS.includes(key))).toEqual([
+      'referenceNet'
+    ])
+    for (const key of keysOf({ lines: data.lines, options: data.options, source: data.source }))
+      expect(key).not.toMatch(/cost|margin|rate|supplier|policy|profile|floor|markup|key|kind|discount|adjust/i)
+
+    // Every figure the two additions print is one the frozen quotes expose on purpose: the price the waived row
+    // had, and the net of a period of each option. Nothing else of the three results is in the data.
+    const exposed = [
+      ...clientSafeWaivedItems(startupWaived).flatMap(period => period.items.map(item => item.referenceNet)),
+      ...OPTIONS.map(option => option.result.quote.periods[0].result.totals!.net)
+    ]
+
+    const values = leaves(data)
+    const printed = JSON.stringify(data)
+
+    for (const result of [startupWaived, ...OPTIONS.map(option => option.result)]) {
+      const internals = internalsOf(result)
+
+      expect(internals.amounts.length).toBeGreaterThan(3)
+      for (const amount of internals.amounts.filter(amount => !exposed.includes(amount)))
+        expect(values, 'the data holds an internal amount').not.toContain(amount)
+      for (const internal of internals.names) expect(printed, 'the data holds an internal name').not.toContain(internal)
+    }
+
+    // The reason of the waiver and the adjustment itself stay in the quote.
+    for (const adjustment of startupWaived.quote.resolution.brief!.adjustments ?? []) {
+      expect(printed).not.toContain(adjustment.reason)
+      expect(printed).not.toContain(adjustment.adjustmentId)
+    }
   })
 
   it('the preview is the same firewall, printed by concept and net, and did not move', () => {
@@ -1376,6 +1529,653 @@ describe('nothing the client-safe view does not expose reaches the document', ()
   })
 })
 
+describe('what a quote waives, and what it would have charged for it (clientSafeWaivedItems)', () => {
+  /** Per key, the periods it is waived in and the reference value of each. */
+  const waivedByKey = (result: Composition) => {
+    const byKey = new Map<string, { periodId: number; net: string }[]>()
+
+    for (const period of clientSafeWaivedItems(result))
+      for (const item of period.items)
+        byKey.set(item.key, [...(byKey.get(item.key) ?? []), { periodId: period.periodId, net: item.referenceNet }])
+
+    return byKey
+  }
+
+  it('the committed example: the start-up row is zero through its adjustment and keeps the price it had', () => {
+    const artifact = frozen(`${COURTESY}.artifact.json`)
+    const setup = rowsOf(startupWaived).filter(row => row.kind === 'setup')
+
+    // Premise, from the frozen demand and the kernel row: an agreed net of zero on the setup, a net of zero, and
+    // the whole price of the row taken off as discount.
+    expect(artifact.semantic.demand.brief.adjustments).toMatchObject([
+      { kind: 'agreed_net', amount: '0', billing: 'setup', lineIds: ['design'] }
+    ])
+    expect(setup.length).toBe(1)
+    expect(setup[0].net).toBe('0')
+    expect(new D(setup[0].undiscountedPrice).gt(0)).toBe(true)
+    expect(setup[0].discount).toBe(setup[0].undiscountedPrice)
+
+    expect(clientSafeWaivedItems(startupWaived)).toEqual([
+      {
+        periodId: 1,
+        items: [
+          {
+            key: 'design:setup',
+            kind: 'setup',
+            label: 'Implementación inicial',
+            position: 1,
+            referenceNet: setup[0].undiscountedPrice
+          }
+        ]
+      },
+      { periodId: 2, items: [] },
+      { periodId: 3, items: [] }
+    ])
+  })
+
+  it.each(WAIVERS)(
+    '%s: the reference is what the same demand is charged for it without the waiver',
+    (_, waiver, twin, keys) => {
+      const references = waivedByKey(waiver)
+      const charged = chargedByKey(twin)
+
+      expect([...references.keys()]).toEqual([...keys])
+
+      for (const key of keys) {
+        // The verifier is another calculation of the kernel: the demand with no adjustment charges exactly this.
+        expect(charged.get(key)?.length).toBeGreaterThan(0)
+        expect(references.get(key)).toEqual(charged.get(key))
+        // And the quote that waives it charges nothing for it, anywhere.
+        expect(chargedByKey(waiver).has(key)).toBe(false)
+      }
+
+      // Nothing else of the two quotes differs for a client: every other key is charged the same.
+      for (const [key, periods] of chargedByKey(waiver)) expect(periods).toEqual(charged.get(key))
+    }
+  )
+
+  const everyQuote: [string, Composition][] = [
+    ...corpus.map(path => [path, frozen(path).semantic.result] as [string, Composition]),
+    ...WAIVERS.map(([name, waiver]) => [name, waiver] as [string, Composition]),
+    ['managed service over three months', managedSuppliersOverTheTerm],
+    ['the same team sold by lines', linesThreeMonths]
+  ]
+
+  it.each(everyQuote)(
+    '%s: an entry names its concept as the firewall does, and nothing else of its rows',
+    (_, result) => {
+      const firewall = clientSafePeriodItems(result)
+      const reading = clientSafeWaivedItems(result)
+      const zero = new D(0).toFixed(totalsOf(result).net.split('.')[1]?.length ?? 0)
+
+      expect(reading.map(period => period.periodId)).toEqual(firewall.map(period => period.periodId))
+
+      // A quote with no row at zero waives nothing: the list is empty for almost every quote.
+      if (!rowsOf(result).some(row => new D(row.net).isZero()))
+        expect(reading.flatMap(period => period.items)).toEqual([])
+
+      reading.forEach((period, index) => {
+        expect(new Set(period.items.map(item => item.key)).size).toBe(period.items.length)
+
+        for (const item of period.items) {
+          expect(Object.keys(item)).toEqual(['key', 'kind', 'label', 'position', 'referenceNet'])
+          expect(new D(item.referenceNet).gt(0)).toBe(true)
+
+          const listed = firewall[index].items.some(other => other.key === item.key)
+
+          // Where the firewall lists the item, it is that item: same key, kind and label, at that place, at zero.
+          if (listed)
+            expect(firewall[index].items[item.position]).toEqual({
+              key: item.key,
+              kind: item.kind,
+              label: item.label,
+              net: zero
+            })
+          // It only leaves out the setup of a managed service that charges none: it would follow the fee.
+          else {
+            expect(result.commercialUnit).toBe('managed_service')
+            expect(item).toMatchObject({ key: 'setup', kind: 'setup', position: 1 })
+            expect(firewall[index].items[0].key).toBe('fee')
+          }
+        }
+      })
+    }
+  )
+
+  it('the committed corpus holds quotes that waive something and many that do not', () => {
+    const waiving = corpus.filter(path =>
+      clientSafeWaivedItems(frozen(path).semantic.result).some(period => period.items.length)
+    )
+
+    expect(waiving).toContain(`${COURTESY}.artifact.json`)
+    expect(corpus.length - waiving.length).toBeGreaterThan(5)
+  })
+
+  it('a zero no adjustment explains, a row with no price and a setup waived in part are not waivers', () => {
+    // The net of a row moved to zero by hand: nothing of the quote says it was given away.
+    const unexplained = clone(linesThreeMonths)
+    const row = unexplained.quote.periods[1].result.lines[0]
+
+    unexplained.quote.periods[1].result.totals!.net = new D(unexplained.quote.periods[1].result.totals!.net)
+      .minus(row.net)
+      .toFixed(0)
+    unexplained.quote.totals!.net = new D(unexplained.quote.totals!.net).minus(row.net).toFixed(0)
+    row.net = '0'
+    expect(clientSafeWaivedItems(unexplained).flatMap(period => period.items)).toEqual([])
+
+    // A row that never had a price: zero before and after, with nothing waived.
+    const priceless = clone(startupWaived)
+    const setup = priceless.quote.periods[0].result.lines.find(line => line.kind === 'setup')!
+
+    setup.undiscountedPrice = '0'
+    setup.discount = '0'
+    expect(clientSafeWaivedItems(priceless).flatMap(period => period.items)).toEqual([])
+
+    // One of the two setup rows of a managed service waived: its setup is still charged, for the other one.
+    const inPart = calculated(
+      recompose(SERVICE, demand => {
+        demand.brief.adjustments = waived('setup', [demand.brief.lines[0].lineId])
+      })
+    )
+
+    expect(chargedByKey(inPart).has('setup')).toBe(true)
+    expect(clientSafeWaivedItems(inPart).flatMap(period => period.items)).toEqual([])
+
+    expect(() => clientSafeWaivedItems(blocked)).toThrow('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+  })
+
+  it('the firewall and the preview say of a waived quote what they said before the reference existed', () => {
+    // The start-up at zero is an item of the firewall with no other figure; the reference is in neither reading.
+    const reference = clientSafeWaivedItems(startupWaived)[0].items[0].referenceNet
+
+    expect(clientSafePeriodItems(startupWaived)[0].items).toEqual([
+      { key: 'design', kind: 'line', label: rowsOf(startupWaived)[0].label, net: rowsOf(startupWaived)[0].net },
+      { key: 'design:setup', kind: 'setup', label: 'Implementación inicial', net: '0' }
+    ])
+    expect(leaves(clientSafePeriodItems(startupWaived))).not.toContain(reference)
+    expect(leaves(projectCompositionPreview(startupWaived))).not.toContain(reference)
+    expect(compositionPreviewMarkdown(startupWaived)).not.toContain(reference)
+  })
+})
+
+describe('a courtesy is printed only where the brief asks, with the reference value of the quote', () => {
+  const courtesy = (key: string, extra: Json = {}): Json => ({
+    ...texts(),
+    lines: { [key]: { courtesy: true, ...extra } }
+  })
+
+  const referenceOf = (result: Composition, key: string) =>
+    sum(
+      clientSafeWaivedItems(result)
+        .flatMap(period => period.items)
+        .filter(item => item.key === key)
+        .map(item => item.referenceNet)
+    )
+
+  it.each(WAIVERS)(
+    '%s: unmarked it prints nothing; marked, a line at zero with its reference',
+    (_, waiver, twin, keys) => {
+      const [key] = keys
+      const plain = emitted(waiver)
+      const marked = emitted(waiver, courtesy(key))
+      const added = marked.lines.filter(line => line.referenceNet !== undefined)
+      const zero = new D(0).toFixed(totalsOf(waiver).net.split('.')[1]?.length ?? 0)
+
+      // Unmarked: the document of today. No line for the waived key and no reference anywhere.
+      expect(JSON.stringify(plain)).not.toContain('referenceNet')
+      expectLinesFaithful(waiver)
+
+      // Marked: the same lines plus one, which adds nothing to any figure of the document.
+      expect(marked.lines.filter(line => line.referenceNet === undefined)).toEqual(plain.lines)
+      expect({ ...marked, lines: plain.lines }).toEqual(plain)
+      expect(added.length).toBe(1)
+      expect(added[0].net).toBe(zero)
+      expect(added[0]).not.toHaveProperty('unitNet')
+      expect(sum(marked.lines.map(line => line.net)).toFixed()).toBe(new D(totalsOf(waiver).net).toFixed())
+
+      // The reference is what the demand without the waiver charges for that key over the term, at the same scale.
+      const unwaived = chargedByKey(twin).get(key)!
+
+      expect(added[0].referenceNet).toBe(
+        sum(unwaived.map(period => period.net)).toFixed(zero.split('.')[1]?.length ?? 0)
+      )
+      expect(added[0].referenceNet).toBe(referenceOf(waiver, key).toFixed(zero.split('.')[1]?.length ?? 0))
+      // Counted like the line it stands for: the months it is waived in, or one payment.
+      expect(added[0].quantity.value).toBe(unwaived.length)
+    }
+  )
+
+  it('the example: the start-up as a one-off courtesy, in the group and at the place of a charged start-up', () => {
+    const data = emitted(startupWaived, courtesy('design:setup', { label: 'Puesta en marcha', detail: 'Cortesía' }))
+    const charged = emitted(startupCharged)
+
+    expect(data.lines[1]).toEqual({
+      label: 'Puesta en marcha',
+      detail: 'Cortesía',
+      group: QUOTE_DOCUMENT_DEFAULT_GROUPS.setup,
+      quantity: { value: 1, unit: 'pago único' },
+      net: '0',
+      // What the start-up line of the same demand reads when nothing waives it.
+      referenceNet: charged.lines[1].net
+    })
+    expect(charged.lines[1]).toMatchObject({ group: 'Puesta en marcha', quantity: { value: 1, unit: 'pago único' } })
+    expect(data.lines[0]).toEqual(charged.lines[0])
+    // The tax and the total stay the ones of the quote that waives: lower than the ones of the quote that charges.
+    expect(data.net).toBe(totalsOf(startupWaived).net)
+    expect(data.taxAmount).toBe(totalsOf(startupWaived).tax)
+    expect(new D(charged.net).minus(data.net).toFixed()).toBe(data.lines[1].referenceNet)
+  })
+
+  it('a courtesy sits where its line would be if it were charged', () => {
+    // The first line of the team, given away over three months: first of its group, counted in months.
+    const team = emitted(lineWaived, courtesy('primary'))
+    const teamCharged = emitted(linesThreeMonths)
+
+    expect(team.lines.map(line => line.label)).toEqual(teamCharged.lines.map(line => line.label))
+    expect(team.lines[0]).toMatchObject({ quantity: { value: 3, unit: 'meses' }, net: '0' })
+    expect(team.lines[0].referenceNet).toBe(teamCharged.lines[0].net)
+
+    // The first of the re-invoiced costs: before the other two, as the quote lists them.
+    const service = emitted(supplierWaived, courtesy('third_party:tp-production'))
+
+    expect(service.lines.map(line => line.label)).toEqual(emitted(managed).lines.map(line => line.label))
+    expect(service.lines[1]).toMatchObject({ quantity: { value: 1, unit: 'pago único' }, net: '0' })
+
+    // The setup of a managed service is not an item of the firewall when it is zero: it follows the fee, ahead of
+    // the re-invoiced costs, as a charged setup does. A setup row waived whole is added to the frozen example.
+    const withSetup = clone(managed)
+    const [period] = withSetup.quote.periods
+    const model = period.result.lines.find(row => row.kind === 'monthly')!
+
+    period.result.lines = [
+      ...period.result.lines,
+      {
+        ...model,
+        lineId: `${model.parentLineId}:1:setup`,
+        kind: 'setup',
+        undiscountedPrice: '100000',
+        discount: '100000',
+        net: '0'
+      }
+    ] as typeof period.result.lines
+
+    expect(emitted(withSetup, courtesy('setup')).lines.map(line => line.group)).toEqual([
+      'Servicio',
+      'Puesta en marcha',
+      'Costos de terceros',
+      'Costos de terceros',
+      'Costos de terceros'
+    ])
+  })
+
+  it('a mark is a boolean on a line the quote waives completely; anything else is rejected', () => {
+    const cases: [Json, { path: string; rule: string }][] = [
+      // A line with a net is never presented as a courtesy.
+      [{ design: { courtesy: true } }, { path: 'lines.0.courtesy', rule: 'line_is_charged' }],
+      [{ 'design:setup': { courtesy: 'yes' } }, { path: 'lines.0', rule: 'unknown_key' }],
+      [{ design: { courtesy: 'yes' } }, { path: 'lines.0.courtesy', rule: 'invalid_courtesy' }],
+      // Unmarked, a waived key is the unknown key it was before the mark existed: its line prints nothing.
+      [{ 'design:setup': { label: 'Puesta en marcha' } }, { path: 'lines.0', rule: 'unknown_key' }],
+      [{ 'design:setup': { courtesy: false } }, { path: 'lines.0', rule: 'unknown_key' }],
+      [{ 'not-a-key': { courtesy: true } }, { path: 'lines.0', rule: 'unknown_key' }],
+      // The mark brings no figure with it.
+      [{ 'design:setup': { courtesy: true, referenceNet: '1' } }, { path: 'lines.0', rule: 'unknown_field' }]
+    ]
+
+    for (const [lines, issue] of cases) {
+      const outcome = rejection(startupWaived, { ...texts(), lines })
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toEqual([issue])
+    }
+
+    // `false` on a line the quote charges for is the line of today.
+    expect(emitted(startupWaived, { ...texts(), lines: { design: { courtesy: false } } })).toEqual(
+      emitted(startupWaived)
+    )
+    // A quote that waives nothing has no key to mark.
+    expect(rejection(designer, courtesy('design:setup')).issues).toEqual([
+      { path: 'lines.0.courtesy', rule: 'line_is_charged' }
+    ])
+  })
+
+  it('a reference value the template cannot take is a fault of the quote, named where the brief asked for it', () => {
+    const fraction = clone(startupWaived)
+    const setup = fraction.quote.periods[0].result.lines.find(line => line.kind === 'setup')!
+
+    setup.undiscountedPrice = '320000.5'
+    setup.discount = '320000.5'
+
+    expect(rejection(fraction, courtesy('design:setup'))).toMatchObject({
+      code: 'QUOTE_DOCUMENT_NOT_REPRESENTABLE',
+      issues: [{ path: 'lines.0.courtesy', rule: 'reference_not_representable' }]
+    })
+    // Unasked, it changes nothing: the document and the scaffold of today, which lists no courtesy to choose.
+    expect(emitted(fraction)).toEqual(emitted(startupWaived))
+    expect(scaffold(fraction)).not.toHaveProperty('waived')
+  })
+
+  it('the scaffold lists what the quote waives, apart from the lines and out of the brief', () => {
+    const reading = scaffold(startupWaived)
+
+    expect(reading.waived).toEqual([
+      {
+        key: 'design:setup',
+        kind: 'setup',
+        label: 'Implementación inicial',
+        group: QUOTE_DOCUMENT_DEFAULT_GROUPS.setup,
+        quantity: { value: 1, unit: 'pago único' },
+        net: '0',
+        referenceNet: emitted(startupCharged).lines[1].net
+      }
+    ])
+    // The lines and the brief are the ones of the quote with nothing marked: a courtesy is asked for, not assumed.
+    expect(reading.lines.map(line => line.key)).toEqual(['design'])
+    expect(Object.keys(reading.brief.lines)).toEqual(['design'])
+    expect(emitted(startupWaived, { ...texts(), lines: reading.brief.lines })).toEqual(emitted(startupWaived))
+    // As listed is as printed once the key is marked.
+    expect(emitted(startupWaived, courtesy('design:setup')).lines[1]).toEqual(
+      (({ key, kind, ...line }) => (void key, void kind, line))(reading.waived![0])
+    )
+
+    // A quote that waives nothing has no such list.
+    for (const result of [designer, managed, linesThreeMonths]) expect(scaffold(result)).not.toHaveProperty('waived')
+  })
+
+  it('a courtesy lends the tax guard nothing: the frozen tax is held to the months that are charged', () => {
+    const totals = totalsOf(startupWaived)
+    const charged = scaffold(startupWaived).lines.reduce((total, line) => total + line.quantity.value, 0)
+
+    // Premise: three charged months, and a courtesy that would count a fourth unit if it were counted.
+    expect(charged).toBe(3)
+    expect(emitted(startupWaived, courtesy('design:setup')).lines.reduce((n, line) => n + line.quantity.value, 0)).toBe(
+      4
+    )
+
+    const shifted = (units: number) => {
+      const edited = clone(startupWaived)
+
+      edited.quote.totals!.tax = new D(totals.tax!).plus(units).toFixed(0)
+      edited.quote.totals!.grandTotal = new D(totals.grandTotal!).plus(units).toFixed(0)
+
+      return edited
+    }
+
+    expect(emitted(shifted(charged), courtesy('design:setup')).taxAmount).toBe(
+      new D(totals.tax!).plus(charged).toFixed(0)
+    )
+    expect(rejection(shifted(charged + 1), courtesy('design:setup'))).toMatchObject({
+      code: 'QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE',
+      issues: [{ path: 'totals.tax', rule: 'tax_differs_from_rate' }]
+    })
+  })
+})
+
+describe('optional add-ons: each priced by its own frozen quote, printed apart, outside every figure of the quote', () => {
+  const named = (options: unknown = optionTexts(), extra: Json = {}): Json => ({ ...texts(), options, ...extra })
+
+  const periodNets = (option: QuoteDocumentOption) =>
+    option.result.quote.periods.map(period => period.result.totals!.net)
+
+  it('the price of an option is the net of one of its periods, as its own artifact froze it', () => {
+    const data = emitted(startupWaived, named(), OPTIONS)
+
+    // Premise, from the frozen artifacts: three equal months for one option and a single month for the other.
+    expect(periodNets(copywriter).length).toBe(3)
+    expect(new Set(periodNets(copywriter)).size).toBe(1)
+    expect(new D(periodNets(copywriter)[0]).mul(3).toFixed()).toBe(new D(totalsOf(copywriter.result).net).toFixed())
+    expect(periodNets(motion)).toEqual([totalsOf(motion.result).net])
+
+    expect(data.options).toEqual({
+      ...QUOTE_DOCUMENT_DEFAULT_OPTIONS_TEXTS,
+      items: [
+        { label: 'Redacción creativa', net: periodNets(copywriter)[0], unit: 'al mes' },
+        {
+          label: 'Edición de video',
+          detail: 'Una persona durante la campaña.',
+          net: periodNets(motion)[0],
+          unit: 'por campaña'
+        }
+      ]
+    })
+    // Each price is traced to the calculation it came from, in the order printed; a key is never part of the data.
+    expect(data.source).toEqual({
+      system: 'pricing-v3',
+      calculationId: IDENTITY.calculationId,
+      digest: IDENTITY.replayDigest,
+      engineVersion: startupWaived.quote.periods[0].result.engineVersion,
+      option1CalculationId: copywriter.identity.calculationId,
+      option1Digest: copywriter.identity.replayDigest,
+      option2CalculationId: motion.identity.calculationId,
+      option2Digest: motion.identity.replayDigest
+    })
+    expect(JSON.stringify(data)).not.toMatch(/"copywriter"|"motion"/)
+  })
+
+  it('nothing of an option enters the lines, the net, the tax or the total of the quote', () => {
+    const without = emitted(startupWaived)
+    const { options, source, ...quote } = emitted(startupWaived, named(), OPTIONS)
+    const { source: plainSource, ...plain } = without
+
+    expect(options).toBeDefined()
+    expect(quote).toEqual(plain)
+    expect(source).toMatchObject(plainSource)
+    // And the sum a reader could be tempted to make is not the net of anything in the document.
+    expect(leaves(quote)).not.toContain(new D(without.net).plus(periodNets(copywriter)[0]).toFixed(0))
+  })
+
+  it('the block follows the order and the texts of the brief', () => {
+    const reordered = emitted(
+      startupWaived,
+      named(
+        { motion: optionTexts().motion, copywriter: optionTexts().copywriter },
+        { optionsTexts: { title: 'Servicios opcionales', note: 'Se acuerdan por separado.' } }
+      ),
+      OPTIONS
+    )
+
+    expect(reordered.options).toMatchObject({ title: 'Servicios opcionales', note: 'Se acuerdan por separado.' })
+    expect(reordered.options!.items.map(item => item.net)).toEqual([periodNets(motion)[0], periodNets(copywriter)[0]])
+    expect(reordered.source).toMatchObject({
+      option1CalculationId: motion.identity.calculationId,
+      option2CalculationId: copywriter.identity.calculationId
+    })
+    // Whatever the order of the flags that passed them.
+    expect(emitted(startupWaived, named(), [motion, copywriter]).options).toEqual(
+      emitted(startupWaived, named(), OPTIONS).options
+    )
+  })
+
+  it('an option is one amount that says all of it, or it is rejected by its place in the list', () => {
+    const as = (key: string, result: Composition, calculationId = `composition-${key}`): QuoteDocumentOption => ({
+      key,
+      result,
+      identity: { calculationId, replayDigest: `digest-${key}` }
+    })
+
+    const zeroNet = clone(motion.result)
+
+    zeroNet.quote.totals!.net = '0'
+    zeroNet.quote.periods[0].result.totals!.net = '0'
+
+    const periodsMoved = clone(copywriter.result)
+
+    periodsMoved.quote.totals!.net = new D(periodsMoved.quote.totals!.net).plus(1).toFixed(0)
+
+    const cases: [string, QuoteDocumentOption[], { path: string; rule: string }[]][] = [
+      ['a quote that did not calculate', [as('a', blocked)], [{ path: 'options.0', rule: 'not_calculated' }]],
+      // The designer in dollars against a quote in pesos: no conversion happens in a document.
+      [
+        'another currency',
+        [copywriter, as('b', designerInDollars)],
+        [{ path: 'options.1', rule: 'currency_differs_from_quote' }]
+      ],
+      // Three months with a start-up in the first: «al mes» would be true of two of them.
+      [
+        'a net that changes over its periods',
+        [as('a', startupCharged)],
+        [{ path: 'options.0', rule: 'net_differs_between_periods' }]
+      ],
+      // The managed example declares a cost its client pays a supplier directly: one amount would leave it out.
+      ['a cost the client pays apart', [as('a', managed)], [{ path: 'options.0', rule: 'client_pays_costs_directly' }]],
+      ['a net of zero', [as('a', zeroNet)], [{ path: 'options.0', rule: 'amount_not_representable' }]],
+      [
+        'periods that do not add up to its net',
+        [as('a', periodsMoved)],
+        [{ path: 'options.0', rule: 'periods_differ_from_net' }]
+      ],
+      [
+        'the quote of the document itself',
+        [as('a', motion.result, IDENTITY.calculationId)],
+        [{ path: 'options.0', rule: 'same_as_quote' }]
+      ],
+      [
+        'one quote passed twice',
+        [motion, { ...motion, key: 'again' }],
+        [{ path: 'options.1', rule: 'duplicate_option' }]
+      ],
+      [
+        'one key for two options',
+        [motion, { ...copywriter, key: 'motion' }],
+        [{ path: 'options.1', rule: 'duplicate_key' }]
+      ],
+      ['a key that is not a name', [{ ...motion, key: 'dos palabras' }], [{ path: 'options.0', rule: 'invalid_key' }]],
+      [
+        'more options than a document takes',
+        Array.from({ length: 9 }, (_, index) => as(`o${index}`, motion.result)),
+        [{ path: 'options', rule: 'too_many' }]
+      ]
+    ]
+
+    for (const [name, options, issues] of cases) {
+      // The brief names whatever was passed, so only the option is at fault.
+      const brief = named(Object.fromEntries(options.map(option => [option.key, { label: 'Opción', unit: 'al mes' }])))
+      const outcome = rejection(startupWaived, brief, options)
+
+      expect(outcome.code, name).toBe('QUOTE_DOCUMENT_OPTION_INVALID')
+      expect(outcome.issues, name).toEqual(issues)
+      // The scaffold lists no price for an option the document would refuse.
+      expect(scaffoldQuoteDocumentBrief(startupWaived, IDENTITY, options), name).toMatchObject({
+        ok: false,
+        code: 'QUOTE_DOCUMENT_OPTION_INVALID'
+      })
+    }
+  })
+
+  it('the brief names exactly the options passed, with a label and a unit and no figure', () => {
+    const texts2 = optionTexts() as Record<string, Json>
+
+    const cases: [Json, QuoteDocumentOption[], { path: string; rule: string }[]][] = [
+      // Passed and not named: it would be priced and silently left out.
+      [texts(), OPTIONS, [{ path: 'options', rule: 'option_not_named' }]],
+      [named({ copywriter: texts2.copywriter }), OPTIONS, [{ path: 'options', rule: 'option_not_named' }]],
+      // Named and not passed: there is no frozen quote to price it.
+      [named(), [copywriter], [{ path: 'options.1', rule: 'unknown_key' }]],
+      [
+        named(),
+        [],
+        [
+          { path: 'options.0', rule: 'unknown_key' },
+          { path: 'options.1', rule: 'unknown_key' }
+        ]
+      ],
+      [named(['copywriter']), OPTIONS, [{ path: 'options', rule: 'not_an_object' }]],
+      [named({ ...texts2, motion: 'Video' }), OPTIONS, [{ path: 'options.1', rule: 'not_an_object' }]],
+      [named({ ...texts2, motion: { label: 'Video' } }), OPTIONS, [{ path: 'options.1.unit', rule: 'missing_unit' }]],
+      [named({ ...texts2, motion: { unit: 'al mes' } }), OPTIONS, [{ path: 'options.1.label', rule: 'missing_label' }]],
+      [
+        named({ ...texts2, motion: { label: 'Video', unit: 'al mes', detail: 'Uno\nDos' } }),
+        OPTIONS,
+        [{ path: 'options.1.detail', rule: 'invalid_detail' }]
+      ],
+      // The price of an option is not the brief's to give.
+      [
+        named({ ...texts2, motion: { label: 'Video', unit: 'al mes', net: '1000' } }),
+        OPTIONS,
+        [{ path: 'options.1', rule: 'unknown_field' }]
+      ],
+      [{ ...texts(), optionsTexts: { title: 'Opciones' } }, [], [{ path: 'optionsTexts', rule: 'requires_options' }]]
+    ]
+
+    for (const [brief, options, issues] of cases) {
+      const outcome = rejection(startupWaived, brief, options)
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toEqual(issues)
+    }
+
+    expect(rejection(startupWaived, { ...texts(), optionsTexts: { title: 'Opciones', net: '1' } }).issues).toEqual([
+      { path: 'optionsTexts', rule: 'unrecognized_keys' }
+    ])
+  })
+
+  it('the scaffold lists the options passed with the price of each, and names them in the brief to fill', () => {
+    const reading = scaffold(startupWaived, OPTIONS)
+
+    expect(reading.options).toEqual([
+      {
+        key: 'copywriter',
+        net: periodNets(copywriter)[0],
+        currency: 'CLP',
+        periods: 3,
+        calculationId: copywriter.identity.calculationId
+      },
+      {
+        key: 'motion',
+        net: periodNets(motion)[0],
+        currency: 'CLP',
+        periods: 1,
+        calculationId: motion.identity.calculationId
+      }
+    ])
+    expect(reading.brief.options).toEqual({ copywriter: { label: '', unit: '' }, motion: { label: '', unit: '' } })
+    // Unfilled, it is rejected; filled, it is the document.
+    expect(rejection(startupWaived, { ...texts(), options: reading.brief.options }, OPTIONS).code).toBe(
+      'QUOTE_DOCUMENT_BRIEF_INVALID'
+    )
+
+    // Without options the scaffold has neither key: it is the scaffold of before.
+    const plain = scaffold(startupWaived)
+
+    expect(plain).not.toHaveProperty('options')
+    expect(plain.brief).not.toHaveProperty('options')
+    expect({ ...reading, options: undefined, brief: { ...reading.brief, options: undefined } }).toEqual({
+      ...plain,
+      options: undefined,
+      brief: { ...plain.brief, options: undefined }
+    })
+  })
+
+  it('the committed example: brief, artifacts and data in step, with the courtesy and both options', () => {
+    const artifact = frozen(`${COURTESY}.artifact.json`)
+
+    const outcome = composeQuoteDocument(
+      artifact.semantic.result,
+      artifact,
+      read(`${COURTESY}.document-brief.json`),
+      OPTIONS
+    )
+
+    if (!outcome.ok) throw new Error(`document rejected: ${outcome.code} ${JSON.stringify(outcome.issues)}`)
+
+    expect(clone(outcome.reading)).toEqual(read(`${COURTESY}.document.json`))
+
+    const data = outcome.reading
+    const totals = totalsOf(artifact.semantic.result)
+
+    expect(data.net).toBe(totals.net)
+    expect(data.taxAmount).toBe(totals.tax)
+    expect(data.lines.map(line => [line.net, line.referenceNet])).toEqual([
+      [totals.net, undefined],
+      ['0', emitted(startupCharged).lines[1].net]
+    ])
+    expect(data.options!.items.map(item => item.net)).toEqual([periodNets(copywriter)[0], periodNets(motion)[0]])
+    expect(data.source).toMatchObject({ calculationId: artifact.calculationId, digest: artifact.replayDigest })
+    // The buyer of an example is invented.
+    expect(data.buyer.name).toBe('Cliente de ejemplo')
+  })
+})
+
 // The generator of the A4 quote is the consumer of the data. It is loaded by path at run time, so this module does
 // not become part of the typed program of the kernel: only the two functions the data must satisfy are named.
 type Template = {
@@ -1392,26 +2192,9 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
     { id: 'b', label: 'Saldo', share: '0.5', periodId: 1 }
   ]
 
-  it.each([
-    ['designer (tax not resolved)', designer, texts()],
-    ['managed service with suppliers and a payment calendar', managed, { ...texts(), paymentMilestones: milestones }],
-    ['managed service over three months', managedSuppliersOverTheTerm, { ...texts(), paymentMilestones: milestones }],
-    ['the same team sold by lines', linesThreeMonths, texts()],
-    ['a fee that changes in the third month', managedFeeChanges, texts()],
-    ['designer with a month off', designerWithGap, texts()],
-    ['exclusive tax', designerWithTax('0.19'), texts()],
-    ['exclusive tax of four decimals', designerWithTax('0.1925'), texts()],
-    ['exclusive tax rounded month by month', taxRoundedByMonth, texts()],
-    ['the three-month example with IVA', frozen(`${THREE_MONTHS}.artifact.json`).semantic.result, texts()],
-    ['tax not applicable', designerTaxNotApplicable, texts()],
-    [
-      'a quote in dollars',
-      designerInDollars,
-      { ...texts(), pricing: { ...(texts().pricing as Json), monthly: { months: 1, note: 'Referencia.' } } }
-    ]
-  ] as const)('%s: the template accepts the data and computes the totals of the quote', async (_, result, brief) => {
+  /** The template takes the data as the CLI writes it and computes from it the totals the quote froze. */
+  const expectTotalsOfTheQuote = async (result: Composition, data: QuoteDocumentData) => {
     const { validateQuote, quoteAmounts } = await template()
-    const data = emitted(result, brief)
     const totals = totalsOf(result)
 
     // JSON as the CLI writes it: what the generator reads from a file.
@@ -1435,9 +2218,60 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
       expect(new D(amounts.vat!).toFixed()).toBe(new D(totals.tax).toFixed())
       expect(new D(amounts.total!).toFixed()).toBe(new D(totals.grandTotal!).toFixed())
     }
+  }
+
+  it.each([
+    ['designer (tax not resolved)', designer, texts()],
+    ['managed service with suppliers and a payment calendar', managed, { ...texts(), paymentMilestones: milestones }],
+    ['managed service over three months', managedSuppliersOverTheTerm, { ...texts(), paymentMilestones: milestones }],
+    ['the same team sold by lines', linesThreeMonths, texts()],
+    ['a fee that changes in the third month', managedFeeChanges, texts()],
+    ['designer with a month off', designerWithGap, texts()],
+    ['exclusive tax', designerWithTax('0.19'), texts()],
+    ['exclusive tax of four decimals', designerWithTax('0.1925'), texts()],
+    ['exclusive tax rounded month by month', taxRoundedByMonth, texts()],
+    ['the three-month example with IVA', frozen(`${THREE_MONTHS}.artifact.json`).semantic.result, texts()],
+    ['tax not applicable', designerTaxNotApplicable, texts()],
+    [
+      'a quote in dollars',
+      designerInDollars,
+      { ...texts(), pricing: { ...(texts().pricing as Json), monthly: { months: 1, note: 'Referencia.' } } }
+    ]
+  ] as const)('%s: the template accepts the data and computes the totals of the quote', async (_, result, brief) => {
+    await expectTotalsOfTheQuote(result, emitted(result, brief))
   })
 
-  it.each(EXAMPLES)('%s.document.json is accepted by the template as committed', async example => {
+  // The two additions of the data: a courtesy line (`referenceNet`) and the block of options. The template adds
+  // neither to the subtotal, so the totals it computes are still the ones of the quote.
+  const courtesyOf = (key: string): Json => ({ ...texts(), lines: { [key]: { courtesy: true } } })
+
+  const additions: [string, Composition, Json, QuoteDocumentOption[]][] = [
+    ['a start-up given as a courtesy', startupWaived, courtesyOf('design:setup'), []],
+    ['a courtesy in dollars', dollarsStartupWaived, courtesyOf('design:setup'), []],
+    ['a line given away over three months', lineWaived, courtesyOf('primary'), []],
+    ['the setup of a managed service as a courtesy', serviceSetupWaived, courtesyOf('setup'), []],
+    ['a re-invoiced cost the service absorbs', supplierWaived, courtesyOf('third_party:tp-production'), []],
+    ['optional add-ons', startupWaived, { ...texts(), options: optionTexts() }, OPTIONS],
+    [
+      'a courtesy, optional add-ons and a payment calendar',
+      startupWaived,
+      { ...courtesyOf('design:setup'), options: optionTexts(), paymentMilestones: milestones },
+      OPTIONS
+    ]
+  ]
+
+  it.each(additions)(
+    '%s: the template accepts the data and computes the totals of the quote',
+    async (_, result, brief, options) => {
+      const data = emitted(result, brief, options)
+
+      // Premise: the data does carry what the case is about.
+      expect(data.lines.some(line => line.referenceNet !== undefined) || data.options !== undefined).toBe(true)
+      await expectTotalsOfTheQuote(result, data)
+    }
+  )
+
+  it.each([...EXAMPLES, COURTESY])('%s.document.json is accepted by the template as committed', async example => {
     const { validateQuote, quoteAmounts } = await template()
     const data = read(`${example}.document.json`)
     const totals = totalsOf(frozen(`${example}.artifact.json`).semantic.result)
@@ -1529,11 +2363,104 @@ describe('compose document (CLI)', () => {
     })
   })
 
+  const optionFlags = ['copywriter', 'motion'].flatMap(key => [
+    '--option',
+    `${key}=${COURTESY}.option-${key}.artifact.json`
+  ])
+
+  it('with options: the scaffold lists them with their price, and the brief of the example yields its data', () => {
+    const artifact = frozen(`${COURTESY}.artifact.json`)
+    const expected = scaffoldQuoteDocumentBrief(artifact.semantic.result, artifact, OPTIONS)
+
+    if (!expected.ok) throw new Error('scaffold rejected')
+
+    const scaffolded = cli('compose', 'document', '--input', `${COURTESY}.artifact.json`, ...optionFlags)
+
+    expect(scaffolded.status).toBe(2)
+    expect(JSON.parse(scaffolded.stdout)).toEqual(clone(expected.reading))
+    expect(JSON.parse(scaffolded.stdout).waived.map((line: Json) => line.key)).toEqual(['design:setup'])
+
+    const out = join(dir, 'courtesy-and-options.json')
+
+    const run = cli(
+      'compose',
+      'document',
+      '--input',
+      `${COURTESY}.artifact.json`,
+      '--brief',
+      `${COURTESY}.document-brief.json`,
+      ...optionFlags,
+      '--out',
+      out
+    )
+
+    expect(run.status).toBe(3)
+    // The committed example is what the command prints, to the byte, and what it writes.
+    expect(run.stdout).toBe(readFileSync(`${COURTESY}.document.json`, 'utf8'))
+    expect(readFileSync(out, 'utf8')).toBe(run.stdout)
+  })
+
+  it('an option is `key=artifact`, read and verified like the quote; a rejection names the flag', () => {
+    const base = ['compose', 'document', '--input', `${COURTESY}.artifact.json`]
+
+    const report = (...args: string[]) => {
+      const run = cli(...base, ...args)
+
+      expect(run.status).toBe(1)
+      expect(run.stdout).toBe('')
+
+      return JSON.parse(run.stderr).error
+    }
+
+    const motionFile = `${COURTESY}.option-motion.artifact.json`
+
+    // Not `key=path`, a key that is not a name, and one key twice.
+    for (const malformed of [
+      [motionFile],
+      ['=x.json'],
+      ['dos palabras=x.json'],
+      [`a=${motionFile}`, `a=${motionFile}`]
+    ])
+      expect(report(...malformed.flatMap(value => ['--option', value]))).toMatchObject({
+        code: 'INVALID_ARGUMENT',
+        option: 'option'
+      })
+
+    expect(report('--option', `a=${join(dir, 'missing.artifact.json')}`)).toMatchObject({
+      code: 'INPUT_NOT_FOUND',
+      option: 'option'
+    })
+    // A document brief is not a frozen quote: the replay check of an option is the one of `--input`.
+    expect(report('--option', `a=${COURTESY}.document-brief.json`).option).toBe('option')
+
+    // The quote of the document passed as its own option, and a brief that names an option nobody passed.
+    expect(report('--option', `a=${COURTESY}.artifact.json`)).toEqual({
+      code: 'QUOTE_DOCUMENT_OPTION_INVALID',
+      message: expect.any(String),
+      option: 'option',
+      issues: [{ path: 'options.0', rule: 'same_as_quote' }]
+    })
+    expect(report('--brief', `${COURTESY}.document-brief.json`, '--option', `motion=${motionFile}`)).toMatchObject({
+      code: 'QUOTE_DOCUMENT_BRIEF_INVALID',
+      option: 'brief',
+      issues: [{ path: 'options.0', rule: 'unknown_key' }]
+    })
+
+    // Only the document takes options.
+    expect(
+      JSON.parse(
+        cli('compose', 'preview', '--input', `${COURTESY}.artifact.json`, '--option', `a=${motionFile}`).stderr
+      ).error
+    ).toMatchObject({ code: 'INVALID_ARGUMENT', option: 'option' })
+  })
+
   it('is listed in the usage the tool prints', () => {
     const usage = JSON.parse(cli('help').stdout)
 
     expect(usage.operations.compose).toContain(
       'document --input artifact.json [--brief document-brief.json] [--out data.json]'
     )
+    expect(usage.operations.compose).toContain('[--option key=option.artifact.json]...')
+    expect(Object.keys(usage.quoteDocument)).toEqual(['command', 'withoutBrief', 'brief', 'options', 'courtesy'])
   })
 })
