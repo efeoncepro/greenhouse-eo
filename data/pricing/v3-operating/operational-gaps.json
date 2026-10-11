@@ -104,6 +104,36 @@
       "owner": "Operations",
       "required": "Review each tool unit price by its review date, and replace it with a new policy version when a provider changes it; confirm the contracted plan where the price is a public list price",
       "known": "Decided by the CEO on 2026-10-11: a unit price does not expire. Resource policy v6 keeps the 25 tool prices valid until replaced and gives each a review date of 2027-04-11 that warns without blocking; before, every price ended within 30 days of its evidence and blocked the quote. What varies is the number of seats, declared per quote. Most prices are still public list prices marked estimated"
+    },
+    {
+      "code": "ENGAGEMENT_FORM",
+      "owner": "CEO",
+      "required": "Decide whether new quotes must declare the form of the engagement, and whether the Hybrid and Licence/Consulting forms of the workbook are needed. Review the 10% if On-Demand engagements start leaving people unsold when they end",
+      "known": "Decided on 2026-10-11: the form of the engagement is its own datum (catalog v9, contract 1.3.0). On-Going ratio 1, On-Demand ratio 1.10 on the price of every row, same floor as On-Going. The 10% is the workbook's commercial-model multiplier; the CEO left the adjustment to the agent, who kept it. An undeclared form prices as On-Going and says nothing"
+    },
+    {
+      "code": "STARTUP_PROVISIONS_NOT_MEASURED",
+      "owner": "Operations",
+      "required": "Measure account onboarding and recruiting on the next two real incorporations and replace the estimates. Decide whether managed services need a start-up provision",
+      "known": "Since catalog v9: account onboarding USD 200 once per person (default) and recruiting USD 500 once per person (optional, only when a person has to be hired). Both estimates proposed by the agent and accepted by the CEO on 2026-10-11, in place of the workbook rule of one month of the resource's cost. The managed-service kit has no start-up requirement"
+    },
+    {
+      "code": "ADOBE_DISCOUNT_ENDS",
+      "owner": "CEO",
+      "required": "Confirm the price Adobe charges once the 50% discount on Creative Cloud Pro ends (expected about mid-December 2026) and issue a policy version that makes it the current price. Until then, quote engagements that run past that date with the renewal scenario",
+      "known": "Policy v7 carries Adobe as invoiced (invoice 3582641940 of 2026-09-16): Creative Cloud Pro, 3 licences, CLP 162,605 a month, and Adobe Express, 3 licences, CLP 16,240 a month; totals with IVA by the CEO's decision (the tax is recovered, not month by month); both contracted for twelve months and paid monthly. The renewal scenario is the list price of the invoice with IVA, CLP 325,405.5 a month. The current price has a review date of 2026-12-01"
+    },
+    {
+      "code": "SUPPLIER_CONTRACT_TERMS",
+      "owner": "Operations",
+      "required": "Declare the contract term of each tool whose plan binds for longer than it bills (commitmentTermMonths), and whether a seat is bought for a job or already held",
+      "known": "Only Adobe declares a term (12 months). For every other month-priced tool the commitment reading says the term is not declared. A quote carries periods, not the length of the contract, and does not say whether a seat is a new purchase, so the cash reading of an engagement cannot subtract a seat bought for it"
+    },
+    {
+      "code": "THIRD_PARTY_AND_CONTINGENCY",
+      "owner": "CEO",
+      "required": "Decide the handling rate per category of third-party cost and the contingency reserve rate and scope, so the next contract can be built",
+      "known": "Designed, not built: third-party costs of an engagement (own rows with a policy per category, outside market factor, engagement ratio and rate discounts) and a contingency reserve for fixed-scope work (a rate over a declared cost base, as a cost). Recommended defaults pending decision: 10% handling with a 5% floor on production, talent and printing; media and licences at cost; reserve 12% of people cost for managed services sold On-Demand"
     }
   ]
 }

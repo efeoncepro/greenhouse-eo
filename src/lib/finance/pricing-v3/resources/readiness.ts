@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js'
 
-import { describeMarketFactor } from '../catalog/explain'
+import { describeEngagementForm, describeMarketFactor } from '../catalog/explain'
 import { PricingV3Error } from '../errors'
 import type { composeResourceQuote } from './composition'
 import { estimateExposure, linesBelowPolicyFloor } from './summary'
@@ -88,6 +88,7 @@ export function assessCompositionReadiness(result: Composition) {
   // The floor verdict is the kernel's (MARGIN_BELOW_FLOOR per line); readiness only turns it into an owned decision.
   const belowPolicyFloor = linesBelowPolicyFloor(result)
   const marketFactor = describeMarketFactor(result.quote.resolution)
+  const engagementForm = describeEngagementForm(result.quote.resolution)
 
   for (const line of belowPolicyFloor)
     gap(
@@ -125,10 +126,12 @@ export function assessCompositionReadiness(result: Composition) {
             result.quote.totals.marginRate === null ? null : new Decimal(result.quote.totals.marginRate).lt('0.35'),
           // Per-line floors of the pricing policy actually selected, as judged by the kernel. Independent of the
           // generic proposals above, which stay unapproved references. With a market factor whose floor follows the
-          // base market, `modeledRate` (the real margin) can sit under the policy minimum with no line flagged.
+          // base market, `modeledRate` (the real margin) can sit under the policy minimum with no line flagged. The
+          // form of the engagement moves the net and never the floor: a ratio under 1 can be why a line is flagged.
           policyFloor: {
             source: 'kernel:MARGIN_BELOW_FLOOR',
             ...(marketFactor ? { marketFactor } : {}),
+            ...(engagementForm ? { engagementForm } : {}),
             linesBelowFloor: belowPolicyFloor
           }
         }

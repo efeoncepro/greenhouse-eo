@@ -5,6 +5,7 @@ export { resolveBrief } from './resolve'
 export { calculateCatalogQuote, QUOTE_VERSION } from './quote'
 export {
   describeCommercialTerms,
+  describeEngagementForm,
   describeMarketFactor,
   explainCommercialAdjustments,
   explainCostComponents

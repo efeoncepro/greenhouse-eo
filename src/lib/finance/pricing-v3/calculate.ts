@@ -4,6 +4,7 @@ import { PRICING_V3_ENGINES, PRICING_V3_MARKET_FLOOR_BASIS, parsePricingV3Input 
 import type {
   PricingV3AdjustmentV11,
   PricingV3ContractVersion,
+  PricingV3EngagementFactorV13,
   PricingV3Input,
   PricingV3MarketFactorV12,
   PricingV3PriceRounding,
@@ -20,7 +21,8 @@ const Wide = Decimal.clone({ precision: 240, rounding: Decimal.ROUND_HALF_UP })
 export const PRICING_V3_PRECISION_POLICIES = {
   '1.0.0': 'decimal-80-half-up-final-line-largest-remainder-v1',
   '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2',
-  '1.2.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-v3'
+  '1.2.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-v3',
+  '1.3.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-v4'
 } as const
 
 // "Met the floor before rounding" is read on the unrounded amounts, whose last digits are division noise: a price
@@ -84,19 +86,37 @@ type CommercialAmounts = {
 }
 
 /**
- * Contract 1.2.0 only. `marketAdjustment` is the policy price with the market factor minus the policy price at factor
+ * From contract 1.2.0. `marketAdjustment` is the policy price with the market factor minus the policy price at factor
  * 1 (signed, before commercial rounding), so `undiscountedPrice - roundingAdjustment - marketAdjustment` is the price
- * of the base market. It describes the price; `marginAmount` and `marginRate` stay those of the final net.
+ * of the base market. It describes the price; `marginAmount` and `marginRate` stay those of the final net. Under
+ * contract 1.3.0 both prices are read at engagement ratio 1 (see `EngagementAmounts`), so this amount is what it
+ * would be for the same row quoted without a form and `engagementAdjustment` is subtracted as well to reach the base.
  */
 type MarketAmounts = { marketAdjustment: string }
 
-/** Contract 1.2.0 only, per row. The row is flagged MARGIN_BELOW_FLOOR when its final net is under `floorNet`. */
+/** From contract 1.2.0, per row. The row is flagged MARGIN_BELOW_FLOOR when its final net is under `floorNet`. */
 type MarketFloor = {
   /** Policy price over base-market price when the floor follows the base market and the factor lowered it; else "1". */
   marketPriceRatio: string
   /** Smallest net, at the currency unit, that meets `minimumMargin` in this market. */
   floorNet: string
 }
+
+/**
+ * Contract 1.3.0 only. `engagementAdjustment` is the policy price with the engagement ratio minus the same price at
+ * ratio 1, that is, the price every earlier contract forms for the row (signed, both as presented, before commercial
+ * rounding). The walk of a row, exact at every step and in totals:
+ *
+ *   base-market price at ratio 1
+ *     + marketAdjustment       -> policy price in the offer market, as contracts 1.0.0 to 1.2.0 price it
+ *     + engagementAdjustment   -> policy price of this quote
+ *     + roundingAdjustment     -> undiscountedPrice
+ *     + uplift - discount      -> net;  net - cost = marginAmount
+ */
+type EngagementAmounts = { engagementAdjustment: string }
+
+/** Contract 1.3.0 only, per row: the ratio of the engagement form the request declares, as the snapshot states it. */
+type EngagementRatio = { engagementPriceRatio: string }
 
 type Envelope<Contract extends PricingV3ContractVersion, Line, Sum> = {
   engineVersion: (typeof PRICING_V3_ENGINES)[Contract]
@@ -121,11 +141,20 @@ export type PricingV3LineV12 = PricingV3LineV11 & MarketAmounts & MarketFloor
 export type PricingV3TotalsV12 = PricingV3TotalsV11 & MarketAmounts
 export type PricingV3ResultV12 = Envelope<'1.2.0', PricingV3LineV12, PricingV3TotalsV12>
 
-/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
-export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11 | PricingV3ResultV12
+export type PricingV3LineV13 = PricingV3LineV12 & EngagementAmounts & EngagementRatio
+export type PricingV3TotalsV13 = PricingV3TotalsV12 & EngagementAmounts
+export type PricingV3ResultV13 = Envelope<'1.3.0', PricingV3LineV13, PricingV3TotalsV13>
 
-type Row = Billable & Partial<CommercialAmounts & MarketAmounts & MarketFloor>
-type Draft = Envelope<PricingV3ContractVersion, Row, Totals & Partial<CommercialAmounts & MarketAmounts>>
+/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
+export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11 | PricingV3ResultV12 | PricingV3ResultV13
+
+type Row = Billable & Partial<CommercialAmounts & MarketAmounts & MarketFloor & EngagementAmounts & EngagementRatio>
+
+type Draft = Envelope<
+  PricingV3ContractVersion,
+  Row,
+  Totals & Partial<CommercialAmounts & MarketAmounts & EngagementAmounts>
+>
 
 /** Pure calculation: all costs, country policies and FX are supplied, never fetched. */
 export function calculatePricingV3(raw: unknown): PricingV3Result {
@@ -133,12 +162,14 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
 }
 
 // One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys;
-// 1.1.0 is the case with no market floor basis and no 1.2.0 keys.
+// 1.1.0 is the case with no market floor basis and no 1.2.0 keys; 1.2.0 is the case with no engagement form, where
+// every price is the price at engagement ratio 1, and no 1.3.0 keys.
 function calculate(raw: unknown): Draft {
   const { contract, parsed } = parsePricingV3Input(raw)
-  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added.
+  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added, 1.3.0 everything 1.2.0 added.
   const v11 = contract !== '1.0.0'
-  const v12 = contract === '1.2.0'
+  const v13 = contract === '1.3.0'
+  const v12 = contract === '1.2.0' || v13
   const diagnostics: Diagnostic[] = []
   const lines: Row[] = []
 
@@ -265,11 +296,44 @@ function calculate(raw: unknown): Draft {
 
   if (!market) report('MISSING_MARKET_POLICY', 'snapshot.marketFactors', 'missing')
   else sourceOk(market.source, 'snapshot.marketFactors')
+
+  // Contract 1.3.0: the request names the form of the engagement and the snapshot states its price ratio, the way the
+  // offer market names its market factor. A declared form without a ratio withholds the calculation: no ratio is ever
+  // assumed for it. A 1.3.0 request that declares no form is priced at ratio 1, which is what 1.2.0 prices.
+  const engagementFactors: PricingV3EngagementFactorV13[] =
+    ('engagementFactors' in config ? config.engagementFactors : undefined) ?? []
+
+  const engagementForm = 'engagementForm' in req ? req.engagementForm : undefined
+
+  const engagement =
+    engagementForm === undefined ? undefined : engagementFactors.find(item => item.form === engagementForm)
+
+  duplicate(
+    engagementFactors.map(item => item.form),
+    'snapshot.engagementFactors'
+  )
+
+  if (engagementForm !== undefined) {
+    if (!engagement) report('MISSING_ENGAGEMENT_FACTOR', 'snapshot.engagementFactors', 'missing')
+    else sourceOk(engagement.source, 'snapshot.engagementFactors')
+  }
+
+  // The ratio every row of a 1.3.0 result is priced with; undefined in the contracts that have no such thing.
+  const engagementRatio = v13 ? (engagement?.priceRatio ?? '1') : undefined
+
   if (config.mode === 'historical') report('HISTORICAL_ONLY', 'snapshot.mode', 'review')
 
   const allocatedCoverage = new Map<string, Decimal>()
   const allocationIds = new Set<string>()
-  const pendingRows: { line: Row; rawCost: Decimal; rawPrice: Decimal; rawBasePrice: Decimal; rawCash: Decimal }[] = []
+
+  const pendingRows: {
+    line: Row
+    rawCost: Decimal
+    rawPrice: Decimal
+    rawFormlessPrice: Decimal
+    rawBasePrice: Decimal
+    rawCash: Decimal
+  }[] = []
 
   for (const [index, line] of req.lines.entries()) {
     const path = `request.lines.${index}`
@@ -496,10 +560,33 @@ function calculate(raw: unknown): Draft {
         const sum = (key: 'cost' | 'price' | 'cashCommitment') =>
           group.reduce((total, component) => total.plus(component[key]), new D(0))
 
+        // Price of the row at engagement ratio 1: what the pricing policy and the market factor form, and all that
+        // contracts 1.0.0 to 1.2.0 ever price.
+        const formlessPrice = sum('price')
+
+        // Contract 1.3.0. The engagement ratio enters here, on every component the row sells and in both billing
+        // classes: after the pricing policy (cost x multiplier) and after the market factor (human component only),
+        // before the row is presented, rounded commercially or adjusted. Cost and cash are not touched: the form of
+        // the commitment changes what the client pays, never what the work costs. A stored component price is the
+        // price it is sold at, so the components of a row still add up to its raw price; the trace names the ratio.
+        const sold =
+          engagementRatio === undefined
+            ? group
+            : group.map(component => ({
+                ...component,
+                price: new D(component.price).mul(engagementRatio).toString(),
+                trace: { ...component.trace, engagementPriceRatio: engagementRatio }
+              }))
+
         pendingRows.push({
           rawCost: sum('cost'),
-          rawPrice: sum('price'),
-          // Same components in the same order, with the human one at its base-market price.
+          rawPrice:
+            engagementRatio === undefined
+              ? formlessPrice
+              : sold.reduce((total, component) => total.plus(component.price), new D(0)),
+          rawFormlessPrice: formlessPrice,
+          // Same components in the same order, with the human one at its base-market price. Read at engagement
+          // ratio 1, like `rawFormlessPrice`: the two are the terms of the market ratio rho (see below).
           rawBasePrice: group.reduce(
             (total, component) => total.plus(component.kind === 'human' ? humanBasePrice : component.price),
             new D(0)
@@ -513,15 +600,17 @@ function calculate(raw: unknown): Draft {
             label: profile.label,
             cost: '',
             ...(v12 ? { marketAdjustment: '' } : {}),
+            ...(v13 ? { engagementAdjustment: '' } : {}),
             undiscountedPrice: '',
             ...(v11 ? { roundingAdjustment: '' } : {}),
             discount: '',
             ...(v11 ? { uplift: '' } : {}),
             net: '',
             marginAmount: '',
-            components: group,
+            components: sold,
             minimumMargin: policy.minimumMargin,
-            ...(v12 ? { marketPriceRatio: '', floorNet: '' } : {})
+            ...(v12 ? { marketPriceRatio: '', floorNet: '' } : {}),
+            ...(v13 ? { engagementPriceRatio: '' } : {})
           }
         })
       }
@@ -579,24 +668,37 @@ function calculate(raw: unknown): Draft {
   // Contract 1.2.0: the market factor declared its floor on the base market and lowered the price. The floor of a row
   // is then its base-market floor scaled by how much the market lowered that row, rho = price / base price, both as
   // presented. Rows are kept here as the two terms of rho so every comparison stays a product, never a quotient.
+  //
+  // Contract 1.3.0: what "base-market price" means once an engagement ratio exists. The form of the engagement is a
+  // commercial condition of the quote, not a country effect, so it belongs to the base-market price as much as to the
+  // price of the market: the base-market price of a row is its price at market factor 1 under the same form. The
+  // ratio therefore multiplies both terms of rho and leaves it as it was, and rho is read where contract 1.2.0 reads
+  // it, on the two prices at engagement ratio 1, as presented. Two consequences, both intended:
+  //   - the floor of a row (`floorNet`, and `minimumMargin` itself) is digit for digit the floor of the same row
+  //     quoted without a form. The engagement ratio never relaxes or moves it, not even by a rounding unit;
+  //   - the net judged against that floor carries the ratio. A ratio above 1 is margin the row really has; a ratio
+  //     below 1 (a commitment discount) can take the row under its floor, and then it is flagged like any other price.
   const floorFollowsBaseMarket =
     v12 && market?.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS && new D(market.factor).lt(1)
 
   const marketFloor = new Map<Row, { price: Decimal; basePrice: Decimal }>()
 
-  for (const { line, rawCost, rawPrice, rawBasePrice } of pendingRows) {
+  for (const { line, rawCost, rawPrice, rawFormlessPrice, rawBasePrice } of pendingRows) {
     line.cost = money(rawCost.mul(outputFx))
     line.undiscountedPrice = money(rawPrice.mul(outputFx))
 
     if (v11) {
+      // Policy price of this quote: with the engagement ratio when the contract has one.
       const policyPrice = new D(line.undiscountedPrice)
+      // Policy price in the offer market at engagement ratio 1. Before contract 1.3.0 it is the policy price itself.
+      const marketPrice = new D(money(rawFormlessPrice.mul(outputFx)))
       const basePrice = new D(money(rawBasePrice.mul(outputFx)))
       const marginShare = new Wide(1).minus(line.minimumMargin)
 
       // A row whose price has no human component was not lowered by the market: rho is 1 and nothing changes for it.
       const scaled =
-        floorFollowsBaseMarket && policyPrice.lt(basePrice)
-          ? { price: new Wide(policyPrice), basePrice: new Wide(basePrice) }
+        floorFollowsBaseMarket && marketPrice.lt(basePrice)
+          ? { price: new Wide(marketPrice), basePrice: new Wide(basePrice) }
           : undefined
 
       let rounded = policyPrice
@@ -605,8 +707,12 @@ function calculate(raw: unknown): Draft {
 
       if (rounding && policyPrice.gt(0)) {
         const multiple = new D(rounding.multiple)
-        // With a base-market floor, "met the floor before rounding" is read on the base-market price.
-        const unroundedPrice = (scaled ? rawBasePrice : rawPrice).mul(outputFx)
+
+        // With a base-market floor, "met the floor before rounding" is read on the base-market price: the price of
+        // this row at market factor 1, which under contract 1.3.0 carries the engagement ratio like the price does.
+        const unroundedPrice = (
+          scaled ? (engagementRatio === undefined ? rawBasePrice : rawBasePrice.mul(engagementRatio)) : rawPrice
+        ).mul(outputFx)
 
         const compliant = !unroundedPrice
           .minus(rawCost.mul(outputFx))
@@ -629,8 +735,8 @@ function calculate(raw: unknown): Draft {
       }
 
       if (v12) {
-        line.marketAdjustment = money(policyPrice.minus(basePrice))
-        line.marketPriceRatio = scaled ? policyPrice.div(basePrice).toString() : '1'
+        line.marketAdjustment = money(marketPrice.minus(basePrice))
+        line.marketPriceRatio = scaled ? marketPrice.div(basePrice).toString() : '1'
         // cost x rho / (1 - minimumMargin), raised to the currency unit: an exact count of units, never a quotient.
         line.floorNet = money(
           (scaled
@@ -638,6 +744,12 @@ function calculate(raw: unknown): Draft {
             : ceilDiv(new Wide(line.cost), marginShare.mul(unit))
           ).mul(unit)
         )
+      }
+
+      if (engagementRatio !== undefined) {
+        // What the form added to (or took from) the price of this row in its market, before commercial rounding.
+        line.engagementAdjustment = money(policyPrice.minus(marketPrice))
+        line.engagementPriceRatio = engagementRatio
       }
 
       line.roundingAdjustment = money(rounded.minus(policyPrice))
@@ -745,6 +857,7 @@ function calculate(raw: unknown): Draft {
     key:
       | 'cost'
       | 'marketAdjustment'
+      | 'engagementAdjustment'
       | 'undiscountedPrice'
       | 'roundingAdjustment'
       | 'discount'
@@ -776,6 +889,7 @@ function calculate(raw: unknown): Draft {
   result.totals = {
     cost: money(sumLines('cost')),
     ...(v12 ? { marketAdjustment: money(sumLines('marketAdjustment')) } : {}),
+    ...(v13 ? { engagementAdjustment: money(sumLines('engagementAdjustment')) } : {}),
     undiscountedPrice: money(sumLines('undiscountedPrice')),
     ...(v11 ? { roundingAdjustment: money(sumLines('roundingAdjustment')) } : {}),
     discount: money(sumLines('discount')),

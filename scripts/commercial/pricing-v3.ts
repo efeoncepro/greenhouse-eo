@@ -24,6 +24,8 @@ import {
 import { planCreditBudget, creditCatalogSchema } from '../../src/lib/finance/pricing-v3/resources/credit-budget'
 import { quotePriceNotices } from '../../src/lib/finance/pricing-v3/resources/price-review'
 import { splitQuotedPrice } from '../../src/lib/finance/pricing-v3/resources/price-split'
+import { commitmentExposure } from '../../src/lib/finance/pricing-v3/resources/commitment-exposure'
+import { presentPaymentSchedule, readEngagementCash } from '../../src/lib/finance/pricing-v3/resources/engagement-view'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -90,6 +92,7 @@ const options = {
   confirm: { type: 'string' },
   reason: { type: 'string' },
   tools: { type: 'string' },
+  milestones: { type: 'string' },
   label: { type: 'string' },
   current: { type: 'boolean' },
   help: { type: 'boolean' }
@@ -227,7 +230,20 @@ try {
       'confirm',
       'help'
     ],
-    compose: ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'format', 'brief', 'tools', 'label', 'help'],
+    compose: [
+      'catalog',
+      'policy',
+      'credits',
+      'current',
+      'input',
+      'out',
+      'format',
+      'brief',
+      'tools',
+      'label',
+      'milestones',
+      'help'
+    ],
     current: ['catalog', 'policy', 'credits', 'reason', 'confirm', 'input', 'out', 'help'],
     help: ['help']
   }
@@ -297,7 +313,7 @@ try {
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json]',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
           current:
@@ -385,7 +401,19 @@ try {
     }
   } else if (command === 'compose') {
     if (
-      !['prepare', 'quote', 'scaffold', 'plan', 'assess', 'preview', 'split', 'workload'].includes(subcommand) ||
+      ![
+        'prepare',
+        'quote',
+        'scaffold',
+        'plan',
+        'assess',
+        'preview',
+        'split',
+        'schedule',
+        'cash',
+        'commitments',
+        'workload'
+      ].includes(subcommand) ||
       positionals.length !== 2
     )
       throw new PricingV3Error('INVALID_ARGUMENT')
@@ -394,6 +422,10 @@ try {
       ? ['input', 'out', 'format', 'help']
       : subcommand === 'split'
         ? ['input', 'out', 'tools', 'label', 'help']
+        : subcommand === 'schedule'
+          ? ['input', 'out', 'milestones', 'help']
+          : ['cash', 'commitments'].includes(subcommand)
+            ? ['input', 'out', 'help']
         : subcommand === 'workload'
           ? ['input', 'brief', 'out', 'help']
           : subcommand === 'scaffold'
@@ -480,6 +512,37 @@ try {
       process.stdout.write(json(result))
       // A composition is always under review, exactly as `assess` and `preview` report it; a rejection exits 1.
       process.exitCode = 3
+    } else if (subcommand === 'schedule' || subcommand === 'cash') {
+      // Readings of a frozen quote, like `split`: verified by replay first, the total never changes.
+      const artifact = replayResourceComposition(load('input'))
+
+      const outcome =
+        subcommand === 'schedule'
+          ? presentPaymentSchedule(
+              artifact.semantic.result,
+              artifact,
+              // The reader validates the list; a file that is not an array is its `milestones:empty`-family issue.
+              readJson('milestones', required('milestones')) as Parameters<typeof presentPaymentSchedule>[2]
+            )
+          : readEngagementCash(artifact.semantic.result, artifact)
+
+      if (!outcome.ok)
+        throw new PricingV3Error(outcome.code, {
+          ...(subcommand === 'schedule' ? { option: 'milestones' } : {}),
+          issues: outcome.issues
+        })
+
+      if (values.out) writeNew(values.out, json(outcome.reading))
+      process.stdout.write(json(outcome.reading))
+      process.exitCode = 3
+    } else if (subcommand === 'commitments') {
+      // Needs the frozen policy, demand and catalog besides the result: alternatives and declared contract terms
+      // live there. It reports; whether a commitment is acceptable is the operator's call.
+      const reading = commitmentExposure(replayResourceComposition(load('input')))
+
+      if (values.out) writeNew(values.out, json(reading))
+      process.stdout.write(json(reading))
+      process.exitCode = reading.calculationStatus === 'calculated' ? 3 : 2
     } else {
       const artifact = runResourceComposition(loadCatalog(), load('policy'), load('credits'), load('input'))
 
@@ -633,7 +696,8 @@ try {
         'talent_factor',
         'market_factor',
         'fx',
-        'price_rounding'
+        'price_rounding',
+        'engagement_factor'
       ] as const
 
       if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number]))

@@ -1,16 +1,16 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Catalog v8 adds the managed-service offer of the SEO/AEO practice: target margin 55%, floor 45%. CEO decision of 2026-10-11 on the floor approved on 2026-07-13.",
+  "reason": "Catalog v9: engagement form with its price ratio (On-Demand 1.10), costed start-up provisions and CLP to USD. Policy v7: Adobe as invoiced, two products in CLP with a twelve-month contract term. Decisions of 2026-10-11.",
   "catalog": {
-    "path": "data/pricing/v3-operating/catalog.review-v8.json",
-    "version": "operating-review-2026-10-11-v8",
-    "digest": "63b586dec65c9ded2c4b4806f9693a24335dea9245b6ce188f302630c1d7a45d"
+    "path": "data/pricing/v3-operating/catalog.review-v9.json",
+    "version": "operating-review-2026-10-11-v9",
+    "digest": "2a329a9dd1c9fe672d221584a62f18c4146c3f2042103cd9478fa705cb11a29c"
   },
   "policy": {
-    "path": "data/pricing/v3-operating/resources.review-v6.json",
-    "version": "operating-review-2026-10-11-v6",
-    "digest": "f0bc05a6f16f852bc2ffe8116f386da289eba8a0665b18902f5189f5784c5d88"
+    "path": "data/pricing/v3-operating/resources.review-v7.json",
+    "version": "operating-review-2026-10-11-v7",
+    "digest": "6fbd94cef54bfcdcc981fd56204713d83cb2885514ad9b79d47eb608bcbe78fc"
   },
   "credits": {
     "path": "data/pricing/v3-resources/ai-credits.review-v1.json",

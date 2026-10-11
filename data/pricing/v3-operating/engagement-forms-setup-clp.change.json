@@ -1,0 +1,1033 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-engagement-forms-setup-clp-2026-10-11",
+  "baseDigest": "63b586dec65c9ded2c4b4806f9693a24335dea9245b6ce188f302630c1d7a45d",
+  "nextVersion": "operating-review-2026-10-11-v9",
+  "actor": "operator-authorized-agent",
+  "reason": "Three additions decided on 2026-10-11. (1) The form of the engagement as its own datum: On-Going ratio 1 and On-Demand ratio 1.10 on price, one record per form instead of a second set of pricing policies. (2) Start-up provisions costed instead of the workbook rule of one month of the resource: account onboarding (USD 200, once per person, default) and recruiting (USD 500, optional, only when a person has to be hired); both estimates proposed by the agent and accepted by the CEO; the USD 100 test placeholder stops being selected. (3) CLP to USD at the inverse of the quote FX, so a cost invoiced in CLP can be carried in its own currency. Pricing policies and floors are untouched.",
+  "changes": [
+    {
+      "operation": "add",
+      "recordId": "engagement:on_going",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "engagement:on_going",
+        "revision": 1,
+        "kind": "engagement_factor",
+        "source": {
+          "reference": "policy:ceo-engagement-form-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "On-Going engagement: the reference form, no premium (price ratio 1). Commercial-model multiplier of the pricing workbook, kept on 2026-10-11. General record: it applies to every offer without a record of its own.",
+        "value": {
+          "form": "on_going",
+          "priceRatio": "1"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "engagement:on_demand",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "engagement:on_demand",
+        "revision": 1,
+        "kind": "engagement_factor",
+        "source": {
+          "reference": "policy:ceo-engagement-form-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "On-Demand engagement: +10% on the price of every row (price ratio 1.10). It is the commercial-model multiplier of the pricing workbook. On 2026-10-11 the CEO asked whether 10% was right and left any adjustment to the agent, who kept it: it sits at the low end of the 10-15% that agencies discount a retainer against a project rate, and in V3 start-up, coordination and supplier commitments are costed apart instead of hiding in the premium. General record: it applies to every offer without a record of its own.",
+        "value": {
+          "form": "on_demand",
+          "priceRatio": "1.10"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "provision-account-onboarding",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "provision-account-onboarding",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "amount": "200",
+          "currency": "USD",
+          "resourceId": "provision-account-onboarding",
+          "label": "Account onboarding per person (accesses, brief, brand immersion) — estimate, not measured",
+          "kind": "setup",
+          "unit": "once",
+          "scope": "person",
+          "covers": [
+            "setup"
+          ]
+        },
+        "source": {
+          "reference": "policy:ceo-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up provision charged once for each person who joins an account: accesses, brief and brand immersion. Proposed by the agent and accepted by the CEO on 2026-10-11. Basis: about two days of the lead's time, from the catalog cost of the Creative Operations Lead profile (ECG-001, USD 1,900 a month); the figure is the accepted round amount, not a measurement. Estimated: to be measured on the next two real incorporations and then replaced. It replaces the placeholder trial-setup. The workbook rule of one month of the resource's cost as recruiting and onboarding fee is not carried into the quoter; the protection it sought belongs to the contract terms (minimum term, conversion clause)."
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "provision-recruiting",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "provision-recruiting",
+        "revision": 1,
+        "kind": "resource",
+        "value": {
+          "amount": "500",
+          "currency": "USD",
+          "resourceId": "provision-recruiting",
+          "label": "Recruiting of a new hire for the client — estimate, not measured",
+          "kind": "setup",
+          "unit": "once",
+          "scope": "person",
+          "covers": [
+            "recruiting"
+          ]
+        },
+        "source": {
+          "reference": "policy:ceo-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up provision charged once for each person who has to be hired for that client. Optional: it enters a quote only when the line selects it through choices (requirementId recruiting); it is never applied by default. Proposed by the agent and accepted by the CEO on 2026-10-11. Basis: about one week of selection work. Estimated: to be measured on the next two real incorporations and then replaced. The workbook rule of one month of the resource's cost is not carried into the quoter; the protection it sought belongs to the contract terms (minimum term, conversion clause)."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "generic-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "generic-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "generic-core",
+          "label": "Proposed generic-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-generic-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "visual-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "visual-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "visual-core",
+          "label": "Proposed visual-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "design",
+              "coverage": "tool:ETG-001",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-001"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "stock",
+              "coverage": "tool:stock",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-002",
+                "ETG-021"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "prototyping",
+              "coverage": "tool:ETG-019",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-019"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-visual-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "seo-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "seo-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "seo-core",
+          "label": "Proposed seo-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "seo-suite",
+              "coverage": "tool:seo",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-004",
+                "pending-seo-suite"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-seo-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "wordpress-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "wordpress-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "wordpress-core",
+          "label": "Proposed wordpress-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "hosting",
+              "coverage": "tool:ETG-009",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-009"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "page-builder",
+              "coverage": "tool:ETG-010",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-010"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "cache",
+              "coverage": "tool:ETG-011",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-011"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-wordpress-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "community-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "community-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "community-core",
+          "label": "Proposed community-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "social-management",
+              "coverage": "tool:ETG-003",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-003"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-community-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "development-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "development-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "development-core",
+          "label": "Proposed development-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "developer-ai",
+              "coverage": "tool:ETG-024",
+              "required": false,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-024"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-development-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "crm-core",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "crm-core",
+        "revision": 2,
+        "kind": "kit",
+        "value": {
+          "kitId": "crm-core",
+          "label": "Proposed crm-core",
+          "requirements": [
+            {
+              "requirementId": "collaboration",
+              "coverage": "tool:ETG-016",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-016"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "tracking",
+              "coverage": "tool:ETG-015",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-015"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "ai",
+              "coverage": "tool:ai",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-007",
+                "ETG-018"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "platform",
+              "coverage": "platform_fee",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "fee:{profileId}"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "assurance",
+              "coverage": "talent_assurance",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-assurance"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "operations",
+              "coverage": "operations",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "trial-operations"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            },
+            {
+              "requirementId": "setup",
+              "coverage": "setup",
+              "required": true,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-account-onboarding"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "recruiting",
+              "coverage": "recruiting",
+              "required": false,
+              "allowClientProvided": false,
+              "candidateResourceIds": [
+                "provision-recruiting"
+              ],
+              "quantityMode": "headcount",
+              "shareMode": "full"
+            },
+            {
+              "requirementId": "crm-platform",
+              "coverage": "tool:ETG-005",
+              "required": true,
+              "allowClientProvided": true,
+              "candidateResourceIds": [
+                "ETG-005"
+              ],
+              "quantityMode": "one",
+              "shareMode": "equal_consumers"
+            }
+          ]
+        },
+        "source": {
+          "reference": "hypothesis-only:kit-crm-core-setup-provisions-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Start-up requirements changed by the CEO decision of 2026-10-11: setup now resolves to the account onboarding provision, once per person; recruiting is a new optional requirement selected through choices. Every other requirement is unchanged and keeps its earlier standing: Proposed simulation kit. Account packages split equally among consuming lines, never by FTE. Sharing permissions still unverified."
+      }
+    },
+    {
+      "operation": "retire",
+      "recordId": "trial-setup",
+      "effectiveFrom": "2026-10-11"
+    },
+    {
+      "operation": "add",
+      "recordId": "fx:CLP:USD",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "fx:CLP:USD",
+        "revision": 1,
+        "kind": "fx",
+        "source": {
+          "reference": "policy:ceo-quote-fx-2026-10-10",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Inverse of the quote FX the CEO keeps at 1000 CLP per USD. It exists so a cost invoiced in CLP (for example the Adobe plan) enters the calculation and returns to a CLP quote at the same amount. A policy value, not a market observation; it must move together with fx:USD:CLP.",
+        "value": {
+          "from": "CLP",
+          "to": "USD",
+          "rate": "0.001"
+        }
+      }
+    }
+  ]
+}

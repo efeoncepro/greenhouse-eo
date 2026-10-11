@@ -178,7 +178,10 @@ describe('the verifier reports what disagrees and never the content', () => {
 })
 
 describe('--current fills only the sources the caller did not name', () => {
-  const demand = 'data/pricing/v3-operating/managed-care-colombia.demand.json'
+  // A demand written for the versions the pointer names today. A demand is a dated input: one written for an older
+  // policy can stop calculating when a profile recipe changes (it then asks for the allocation it lacks), which is
+  // the quoter working, not this flag failing.
+  const demand = 'data/pricing/v3-operating/designer-on-demand.demand.json'
   const olderCatalog = 'data/pricing/v3-operating/catalog.review-v3.json'
   const rest = ['--policy', pointer.policy.path, '--credits', pointer.credits.path]
 

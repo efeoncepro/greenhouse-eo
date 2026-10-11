@@ -194,6 +194,33 @@ describe('package and client coverage constraints', () => {
     d.allocations.push({ ...d.allocations[0], toolId: 'adobe-express', priceId: 'historical' })
     expect(codes(run(d))).toContain('BUNDLED_TOOL_DOUBLE_COUNT')
   })
+  it('counts a bundle twice only when the same line holds the plan and the product it includes', () => {
+    // Versions the pointer names: Creative Cloud Pro (bundles Adobe Express) for designers, Adobe Express on its own
+    // for content profiles. A mixed team is two people on two products, not one product charged twice.
+    const current = read('data/pricing/v3-operating/current.json')
+    const currentCatalog = read(current.catalog.path)
+    const currentPolicy = compositionPolicySchema.parse(read(current.policy.path))
+    const base = () => compositionDemandSchema.parse(operating('designer-on-demand.demand'))
+
+    const issues = (d: ReturnType<typeof base>) =>
+      composeResourceQuote(currentCatalog, currentPolicy, credits, d).quote.diagnostics.map(x => x.code)
+
+    expect(issues(base())).not.toContain('BUNDLED_TOOL_DOUBLE_COUNT')
+
+    const mixed = base()
+
+    mixed.brief.lines.push({ ...mixed.brief.lines[0], lineId: 'content', profile: 'ECG-007' })
+    mixed.work.push({ ...mixed.work[0], lineId: 'content', assigneeIds: ['content-slot'], aiToolIds: [], creditDemand: [] })
+
+    // The content line still lacks its own allocations here; what matters is that its Adobe Express does not turn
+    // the designer's plan into a double count.
+    expect(issues(mixed)).not.toContain('BUNDLED_TOOL_DOUBLE_COUNT')
+
+    const same = base()
+
+    same.work[0].tasks = [...same.work[0].tasks, 'express-design']
+    expect(issues(same)).toContain('BUNDLED_TOOL_DOUBLE_COUNT')
+  })
   it('blocks fictional package capacity and fractional named-license quantities', () => {
     const d = demand()
 

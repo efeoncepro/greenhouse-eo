@@ -6,8 +6,9 @@ import type { composeResourceQuote } from './composition'
 type Composition = ReturnType<typeof composeResourceQuote>
 
 // Component price x output FX x row net must be exact for any amount the kernel can store, as in its own floor
-// arithmetic: 80 digits only cover two of the three. Nothing is divided here except through an integer quotient or
-// for a ratio that is only read.
+// arithmetic: 80 digits only cover two of the three. The floor of a part multiplies a cost, a price and, from contract
+// 1.3.0, the engagement ratio, which fits as well. Nothing is divided here except through an integer quotient or for a
+// ratio that is only read.
 const Wide = Decimal.clone({ precision: 240, rounding: Decimal.ROUND_HALF_UP })
 
 export const PRICE_SPLIT_VERSION = 'pricing-v3-price-split/1'
@@ -49,6 +50,9 @@ type Amounts = { cost: Decimal; net: Decimal }
  * 2. Market factor (contract 1.2.0). The kernel multiplies the human component only; a tool component is stored with
  *    market factor 1. The kit therefore carries none of `marketAdjustment`: all of it stays in the person part, and
  *    the kit costs the same in every market.
+ *    Engagement form (contract 1.3.0). The kernel multiplies every component of the row by the ratio of the declared
+ *    form, tools included, and stores each component at the price it is sold at. The kit therefore takes the ratio
+ *    like the person does and carries its own share of `engagementAdjustment`: nothing is moved between the parts.
  * 3. Commercial rounding (`roundingAdjustment`). It raises the row as a whole to the next multiple and belongs to no
  *    component, so it stays in the person part, which is the unit the row sells. The kit is then presented under the
  *    same catalog rule as any priced figure: raised to the next multiple (never rounded down, the kernel never
@@ -69,8 +73,9 @@ type Amounts = { cost: Decimal; net: Decimal }
  * Floor. `minimumMargin` belongs to the row and the row verdict is the kernel's `MARGIN_BELOW_FLOOR`, never
  * recomputed. Each part is then measured against that same minimum on its own cost: the kit on its final net (the
  * market never lowered it), the person with the kernel's base-market rule when the row has one, where the ratio is
- * the person's own price over its own base-market price (the kit price is equal in both and leaves both terms). With
- * no tool shown apart in a row the person floor is the row `floorNet`, digit for digit. A part under the floor in a
+ * the person's own price over its own base-market price (the kit price is equal in both and leaves both terms). The
+ * engagement ratio moves no floor, as in the kernel: it multiplies both terms of that ratio and cancels. With no
+ * tool shown apart in a row the person floor is the row `floorNet`, digit for digit. A part under the floor in a
  * row that meets it is reported, not repaired: it is the information that dropping the kit, or selling it alone,
  * would not hold the policy.
  *
@@ -185,12 +190,21 @@ export function splitQuotedPrice(
           : ceilDiv(cost, marginShare.mul(unit))
         ).mul(unit)
 
-      // Contract 1.2.0 with a base-market floor: policy price and base-market price of the row, by the identities
-      // the kernel documents for its stored amounts. The kit price is the same in both markets.
+      // Contract 1.2.0 with a base-market floor: price of the row in its market and in the base market, by the
+      // identities the kernel documents for its stored amounts. The kit price is the same in both markets.
+      //
+      // Contract 1.3.0: the kernel reads those two prices at engagement ratio 1, so `engagementAdjustment` comes off
+      // first, while the stored kit price carries the ratio. Both row prices are multiplied by the ratio here instead
+      // of dividing the kit by it: the two terms keep their proportion, which is all the floor uses, and stay exact.
       const policyPrice = undiscounted.minus('roundingAdjustment' in row ? row.roundingAdjustment : 0)
-      const basePrice = policyPrice.minus('marketAdjustment' in row ? row.marketAdjustment : 0)
-      const personPrice = policyPrice.minus(toolsPrice)
-      const personBasePrice = basePrice.minus(toolsPrice)
+      const marketPrice = policyPrice.minus('engagementAdjustment' in row ? row.engagementAdjustment : 0)
+      const basePrice = marketPrice.minus('marketAdjustment' in row ? row.marketAdjustment : 0)
+
+      const atRowRatio = (price: Decimal) =>
+        'engagementPriceRatio' in row ? price.mul(row.engagementPriceRatio) : price
+
+      const personPrice = atRowRatio(marketPrice).minus(toolsPrice)
+      const personBasePrice = atRowRatio(basePrice).minus(toolsPrice)
 
       const loweredByMarket =
         'marketPriceRatio' in row &&
@@ -233,6 +247,8 @@ export function splitQuotedPrice(
           marginRateRoundedDown: net.gt(0) ? ratioForReading(new Wide(row.marginAmount).div(net)) : null,
           minimumMargin: row.minimumMargin,
           ...('floorNet' in row ? { floorNet: row.floorNet } : {}),
+          // From contract 1.3.0: the ratio of the declared form, already inside every price of the row.
+          ...('engagementPriceRatio' in row ? { engagementPriceRatio: row.engagementPriceRatio } : {}),
           rowBelowFloor,
           tools: {
             ...readPart(tools, toolsFloor, toolsBelowFloor),
@@ -289,7 +305,13 @@ export function splitQuotedPrice(
     basis: [
       'tools.net: stored price of the selected tool components (cost x pricing multiplier; a market factor never applies to a tool) x row net / row undiscountedPrice, raised to the price-rounding multiple of the quote when it has one and read at the currency unit otherwise; never above the row net.',
       'person.net: row net - tools.net. It keeps the person, the market adjustment, the platform fee, provisions, every tool not shown apart and the commercial rounding of the row.',
-      'cost: frozen cost of the components of each part; person.cost is the remainder of the row cost. floorNet of a part is the smallest net that meets the row minimumMargin on that cost; rowBelowFloor is the kernel verdict.'
+      'cost: frozen cost of the components of each part; person.cost is the remainder of the row cost. floorNet of a part is the smallest net that meets the row minimumMargin on that cost; rowBelowFloor is the kernel verdict.',
+      // Said only of a quote that declares the form of its engagement; every earlier reading keeps its three entries.
+      ...(everyRow.some(({ row }) => 'engagementPriceRatio' in row)
+        ? [
+            'engagement form: the stored price of every component, tools included, already carries the price ratio of the declared form (engagementPriceRatio), so each part holds its own share of the engagement adjustment. The ratio moves no floor.'
+          ]
+        : [])
     ],
     tools: {
       label: choice.label ?? PRICE_SPLIT_DEFAULT_LABEL,

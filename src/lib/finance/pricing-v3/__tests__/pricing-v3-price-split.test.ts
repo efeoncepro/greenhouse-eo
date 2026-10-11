@@ -577,6 +577,156 @@ describe('each part is measured against the floor of its row, and nothing is rep
   })
 })
 
+describe('a quote that declares the form of its engagement (contract 1.3.0)', () => {
+  // Built in memory from the frozen inputs of the Colombia case (market factor 0.90 with a base-market floor, COP
+  // rounded to 50.000): the same demand with and without a form, over the same catalog with the ratios added. The
+  // quote without a form is priced by contract 1.2.0, which the frozen corpus guards; it is the reference here.
+  const { catalog, policy, credits, demand } = frozen(COLOMBIA).semantic
+
+  const source = { reference: 'price-split-test', effectiveFrom: '2026-01-01', effectiveUntil: '9999-12-31' }
+
+  const formRecord = (form: string, priceRatio: string) => ({
+    recordId: `engagement:${form}`,
+    revision: 1,
+    kind: 'engagement_factor',
+    source: { ...source, status: 'confirmed' },
+    note: 'Price ratio of a form of engagement, declared for the test.',
+    value: { form, priceRatio }
+  })
+
+  const withForms = (base: unknown, rounding = true) => {
+    const next = clone(base) as { records: { kind: string }[] }
+
+    next.records.push(formRecord('on_going', '1'), formRecord('on_demand', '1.10'), formRecord('committed', '0.90'))
+    if (!rounding) next.records = next.records.filter(r => r.kind !== 'price_rounding')
+
+    return next
+  }
+
+  const quoted = (form?: string, rounding = true) => {
+    const declared = clone(demand) as typeof demand & { brief: { engagementForm?: string } }
+
+    if (form) declared.brief.engagementForm = form
+
+    const result = composeResourceQuote(withForms(catalog, rounding), policy, credits, declared)
+
+    expect(result.quote.calculationStatus).toBe('calculated')
+
+    return result
+  }
+
+  const identity = { calculationId: 'composition-under-test', replayDigest: 'digest-under-test' }
+
+  const splitOf = (result: Composition, tools: 'all' | string[] = 'all') =>
+    splitQuotedPrice(result, identity, { tools })
+
+  const without = quoted()
+  const onDemand = quoted('on_demand')
+
+  it('the premise: a 1.3.0 quote over a market floor, with tools in every row and more to pay than without a form', () => {
+    expect(engineOf(without)).toBe(PRICING_V3_ENGINES['1.2.0'])
+    expect(engineOf(onDemand)).toBe(PRICING_V3_ENGINES['1.3.0'])
+    expect(new D(onDemand.quote.totals!.net).gt(without.quote.totals!.net)).toBe(true)
+    expect(kernelRows(onDemand).every(({ row }) => 'marketPriceRatio' in row && row.marketPriceRatio !== '1')).toBe(
+      true
+    )
+    expect(kernelRows(onDemand).every(({ row }) => kernelToolPrice(row).gt(0))).toBe(true)
+  })
+
+  it('tools + person is the row, to the unit, for every form and every choice of tools', () => {
+    for (const result of [onDemand, quoted('on_going'), quoted('committed'), quoted('on_demand', false)]) {
+      const tools = attributedTools(result)
+
+      for (const choice of ['all', ...tools.map(id => [id]), tools.slice(0, 2)] as ('all' | string[])[])
+        expectExact(result, splitOf(result, choice))
+    }
+  })
+
+  it('the kit takes the ratio like every other component of the row', () => {
+    // Without a rounding rule the kit is read at the currency unit, so it shows the ratio and nothing else.
+    const before = quoted(undefined, false)
+    const after = quoted('on_demand', false)
+    const kitBefore = splitOf(before).rows
+    const kitAfter = splitOf(after).rows
+
+    for (const [index, { row }] of kernelRows(after).entries()) {
+      const earlier = kernelRows(before)[index].row
+      const unit = unitOf(row.net)
+
+      // What the kernel stored for the tool components: the prior price times 1.10, to its working precision.
+      expect(kernelToolPrice(row).div(kernelToolPrice(earlier)).minus('1.10').abs().lt('1e-60')).toBe(true)
+      expect(new D(kitAfter[index].tools.policyPrice).minus(kernelToolPrice(row)).abs().lte(unit.div(2))).toBe(true)
+      expect(new D(kitAfter[index].tools.net).minus(kernelToolPrice(earlier).mul('1.10')).abs().lte(unit.div(2))).toBe(
+        true
+      )
+      expect(new D(kitAfter[index].tools.net).gt(kitBefore[index].tools.net)).toBe(true)
+      // Cost is the frozen cost of the same components: the form does not move it, in either part.
+      expect(kitAfter[index].tools.cost).toBe(kitBefore[index].tools.cost)
+      expect(kitAfter[index].person.cost).toBe(kitBefore[index].person.cost)
+      expect(kitAfter[index].engagementPriceRatio).toBe('1.10')
+      expect(kitBefore[index]).not.toHaveProperty('engagementPriceRatio')
+    }
+  })
+
+  it('with a rounding rule the kit is the ratioed price raised to the multiple of the quote', () => {
+    const s = splitOf(onDemand)
+
+    for (const [index, { periodId, row }] of kernelRows(onDemand).entries()) {
+      const multiple = multipleOf(onDemand, periodId)!
+      const gap = new D(s.rows[index].tools.net).minus(kernelToolPrice(row).mul(row.net).div(row.undiscountedPrice))
+
+      expect(new D(s.rows[index].tools.net).mod(multiple).isZero()).toBe(true)
+      expect(gap.gte(0) && gap.lt(multiple)).toBe(true)
+    }
+  })
+
+  it('the ratio moves no floor: each part is measured against the floor it has without a form', () => {
+    for (const form of ['on_going', 'on_demand', 'committed']) {
+      const result = quoted(form)
+
+      for (const tools of ['all', ['social-inbox']] as ('all' | string[])[]) {
+        const before = splitOf(without, tools).rows
+        const after = splitOf(result, tools).rows
+
+        for (const [index, part] of after.entries()) {
+          expect(part.tools.floorNet).toBe(before[index].tools.floorNet)
+          expect(part.person.floorNet).toBe(before[index].person.floorNet)
+          expect('floorNet' in part && part.floorNet).toBe('floorNet' in before[index] && before[index].floorNet)
+        }
+      }
+    }
+  })
+
+  it('with no tool shown apart in a row, the person floor is the floor the kernel stored, digit for digit', () => {
+    const stored = kernelRows(onDemand).map(({ row }) => ('floorNet' in row ? row.floorNet : null))
+    const inboxOnly = splitOf(onDemand, ['social-inbox']).rows
+    const untouched = inboxOnly.flatMap((part, index) => (part.tools.components.length === 0 ? [index] : []))
+
+    expect(stored.every(floorNet => floorNet !== null)).toBe(true)
+    expect(untouched.length).toBeGreaterThan(0)
+    for (const index of untouched) expect(inboxOnly[index].person.floorNet).toBe(stored[index])
+  })
+
+  it('the row verdict is the kernel one for a ratio under 1, and each part still says its own', () => {
+    const committed = quoted('committed')
+    const s = splitOf(committed)
+
+    expect(kernelFloor(committed).length).toBeGreaterThan(0)
+    expect(s.floor.rowsBelowFloor.map(r => `${r.periodId}:${r.lineId}`)).toEqual(kernelFloor(committed))
+
+    for (const part of s.rows) {
+      for (const side of [part.tools, part.person]) expect(side.belowFloor).toBe(new D(side.net).lt(side.floorNet))
+      if (part.rowBelowFloor) expect(part.partsBelowFloorWhileRowMeetsIt).toEqual([])
+    }
+  })
+
+  it('says that the prices carry the ratio only for a quote that declares a form', () => {
+    expect(splitOf(onDemand).basis.length).toBe(splitOf(without).basis.length + 1)
+    expect(splitOf(without).basis).toEqual(split(COLOMBIA, 'all').basis)
+    expect(JSON.stringify(splitOf(without))).not.toMatch(/engagement/i)
+  })
+})
+
 describe('compose split on the command line', () => {
   const dir = mkdtempSync(join(tmpdir(), 'pricing-v3-price-split-'))
 

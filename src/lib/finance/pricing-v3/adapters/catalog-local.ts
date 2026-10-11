@@ -54,8 +54,9 @@ export function explainCatalogQuote(raw: unknown) {
     },
     ...result,
     maintenance: 'Frozen catalog. New values affect only a new quote or explicit revision.',
+    // An `engagement_factor` binding exists only in a quote whose brief declares the form (contract 1.3.0).
     factorAndFxReferences: result.resolution.bindings.filter(b =>
-      ['talent_factor', 'market_factor', 'fx'].includes(b.purpose)
+      ['talent_factor', 'market_factor', 'engagement_factor', 'fx'].includes(b.purpose)
     ),
     costBreakdown: explainCostComponents(result),
     commercialAdjustments: explainCommercialAdjustments(result)

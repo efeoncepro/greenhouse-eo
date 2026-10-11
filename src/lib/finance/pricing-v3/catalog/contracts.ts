@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  pricingV3EngagementFactorSchemaV13,
   pricingV3MarketFactorSchemaV12,
   pricingV3PriceRoundingSchema,
   pricingV3RequestSchema,
@@ -94,6 +95,13 @@ export const catalogRecordSchema = z.union([
         offerId: id.optional()
       })
       .strict()
+  ),
+  // Price ratio of a form of engagement (contract 1.3.0): one record per form, the single source of its premium or
+  // discount for every pricing policy. Forms are data, so the catalog decides which exist. With `offerId` the record
+  // governs that offer and prevails over the general one of the same form. The ratio is bounded like a market factor.
+  record(
+    'engagement_factor',
+    pricingV3EngagementFactorSchemaV13.omit({ source: true }).extend({ offerId: id.optional() }).strict()
   )
 ])
 
@@ -140,6 +148,9 @@ export const briefSchema = z
     quoteDate: date,
     offerId: id,
     engagementCode: id,
+    // Form of the engagement (contract 1.3.0), by the id of an `engagement_factor` record. It is a datum apart from
+    // `engagementCode`, which keeps selecting the pricing policy. Absent, the brief parses and resolves as it always did.
+    engagementForm: id.optional(),
     accountId: id,
     offerMarketCountry: z.string().regex(/^[A-Z]{2}$/),
     outputCurrency: z.string().regex(/^[A-Z]{3}$/),

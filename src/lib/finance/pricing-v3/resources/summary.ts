@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 
 import type { PricingV3LineV12 } from '../calculate'
-import { describeCommercialTerms, describeMarketFactor } from '../catalog/explain'
+import { describeCommercialTerms, describeEngagementForm, describeMarketFactor } from '../catalog/explain'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -514,6 +514,7 @@ export function summarizeComposition(result: Composition, identity: { calculatio
 
   const floorLines = linesBelowPolicyFloor(result)
   const marketFactor = describeMarketFactor(quote.resolution)
+  const engagementForm = describeEngagementForm(quote.resolution)
 
   const selection = (s: Composition['selections'][number]) => ({
     lineId: s.lineId,
@@ -540,15 +541,20 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     reviewStatus: result.reviewStatus,
     quoteReviewStatus: quote.reviewStatus,
     // Contract the kernel calculated with: 1.1.0 only when the demand or the catalog uses agreed nets or rounding;
-    // 1.2.0 only when the market factor of the quote declares its floor on the base market.
+    // 1.2.0 only when the market factor of the quote declares its floor on the base market; 1.3.0 only when the
+    // demand declares the form of the engagement.
     engineVersion: quote.periods[0]?.result.engineVersion ?? null,
     // 1.1.0 totals add `roundingAdjustment` (already inside `undiscountedPrice`) and `uplift`; 1.2.0 totals add
-    // `marketAdjustment` (price with the market factor minus price of the base market, also inside it).
+    // `marketAdjustment` (price with the market factor minus price of the base market, also inside it); 1.3.0 totals
+    // add `engagementAdjustment` (price with the ratio of the form minus the same price at ratio 1, also inside it).
     totals: quote.totals,
     // Adjustments as the frozen demand declares them and the rounding rule in force for the output currency.
     ...describeCommercialTerms(quote.resolution),
     // Present only for a market factor that changes something (not 1, or with a declared floor basis).
     ...(marketFactor ? { marketFactor } : {}),
+    // Present only when the demand declares the form of the engagement, also with a ratio of 1: form, ratio and the
+    // record that states it. What it moved is `totals.engagementAdjustment`.
+    ...(engagementForm ? { engagementForm } : {}),
     // `totals.marginRate` keeps the exact stored ratio; this is the same ratio at reading precision. It is the real
     // margin of the final net in every contract, never a base-market equivalent.
     marginRateRoundedDown: quote.totals?.marginRate ? ratioForReading(new D(quote.totals.marginRate)) : null,

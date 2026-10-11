@@ -79,6 +79,27 @@ export function describeMarketFactor(resolution: Quote['resolution']) {
 }
 
 /**
+ * Form of the engagement a frozen quote declares and the price ratio resolution bound for it (contract 1.3.0). Null
+ * when the brief declares no form. Unlike the market factor, a ratio of 1 is reported too: the declared form is part
+ * of what the quote freezes, whatever it does to the price.
+ */
+export function describeEngagementForm(resolution: Quote['resolution']) {
+  const engagement = resolution.bindings.find(b => b.purpose === 'engagement_factor')?.record
+
+  if (engagement?.kind !== 'engagement_factor') return null
+
+  return {
+    form: engagement.value.form,
+    priceRatio: engagement.value.priceRatio,
+    scope: engagement.value.offerId ? ('offer' as const) : ('general' as const),
+    offerId: engagement.value.offerId ?? null,
+    recordId: engagement.recordId,
+    revision: engagement.revision,
+    sourceStatus: engagement.source.status
+  }
+}
+
+/**
  * Commercial terms a frozen quote was resolved with: the adjustments its brief declares and the rounding rule
  * resolution bound for the output currency. A selection readout; every amount stays the kernel's.
  */
@@ -108,29 +129,42 @@ const MARKET_IDENTITY =
   ' undiscountedPrice - roundingAdjustment - marketAdjustment is the price of the base market (market factor 1).' +
   ' A row is under its floor when net < floorNet; the margin reported is always the real one, on the final net.'
 
+// Contract 1.3.0 puts the engagement ratio on top of the market price, so one more amount is taken off to reach the
+// base. The floor sentence is the same: the ratio moves the net, never `floorNet`.
+const ENGAGEMENT_IDENTITY =
+  ' undiscountedPrice - roundingAdjustment - engagementAdjustment is the price of the offer market at engagement' +
+  ' ratio 1; less marketAdjustment it is the price of the base market (market factor 1) at that ratio.' +
+  ' A row is under its floor when net < floorNet; floorNet is the one of the same row quoted without a form, and' +
+  ' the margin reported is always the real one, on the final net.'
+
 /**
  * Internal price walk per billable row, as the kernel stored it. Contract 1.1.0 rows add rounding and uplift; contract
- * 1.2.0 rows add the market adjustment and the floor of that market.
+ * 1.2.0 rows add the market adjustment and the floor of that market; contract 1.3.0 rows add the engagement
+ * adjustment and the ratio of the declared form.
  */
 export function explainCommercialAdjustments(result: Quote) {
-  const v12 = result.periods.some(period => period.result.engineVersion === PRICING_V3_ENGINES['1.2.0'])
+  const v13 = result.periods.some(period => period.result.engineVersion === PRICING_V3_ENGINES['1.3.0'])
+  const v12 = v13 || result.periods.some(period => period.result.engineVersion === PRICING_V3_ENGINES['1.2.0'])
 
   return {
     ...describeCommercialTerms(result.resolution),
     ...(v12 ? { marketFactor: describeMarketFactor(result.resolution) } : {}),
-    identity: v12 ? IDENTITY + MARKET_IDENTITY : IDENTITY,
+    ...(v13 ? { engagementForm: describeEngagementForm(result.resolution) } : {}),
+    identity: v13 ? IDENTITY + ENGAGEMENT_IDENTITY : v12 ? IDENTITY + MARKET_IDENTITY : IDENTITY,
     rows: result.periods.flatMap(period =>
       period.result.lines.map(line => ({
         periodId: period.periodId,
         lineId: line.lineId,
         kind: line.kind,
         ...('marketAdjustment' in line ? { marketAdjustment: line.marketAdjustment } : {}),
+        ...('engagementAdjustment' in line ? { engagementAdjustment: line.engagementAdjustment } : {}),
         undiscountedPrice: line.undiscountedPrice,
         ...('roundingAdjustment' in line ? { roundingAdjustment: line.roundingAdjustment } : {}),
         discount: line.discount,
         ...('uplift' in line ? { uplift: line.uplift } : {}),
         net: line.net,
-        ...('floorNet' in line ? { marketPriceRatio: line.marketPriceRatio, floorNet: line.floorNet } : {})
+        ...('floorNet' in line ? { marketPriceRatio: line.marketPriceRatio, floorNet: line.floorNet } : {}),
+        ...('engagementPriceRatio' in line ? { engagementPriceRatio: line.engagementPriceRatio } : {})
       }))
     )
   }

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 
 import { PRICING_V3_MARKET_FLOOR_BASIS } from '../schemas'
-import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV12 } from '../schemas'
+import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV13 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
 import { briefSchema } from './contracts'
 import type { CatalogRecord, Diagnostic } from './contracts'
@@ -11,8 +11,9 @@ const D = Decimal.clone({ precision: 80 })
 type Row<K extends CatalogRecord['kind']> = Extract<CatalogRecord, { kind: K }>
 
 // Built as the widest contract; `schemaVersion` says which one each quote declares and the kernel parses it as such.
-type KernelSnapshot = Omit<PricingV3InputV12['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
-type KernelRequest = Omit<PricingV3InputV12['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+// The keys contract 1.3.0 added are optional in it and are set only for a quote of that contract.
+type KernelSnapshot = Omit<PricingV3InputV13['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+type KernelRequest = Omit<PricingV3InputV13['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
 
 type KitAssignment = {
   requirement: Row<'kit'>['value']['requirements'][number]
@@ -105,17 +106,42 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     bind('*', 'price_rounding', rounding)
   }
 
+  // The form of the engagement is one record per form: the single source of its price ratio, whatever the pricing
+  // policy. The record of the offer prevails over the general one; none in force for the declared form is a missing
+  // selection and two of the prevailing level an ambiguous one, never a silent pick or an assumed ratio of 1.
+  const formRecords =
+    brief.engagementForm === undefined
+      ? []
+      : kind('engagement_factor').filter(r => r.value.form === brief.engagementForm)
+
+  const offerForms = formRecords.filter(r => r.value.offerId === brief.offerId)
+
+  const engagement =
+    brief.engagementForm === undefined
+      ? undefined
+      : unique(offerForms.length ? offerForms : formRecords.filter(r => !r.value.offerId), 'engagementForm')
+
+  if (engagement) bind('*', 'engagement_factor', engagement)
+
   // Contract 1.1.0 only when the frozen inputs use what 1.0.0 cannot express; everything else stays 1.0.0, so a quote
   // frozen before 1.1.0 existed resolves to the contract and digest it was signed with. Same answer for every period.
   //
   // Contract 1.2.0 only when the market factor selected for this quote declares its floor basis. It is a property of
   // the record, never of the factor's value: a catalog frozen before 1.2.0 cannot declare it and resolves as it did.
+  //
+  // Contract 1.3.0 only when the brief declares the form of the engagement, also when its ratio is 1: the declared
+  // form is part of what the quote freezes. A brief frozen before 1.3.0 cannot declare it and resolves as it did,
+  // whatever `engagement_factor` records its catalog later holds.
   const contract: PricingV3ContractVersion =
-    market?.value.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS
-      ? '1.2.0'
-      : applicableRules.length > 0 || brief.adjustments.length > 1 || brief.adjustments.some(a => a.kind !== 'discount')
-        ? '1.1.0'
-        : '1.0.0'
+    brief.engagementForm !== undefined
+      ? '1.3.0'
+      : market?.value.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS
+        ? '1.2.0'
+        : applicableRules.length > 0 ||
+            brief.adjustments.length > 1 ||
+            brief.adjustments.some(a => a.kind !== 'discount')
+          ? '1.1.0'
+          : '1.0.0'
 
   const selected = brief.lines.flatMap(line => {
     const path = `lines.${line.lineId}`
@@ -339,7 +365,15 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       talentFactors: talentFactors.map(r => ({ ...r.value, source: r.source })),
       marketFactors: market ? [{ ...market.value, source: market.source }] : [],
       fx: fx.map(r => ({ ...r.value, source: r.source })),
-      ...(rounding ? { priceRounding: { multiple: rounding.value.multiple, source: rounding.source } } : {})
+      ...(rounding ? { priceRounding: { multiple: rounding.value.multiple, source: rounding.source } } : {}),
+      // Only the ratio resolution selected reaches the kernel; which offer the record governs was decided above.
+      ...(contract === '1.3.0'
+        ? {
+            engagementFactors: engagement
+              ? [{ form: engagement.value.form, priceRatio: engagement.value.priceRatio, source: engagement.source }]
+              : []
+          }
+        : {})
     }
 
     const request: KernelRequest = {
@@ -348,6 +382,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       offerId: brief.offerId,
       deliveryModel: 'staffing',
       engagementCode: brief.engagementCode,
+      ...(brief.engagementForm !== undefined ? { engagementForm: brief.engagementForm } : {}),
       offerMarketCountry: brief.offerMarketCountry,
       outputCurrency: brief.outputCurrency,
       duration: { unit: 'month', periods: 1 },

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 
 import { calculatePricingV3 } from '../calculate'
-import type { PricingV3TotalsV12 } from '../calculate'
+import type { PricingV3TotalsV13 } from '../calculate'
 import { PRICING_V3_ENGINES } from '../schemas'
 import { resolveBrief } from './resolve'
 import type { Diagnostic } from './contracts'
@@ -48,11 +48,12 @@ export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrie
 
     // Resolution declares one contract per quote. The amounts a contract added are summed only for a quote of that
     // contract or a later one; an earlier quote keeps the key set its artifacts were frozen with (absent, not zero).
-    const v12 = periods.every(p => p.result.engineVersion === PRICING_V3_ENGINES['1.2.0'])
+    const v13 = periods.every(p => p.result.engineVersion === PRICING_V3_ENGINES['1.3.0'])
+    const v12 = v13 || periods.every(p => p.result.engineVersion === PRICING_V3_ENGINES['1.2.0'])
     const v11 = v12 || periods.every(p => p.result.engineVersion === PRICING_V3_ENGINES['1.1.0'])
 
-    const commercial = (key: 'marketAdjustment' | 'roundingAdjustment' | 'uplift') =>
-      periods.reduce((sum, p) => sum.plus((p.result.totals as Partial<PricingV3TotalsV12>)[key] ?? 0), new D(0))
+    const commercial = (key: 'marketAdjustment' | 'engagementAdjustment' | 'roundingAdjustment' | 'uplift') =>
+      periods.reduce((sum, p) => sum.plus((p.result.totals as Partial<PricingV3TotalsV13>)[key] ?? 0), new D(0))
 
     const annual = new Map<string, { first: number; last: number; amount: string }>()
 
@@ -118,6 +119,7 @@ export function calculateResolvedQuote(resolution: ReturnType<typeof resolveBrie
     totals = {
       cost: money(cost),
       ...(v12 ? { marketAdjustment: money(commercial('marketAdjustment')) } : {}),
+      ...(v13 ? { engagementAdjustment: money(commercial('engagementAdjustment')) } : {}),
       undiscountedPrice: money(sums('undiscountedPrice')),
       ...(v11 ? { roundingAdjustment: money(commercial('roundingAdjustment')) } : {}),
       discount: money(sums('discount')),

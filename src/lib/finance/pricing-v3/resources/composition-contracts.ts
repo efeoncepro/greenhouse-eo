@@ -53,6 +53,12 @@ export const compositionPolicySchema = z
                     // feeds derived notices (price-review.ts) and never reaches a calculation or a frozen result.
                     // It lives here, not in `price.source`, because that object is the kernel's strict source.
                     reviewBy: pricingV3RequestSchema.shape.quoteDate.optional(),
+                    // How long the supplier contract binds, in months, when that is longer than what `price.unit`
+                    // bills: a plan contracted for a year and paid month by month is `unit: 'month'` with a term of
+                    // 12. Billing and commitment are two facts; the kernel only needs the first. This one never
+                    // reaches a calculation or a frozen result: it feeds the commitment reading
+                    // (commitment-exposure.ts), which without it cannot tell such a plan from one with no commitment.
+                    commitmentTermMonths: z.number().int().min(2).max(120).optional(),
                     pendingReason: z.string().min(1).optional()
                   })
                   .strict()
@@ -63,8 +69,9 @@ export const compositionPolicySchema = z
                         Number(Boolean(v.pendingReason)) ===
                       1
                   )
-                  // A price nobody has yet has nothing to review.
+                  // A price nobody has yet has nothing to review, and no contract to be bound by.
                   .refine(v => !(v.reviewBy && v.pendingReason))
+                  .refine(v => !(v.commitmentTermMonths && v.pendingReason))
               )
               .max(20)
           })

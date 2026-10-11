@@ -188,6 +188,8 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
             return `${r.value.from}:${r.value.to}`
           case 'price_rounding':
             return `${r.value.currency}:${r.value.offerId ?? '*'}`
+          case 'engagement_factor':
+            return `${r.value.form}:${r.value.offerId ?? '*'}`
         }
       }
 

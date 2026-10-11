@@ -287,6 +287,37 @@ export const pricingV3InputSchemaV12 = z
   })
   .strict()
 
+// Contract 1.3.0 extends 1.2.0 with the FORM of the engagement (on-going, on-demand, ...) as its own datum. The request
+// declares the form and the snapshot carries its price ratio, exactly as the request declares the offer market and
+// the snapshot carries its market factor. `engagementCode` is untouched: it keeps selecting the pricing policy (a
+// billing cadence), while the form is a commercial condition that multiplies the price of every row. Forms are data:
+// the kernel knows no list of them, only the ratio of the one the request names.
+//
+// Both keys are optional, like every capability a contract added: a 1.2.0 input relabelled 1.3.0 is a valid 1.3.0
+// input and prices the same. A request that declares a form must find its ratio in the snapshot; one that declares
+// none is priced at ratio 1. The keys exist only in 1.3.0: an earlier contract that carries them is rejected.
+export const pricingV3EngagementFactorSchemaV13 = z
+  .object({ form: id, priceRatio: positive, source: sourceSchema })
+  .strict()
+
+export const pricingV3RequestSchemaV13 = pricingV3RequestSchemaV12
+  .extend({ schemaVersion: z.literal('1.3.0'), engagementForm: id.optional() })
+  .strict()
+
+export const pricingV3SnapshotSchemaV13 = pricingV3SnapshotSchemaV12
+  .extend({
+    schemaVersion: z.literal('1.3.0'),
+    engagementFactors: z.array(pricingV3EngagementFactorSchemaV13).optional()
+  })
+  .strict()
+
+export const pricingV3InputSchemaV13 = z
+  .object({
+    request: pricingV3RequestSchemaV13,
+    snapshot: pricingV3SnapshotSchemaV13
+  })
+  .strict()
+
 /** `PricingV3Input`, `PricingV3Request` and `PricingV3Snapshot` are contract 1.0.0, as every existing consumer types them. */
 export type PricingV3Input = z.infer<typeof pricingV3InputSchema>
 export type PricingV3Request = PricingV3Input['request']
@@ -300,7 +331,11 @@ export type PricingV3InputV12 = z.infer<typeof pricingV3InputSchemaV12>
 export type PricingV3RequestV12 = PricingV3InputV12['request']
 export type PricingV3SnapshotV12 = PricingV3InputV12['snapshot']
 export type PricingV3MarketFactorV12 = z.infer<typeof pricingV3MarketFactorSchemaV12>
-export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11 | PricingV3InputV12
+export type PricingV3InputV13 = z.infer<typeof pricingV3InputSchemaV13>
+export type PricingV3RequestV13 = PricingV3InputV13['request']
+export type PricingV3SnapshotV13 = PricingV3InputV13['snapshot']
+export type PricingV3EngagementFactorV13 = z.infer<typeof pricingV3EngagementFactorSchemaV13>
+export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11 | PricingV3InputV12 | PricingV3InputV13
 export type PricingV3Source = z.infer<typeof sourceSchema>
 
 /**
@@ -310,7 +345,8 @@ export type PricingV3Source = z.infer<typeof sourceSchema>
 export const PRICING_V3_ENGINES = {
   '1.0.0': 'pricing-v3-local/1.0.0',
   '1.1.0': 'pricing-v3-local/1.1.0',
-  '1.2.0': 'pricing-v3-local/1.2.0'
+  '1.2.0': 'pricing-v3-local/1.2.0',
+  '1.3.0': 'pricing-v3-local/1.3.0'
 } as const
 
 export type PricingV3ContractVersion = keyof typeof PRICING_V3_ENGINES
@@ -327,6 +363,7 @@ export const isPricingV3EngineVersion = (value: unknown): value is PricingV3Engi
 export function parsePricingV3Input(raw: unknown) {
   const declared = (raw as { request?: { schemaVersion?: unknown } } | null | undefined)?.request?.schemaVersion
 
+  if (declared === '1.3.0') return { contract: '1.3.0' as const, parsed: pricingV3InputSchemaV13.safeParse(raw) }
   if (declared === '1.2.0') return { contract: '1.2.0' as const, parsed: pricingV3InputSchemaV12.safeParse(raw) }
 
   return declared === '1.1.0'

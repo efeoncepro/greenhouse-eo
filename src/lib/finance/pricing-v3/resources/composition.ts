@@ -358,7 +358,18 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           continue
         }
 
-        if (price.bundledToolIds?.some(id => selected.has(id))) {
+        // A bundle is counted twice when the SAME person or line is charged the plan and a tool the plan already
+        // includes. Two people on different plans of one vendor (a designer on the full suite, a community manager
+        // on the light product) is the normal shape of a mixed team, not a double count.
+        const holders = new Set(consumers.flatMap(c => [`line:${c.lineId}`, ...c.assignees.map(a => `person:${a}`)]))
+
+        if (
+          price.bundledToolIds?.some(id =>
+            (selected.get(id) ?? []).some(
+              c => holders.has(`line:${c.lineId}`) || c.assignees.some(a => holders.has(`person:${a}`))
+            )
+          )
+        ) {
           issue('BUNDLED_TOOL_DOUBLE_COUNT', key)
           continue
         }
