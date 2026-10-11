@@ -44,6 +44,17 @@ Dimensionar costo total, caja incremental y continuidad; medir progreso comprado
 cohortes con denominador. No adoptar uplift de proveedores como meta ni declarar efecto causal por atribución.
 El piloto del informe es propuesta y requiere parámetros/capacidad aprobados antes de ejecutarse.
 
+## Herramientas de operación account-based
+
+- Cuentas objetivo/roles HubSpot: [adapter](../../../.codex/skills/hubspot-as-a-service/references/account-based-prospecting.md)
+  y changeset. Refrescar diccionario/capability; conservar valores y mapa por iniciativa. No asumir API/CLI del gráfico.
+- Capacidad/preventa: [módulo](../../../.codex/skills/efeonce-b2b-prospecting/references/capacity-and-economics.md)
+  y plantilla por owner/período, seguimiento y costo total/caja, con unknowns y sin tarifas nuevas.
+- Discovery/prueba: [módulo](../../../.codex/skills/efeonce-b2b-prospecting/references/discovery-and-proof.md)
+  por oferta/función; pregunta, baseline, prueba mínima/derechos y criterio comprador, sin claims infundados.
+- Aprendizaje: [módulo](../../../.codex/skills/efeonce-b2b-prospecting/references/experiments-and-learning.md)
+  y ficha por iniciativa; motivo declarado separado de hipótesis, datos a revalidar y restricciones del seguimiento existente.
+
 ## Problemas frecuentes
 
 | Observación | Acción |

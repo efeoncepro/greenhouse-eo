@@ -63,6 +63,11 @@ For account research, contact discovery and access strategy, load
 [efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). It owns the prospecting method; this skill
 retains CRM identity, dedupe, dictionaries, associations, writes and independent readback.
 
+For target accounts, ICP tiers, buying roles or initiative maps, load
+[account-based-prospecting](references/account-based-prospecting.md) and its changeset template. It distinguishes
+standard CRM fields from native Buying Groups graph capabilities, preserves multiselect values and scopes
+roles by initiative without inventing a Deal or schema. This is an agent operating adapter, not new software.
+
 For B2B prospecting, research the target AND always seek an initial 2–3 additional relevant account contacts
 with actionable corporate email. This is a search baseline, never a ceiling or proof of a complete buying group.
 Expand by opportunity, phase and critical decision roles/risks; report functional gaps, owners and access routes.

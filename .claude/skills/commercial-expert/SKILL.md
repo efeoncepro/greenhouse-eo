@@ -21,6 +21,12 @@ Digital Marketing el plan ABM. 1:many puede ser válido si conserva selección/r
 no adoptar rangos ni resultados numéricos genéricos como metas Efeonce. Este método local gobierna si el
 bundle global carece del módulo referenciado; no afirmar que se cargó un archivo ausente.
 
+Para discovery y prueba por oferta/función, cargar [decision/proof](../efeonce-b2b-prospecting/references/discovery-and-proof.md)
+con la práctica; para dimensionar preventa/seguimiento, [capacidad y economía](../efeonce-b2b-prospecting/references/capacity-and-economics.md)
+con Pricing/Finance. Para win/loss/no decisión y vigencia, [aprendizaje](../efeonce-b2b-prospecting/references/experiments-and-learning.md).
+Representación target/roles/readback pertenece al [adapter HubSpot](../hubspot-as-a-service/references/account-based-prospecting.md).
+Los módulos comparten método; no crean ofertas, presupuesto, schema, Deals ni nuevas automatizaciones.
+
 # commercial-expert — Greenhouse Overlay
 
 ## Envíos desde el Outlook de Julio

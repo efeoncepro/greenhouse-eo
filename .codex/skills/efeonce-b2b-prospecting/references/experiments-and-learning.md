@@ -45,3 +45,30 @@ criterios/hitos acordados, no decisión, contratos/ingresos/margen y retención/
 conservan unidades distintas. Pipeline influenciado es atribución, no prueba de ingreso incremental.
 Cohortes de adquisición, expansión y relación se analizan separadas. Confirmar continuidad/costo después
 de la ventana del piloto; mantener capacidad máxima sin forzar abandono al iniciar otra ola.
+
+## Aprendizaje de cuenta e iniciativa
+
+Usar [account-learning](../templates/account-learning.md) al revisar una respuesta, hito o desenlace.
+Reutilizar expediente/hilo/HSP existentes. Separar ganada, perdida ante alternativa, no decisión/pospuesta
+y resultado desconocido según evidencia; silencio no prueba pérdida, baja es restricción de contacto,
+un piloto solicitado no es ganado. La calificación y actualización de stage pertenecen a Commercial/HubSpot
+y requieren el alcance correspondiente, no se ejecutan como efecto de documentar aprendizaje.
+
+Registrar motivo declarado por comprador y evidencia; análisis del equipo como hipótesis aparte. Permitir
+varios factores (prioridad, consenso, fit, presupuesto, prueba, riesgo, proceso, capacidad o competencia),
+sin taxonomía nueva automática. Una razón aislada no prueba causalidad ni autoriza descontar/alterar ICP.
+Contrastar qué predijo la hipótesis, qué ocurrió y qué falta saber; conservar casos desfavorables y cohortes.
+
+Cada dato del mapa tiene fuente/fecha, owner y condición de revisión. Una fecha de revisión elegida por
+riesgo/ventana no convierte la información en vigente hasta entonces: nuevo empleo, bounce, cambio de
+sponsor, iniciativa, proceso o señal contradictoria exige refrescar el dato afectado. Si faltan datos actuales,
+mantener autoridad/email/acceso desconocidos; no caducar ni borrar el expediente completo por defecto.
+
+Un trigger de presupuesto/cambio de función puede justificar nueva investigación acotada, no outreach.
+HOLD/negativas prevalecen: revisión sólo en el evento/alcance permitido; no abordar colegas ni crear scheduler
+para rodearlas. Derivación prometida no es introducción realizada. Con owner/fecha, entregar el próximo paso
+al seguimiento existente; no crear una segunda automatización por cada mapa.
+
+Cuando evidencia real contradice un comportamiento de la skill, anonimizar el mínimo caso, añadir escenario
+y corregir el módulo dueño. Explicar alcance/muestra; no transformar una anécdota en cuota universal ni
+un cambio documental en mejora demostrada de conversión. Repetir los escenarios afectados.

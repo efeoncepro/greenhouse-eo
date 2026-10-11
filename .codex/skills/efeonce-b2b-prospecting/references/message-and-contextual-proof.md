@@ -45,5 +45,8 @@ No prometer incremento de venta en Channel & Commerce ni disponibilidad por natu
 La práctica elige material y valida su evidencia; Commercial compone el caso y Pricing decide economics.
 
 Canon: [venta con demostración contextual](../../../../docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md).
+Para preguntas/criterios y material por oferta o función, cargar [discovery y proof](discovery-and-proof.md).
+Dimensionar esfuerzo extenso con [capacidad y economía](capacity-and-economics.md), sin convertir una
+apertura en diagnóstico completo ni una muestra preparada en evidencia de resultado del comprador.
 Si se autoriza envío desde Outlook de Julio, cargar la [política de firma/CCO](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md)
 y verificar el canal real. Borrador, envío, Enviados e ingestión HubSpot son estados separados.

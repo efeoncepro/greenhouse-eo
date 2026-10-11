@@ -49,7 +49,10 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Encontrar objetivo, adyacentes y rutas de acceso | [buying-group-and-access](references/buying-group-and-access.md) |
 | Conseguir y evaluar datos accionables | [contact-quality-and-enrichment](references/contact-quality-and-enrichment.md) |
 | Preparar acercamiento o prueba contextual | [message-and-contextual-proof](references/message-and-contextual-proof.md) + Copywriting/práctica |
+| Preparar discovery, criterios o prueba por oferta/función | [discovery-and-proof](references/discovery-and-proof.md) + Commercial/práctica |
+| Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |
+| Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
 | Diseñar un piloto o revisar resultados | [experiments-and-learning](references/experiments-and-learning.md) |
 | Verificar sustento técnico/mercado o incorporar Sales | [sources](references/sources.md) |
 
@@ -83,7 +86,8 @@ No asumas que Sales incluye instrucciones de Apollo ni que un plugin concede con
 ## Salida y continuidad
 
 Usa [account-brief](templates/account-brief.md) para investigación y [action-pack](templates/action-pack.md)
-para entregar al siguiente owner. Resume en chat lo accionable y las brechas; conserva detalle privado donde
+para entregar al siguiente owner. Capacidad/economía, discovery/proof, changeset y aprendizaje tienen
+plantillas en sus módulos; cargar sólo las que habiliten la decisión pedida. Resume en chat lo accionable y las brechas; conserva detalle privado donde
 corresponda, sin emails reales en ejemplos versionados. Evita duplicar una empresa por persona o servicio.
 
 Entrega entidad/fit, hechos vs hipótesis, relación/demanda/proceso, decisión/fase y mapa de roles/personas,

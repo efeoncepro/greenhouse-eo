@@ -24,6 +24,9 @@ Necesidad/decisión, unidad, alcance y fase: <ancla del buying group; no requier
 - Capacidad/costo/ventana y continuidad: <horas, tarifas cargadas, herramientas asignadas, caja incremental>.
 - Medición/cohorte: <baseline, denominador, progreso/resultado; límites de atribución>.
 
+Si hace falta dimensionar, anexar [capacidad/economía](account-economics.md); para criterios/prueba,
+[decision-proof](decision-proof.md). No rellenar tablas irrelevantes a la fase ni duplicar el expediente.
+
 ## Personas y cobertura
 
 Objetivo investigado: <persona o rol por resolver>. Base: 2–3 adicionales buscados; ampliación: <brecha/motivo>.
@@ -51,6 +54,8 @@ No incluir direcciones reales en fixtures/versionados. Roles y vínculos inferid
 - CRM existente, IDs y cambios propuestos; qué está autorizado/verificado.
 - Límites, contradicciones, presupuesto consumido/remanente y qué chequeo falta.
 - Próxima decisión, responsable, fecha/hito y condiciones de parada.
+- Vigencia del mapa y aprendizaje: <datos a revalidar, motivo comprador vs hipótesis, evento/owner;
+  [detalle](account-learning.md) cuando haya revisión de resultado>.
 
 ## Fuentes y cobertura
 

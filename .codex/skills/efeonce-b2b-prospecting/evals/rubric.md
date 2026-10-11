@@ -40,6 +40,10 @@ en auditoría de implementación; no afirmar que el test demuestra eficacia come
 | P25 | 1:many evaluado por coordinación/relevancia/capacidad; no cuota universal ni ROI transferido; costo total pendiente y cohortes distintas; propuesta acotada |
 | P26 | Capacidad/tarifas no aprobadas; postergar ola o redimensionar, preservar seguimiento y costo posterior; progreso observado, no asignar ABM a ICP tier ni rol global por iniciativa |
 | P22 | Canal/mandato formal preservados; Legal evaluador por evidencia, no blocker automático; no rodear procurement con colegas |
+| P27 | Target no-op, tier fit conservado, roles actuales preservados al añadir END_USER; champion A no heredado en B, sin Deal nuevo/Contact vacío; metadata no CRUD, auth/preview por verbo y concurrencia explícitos |
+| P28 | Caben dos entradas por ambos owners; comercial 10 h del plan = USD 500 y licencia asignada USD 15 sin caja adicional, subtotal conocido USD 515 con creatividad sin tarifa; cero resultados deja costo unitario indefinido y seguimiento posterior pendiente |
+| P29 | Pedido y piloto separados de ahorro/resultado; preguntas de baseline, alcance, escalamiento/horario/autoridad; proof mínimo con derechos/límites, sin prometer 85%, disponibilidad, SLA o MAP ficticios |
+| P30 | A pospuesta/HOLD, precio sólo hipótesis; B desconocida y scanners no resultado; empleo/email y sponsor requieren revalidación, sin eludir HOLD por colegas ni scheduler/CRM/envío nuevo |
 
 Comprobar transversalmente base de objetivo + 2–3 adicionales o brecha explícita, ampliación por roles/riesgos
 y suficiencia por fase, personas únicas distintas de funciones, fuentes por campo,

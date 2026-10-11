@@ -19,8 +19,12 @@ Customer Model y práctica disponible, declarar la limitación y no fingir módu
 - Coordinación ABM/ABS, intensidad por cuenta y buyer enablement →
   [módulo compartido](../efeonce-b2b-prospecting/references/abm-and-abs.md); Commercial conserva ABS y Digital Marketing ABM.
 - ICP/JTBD y grupo comprador → [Customer Model](../efeonce-customer-model-operator/SKILL.md).
+- Discovery/prueba por oferta o función → [módulo compartido](../efeonce-b2b-prospecting/references/discovery-and-proof.md) + práctica.
+- Capacidad/preventa → [economía](../efeonce-b2b-prospecting/references/capacity-and-economics.md) + Pricing/Finance;
+  aprendizaje de cuenta → [resultados y vigencia](../efeonce-b2b-prospecting/references/experiments-and-learning.md).
 - Empaquetado/precio → [Pricing](../efeonce-pricing-operator/SKILL.md) + Business Model/práctica.
 - Operaciones CRM → [HubSpot](../hubspot-as-a-service/SKILL.md).
+  Cuentas objetivo/roles → su [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md).
 
 No cargar recursivamente ambos entrypoints: cada owner conserva su fase. Una oportunidad/etapa o una
 invocación comercial no autoriza precio, contrato, consumo pagado, CRM ni envío adicionales al pedido.

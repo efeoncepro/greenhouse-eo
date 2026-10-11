@@ -47,6 +47,16 @@ actividad y pipeline influenciado no prueban ingreso incremental; muestras/bench
 [Investigación](../../audits/commercial/2026-10-11-abm-abs-research.md) y [verificación](../../audits/commercial/2026-10-11-abm-abs-skill-update.md).
 Método aprobado, piloto/eficacia local pendientes. Uso interno y una posible oferta ABM cliente son decisiones distintas.
 
+## Capacidad operativa ampliada
+
+El [adapter HubSpot](../../../.codex/skills/hubspot-as-a-service/references/account-based-prospecting.md)
+guía campos/roles, changeset, concurrencia y readback; es método de agentes, no nuevo software ni API del
+gráfico. [Capacidad/economía](../../../.codex/skills/efeonce-b2b-prospecting/references/capacity-and-economics.md)
+dimensiona por owner/período con seguimiento y costos conocidos/pendientes. [Discovery/proof](../../../.codex/skills/efeonce-b2b-prospecting/references/discovery-and-proof.md)
+conecta criterios con oferta/función, material y derechos. [Aprendizaje](../../../.codex/skills/efeonce-b2b-prospecting/references/experiments-and-learning.md)
+conserva outcomes/motivos y vigencia por iniciativa. Plantillas progresivas evitan cargar detalle irrelevante.
+[Actualización y verificación](../../audits/commercial/2026-10-11-prospecting-operational-modules-update.md).
+
 ## Roles y continuidad
 
 Commercial dirige avance de venta; Customer Model el ICP/grupo comprador; prácticas oferta/capacidad/proof;

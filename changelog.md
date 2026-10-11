@@ -9,6 +9,8 @@
 
 ## 2026-10-11 — Cotizador V3: factores por país
 
+- Prospección: adapter operativo HubSpot (Agent CLI/API por capability, roles globales vs iniciativa, cambios mínimos/readback), capacity/costo, discovery/proof y aprendizaje por iniciativa. Plantillas/mirrors y routing Commercial/HubSpot sincronizados; fixtures ampliados a 30 conservando los anteriores. [Verificación](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md). Método aprobado, sin software nuevo, acciones SaaS o automatizaciones.
+
 - ABM/ABS incorporado a prospección: módulo por demanda, coordinación Digital Marketing/Commercial, inversión por cuenta y mapas por iniciativa, consenso, costo total y medición; plantillas/espejos y escenarios ampliados a 26. [Verificación](docs/audits/commercial/2026-10-11-abm-abs-skill-update.md). Método aprobado; piloto, gastos, CRM y envío conservan su propia autoridad.
 
 - [Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md): núcleo Codex/Claude compartido, módulos por recorrido, plantillas y evaluación offline; companion Commercial Codex, routing y adapter personal compatibles con HSP/radar. Sales opcional por fase. Buying group: base de 2–3 adicionales ampliable por roles/riesgos y suficiencia por fase; personas únicas y funciones separadas, sin comité completo antes del primer acercamiento. [Actualización](docs/audits/commercial/2026-10-11-buying-group-skill-update.md). [Decisión](docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md); sin nuevas automatizaciones, CRM, créditos o envíos.

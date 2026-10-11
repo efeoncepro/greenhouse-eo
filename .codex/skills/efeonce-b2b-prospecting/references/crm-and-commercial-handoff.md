@@ -23,6 +23,11 @@ Approval vigente para un lote se reutiliza; no pedir confirmación por segunda v
 Correcciones de Primary Company requieren evidencia de empleo/entidad y autorización vigente; un dominio
 distinto no implica que haya que cambiarla. No conservar ni eliminar asociaciones históricas sin analizar su función.
 
+Para selección target, fit ICP, roles o mapas por iniciativa, cargar el
+[adapter account-based de HubSpot](../../hubspot-as-a-service/references/account-based-prospecting.md).
+Usa diccionario efectivo y cambios mínimos preservando multiselect; separa capability API/CLI/UI y
+representación global vs iniciativa. Es guía operativa, no un wrapper nuevo ni CRUD demostrado del gráfico.
+
 ## Entregar una siguiente decisión
 
 Usar [action-pack](../templates/action-pack.md): owner, cuenta/IDs, evidencia, relación por persona, necesidad,

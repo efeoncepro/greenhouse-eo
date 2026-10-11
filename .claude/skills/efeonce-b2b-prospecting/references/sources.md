@@ -69,3 +69,13 @@ encaje Efeonce y baja en cualquier uplift transferible. Fuentes operativas se re
 No importar las cifras +3,4×/−32 días ni cuotas de cuentas/comité del módulo integrado de Digital Marketing
 como expectativas Efeonce; conservar los límites del informe. Si falta el módulo global Commercial
 `motions/abm-abs-abe.md`, declarar la dependencia y usar el método local aprobado sin fingir que se cargó.
+
+## Adapter y aprendizaje — ampliación aprobada 2026-10-11
+
+[Readback API/Agent CLI](../../../../docs/audits/commercial/2026-10-11-hubspot-abm-buying-groups-api-cli.md)
+conserva fuentes/contratos y limitaciones del corte; el [adapter HubSpot](../../hubspot-as-a-service/references/account-based-prospecting.md)
+es dueño de su uso operativo. Refrescar identidad/diccionario/help antes de cada acción, sin convertir metadata
+en CRUD ni roles globales en autoridad por iniciativa. Properties, KB Buying Groups y repo oficial Agent CLI
+reabiertos en esta ampliación; no hubo nuevos writes ni se auditó beta/layout.
+Capacidad, discovery/proof y aprendizaje son procedimientos Efeonce sobre los owners vigentes, no técnicas
+con uplift demostrado ni una extensión de pricing/schema/oferta. Los ejemplos y evals son sintéticos.

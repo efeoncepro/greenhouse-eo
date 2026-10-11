@@ -93,6 +93,8 @@ inversión. Roles globales de Contact no prueban sus roles por iniciativa; prese
 asociaciones disponibles. Una beta con placeholders no autoriza crear Contacts sin correo. No asumir que
 un API CRUD reproduce una función visual; verificar contrato y readback con HubSpot antes de implementarla.
 El mínimo de audiencia de una plataforma publicitaria no justifica ampliar ICP o gastar.
+Para operar, cargar [adapter HubSpot](../../hubspot-as-a-service/references/account-based-prospecting.md):
+changeset/readback con capacidades fechadas; el mapa por iniciativa precede a un Deal y no exige crearlo.
 
 ## Economía, medición y aprendizaje
 
@@ -107,6 +109,10 @@ con sus límites: contenido observado no prueba recuerdo; email no prueba apoyo;
 prueba progreso; pipeline influenciado no es ingreso incremental. Añadir reuniones realizadas, criterios/hitos
 acordados, oportunidades calificadas, no decisión, contratos, ingresos/margen, retención/expansión y costo.
 Mantener cohortes, denominador, ventana y personas/cuentas únicas; no sumar Spot/MRR/ARR como iguales.
+
+Para dimensionar el plan, cargar [capacidad y economía](capacity-and-economics.md); comprobar por owner
+y período, incluyendo seguimiento. Para criterios/pruebas, cargar [discovery y proof](discovery-and-proof.md)
+con Commercial/práctica. Mantener aprendizaje por iniciativa, sin resultados de cuenta mezclados.
 
 Separar atribución de causalidad. Las encuestas, correlaciones de plataformas y ROI modelado de proveedores
 no permiten prometer uplift. Un lote pequeño valida proceso/calidad/costo; efecto causal requiere diseño,

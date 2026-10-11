@@ -19,6 +19,13 @@ const repo = resolve(new URL('../..', import.meta.url).pathname)
 
 const mirroredSkills = [
   {
+    // CRM y el adapter account-based conservan los mismos permisos y readbacks en ambos agentes.
+    id: 'hubspot-as-a-service',
+    mode: 'byte-identical',
+    codex: '.codex/skills/hubspot-as-a-service',
+    claude: '.claude/skills/hubspot-as-a-service',
+  },
+  {
     // Prospección comparte método, templates y escenarios; ningún agente admite contactos vacíos.
     id: 'efeonce-b2b-prospecting',
     mode: 'byte-identical',

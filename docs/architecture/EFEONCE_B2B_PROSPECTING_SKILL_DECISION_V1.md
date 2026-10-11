@@ -68,6 +68,27 @@ El escenario de piloto sigue propuesto: esta aprobación de método no reserva h
 crea oferta ABM para clientes ni habilita comunicaciones/schema/proveedores. La eficacia local está pendiente.
 [Verificación de actualización](../audits/commercial/2026-10-11-abm-abs-skill-update.md).
 
+### Delta aceptado 2026-10-11 — adapter, economía, proof y aprendizaje
+
+El operador aprobó las cuatro mejoras propuestas tras la investigación HubSpot con «vamos con eso y
+actualiza las skills». [Adapter HubSpot](../../.codex/skills/hubspot-as-a-service/references/account-based-prospecting.md)
+como contrato de operación de agentes, no nuevo software ni schema: cuenta target, fit ICP y rol global
+separados del mapa por iniciativa; changeset mínimo, preservación de valores, concurrencia/readback y
+capability API/Agent CLI/UI fechada. CRUD del gráfico Buying Groups sigue no comprobado.
+
+[Capacidad/economía](../../.codex/skills/efeonce-b2b-prospecting/references/capacity-and-economics.md)
+comprueba esfuerzo por owner/período y seguimiento, costo total/caja incremental y unknowns sin fijar tarifas;
+[discovery/proof](../../.codex/skills/efeonce-b2b-prospecting/references/discovery-and-proof.md) adapta preguntas
+y evidencia mínima a oferta/función, con derechos y criterios confirmados separados de propuestas;
+[aprendizaje](../../.codex/skills/efeonce-b2b-prospecting/references/experiments-and-learning.md) conserva
+motivo comprador vs interpretación, resultado por iniciativa y vigencia/trigger sin nuevos schedulers.
+
+Plantillas/mirrors y routing Commercial/HubSpot se actualizan; fixtures v4 añaden P27–P30 y preservan los
+26 casos previos. El bundle HubSpot ya idéntico queda incorporado al gate mecánico de espejos, sin excepciones
+de contenido. Continúan los gates de correo/cobertura y owners. La aprobación actualiza método, no
+habilita beta, software externo, créditos, schema, gastos, comunicaciones o lotes CRM.
+[Verificación](../audits/commercial/2026-10-11-prospecting-operational-modules-update.md).
+
 ## Alternatives Considered
 
 - **Ampliar sólo la skill personal:** no comparte método ni corrige routing/deriva entre agentes.

@@ -84,6 +84,14 @@ Pipeline; `dealtype=newbusiness` y Primary mexicana se conservaron. La evidencia
 concreto ni acredita cliente existente. Contact 174/176 y Company 177 se comprobaron individualmente sin
 mutar atributos/listas ni recontar la base. Scope de cada lectura y valores propuestos/live quedan separados.
 
+## Cuentas objetivo y buying groups — corte 2026-10-11
+
+Agent CLI `hubspot` 0.15.1 y MCP contrastados en 48713323: campos target/ICP/rol leídos; metadata de
+Buying Groups visible, pero list/search rechazados con 400. Sin write ni activación beta. [Evidencia](../audits/commercial/2026-10-11-hubspot-abm-buying-groups-api-cli.md).
+Para operar, cargar [adapter account-based](../../.codex/skills/hubspot-as-a-service/references/account-based-prospecting.md)
+y preparar changeset/readback. Roles globales no sustituyen contexto por iniciativa; help/auth por comando
+prevalece sobre anuncio genérico de CLI. Metadata no demuestra CRUD del gráfico; refrescar el corte antes de actuar.
+
 ## Procedimiento por operación
 
 Aplicación bancaria verificada el 2026-10-11: ACTIVE **188**, 28 Contact de 14 cuentas Primary. Dos creates CLI
