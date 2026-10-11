@@ -6,7 +6,7 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
 
 **Empieza aquí (2026-10-11).** Las versiones vigentes no se nombran a mano: las nombra `current.json`, y un comando
 las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el comando, no esta línea. Al
-2026-10-11, tras el piso de staffing: `catalog.review-v7.json`, `resources.review-v6.json` y
+2026-10-11, tras la oferta SEO/AEO: `catalog.review-v8.json`, `resources.review-v6.json` y
 `../v3-resources/ai-credits.review-v1.json`.
 
 ```bash
@@ -76,7 +76,13 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
   `catalog preview|apply`): las 32 políticas de precio de `talent-assurance-staffing` (una persona vendida por
   dedicación) pasan del recargo histórico con mínimo 0 a margen objetivo por tier (0,30 / 0,30 / 0,35 / 0,40) con
   `minimumMargin` 0,25, desde el 2026-10-11. Piso y objetivos: decisión del CEO (los objetivos sobre propuesta del agente).
+  *Corrección 2026-10-11 (posterior):* el vigente pasó a ser `catalog.review-v8.json`; v7 queda como padre congelado.
 - `staffing-margin-floor.change.json` (`pricing-v3-catalog-change/1`): los 32 `replace` que produjeron v7 desde v6.
+- `catalog.review-v8.json` (change-set `seo-aeo-managed-service.change.json`, aplicado sobre v7 con
+  `catalog preview|apply`): agrega la oferta `seo-aeo-managed-service`, los servicios gestionados de la práctica
+  SEO/AEO, con 32 políticas de precio (margen objetivo 0,55, `minimumMargin` 0,45, `confirmed`) vigentes desde el
+  2026-10-11. No toca ninguna política existente. Es el catálogo que nombra el puntero al 2026-10-11.
+- `seo-aeo-managed-service.change.json` (`pricing-v3-catalog-change/1`): los 32 `add` que produjeron v8 desde v7.
 - `managed-care-colombia.demand.json` → `managed-care-colombia.artifact.json`: el servicio gestionado sintético de
   `managed-care.*` para un cliente de Colombia con equipo en Colombia, en COP y con fecha 2026-10-11. Es el primer
   artefacto firmado por el motor `pricing-v3-local/1.2.0` y el que la guarda de artefactos congelados exige para ese
@@ -174,7 +180,7 @@ Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/coti
   *Corrección 2026-10-11:* desde hoy se cotiza con `catalog.review-v5.json`; con él, un cliente de Colombia o de
   Perú se calcula con el contrato 1.2.0. Ver el delta siguiente.
   *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
-  2026-10-11, catálogo v7 + policy v6). Ver los dos últimos deltas.
+  2026-10-11, catálogo v8 + policy v6). Ver los últimos deltas.
 - **Qué no se toca.** `catalog.review-v2.json` y `catalog.review-v3.json` son los padres congelados de los artefactos
   que los usaron. Ningún artefacto de esta carpeta se regeneró: cada uno lleva su catálogo dentro, vuelve a resolver al
   contrato 1.0.0 y responde `verified: true`. La prueba `pricing-v3-frozen-artifacts.test.ts` los reproduce a todos en
@@ -210,7 +216,7 @@ Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador
 - **Qué usar para cotizar hoy.** `catalog.review-v5.json` + `resources.review-v5.json` +
   `../v3-resources/ai-credits.review-v1.json`. La CLI sin `--catalog` sigue leyendo review-v1: hay que pasar la ruta.
   *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
-  2026-10-11, `catalog.review-v7.json` + `resources.review-v6.json` + el mismo catálogo de créditos). Sin `--current`
+  2026-10-11, `catalog.review-v8.json` + `resources.review-v6.json` + el mismo catálogo de créditos). Sin `--current`
   ni `--catalog` la CLI sigue leyendo review-v1.
 - **Qué no se toca.** `catalog.review-v2.json`, `catalog.review-v3.json` y `catalog.review-v4.json` son los padres
   congelados de los artefactos que los usaron. Ningún artefacto anterior de esta carpeta se regeneró: cada uno
@@ -398,4 +404,24 @@ Decisión: [delta del ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPER
   y un objetivo de 30 %, 35 % o 40 % según el tier del perfil (propuesto por el agente y confirmado por el CEO el
   mismo día; `confirmed`, `COMMERCIAL_POLICY` en el ledger). Un neto acordado bajo el piso sale marcado `MARGIN_BELOW_FLOOR`.
 - **Qué no cambia.** `creative-managed-service` (45/45), el resto de v6 y todos los artefactos. Una cotización con
-  fecha anterior al 2026-10-11 conserva el recargo histórico. El siguiente catálogo sería `catalog.review-v8.json`.
+  fecha anterior al 2026-10-11 conserva el recargo histórico. El siguiente catálogo fue `catalog.review-v8.json`
+  (delta siguiente).
+
+## Delta 2026-10-11 — catálogo v8: oferta de la práctica SEO/AEO
+
+Decisión: [delta del ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--oferta-propia-de-la-práctica-seoaeo-catálogo-v8).
+
+- **Archivos nuevos.** `catalog.review-v8.json` (versión `operating-review-2026-10-11-v8`) y su change-set
+  `seo-aeo-managed-service.change.json`. El puntero pasó a nombrar el catálogo v8; policy y créditos no cambiaron.
+- **Qué agrega.** Una tercera oferta, `seo-aeo-managed-service` (servicios gestionados de la práctica SEO/AEO): 32
+  registros `pricing:<profileId>:seo-aeo-managed-service`, revisión 1, con margen objetivo 55 % y piso 45 %. El piso
+  lo aprobó el CEO el 2026-07-13; el objetivo, extremo bajo de la banda 55–60 % de esa práctica, lo propuso el agente
+  y el CEO lo confirmó el 2026-10-11 (`confirmed`, `COMMERCIAL_POLICY` en el ledger).
+- **Tres ofertas, tres políticas.** `creative-managed-service` (práctica creativa, 45/45), `seo-aeo-managed-service`
+  (práctica SEO/AEO, 55/45) y `talent-assurance-staffing` (una persona por dedicación, 30/35/40 por tier con piso 25).
+  Son 96 políticas de precio vigentes, más las 32 revisiones reemplazadas de staffing.
+- **Qué no cambia.** Las otras dos ofertas, el resto de v7 y todos los artefactos. La oferta nueva rige para
+  cotizaciones fechadas desde el 2026-10-11. El siguiente catálogo sería `catalog.review-v9.json`.
+- **Medido el 2026-10-11.** `managed-care.demand.json` copiado fuera de esta carpeta con
+  `offerId: "seo-aeo-managed-service"` y fecha 2026-10-11, con `--current`: CLP 11.640.000 al mes, margen 0,5507, motor
+  `pricing-v3-local/1.1.0`, ninguna línea bajo el piso. Evidencia fechada, no fixture.

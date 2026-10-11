@@ -67,7 +67,9 @@ país de la persona y un factor de mercado por país del cliente
 ([cómo se cotiza con ellos](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo)). Las políticas por tier de la baseline usan markup histórico, no
 margen objetivo 40%. El catálogo no hereda la aspiración de margen del expediente Pibank. En el catálogo operativo,
 desde el v7 (2026-10-11), la oferta de staffing `talent-assurance-staffing` usa margen objetivo por tier (30 %, 30 %,
-35 % y 40 %) con piso de 25 %, ambos decididos por el CEO; las fechas anteriores conservan el markup.
+35 % y 40 %) con piso de 25 %, ambos decididos por el CEO; las fechas anteriores conservan el markup. Las otras dos
+ofertas son de servicio gestionado, las dos con piso de 45 %: `creative-managed-service` (práctica creativa, objetivo
+45 %) y, desde el v8, `seo-aeo-managed-service` (práctica SEO/AEO, objetivo 55 %).
 
 Talent Assurance USD 25/mes, operación USD 25 y setup USD 100 son **placeholders de la prueba anterior**,
 identificados `trial-*`; no costos medidos ni promesas de formación/reemplazo. Se actualizan como recursos explícitos.
@@ -132,8 +134,8 @@ pnpm --silent pricing:v3 current show
 
 Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, `path`, `status` y lo que se encontró
 en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
-coincide. Lo que imprime es la respuesta vigente. Al 2026-10-11, tras el piso de staffing, apunta a
-`data/pricing/v3-operating/catalog.review-v7.json` (`operating-review-2026-10-11-v7`),
+coincide. Lo que imprime es la respuesta vigente. Al 2026-10-11, tras la oferta SEO/AEO, apunta a
+`data/pricing/v3-operating/catalog.review-v8.json` (`operating-review-2026-10-11-v8`),
 `data/pricing/v3-operating/resources.review-v6.json` (`operating-review-2026-10-11-v6`) y
 `data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`).
 
@@ -298,12 +300,20 @@ de `1.20` desde el 2026-10-11, sin fecha de término y marcado `estimated`. Lo p
 margen prudencial que el operador fijó para las otras monedas (referencia ECB `1.1206`); el operador no lo decidió de
 forma explícita para EUR, y por eso no está `confirmed`.
 
-El cambio más reciente al 2026-10-11 es
-[`staffing-margin-floor.change.json`](../../../data/pricing/v3-operating/staffing-margin-floor.change.json), que
+Ese mismo día,
+[`staffing-margin-floor.change.json`](../../../data/pricing/v3-operating/staffing-margin-floor.change.json)
 produjo `catalog.review-v7.json` desde `catalog.review-v6.json`: 32 `replace`, uno por política de precio de
 `talent-assurance-staffing`, que cambian el markup histórico con mínimo 0 por margen objetivo por tier con
 `minimumMargin` `0.25`. El piso de 25 % lo decidió el CEO; los objetivos por tier los propuso el agente y él los
 confirmó el mismo día, así que los registros están `confirmed`.
+
+El cambio más reciente al 2026-10-11 es
+[`seo-aeo-managed-service.change.json`](../../../data/pricing/v3-operating/seo-aeo-managed-service.change.json), que
+produjo `catalog.review-v8.json` desde `catalog.review-v7.json`: 32 `add`, uno por perfil, que crean la oferta
+`seo-aeo-managed-service` (servicios gestionados de la práctica SEO/AEO) con margen objetivo `0.55` y `minimumMargin`
+`0.45`. El piso lo aprobó el CEO el 2026-07-13; el objetivo, extremo bajo de la banda 55–60 % de esa práctica, lo
+propuso el agente y él lo confirmó el 2026-10-11, así que los registros están `confirmed`. Una oferta nueva son 32
+registros, uno por perfil: ya hay tres ofertas y 96 políticas de precio vigentes.
 
 Rechazos (exit 1, `error.code` en stderr): `CATALOG_BASE_CONFLICT` (el `baseDigest` no es el de la base entregada),
 `CATALOG_PREVIEW_CONFLICT` (el `--confirm` no es el del preview vigente: repetir el preview),
@@ -316,7 +326,7 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
 conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor cuando el puntero lo
 nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente al del catálogo
-que nombra el puntero (al 2026-10-11 sería `catalog.review-v8.json`) junto a su change-set, probarlo con los casos
+que nombra el puntero (al 2026-10-11 sería `catalog.review-v9.json`) junto a su change-set, probarlo con los casos
 afectados y mover el puntero
 ([pasos](#versiones-vigentes-el-puntero-currentjson)), para que agentes y operador usen el mismo catálogo.
 

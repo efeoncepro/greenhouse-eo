@@ -171,10 +171,12 @@ Los costos de persona son el costo objetivo que fijó el CEO, no la nómina: no 
 llamarlos «lo que Efeonce paga»; el margen real de hoy sobre personas es mayor que el mostrado.
 Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
 validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
-no sustituyen pisos de práctica aprobados. Hay dos pisos, ambos del CEO: 45 % en un servicio gestionado de la
-práctica creativa (`creative-managed-service`) y 25 % en una persona vendida por dedicación, staff augmentation
-(`talent-assurance-staffing`, desde 2026-10-11); sobre el piso el objetivo sube según el caso, y una excepción
-bajo un piso es del CEO y nunca referencia para otro cliente.
+no sustituyen pisos de práctica aprobados. Hay tres ofertas, todas del CEO: servicio gestionado de la práctica
+creativa (`creative-managed-service`, objetivo 45 %, piso 45 %), servicio gestionado de la práctica SEO/AEO
+(`seo-aeo-managed-service`, objetivo 55 %, piso 45 %, desde 2026-10-11) y una persona vendida por dedicación, staff
+augmentation (`talent-assurance-staffing`, objetivo 30/35/40 % por tier, piso 25 %, desde 2026-10-11). Se elige por
+práctica y unidad vendida, nunca por el margen que deja pasar; sobre el piso el objetivo sube con una versión nueva
+del catálogo, y una excepción bajo un piso es del CEO y nunca referencia para otro cliente.
 El precio que se acuerda se declara directo en la demanda como
 neto acordado (`agreed_net` en `brief.adjustments`, por periodo, con motivo), sin calcular tasas a mano, y se
 vuelve a correr: el margen real y el veredicto del piso salen del motor. El catálogo vigente redondea cada

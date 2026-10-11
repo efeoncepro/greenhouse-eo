@@ -14,7 +14,8 @@
 > «propuesta» o «todavía no disponible» describe ese día. Varias de esas definiciones ya existen en el prototipo
 > local. Los comandos reales son `pnpm pricing:v3 …`, no la sintaxis `cotizador …` propuesta más abajo. Los dos
 > factores de país tienen valores (varios todavía estimados), hay tipo de cambio de cotización y redondeo comercial
-> por moneda, y el piso de los servicios gestionados de la práctica creativa es 45 %. Las versiones vigentes del
+> por moneda, y el piso de los servicios gestionados es 45 %, con una oferta para la práctica creativa y otra para
+> SEO/AEO (una persona vendida por dedicación tiene piso de 25 %). Las versiones vigentes del
 > catálogo las nombra un puntero y se usan con `--current`. Un precio unitario de herramienta ya no vence: tiene una
 > fecha de revisión que avisa sin bloquear. El costo de las personas es un costo objetivo decidido por el CEO, no la
 > nómina de hoy. Todavía no se puede emitir una cotización en EUR. Estado vigente:

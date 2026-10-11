@@ -303,7 +303,8 @@ alcance importa. *(Y ya tiene gobernanza real: aprobación, snapshot de costo re
 (→ `modules/03_OFERTA.md`). En staff-aug el cliente dirige; en Managed Squad **nosotros operamos y respondemos
 por el outcome**. **Cobrar un Managed Squad a precio de staff-aug es regalar la parte que más vale: el gobierno.**
 Su piso también es otro: **25%** de margen (decisión del CEO, 2026-10-11; oferta `talent-assurance-staffing` de V3),
-y de ahí sube según el caso. El 45% sigue siendo el piso del servicio gestionado; no uses la oferta de staff-aug
+y de ahí sube según el caso. El 45% sigue siendo el piso del servicio gestionado (oferta `creative-managed-service`
+en esta práctica; SEO/AEO tiene la suya, `seo-aeo-managed-service`, objetivo 55%); no uses la oferta de staff-aug
 para bajarlo.
 
 ---

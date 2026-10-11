@@ -13,8 +13,8 @@
 > catálogo operativo: los costos de perfil se declararon como costo de referencia de Chile, hay un factor de talento
 > y un factor de mercado por país (algunos confirmados, otros estimados), tipo de cambio de cotización desde USD
 > decidido por el operador (distinto del FX histórico de este documento), redondeo comercial por moneda y piso de
-> 45 % para los servicios gestionados de la práctica creativa. Además, por decisión del CEO esos costos de perfil se
-> leen como costo objetivo, no como la nómina de hoy. Estado vigente:
+> 45 % para los servicios gestionados de las prácticas creativa y SEO/AEO (25 % en staffing). Además, por decisión
+> del CEO esos costos de perfil se leen como costo objetivo, no como la nómina de hoy. Estado vigente:
 > [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11),
 > [factores y versiones](cotizador-v3-mantenimiento-catalogo.md) y
 > [base de costo](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).

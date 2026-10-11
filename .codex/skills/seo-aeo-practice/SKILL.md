@@ -570,7 +570,9 @@ Para cotizar sin UI con demanda/perfiles/tools versionados, cargar
 Este carril opt-in calcula hipótesis y las explica desde snapshot: no reemplaza cotizador canónico, emisión o
 aprobaciones de §2 y `modules/04_PRICING.md`. SEO→SEMrush, baseNotion/M365, IA/Adobe/plataforma según necesidad;
 conservar variante salarial, países, dedicación y fuente real. Reparto declarado no acredita inventario.
-`managed_service` agrega fee sin publicar costos/horas internos. Readiness40/35 son propuestas genéricas, **no
+`managed_service` agrega fee sin publicar costos/horas internos. Un programa SEO/AEO gestionado usa
+`offerId: "seo-aeo-managed-service"` (objetivo 55%, piso 45%; desde el 2026-10-11), no la oferta creativa.
+Readiness40/35 son propuestas genéricas, **no
 reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del
 CEO, 2026-10-11): el margen real en personas hoy es mayor que el que muestra V3. Una excepción bajo el piso la decide

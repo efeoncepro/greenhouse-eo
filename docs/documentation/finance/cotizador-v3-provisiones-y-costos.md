@@ -85,13 +85,13 @@ Decisión del operador (CEO) del 2026-10-11. Registro: `LOCALIZED_TALENT_COSTS` 
 Cómo leerlo y qué evitar:
 
 - El margen de una cotización es el margen **contra el costo objetivo**. No es el margen contable del mes ni el realizado. Los demás documentos del cotizador llaman «margen real» al margen del neto final contra el costo del catálogo; ese término no se refiere a la nómina.
-- El piso de 45 % de los servicios gestionados de la práctica creativa se lee sobre ese mismo costo objetivo. Esta decisión no cambió el piso.
+- Los pisos de margen (45 % en los servicios gestionados de las prácticas creativa y SEO/AEO, 25 % en una persona vendida por dedicación) se leen sobre ese mismo costo objetivo. Esta decisión no cambió ningún piso.
 - No describas el costo del catálogo como «lo que Efeonce paga hoy».
 - No propongas «conectar la nómina real» como mejora del cotizador. No es un pendiente: es una decisión tomada.
 - No escribas la cifra salarial de ninguna persona en documentos, briefs ni salidas para clientes.
 - Que la fuente de esos costos esté marcada `confirmed` significa que su autor confirma el valor objetivo. No significa que ese importe se pague hoy.
 
-Qué sí queda abierto: un registro de costo específico (`specific`) sólo donde el costo objetivo de un perfil en un país se aparte del costo de Chile por el factor de talento de ese país. Los factores de talento de Colombia, Perú, México, España y Estados Unidos siguen siendo estimaciones (`COUNTRY_FACTORS_UNVALIDATED`); validarlos es distinto de cambiar la base de costo.
+Qué sí queda abierto: un registro de costo específico (`specific`) sólo donde el costo objetivo de un perfil en un país se aparte del costo de Chile por el factor de talento de ese país. Los factores de talento de Colombia, Perú, México, España y Estados Unidos siguen siendo estimaciones por elección del operador, que pidió que se propusieran y quedaran marcadas así (`COUNTRY_FACTORS_UNVALIDATED`); validarlos espera referencias reales, no es una decisión que él deba, y es distinto de cambiar la base de costo.
 
 Esta definición aplica al costo humano. Las demás filas de la tabla de componentes —formación, QA, respaldo, reemplazo, gestión, licencias, infraestructura— siguen como propuesta por medir.
 

@@ -34,8 +34,8 @@ pnpm --silent pricing:v3 catalog validate --current
 ```
 
 `current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`, e imprime qué archivo y
-qué versión nombra el puntero; esa es la fuente, no este manual. Al 2026-10-11, tras el piso de staffing, son
-`catalog.review-v7.json` (`operating-review-2026-10-11-v7`), `resources.review-v6.json`
+qué versión nombra el puntero; esa es la fuente, no este manual. Al 2026-10-11, tras la oferta SEO/AEO, son
+`catalog.review-v8.json` (`operating-review-2026-10-11-v8`), `resources.review-v6.json`
 (`operating-review-2026-10-11-v6`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
 versión del catálogo, con exit 0.
 
@@ -54,8 +54,9 @@ versión del catálogo, con exit 0.
 
 El catálogo vigente conserva lo del v5 (redondeo comercial por moneda, tipo de cambio de cotización, los 32 costos de
 persona confirmados y declarados como el costo de cada perfil en Chile, y los factores por país del cliente y de cada
-persona), el tipo de cambio de cotización EUR→USD que el v6 agregó para las herramientas con precio en EUR y, desde
-el v7, el piso de margen de la oferta de staffing ([Oferta y piso de margen](#selección-y-asignación)).
+persona), el tipo de cambio de cotización EUR→USD que el v6 agregó para las herramientas con precio en EUR, el piso
+de margen de la oferta de staffing desde el v7 y la oferta propia de la práctica SEO/AEO desde el v8
+([Oferta y piso de margen](#selección-y-asignación)).
 La policy v6 deja
 los 25 precios de herramientas vigentes hasta que se reemplacen, cada uno con una fecha de revisión
 ([Un precio unitario no vence](#un-precio-unitario-no-vence)).
@@ -255,17 +256,26 @@ un perfil en un país se aparta del costo de Chile por su factor
 ([cuándo](#cuándo-registrar-el-costo-específico-de-un-perfil-en-un-país)).
 
 **Oferta y piso de margen.** La oferta del brief (`brief.offerId`) elige la política de precio de cada perfil y, con
-ella, el piso que el motor vigila. Hay dos, ambos decididos por el CEO:
+ella, el objetivo y el piso que el motor vigila. Hay tres, todas decididas por el CEO. Se elige por lo que se vende y
+por la práctica que lo entrega:
 
 - Una persona vendida por dedicación (staff augmentation): `offerId: "talent-assurance-staffing"`, con
   `commercialUnit: "role_capacity"`. Piso de 25 % (2026-10-11, catálogo v7). El objetivo es 30 %, 35 % o 40 % según el
   tier del perfil; esos objetivos los propuso el agente y el CEO los confirmó el mismo día (`COMMERCIAL_POLICY` en el
-  ledger).
+  ledger). Elígela cuando el cliente compra la dedicación de una persona y dirige su trabajo.
 - Un servicio gestionado de la práctica creativa: `offerId: "creative-managed-service"`, con
-  `commercialUnit: "managed_service"`. Piso de 45 % y objetivo de 45 % (2026-10-10).
+  `commercialUnit: "managed_service"`. Piso de 45 % y objetivo de 45 % (2026-10-10). Elígela cuando Efeonce opera un
+  servicio creativo recurrente (contenido, diseño, social care, producción).
+- Un servicio gestionado de la práctica SEO/AEO: `offerId: "seo-aeo-managed-service"`, con
+  `commercialUnit: "managed_service"`. Piso de 45 % (aprobado el 2026-07-13) y objetivo de 55 %, el extremo bajo de la
+  banda 55–60 % de esa práctica, propuesto por el agente y confirmado por el CEO el 2026-10-11 (catálogo v8). Elígela
+  cuando Efeonce opera un programa SEO/AEO recurrente. Rige para cotizaciones fechadas desde el 2026-10-11; con una
+  fecha anterior la corrida queda `needs_input` con `MISSING_CATALOG_SELECTION` en `lines.<lineId>.pricing`.
 
-No elijas la oferta de staffing para un servicio gestionado porque su piso es más bajo. Sobre el piso, el objetivo
-sube según el caso; nunca se baja el piso para que un precio pase. Si declaras un neto acordado bajo el piso, el
+No elijas una oferta por el margen que deja pasar: ni la de staffing para un servicio gestionado porque su piso es
+más bajo, ni la creativa para un programa SEO/AEO, que saldría a 45 % y no a su objetivo. Sobre un piso, el objetivo
+puede subirse por oferta o por perfil con una versión nueva del catálogo; nunca se baja el piso para que un precio
+pase. Si declaras un neto acordado bajo el piso, el
 cotizador no lo rechaza ni lo corrige: marca la línea con `MARGIN_BELOW_FLOOR` y la lista en `marginFloor.lines[]` del
 resumen, con su `minimumMargin` y su margen real ([Leer el resumen](#leer-el-resumen)). Eso se le informa al operador
 tal cual; no se «arregla» quitando costo, con un descuento ni con el redondeo. La excepción bajo un piso es del CEO,
@@ -398,7 +408,8 @@ de cambio de cotización `fx:EUR:USD`; sigue apareciendo porque el registro ante
 ## Cotizar un servicio gestionado por volumen
 
 Para un servicio que se vende por capacidad y se dimensiona por volumen (social care, soporte, producción recurrente),
-usar las versiones vigentes (`--current`) y la oferta `creative-managed-service`.
+usar las versiones vigentes (`--current`) y la oferta de la práctica que lo entrega: `creative-managed-service` en el
+ejemplo, `seo-aeo-managed-service` si es un programa SEO/AEO.
 
 ```bash
 # 1. Volumen → dedicación. Sin --brief sólo calcula; con --brief escribe un brief nuevo.
@@ -443,7 +454,9 @@ En la demanda:
 La política pone cada fila al piso (margen objetivo 45 %, mínimo 45 %) y el catálogo la sube al múltiplo de su
 moneda: el ejemplo (cliente y equipo en Chile) sale en CLP 9.530.000 al mes, de ellos 21.054 de redondeo, con margen
 `0.451214` y ninguna línea bajo el piso. El 45 % es el piso de margen de los servicios gestionados (decisión del CEO, 2026-10-10): un servicio
-donde se puede ganar más sube su margen objetivo en su propia política, no el piso.
+donde se puede ganar más sube su margen objetivo en su propia política, no el piso. Así lo hace la oferta SEO/AEO:
+una copia de este ejemplo con `offerId: "seo-aeo-managed-service"` y `quoteDate` 2026-10-11 sale en CLP 11.640.000 al
+mes, con margen `0.550693`, motor `pricing-v3-local/1.1.0` y ninguna línea bajo el piso.
 
 Sigue siendo una simulación en revisión. Las provisiones y el consumo de agentes son hipótesis declaradas y el plan
 de Sprout es precio público. Los 32 costos de persona están confirmados por su autor (el CEO) con los montos del
@@ -619,10 +632,11 @@ del otro ni de la moneda: un cliente chileno con equipo en Colombia es `offerMar
   precio sigue al país del cliente y el costo al país de la persona; factor de mercado de Chile 1, Colombia 0,90 y
   Estados Unidos 1,10, tomados de los rangos de «Factor País» del Excel; y en los mercados bajo 1 el piso acompaña al
   factor.
-- **Estimado**, sin validar y propuesto por el agente, no decidido por el operador: los cinco factores de talento
-  (avisos de empleo y guías salariales leídos el 2026-10-11; un solo número por país para todos los perfiles y
-  seniorities, sin contraste con contrataciones reales) y los factores de mercado de Perú, México y España (sin
-  contraste con negocios cerrados o perdidos). Cada uno aparece en
+- **Estimado** y sin validar: los cinco factores de talento (avisos de empleo y guías salariales leídos el
+  2026-10-11; un solo número por país para todos los perfiles y seniorities, sin contraste con contrataciones reales;
+  el operador pidió que el agente los propusiera y que quedaran marcados como estimados, así que es su elección y no
+  una decisión que deba) y los factores de mercado de Perú, México y España (propuestos por el agente, sin contraste
+  con negocios cerrados o perdidos). Cada uno aparece en
   el resumen como `ESTIMATED_SOURCE` y está abierto en el ledger como `COUNTRY_FACTORS_UNVALIDATED`. Un precio que
   dependa de un factor estimado se presenta diciéndolo.
 - **No están en el cotizador** los factores por tipo de cliente que trae el Excel (pyme 0,9; licitación pública
@@ -931,7 +945,9 @@ objetivo, no el piso; la política `creative-managed-service` se mantiene en obj
 care es una excepción aprobada por ser cliente vigente. No usar el precio de SKY ni su margen como referencia para
 otro cliente. Confirmado el 2026-10-11: una persona vendida por dedicación (`talent-assurance-staffing`) tiene piso
 de 25 % y de ahí sube según el caso; los objetivos por tier (30 %, 35 % y 40 %) los propuso el agente y el CEO los
-confirmó.
+confirmó. Confirmado el mismo día: los servicios gestionados de la práctica SEO/AEO llevan su propia oferta
+(`seo-aeo-managed-service`), con el piso de 45 % que el CEO aprobó el 2026-07-13 y objetivo 55 %, el extremo bajo de
+su banda 55–60 %, propuesto por el agente y confirmado por él.
 Confirmado el 2026-10-11: el precio sigue al país del cliente, el costo al país de la persona y, en los
 mercados con factor bajo 1, el piso acompaña al factor; el piso de la oferta (45 % o 25 %) sigue rigiendo en el
 mercado base. Declarar `floorBasis` en otro mercado, o cambiar un factor, es decisión del operador.
@@ -971,8 +987,11 @@ No resolver nada de esto por cuenta propia en una cotización.
   dedicación.
 - **No decidir cifras comerciales.** Márgenes, pisos, precios, FX de cotización, múltiplos de redondeo, factores de
   país, `floorBasis` y excepciones son del operador (CEO). El agente lleva el margen real y una recomendación.
-- **No atribuirle al operador lo que propuso el agente**: la fecha de revisión `2027-04-11`, el FX de cotización
-  EUR→USD `1.20` y los factores de talento estimados. Se presentan como estimados pendientes de su decisión.
+- **No elegir la oferta por el margen que deja pasar.** Un programa SEO/AEO gestionado va con
+  `seo-aeo-managed-service`, no con la oferta creativa; un servicio gestionado no va con la de staffing.
+- **No atribuirle al operador lo que propuso el agente**: la fecha de revisión `2027-04-11` y el FX de cotización
+  EUR→USD `1.20` se presentan como estimados pendientes de su decisión. Los factores de talento fuera de Chile siguen
+  estimados porque el operador lo pidió así: se presentan como estimados, no como una decisión que él deba.
 - **No usar el redondeo, un ajuste ni un cambio de fecha para «cumplir» un piso** o para llegar a un precio.
 - **No editar un archivo versionado** (catálogo, policy, demanda de ejemplo, artefacto): se copia a una ruta nueva o
   se emite una versión.
@@ -1004,7 +1023,7 @@ fechada antes lo sigue emitiendo por línea, porque ese día los registros no de
 factor de país estimado entre sus `gaps`: eso se lee en `reviewSignals` del resumen, y su peso, en
 `costEvidencePriority` ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Cuando el
 factor de mercado cambia algo, `margin.policyFloor.marketFactor` lo repite.
-Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Creative Practice mantiene 45% bruto aprobado; `assess` no sustituye ese piso ni aprueba una excepción. El precio que se presenta y toda excepción los decide el operador (CEO). El preview está redactado, local y marcado como simulación;
+Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Los pisos aprobados son los de cada oferta (45 % en los servicios gestionados de las prácticas creativa y SEO/AEO, 25 % en una persona por dedicación); `assess` no los sustituye ni aprueba una excepción. El precio que se presenta y toda excepción los decide el operador (CEO). El preview está redactado, local y marcado como simulación;
 no es oferta emitida. La promoción futura tiene [mapa de integración](../../documentation/finance/cotizador-v3-promocion-canonica.md),
 con la autoridad y lifecycle del cotizador vigente. Este trabajo no despliega ni escribe API/DB/CRM.
 

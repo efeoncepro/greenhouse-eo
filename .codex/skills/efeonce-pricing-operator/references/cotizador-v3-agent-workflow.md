@@ -50,8 +50,8 @@ ruta, versión y digest; `--current` (interruptor sin valor) rellena cada `--cat
 comando acepta y no recibió, después de verificar versión y digest del archivo. Una opción escrita gana. En
 `resources budget` rellena `--catalog` con el catálogo de créditos. Sin `--current` nada cambió: sin `--catalog` cae
 en la baseline histórica y `--policy`/`--credits` son obligatorios. Qué nombra el puntero lo imprime `current show`;
-no citarlo de memoria. Al 2026-10-11, tras el piso de staffing: `catalog.review-v7.json`
-(`operating-review-2026-10-11-v7`) + `resources.review-v6.json` + `ai-credits.review-v1.json`.
+no citarlo de memoria. Al 2026-10-11, tras la oferta SEO/AEO: `catalog.review-v8.json`
+(`operating-review-2026-10-11-v8`) + `resources.review-v6.json` + `ai-credits.review-v1.json`.
 
 Los valores se toman por `quoteDate`, no por el archivo: factores de país, costos en Chile y FX EUR→USD rigen con
 `quoteDate` 2026-10-11 o posterior; una demanda fechada 2026-10-10 resuelve sin factores de país y sin error (lo
@@ -229,8 +229,9 @@ No crear fórmulas o autoridad independientes en cada consumer ni dar por desple
 ## Servicio gestionado por volumen (delta 2026-10-10)
 
 Para un servicio que se dimensiona por volumen (social care, soporte, producción recurrente) usar las versiones
-vigentes con `--current` (bandeja = Sprout Social Advanced por asiento) y la oferta
-`creative-managed-service`; ejemplo completo en `data/pricing/v3-operating/managed-care.*` y pasos en el manual
+vigentes con `--current` (bandeja = Sprout Social Advanced por asiento) y la oferta de la práctica que lo entrega:
+`creative-managed-service` (creativa) o `seo-aeo-managed-service` (SEO/AEO); ejemplo completo, con la oferta
+creativa, en `data/pricing/v3-operating/managed-care.*` y pasos en el manual
 («Cotizar un servicio gestionado por volumen»). Ese ejemplo (cliente y equipo en Chile) da CLP 9.530.000 al mes, sin
 líneas bajo el piso; el mismo servicio para un cliente y un equipo en Colombia está en `managed-care-colombia.*`.
 
@@ -243,7 +244,11 @@ líneas bajo el piso; el mismo servicio para un cliente y un equipo en Colombia 
   declarar una herramienta que el servicio no usa para «pasar» la validación. Sólo se excluye lo que la receta agrega.
 - **Piso de margen:** la política `creative-managed-service` usa `target_margin` 0,45 y `minimumMargin` 0,45 en los
   32 perfiles. Decidido por el CEO el 2026-10-10: 45 % es el piso de margen de los servicios gestionados; un servicio
-  donde se puede ganar más sube su objetivo en su propia política, no el piso. `talent-assurance-staffing` (una
+  donde se puede ganar más sube su objetivo en su propia política, no el piso. Así lo hace
+  `seo-aeo-managed-service` (servicios gestionados de la práctica SEO/AEO, catálogo v8, `quoteDate` ≥ 2026-10-11):
+  `target_margin` 0,55 —extremo bajo de la banda 55–60 % de esa práctica, propuesto por el agente y confirmado por
+  el CEO el 2026-10-11— con `minimumMargin` 0,45, aprobado el 2026-07-13 (`confirmed`); el ejemplo con esa oferta
+  calcula a 55,07 %. Un programa SEO/AEO no se cotiza con la oferta creativa. `talent-assurance-staffing` (una
   persona vendida por dedicación, staff augmentation) tiene desde el catálogo v7 `minimumMargin` 0,25 —piso decidido
   por el CEO el 2026-10-11— y objetivo 0,30/0,30/0,35/0,40 por tier, propuesto por el agente y confirmado por el CEO
   el mismo día (`confirmed`); antes de
@@ -337,7 +342,8 @@ redondeo ocurren dentro del motor.
   o un ajuste para «cumplir» un piso. Confirmado 2026-10-10: 45 % es el piso de los servicios gestionados y un
   servicio que puede ganar más sube su objetivo, no el piso; la política queda 0,45/0,45; SKY es excepción aprobada
   por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro cliente. Confirmado
-  2026-10-11: 25 % es el piso de una persona vendida por dedicación y de ahí sube según el caso.
+  2026-10-11: 25 % es el piso de una persona vendida por dedicación y de ahí sube según el caso (objetivos 30/35/40
+  por tier, confirmados); y SEO/AEO lleva oferta propia con objetivo 55 % y piso 45 %.
 - **Abierto** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)):
   `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`, `COUNTRY_FACTORS_UNVALIDATED`, `LOCALIZED_TALENT_COSTS`, provisiones
   estimadas y consumo de agentes sin medir. `MARGIN_FLOOR_SCOPE` quedó decidido; `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE` se
@@ -358,7 +364,8 @@ Decisión: delta 2026-10-11 del ADR motor 1.1. Aquí sólo las reglas.
   línea → factor de talento sobre el **costo** (costo en Chile × factor), y de ahí el precio. No deducir uno del otro
   ni de `outputCurrency`: país fija factores; moneda fija FX y redondeo. Países registrados: CL, CO, PE, MX, US, ES.
 - **Valores vigentes** (rigen con `quoteDate` ≥ 2026-10-11). Talento respecto de Chile: CL 1; CO 0.80, PE 0.85,
-  MX 0.90, ES 3, US 5 — los cinco **estimados** y propuestos por el agente, uno por país para todo perfil. Mercado: CL 1, CO 0.90, US 1.10 **decididos**
+  MX 0.90, ES 3, US 5 — los cinco **estimados** y propuestos por el agente, uno por país para todo perfil; siguen
+  estimados por elección del operador, no es una decisión que deba. Mercado: CL 1, CO 0.90, US 1.10 **decididos**
   por el CEO; PE 0.95, MX 1, ES 1.10 **estimados**. Un factor estimado sale en `reviewSignals` como `ESTIMATED_SOURCE`
   (`paths` `snapshot.talentFactors` / `snapshot.marketFactors`): decirlo al presentar el precio. No citar estos
   valores de memoria: `catalog search --kind talent_factor|market_factor --current --date <fecha>`.

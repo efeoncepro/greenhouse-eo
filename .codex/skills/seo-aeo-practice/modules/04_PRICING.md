@@ -10,6 +10,10 @@ congela inputs y produce explain/replay/readiness/preview. Costos históricos y 
 no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
 canónica. **Las propuestas40/35 de readiness no reemplazan el piso45% de la práctica** ni precio/condiciones
 aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas.
+**Oferta V3 de esta práctica (catálogo v8, 2026-10-11):** un programa SEO/AEO gestionado se cotiza con
+`offerId: "seo-aeo-managed-service"` — objetivo 55% (extremo bajo del target 55-60% de abajo, confirmado por el CEO)
+y piso 45% (el del 2026-07-13). No usar `creative-managed-service` (objetivo = piso: saldría a 45%) ni la oferta de
+staffing; `--current` y fecha de cotización desde el 2026-10-11.
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
 nómina real del §4: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.

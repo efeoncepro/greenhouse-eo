@@ -385,7 +385,7 @@ Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay coman
   también como padre congelado. Ver el delta del 2026-10-11, más abajo.
   *Nota 2026-10-11 (posterior):* las versiones vigentes ya no se nombran en este documento. Las nombra el puntero
   `data/pricing/v3-operating/current.json`, se usan con `--current` y las imprime `current show` (al 2026-10-11,
-  tras el piso de staffing: catálogo v7 y policy v6).
+  tras la oferta SEO/AEO: catálogo v8 y policy v6).
 - **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
   `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
   muestran sólo el neto final.
@@ -505,7 +505,8 @@ dueño del tema y aquí sólo se anota su efecto sobre el flujo; los otros tres 
   `data/pricing/v3-catalog/catalog.review-v1.json`, y `--policy` y `--credits` siguen siendo obligatorios.
 - **Qué nombra el puntero.** Lo imprime `current show`; esa es la fuente, no este párrafo. Al emitirse esta ronda
   eran `catalog.review-v6.json`, `resources.review-v6.json` y `../v3-resources/ai-credits.review-v1.json`; al
-  2026-10-11, tras el piso de staffing (delta siguiente), el catálogo es `catalog.review-v7.json`.
+  2026-10-11 el catálogo pasó a `catalog.review-v7.json` con el piso de staffing (delta siguiente) y a
+  `catalog.review-v8.json` con la oferta SEO/AEO (último delta).
 - **Una fecha de cotización posterior ya no se bloquea por la vigencia de un precio de herramienta.** Medido con la
   demanda `managed-care-colombia` fechada el 2026-12-15: con la policy v6 calcula; con la v5 queda `needs_input` con
   `RESOURCE_PRICE_NOT_EFFECTIVE` en Notion, Microsoft 365 y la bandeja social.
@@ -681,14 +682,58 @@ acordado de CLP 1.900.000, el resumen lista la línea en `marginFloor.lines[]` c
 
 **Reglas para agentes.**
 
-- Hay dos pisos, ambos del CEO: 45 % para un servicio gestionado de la práctica creativa
-  (`creative-managed-service`) y 25 % para una persona vendida por dedicación (`talent-assurance-staffing`).
+- Al emitirse este delta había dos ofertas con piso, ambos del CEO: 45 % para un servicio gestionado de la práctica
+  creativa (`creative-managed-service`) y 25 % para una persona vendida por dedicación (`talent-assurance-staffing`).
+  Desde el catálogo v8 son tres ofertas: ver el delta siguiente.
 - **NUNCA** bajar un piso, ni elegir la oferta de staffing para un servicio gestionado, para que un precio pase.
 - El objetivo de un perfil puede subirse en su propio registro, con una versión nueva del catálogo. El piso no.
 - Los objetivos 30/35/40 son decisión del CEO sobre una propuesta del agente; cambiarlos exige una decisión suya y una
   versión nueva del catálogo.
 - Una línea bajo el piso se informa al operador con su margen real. La excepción es del CEO, caso por caso, y nunca
   es referencia para otro cliente.
+
+## Delta 2026-10-11 — oferta propia de la práctica SEO/AEO (catálogo v8)
+
+**Contexto.** El piso de 45 % de la práctica SEO/AEO está aprobado por el operador (CEO) desde el 2026-07-13, con una
+banda objetivo de 55–60 %, pero el catálogo no tenía una oferta para esa práctica. Un programa SEO/AEO gestionado sólo
+podía cotizarse con `creative-managed-service`, cuyo objetivo es igual a su piso: salía al 45 %, por debajo de la banda
+de su propia política.
+
+**Decisión del operador (CEO, 2026-10-11).** Los servicios gestionados de la práctica SEO/AEO llevan su propia oferta
+en el cotizador, `seo-aeo-managed-service`, con objetivo 55 % y piso 45 %. El piso es el aprobado el 2026-07-13; el
+objetivo es el extremo bajo de la banda, propuesto por el agente y confirmado por el CEO el mismo día.
+
+**Qué se registró.** `catalog.review-v8.json` (versión `operating-review-2026-10-11-v8`), emitido desde v7 con el
+change-set `seo-aeo-managed-service.change.json`: 32 `add`, uno por perfil
+(`pricing:<profileId>:seo-aeo-managed-service`, revisión 1, vigentes desde el 2026-10-11), con `method: target_margin`,
+`rate` 0,55 sobre todos los costos y `minimumMargin` 0,45, marcados `confirmed`. Ninguna política existente se tocó. El
+puntero `current.json` pasó a nombrar el catálogo v8; policy y créditos no cambiaron. El siguiente catálogo sería v9.
+No hay cambio de motor, de esquema ni de contrato.
+
+**Por qué una oferta propia y no la creativa.** En SEO/AEO el objetivo no es el piso. Y el `offerId` es lo que un
+agente elige en el brief: una práctica sin oferta propia termina cotizada al objetivo de otra práctica.
+
+**Por qué otros 32 registros y no una dimensión «práctica».** El catálogo ya modela la política por oferta y perfil;
+agregar la oferta no pide cambio de esquema ni de motor. El costo es un registro por perfil por oferta: hoy hay 96
+políticas de precio vigentes (tres ofertas por 32 perfiles), más las 32 revisiones reemplazadas de staffing. Si las
+ofertas siguen multiplicándose, la alternativa es una dimensión de práctica en la política.
+
+**Comportamiento verificado.** El ejemplo de servicio gestionado del repo (`managed-care.demand.json`, cliente y equipo
+en Chile, CLP), cotizado con `offerId: "seo-aeo-managed-service"` y fecha 2026-10-11, calcula con 55,07 % de margen,
+motor `pricing-v3-local/1.1.0`, sin ninguna línea bajo el piso. Con una fecha anterior al 2026-10-11 esa oferta no
+tiene política y la corrida queda `needs_input` con `MISSING_CATALOG_SELECTION` en `lines.<lineId>.pricing`.
+
+**Reglas para agentes.**
+
+- El catálogo lleva tres ofertas y tres políticas, todas decididas por el CEO: `creative-managed-service` (servicio
+  gestionado de la práctica creativa; objetivo 45 %, piso 45 %), `seo-aeo-managed-service` (servicio gestionado de la
+  práctica SEO/AEO; objetivo 55 %, piso 45 %) y `talent-assurance-staffing` (una persona vendida por dedicación;
+  objetivo 30/35/40 % según tier, piso 25 %).
+- **SIEMPRE** elegir la oferta por lo que se vende y por la práctica que lo entrega, nunca por el margen que deja pasar.
+- Sobre un piso, el objetivo puede subirse por oferta o por perfil, con una versión nueva del catálogo. **NUNCA** se
+  baja un piso para que un precio pase.
+- La excepción bajo un piso es del CEO, caso por caso, y nunca es referencia para otro cliente.
+- El 40/35 de `compose assess` sigue siendo una propuesta genérica sin aprobar, nunca un piso.
 
 ## Evidencia y rutas de operación
 

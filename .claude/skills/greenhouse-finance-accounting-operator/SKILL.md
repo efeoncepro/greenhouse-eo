@@ -375,8 +375,10 @@ créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y r
 FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
 `trial-*` son costos no medidos y no provisiones aprobadas. Margen sobre venta y markup no son intercambiables;
 40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
-Hay dos pisos, ambos del CEO: 45% en el servicio gestionado creativo y, desde 2026-10-11, 25% en una persona vendida
-por dedicación (staff augmentation, oferta `talent-assurance-staffing`); sobre el piso el objetivo sube según el caso.
+Hay tres ofertas, todas del CEO: servicio gestionado creativo (`creative-managed-service`, objetivo 45%, piso 45%),
+servicio gestionado SEO/AEO (`seo-aeo-managed-service`, objetivo 55%, piso 45%, desde 2026-10-11) y una persona
+vendida por dedicación (staff augmentation, `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%, desde
+2026-10-11); sobre el piso el objetivo sube según el caso y nunca se baja un piso para que un precio pase.
 Las cifras y sus excepciones las decide el CEO (SKY social care 2027, 40,26%, es una y no es referencia): el agente
 lleva una recomendación verificada contra sus datos.
 

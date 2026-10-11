@@ -255,8 +255,8 @@ con su ruta, versión y digest (la huella de su contenido). Con `--current`, la 
 pasaste; si pasas una ruta explícita, gana la ruta. Antes de usar el puntero lo comprueba contra los archivos: si la
 versión o el digest no coinciden, rechaza con `CURRENT_VERSIONS_MISMATCH` en vez de seguirlo. Sin `--current` todo
 sigue como antes: sin `--catalog` se lee review-v1 y `--policy` y `--credits` son obligatorios. Qué nombra el puntero
-lo imprime `pnpm --silent pricing:v3 current show`; al 2026-10-11, tras el piso de staffing, es
-`catalog.review-v7.json`, `resources.review-v6.json` y `ai-credits.review-v1.json`, y esa frase envejece, así que
+lo imprime `pnpm --silent pricing:v3 current show`; al 2026-10-11, tras la oferta SEO/AEO, es
+`catalog.review-v8.json`, `resources.review-v6.json` y `ai-credits.review-v1.json`, y esa frase envejece, así que
 confírmalo con el comando. Emitir una versión nueva no mueve el puntero: es un paso
 aparte. [Cómo se mueve](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
 
@@ -272,14 +272,15 @@ El presupuesto IA separado posee su propio formato: no es una quote válida para
 
 `compose assess` separa completitud matemática de evidencia: salario localizado, provisiones medidas,
 suscripciones/acceso/capacidad reales, asignación simulada, impuestos/entidad, SOW y autorización comercial.
-Siempre devuelve revisión. 40% objetivo/35% piso son propuesta, `approved=false`; no reemplazan la policy elegida ni pisos vigentes de la práctica. Creative Practice conserva 45% bruto aprobado y, desde el 2026-10-11, una persona vendida por dedicación (staff augmentation) tiene piso de 25%, ambos decididos por el CEO: el aviso genérico de `assess` no certifica esos pisos ni permite una excepción. El agente debe calcular y verificar el piso de la oferta correspondiente.
+Siempre devuelve revisión. 40% objetivo/35% piso son propuesta, `approved=false`; no reemplazan la policy elegida ni pisos vigentes de la práctica. Creative Practice conserva 45% bruto aprobado; la práctica SEO/AEO tiene el mismo piso de 45% y, desde el 2026-10-11, su propia oferta con objetivo 55%; y desde esa fecha una persona vendida por dedicación (staff augmentation) tiene piso de 25%. Los tres los decidió el CEO: el aviso genérico de `assess` no certifica esos pisos ni permite una excepción. El agente debe calcular y verificar el piso de la oferta correspondiente.
 TrialAssurance 25/operación 25/setup 100 permanecen recursos de prueba, no estándares de Talent Assurance.
 
 Delta 2026-10-10: `assess` ya reporta el piso de la política de precio seleccionada, sin recalcularlo. Agrega una
 brecha `MARGIN_BELOW_POLICY_FLOOR` (owner Commercial/Finance) por cada línea que el kernel marcó
 `MARGIN_BELOW_FLOOR`, y `margin.policyFloor.linesBelowFloor` con neto, margen, `marginRateRoundedDown` y
 `marginAmountShortOfFloor` de cada una. `proposedTarget`/`proposedFloor` no cambian. El veredicto vale sólo si la
-oferta elegida codifica el piso de su práctica: con `creative-managed-service` (objetivo y mínimo 0,45) lo hace; una
+oferta elegida codifica el piso de su práctica: con `creative-managed-service` (objetivo y mínimo 0,45) lo hace, y
+desde el catálogo v8 también `seo-aeo-managed-service` (práctica SEO/AEO: objetivo 0,55, mínimo 0,45); una
 política con mínimo 0 no marca nada y `assess` no suple esa verificación (desde el catálogo v7 del 2026-10-11
 `talent-assurance-staffing`, la persona por dedicación, también codifica el suyo: mínimo 0,25; sólo los catálogos
 anteriores la dejan en mínimo 0). Con objetivo igual al mínimo, costo y precio

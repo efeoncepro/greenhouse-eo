@@ -520,4 +520,5 @@ La práctica declara tareas SEO, capacidad, plataformas y límites; el agente se
 CLI calcula. Copywriter+tareaSEO requiere SEMrush sin cambiar automáticamente su variante salarial. Adobe/IA se
 añaden sólo cuando el trabajo los necesita; Notion/M365 son base. Fuente pública no acredita plan/permisos reales.
 Costeo de servicio mantiene funciones internas y fee externo; explain interno y preview de simulación no prueban
-aprobación/SOW ni autorizan enviar precio. La política específica de `seo-aeo-practice` conserva sus pisos/gates.
+aprobación/SOW ni autorizan enviar precio. La política específica de `seo-aeo-practice` conserva sus pisos/gates;
+en V3 un programa SEO/AEO gestionado usa la oferta `seo-aeo-managed-service` (objetivo 55%, piso 45%).
