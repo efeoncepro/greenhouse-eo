@@ -56,3 +56,11 @@ tasa, catálogo v3) siguen siendo válidos y reproducibles; quedan como registro
 
 Ese mismo día el operador confirmó como válidos los sueldos del Excel de pricing, que él construyó. Siguen siendo
 hipótesis los reemplazos, la guardia y el consumo de agentes.
+
+## Delta 2026-10-11 — el margen con el refuerzo de campaña dentro del fee
+
+Esta nota registró la excepción con 40,26 %, antes de que el refuerzo de campaña pasara a estar incluido en el fee.
+Cotizado a 12 meses con las versiones vigentes y el refuerzo adentro, el margen es 34,9 % con la forma de compra que
+el CEO definió el 11/10/2026: Sprout con facturación mensual y un solo asiento, compartido con la persona de refuerzo.
+El precio no cambia. Detalle y lecturas alternativas:
+[cotización de 12 meses](COTIZACION-12-MESES-2026-10-11.md).
