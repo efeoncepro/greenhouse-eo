@@ -39,6 +39,13 @@ iguales se declaran una vez, el documento admite opciones adicionales y líneas 
 cotización calculada o no guarda nada. No toca ningún contrato del kernel, y todos los artefactos congelados se
 reproducen igual. El resumen para leer primero está en
 [Asientos como se compran y períodos declarados una vez](#asientos-como-se-compran-y-períodos-declarados-una-vez-2026-10-11).
+Los párrafos marcados «incremento (2026-10-11, cierre)» describen el cierre de ese día: un adicional opcional que
+amplía la cotización base se lee como la diferencia entre dos cotizaciones congeladas (`compose increment`, y
+`compose document --increment` para imprimirlo). No toca ningún contrato del kernel, y todos los artefactos
+congelados se reproducen igual. Ese mismo día el CEO decidió que la fecha de inicio del servicio y la duración del
+contrato no son datos del cotizador, porque una cotización no es un contrato: donde este documento las listaba como
+algo por modelar, ahora dice que quedan fuera por decisión. El resumen para leer primero está en
+[Un adicional que amplía la base se lee como un incremento](#un-adicional-que-amplía-la-base-se-lee-como-un-incremento-2026-10-11).
 
 ## Qué versiones se usan hoy (2026-10-11)
 
@@ -134,8 +141,10 @@ cifras del artefacto congelado.
 
 **Qué no puede expresar todavía un trabajo acotado.**
 
-- La duración del contrato no es un dato de entrada: una cotización tiene períodos, no un plazo. El cotizador no
-  sabe si un mes es un trabajo de un mes o el mes representativo de un servicio continuo.
+- El cotizador no sabe si un mes es un trabajo de un mes o el mes representativo de un servicio continuo: una
+  cotización tiene períodos, no un plazo. La duración del contrato no es un dato de entrada y no lo será. Lo decidió
+  el CEO el 2026-10-11 (cierre): es materia del contrato, igual que la fecha de inicio del servicio, y no mueve
+  ningún costo, precio ni impuesto. No es un pendiente de esta lista.
 - Un trabajo de menos de un mes se expresa como horas dentro de un período; no hay períodos más cortos.
 - Los costos de terceros del trabajo y una reserva de contingencia para alcance fijo no estaban modelados cuando se
   escribió esta lista. Existen desde el contrato 1.4.0, de la noche del mismo 2026-10-11:
@@ -449,6 +458,7 @@ este diseño a ese cotizador, que aporta lo que falta; ese paso no ha empezado.
 | --- | --- |
 | La cotización congelada | Toda cifra: la moneda, la fecha del documento, las líneas y su neto, el impuesto, el total, los costos que el cliente paga directo, los importes de un calendario de pagos y el valor de referencia de una línea bonificada |
 | La cotización congelada de cada opción | El precio de esa opción adicional (asientos y opciones, 2026-10-11): cada opción se cotiza aparte y su precio sale de su propio artefacto |
+| La cotización congelada del servicio con el adicional adentro | El precio de una opción que amplía la base (incremento, 2026-10-11, cierre): lo que el adicional le suma al neto de un período, que es la diferencia entre ese artefacto y el de la cotización base |
 | El brief del documento | Todo texto: referencia, quién emite y para quién, portada, nombre del servicio, alcance, calendario del trabajo, textos de la sección de precio y condiciones. También cómo se presentan las líneas: nombre, detalle y grupo, si una línea bonificada se muestra, y el nombre y la unidad de cada opción |
 
 El brief (`pricing-v3-quote-document-brief/1`) no tiene dónde escribir un importe, una moneda, una tasa de impuesto
@@ -463,7 +473,9 @@ una cifra se cambia la cotización y se vuelve a emitir.
    (falta información).
 2. Con el brief lleno, `compose document --input <artefacto> --brief <brief> --out <datos>` emite los datos del
    documento. Sale con código 3: es el borrador de una cotización en revisión. Si el documento lleva opciones
-   adicionales, los dos pasos reciben además `--option <clave>=<artefacto de la opción>`, una vez por opción.
+   adicionales, los dos pasos reciben además `--option <clave>=<artefacto de la opción>`, una vez por opción; o
+   `--increment <clave>=<artefacto del servicio con el adicional>` si la opción amplía la base (ver
+   [el incremento](#un-adicional-que-amplía-la-base-se-lee-como-un-incremento-2026-10-11)).
 3. `node scripts/documents/render-cotizacion-a4.mjs --data <datos> --out <carpeta nueva>` genera el HTML, el PDF,
    un manifiesto y las capturas para revisar.
 
@@ -505,7 +517,8 @@ habría dos cifras para la misma cotización. La plantilla trae un
   neto. Cada hito dice cuándo se cobra: en un período de la cotización o con un texto.
 - **Opciones adicionales.** Aparecen si la corrida recibe la cotización congelada de cada opción con
   `--option <clave>=<artefacto>` (hasta ocho). Se imprimen en un bloque propio, fuera de las líneas, del neto, del
-  impuesto y del total.
+  impuesto y del total. Desde el cierre del 2026-10-11 una opción también puede entregarse con
+  `--increment <clave>=<artefacto>`; las dos formas comparten el bloque y el límite de ocho.
 
 **Opciones adicionales (asientos y opciones, 2026-10-11).** Un servicio que el cliente puede contratar aparte se
 muestra con su precio sin entrar a la cotización. La regla es una sola: **el precio de una opción sale de su propia
@@ -520,6 +533,25 @@ cotización congelada**, nunca de un texto.
   en que se lee el precio («al mes», «por mes de campaña») y un detalle opcional. No tiene dónde escribir el precio.
 - El documento las imprime bajo un rótulo que dice que están fuera de la cotización y que sus valores son netos. Ese
   texto es fijo y lo pone la plantilla.
+
+**Una opción que amplía la base (incremento, 2026-10-11, cierre).** La regla anterior vale para una opción que es
+otra persona u otro trabajo. Una opción que sólo le suma dedicación o consumo a personas que ya son líneas de la
+cotización base se entrega con `--increment <clave>=<artefacto>`, donde el artefacto es la cotización congelada **del
+servicio con el adicional adentro**. Su precio es lo que el adicional le suma al neto de un período: ese artefacto
+menos la cotización del documento.
+
+- Comparte con `--option` el bloque, el límite de ocho y el brief (`options.<clave>`: nombre, unidad y detalle). Una
+  clave no puede usarse en las dos formas.
+- Las dos cotizaciones tienen que ser comparables, o la corrida se rechaza con el código de la regla que falló
+  (`QUOTE_INCREMENT_*`); nada se aproxima. Además, el adicional debe sumar el mismo neto en cada período comparado y
+  no traer un costo que el cliente paga directo y que la base no tenga. Ésas son reglas del documento sobre un
+  incremento ya comparable, y su rechazo es `QUOTE_DOCUMENT_OPTION_INVALID`.
+- El cliente ve un precio. El costo y el margen del incremento son internos (`compose increment`) y nunca llegan al
+  documento.
+- `source` registra, para esa opción, la identidad de la cotización con el adicional y `option<N>Basis: "increment"`.
+
+Qué es comparable, cuándo usar cada forma y un ejemplo:
+[Un adicional que amplía la base se lee como un incremento](#un-adicional-que-amplía-la-base-se-lee-como-un-incremento-2026-10-11).
 
 **Línea bonificada (asientos y opciones, 2026-10-11).** Una línea que la cotización deja en cero con un ajuste
 explícito (por ejemplo, una puesta en marcha que se regala a cambio de un compromiso de plazo) no imprime nada por
@@ -536,6 +568,7 @@ efecto del documento.
 neto de la cotización; la cotización está calculada; cada importe se puede escribir en su moneda y el contenido
 cabe en los límites de la plantilla (hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos); el impuesto
 corresponde a su tasa; y cada opción es un solo importe que dice todo de ella (`QUOTE_DOCUMENT_OPTION_INVALID` si no).
+Una opción entregada como incremento exige además que sus dos cotizaciones se puedan restar (`QUOTE_INCREMENT_*`).
 Códigos y reglas:
 [contrato](cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11).
 
@@ -555,6 +588,7 @@ en CLP.
 | `designer-three-months-iva` (contrato 1.3.0, tres meses) | El mismo diseñador, 3 meses × 2.550.000 = 7.650.000; puesta en marcha, 320.000 | 7.970.000 | IVA 19 %: 1.514.300; total 9.484.300 | 4 |
 | `managed-on-demand-third-party` (contrato 1.4.0, un mes) | Fee del servicio 11.370.000; tres costos de terceros: 4.950.000, 1.380.000 y 3.333.333 | 21.033.333 | Sin resolver: «Por confirmar» | 5 |
 | `designer-startup-courtesy` (contrato 1.3.0, tres meses; asientos y opciones) | El mismo diseñador, 3 meses × 2.550.000 = 7.650.000; puesta en marcha «Bonificado», valor de referencia 320.000. Dos opciones: 2.580.000 «al mes» y 3.570.000 «por mes de campaña» | 7.650.000 | IVA 19 %: 1.453.500; total 9.103.500 | 5 |
+| `managed-addon-increment` (contrato 1.3.0, tres meses; incremento, cierre) | Fee del servicio gestionado, 3 meses × 5.650.000 = 16.950.000. Una opción entregada como incremento: 300.000 «al mes» | 16.950.000 | IVA 19 %: 3.220.500; total 20.170.500 | 4 |
 
 - `designer-startup-courtesy` es el ejemplo de una línea bonificada y de dos opciones. Su demanda es la de
   `designer-three-months-iva` con un ajuste más: un neto pactado de cero sobre la puesta en marcha. Por eso el neto
@@ -567,6 +601,10 @@ en CLP.
   policy anterior, cuando Creative Cloud Pro todavía se cotizaba con su descuento.
 - En `managed-on-demand-third-party` el documento imprime aparte el costo que paga el cliente (USD 890, sin
   convertir) y un calendario de pagos de 50 %, 30 % y 20 %: 10.520.000, 6.310.000 y 4.203.333, que suman el neto.
+- `managed-addon-increment` es el ejemplo de una opción entregada como incremento (cierre del 2026-10-11). Su
+  cotización base es un servicio gestionado de tres meses con un fee pactado. La opción no tiene cotización propia en
+  el documento: su precio sale de `managed-addon-increment.with-addon.artifact.json`, la cotización del mismo servicio
+  con el adicional adentro, y `source` lo registra con `option1Basis: "increment"`. El comprador es inventado.
 
 **Qué no está modelado.** No describir nada de esto como existente:
 
@@ -585,12 +623,19 @@ en CLP.
   marcha a un servicio gestionado, así que su cotización no tiene una fila que bonificar: una «puesta en marcha
   bonificada» de un servicio gestionado sigue siendo un texto del brief, sin cifra, hasta que el catálogo la costee
   (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC` en el ledger).
-- **El margen de una opción que sólo suma dedicación es un piso, no la cifra real.** Una opción que agrega
-  dedicación de personas que ya están en la cotización base es una línea nueva en su propia cotización, y vuelve a
-  llevar el fee de plataforma por línea y su parte de las herramientas base. Su costo queda sobrestimado y su margen
-  es una cota inferior. El precio impreso no cambia (`OPTION_QUOTES_REPEAT_PER_LINE_FEES` en el ledger).
-- La duración del contrato y una fecha de inicio que el cliente define después: una cotización tiene meses fechados
-  desde su fecha de cotización.
+
+Dos puntos que esta lista traía dejaron de ser límites en el cierre del 2026-10-11:
+
+- **El margen de una opción que sólo suma dedicación ya tiene su cifra.** Esta lista decía que era un piso: cotizada
+  sola, esa opción es una línea nueva y vuelve a llevar el fee de plataforma por línea y su parte de las herramientas
+  base. Eso sigue siendo cierto de una opción entregada con `--option`. Lo que cambió es que ese adicional se declara
+  como incremento, y `compose increment` lee su costo y su margen sin cobrar nada dos veces
+  (`OPTION_QUOTES_REPEAT_PER_LINE_FEES` quedó cerrado en el ledger):
+  [el incremento](#un-adicional-que-amplía-la-base-se-lee-como-un-incremento-2026-10-11).
+- **La duración del contrato y la fecha de inicio del servicio quedan fuera del cotizador por decisión.** El CEO lo
+  decidió el 2026-10-11: una cotización no es un contrato, y esos dos datos son materia del contrato; no mueven
+  ningún costo, precio ni impuesto. No son un pendiente. Lo que la cotización supone se mantiene: sus meses están
+  fechados desde su fecha de cotización.
 
 Datos, reglas de composición y límites de la plantilla:
 [su manual](../../commercial/templates/cotizacion-a4/README.md).
@@ -684,6 +729,109 @@ Paso a paso:
 Por qué así y qué se descartó:
 [decisión](../../architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
 
+## Un adicional que amplía la base se lee como un incremento (2026-10-11)
+
+**Qué es y para qué sirve.** Un adicional opcional puede ser de dos clases. Si es otra persona u otro trabajo (un
+redactor, un mes de video), se cotiza solo y su cotización dice todo de él. Si en cambio sólo le suma dedicación o
+consumo a personas que ya son líneas de la cotización base, lo que cuesta y lo que deja es lo que cambia en la
+cotización del servicio cuando el adicional entra. `compose increment` lee esa diferencia entre dos cotizaciones
+congeladas: la base, y **la base con el adicional adentro**. Es una lectura, como las de
+[una cotización congelada](#tres-lecturas-de-una-cotización-congelada-2026-10-11): verifica los dos artefactos por
+replay, no recalcula nada y no cambia un precio, un costo ni un estado. Cada cifra es un importe congelado de una
+cotización menos el mismo importe congelado de la otra.
+
+**El límite que cerró.** Hasta este cambio un adicional sólo podía imprimirse desde su propia cotización
+(`--option`). Cuando el adicional son unos puntos más de una persona que ya está en la base, esa cotización propia
+es una línea nueva y vuelve a llevar lo que se cobra una vez por línea, cualquiera sea su dedicación: el fee de
+plataforma y su parte de las herramientas base. El costo quedaba sobrestimado y el margen, subestimado. El precio
+impreso era correcto sólo porque estaba pactado: a precio de policy, la cotización suelta además pide más de lo que
+el mismo adicional le sube al precio del servicio. En la cotización del servicio con el adicional adentro cada
+persona es una sola línea con la dedicación sumada, así que nada se cobra dos veces. Era el punto
+`OPTION_QUOTES_REPEAT_PER_LINE_FEES` del ledger, que quedó cerrado.
+
+**Cómo se usa.** El paso a paso está en el
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#un-adicional-que-amplía-la-base-compose-increment).
+
+1. Se cotiza la base como cualquier cotización.
+2. Se cotiza el mismo servicio con el adicional adentro: la demanda de la base con más dedicación en las mismas
+   líneas (o más consumo), con una línea nueva si el adicional trae además a alguien que la base no tiene, y con el
+   precio del adicional escrito donde la cotización escribe sus precios. Mismas fuentes, misma fecha de cotización
+   y los mismos períodos.
+3. `compose increment --input <con el adicional> --base <base> [--out <lectura>]` imprime la lectura. Sale con 3.
+4. Para imprimirlo en el documento del cliente:
+   `compose document --input <base> --brief <brief> --increment <clave>=<con el adicional>`.
+
+**Es una lectura interna.** Trae costo y margen, y lo dice en `audience: "internal"`. No se le muestra a un cliente.
+El documento toma de ella una sola cifra: lo que el adicional le suma al neto de un período. No es un precio nuevo y
+no aprueba nada (`binding: false`): informa, y decide el operador.
+
+**Qué trae** (`pricing-v3-quote-increment/1`).
+
+| Clave | Qué dice |
+| --- | --- |
+| `base`, `withAddOn` | La identidad de cada cotización (`calculationId`, `replayDigest`) |
+| `versions` | Catálogo, policy de recursos y catálogo de créditos, que son los mismos en las dos |
+| `comparison` | El modo (`same_periods` o `representative_period`) y cuántos períodos tiene cada cotización y cuántos se comparan |
+| `periods[]` | Por período comparado: `base`, `withAddOn` e `increment`, cada uno con neto, costo, margen en importe y tasa de margen redondeada hacia abajo |
+| `totals` | Lo mismo sumado sobre los períodos comparados, y `costByComponentKind`: dónde está el costo del adicional y qué clases de costo no se movieron |
+| `netIncrementPerPeriod` | Lo que el adicional le suma al neto de un período cuando le suma lo mismo a todos; `null` si los períodos difieren. Es la cifra que imprime el documento |
+| `changed` | De qué está hecho el adicional: `lines` (líneas nuevas o con más personas o más dedicación), `tools` (herramientas cuyo costo se movió) y `thirdPartyCosts` (costos de terceros que agrega) |
+
+`costByComponentKind` se redondea entrada por entrada para leerlo y puede diferir en una unidad; `cost` es la cifra
+que suma.
+
+**Cuándo se pueden restar dos cotizaciones.** Sólo cuando la diferencia puede significar el adicional y nada más.
+Si no, la lectura se rechaza con la regla que falló, con salida 1; **nunca se aproxima**. Las reglas se revisan en
+este orden:
+
+| Código | Qué exige | Por qué |
+| --- | --- | --- |
+| `QUOTE_INCREMENT_REQUIRES_CALCULATED_QUOTES` | Las dos cotizaciones están calculadas | Una cotización bloqueada no tiene importes que restar |
+| `QUOTE_INCREMENT_CONTEXT_DIFFERS` | La misma moneda, oferta, cuenta, tratamiento de impuesto, forma del trabajo, unidad comercial, código de engagement, país de mercado, fecha de cotización, modo y declaración de contingencia | Dos cotizaciones que difieren en algo de esto cotizan dos cosas distintas. La fecha cuenta porque los registros del catálogo rigen por fecha |
+| `QUOTE_INCREMENT_VERSIONS_DIFFER` | El mismo catálogo, la misma policy de recursos y el mismo catálogo de créditos, por versión y por contenido | Una diferencia entre versiones metería un cambio de precio dentro del costo del adicional |
+| `QUOTE_INCREMENT_PERIODS_NOT_COMPARABLE` | La cotización con el adicional tiene los períodos de la base; o es un solo período representativo, y entonces la base es igual en todos sus períodos (neto, costo y líneas) y ese período no cobra nada una sola vez (no trae una fila de puesta en marcha). En las dos cotizaciones los períodos suman sus totales | Un período representativo vale por todos los de la base: no puede hacerlo si la base cambia de un mes a otro, y un cobro único no es un costo de cada período |
+| `QUOTE_INCREMENT_BASE_NOT_CONTAINED` | Cada línea de la base sigue en la cotización con el adicional, con el mismo perfil, país y modo de asignación, la misma base de precio y de costo (policy de asignación, policy de precio, kit, registro de costo y equipo), cada elección de kit que hizo la base, la misma unidad de dedicación y al menos las mismas personas y la misma dedicación; y siguen ahí cada costo de terceros y cada herramienta de la base | Si la base no está entera adentro, la diferencia mezcla el adicional con un cambio de la base |
+| `QUOTE_INCREMENT_NET_NOT_POSITIVE` | El neto crece en cada período comparado | Un período en que la cotización con el adicional no vale más que la base no tiene adicional que valorar |
+
+Lo que el acuerdo dice del precio (descuentos, netos pactados) no se compara: es donde se escribe el precio del
+adicional. Tampoco se le exige nada al costo: un adicional puede no agregar ninguno, y la lectura dice lo que
+encontró. En modo `representative_period` el incremento es por período de la base y no se multiplica por ningún
+número de períodos, porque ningún dato de entrada dice en cuántos corre el adicional.
+
+**Cuál usar.**
+
+| El adicional | Se entrega con | Por qué |
+| --- | --- | --- |
+| Amplía a personas que ya son líneas de la base: más dedicación, más consumo | `--increment` | Su costo es lo que cambia en la cotización del servicio; cotizado solo repetiría lo que se cobra por línea |
+| Es mixto: amplía a personas de la base y además trae una persona nueva | `--increment` | La cotización con el adicional puede tener líneas nuevas además de más dedicación en las de la base; `changed.lines` las distingue (`dedication_grew` y `added`) |
+| Es sólo una persona nueva o un trabajo aparte | `--option` | Su propia cotización dice todo de él, incluido lo que se cobra por línea, que en ese caso sí es suyo |
+
+Una base cuyo costo cambia de un mes a otro (una persona activa sólo algunos meses) no admite un período
+representativo: la cotización con el adicional se hace sobre los mismos períodos de la base.
+
+**Ejemplo congelado, vuelto a correr el 2026-10-11.** `managed-addon-increment`, en
+[`data/pricing/v3-operating/`](../../../data/pricing/v3-operating/README.md): un servicio gestionado de tres meses
+con un fee pactado, y un adicional de ocho puntos más de dedicación de una de sus personas, pactado en 300.000 al
+mes. Importes en CLP, por mes; el comprador es inventado.
+
+| | Neto | Costo | Margen |
+| --- | --- | --- | --- |
+| Base | 5.650.000 | 3.076.309 | 45,55 % |
+| Base con el adicional | 5.950.000 | 3.231.405 | 45,69 % |
+| El adicional cotizado solo (`.option-standalone`) | 300.000 | 204.096 | 31,97 % |
+| El adicional leído como incremento | 300.000 | 155.096 | 48,30 % |
+
+Los 49.000 de diferencia entre los dos costos del adicional son el fee de plataforma que la cotización suelta
+vuelve a llevar por ser una línea nueva. En `costByComponentKind`, el fee de plataforma tiene incremento cero; el
+costo del adicional está en las personas (456.000 en los tres meses) y en las herramientas (9.288). El documento
+imprime 300.000 «al mes» con cualquiera de las dos formas: lo que cambia es el costo y el margen que el operador lee
+al decidir.
+
+Claves y rechazos:
+[contrato](cotizador-v3-contrato-y-validacion.md#incremento-de-un-adicional-compose-increment-2026-10-11).
+Por qué una diferencia y no un interruptor:
+[decisión](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--un-adicional-que-amplía-la-base-se-lee-como-un-incremento-compose-increment).
+
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
@@ -704,7 +852,8 @@ Por qué así y qué se descartó:
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
 | Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado. Motor 1.3 (aditivo): bloque `engagementForm` y `totals.engagementAdjustment`, sólo cuando el pedido declara la forma. Motor 1.4 (aditivo): bloques `ownWork`, `thirdParty` y `contingencyReserve`, sólo en una cotización 1.4.0 |
 | Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total. Motor 1.4: las cuatro reconocen las filas de terceros y la reserva. Asientos y opciones (2026-10-11): compromisos lista los asientos ociosos declarados (`kind: "idle_seat"`) |
-| Documento de cotización   | `pricing-v3-quote-document-brief/1`, `pricing-v3-quote-document-scaffold/1` (`resources/quote-document.ts`) | Documento (2026-10-11): recibe un artefacto congelado y un brief de textos; devuelve la versión 2 de los datos de la plantilla A4 de cotización, o el andamio del brief si no se entrega uno. Verifica el artefacto por replay, toma toda cifra de la cotización y no cambia ningún total. Asientos y opciones (2026-10-11): recibe además la cotización congelada de cada opción adicional (`--option`), y el brief admite `options`, `optionsTexts` y `lines.<clave>.courtesy` |
+| Documento de cotización   | `pricing-v3-quote-document-brief/1`, `pricing-v3-quote-document-scaffold/1` (`resources/quote-document.ts`) | Documento (2026-10-11): recibe un artefacto congelado y un brief de textos; devuelve la versión 2 de los datos de la plantilla A4 de cotización, o el andamio del brief si no se entrega uno. Verifica el artefacto por replay, toma toda cifra de la cotización y no cambia ningún total. Asientos y opciones (2026-10-11): recibe además la cotización congelada de cada opción adicional (`--option`), y el brief admite `options`, `optionsTexts` y `lines.<clave>.courtesy`. Incremento (2026-10-11, cierre): una opción que amplía la base se recibe con `--increment`, la cotización congelada del servicio con el adicional adentro; ni el brief ni el contrato de datos cambian de versión |
+| Incremento de un adicional | `pricing-v3-quote-increment/1` (`resources/quote-increment.ts`) | Incremento (2026-10-11, cierre): recibe dos artefactos congelados, la base y la base con el adicional adentro, los verifica por replay y devuelve la diferencia de neto, costo y margen por período y en total. Lectura interna; no cambia ningún total y rechaza dos cotizaciones que no son comparables |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
 | Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2), `1.3.0` → `pricing-v3-local/1.3.0` (motor 1.3), `1.4.0` → `pricing-v3-local/1.4.0` (motor 1.4); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
@@ -1293,6 +1442,36 @@ y un rechazo nuevo; no hay comandos nuevos y los códigos de salida significan l
   `option: "option"`.
 - `compose preview`, `compose split`, `compose cash`, `compose schedule` y `explain` no cambian de forma.
 
+Incremento (2026-10-11, cierre), qué imprime cada comando. Hay una operación nueva bajo `compose`, `increment`, una
+opción nueva de `compose document`, `--increment`, y seis rechazos nuevos; los códigos de salida significan lo mismo
+que antes. Ningún otro comando cambió su salida.
+
+- `compose increment --input <artefacto con el adicional> --base <artefacto base> [--out <lectura>]` imprime la
+  lectura `pricing-v3-quote-increment/1`, con `binding: false` y `audience: "internal"`: `base` y `withAddOn`
+  (identidad de cada cotización), `commercialUnit`, `currency`, `statement`, `basis[]`, `versions`, `comparison`,
+  `periods[]`, `totals` (con `costByComponentKind`), `netIncrementPerPeriod` y `changed`. Sale con 3. Los dos
+  artefactos se verifican por replay; uno alterado se rechaza con `REPLAY_MISMATCH` y `option` dice cuál (`input` o
+  `base`).
+- No acepta `--current`, catálogo, policy ni créditos (`INVALID_ARGUMENT` con `option: "current"`): lee dos
+  artefactos que ya llevan sus fuentes dentro. Sin `--base` es `MISSING_ARGUMENT` con `option: "base"`.
+- Rechazos nuevos del [registro](../../../src/lib/finance/pricing-v3/errors.ts), todos con salida 1 y con
+  `issues[]` de ruta y regla: `QUOTE_INCREMENT_REQUIRES_CALCULATED_QUOTES`, `QUOTE_INCREMENT_CONTEXT_DIFFERS`,
+  `QUOTE_INCREMENT_VERSIONS_DIFFER`, `QUOTE_INCREMENT_PERIODS_NOT_COMPARABLE`, `QUOTE_INCREMENT_BASE_NOT_CONTAINED` y
+  `QUOTE_INCREMENT_NET_NOT_POSITIVE`. `option` es `input` (se corrige la cotización con el adicional, que es la que
+  se arma para ampliar la base) y es `base` sólo cuando lo único que falla es la base. Tabla completa:
+  [contrato](cotizador-v3-contrato-y-validacion.md#incremento-de-un-adicional-compose-increment-2026-10-11).
+- `compose document --increment <clave>=<artefacto con el adicional>`: repetible; comparte con `--option` el límite
+  de ocho, el bloque `options` y el brief. Sin `--brief`, la entrada de `options[]` del andamio de una opción
+  entregada así trae `basis: "increment"`, y `optional` agrega la nota `options (increment)`. Con `--brief`, `source`
+  agrega `option<N>Basis: "increment"` junto a la identidad de la cotización con el adicional.
+- En `compose document`, un par que no es comparable se rechaza con su código `QUOTE_INCREMENT_*`, con
+  `option: "increment"` y cada ruta bajo `options.<n>.` (la posición de esa opción en la corrida). Un incremento
+  comparable que el documento no puede imprimir como un solo importe es `QUOTE_DOCUMENT_OPTION_INVALID`, también con
+  `option: "increment"`. La misma clave en `--option` y en `--increment`, o un `--increment` mal escrito, es
+  `INVALID_ARGUMENT` con `option` igual a la opción que lo trae.
+- `compose preview`, `compose split`, `compose cash`, `compose schedule`, `compose commitments` y `explain` no
+  cambian de forma.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -1477,12 +1656,39 @@ copias de la demanda de `designer-startup-courtesy` con un solo cambio y no est�
 | La demanda con un grupo de `seatSharing` que nombra a alguien que no usa la herramienta | 2 | `needs_input`: `INVALID_SEAT_SHARING` |
 | Una asignación con `periodId` y `periodIds` a la vez | 1 | Rechazo `SCHEMA_INVALID` en `allocations.0` |
 
+Readback del 2026-10-11, cierre, tras `compose increment`, hecho con la CLI: `pnpm pricing:v3:test` con 28 archivos
+y 1.445 pruebas V3, y `replay` con `verified: true` en los 26 `*.artifact.json` versionados bajo `data/pricing/`,
+entre ellos los tres nuevos de `managed-addon-increment` (la base, `.with-addon` y `.option-standalone`). Los tres
+son del motor 1.3.0 y congelaron el catálogo v10, la policy v11 y los créditos v1. Importes en CLP. Corridas de ese
+día; las que no nombran un archivo versionado usan copias con un solo cambio y no están versionadas:
+
+| Caso | Salida | Resultado |
+| --- | --- | --- |
+| `compose increment` con `.with-addon` sobre la base | 3 | Idéntico a `managed-addon-increment.increment.json`. Modo `same_periods`, tres períodos. Por mes: neto 300.000, costo 155.096, margen 144.904 (0,483013). En total: 900.000, 465.288 y 434.712. `netIncrementPerPeriod` 300.000. `changed`: una línea con más dedicación (de 0,2 a 0,28) y dos herramientas cuyo costo se movió; ningún costo de terceros |
+| `costByComponentKind` de esa lectura, en los tres meses | — | Personas 456.000 y herramientas 9.288 de incremento; fee de plataforma, Talent Assurance y operaciones, incremento cero |
+| `replay` de `.option-standalone.artifact.json` | 3 | El mismo adicional cotizado solo: por mes, neto 300.000, costo 204.096 y margen 95.904 (0,319680). Su costo supera en 49.000 al del incremento |
+| `compose document` sobre la base con su brief y `--increment conversations=<.with-addon>` | 3 | Datos idénticos a `managed-addon-increment.document.json`: una línea de fee, 3 meses a 5.650.000; neto 16.950.000, IVA 19 % 3.220.500 y total 20.170.500; una opción de 300.000 «al mes»; `source.option1Basis` es `increment` |
+| El mismo con `--option conversations=<.option-standalone>` en vez de `--increment` | 3 | La misma opción de 300.000 «al mes»; `source` no trae `option1Basis` y nombra la cotización suelta |
+| El mismo `--increment` sin brief | 2 | Andamio: `options` con `conversations`, 300.000, tres períodos y `basis: "increment"`; `optional` trae la nota `options (increment)` |
+| Esos datos generados con la plantilla | 0 | Cuatro páginas |
+| Una copia no versionada de esos datos con una línea larga en el título de portada | 3 al emitir; 1 al generar | Los datos se emiten; el generador falla con «Contenido fuera del A4» en la portada y no deja documento. Se arregla acortando el título |
+| `compose increment` con los dos artefactos intercambiados | 1 | `QUOTE_INCREMENT_BASE_NOT_CONTAINED`, regla `dedication_smaller` en la línea y en sus tres períodos; `option: "input"` |
+| `compose increment` con `.option-standalone` como cotización con el adicional | 1 | `QUOTE_INCREMENT_BASE_NOT_CONTAINED`: `line_missing` en dos líneas, `dedication_smaller` en la tercera y `tool_missing` |
+| `compose document` con la base también como `--increment` | 1 | `QUOTE_INCREMENT_NET_NOT_POSITIVE` en `options.0.periods.1` a `.3`; `option: "increment"` |
+| `compose document` con la misma clave en `--option` y en `--increment` | 1 | `INVALID_ARGUMENT`; `option` nombra la opción que repite la clave |
+| `compose increment` con un artefacto alterado | 1 | `REPLAY_MISMATCH`, con `option: "input"` o `option: "base"` según cuál |
+| `compose increment` sin `--base`, o con `--current` | 1 | `MISSING_ARGUMENT` con `option: "base"`; `INVALID_ARGUMENT` con `option: "current"` |
+| La cotización con el adicional vuelta a cotizar con un solo período | 3 | Modo `representative_period`: un período comparado que vale por los tres de la base; incremento de un período, 300.000 de neto y 155.096 de costo, sin multiplicar |
+| Las tres demandas sin su neto pactado, cotizadas con `--current` | 3 | A precio de policy la cotización suelta pide 380.000 al mes y el incremento es de 280.000 al mes, con el mismo costo de antes en cada una (204.096 y 155.096) |
+
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
 vigentes, medición de provisiones, policy comercial y términos reales siguen en
 [ledger de pendientes](../../../data/pricing/v3-operating/operational-gaps.json). Cambios salariales por periodo,
 drivers actuariales/contables, setup amortizado, fees porcentuales, ajustes encadenados y promoción de consumers
-API/UI/MCP/Nexa necesitan extensión propia. La duración del contrato no es un dato de entrada. Los costos de terceros
+API/UI/MCP/Nexa necesitan extensión propia. La duración del contrato y la fecha de inicio del servicio no son datos de
+entrada y no están en esa lista de extensiones: quedan fuera del cotizador por decisión del CEO del 2026-10-11, porque
+una cotización no es un contrato. Los costos de terceros
 de un trabajo y la reserva de contingencia para alcance fijo, que esta lista daba por no modelados, existen desde el
 motor 1.4 (2026-10-11); lo que de ellos sigue sin modelarse —cuándo se le paga al proveedor, si una compra obliga más
 allá del trabajo, una comisión sobre lo que el cliente paga directo, una lista de precios de proveedores recurrentes

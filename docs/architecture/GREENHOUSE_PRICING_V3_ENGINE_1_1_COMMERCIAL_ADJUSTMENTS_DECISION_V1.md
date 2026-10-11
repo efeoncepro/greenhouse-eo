@@ -492,6 +492,10 @@ piso. La misma demanda sin `engagementForm`, con las mismas versiones, resuelve 
   supuesto `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM`. Con el catálogo v10 eso ocurre en las dos
   ofertas de servicio gestionado.
 - El plazo del contrato con el cliente no es un input: una cotización tiene períodos, no un plazo.
+  *Nota 2026-10-11 (cierre):* esto no sigue abierto. El CEO decidió que el plazo del contrato y la fecha de inicio del
+  servicio quedan fuera del cotizador, porque una cotización no es un contrato
+  ([delta](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)). Una cotización sigue teniendo períodos, no
+  un plazo.
 - Un encargo de menos de un mes se expresa como horas dentro de un período.
 - Todavía no se modelan los costos de terceros de un encargo ni una reserva de contingencia para trabajo de alcance
   fijo. No hay contrato de entrada ni datos para eso.
@@ -828,6 +832,8 @@ resolución, composición y CLI); esta nota no registra una corrida de la suite.
 - La liberación de la reserva después de la entrega.
 - De antes: el plazo del contrato con el cliente, un asiento comprado para el trabajo, períodos de menos de un mes,
   la forma Hybrid, cotizar en EUR y una vista apta para el cliente de las lecturas internas.
+  *Nota 2026-10-11 (cierre):* el plazo del contrato con el cliente salió de esta lista: no es un pendiente, queda
+  fuera del cotizador por decisión del CEO ([delta](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)).
 
 ## No decidido a propósito
 

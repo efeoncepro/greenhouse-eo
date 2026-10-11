@@ -25,6 +25,7 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 | Lecturas de un engagement sobre una cotización congelada: calendario de pagos (`pricing-v3-payment-schedule/1`) y lectura de caja (`pricing-v3-engagement-cash/1`) | `resources/engagement-view.ts` |
 | Compromisos con proveedores que sobreviven a los períodos cotizados (`pricing-v3-commitment-exposure/1`) | `resources/commitment-exposure.ts` |
 | Documento de cotización para el cliente de una cotización congelada: brief de textos (`pricing-v3-quote-document-brief/1`), su andamio y los datos de la plantilla A4 | `resources/quote-document.ts`; lo que un cliente puede ver, `clientSafePeriodItems` en `resources/readiness.ts` |
+| Incremento de un adicional que amplía una cotización: la diferencia entre dos cotizaciones congeladas y las reglas que las hacen comparables (`pricing-v3-quote-increment/1`) | `resources/quote-increment.ts` |
 | Resumen derivado de una composición: motor que calculó, ajustes y regla de redondeo aplicados, líneas que el kernel marcó bajo su piso y exposición a datos estimados (`estimateExposure`) | `resources/summary.ts` |
 | Fechas de los precios: vigencias duras que bloquean y fechas de revisión que sólo avisan (`pricing-v3-price-review/1`) | `resources/price-review.ts` |
 | Puntero a las versiones vigentes (`pricing-v3-current/1`): verificación por versión y digest, sin leer ni escribir archivos | `adapters/current-versions.ts` |
@@ -48,6 +49,9 @@ de la tabla aprendieron a describir una cotización con filas de terceros y rese
 *Nota 2026-10-11 (noche, posterior):* la fila del documento de cotización viene del
 [delta de `compose document`](#delta-2026-10-11--el-documento-de-cotización-de-una-cotización-v3-compose-document).
 Es un lector más de una cotización congelada: no agrega un contrato ni toca el kernel.
+*Nota 2026-10-11 (cierre):* la fila del incremento viene del
+[delta de `compose increment`](#delta-2026-10-11-cierre--un-adicional-que-amplía-la-base-se-lee-como-un-incremento-compose-increment).
+Es el único lector que recibe dos cotizaciones congeladas; tampoco agrega un contrato ni toca el kernel.
 
 ## Contrato de entradas y selección
 
@@ -1099,6 +1103,10 @@ neto 2.790.000, costo completo 1.768.438; son las cifras del artefacto congelado
 
 - El plazo del contrato con el cliente no es un input: una cotización tiene períodos, no un plazo. Por eso
   `commitments` no es automático.
+  *Nota 2026-10-11 (cierre):* esto dejó de estar «abierto». El CEO decidió que el plazo del contrato y la fecha de
+  inicio del servicio quedan fuera del cotizador
+  ([delta](#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)). Lo que la lectura supone no cambia:
+  `commitments` conoce los períodos cotizados y se sigue pidiendo a propósito.
 - **Límite conocido de la lectura de plazos.** La fecha de renovación es opcional (`commitmentRenewsOn`). Un precio
   que declara plazo **sin** fecha se sigue leyendo como un plazo entero contado desde el primer mes cotizado: para un
   contrato que ya está corriendo eso sobrestima lo comprometido, y sus importes se leen como un techo, no como una
@@ -1320,6 +1328,8 @@ No describir nada de esta lista como existente.
 - La liberación de la reserva después de la entrega.
 - De antes: el plazo del contrato con el cliente, un asiento comprado para el trabajo, períodos de menos de un mes,
   la forma Hybrid, cotizar en EUR y una vista apta para el cliente de las lecturas internas.
+  *Nota 2026-10-11 (cierre):* el plazo del contrato con el cliente salió de esta lista: no es un pendiente, queda
+  fuera del cotizador por decisión ([delta](#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)).
   *Nota 2026-10-11 (noche, posterior):* el cliente ya tiene un documento propio, con las líneas de la cotización y,
   si se pide, su calendario de pagos (delta siguiente). Sigue sin existir una versión para el cliente del reparto en
   persona y kit, de la lectura de caja y de los compromisos.
@@ -1548,8 +1558,14 @@ Los datos y las reglas de composición son de la plantilla:
   propia cotización: vuelve a llevar el fee de plataforma por línea y su parte de las herramientas base. Su costo
   está sobrestimado y su margen es una cota inferior; el precio impreso no cambia
   (`OPTION_QUOTES_REPEAT_PER_LINE_FEES`, agregado al ledger).
+  *Nota 2026-10-11 (cierre):* este límite se cerró el mismo día: ese adicional se declara como incremento
+  ([delta](#delta-2026-10-11-cierre--un-adicional-que-amplía-la-base-se-lee-como-un-incremento-compose-increment)),
+  y el ítem del ledger quedó cerrado.
 - La duración del contrato y una fecha de inicio que el cliente define después siguen sin ser un dato: una
   cotización tiene meses fechados desde su fecha de cotización.
+  *Nota 2026-10-11 (cierre):* no es un límite por cerrar. El CEO decidió que las dos quedan fuera del cotizador
+  ([delta](#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)). La segunda frase sigue siendo cierta: es
+  lo que una cotización supone de su calendario.
 - El reparto en persona y kit sigue sin ser una forma del documento, y número de cotización, versiones, QR, firmas y
   aprobación siguen perteneciendo al cotizador de Greenhouse. Llevar este diseño allá es el paso acordado y **no ha
   empezado**.
@@ -1562,6 +1578,8 @@ Los datos y las reglas de composición son de la plantilla:
 - **NUNCA** tratar un artefacto guardado con `--keep-blocked` como una cotización.
 - **SIEMPRE** corregir la demanda y repetir con el mismo `--out` cuando una corrida queda bloqueada.
 - **SIEMPRE** decir, al entregar una opción que sólo suma dedicación, que su margen es una cota inferior.
+  *Nota 2026-10-11 (cierre):* reemplazada. Ese adicional ya no se entrega con el margen de su cotización suelta: se
+  lee con `compose increment` y se informa el margen del incremento.
 
 **Medido el 2026-10-11.** Ejemplo versionado `designer-startup-courtesy` en
 [`data/pricing/v3-operating/`](../../data/pricing/v3-operating/README.md), con sus dos opciones, cada una con su
@@ -1582,6 +1600,149 @@ demanda y su artefacto (motor `1.3.0`, catálogo v10 y policy v11). Importes en 
 
 Evidencia fechada. Los artefactos que se agregaron a la carpeta de datos son el de `designer-startup-courtesy` y los
 de sus dos opciones.
+
+## Delta 2026-10-11 (cierre) — un adicional que amplía la base se lee como un incremento (`compose increment`)
+
+Posterior al delta de opciones, el mismo día. Cierra el límite que ese delta declaró
+(`OPTION_QUOTES_REPEAT_PER_LINE_FEES`). No cambia el kernel, ningún contrato de entrada ni lo que congela un
+artefacto; todos los artefactos anteriores se reproducen igual. Contrato:
+[incremento](../documentation/finance/cotizador-v3-contrato-y-validacion.md#incremento-de-un-adicional-compose-increment-2026-10-11).
+Paso a paso:
+[manual](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#un-adicional-que-amplía-la-base-compose-increment).
+
+**La evidencia.** `compose document --option` imprime un adicional desde su propia cotización congelada, que es la
+fuente correcta de su precio. En el primer caso real, uno de los adicionales eran unos puntos más de dedicación de
+una persona que ya era una línea de la cotización base. Su cotización propia es una línea nueva, y una línea nueva
+lleva lo que se cobra una vez por línea, cualquiera sea su dedicación: el fee de plataforma y su parte de las
+herramientas base. El costo del adicional quedaba sobrestimado y su margen, subestimado. El precio impreso estaba
+bien sólo porque era un precio pactado: a precio de policy, la cotización suelta además pide más de lo que el mismo
+adicional le sube al precio del servicio. El ejemplo versionado reproduce la forma del problema con datos inventados
+(tabla de abajo).
+
+**La decisión.** Un adicional que amplía una cotización se declara como **la cotización congelada del servicio con
+el adicional adentro**, y su precio, su costo y su margen son la diferencia entre esa cotización y la base.
+
+- `compose increment --input <con el adicional> --base <base>` verifica los dos artefactos por replay y emite la
+  lectura `pricing-v3-quote-increment/1`: por período comparado y en total, `base`, `withAddOn` e `increment` (neto,
+  costo, margen y tasa de margen), `costByComponentKind`, `netIncrementPerPeriod`, `changed` (líneas, herramientas y
+  costos de terceros) y `versions`. Sale con 3. Es interna: trae costo y margen.
+- `compose document --increment <clave>=<con el adicional>` imprime ese adicional como una opción del documento de
+  la base. Comparte con `--option` el límite de ocho y el bloque `options` del brief; una clave no se usa en las
+  dos. El precio impreso es lo que el adicional le suma al neto de un período. `source` registra
+  `option<N>Basis: "increment"`. El cliente ve un precio, nunca el costo ni el margen del incremento.
+- `--option` sigue siendo lo correcto para un adicional que es sólo una persona nueva o un trabajo aparte: ahí lo
+  que se cobra por línea sí es suyo. Un adicional mixto, que amplía a personas de la base y además trae una persona
+  nueva, va como incremento: la cotización con el adicional puede tener líneas que la base no tiene.
+
+**Por qué una diferencia de dos cotizaciones y no un interruptor que omita los costos por línea.**
+
+- *Un interruptor en la cotización del adicional* («no cobres en esta línea lo que se cobra por línea») habría
+  puesto en la demanda una decisión de costo que hoy toma el catálogo. Una cotización así ya no se sostiene sola: su
+  costo es correcto sólo si existe otra cotización que ya cobró eso, y nada en ella la nombra ni lo comprueba.
+  Exige además decidir, fuera del kernel, qué costos son «por línea»: el fee de plataforma lo es, la parte de las
+  herramientas base también, y esa lista tendría que seguir al catálogo a mano.
+- *La diferencia* no necesita esa lista. En la cotización con el adicional cada persona es una sola línea con la
+  dedicación sumada, así que el kernel cobra una vez lo que se cobra una vez, con las reglas de siempre. La resta es
+  de importes ya congelados: no hay aritmética nueva de precios, y cada una de las dos cotizaciones se verifica por
+  replay y se explica por su cuenta.
+- La diferencia es además comprobable: cuando el adicional no trae líneas nuevas, `costByComponentKind` muestra que
+  la clase que se cobra por línea no se movió, y las reglas de comparabilidad rechazan el par cuando la resta no
+  significaría el adicional.
+
+**Las reglas de comparabilidad y por qué existe cada una.** Dos cotizaciones se restan sólo cuando la diferencia
+puede significar el adicional y nada más. Si no, la lectura se rechaza con el código de la regla; nunca se aproxima,
+porque una resta entre cotizaciones que no son comparables da una cifra con forma de margen que no lo es.
+
+| Código | Qué exige | Por qué existe |
+| --- | --- | --- |
+| `QUOTE_INCREMENT_REQUIRES_CALCULATED_QUOTES` | Las dos calculadas | Una cotización bloqueada no tiene importes que restar |
+| `QUOTE_INCREMENT_CONTEXT_DIFFERS` | La misma moneda, oferta, cuenta, tratamiento de impuesto, forma del engagement, unidad comercial, código de engagement, país de mercado, fecha de cotización, modo y declaración de contingencia | Cada uno de esos datos elige un precio o un costo. Si difieren, son dos cotizaciones de cosas distintas. La fecha entra por la misma razón que las versiones: los registros del catálogo rigen por fecha |
+| `QUOTE_INCREMENT_VERSIONS_DIFFER` | El mismo catálogo, la misma policy de recursos y el mismo catálogo de créditos, por versión y por contenido | Entre dos versiones, la diferencia traería un cambio de precio dentro del costo del adicional. Se compara también el contenido porque un archivo editado bajo la misma versión es otra fuente |
+| `QUOTE_INCREMENT_PERIODS_NOT_COMPARABLE` | Los mismos períodos; o un solo período representativo, sólo si la base es igual en todos los suyos (neto, costo y líneas) y ese período no cobra nada una sola vez. En las dos cotizaciones los períodos suman sus totales | Un período representativo vale por todos los de la base, y no puede hacerlo si la base cambia de un mes a otro. Una puesta en marcha no es un costo de cada período |
+| `QUOTE_INCREMENT_BASE_NOT_CONTAINED` | Cada línea de la base sigue en la otra con el mismo perfil, país y modo de asignación, la misma base de precio y de costo (policy de asignación, policy de precio, kit, registro de costo y equipo), sus elecciones de kit, la misma unidad de dedicación y al menos las mismas personas y dedicación; y siguen ahí cada costo de terceros y cada herramienta de la base | Si a la base le falta o le cambia algo dentro de la otra, la diferencia mezcla el adicional con un cambio de la base |
+| `QUOTE_INCREMENT_NET_NOT_POSITIVE` | El neto crece en cada período comparado | Un período en que la cotización con el adicional no vale más que la base no tiene adicional que valorar |
+
+Dos cosas no se comparan, a propósito. Lo que el acuerdo dice del precio (descuentos, netos pactados): es donde se
+escribe el precio del adicional. Y el costo: un adicional puede no agregar ninguno, y la lectura dice lo que
+encontró. En un período representativo el incremento es por período y no se multiplica por ningún número de
+períodos: ningún dato de entrada dice en cuántos corre el adicional.
+
+En `compose document --increment`, un par que no es comparable se rechaza con su propio código `QUOTE_INCREMENT_*`,
+con `option: "increment"` y cada ruta bajo `options.<n>.`. `QUOTE_DOCUMENT_OPTION_INVALID` cubre sólo las reglas
+propias del documento sobre un incremento ya comparable: que el adicional sume lo mismo en cada período comparado,
+que no traiga un costo que el cliente paga directo, que el importe se pueda escribir, que no repita otra opción y
+que no haya más de ocho. En `compose increment`, `option` es `base` sólo cuando lo único que falla es la base; en
+los demás casos es `input`, porque la que se arma para ampliar la base es la cotización con el adicional.
+
+**Reglas para agentes.**
+
+- **NUNCA** informar el margen de un adicional que amplía a personas de la base desde su cotización suelta: se lee
+  con `compose increment`.
+- **NUNCA** restar a mano dos cotizaciones que la lectura rechazó, ni aproximar una cifra.
+- **NUNCA** quitar o cambiar algo de la base en la cotización con el adicional para que la resta pase.
+- **NUNCA** mostrarle la lectura al cliente: es interna. Al cliente va el documento, con un precio.
+- **SIEMPRE** poner la dedicación que se le suma a una persona de la base en la línea que esa persona ya tiene.
+- **SIEMPRE** decir de qué dos artefactos sale la cifra. La lectura informa; el adicional y su precio los decide el
+  operador.
+
+**Medido el 2026-10-11 (cierre).** Ejemplo versionado `managed-addon-increment` en
+[`data/pricing/v3-operating/`](../../data/pricing/v3-operating/README.md): un servicio gestionado de tres meses con
+un fee pactado, y un adicional de ocho puntos más de dedicación de una de sus personas, pactado en 300.000 al mes.
+Motor `1.3.0`, catálogo v10, policy v11 y créditos v1. Importes en CLP, por mes; el comprador es inventado.
+
+| | Neto | Costo | Margen |
+| --- | --- | --- | --- |
+| Base | 5.650.000 | 3.076.309 | 45,55 % |
+| Base con el adicional | 5.950.000 | 3.231.405 | 45,69 % |
+| El adicional cotizado solo | 300.000 | 204.096 | 31,97 % |
+| El adicional como incremento | 300.000 | 155.096 | 48,30 % |
+
+- Los 49.000 de diferencia entre los dos costos del adicional son el fee de plataforma de una línea. En
+  `costByComponentKind` el fee de plataforma tiene incremento cero; el incremento está en las personas (456.000 en
+  los tres meses) y en las herramientas (9.288).
+- La lectura vuelta a emitir es idéntica al versionado `managed-addon-increment.increment.json`, y los datos del
+  documento, a `managed-addon-increment.document.json`. El documento imprime 300.000 «al mes» con `--increment` y
+  con `--option`.
+- Las mismas tres demandas sin su neto pactado, cotizadas con `--current` (no versionadas): la cotización suelta
+  pide 380.000 al mes y el incremento es de 280.000 al mes.
+- El documento del ejemplo, generado con la plantilla, tiene cuatro páginas.
+- `pnpm pricing:v3:test`: 28 archivos y 1.445 pruebas. `replay` de los 26 artefactos versionados bajo
+  `data/pricing/**`: todos `verified: true`.
+
+Evidencia fechada. Los artefactos que se agregaron a la carpeta de datos son los tres de `managed-addon-increment`.
+
+## Delta 2026-10-11 (cierre) — una cotización no es un contrato
+
+Decisión del CEO, el mismo cierre. **La fecha de inicio del servicio y la duración del contrato no son datos de
+entrada del cotizador, y no lo serán.** Son materia del contrato: no mueven ningún costo, precio ni impuesto.
+
+- **Qué cambia.** Nada en el código ni en un contrato de entrada: ninguno tenía una clave para ellas. Cambia cómo se
+  nombran. Este ADR y los documentos del cotizador las listaban entre lo «abierto», lo «no modelado» o lo que
+  «todavía no se puede», como si alguien las debiera. Desde este delta se leen como fuera del cotizador por
+  decisión, y las listas de pendientes dejaron de traerlas; cada lugar corregido lleva una nota fechada.
+- **Qué no cambia.** Lo que cada lectura supone de su calendario se sigue diciendo. Una cotización tiene períodos,
+  fechados desde su fecha de cotización, y no un plazo. `compose commitments` conoce los períodos cotizados y no la
+  duración del acuerdo, y por eso se pide a propósito para trabajos acotados. El incremento de un período
+  representativo no se multiplica por un número de meses.
+- **En el documento del cliente.** Un texto del brief se escribe cuando le dice al cliente algo que necesita. El
+  documento no declara lo obvio: no se escribe quién define la fecha de inicio.
+- **Por qué.** Una cotización responde cuánto cuesta y cuánto vale un servicio por período. Cuándo empieza y cuánto
+  dura el acuerdo se pactan después, en otro documento, y ninguna de las dos respuestas cambia un importe de la
+  cotización. Modelarlas habría agregado al pedido dos datos que el cálculo no usa.
+
+**Lo que sigue sin modelarse** (lo único que se lista como pendiente de este frente): un costo de puesta en marcha
+de un servicio gestionado en el catálogo, por lo que su cotización no tiene una fila de puesta en marcha que
+bonificar (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC`); la validación de las condiciones con que un proveedor permite
+compartir un asiento, que queda fuera del cotizador; el reparto en persona y kit como forma del documento; y número
+de cotización, versiones, QR, firmas y aprobación, que pertenecen al cotizador de Greenhouse (llevar este diseño
+allá es el paso acordado y **no ha empezado**).
+
+**Reglas para agentes.**
+
+- **NUNCA** pedir la fecha de inicio del servicio ni la duración del contrato como datos de una cotización, ni
+  presentarlas como un pendiente del cotizador.
+- **NUNCA** escribir en el documento del cliente quién define la fecha de inicio.
+- **SIEMPRE** decir lo que una lectura supone de su calendario cuando la cifra depende de él.
 
 ## Evidencia y rutas de operación
 

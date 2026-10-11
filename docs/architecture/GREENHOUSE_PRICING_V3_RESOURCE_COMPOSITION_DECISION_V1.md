@@ -469,3 +469,6 @@ el ledger, `NAMED_SEATS_UNDER_TWO_PLANS` quedó cerrado.
 - Si un asiento ocioso ya existe o hay que comprarlo para el trabajo: el artefacto no lo dice.
 - La duración del contrato con el cliente y una fecha de inicio que éste define después: una cotización tiene meses
   fechados desde su fecha de cotización.
+  *Nota 2026-10-11 (cierre):* esto no sigue abierto. El CEO decidió que las dos quedan fuera del cotizador, porque
+  una cotización no es un contrato ([delta](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)). La segunda
+  frase se mantiene: es lo que una cotización supone de su calendario.
