@@ -5,7 +5,7 @@ Owner: Finance/Commercial para costos/precio; Operations para kits/asignación; 
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
-Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. La excepción es [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización), que opera sobre el catálogo operativo vigente (`catalog.review-v4.json`).
+Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización) y [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país), que operan sobre el catálogo operativo vigente (`catalog.review-v5.json`).
 
 ## Qué hace el agente
 
@@ -58,8 +58,11 @@ Ninguna regla certifica permiso contractual para compartir una licencia. Recurso
 kit con `allowClientProvided`; no se puede eliminar gestión/Assurance diciendo que la cubre el cliente.
 
 País de costo y mercado son dimensiones independientes. Costos específicos no reciben factor salarial adicional.
-Costo sin país sólo puede usarse con `mode=simulation` y `allowUnlocalizedCost=true`; queda como supuesto y revisión.
-Factores de mercado 1 son neutrales de prueba; no WTP aprobado. Las políticas por tier usan markup histórico, no
+En esta baseline, costo sin país sólo puede usarse con `mode=simulation` y `allowUnlocalizedCost=true`; queda como
+supuesto y revisión, y sus factores de mercado 1 son neutrales de prueba; no WTP aprobado. El catálogo operativo
+vigente sí tiene valores por país desde el 2026-10-11: costos declarados como costo en Chile, un factor de talento por
+país de la persona y un factor de mercado por país del cliente
+([cómo se cotiza con ellos](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo)). Las políticas por tier usan markup histórico, no
 margen objetivo 40%. El catálogo no hereda la aspiración de margen del expediente Pibank.
 
 Talent Assurance USD 25/mes, operación USD 25 y setup USD 100 son **placeholders de la prueba anterior**,
@@ -115,11 +118,11 @@ el agente prepara el change-set, le muestra el preview y aplica sólo con su con
 [Cotizar en otra moneda](operar-cotizador-v3-con-agentes.md#cotizar-en-otra-moneda). Para ver lo vigente:
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v4.json
+pricing_catalog=data/pricing/v3-operating/catalog.review-v5.json
 
 pnpm --silent pricing:v3 catalog validate --catalog "$pricing_catalog"
-pnpm --silent pricing:v3 catalog search --kind price_rounding --catalog "$pricing_catalog" --date 2026-10-10
-pnpm --silent pricing:v3 catalog search --kind fx --catalog "$pricing_catalog" --date 2026-10-10
+pnpm --silent pricing:v3 catalog search --kind price_rounding --catalog "$pricing_catalog" --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind fx --catalog "$pricing_catalog" --date 2026-10-11
 ```
 
 Los tres devuelven exit 0. `catalog validate` entrega el `digest` de la base, que va en `baseDigest` del change-set.
@@ -190,7 +193,7 @@ pnpm --silent pricing:v3 catalog apply --catalog data/pricing/v3-operating/catal
 `preview` devuelve exit 0 con `previewDigest` (el valor de `--confirm`) y `differences`: 41 entradas con el antes y el
 después de cada registro. `apply` devuelve exit 0 y escribe un archivo idéntico a `catalog.review-v4.json`
 (`version` `operating-review-2026-10-10-v4`). Un cambio nuevo se construye sobre el catálogo vigente: su `baseDigest`
-es el `digest` de `catalog.review-v4.json` y `--catalog` apunta a ese archivo. `--impact` acepta un arreglo de briefs
+es el `digest` de `catalog.review-v5.json` y `--catalog` apunta a ese archivo. `--impact` acepta un arreglo de briefs
 del carril de catálogo para ver el efecto en casos concretos; una demanda de composición se compara cotizándola con
 la base y con el sucesor.
 
@@ -205,9 +208,168 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
 conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor sólo si se elige con
 `--catalog`. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente
-(`catalog.review-v5.json`) junto a su change-set, volver a cotizar los casos afectados y actualizar la ruta en
+(hoy sería `catalog.review-v6.json`) junto a su change-set, volver a cotizar los casos afectados y actualizar la ruta en
 [«Versiones vigentes»](operar-cotizador-v3-con-agentes.md#versiones-vigentes) y en la referencia de la skill, para
 que agentes y operador usen el mismo catálogo.
+
+## Cambiar un factor de país o registrar el costo de un perfil en un país
+
+El país entra al precio por tres clases de registro del catálogo monetario operativo. Qué significan al cotizar,
+valores vigentes y ejemplos: [Cotizar según el país del cliente y del equipo](operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo).
+Los valores los decide el operador (CEO); el agente prepara el change-set, le muestra el preview y aplica sólo con su
+confirmación. Para ver lo vigente (los tres devuelven exit 0):
+
+```bash
+pricing_catalog=data/pricing/v3-operating/catalog.review-v5.json
+
+pnpm --silent pricing:v3 catalog search --kind talent_factor --catalog "$pricing_catalog" --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind market_factor --catalog "$pricing_catalog" --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind cost --query ECG-007 --catalog "$pricing_catalog" --date 2026-10-11
+```
+
+- **Factor de talento** (`kind: "talent_factor"`, `recordId` `talent:<PAÍS>:CL`): `value` es
+  `{ "country": "CO", "referenceCountry": "CL", "factor": "0.80" }`. Multiplica el costo de Chile de **todos** los
+  perfiles para una persona en ese país. Uno por país.
+- **Factor de mercado** (`kind: "market_factor"`, `recordId` `market:<PAÍS>`): `value` es
+  `{ "country": "CO", "factor": "0.90" }`, con `"floorBasis": "base_market"` opcional. Multiplica el precio de la
+  parte humana para un cliente de ese país. Uno por país.
+- **Costo de un perfil** (`kind: "cost"`): los 32 registros `cost:<perfil>:unknown` llevan
+  `"localization": { "kind": "reference_adjusted", "referenceCountry": "CL" }`: son el costo en Chile y reciben el
+  factor de talento. Un registro con `"localization": { "kind": "specific", "country": "CO" }` es el costo real de
+  ese perfil en ese país: no recibe factor y, para las personas de ese país, reemplaza al de referencia.
+
+### Cambiar un factor
+
+Es una entrada `replace` sobre el `recordId` del factor, con `revision` igual a la anterior más uno, una
+`source.reference` distinta (la decisión o la evidencia que lo respalda) y `effectiveFrom` igual o posterior al del
+registro que reemplaza. Un factor para un país que aún no tiene es un `add` con `revision: 1`. Así quedó el factor
+de mercado de Colombia en el change-set real (era `1`, revisión 1):
+
+```json
+{
+  "operation": "replace",
+  "recordId": "market:CO",
+  "effectiveFrom": "2026-10-11",
+  "record": {
+    "recordId": "market:CO",
+    "revision": 2,
+    "kind": "market_factor",
+    "source": {
+      "reference": "policy:ceo-market-factors-2026-10-11",
+      "effectiveFrom": "2026-10-11",
+      "effectiveUntil": "9999-12-31",
+      "status": "confirmed"
+    },
+    "note": "CEO decision of 2026-10-11: conservative end of the workbook range for Colombia (0.85-0.9). The margin floor follows this factor: it is read on the base-market price.",
+    "value": { "country": "CO", "factor": "0.90", "floorBasis": "base_market" }
+  }
+}
+```
+
+- `source.status`: `confirmed` si el valor es una decisión del operador o sale de evidencia real; `estimated` si es
+  una aproximación. Un factor `estimated` hace que toda cotización que lo use lo informe como `ESTIMATED_SOURCE`.
+  `note` dice quién lo decidió o de dónde sale el estimado, y contra qué observación.
+- **`floorBasis`** sólo existe en el factor de mercado y su único valor es `"base_market"`: el piso de margen se lee
+  sobre el precio del mercado base y la rebaja del país no se marca. Sin el campo, el piso se lee sobre el neto
+  final. Con un factor bajo 1 y sin `floorBasis`, **toda** cotización de ese mercado al precio de política sale con
+  sus líneas marcadas. Con `floorBasis`, las cotizaciones de ese mercado pasan a firmarse con el motor
+  `pricing-v3-local/1.2.0` y dejan de marcarse aunque su margen real quede bajo el mínimo de la política. Declararlo
+  es decidir que ese mercado se vende más barato: nunca se agrega ni se quita sin una decisión del operador sobre
+  ese país, y no se infiere del valor del factor. Con factor 1 o mayor no cambia el veredicto del piso.
+- **País nuevo**: se declara en `dimensions.countriesAdd` del mismo change-set y se agregan sus dos factores (talento
+  y mercado). Si falta `countriesAdd`, el preview pasa igual y después toda cotización con ese país devuelve exit 2
+  con `UNSUPPORTED_COUNTRY`. Un país con factor de mercado y sin factor de talento sirve para un cliente de ese país,
+  no para una persona en él.
+- **Un solo factor por país.** Para cambiar un valor se reemplaza el registro; agregar un segundo registro con otro
+  `recordId` pasa el preview y después bloquea las cotizaciones de ese país con `AMBIGUOUS_SELECTION`.
+- No se usa el factor de talento para representar lo que paga un mercado ni el de mercado para representar lo que
+  cuesta una persona. Factores por tipo de cliente no existen en el catálogo: se registran como neto acordado.
+
+### Registrar el costo real de un perfil en un país
+
+Cuándo conviene: [manual operativo](operar-cotizador-v3-con-agentes.md#cuándo-registrar-el-costo-real-de-un-perfil-en-un-país).
+Es un `add` de un registro `cost` nuevo; el de referencia no se toca. Los montos de este ejemplo son marcadores:
+se reemplazan por el costo mensual real.
+
+```json
+{
+  "operation": "add",
+  "recordId": "cost:ECG-007:CO",
+  "effectiveFrom": "FECHA_DESDE_QUE_RIGE",
+  "record": {
+    "recordId": "cost:ECG-007:CO",
+    "revision": 1,
+    "kind": "cost",
+    "source": {
+      "reference": "REFERENCIA_DE_LA_EVIDENCIA",
+      "effectiveFrom": "FECHA_DESDE_QUE_RIGE",
+      "effectiveUntil": "9999-12-31",
+      "status": "confirmed"
+    },
+    "note": "Qué evidencia respalda el costo (contratación, oferta, contrato), de qué fecha y quién lo confirmó.",
+    "value": {
+      "profileId": "ECG-007",
+      "seniorityCode": "not_specified",
+      "localization": { "kind": "specific", "country": "CO" },
+      "currency": "USD",
+      "components": [
+        { "coverage": "human_salary", "amount": "MONTO" },
+        { "coverage": "human_bonus_jit", "amount": "MONTO" },
+        { "coverage": "human_bonus_rpa", "amount": "MONTO" },
+        { "coverage": "human_bonus_ar", "amount": "MONTO" },
+        { "coverage": "human_bonus_overperformance", "amount": "MONTO" },
+        { "coverage": "human_charges", "amount": "MONTO" }
+      ]
+    }
+  }
+}
+```
+
+- `profileId` y `seniorityCode` son los del perfil
+  (`catalog show --kind profile --query ECG-007 --catalog "$pricing_catalog" --date 2026-10-11` los muestra); con otro
+  `seniorityCode` el registro no se asocia a ese perfil.
+- `components` lleva las mismas coberturas que el registro de referencia del perfil (el `search --kind cost` de arriba
+  las lista), cada una con su monto mensual como cadena, en la moneda de `currency`. Un componente que es cero se
+  escribe `"0"`.
+- `reference` nombra la evidencia sin copiarla: contratos, liquidaciones y datos personales no entran al repo.
+- Efecto, desde `effectiveFrom`: una línea con ese perfil y `talentCountry` de ese país usa este costo y no recibe
+  factor de talento. El mismo perfil en otro país sigue con el costo de Chile por su factor. Para corregir el monto
+  después se hace `replace` de este registro, no un segundo `add`.
+
+### El change-set real y su reproducción
+
+[`country-factors.change.json`](../../../data/pricing/v3-operating/country-factors.change.json) es el change-set
+que produjo `catalog.review-v5.json` desde `catalog.review-v4.json` con las decisiones del CEO del 2026-10-11:
+`dimensions.countriesAdd` con `ES`; 32 `replace` de costos de persona, que pasan a ser el costo en Chile sin cambiar
+ningún monto; seis `add` de factor de talento (CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3 y US 5, estimados); cinco
+`replace` de factor de mercado (CL 1, CO 0.90 con `floorBasis`, US 1.10, decididos; PE 0.95 con `floorBasis` y MX 1,
+estimados) y un `add` (ES 1.10, estimado). Todo con `effectiveFrom` 2026-10-11. Se reproduce así; la base es el v4
+porque el cambio se construyó sobre él:
+
+```bash
+pnpm --silent pricing:v3 catalog preview --catalog data/pricing/v3-operating/catalog.review-v4.json \
+  --input data/pricing/v3-operating/country-factors.change.json
+
+pnpm --silent pricing:v3 catalog apply --catalog data/pricing/v3-operating/catalog.review-v4.json \
+  --input data/pricing/v3-operating/country-factors.change.json \
+  --confirm a020b319042cd843aca9fbc5c93f0fab89a598af4d83298ade2b6bc10830f7b6 \
+  --out /tmp/catalogo-v5-reproducido.json
+```
+
+`preview` devuelve exit 0 con ese `previewDigest`, 44 entradas en `differences` y el país agregado en
+`dimensionChanges`. `apply` devuelve exit 0 y escribe un archivo idéntico a `catalog.review-v5.json` (`version`
+`operating-review-2026-10-11-v5`, 299 registros: los 255 del v4 más las 44 revisiones nuevas; las anteriores se
+conservan). Los rechazos son los de la sección anterior; un `floorBasis` con otro valor es `SCHEMA_INVALID`.
+
+Como todo cambio, es una versión nueva del catálogo y rige por fecha:
+
+- Las cotizaciones congeladas lo ignoran: `replay` las recalcula con el catálogo y el contrato que llevan dentro. Un
+  artefacto anterior al v5 no tiene `floorBasis` y se sigue verificando con su motor.
+- Una demanda con `quoteDate` anterior al `effectiveFrom` del cambio resuelve con el valor previo aunque se cotice
+  con el catálogo nuevo. Con el v5, una demanda fechada 2026-10-10 no recibe ningún factor de país.
+- Después de aplicar: volver a cotizar los casos abiertos de ese país con la fecha del día y comparar el neto y
+  `marginRateRoundedDown` con la base. El `--impact` de `catalog preview` sólo acepta briefs del carril de catálogo;
+  una demanda de composición se compara cotizándola con la base y con el sucesor.
 
 ## Límites y futuros consumers
 

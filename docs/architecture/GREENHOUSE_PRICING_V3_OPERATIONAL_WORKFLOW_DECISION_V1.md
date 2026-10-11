@@ -365,6 +365,8 @@ Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay coman
 - **Catálogo vigente para cotizar.** `catalog.review-v4.json` + `resources.review-v5.json` (+ el catálogo de
   créditos). Con v4 una cotización nueva en CLP, USD, COP, MXN o PEN fechada desde el 2026-10-10 sale en `1.1.0` y
   redondeada; v2 y v3 quedan como padres congelados de los artefactos que los usaron.
+  *Nota 2026-10-11:* el catálogo vigente para cotizaciones nuevas pasó a ser `catalog.review-v5.json`; v4 queda
+  también como padre congelado. Ver el delta del 2026-10-11, más abajo.
 - **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
   `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
   muestran sólo el neto final.
@@ -386,8 +388,58 @@ EUR→USD del BCE está fechada sólo el 2026-10-09: una cotización posterior q
 USD→CLF sigue siendo un valor estimado de 2025 (`QUOTE_FX_REVIEW`). Múltiplos para otras monedas u ofertas que
 redondeen distinto: `COMMERCIAL_ROUNDING_SCOPE`.
 
+> Nota 2026-10-11: el primer punto quedó cerrado con el catálogo v5, que declara cada costo del workbook como
+> referencia de Chile. Con v5 y fecha de cotización desde el 2026-10-11 ya no aparece el supuesto
+> `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` ni `ESTIMATED_SOURCE` sobre el costo de la persona. EUR, CLF y los
+> múltiplos de otras monedas siguen abiertos.
+
 **Verificación (2026-10-10, local).** `pnpm pricing:v3:test`: 12 archivos y 320 pruebas; ESLint y `pnpm typecheck`
 limpios; todos los artefactos congelados en disco responden `verified: true` (la guarda cubre los versionados).
+[Readback con cifras](../documentation/finance/cotizador-v3-superficie-implementada.md).
+
+## Delta 2026-10-11 — factores de país con valor y catálogo v5: qué cambia en el flujo operativo
+
+Decisión, regla exacta, alternativas y reglas duras:
+[delta 1.2.0 del ADR del motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado).
+Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay comandos, flags ni códigos de salida nuevos,
+y la demanda no gana campos: los dos países que ya declaraba pasan a tener efecto.
+
+- **Los dos ejes de país ahora llevan valores.** Hasta v4 todos los factores de mercado del catálogo eran hipótesis
+  neutrales en 1 y los costos no declaraban país: `offerMarketCountry` y `talentCountry` sólo cambiaban moneda,
+  redondeo y un supuesto. Con v5, `talentCountry` (país de la persona) mueve el **costo** por el factor de talento, y
+  `offerMarketCountry` (país del cliente) mueve el **precio del componente humano** por el factor de mercado. Son
+  hechos distintos y se declaran por separado; herramientas, fees y provisiones no reciben ninguno de los dos.
+- **Catálogo vigente para cotizar.** `catalog.review-v5.json` + `resources.review-v5.json` (+ el catálogo de
+  créditos). v2, v3 y v4 quedan como padres congelados. Los valores nuevos rigen desde el 2026-10-11: una demanda
+  con fecha anterior sobre v5 sigue resolviendo los valores de la época de v4.
+- **Qué contrato calcula.** A las reglas del delta anterior se suma una: la resolución emite `1.2.0` si y sólo si el
+  factor de mercado elegido declara `floorBasis: "base_market"` (en v5, Colombia y Perú). En ese mercado el piso de
+  cada fila acompaña al factor, de modo que una cotización a precio de política no sale marcada aunque su margen
+  real quede bajo el mínimo de la política; un descuento adicional sí cruza el piso. Chile, México, Estados Unidos y
+  España no lo declaran y siguen con las reglas anteriores (`1.1.0` cuando hay redondeo o ajustes).
+- **Lectura.** El resumen nombra el factor de mercado en `marketFactor` cuando cambia algo y, por línea marcada,
+  entrega `floorNet` y `netShortOfFloor`. El margen que se informa es siempre el real, sobre el neto final. El agente
+  no recalcula el piso de un mercado ni presenta un margen «equivalente al mercado base».
+- **Supuestos y señales.** Con v5 desaparecen `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` y `ESTIMATED_SOURCE` sobre el
+  costo de la persona; `allowUnlocalizedCost` deja de hacer falta para esos costos. Los factores estimados sí se
+  reportan como `ESTIMATED_SOURCE`, y una persona de un país sin factor de talento registrado deja la cotización en
+  `needs_input`.
+- **Costo real por perfil y país.** Cuando exista, se registra como costo `specific` de ese país con el flujo de
+  mantenimiento de siempre y reemplaza al factor para ese perfil; el factor de talento es la aproximación para
+  cuando ese dato no existe.
+
+**Decisiones del operador (CEO, 2026-10-11)**, registradas como datos del catálogo v5 y del ledger: el precio sigue
+al país del cliente y el costo al país de la persona, con las dos palancas configuradas; en los mercados con factor
+menor que 1 el piso de margen acompaña al factor; el margen real se muestra siempre. 45 % sigue siendo el piso de los
+servicios gestionados en el mercado base.
+
+**Sigue abierto.** Validar cada factor con contrataciones reales (talento) y con negocios cerrados o perdidos
+(mercado): `COUNTRY_FACTORS_UNVALIDATED`. Factores por tipo de cliente, que hoy se expresan como `agreed_net`, y
+factores de talento por perfil o seniority, que hoy se expresan como costo específico (`LOCALIZED_TALENT_COSTS`).
+Regla de redondeo y tipo de cambio para EUR: todavía no se puede cotizar en EUR a un cliente de España.
+
+**Verificación (2026-10-11, local).** `pnpm pricing:v3:test`: 13 archivos y 407 pruebas; ESLint limpio; todos los
+artefactos congelados en disco responden `verified: true`.
 [Readback con cifras](../documentation/finance/cotizador-v3-superficie-implementada.md).
 
 ## Evidencia y rutas de operación

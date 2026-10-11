@@ -35,6 +35,17 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
   PEN, COP, MXN), tipo de cambio de cotización desde USD como valor de política con margen prudencial, y los 32
   costos del workbook confirmados por su autor sin cambio de importes. Es el catálogo vigente para cotizaciones
   nuevas, junto con `resources.review-v5.json`; v2 y v3 se conservan como padres congelados.
+  *Corrección 2026-10-11:* el vigente para cotizaciones nuevas pasó a ser `catalog.review-v5.json`; v4 queda como
+  padre congelado.
+- `catalog.review-v5.json` (change-set `country-factors.change.json`, aplicado sobre v4 con `catalog preview|apply`):
+  los 32 costos del workbook declarados como costo de cada perfil en Chile, un factor de talento por país de la
+  persona relativo a Chile, y un factor de mercado por país del cliente sobre el precio humano, con
+  `floorBasis: "base_market"` en Colombia y Perú. Agrega España como país. Es el catálogo vigente para cotizaciones
+  nuevas, junto con `resources.review-v5.json`; v2, v3 y v4 se conservan como padres congelados.
+- `managed-care-colombia.demand.json` → `managed-care-colombia.artifact.json`: el servicio gestionado sintético de
+  `managed-care.*` para un cliente de Colombia con equipo en Colombia, en COP y con fecha 2026-10-11. Es el primer
+  artefacto firmado por el motor `pricing-v3-local/1.2.0` y el que la guarda de artefactos congelados exige para ese
+  motor.
 - `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
   dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
@@ -116,6 +127,8 @@ Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/coti
   `../v3-resources/ai-credits.review-v1.json`. Con v4 toda cotización nueva en CLP, USD, COP, MXN o PEN fechada desde
   el 2026-10-10 se calcula con el contrato 1.1.0 y sale redondeada al múltiplo de su moneda. La CLI sin `--catalog`
   sigue leyendo review-v1: hay que pasar la ruta.
+  *Corrección 2026-10-11:* desde hoy se cotiza con `catalog.review-v5.json`; con él, un cliente de Colombia o de
+  Perú se calcula con el contrato 1.2.0. Ver el delta siguiente.
 - **Qué no se toca.** `catalog.review-v2.json` y `catalog.review-v3.json` son los padres congelados de los artefactos
   que los usaron. Ningún artefacto de esta carpeta se regeneró: cada uno lleva su catálogo dentro, vuelve a resolver al
   contrato 1.0.0 y responde `verified: true`. La prueba `pricing-v3-frozen-artifacts.test.ts` los reproduce a todos en
@@ -130,9 +143,66 @@ Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/coti
   EUR queda sin tasa vigente.
 - **Costos.** Los 32 costos quedaron confirmados en su importe pero siguen sin país declarado; la resolución los sigue
   reportando como `ESTIMATED_SOURCE` con el supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`.
+  *Corrección 2026-10-11:* eso vale para v4. En v5 cada costo declara Chile como país de referencia y, con fecha
+  desde el 2026-10-11, ni el aviso ni el supuesto aparecen sobre el costo de la persona.
 - **Ledger.** `operational-gaps.json` retiró `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE`,
   agregó `QUOTE_FX_REVIEW` y `COMMERCIAL_ROUNDING_SCOPE`, y actualizó `MARGIN_FLOOR_SCOPE` y `LOCALIZED_TALENT_COSTS`.
 - **Corrida del 2026-10-10** con v4 + v5 sobre `managed-care.demand.json`: CLP 9.530.000, y cambiando sólo la moneda
   de salida, USD 9.530,00, COP 34.900.000, MXN 183.300,00 y PEN 35.300,00; todas calculadas, múltiplos de su regla y
   sin líneas marcadas. Con v3 la misma demanda da CLP 9.508.946 y seis líneas marcadas. Evidencia fechada, no fixture:
   la demanda versionada está en CLP y no se escribieron artefactos nuevos en esta carpeta.
+
+## Delta 2026-10-11 — motor 1.2, factores de país y catálogo v5
+
+Decisión: [delta 1.2.0 del ADR del motor](../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado).
+Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md#factores-de-país-talento-y-mercado-2026-10-11).
+
+- **Archivos nuevos.** `catalog.review-v5.json` (versión `operating-review-2026-10-11-v5`),
+  `country-factors.change.json` (el change-set que lo produjo desde `catalog.review-v4.json`),
+  `managed-care-colombia.demand.json` y `managed-care-colombia.artifact.json`.
+- **Qué usar para cotizar hoy.** `catalog.review-v5.json` + `resources.review-v5.json` +
+  `../v3-resources/ai-credits.review-v1.json`. La CLI sin `--catalog` sigue leyendo review-v1: hay que pasar la ruta.
+- **Qué no se toca.** `catalog.review-v2.json`, `catalog.review-v3.json` y `catalog.review-v4.json` son los padres
+  congelados de los artefactos que los usaron. Ningún artefacto anterior de esta carpeta se regeneró: cada uno
+  vuelve a resolver a su contrato y responde `verified: true`.
+- **Dos países, dos efectos.** `talentCountry` de cada línea (país de la persona) ajusta el **costo** por el factor
+  de talento, relativo a Chile. `offerMarketCountry` (país del cliente) ajusta el **precio del componente humano**
+  por el factor de mercado. Herramientas, fees y provisiones no reciben ninguno. Hasta v4 todos los factores de
+  mercado valían 1 y ningún costo declaraba país: el país sólo cambiaba moneda y redondeo.
+- **Valores de v5**, vigentes desde el 2026-10-11 (la fuente es el JSON):
+
+  | País | Factor de talento | Factor de mercado | Piso sobre el mercado base |
+  | --- | --- | --- | --- |
+  | CL | 1 (confirmado, por definición) | 1 (confirmado) | no |
+  | CO | 0,80 (estimado) | 0,90 (confirmado) | sí |
+  | PE | 0,85 (estimado) | 0,95 (estimado) | sí |
+  | MX | 0,90 (estimado) | 1 (estimado) | no |
+  | US | 5 (estimado) | 1,10 (confirmado) | no |
+  | ES | 3 (estimado) | 1,10 (estimado) | no |
+
+  Los factores de talento estimados salen de avisos de empleo y guías salariales leídos el 2026-10-11, uno por país
+  para todos los perfiles. Los de mercado confirmados los decidió el operador (CEO) desde los rangos de la hoja
+  «Factor País» del workbook, que era una tabla guía que ninguna fórmula referenciaba.
+- **Piso en Colombia y Perú.** Su factor de mercado declara `floorBasis: "base_market"`: la cotización se calcula
+  con el contrato 1.2.0 y el piso de cada fila acompaña al factor. A precio de política ninguna línea sale marcada,
+  aunque el margen real quede cerca de 41 % (CO) y 43 % (PE); un descuento o un neto pactado adicional sí cruza el
+  piso. 45 % sigue siendo el piso de los servicios gestionados en el mercado base. El resumen nombra el factor en
+  `marketFactor` y muestra siempre el margen real.
+- **Fecha de cotización.** Los valores nuevos rigen desde el 2026-10-11. Una demanda con fecha anterior sobre v5
+  sigue resolviendo los valores de la época de v4: `managed-care.demand.json` (2026-10-10) sobre v5 da los mismos
+  CLP 9.530.000 de la corrida anterior.
+- **Costo real por perfil y país.** Cuando exista, se registra como costo `specific` de ese país y reemplaza al
+  factor de talento para ese perfil.
+- **Lo que todavía no se puede.** Cotizar en EUR a un cliente de España: no hay regla de redondeo ni tipo de cambio
+  vigente para EUR. Factores por tipo de cliente (pyme, licitación, cliente estratégico): hoy son un `agreed_net`.
+  Factores de talento por perfil o seniority: hoy son un costo específico.
+- **Ledger.** `operational-gaps.json` agregó `COUNTRY_FACTORS_UNVALIDATED` (validar cada factor con contrataciones
+  reales y con negocios cerrados o perdidos) y actualizó `LOCALIZED_TALENT_COSTS`.
+- **Corrida del 2026-10-11** con v5 + v5. `managed-care-colombia.demand.json`: COP 28.100.000 al mes, margen real
+  0,4152, ninguna línea marcada; el artefacto versionado responde `verified: true`. La misma demanda con un
+  `agreed_net` de 24.000.000: margen 0,3153 y las seis líneas marcadas, cada una con su `floorNet` y
+  `netShortOfFloor`. Sobre `managed-care.demand.json` con fecha 2026-10-11 y salida en USD, por cliente / equipo:
+  CL/CL 9.530,00 · CL/CO 8.210,00 · CO/CL 8.890,00 · CO/CO 7.690,00 · PE/PE 8.260,00 · MX/MX 8.890,00 ·
+  US/CL 10.180,00 · US/US 39.300,00 · ES/ES 24.740,00 · ES/CL 10.180,00; ninguna con líneas marcadas. Salvo el par
+  Colombia versionado, es evidencia fechada y no fixture: no se escribieron más artefactos en esta carpeta.
+  [Tabla con costo, margen y contrato](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md).

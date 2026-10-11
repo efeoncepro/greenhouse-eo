@@ -9,13 +9,16 @@ derivado y veredicto de piso); el resto conserva el estado verificado del 2026-1
 Los párrafos marcados «motor 1.1» describen el cambio posterior del mismo 2026-10-10: contrato 1.1.0 del kernel,
 neto pactado, redondeo comercial y catálogo v4
 ([ADR](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)).
+Los párrafos marcados «motor 1.2» describen el cambio del 2026-10-11: contrato 1.2.0 del kernel (el piso acompaña al
+factor de mercado), factores de país con valor y catálogo v5
+([delta del ADR](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado)).
 
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
 | ------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0` o `1.1.0` (motor 1.1); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
-| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`) |
+| Núcleo                    | `schemas.ts`, `calculate.ts`                                | Request y snapshot resueltos, contrato `1.0.0`, `1.1.0` (motor 1.1) o `1.2.0` (motor 1.2); cálculo Decimal sin archivos, DB, HTTP, proveedores o LLM |
+| Catálogo monetario        | `pricing-v3-catalog/1`                                      | Perfiles, costos, kits, asignación, precio, países, monedas, factores y FX con fuentes; desde el motor 1.1, también reglas de redondeo (`kind: price_rounding`); desde el motor 1.2, `floorBasis` opcional en `market_factor` |
 | Brief                     | `pricing-v3-brief/1`                                        | Necesidad, selecciones y ajustes comerciales (`discount`, `agreed_net`); el resolver devuelve bindings, supuestos, pendientes y el contrato que emite al kernel |
 | Policy de recursos        | `pricing-v3-resource-policy/1`                              | Base común, tareas, reglas de perfil, acceso, planes y capacidades; modo `review_only`         |
 | Demanda compuesta         | `pricing-v3-composition-demand/1`                           | Brief, trabajo, usuarios, tareas, IA, allocations, presupuestos y cobertura cliente            |
@@ -26,14 +29,14 @@ neto pactado, redondeo comercial y catálogo v4
 | Mantenimiento de recursos | `pricing-v3-resource-change/1`                              | Replacement completo `policy` o `credits`; preview con impacto y sucesor nuevo                 |
 | Composición congelada     | `pricing-v3-resource-composition/1`                         | Catálogo, policy, créditos, demanda y resultado completos; digest y replay verificable         |
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
-| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding` |
+| Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
-| Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`; cada uno con su `precisionPolicy` |
+| Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
 
 Fuentes ejecutables: [dominio](../../../src/lib/finance/pricing-v3/),
 [CLI](../../../scripts/commercial/pricing-v3.ts), [fixtures operativas](../../../data/pricing/v3-operating/README.md).
-Versiones de reproducción: motor `pricing-v3-local/1.0.0` y, desde el motor 1.1, también `pricing-v3-local/1.1.0` (cada artefacto se reproduce con el que lo firmó; `ENGINE_VERSION` ya no existe), artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`. Las tres versiones de artefacto no cambiaron.
+Versiones de reproducción: motor `pricing-v3-local/1.0.0`, desde el motor 1.1 también `pricing-v3-local/1.1.0` y desde el motor 1.2 también `pricing-v3-local/1.2.0` (cada artefacto se reproduce con el que lo firmó; `ENGINE_VERSION` ya no existe), artefacto de snapshot `pricing-v3-local-artifact/1`, quote de catálogo `pricing-v3-selection-quote/1` y composición `pricing-v3-resource-composition/1`. Las tres versiones de artefacto no cambiaron.
 Las propiedades desconocidas de los inputs estrictos se rechazan. Versiones o hashes incompatibles no se
 reinterpretan con la versión más reciente.
 
@@ -52,6 +55,15 @@ El país del talento define localización del costo; el mercado de oferta ajusta
 independientes de moneda y FX. `specific` usa costo del país y no recibe un segundo factor salarial.
 `reference_adjusted` exige un factor desde el país de referencia. Histórico sin país sólo se admite bajo la
 opción explícita de simulación; no constituye una remuneración colombiana, peruana o chilena vigente.
+
+Motor 1.2 (2026-10-11): hasta `catalog.review-v4` ningún costo declaraba país y todos los factores de mercado valían
+1, así que el país de la persona sólo producía un supuesto y el del cliente sólo cambiaba moneda y redondeo. En
+`catalog.review-v5` las dos dimensiones tienen valores. Los 32 costos del workbook son `reference_adjusted` con
+referencia Chile, y `talentCountry` los multiplica por el registro `talent_factor` de ese país: mueve el costo y,
+con él, el precio. `offerMarketCountry` selecciona el `market_factor` del país del cliente, que multiplica sólo el
+precio del componente humano. Un costo `specific` de un país reemplaza al factor de talento para ese perfil. Sin
+factor para el país de la persona la cotización queda `needs_input`. Cómo componen los dos ejes:
+[contrato 1.2.0](cotizador-v3-contrato-y-validacion.md#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11).
 
 ## Cuenta económica y calendario
 
@@ -84,6 +96,15 @@ piso antes de redondear lo sigue cumpliendo. Los ajustes son hasta 10, `discount
 pactado por período; el motor deriva `discount` o `uplift` y llega al monto exacto), y cada fila recibe a lo más uno:
 sigue sin haber cadena de ajustes sobre una misma fila. Margen final = `(neto − costo) / neto` sobre el neto después
 de redondeo, descuento y recargo. Detalle: [contrato 1.1.0](cotizador-v3-contrato-y-validacion.md#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10).
+
+Motor 1.2 (2026-10-11): las fórmulas de costo, precio y margen no cambian. Cambia contra qué se compara el piso
+cuando el factor de mercado elegido declara `floorBasis: "base_market"` y es menor que 1. Cada fila calcula
+`ρ` = su precio de política con el factor ÷ su precio con factor 1 (ambos a la precisión de la moneda, antes del
+redondeo comercial) y su piso pasa a ser `floorNet = costo × ρ / (1 − minimumMargin)`, elevado a la unidad de la
+moneda. El kernel marca la fila cuando el neto final es menor que `floorNet`. Sin componente humano, con factor 1 o
+mayor, o sin `floorBasis`, `ρ = 1` y el control es el de 1.1.0. El margen final sigue siendo `(neto − costo) / neto`:
+en un mercado con factor menor que 1 puede quedar bajo el mínimo de la política sin que ninguna línea esté marcada.
+Detalle: [contrato 1.2.0](cotizador-v3-contrato-y-validacion.md#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11).
 
 FX conserva par, tasa, fecha, fuente e IDs; convertir exige la dirección seleccionada, sin invertir o cruzar
 automáticamente. La referencia EUR→USD de la fixture operativa es 1.1206 al 09-10-2026; permite simular Magnific,
@@ -194,6 +215,12 @@ Motor 1.1 (2026-10-10): lo anterior es el contrato 1.0.0 (el ejemplo con `catalo
 redondeo vigente, el contrato 1.1.0 conserva el piso de toda fila que lo cumplía antes de redondear: el mismo ejemplo
 con `catalog.review-v4` no marca ninguna línea. `assess` no cambió; sigue leyendo sólo `MARGIN_BELOW_FLOOR`.
 
+Motor 1.2 (2026-10-11): `assess` sigue leyendo sólo `MARGIN_BELOW_FLOOR` y el texto de su brecha no cambió. Agrega
+`margin.policyFloor.marketFactor` cuando el factor elegido no es neutral, y cada entrada de `linesBelowFloor` de una
+fila 1.2.0 trae `floorNet` y `netShortOfFloor`. `modeledRate` es el margen real: con un factor de mercado cuyo piso
+acompaña al mercado base puede estar bajo el mínimo de la política con `linesBelowFloor` vacío. `proposedTarget` y
+`proposedFloor` siguen siendo la propuesta genérica y no conocen el factor de mercado.
+
 `compose preview` admite simulación calculada en revisión y entrega JSON/Markdown con allowlist. Excluye
 costos, margen, IDs/fuentes privados, providers, drivers y países de talento. No autoriza publicación o envío.
 Desde el 2026-10-10, en `managed_service` los importes derivados (fee del período e implementación) conservan la
@@ -261,6 +288,35 @@ Motor 1.1 (2026-10-10), qué imprime cada comando. No hay comandos, flags ni có
   `calculationStatus: needs_input`. `AMBIGUOUS_PRICE_ROUNDING` y un neto de `setup` que no cae en ningún período
   (`AGREED_NET_WITHOUT_BASE`, ruta `adjustments.<adjustmentId>`) son bloqueos de resolución.
 
+Motor 1.2 (2026-10-11), qué imprime cada comando. No hay comandos, flags ni códigos de salida nuevos.
+
+- `compose prepare|quote` y `replay` de una composición: el mismo resumen, con claves aditivas. `marketFactor`
+  (`{ country, factor, floorBasis, recordId, revision, sourceStatus }`) aparece en la raíz **sólo** cuando el factor
+  de mercado elegido cambia algo: factor distinto de 1 o `floorBasis` declarado. Con el factor neutral la clave no
+  existe (no va en `null`), así que el resumen de una cotización anterior conserva sus claves. `floorBasis` es
+  `"base_market"` o `null`; un factor mayor que 1 sin base de piso se nombra igual, y esa cotización sigue en 1.1.0.
+  `engineVersion` es `pricing-v3-local/1.2.0` cuando el factor elegido declara `floorBasis`. En una quote 1.2.0,
+  `totals` y los totales por período agregan `marketAdjustment`.
+- `marginFloor.lines[]`: en una fila 1.2.0 cada línea marcada agrega `floorNet` y `netShortOfFloor`
+  (`floorNet − net`). Si el piso de esa fila se lee sobre el mercado base (`ρ < 1`), `marginAmountShortOfFloor` es
+  `null`: esa cifra sería la del mercado base. Si `ρ = 1` se conserva junto a las dos nuevas. `net`, `marginAmount`
+  y `marginRateRoundedDown` son siempre los reales.
+- `compose assess`: `margin.policyFloor` agrega `marketFactor` cuando no es neutral; `linesBelowFloor` trae las
+  mismas claves nuevas por línea.
+- `explain` (catálogo y composición): `commercialAdjustments` agrega `marketFactor` cuando la quote es 1.2.0, la
+  identidad suma que `undiscountedPrice − roundingAdjustment − marketAdjustment` es el precio del mercado base, y cada
+  fila 1.2.0 de `rows[]` agrega `marketAdjustment`, `marketPriceRatio` y `floorNet`.
+- `prepare|quote` del carril de catálogo y `calculate` del kernel entregan el resultado completo, con las claves
+  nuevas por fila y en totales cuando el contrato es 1.2.0.
+- `compare` de dos artefactos de snapshot compara `marketAdjustment` sólo si ambos lados lo traen.
+- `catalog search|show|validate` leen `floorBasis`; `catalog preview|apply` lo llevan en `add` y `replace`, y otro
+  valor que no sea `base_market` se rechaza como `SCHEMA_INVALID`.
+- `compose preview`, `export` y las proyecciones cliente no cambian: muestran el neto final y nada del ajuste de
+  mercado, la razón ni el piso.
+- Supuestos y señales: con `catalog.review-v5` y fecha desde el 2026-10-11, `assumptions` ya no trae
+  `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` y el costo de la persona ya no sale como `ESTIMATED_SOURCE`; los factores de
+  talento y de mercado estimados sí salen como `ESTIMATED_SOURCE` en `reviewSignals`.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -281,6 +337,49 @@ Cotizaciones de prueba de ese día con `catalog.review-v4` + `resources.review-v
 
 Los archivos `acordado-neto.*` del caso SKY están junto al
 [registro de la excepción](../../commercial/prospects/sky-social-care-2027/pricing/EXCEPCION-PISO-2026-10-10.md).
+Las cifras son evidencia fechada de esa corrida, no un contrato.
+
+Readback del 2026-10-11 tras el motor 1.2 y el catálogo v5: `pnpm pricing:v3:test` con 13 archivos y 407 pruebas V3,
+ESLint limpio, y `verified: true` en todos los `*.artifact.json` en disco: 17 bajo `data/pricing/` y 14 en la
+carpeta del caso SKY (31). La guarda permanente cubre los versionados: 19 desde el commit `e8117442b`, que agregó
+`managed-care-colombia.artifact.json`, el primero firmado por el motor 1.2.0.
+Cotizaciones de prueba de ese día con `catalog.review-v5` + `resources.review-v5`: `managed-care.demand.json` con
+`quoteDate` 2026-10-11 y salida en USD, cambiando sólo el país del cliente (`offerMarketCountry`) y el del equipo
+(`talentCountry` de las seis líneas). Todas salen calculadas y en revisión (exit 3).
+
+| Cliente / equipo | Contrato | Neto mensual USD | Costo USD | Margen real | Líneas marcadas |
+| --- | --- | --- | --- | --- | --- |
+| CL / CL | 1.1.0 | 9.530,00 | 5.229,94 | 0,4512 | 0 |
+| CL / CO | 1.1.0 | 8.210,00 | 4.501,94 | 0,4516 | 0 |
+| CO / CL | 1.2.0 | 8.890,00 | 5.229,94 | 0,4117 | 0 |
+| CO / CO | 1.2.0 | 7.690,00 | 4.501,94 | 0,4145 | 0 |
+| PE / PE | 1.2.0 | 8.260,00 | 4.683,94 | 0,4329 | 0 |
+| MX / MX | 1.1.0 | 8.890,00 | 4.865,94 | 0,4526 | 0 |
+| US / CL | 1.1.0 | 10.180,00 | 5.229,94 | 0,4862 | 0 |
+| US / US | 1.1.0 | 39.300,00 | 19.789,94 | 0,4964 | 0 |
+| ES / ES | 1.1.0 | 24.740,00 | 12.509,94 | 0,4943 | 0 |
+| ES / CL | 1.1.0 | 10.180,00 | 5.229,94 | 0,4862 | 0 |
+
+- El equipo en Colombia baja el costo (4.501,94 contra 5.229,94) y el precio con él: el margen queda en el de la
+  política. El cliente en Colombia baja sólo el precio: en CO / CL `totals.marketAdjustment` es −661,84 y el margen
+  real queda en 0,4117 sin ninguna línea marcada.
+- Estados Unidos y España cotizan en 1.1.0 porque su factor de mercado, mayor que 1, no declara `floorBasis`; el
+  resumen igual lo nombra en `marketFactor` y los totales no traen `marketAdjustment`. Con el factor neutral
+  (CL, MX) `marketFactor` no aparece.
+- En COP, cliente y equipo en Colombia
+  ([`managed-care-colombia.demand.json`](../../../data/pricing/v3-operating/managed-care-colombia.demand.json) →
+  `.artifact.json`, versionados): 28.100.000 al mes, costo 16.432.006, `marketAdjustment` −1.932.511, margen real
+  0,4152, ninguna línea marcada, replay verificado. Sin `floorBasis`, esa misma cotización con factor 0,90 marcaba
+  las seis líneas (medido antes del cambio).
+- La misma cotización con un `agreed_net` de 24.000.000 (sin versionar): `discount` 4.100.000, margen real 0,3153 y
+  las seis líneas marcadas, cada una con `floorNet` y `netShortOfFloor`; `marginAmountShortOfFloor` es `null` en
+  todas. Primera línea: neto 10.163.701, piso 11.872.366, faltan 1.708.665.
+- La demanda versionada original (`quoteDate` 2026-10-10) sobre v5 sigue dando CLP 9.530.000 en 1.1.0 y con el
+  supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`, también si se le cambia el mercado a Colombia: los valores de v5
+  rigen desde el 2026-10-11.
+- Una cotización en EUR para un cliente de España queda `needs_input` (falta la tasa USD→EUR vigente): no hay tipo
+  de cambio ni regla de redondeo para EUR.
+
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
 vigentes, medición de provisiones, policy comercial y términos reales siguen en

@@ -152,9 +152,14 @@ canónicas y comandos exactos; leerla antes de completar demanda o actualizar pr
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
 `compose prepare|quote` → `explain|replay` → `compose assess|preview`. El sucesor operativo es opt-in;
 no cambiar defaults ni sobrescribir artifacts. Para cotizaciones nuevas el catálogo vigente es
-`data/pricing/v3-operating/catalog.review-v4.json`, con `resources.review-v5.json` y
+`data/pricing/v3-operating/catalog.review-v5.json`, con `resources.review-v5.json` y
 `data/pricing/v3-resources/ai-credits.review-v1.json`; se puede cotizar en CLP, USD, COP, MXN y PEN
 (`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo.
+El país entra por dos campos distintos de la demanda y rige con `quoteDate` 2026-10-11 o posterior:
+`brief.offerMarketCountry` (país del cliente) ajusta el precio de la parte humana y `brief.lines[].talentCountry`
+(país de cada persona) ajusta el costo; país no es moneda y varios factores son estimados. Con cliente en Colombia o
+Perú el piso acompaña al factor de mercado: una cotización al precio de política no sale marcada aunque su margen
+real quede bajo 45 %, así que el margen que se informa es siempre `marginRateRoundedDown`.
 Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 `compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
 el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo
@@ -166,5 +171,5 @@ no sustituyen pisos de práctica aprobados. El precio que se acuerda se declara 
 neto acordado (`agreed_net` en `brief.adjustments`, por periodo, con motivo), sin calcular tasas a mano, y se
 vuelve a correr: el margen real y el veredicto del piso salen del motor. El catálogo vigente redondea cada
 precio hacia arriba al múltiplo de su moneda, así que una línea al piso ya no sale marcada: una línea bajo el
-piso es un incumplimiento real y la excepción la decide el operador (CEO), nunca el agente. Mantener la frontera de
+piso de su mercado es un incumplimiento real y la excepción la decide el operador (CEO), nunca el agente. Mantener la frontera de
 [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).

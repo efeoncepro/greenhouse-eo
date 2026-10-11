@@ -60,6 +60,30 @@ export function activeRecords(catalog: Catalog, asOf: string) {
   return catalog.records.filter(r => r.source.effectiveFrom <= asOf && r.source.effectiveUntil >= asOf)
 }
 
+/**
+ * Catalog values that start AFTER a quote date. A quote dated earlier resolves the values of its own date: right for
+ * a quote of that day, silently wrong for one written today from a demand that kept an old date.
+ */
+export function valuesEffectiveAfter(catalog: Catalog, quoteDate: string) {
+  const later = catalog.records.filter(r => !r.retiredAt && r.source.effectiveFrom > quoteDate)
+
+  if (later.length === 0) return null
+
+  const byKind: Record<string, number> = {}
+
+  for (const r of later) byKind[r.kind] = (byKind[r.kind] ?? 0) + 1
+
+  return {
+    quoteDate,
+    newestEffectiveFrom: later
+      .map(r => r.source.effectiveFrom)
+      .sort()
+      .at(-1)!,
+    records: later.length,
+    byKind
+  }
+}
+
 export function searchCatalog(catalog: Catalog, query = '', kind?: CatalogRecord['kind'], asOf?: string) {
   const normalize = (text: string) =>
     text

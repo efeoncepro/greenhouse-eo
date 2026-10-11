@@ -10,7 +10,9 @@ Código: `catalog/contracts.ts`, `catalog/catalog.ts`, `adapters/catalog-local.t
 
 - Finance/Commercial mantiene costo humano, moneda/FX, fees, margen/markup y factores de mercado. Desde el
   2026-10-10 también el redondeo comercial; piso de margen, tipo de cambio de cotización, múltiplos de redondeo y
-  excepciones los decide el operador (CEO) y se registran con su decisión como fuente.
+  excepciones los decide el operador (CEO) y se registran con su decisión como fuente. Desde el 2026-10-11 también
+  los factores de país —talento y mercado— y la base del piso de un mercado (`floorBasis`); People aporta el costo
+  real por perfil y país cuando existe.
 - Operations mantiene perfiles, kits, capacidad/asignación y costos de Talent Assurance/operación.
 - Platform mantiene schemas, compatibilidad y consumers.
 
@@ -26,7 +28,8 @@ estimado continúa revisión. Confirmar significado de una celda no confirma cos
 `zeroReason` en componentes humanos para modo commercial_draft y justificación según contrato del motor; null/pending no se transforma en cero.
 
 Kinds: profile, cost, resource, kit, allocation, pricing, talent_factor, market_factor, fx y, desde el 2026-10-10,
-price_rounding ([detalle](#redondeo-tipo-de-cambio-de-cotización-y-costos-confirmados-2026-10-10)). Perfil no incorpora fee,
+price_rounding ([detalle](#redondeo-tipo-de-cambio-de-cotización-y-costos-confirmados-2026-10-10)). talent_factor y
+market_factor llevan valores desde el 2026-10-11 ([detalle](#factores-de-país-talento-y-mercado-2026-10-11)). Perfil no incorpora fee,
 software ni margen dentro de salario. Cost conserva componentes/coberturas y país específico, referencia con factor
 u origen desconocido; kits describen cómo asignar recursos. Datos de unidad/scope/moneda son parte del valor.
 El catálogo declara países/monedas con precisión explícita y evidence/hashes de los antecedentes.
@@ -137,6 +140,10 @@ resolución reporta ese costo como `ESTIMATED_SOURCE` con el supuesto `UNLOCALIZ
 fuente esté confirmada. Lo que cierra ese aviso es declarar el país de cada registro (`LOCALIZED_TALENT_COSTS`), no
 volver a confirmar el importe.
 
+> Nota 2026-10-11: eso describe v4. El catálogo v5 declaró el país de los 32 registros (referencia Chile) y, con
+> fecha de cotización desde ese día, el aviso y el supuesto ya no aparecen. Ver
+> [factores de país](#factores-de-país-talento-y-mercado-2026-10-11).
+
 ### Sucesor v4
 
 `catalog.review-v4.json` (versión `operating-review-2026-10-10-v4`) se emitió desde `catalog.review-v3.json` con
@@ -149,3 +156,114 @@ no aplican a una fecha anterior a su inicio. Los valores viven en el JSON y en s
 Para cotizaciones nuevas el par es `catalog.review-v4.json` + `resources.review-v5.json`, más
 `data/pricing/v3-resources/ai-credits.review-v1.json`. v2 y v3 no se editan ni se retiran: son los padres congelados
 de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.
+
+> Nota 2026-10-11: el par para cotizaciones nuevas pasó a ser `catalog.review-v5.json` + `resources.review-v5.json`.
+> v4 se suma a los padres congelados y tampoco se edita.
+
+## Factores de país: talento y mercado (2026-10-11)
+
+Decisión: [delta 1.2.0 del ADR del motor](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado).
+Datos: `catalog.review-v5.json` y su change-set `country-factors.change.json` en
+[`data/pricing/v3-operating/`](../../../data/pricing/v3-operating/README.md). Esquemas:
+[`catalog/contracts.ts`](../../../src/lib/finance/pricing-v3/catalog/contracts.ts) y
+[`schemas.ts`](../../../src/lib/finance/pricing-v3/schemas.ts). Cómo se calcula con ellos:
+[contrato 1.2.0](cotizador-v3-contrato-y-validacion.md#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11).
+
+Son dos registros para dos hechos. El factor de talento dice cuánto cuesta una persona según el país donde vive; el
+factor de mercado dice cuánto paga un cliente según su país. No se usa uno para representar el otro.
+
+### Registro `talent_factor`
+
+`value` es `{ "country", "referenceCountry", "factor" }`: el costo de una persona de `country` como múltiplo del
+costo de referencia de `referenceCountry`. `source` y vigencia como cualquier otro registro.
+
+- Se aplica sólo a un costo `reference_adjusted` cuyo `referenceCountry` coincide, en las líneas cuyo
+  `talentCountry` es `country`. Multiplica el costo humano y, con él, su precio de política.
+- Debe existir un registro vigente por cada par (país de la persona, país de referencia) que se quiera cotizar,
+  incluido el del país de referencia consigo mismo, con factor 1. No se asume un factor neutral: sin registro la
+  resolución bloquea con `MISSING_CATALOG_SELECTION` en `lines.<lineId>.talentFactor`, y con más de uno aplicable,
+  con `AMBIGUOUS_SELECTION`.
+- Es un solo factor por país para todos los perfiles. Donde un perfil o un seniority se aparta de él, lo que se
+  registra es su costo específico (más abajo), no otro factor.
+- No requiere contrato nuevo del kernel: existe desde 1.0.0. Agregarlo o cambiarlo no cambia el contrato que emite la
+  resolución.
+
+### Registro `market_factor`
+
+`value` es `{ "country", "factor", "floorBasis"? }`: el multiplicador del precio del componente humano cuando el
+cliente es de `country`. Herramientas, fees y provisiones no lo reciben; el costo tampoco.
+
+- `floorBasis` es opcional y su único valor es `"base_market"`; cualquier otro se rechaza al validar
+  (`SCHEMA_INVALID`). Declara que el piso de margen de ese mercado se lee sobre el precio del mercado base, de modo
+  que el factor no vuelve a contarse contra el piso. Ausente, el piso se lee sobre el neto final.
+- Sobre el veredicto de piso sólo tiene efecto con factor menor que 1. Declararlo exige una decisión del operador
+  sobre ese mercado; no se agrega por defecto ni «para que no marque».
+- Declararlo en el factor de un país cambia el contrato de las cotizaciones **nuevas** de ese mercado, cualquiera
+  sea el valor del factor: la resolución pasa a emitir `1.2.0`. Una revisión posterior sin el campo vuelve a la base
+  del neto final y al contrato anterior.
+  Ninguna cotización congelada se mueve: lleva su catálogo dentro. Por eso entra siempre en un sucesor.
+- Cambiar un factor es un `replace` del registro del país con referencia nueva; un país nuevo es un `add`, más
+  `dimensions.countriesAdd` si el país no estaba declarado.
+- Consultar: `pricing:v3 catalog search --kind market_factor --catalog <archivo> --date YYYY-MM-DD` (o
+  `--kind talent_factor`).
+
+### Costos declarados como referencia de Chile
+
+En v5 los 32 registros de costo humano declaran
+`localization: { "kind": "reference_adjusted", "referenceCountry": "CL" }`: el importe del workbook es el costo de
+ese perfil en Chile. La fuente es la declaración de su autor (el operador), el `status` es `confirmed` y los
+importes no cambiaron. El costo de una persona de otro país es ese importe por el factor de talento de su país.
+
+Consecuencias al cotizar con fecha desde el 2026-10-11: la resolución ya no agrega el supuesto
+`UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`, el costo deja de reportarse como `ESTIMATED_SOURCE` y la línea ya no necesita
+`allowUnlocalizedCost` para esos costos. Los factores estimados sí se reportan como `ESTIMATED_SOURCE`.
+
+### Costo específico por perfil y país
+
+Cuando se conoce el costo real de un perfil en un país, se registra como un costo propio y reemplaza al factor para
+ese caso:
+
+- `add` de un registro `cost` con el mismo `profileId` y `seniorityCode`,
+  `localization: { "kind": "specific", "country": "<país>" }`, sus componentes, su moneda y una fuente concreta con
+  su `status`.
+- La resolución lo prefiere sobre el costo de referencia en toda línea de ese perfil cuyo `talentCountry` es ese
+  país (salvo que la línea elija otro registro con `costRecordId`), y no le aplica factor de talento. Las líneas de
+  otros países siguen con referencia × factor.
+- No se retira el costo de referencia ni el factor del país: siguen sirviendo a los demás perfiles.
+- El factor de mercado no cambia: un costo específico no desactiva el ajuste del mercado del cliente.
+
+Es la forma de expresar hoy un factor de talento por perfil o por seniority, que no existe como registro.
+
+### Sucesor v5
+
+`catalog.review-v5.json` (versión `operating-review-2026-10-11-v5`) se emitió desde `catalog.review-v4.json` con
+`catalog preview` y `catalog apply` sobre `country-factors.change.json`. El change-set hace cuatro cosas: `replace`
+de los 32 costos (declaran la referencia Chile), `add` de seis factores de talento, `replace` de cinco factores de
+mercado y `add` del de España, con `dimensions.countriesAdd: ["ES"]`. Todas las operaciones rigen desde el
+2026-10-11; las revisiones anteriores de costo y de factor de mercado se conservan con su ventana cerrada el día
+previo, de modo que una cotización con fecha anterior sobre v5 resuelve los valores de la época de v4.
+
+Valores al 2026-10-11; la fuente es el JSON y su `audit`, y cambian por `replace`:
+
+| País | Factor de talento (referencia CL) | Factor de mercado | `floorBasis` |
+| --- | --- | --- | --- |
+| CL | 1, por definición (confirmado) | 1 (confirmado) | — |
+| CO | 0,80 (estimado) | 0,90 (confirmado) | `base_market` |
+| PE | 0,85 (estimado) | 0,95 (estimado) | `base_market` |
+| MX | 0,90 (estimado) | 1 (estimado) | — |
+| US | 5 (estimado) | 1,10 (confirmado) | — |
+| ES | 3 (estimado) | 1,10 (estimado) | — |
+
+- Los factores de talento estimados salen de avisos de empleo y guías salariales leídos el 2026-10-11; no están
+  validados con contrataciones reales. Los de mercado confirmados (CL, CO, US) los decidió el operador a partir de
+  los rangos de la hoja «Factor País» del workbook, que era una tabla guía sin fórmulas que la referenciaran; los de
+  PE, MX y ES son estimaciones. Validarlos es el pendiente `COUNTRY_FACTORS_UNVALIDATED` del
+  [ledger](../../../data/pricing/v3-operating/operational-gaps.json).
+- España entró como país, no como moneda de cotización: no hay regla de redondeo ni tipo de cambio vigente para
+  EUR, así que todavía no se puede cotizar en EUR a un cliente de España.
+- No hay factores por tipo de cliente (pyme, licitación, cliente estratégico): hoy se expresan como `agreed_net` en
+  la demanda.
+
+Para cotizaciones nuevas el par es `catalog.review-v5.json` + `resources.review-v5.json`, más
+`data/pricing/v3-resources/ai-credits.review-v1.json`. v2, v3 y v4 no se editan ni se retiran: son los padres
+congelados de los artefactos que los usaron. La CLI sin `--catalog` sigue leyendo review-v1.

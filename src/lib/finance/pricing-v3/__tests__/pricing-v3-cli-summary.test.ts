@@ -132,3 +132,47 @@ describe('preview amounts keep the scale of the currency', () => {
     expect(new Set(scales).size).toBe(2)
   })
 })
+
+describe('a demand dated before newer catalog values says so', () => {
+  const current = [
+    '--catalog',
+    operating('catalog.review-v5'),
+    '--policy',
+    operating('resources.review-v5'),
+    '--credits',
+    credits
+  ]
+
+  const catalog = read(operating('catalog.review-v5')) as { records: { source: { effectiveFrom: string } }[] }
+
+  const newest = catalog.records
+    .map(r => r.source.effectiveFrom)
+    .sort()
+    .at(-1)!
+
+  it('the committed example keeps an older date: the run reports the newer values it did not use', () => {
+    const demand = read(operating('managed-care.demand')) as { brief: { quoteDate: string } }
+
+    // The premise of this case, read from the data: if the example is ever re-dated, pick another stale demand.
+    expect(demand.brief.quoteDate < newest).toBe(true)
+
+    const run = cli('compose', 'prepare', ...current, '--input', operating('managed-care.demand'))
+    const notice = JSON.parse(run.stdout).laterCatalogValues
+
+    expect(run.status).toBe(3)
+    expect(notice.quoteDate).toBe(demand.brief.quoteDate)
+    expect(notice.newestEffectiveFrom).toBe(newest)
+    expect(notice.records).toBe(catalog.records.filter(r => r.source.effectiveFrom > demand.brief.quoteDate).length)
+  })
+
+  it('a demand dated at the newest values carries no notice', () => {
+    const demand = read(operating('managed-care-colombia.demand')) as { brief: { quoteDate: string } }
+
+    expect(demand.brief.quoteDate >= newest).toBe(true)
+
+    const run = cli('compose', 'prepare', ...current, '--input', operating('managed-care-colombia.demand'))
+
+    expect(run.status).toBe(3)
+    expect(JSON.parse(run.stdout)).not.toHaveProperty('laterCatalogValues')
+  })
+})

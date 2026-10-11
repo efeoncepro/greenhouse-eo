@@ -4,7 +4,7 @@ import { parseArgs } from 'node:util'
 
 import { ZodError } from 'zod'
 
-import { validateCatalog, searchCatalog } from '../../src/lib/finance/pricing-v3/catalog/catalog'
+import { validateCatalog, searchCatalog, valuesEffectiveAfter } from '../../src/lib/finance/pricing-v3/catalog/catalog'
 import { resolveBrief } from '../../src/lib/finance/pricing-v3/catalog/resolve'
 import { briefSchema } from '../../src/lib/finance/pricing-v3/catalog/contracts'
 import { QUOTE_VERSION } from '../../src/lib/finance/pricing-v3/catalog/quote'
@@ -306,15 +306,24 @@ try {
       const result = artifact.semantic.result
 
       if (values.out) writeNew(values.out, json(artifact))
+
+      // A demand that kept an old date quotes with the values of that date and nothing fails. The catalog is in hand
+      // here, so say it; this notice is about the run, not part of the frozen result.
+      const laterCatalogValues = valuesEffectiveAfter(
+        artifact.semantic.catalog,
+        artifact.semantic.demand.brief.quoteDate
+      )
+
       // Both print the same derived summary; the complete result lives only in the artifact written by --out.
       // `quote` is the one that freezes, so only it reports the digest a later replay must reproduce.
       process.stdout.write(
-        json(
-          summarizeComposition(result, {
+        json({
+          ...summarizeComposition(result, {
             calculationId: artifact.calculationId,
             ...(subcommand === 'quote' ? { replayDigest: artifact.replayDigest } : {})
-          })
-        )
+          }),
+          ...(laterCatalogValues ? { laterCatalogValues } : {})
+        })
       )
       process.exitCode = result.quote.calculationStatus === 'calculated' ? 3 : 2
     }

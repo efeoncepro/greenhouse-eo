@@ -2,8 +2,9 @@
 
 Referencia load-on-demand compartida Codex/Claude. Estado verificado 2026-10-09: prototipo local opt-in;
 catálogo, kernel Decimal, mantenimiento, créditos, composición y flujo operativo implementados; desde 2026-10-10,
-motor 1.1 (precio acordado, redondeo comercial) y catálogo v4 con cotización en CLP, USD, COP, MXN y PEN. El canon de
-cotizaciones Greenhouse conserva autoridad, permisos y lifecycle. Esta referencia interpreta sus contratos;
+motor 1.1 (precio acordado, redondeo comercial) y catálogo v4 con cotización en CLP, USD, COP, MXN y PEN; desde
+2026-10-11, catálogo v5 con factores por país del cliente y de cada persona y contrato 1.2.0 (el piso acompaña al
+factor de mercado). El canon de cotizaciones Greenhouse conserva autoridad, permisos y lifecycle. Esta referencia interpreta sus contratos;
 los schemas y primitives de `src/lib/finance/pricing-v3/` calculan.
 
 ## Entrada y fuentes dueñas
@@ -16,12 +17,14 @@ los schemas y primitives de `src/lib/finance/pricing-v3/` calculan.
 - [Mantenimiento](../../../../docs/documentation/finance/cotizador-v3-mantenimiento-catalogo.md): owners, vigencia y cadencia.
 - [ADR operativo](../../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md),
   [ADR motor 1.1](../../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md)
-  (precio acordado, redondeo comercial, contratos convivientes; 2026-10-10) y
+  (precio acordado, redondeo comercial, contratos convivientes; 2026-10-10; delta 2026-10-11: contrato 1.2.0) y
   [promoción futura](../../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
 
 Para interpretar un pedido, identificar unidad comercial, variante/seniority/tier, país del talento, mercado del
-cliente, dedicación, headcount, duración, tareas, moneda y fecha. Una vacante CRM es señal de necesidad; no acredita
-intención de contratar proveedor. Talent Assurance aceptado no aprueba cada salario, fee ni garantía comercial.
+cliente, dedicación, headcount, duración, tareas, moneda y fecha. País del talento y mercado del cliente cambian el
+resultado desde el catálogo v5 y se preguntan por separado, sin deducir uno del otro ni de la moneda
+([delta 2026-10-11](#país-del-cliente-y-de-la-persona-delta-2026-10-11)). Una vacante CRM es señal de necesidad; no
+acredita intención de contratar proveedor. Talent Assurance aceptado no aprueba cada salario, fee ni garantía comercial.
 
 El expediente aporta demanda/alcance y evidencias: no reemplaza valores centrales de tools, factores, salario,
 provisiones o FX con montos arbitrarios. Excel y `pricing:workbook` sirven para investigación histórica;
@@ -31,24 +34,27 @@ Copywriter añade SEMrush cuando corresponde, sin cambiarlo al costo de SEO Spec
 ## Secuencia verificable por CLI
 
 Desde la raíz, seleccionar las tres versiones explícitamente. **Trío vigente para cotizaciones nuevas** (desde
-2026-10-10): `catalog.review-v4.json` (`operating-review-2026-10-10-v4`: redondeo por moneda, FX de cotización, 32
-costos de persona confirmados) + `resources.review-v5.json` + `ai-credits.review-v1.json`, con `quoteDate` 2026-10-10
-o posterior. `catalog.review-v2|v3` y `resources.review-v2…v4` son padres congelados: sus cotizaciones se siguen
-reproduciendo igual y sólo se nombran para repetir un ejemplo anterior (`designer.plan.json`, fechado 2026-10-09,
-corre con v2 + v2; con el trío vigente devuelve `RESOURCE_POLICY_NOT_EFFECTIVE`).
+2026-10-11): `catalog.review-v5.json` (`operating-review-2026-10-11-v5`: lo del v4 —redondeo por moneda, FX de
+cotización, 32 costos de persona confirmados— más factores de talento y de mercado por país y costos declarados como
+costo en Chile) + `resources.review-v5.json` + `ai-credits.review-v1.json`. Los valores se toman por `quoteDate`, no
+por el archivo: lo del v5 rige con `quoteDate` 2026-10-11 o posterior; una demanda fechada 2026-10-10 resuelve, con
+este mismo trío, sin factores de país y sin aviso de error. `catalog.review-v2…v4` y `resources.review-v2…v4` son
+padres congelados: sus cotizaciones se siguen reproduciendo igual y sólo se nombran para repetir un ejemplo anterior
+(`designer.plan.json`, fechado 2026-10-09, corre con v2 + v2; con el trío vigente devuelve
+`RESOURCE_POLICY_NOT_EFFECTIVE`).
 
 ```bash
-pricing_catalog=data/pricing/v3-operating/catalog.review-v4.json
+pricing_catalog=data/pricing/v3-operating/catalog.review-v5.json
 pricing_policy=data/pricing/v3-operating/resources.review-v5.json
 pricing_credits=data/pricing/v3-resources/ai-credits.review-v1.json
 
 pnpm --silent pricing:v3 catalog search --catalog "$pricing_catalog" --query consultor
 pnpm --silent pricing:v3 resources inspect --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-10
+  --policy "$pricing_policy" --credits "$pricing_credits" --date 2026-10-11
 pnpm --silent pricing:v3 compose scaffold --catalog "$pricing_catalog" \
   --policy "$pricing_policy" --input pedido.json
 pnpm --silent pricing:v3 resources portfolio --catalog "$pricing_catalog" \
-  --policy "$pricing_policy" --date 2026-10-10 --input cartera.json
+  --policy "$pricing_policy" --date 2026-10-11 --input cartera.json
 pnpm --silent pricing:v3 compose plan --catalog "$pricing_catalog" \
   --policy "$pricing_policy" --credits "$pricing_credits" --input plan.json --out demanda-nueva.json
 pnpm --silent pricing:v3 compose quote --catalog "$pricing_catalog" \
@@ -147,12 +153,15 @@ Magnific o Studio Credits de Globe. Las capturas no autorizan crear equivalencia
 Provisiones Assurance/operación/onboarding deben costear actividades reales, no porcentaje residual para cuadrar
 precio. `trial-*` de la baseline son placeholders no medidos. Fee genérico de plataforma del Excel (ETG-017) queda
 separado de tools y sin marcaDeel; verificar coberturas laborales/EOR para evitar duplicar cargas/plataforma.
-El salario declarado10400USD mensual del Consultor HubSpot viene del Excel: en el catálogo v4 el monto está confirmado
-por su autor, sin país declarado; no es un costo local verificado.
+El salario declarado10400USD mensual del Consultor HubSpot viene del Excel: el monto está confirmado por su autor y,
+desde el catálogo v5, declarado como costo en Chile; para una persona en otro país se ajusta por el factor de talento
+(estimado) y no es un costo local verificado.
 
 ## Precio, evidencia, redacción y mantenimiento
 
-Kernel Decimal separa factor de talento (costo/localización) del factor de mercado (precio/disposición de pago).
+Kernel Decimal separa factor de talento (costo/localización) del factor de mercado (precio/disposición de pago);
+desde el catálogo v5 ambos tienen valores por país
+([delta 2026-10-11](#país-del-cliente-y-de-la-persona-delta-2026-10-11)).
 No multiplicar todo indiscriminadamente: humanPrice aplica policy y mercado; recursos tienen sus propias reglas.
 `markup`: costo×(1+tasa); `target_margin`: costo/(1−tasa). Margen real=(neto−costo)/neto. No llamar margen a markup,
 ni confundir descuento, IVA, FX, setup y costo mensual. FX exige par/dirección/fecha/fuente explícitos; EUR no se
@@ -178,6 +187,9 @@ Mantenimiento monetario usa change-set `add/replace/retire`, fuente/vigencia/act
 Reglas de redondeo (`price_rounding`) y FX de cotización son registros de ese catálogo y cambian por la misma vía;
 el valor lo decide el operador. Pasos y ejemplo real (`rounding-fx-confirmed-costs.change.json`, v3 → v4) en
 [«Cambiar el redondeo o el FX de cotización»](../../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md#cambiar-el-redondeo-o-el-fx-de-cotización).
+Factores de país (`talent_factor`, `market_factor` con `floorBasis` opcional) y costo específico de un perfil en un
+país (`cost` con `localization.kind: "specific"`): misma vía, ejemplo real `country-factors.change.json` (v4 → v5) en
+[«Cambiar un factor de país o registrar el costo de un perfil en un país»](../../../../docs/manual-de-uso/finance/catalogo-v3-seleccion-y-actualizacion.md#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país).
 Policy/packs usan `pricing-v3-resource-change/1` con `kind=policy|credits`, baseDigest, motivo y `replacement`
 **completo válido**. `resources inspect --credits` devuelve digests; `resources preview|apply` recibe las tres bases
 explicitamente y `--impact` array de demandas. Confirmación ata catálogo/policy/créditos (`contextDigests`), base,
@@ -195,9 +207,10 @@ No crear fórmulas o autoridad independientes en cada consumer ni dar por desple
 ## Servicio gestionado por volumen (delta 2026-10-10)
 
 Para un servicio que se dimensiona por volumen (social care, soporte, producción recurrente) usar el trío vigente
-`catalog.review-v4.json` + `resources.review-v5.json` (bandeja = Sprout Social Advanced por asiento) y la oferta
+`catalog.review-v5.json` + `resources.review-v5.json` (bandeja = Sprout Social Advanced por asiento) y la oferta
 `creative-managed-service`; ejemplo completo en `data/pricing/v3-operating/managed-care.*` y pasos en el manual
-(«Cotizar un servicio gestionado por volumen»). Ese ejemplo da CLP 9.530.000 al mes, sin líneas bajo el piso.
+(«Cotizar un servicio gestionado por volumen»). Ese ejemplo (cliente y equipo en Chile) da CLP 9.530.000 al mes, sin
+líneas bajo el piso; el mismo servicio para un cliente y un equipo en Colombia está en `managed-care-colombia.*`.
 
 - **Dedicación desde el volumen:** `pricing:v3 compose workload --input workload.json [--brief brief.json --out nuevo.json]`
   (`pricing-v3-workload/1`). Driver = unidades/mes × minutos; más horas fijas y horas de presencia por línea. La
@@ -219,13 +232,16 @@ Para un servicio que se dimensiona por volumen (social care, soporte, producció
 - **Lo que la CLI aporta y un cálculo a mano no:** herramientas base y licencias mínimas con su costo (Notion,
   Microsoft 365), fee de contratación completo por persona, FX de cotización y redondeo comercial. Por eso el precio
   se saca de la CLI.
-- **Costos de persona:** los 32 registros están confirmados por su autor (el CEO, 2026-10-10) con los montos del Excel.
-  Ninguno declara su país, así que la herramienta sigue informando `ESTIMATED_SOURCE`, el supuesto
-  `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` y, en `assess`, `HUMAN_COST_EVIDENCE_REQUIRED`: no pedir los montos otra vez.
+- **Costos de persona:** los 32 registros están confirmados por su autor (el CEO, 2026-10-10) con los montos del Excel
+  y, desde el v5 (2026-10-11), declarados como el costo de cada perfil en Chile: no pedir los montos otra vez. Con
+  `quoteDate` 2026-10-11 o posterior ya no salen `ESTIMATED_SOURCE` por esos costos, el supuesto
+  `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` ni, en `assess`, `HUMAN_COST_EVIDENCE_REQUIRED`. Si alguno aparece, la demanda
+  está fechada antes (caso de `managed-care.demand.json`, 2026-10-10) y no recibió factores de país.
 - Brechas abiertas en `operational-gaps.json`: provisiones sin medir, consumo sin medidor, bandeja sin contratar,
-  setup no paramétrico, país de cada costo de persona (`LOCALIZED_TALENT_COSTS`), revisión del FX de cotización con
-  CLF y EUR sin decidir (`QUOTE_FX_REVIEW`) y múltiplos de redondeo para otras monedas u ofertas
-  (`COMMERCIAL_ROUNDING_SCOPE`). El alcance del piso (`MARGIN_FLOOR_SCOPE`) quedó decidido.
+  setup no paramétrico, factores de país sin validar (`COUNTRY_FACTORS_UNVALIDATED`), costo real por perfil y país
+  donde se aparte del factor (`LOCALIZED_TALENT_COSTS`), revisión del FX de cotización con CLF y EUR sin decidir
+  (`QUOTE_FX_REVIEW`) y múltiplos de redondeo para otras monedas u ofertas (`COMMERCIAL_ROUNDING_SCOPE`). El alcance
+  del piso (`MARGIN_FLOOR_SCOPE`) quedó decidido.
 
 ## Resumen, piso y precio acordado (delta 2026-10-10)
 
@@ -243,17 +259,20 @@ redondeo ocurren dentro del motor.
   suma `roundingAdjustment` y `uplift` sólo en una cotización 1.1.0; `net = undiscountedPrice + uplift − discount` y
   `undiscountedPrice` ya incluye el redondeo. `explain.commercialAdjustments.rows` trae el recorrido por fila;
   `compose preview` y la proyección cliente muestran sólo el neto final.
-- **Versión del motor:** conviven dos contratos. Una cotización usa 1.1.0 sólo si necesita un neto acordado, varios
-  ajustes o una regla de redondeo para su moneda; si no, 1.0.0. El agente no la elige: se lee en `engineVersion`.
-- **Redondeo por moneda:** registros `price_rounding` del catálogo v4, una regla general por moneda para toda oferta:
+- **Versión del motor:** conviven tres contratos. Una cotización usa 1.2.0 sólo si el factor de mercado del país del
+  cliente declara `floorBasis`; 1.1.0 si necesita un neto acordado, varios ajustes o una regla de redondeo para su
+  moneda; si no, 1.0.0. El agente no la elige: se lee en `engineVersion`.
+- **Redondeo por moneda:** registros `price_rounding` del catálogo (desde el v4), una regla general por moneda para toda oferta:
   CLP 10000, USD 10, PEN 50, COP 50000, MXN 100 (`catalog search --kind price_rounding --catalog … --date 2026-10-10`).
   Cada fila facturable sube al múltiplo siguiente antes de los ajustes; nunca baja; una fila que cumplía su piso
   antes de redondear lo sigue cumpliendo. Una regla con `offerId` prevalece sobre la general. Moneda sin regla: no se
   redondea.
 - **Línea bajo el piso:** con `priceRounding` presente, una línea en `marginFloor.lines[]` es un **incumplimiento
-  real** (un neto acordado o un descuento la dejó bajo el piso): requiere decisión del operador. La lectura
-  «fracciones = redondeo» vale sólo cuando `priceRounding` es `null`: cotizaciones congeladas sobre catálogos
-  anteriores (`engineVersion` `pricing-v3-local/1.0.0`) o una moneda sin regla.
+  real** (un neto acordado o un descuento la dejó bajo el piso de su mercado): requiere decisión del operador. La
+  lectura «fracciones = redondeo» vale sólo cuando `priceRounding` es `null`: cotizaciones congeladas sobre catálogos
+  anteriores (`engineVersion` `pricing-v3-local/1.0.0`) o una moneda sin regla. Lo inverso ya no vale en todo
+  mercado: con `marketFactor.floorBasis` (Colombia, Perú) «ninguna línea marcada» no significa margen ≥ piso
+  ([delta 2026-10-11](#país-del-cliente-y-de-la-persona-delta-2026-10-11)).
 - **Otra moneda:** `brief.outputCurrency` = CLP, USD, COP, MXN o PEN, en una **copia** de la demanda (no editar la
   versionada). USD es la moneda de referencia: costos en USD, conversión al final con el FX de cotización del
   catálogo, que es política del CEO con margen prudencial y no tipo de cambio de mercado (USD→CLP 1000, COP 3650,
@@ -289,27 +308,72 @@ redondeo ocurren dentro del motor.
   servicio que puede ganar más sube su objetivo, no el piso; la política queda 0,45/0,45; SKY es excepción aprobada
   por ser cliente vigente. No usar el precio de SKY como referencia de margen para otro cliente.
 - **Abierto** ([`operational-gaps.json`](../../../../data/pricing/v3-operating/operational-gaps.json)):
-  `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`, `LOCALIZED_TALENT_COSTS`, provisiones estimadas y consumo de agentes
-  sin medir. `MARGIN_FLOOR_SCOPE` quedó decidido; `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE` se
+  `QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`, `COUNTRY_FACTORS_UNVALIDATED`, `LOCALIZED_TALENT_COSTS`, provisiones
+  estimadas y consumo de agentes sin medir. `MARGIN_FLOOR_SCOPE` quedó decidido; `FLOOR_PRICE_ROUNDS_UNDER_FLOOR` y `AGREED_PRICE_OUTSIDE_ENGINE` se
   resolvieron y salieron del ledger. No decidido a propósito: redondear sobre el total del periodo en vez de por
   fila, terminaciones comerciales como 990.000 (hoy es un neto acordado) y múltiplos para CLF y EUR. No resolverlos
   en una cotización.
 - Sin cambio: códigos de salida, flags, contrato de errores y escritura exclusiva. El contrato 1.0.0 no se movió:
   todo artefacto congelado se sigue reproduciendo con `replay` (`verified: true`).
 
+## País del cliente y de la persona (delta 2026-10-11)
+
+Valores, tabla de resultados, comandos y lectura para el operador: manual,
+[«Cotizar según el país del cliente y del equipo»](../../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#cotizar-según-el-país-del-cliente-y-del-equipo).
+Decisión: delta 2026-10-11 del ADR motor 1.1. Aquí sólo las reglas.
+
+- **Dos ejes, dos campos, dos hechos.** `brief.offerMarketCountry` = país del cliente → factor de mercado sobre el
+  **precio de la parte humana** (herramientas y fees no). `brief.lines[].talentCountry` = país de cada persona, por
+  línea → factor de talento sobre el **costo** (costo en Chile × factor), y de ahí el precio. No deducir uno del otro
+  ni de `outputCurrency`: país fija factores; moneda fija FX y redondeo. Países registrados: CL, CO, PE, MX, US, ES.
+- **Valores v5** (rigen con `quoteDate` ≥ 2026-10-11). Talento respecto de Chile: CL 1; CO 0.80, PE 0.85, MX 0.90,
+  ES 3, US 5 — los cinco **estimados**, uno por país para todo perfil. Mercado: CL 1, CO 0.90, US 1.10 **decididos**
+  por el CEO; PE 0.95, MX 1, ES 1.10 **estimados**. Un factor estimado sale en `reviewSignals` como `ESTIMATED_SOURCE`
+  (`paths` `snapshot.talentFactors` / `snapshot.marketFactors`): decirlo al presentar el precio. No citar estos
+  valores de memoria: `catalog search --kind talent_factor|market_factor --catalog … --date <fecha>`.
+- **El piso acompaña al factor en CO y PE.** Su `market_factor` declara `floorBasis: "base_market"`: el piso se lee
+  sobre el precio del mercado base, la cotización se firma con `pricing-v3-local/1.2.0` y al precio de política **no
+  sale marcada aunque el margen real quede bajo 45 %** (CO ≈ 41 %, PE ≈ 43 %). `marginRateRoundedDown` es siempre el
+  margen real: es el que se informa. **NUNCA** presentar el 45 % del mercado base como margen de la cotización ni leer
+  «cero líneas marcadas» como «sobre el piso» en esos mercados.
+- **Rebaja adicional en CO/PE:** la línea marcada trae `floorNet` (neto mínimo en ese mercado) y `netShortOfFloor`
+  (lo que falta), con `marginAmountShortOfFloor: null`. En los demás mercados sigue `marginAmountShortOfFloor`.
+- **Claves nuevas del resumen:** raíz `marketFactor` `{ country, factor, floorBasis, recordId, revision, sourceStatus }`
+  sólo si cambia algo (factor ≠ 1 o `floorBasis`); ausente con cliente CL o MX. `totals.marketAdjustment` sólo en
+  1.2.0. `assess` repite el factor en `margin.policyFloor.marketFactor`. `compose preview` y la proyección cliente
+  siguen mostrando sólo el neto final.
+- **Comprobar que el país entró:** `marketFactor` con el país esperado y `assumptions` sin
+  `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. Si aparece ese supuesto, la demanda está fechada antes del 2026-10-11.
+  El resumen de `compose prepare|quote` trae además `laterCatalogValues` cuando la demanda está fechada antes de
+  valores más nuevos del catálogo: en una cotización nueva significa corregir `quoteDate`.
+- **País sin factor:** exit 2, `MISSING_CATALOG_SELECTION` en `lines.<lineId>.talentFactor` o en `offerMarketCountry`
+  (en el carril `calculate` el kernel lo llama `MISSING_TALENT_FACTOR`). No sustituir por otro país: se agrega al
+  catálogo con decisión del operador.
+- **Costo específico antes que factor:** si existe el costo real de un perfil en un país, se registra como `cost` con
+  `localization: { kind: "specific", country }`; para ese perfil y ese `talentCountry` reemplaza al costo de Chile ×
+  factor y no recibe factor. Pedirlo sobre todo con equipo en ES o US (factores 3 y 5 son órdenes de magnitud). No
+  «corregir» un costo moviendo el factor del país ni el factor de mercado.
+- **Tipo de cliente** (pyme, licitación pública, cliente estratégico): existe en el Excel, no en el cotizador. Se
+  registra como `agreed_net` con su motivo.
+- **España:** país registrado, sin regla de redondeo ni FX USD→EUR: hoy se cotiza en USD.
+- **Quién decide:** factores, `floorBasis` por mercado y excepciones son del operador (CEO). Confirmado 2026-10-11:
+  precio sigue al país del cliente, costo al país de la persona, y en mercados bajo 1 el piso acompaña al factor;
+  45 % sigue siendo el piso de los servicios gestionados en el mercado base. **NUNCA** declarar `floorBasis` ni mover
+  un factor sin su decisión.
+
 ## Mapa de implementación y evidencia reusable
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
-| Kernel puro, markup/margen, factores, coberturas, FX, rounding; contratos 1.0.0/1.1.0, ajustes (`discount`, `agreed_net`), redondeo comercial y registro de motores | `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` |
+| Kernel puro, markup/margen, factores de talento y de mercado, coberturas, FX, rounding; contratos 1.0.0/1.1.0/1.2.0, ajustes (`discount`, `agreed_net`), redondeo comercial, piso sobre el mercado base (`floorBasis`, `floorNet`) y registro de motores | `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` |
 | Registro cerrado de rechazos (dominio y adaptador) | `src/lib/finance/pricing-v3/errors.ts` |
-| Registros (incluye `price_rounding`)/brief/resolución/quote/explicación; elección del contrato por cotización y recorrido del precio por fila | `src/lib/finance/pricing-v3/catalog/{contracts,catalog,resolve,quote,explain}.ts` |
+| Registros (incluye `price_rounding`, `talent_factor`, `market_factor` con `floorBasis`, `cost` con `localization`)/brief/resolución/quote/explicación; selección de costo específico o de referencia con factor, elección del contrato por cotización y recorrido del precio por fila | `src/lib/finance/pricing-v3/catalog/{contracts,catalog,resolve,quote,explain}.ts` |
 | Demanda/policy y atribuciones | `src/lib/finance/pricing-v3/resources/{composition-contracts,composition}.ts` |
 | Packs/costo base/caja/caducidad | `src/lib/finance/pricing-v3/resources/credit-budget.ts` |
 | Discovery/scaffold/portfolio/plan | `src/lib/finance/pricing-v3/resources/operating.ts` |
 | Volumen → dedicación (`compose workload`) | `src/lib/finance/pricing-v3/resources/workload.ts` |
-| Resumen derivado (`compose prepare`, `compose quote`, `replay`): líneas bajo el piso, `engineVersion`, `commercialAdjustments`, `priceRounding` | `src/lib/finance/pricing-v3/resources/summary.ts` |
-| Gaps económicos, veredicto del piso por línea y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
+| Resumen derivado (`compose prepare`, `compose quote`, `replay`): líneas bajo el piso (`floorNet`, `netShortOfFloor`), `engineVersion`, `commercialAdjustments`, `priceRounding`, `marketFactor` | `src/lib/finance/pricing-v3/resources/summary.ts` |
+| Gaps económicos, veredicto del piso por línea (con `marketFactor`) y proyección comercial redactada | `src/lib/finance/pricing-v3/resources/readiness.ts` |
 | Snapshots/digests/IO/mantenimiento local | `src/lib/finance/pricing-v3/adapters/{local-snapshot,catalog-local,resource-composition,resource-maintenance}.ts` |
 | Adapter CLI, flags, exit, clasificación de errores y escritura exclusiva | `scripts/commercial/pricing-v3.ts` |
 | Guarda permanente: replay de todo artefacto congelado (`data/pricing/**` + SKY `acordado*`) | `src/lib/finance/pricing-v3/__tests__/pricing-v3-frozen-artifacts.test.ts` |
@@ -319,8 +383,8 @@ Versionar y conservar originales: `data/pricing/v3-catalog/` y `v3-composition/`
 casos operativos están en `v3-operating/`, créditos en `v3-resources/`. No convertir fixtures, synthetic access o
 `portfolio.example.json` en default de cartera. `historical-resource-index.json` conserva26filas del Excel:
 25tools y fee de plataforma; tools registradas no equivalen a todos los planes/precios actuales confirmados.
-`operational-gaps.json` conserva owner/acción de costos salariales, provisiones, asignación/acceso, licencia,
-margen, impuestos y SOW. Cerrar esos gaps con evidencia; no inferirlos del número de pruebas o de un commit.
+`operational-gaps.json` conserva owner/acción de costos salariales, factores de país, provisiones, asignación/acceso,
+licencia, margen, impuestos y SOW. Cerrar esos gaps con evidencia; no inferirlos del número de pruebas o de un commit.
 
 Las fuentes y cambios locales no acreditan adopción API/UI/MCP, sincronización remota, aprobación económica,
 inventario, persistencia o emisión. Si se cambia la arquitectura o un contrato, actualizar su dueño en docs,

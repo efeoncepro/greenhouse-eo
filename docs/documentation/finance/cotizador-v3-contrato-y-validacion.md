@@ -8,7 +8,7 @@
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
 
-Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0 y, desde el 2026-10-10, 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)). El cotizador canónico no cambia.
+Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)). El cotizador canónico no cambia.
 
 ## Bloque 2 — Contrato del prototipo
 
@@ -33,7 +33,7 @@ Se distinguen `request` (qué se quiere cotizar), `resolvedContext` (datos y pol
 
 | Campo de `request`                           | Regla                                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `schemaVersion`                              | Obligatorio; versión inicial `1.0.0`; desde el 2026-10-10 también `1.1.0`, con su propio motor; rechazar versión no soportada   |
+| `schemaVersion`                              | Obligatorio; versión inicial `1.0.0`; desde el 2026-10-10 también `1.1.0` y desde el 2026-10-11 `1.2.0`, cada una con su propio motor; rechazar versión no soportada |
 | `quoteDate`                                  | Fecha ISO `YYYY-MM-DD`, válida y explícita; el agente puede proponer la fecha actual, pero la registra en la solicitud          |
 | `offerId`, `deliveryModel`, `engagementCode` | Oferta, modalidad de entrega y engagement separados; resolver desde catálogo, sin crear otra oferta por usar Staff Augmentation |
 | `offerMarketCountry`                         | País/mercado de venta confirmado, código ISO de país; mercados regionales requieren futura extensión expresa                    |
@@ -137,15 +137,15 @@ Mismas entradas/configuración y motor producen el mismo resultado y digest inde
 
 Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Todo lo anterior de este bloque describe el contrato 1.0.0, que no cambió; esta sección describe lo que agrega 1.1.0. Fuentes ejecutables: [`schemas.ts`](../../../src/lib/finance/pricing-v3/schemas.ts), [`calculate.ts`](../../../src/lib/finance/pricing-v3/calculate.ts) y [`catalog/resolve.ts`](../../../src/lib/finance/pricing-v3/catalog/resolve.ts).
 
-**Versiones.** El kernel acepta dos contratos de entrada y firma cada resultado con el motor de su contrato. El registro cerrado es `PRICING_V3_ENGINES` (`schemas.ts`); `ENGINE_VERSION` dejó de existir. Cada contrato nombra su propia aritmética en `precisionPolicy` (`PRICING_V3_PRECISION_POLICIES`, `calculate.ts`).
+**Versiones.** El kernel acepta dos contratos de entrada (tres desde el 2026-10-11: la [sección siguiente](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11) agrega `1.2.0`) y firma cada resultado con el motor de su contrato. El registro cerrado es `PRICING_V3_ENGINES` (`schemas.ts`); `ENGINE_VERSION` dejó de existir. Cada contrato nombra su propia aritmética en `precisionPolicy` (`PRICING_V3_PRECISION_POLICIES`, `calculate.ts`).
 
 | `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué admite |
 | --- | --- | --- |
 | `1.0.0` | `pricing-v3-local/1.0.0` | Lo de siempre, byte a byte: a lo más un `discount`, sin redondeo comercial. Rechaza cualquier campo nuevo |
 | `1.1.0` | `pricing-v3-local/1.1.0` | Hasta 10 ajustes (`discount` o `agreed_net`) sobre filas disjuntas y `snapshot.priceRounding` opcional |
 
-- La versión la declara la entrada, y request y snapshot llevan la misma. El motor no la infiere ni la sube. Una entrada que no declara `1.1.0` (otra versión, ninguna o un documento mal formado) se juzga con el esquema 1.0.0 y conserva los diagnósticos de siempre.
-- En el carril de catálogo y composición el que llama no elige contrato: la resolución emite `1.1.0` sólo si el brief trae un ajuste que no sea un único `discount`, más de un ajuste, o si el catálogo tiene una regla `price_rounding` vigente a `quoteDate` para la moneda de salida. En cualquier otro caso emite `1.0.0`. La decisión depende sólo de lo congelado, así que una cotización anterior vuelve a resolver al mismo contrato y al mismo digest.
+- La versión la declara la entrada, y request y snapshot llevan la misma. El motor no la infiere ni la sube. Una entrada que no declara `1.1.0` ni, desde el 2026-10-11, `1.2.0` (otra versión, ninguna o un documento mal formado) se juzga con el esquema 1.0.0 y conserva los diagnósticos de siempre.
+- En el carril de catálogo y composición el que llama no elige contrato: la resolución emite `1.1.0` sólo si el brief trae un ajuste que no sea un único `discount`, más de un ajuste, o si el catálogo tiene una regla `price_rounding` vigente a `quoteDate` para la moneda de salida. En cualquier otro caso emite `1.0.0`. La decisión depende sólo de lo congelado, así que una cotización anterior vuelve a resolver al mismo contrato y al mismo digest. Desde el 2026-10-11 hay una condición previa: si el factor de mercado elegido declara `floorBasis`, emite `1.2.0`; sin eso, vale lo dicho aquí.
 - Un cambio futuro de comportamiento agrega contrato y motor al registro; nunca modifica un contrato ya usado.
 
 **Ajustes.** En el kernel van en `request.adjustments`; en catálogo y composición, en `brief.adjustments`.
@@ -167,7 +167,7 @@ Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1
 - Conservación del piso: si la fila cumplía su `minimumMargin` antes de redondear, el precio redondeado es el menor múltiplo que también lo cumple sobre los importes presentados. Si no lo cumplía, sólo sube al múltiplo siguiente: el redondeo no repara una política que vende bajo su piso.
 - «Cumplía antes de redondear» se lee sobre los importes sin redondear, a 60 de los 80 dígitos de trabajo. `MARGIN_BELOW_FLOOR` sigue comparando sin tolerancia alguna.
 
-**Forma del resultado.** Filas y totales de un resultado 1.1.0 agregan `roundingAdjustment` y `uplift`. Identidad: `net = undiscountedPrice + uplift − discount`, y `undiscountedPrice` ya incluye el redondeo (precio de política = `undiscountedPrice − roundingAdjustment`). Un resultado 1.0.0 no tiene ninguna de las dos claves: no van en cero, no van, porque agregarlas cambiaría el digest de los artefactos anteriores. Los totales de una quote de catálogo o composición suman las dos claves sólo cuando la quote es 1.1.0.
+**Forma del resultado.** Filas y totales de un resultado 1.1.0 agregan `roundingAdjustment` y `uplift`. Identidad: `net = undiscountedPrice + uplift − discount`, y `undiscountedPrice` ya incluye el redondeo (precio de política = `undiscountedPrice − roundingAdjustment`). Un resultado 1.0.0 no tiene ninguna de las dos claves: no van en cero, no van, porque agregarlas cambiaría el digest de los artefactos anteriores. Los totales de una quote de catálogo o composición suman las dos claves sólo cuando la quote es 1.1.0 o, desde el 2026-10-11, 1.2.0.
 
 **Diagnósticos nuevos.** Todos son `error` del kernel y dejan el período en `invalid`; no son rechazos del registro de `errors.ts`.
 
@@ -184,6 +184,56 @@ En composición suben a `diagnostics` del resumen como bloqueos, con totales nul
 **Replay y guarda.** El replay acepta cualquier motor del registro y verifica por recálculo y digest; un motor fuera del registro es `REPLAY_MISMATCH`. [`pricing-v3-frozen-artifacts.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-frozen-artifacts.test.ts) reproduce cada artefacto congelado y exige al menos uno firmado por cada motor registrado.
 
 **Fuera de 1.1.0.** Redondeo sobre el total del período, terminaciones comerciales (se expresan como `agreed_net`), ajustes de otra clase y ajustes encadenados sobre una misma fila.
+
+### Contrato 1.2.0 — el piso acompaña al factor de mercado (2026-10-11)
+
+Decisión: [delta 1.2.0 del ADR del motor](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado). Los contratos 1.0.0 y 1.1.0 no cambiaron, byte a byte; esta sección describe sólo lo que agrega 1.2.0. Fuentes ejecutables: las tres de la sección anterior y [`pricing-v3-market-floor.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-market-floor.test.ts), que deriva la regla a mano con entradas pequeñas.
+
+**Versiones.** Conviven tres contratos. `1.2.0` es un superconjunto de `1.1.0`: admite todo lo de la tabla anterior y un campo más.
+
+| `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué agrega |
+| --- | --- | --- |
+| `1.2.0` | `pricing-v3-local/1.2.0` | `floorBasis: "base_market"` opcional en cada elemento de `snapshot.marketFactors[]`; filas y totales con el ajuste de mercado y el piso de ese mercado |
+
+- El único valor de `floorBasis` es `"base_market"`. Ausente, el piso se lee sobre el neto final, como en todo contrato anterior. Un snapshot `1.0.0` o `1.1.0` que traiga el campo se rechaza; no se reinterpreta.
+- En el catálogo el campo vive en el `value` del registro `market_factor`. En el carril de catálogo y composición la resolución emite `1.2.0` si y sólo si el factor de mercado **elegido para esa cotización** (el de `offerMarketCountry`, vigente a `quoteDate`) lo declara, también cuando ese factor vale 1. Es una propiedad declarada del registro, nunca una inferencia desde el valor del factor: un factor 0,90 sin `floorBasis` cotiza con `1.1.0` o `1.0.0` como siempre, y un `floorBasis` en el factor de otro país no cambia nada.
+
+**Los dos ejes de país.** Existen desde 1.0.0 y son hechos distintos: lo que cuesta una persona según dónde vive, y lo que paga un mercado según dónde está el cliente. Lo nuevo de 1.2.0 es sólo cómo se juzga el piso cuando el segundo baja el precio.
+
+| Eje | Campo de la demanda | Registro | Sobre qué actúa | Qué no toca |
+| --- | --- | --- | --- | --- |
+| Factor de talento | `talentCountry` de cada línea | `talent_factor` para el par (país de la persona, país de referencia del costo) | El **costo** humano de esa línea, y con él su precio de política | Herramientas, fees y provisiones; el piso |
+| Factor de mercado | `offerMarketCountry` de la cotización | `market_factor` del país del cliente | El **precio del componente humano**; nunca el costo | Herramientas, fees y provisiones, que no reciben factor de mercado |
+
+- **Cómo componen.** Costo humano = costo de referencia × factor de talento. Precio humano = costo humano × multiplicador de la política de precio × factor de mercado. Son independientes: el factor de talento no mueve la razón `ρ` de más abajo y el factor de mercado no mueve el costo.
+- **Qué le pasa al margen.** Con el factor de talento, costo y precio bajan o suben juntos y el margen queda donde lo pone la política. Con un factor de mercado menor que 1 baja sólo el precio y el margen real cae; con uno mayor que 1, sube.
+- **Factor de talento sólo sobre costos de referencia.** Se aplica a un registro de costo con `localization: { kind: "reference_adjusted", referenceCountry }`. Un costo `specific` de un país no recibe factor y sólo sirve a líneas cuyo `talentCountry` es ese país; si existe para el perfil y el país de la línea, prevalece sobre el de referencia, salvo que la línea elija otro registro con `costRecordId`.
+- **Sin factor para el par, no hay total.** El kernel reporta `MISSING_TALENT_FACTOR`; en catálogo y composición la resolución bloquea con `MISSING_CATALOG_SELECTION` y ruta `lines.<lineId>.talentFactor`. En ambos casos el estado es `needs_input`. Nunca se asume un factor 1.
+
+**Base del piso.** Aplica a una fila cuando el factor de mercado elegido declara `floorBasis: "base_market"` y es menor que 1.
+
+- `ρ` = precio de política de la fila con el factor de mercado ÷ su precio de política con factor 1. Los dos se toman como se presentan: `HALF_UP` a la precisión de la moneda de salida y **antes** del redondeo comercial.
+- `ρ = 1`, y el control es el de siempre, cuando el factor es mayor o igual a 1, cuando el factor no declara `floorBasis`, cuando la fila no tiene componente humano o cuando los dos precios presentados son iguales.
+- Piso de la fila: `floorNet = costo presentado × ρ / (1 − minimumMargin)`, elevado a la unidad mínima de la moneda. La fila se marca `MARGIN_BELOW_FLOOR` cuando su neto final es menor que ese valor exacto; la comparación se hace sin dividir y sin tolerancia.
+- Lo que la regla dice: el factor de mercado es una decisión de precio ya aprobada para ese país y el piso no la castiga otra vez. Un descuento o un `agreed_net` adicional sí cruza el piso, y el piso no se mueve por ellos.
+- Lo que la regla no hace: no agrega holgura. Con margen objetivo igual al mínimo y sin regla de redondeo para la moneda, una fila a precio de política puede quedar marcada por un centavo, igual que en el mercado base. Con regla de redondeo, la conservación del piso usa este mismo `floorNet` («cumplía antes de redondear» se lee sobre el precio del mercado base sin redondear) y la fila no se marca.
+
+**Forma del resultado.** Un resultado 1.2.0 tiene todas las claves de 1.1.0 y además:
+
+| Dónde | Clave | Qué es |
+| --- | --- | --- |
+| Fila | `marketAdjustment` | Precio con el factor de mercado menos precio con factor 1, con signo y antes del redondeo comercial: negativo cuando el factor baja el precio, positivo cuando es mayor que 1, cero sin componente humano |
+| Fila | `marketPriceRatio` | `ρ` como cadena decimal; `"1"` cuando la regla no aplica |
+| Fila | `floorNet` | Menor neto que cumple `minimumMargin` en ese mercado, en la moneda de salida |
+| Totales | `marketAdjustment` | Suma de las filas; en una quote de varios períodos, suma de los períodos |
+
+Identidades: `net = undiscountedPrice + uplift − discount`, sin cambio, y `undiscountedPrice − roundingAdjustment − marketAdjustment` es el precio del mercado base. `marginAmount` y `marginRate` siguen siendo el margen real del neto final; ninguna clave trae un margen «equivalente al mercado base». Un resultado 1.0.0 o 1.1.0 no tiene ninguna de estas claves, tampoco en cero.
+
+**Diagnósticos.** 1.2.0 no agrega códigos. `MARGIN_BELOW_FLOOR` conserva nombre, severidad y ruta; cambia el valor contra el que compara en las filas con `ρ < 1`.
+
+**Lectura.** El resumen `pricing-v3-composition-summary/1` suma claves de forma aditiva. `marketFactor` (`{ country, factor, floorBasis, recordId, revision, sourceStatus }`) aparece en la raíz sólo cuando el factor elegido cambia algo —factor distinto de 1 o `floorBasis` declarado—; con el factor neutral la clave no existe. Cada línea marcada de una fila 1.2.0 trae `floorNet` y `netShortOfFloor` (`floorNet − net`); si su `ρ` es menor que 1, `marginAmountShortOfFloor` es `null`, y si es 1 se conserva. Detalle por comando en la [superficie implementada](cotizador-v3-superficie-implementada.md).
+
+**Fuera de 1.2.0.** Factores por tipo de cliente (se expresan como `agreed_net`), factores de talento por perfil o seniority (se expresan como costo `specific`), un piso distinto por país escrito a mano y cualquier otra base del piso.
 
 ## Bloque 3 — Pruebas y convergencia
 
