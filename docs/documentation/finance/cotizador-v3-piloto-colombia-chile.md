@@ -15,6 +15,13 @@ Estado: ficha y simulación histórica ejecutable preparadas; validación econó
 > otras cifras; sigue sin ser un precio aprobado. Estado vigente:
 > [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11) y
 > [base de costo](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+>
+> Nota 2026-10-11 (tarde). Dos importes del ensayo de más abajo ya no existen así en el catálogo operativo. El
+> onboarding de USD 100 era un importe de prueba y dejó de seleccionarse: hoy hay un onboarding de USD 200 por persona
+> y un reclutamiento opcional de USD 500, los dos estimados. Y Adobe ya no se costea con la atribución histórica de
+> USD 20: es Creative Cloud Pro facturado en pesos, del que una persona carga un tercio. Detalle:
+> [puesta en marcha](cotizador-v3-provisiones-y-costos.md#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11)
+> y [Adobe](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11).
 
 ## Alcance confirmado y supuestos
 

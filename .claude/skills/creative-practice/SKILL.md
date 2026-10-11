@@ -478,10 +478,13 @@ privacidad, derechos laborales, proveedores, seguros y procurement parametrizado
 Para simulación local sin UI de roles o servicios con Adobe/IA/plataforma, cargar
 [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
 El kernel V3 opt-in complementa investigación/costeo; emisión y autoridad continúan en el cotizador canónico.
-Adobe180USD cubre paquete3CC Teams+3Express;306 es escenario de renovación sin fecha efectiva. No duplicar Express
-ni reducir seats nominativos por FTE. Higgsfield/Magnific/ChatGPT/Claude se eligen por necesidad; créditos por
-proveedor/mes y packs/caja/validez separados, nunca equivalencia automática con Studio Credits o piezas.
-Notion/M365 son base; GCP/Vercel se atribuyen desde capacidad declarada, dejando interno/sin asignar visibles.
+Adobe son dos productos en CLP con IVA (decisión del CEO), tres licencias cada uno y contrato de doce meses pagado al
+mes: Creative Cloud Pro para diseño (incluye Express) y Adobe Express para perfiles de contenido; el 50% de descuento
+de Creative Cloud Pro termina pronto y, por decisión del CEO (2026-10-11), se cotiza desde ya sin él; el importe
+facturado sólo si el CEO lo elige para un encargo corto. El contrato renueva el 2026-11-16. No reducir
+seats nominativos por FTE. Higgsfield/Magnific/ChatGPT/Claude se eligen por necesidad; créditos por proveedor/mes y
+packs/caja/validez separados, nunca equivalencia automática con Studio Credits o piezas. Notion/M365 son base;
+GCP/Vercel se atribuyen desde capacidad declarada, dejando interno/sin asignar visibles.
 
 `managed_service` conserva funciones de diseño/dirección/cuenta como costos internos y preview agrega fee;
 no cambia la política de vender capacidad/lane ni SOW/rights/QA. **Los40/35 propuestos por readiness V3 no
@@ -491,7 +494,8 @@ de referencia para otra cuenta; donde se puede ganar más se sube el objetivo de
 Staff augmentation (una persona vendida por dedicación, oferta `talent-assurance-staffing`) tiene su propio piso de
 25% (CEO, 2026-10-11): es otro producto y nunca se elige para bajar el piso de un servicio creativo gestionado.
 La oferta V3 de esta práctica es `creative-managed-service` (objetivo y piso 45%); un programa SEO/AEO gestionado
-usa la suya, `seo-aeo-managed-service` (objetivo 55%, piso 45%).
+usa la suya, `seo-aeo-managed-service` (objetivo 55%, piso 45%). On-Demand es una forma de compromiso que se declara
+en la cotización (+10% sobre On-Going, mismo piso), no una oferta; eso y la puesta en marcha: `modules/04_PRICING.md` §7.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no
 la nómina actual: el margen real en personas hoy es mayor que el que muestra V3; no proponer «conectar nómina real»
 ni escribir el pago de una persona. El resumen trae `estimateExposure` (qué insumo estimado carga más costo:

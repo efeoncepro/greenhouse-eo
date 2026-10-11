@@ -14,6 +14,12 @@ Cambiar policy/precios requiere versión nueva explícita; no altera artifacts e
 Desde el 2026-10-11 la policy vigente no es la de esta carpeta: la nombra el puntero
 [`../v3-operating/current.json`](../v3-operating/current.json) y se usa con `--current`. En ella un precio unitario
 de herramienta no vence; rige hasta que una versión nueva lo reemplaza y lleva una fecha de revisión que sólo avisa.
+Desde la policy v7 (2026-10-11) Adobe se registra como se factura: dos productos en CLP con IVA, por licencia. Los
+«Adobe 80 históricos» y «los 180 actuales» que nombran los casos de abajo son los de la policy de esta carpeta y de
+las operativas v2 a v6; los artefactos congelados no cambian. La regla de doble conteo de un bundle salta sólo
+cuando la misma línea o persona tiene el plan y un producto que el plan incluye, y una entrada de precio puede
+declarar por cuántos meses hay que pagar una licencia una vez tomada (`commitmentTermMonths`).
+[Decisión](../../../docs/architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp).
 
 ## Casos de simulación verificados
 

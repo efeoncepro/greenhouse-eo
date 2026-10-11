@@ -5,9 +5,11 @@ TASK-2022 completa el flujo local bajo [ADR](../../../docs/architecture/GREENHOU
 [referencia funcional completa](../../../docs/documentation/finance/cotizador-v3-superficie-implementada.md).
 
 **Empieza aquí (2026-10-11).** Las versiones vigentes no se nombran a mano: las nombra `current.json`, y un comando
-las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el comando, no esta línea. Al
-2026-10-11, tras la oferta SEO/AEO: `catalog.review-v8.json`, `resources.review-v6.json` y
-`../v3-resources/ai-credits.review-v1.json`.
+las usa con `--current`. Qué nombra lo imprime `current show`; la fuente es el comando, no esta línea. Como hecho
+fechado: al cierre del 2026-10-11 eran `catalog.review-v9.json`,
+`resources.review-v10.json` y `../v3-resources/ai-credits.review-v1.json` (por la mañana, tras la oferta SEO/AEO,
+eran el catálogo v8 y la policy v6; por la tarde la policy pasó por v7, v8 y v9). La siguiente policy sería v11 y
+el siguiente catálogo v10.
 
 ```bash
 pnpm --silent pricing:v3 current show
@@ -16,7 +18,10 @@ pnpm --silent pricing:v3 compose quote --input demand.json --current --out artif
 
 Cómo funciona el puntero, cómo se mueve y qué archivos son de v6:
 [delta del 2026-10-11](#delta-2026-10-11--puntero-de-versiones-vigentes-catálogo-v6-y-policy-v6). Qué es el catálogo
-v7: [último delta](#delta-2026-10-11--catálogo-v7-piso-de-margen-de-staffing).
+v7: [delta de staffing](#delta-2026-10-11--catálogo-v7-piso-de-margen-de-staffing). Qué traen el catálogo v9 y las
+policies v7 y v8 (forma del engagement, puesta en marcha, Adobe como se factura, plazos de compromiso y tres
+lecturas nuevas):
+[último delta](#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
 Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasar la ruta», léelo como historia fechada.
 
 - `current.json` (`pricing-v3-current/1`): puntero a las versiones vigentes de catálogo, policy y créditos, cada una
@@ -55,6 +60,33 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
   `resources preview|apply`): los 25 precios de herramienta rigen hasta que se los reemplace y cada uno lleva una
   fecha de revisión (`reviewBy` 2027-04-11) que avisa sin bloquear. Ningún importe, moneda, unidad ni fuente cambió.
   Es la policy vigente; v2 a v5 se conservan.
+  *Corrección 2026-10-11 (tarde):* dejó de ser la vigente ese mismo día; v6 queda como padre congelado.
+- `resources.review-v7.json` (cambio `adobe-invoice.change.json`, aplicado sobre v6 con `resources preview|apply`):
+  Adobe como lo factura el proveedor. Dos productos en CLP con IVA, tres licencias cada uno: `adobe` (Creative Cloud
+  Pro, que ya incluye Express) y `adobe-express` (para Social Media Manager, Community Manager, Content Manager y
+  Content Creator). Agrega la tarea `express-design`, el precio `renewal-scenario` para cuando termine el descuento
+  y el campo `commitmentTermMonths` (12 en Adobe). El «Adobe 180 combinado, 306 condicional» de v2 a v6 ya no rige.
+- `adobe-invoice.change.json` (`pricing-v3-resource-change/1`, `kind: "policy"`): el reemplazo íntegro que produjo
+  v7 desde v6.
+- `resources.review-v8.json` (cambio `supplier-contract-terms.change.json`, aplicado sobre v7): sólo agrega plazos
+  de compromiso, dichos por el CEO el 2026-10-11: Notion 1 mes y los dos precios mensuales de Microsoft 365 1 mes.
+  Ningún importe, moneda ni unidad cambió.
+- `supplier-contract-terms.change.json` (`pricing-v3-resource-change/1`, `kind: "policy"`): el reemplazo íntegro que
+  produjo v8 desde v7.
+- `resources.review-v9.json` (cambio `microsoft-invoice-adobe-renewal.change.json`, aplicado sobre v8): tres hechos
+  que el CEO mostró el 2026-10-11. Microsoft 365 como se factura (factura G185142527 del 2026-09-16: Business
+  Standard, USD 14,70 por licencia al mes, seis licencias, sin impuesto); su precio `current` deja de estar
+  pendiente. Notion como se factura (factura 0D8C80A9-0039 del 2026-09-21: Business mensual, nueve miembros a USD
+  24, más 3000 créditos a USD 30, sin impuesto); mismos importes, ahora citan la factura. Y la fecha en que renueva
+  el contrato de Adobe, 2026-11-16, en el campo nuevo `commitmentRenewsOn`, que pasa a ser también su `reviewBy`.
+- `microsoft-invoice-adobe-renewal.change.json` (`pricing-v3-resource-change/1`, `kind: "policy"`): el reemplazo
+  íntegro que produjo v9 desde v8.
+- `resources.review-v10.json` (cambio `adobe-without-discount.change.json`, aplicado sobre v9): Creative Cloud Pro
+  se cotiza sin su descuento, por decisión del CEO del 2026-10-11. El `current` de `adobe` pasa a CLP 325.405,5 al
+  mes (estimado); el importe facturado con descuento queda como `invoiced-with-discount` (CLP 162.605, confirmado),
+  sólo por elección explícita; `renewal-scenario` desaparece. Nada más cambia.
+- `adobe-without-discount.change.json` (`pricing-v3-resource-change/1`, `kind: "policy"`): el reemplazo íntegro que
+  produjo v10 desde v9.
 - `catalog.review-v4.json` (change-set `rounding-fx-confirmed-costs.change.json`, aplicado sobre v3 con
   `catalog preview|apply`): cinco reglas generales de redondeo comercial (`price_rounding`, una por moneda: CLP, USD,
   PEN, COP, MXN), tipo de cambio de cotización desde USD como valor de política con margen prudencial, y los 32
@@ -82,11 +114,29 @@ Donde una viñeta o un delta anterior dice «el vigente es…» o «hay que pasa
   `catalog preview|apply`): agrega la oferta `seo-aeo-managed-service`, los servicios gestionados de la práctica
   SEO/AEO, con 32 políticas de precio (margen objetivo 0,55, `minimumMargin` 0,45, `confirmed`) vigentes desde el
   2026-10-11. No toca ninguna política existente. Es el catálogo que nombra el puntero al 2026-10-11.
+  *Corrección 2026-10-11 (tarde):* el puntero pasó a `catalog.review-v9.json` ese mismo día; v8 queda como padre
+  congelado.
 - `seo-aeo-managed-service.change.json` (`pricing-v3-catalog-change/1`): los 32 `add` que produjeron v8 desde v7.
+- `catalog.review-v9.json` (change-set `engagement-forms-setup-clp.change.json`, aplicado sobre v8 con
+  `catalog preview|apply`): la forma del engagement como registro `engagement_factor` (`engagement:on_going` con
+  razón 1 y `engagement:on_demand` con razón 1,10); dos provisiones de puesta en marcha por persona
+  (`provision-account-onboarding`, USD 200, por defecto; `provision-recruiting`, USD 500, opcional), con la revisión
+  2 de los siete kits de staffing y el retiro de `trial-setup`; y `fx:CLP:USD` = 0,001. Todo vigente desde el
+  2026-10-11. No toca políticas de precio ni pisos.
+- `engagement-forms-setup-clp.change.json` (`pricing-v3-catalog-change/1`): las 13 operaciones que produjeron v9
+  desde v8 (5 `add`, 7 `replace` y 1 `retire`).
 - `managed-care-colombia.demand.json` → `managed-care-colombia.artifact.json`: el servicio gestionado sintético de
   `managed-care.*` para un cliente de Colombia con equipo en Colombia, en COP y con fecha 2026-10-11. Es el primer
   artefacto firmado por el motor `pricing-v3-local/1.2.0` y el que la guarda de artefactos congelados exige para ese
   motor.
+  *Corrección 2026-10-11 (tarde):* el artefacto sigue respondiendo `verified: true`. La demanda, cotizada de nuevo
+  con `--current`, queda `needs_input` con `RESOURCE_ALLOCATION_REQUIRED` para `adobe-express`: sus dos líneas de
+  Community Manager incluyen `express-design` desde la policy v7. Para volver a cotizarla hay que declarar esa
+  asignación o excluir la tarea con motivo (`work[].excludedProfileTasks`).
+- `designer-on-demand.demand.json` → `designer-on-demand.artifact.json`: un mes de un diseñador senior dedicado en
+  Chile, On-Demand, en CLP, con una licencia de tres de Creative Cloud Pro, Higgsfield y Magnific. Es el primer
+  artefacto firmado por el motor `pricing-v3-local/1.3.0` y el que la guarda exige para ese motor. Se congeló con el
+  catálogo v9 y la policy v7.
 - `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
   dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
@@ -181,6 +231,8 @@ Mantenimiento: [contrato del catálogo](../../../docs/documentation/finance/coti
   Perú se calcula con el contrato 1.2.0. Ver el delta siguiente.
   *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
   2026-10-11, catálogo v8 + policy v6). Ver los últimos deltas.
+  *Corrección 2026-10-11 (tarde):* ese paréntesis es de la mañana. Por la tarde `current show` imprimía el
+  catálogo v9 y la policy v8, y al cierre del día la policy v10; puede haber cambiado después.
 - **Qué no se toca.** `catalog.review-v2.json` y `catalog.review-v3.json` son los padres congelados de los artefactos
   que los usaron. Ningún artefacto de esta carpeta se regeneró: cada uno lleva su catálogo dentro, vuelve a resolver al
   contrato 1.0.0 y responde `verified: true`. La prueba `pricing-v3-frozen-artifacts.test.ts` los reproduce a todos en
@@ -218,6 +270,8 @@ Mantenimiento: [factores de país](../../../docs/documentation/finance/cotizador
   *Corrección 2026-10-11 (posterior):* se cotiza con `--current`; a qué resuelve lo imprime `current show` (al
   2026-10-11, `catalog.review-v8.json` + `resources.review-v6.json` + el mismo catálogo de créditos). Sin `--current`
   ni `--catalog` la CLI sigue leyendo review-v1.
+  *Corrección 2026-10-11 (tarde):* ese paréntesis es de la mañana; por la tarde eran el catálogo v9 y la policy
+  v8. La fuente es `current show`.
 - **Qué no se toca.** `catalog.review-v2.json`, `catalog.review-v3.json` y `catalog.review-v4.json` son los padres
   congelados de los artefactos que los usaron. Ningún artefacto anterior de esta carpeta se regeneró: cada uno
   vuelve a resolver a su contrato y responde `verified: true`.
@@ -422,6 +476,99 @@ Decisión: [delta del ADR](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPER
   Son 96 políticas de precio vigentes, más las 32 revisiones reemplazadas de staffing.
 - **Qué no cambia.** Las otras dos ofertas, el resto de v7 y todos los artefactos. La oferta nueva rige para
   cotizaciones fechadas desde el 2026-10-11. El siguiente catálogo sería `catalog.review-v9.json`.
+  *Corrección 2026-10-11 (tarde):* v9 se emitió ese mismo día (último delta). Las tres ofertas no cambiaron.
 - **Medido el 2026-10-11.** `managed-care.demand.json` copiado fuera de esta carpeta con
   `offerId: "seo-aeo-managed-service"` y fecha 2026-10-11, con `--current`: CLP 11.640.000 al mes, margen 0,5507, motor
   `pricing-v3-local/1.1.0`, ninguna línea bajo el piso. Evidencia fechada, no fixture.
+  *Corrección 2026-10-11 (tarde):* con la policy v7 en adelante esa misma copia queda `needs_input`
+  (`RESOURCE_ALLOCATION_REQUIRED` para `adobe-express`). Excluyendo `express-design` en las dos líneas de Community
+  Manager, con motivo, vuelve a dar lo mismo: CLP 11.640.000, margen 0,5507, motor 1.1.0, ninguna línea bajo el piso.
+
+## Delta 2026-10-11 — catálogo v9 y policies v7 y v8: forma del engagement, puesta en marcha, Adobe y lecturas
+
+Decisiones: [contrato 1.3.0](../../../docs/architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio),
+[puesta en marcha](../../../docs/architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--provisiones-de-puesta-en-marcha-costeadas-catálogo-v9),
+[Adobe, CLP y plazo de compromiso](../../../docs/architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp)
+y [tres lecturas](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--tres-lecturas-de-una-cotización-congelada-calendario-caja-y-compromisos).
+
+- **Archivos nuevos.** `catalog.review-v9.json` y su change-set `engagement-forms-setup-clp.change.json`;
+  `resources.review-v7.json` y su cambio `adobe-invoice.change.json`; `resources.review-v8.json` y su cambio
+  `supplier-contract-terms.change.json`; `resources.review-v9.json` y su cambio
+  `microsoft-invoice-adobe-renewal.change.json`; `resources.review-v10.json` y su cambio
+  `adobe-without-discount.change.json`; `designer-on-demand.demand.json` y `designer-on-demand.artifact.json`. El
+  puntero quedó, al cierre del 2026-10-11, en catálogo v9 + policy v10 + créditos v1; lo vigente lo imprime
+  `current show`.
+- **Qué no se toca.** Las versiones anteriores y todos los artefactos. Las tres ofertas y sus pisos no cambiaron.
+- **Forma del engagement.** El brief admite `"engagementForm": "on_going" | "on_demand"` (los ids son datos del
+  catálogo). Es aparte de `engagementCode`, que sigue en `monthly` y sigue eligiendo la política. On-Demand lleva una
+  razón de 1,10 sobre el precio de toda la fila; el costo y el piso no se mueven, así que la prima cuenta como
+  margen. Con el campo, la cotización sale con el motor `pricing-v3-local/1.3.0`; sin él, nada cambia y el resultado
+  no dice qué forma se asumió. No hay Hybrid (se cotiza como dos cotizaciones) ni Licence/Consulting.
+- **Puesta en marcha.** Cada persona que entra a una cuenta lleva `provision-account-onboarding` (USD 200, una vez).
+  El reclutamiento es opcional: `"choices": [{ "requirementId": "recruiting", "resourceId": "provision-recruiting" }]`
+  (USD 500, una vez). Las dos son estimaciones propuestas por el agente y aceptadas por el CEO. La regla del
+  workbook de cobrar un mes del recurso no entra al cotizador. `managed-service-core` no tiene puesta en marcha.
+- **Adobe.** Dos productos en CLP con IVA, tres licencias cada uno: Creative Cloud Pro y Adobe Express (CLP 16.240
+  al mes). La demanda que use una herramienta en CLP nombra `fx:CLP:USD` en `fxRecordIds`. Creative Cloud Pro se
+  factura hoy con 50 % de descuento (CLP 162.605 al mes) y el CEO espera que termine en unos dos meses; que termine
+  justo en la renovación del 2026-11-16 no está confirmado. Desde la policy v10, por decisión del CEO, **se cotiza
+  sin el descuento**: `current` es CLP 325.405,5 al mes por las tres licencias (estimado hasta que exista una
+  factura a precio completo), y una licencia de tres es CLP 108.468,5. El importe facturado sigue disponible como
+  `invoiced-with-discount` (una licencia: CLP 54.202), sólo para un trabajo que termina antes que el descuento y
+  sólo si el operador lo elige. Ya no existe `renewal-scenario`.
+- **Plazo de compromiso** (`commitmentTermMonths`, en la entrada de precio): por cuántos meses hay que pagar una
+  licencia una vez tomada. Es un dato del asiento, no del contrato firmado. Adobe 12 (la cuenta no baja al quitar
+  una licencia hasta que el contrato renueva); Notion 1; Microsoft 365 1 (contrato anual, pero quitar una licencia
+  baja la cuenta). Sin el campo la lectura dice «no declarado», que no es «sin compromiso». Desde la policy v9 la
+  entrada admite además `commitmentRenewsOn` (fecha ISO, sólo junto con el plazo): la fecha en que renueva el
+  contrato. Con ella `compose commitments` cuenta lo que queda del plazo en curso; la licencia queda atada hasta la
+  primera renovación posterior al último mes cotizado (`commitment.boundUntil`). Adobe la declara: 2026-11-16.
+  Límite conocido: un precio con plazo y sin fecha se sigue leyendo como un plazo entero desde el primer mes
+  cotizado, que para un contrato que ya corre es un techo y no una medida; con fecha, un mes cubierto en parte
+  cuenta entero.
+- **Tres lecturas de un artefacto congelado**, además de `compose split`. Ninguna forma un precio y las tres salen
+  con exit 3:
+
+  ```bash
+  pnpm --silent pricing:v3 compose schedule --input artifact.json --milestones milestones.json
+  pnpm --silent pricing:v3 compose cash --input artifact.json
+  pnpm --silent pricing:v3 compose commitments --input artifact.json
+  ```
+
+  `schedule` reparte el neto en hitos (`[{ "id", "label", "share", "periodId" | "when" }]`; las participaciones
+  suman exactamente 1). `cash` separa el costo por naturaleza, la caja nueva a proveedores y la caja sobre capacidad
+  contratada, que no es margen ni decide precio. `commitments` lista lo que queda comprometido con proveedores
+  después del último período; es para engagements acotados, no un aviso de rutina.
+- **Demandas anteriores.** Una demanda escrita para la policy v6 con Social Media Manager, Community Manager, Content
+  Manager o Content Creator queda `needs_input` con `--current` (`RESOURCE_ALLOCATION_REQUIRED` para
+  `adobe-express`) hasta que declare la asignación o excluya `express-design` con motivo.
+- **Lo que todavía no se puede.** Declarar el plazo del contrato con el cliente (una cotización tiene períodos).
+  Decir si un asiento se compra para el trabajo. Un engagement de menos de un mes se expresa como horas dentro de un
+  período. No se modelan costos de terceros de un encargo ni una reserva de contingencia para alcance fijo.
+
+### Corridas del 2026-10-11
+
+- `designer-on-demand.artifact.json`: `replay` responde `verified: true`. Motor `pricing-v3-local/1.3.0`, costo
+  1.768.438, neto CLP 2.790.000, margen 0,3661, `engagementAdjustment` 252.635, ninguna línea marcada. Congeló la
+  policy v7: Adobe con descuento. Las cinco viñetas siguientes son de ese artefacto.
+- La misma demanda sin `engagementForm`, con las versiones del artefacto: motor 1.1.0, mismo costo, neto CLP
+  2.540.000, margen 0,3037.
+- `compose split --tools adobe,higgsfield,magnific` sobre el artefacto: kit 190.000 y persona 2.600.000.
+- `compose schedule` con 50/30/20: 1.400.000, 840.000 y 550.000.
+- `compose cash`: personas 1.310.000, provisiones 50.000, fee de plataforma 49.000, puesta en marcha 200.000,
+  herramientas 159.438 (créditos 64.436 y asientos 95.002); caja nueva a proveedores 43.770; caja sobre capacidad
+  contratada 2.746.230.
+- `compose commitments` sobre el artefacto (policy v7): un solo compromiso, la licencia de Adobe, leído como
+  liberado al paquete compartido; Notion y Microsoft 365 salen como plazo no declarado. El artefacto no conoce la
+  fecha de renovación: su lectura supone un plazo entero y sus importes son un techo.
+- La misma demanda vuelta a cotizar con `--current` (policy v10, fuera de esta carpeta): costo 1.822.704, neto CLP
+  2.870.000, margen 0,3649, `engagementAdjustment` 260.387, porque Creative Cloud Pro entra sin descuento; sin
+  `engagementForm`, neto CLP 2.610.000 y margen 0,3016. Eligiendo `invoiced-with-discount` vuelve a dar las cifras
+  del artefacto (1.768.438 y 2.790.000). El costo de Microsoft 365 no se mueve: la demanda elige el precio público
+  `public-standard-teams-monthly` y no `current`.
+- `compose commitments` sobre esa cotización nueva: el único compromiso sigue siendo Adobe, leído contra su
+  renovación. Queda un mes, CLP 108.468, liberado al paquete compartido (una licencia de tres); la licencia queda
+  atada hasta el 2026-11-16 y la señal es `SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT`. Notion y Microsoft 365 declaran
+  un mes y no dejan nada.
+
+Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `designer-on-demand`.

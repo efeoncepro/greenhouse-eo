@@ -16,8 +16,8 @@ Regla canonica: `docs/operations/ARCHITECTURE_DECISION_RECORD_OPERATING_MODEL_V1
 
 | Decision | Status | Scope | Canonical doc | Source / notes |
 | --- | --- | --- | --- | --- |
-| Pricing V3: motor 1.1 con precio acordado, redondeo comercial y contratos de entrada convivientes | Accepted local 2026-10-10 — aprobado por el operador (CEO) | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md) | Contrato 1.0.0 intacto y 1.1.0 aditivo, cada uno con su motor en un registro cerrado; `agreed_net`, ajustes disjuntos y redondeo por moneda como dato de catálogo; guarda permanente de artefactos congelados. Delta 2026-10-11: contrato 1.2.0 (el piso de margen acompaña al factor de mercado que declara `floorBasis`) y factores de país en el catálogo v5 (talento sobre el costo, mercado sobre el precio humano). Sin canon/API/DB ni aprobación comercial. |
-| Pricing V3: operación local para agentes | Accepted local2026-10-09 | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) | Catálogo/reglas, portfolio declarado, planes/versiones con impacto, readiness y preview redactado; sin canon/API/DB ni aprobación comercial. Delta 2026-10-11: versiones vigentes por puntero verificado (`current.json`, `--current`), avisos de la corrida fuera del artefacto (`runNotices`), exposición a datos estimados derivada del resultado congelado (`estimateExposure`, `costEvidencePriority`) y base de costo = costo objetivo, no nómina (decisión del CEO). |
+| Pricing V3: motor 1.1 con precio acordado, redondeo comercial y contratos de entrada convivientes | Accepted local 2026-10-10 — aprobado por el operador (CEO) | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md) | Contrato 1.0.0 intacto y 1.1.0 aditivo, cada uno con su motor en un registro cerrado; `agreed_net`, ajustes disjuntos y redondeo por moneda como dato de catálogo; guarda permanente de artefactos congelados. Delta 2026-10-11: contrato 1.2.0 (el piso de margen acompaña al factor de mercado que declara `floorBasis`) y factores de país en el catálogo v5 (talento sobre el costo, mercado sobre el precio humano). Delta 2026-10-11 (tarde): contrato 1.3.0, la forma del engagement (`engagementForm`: On-Going, On-Demand) como dato propio con una razón de precio por forma en el catálogo (`engagement_factor`); la razón multiplica el precio de toda la fila antes del redondeo y de los ajustes, y no mueve costo ni piso. El registro tiene cuatro contratos. Sin canon/API/DB ni aprobación comercial. |
+| Pricing V3: operación local para agentes | Accepted local2026-10-09 | Finance / Commercial / Agent tooling | [GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) | Catálogo/reglas, portfolio declarado, planes/versiones con impacto, readiness y preview redactado; sin canon/API/DB ni aprobación comercial. Delta 2026-10-11: versiones vigentes por puntero verificado (`current.json`, `--current`), avisos de la corrida fuera del artefacto (`runNotices`), exposición a datos estimados derivada del resultado congelado (`estimateExposure`, `costEvidencePriority`) y base de costo = costo objetivo, no nómina (decisión del CEO). Deltas 2026-10-11 posteriores: pisos y objetivos por oferta (staffing 25 %, SEO/AEO 55/45), `compose split` y tres lecturas más de una cotización congelada (`compose schedule`, `compose cash`, `compose commitments`), que derivan y nunca forman un precio. |
 | Excel pricing CLI local para agentes | Accepted 2026-10-09 | Commercial / Finance / Agent tooling | [GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md](GREENHOUSE_PRICING_WORKBOOK_AGENT_CLI_DECISION_V1.md) | Extracción trazable, costeo multirol editable y comparación de márgenes sin UI/DB; no catálogo aprobado ni emisión de quotes. |
 | Capacidad especializada regional de CRM y RevOps | Accepted 2026-10-09 — dirección del operador; oferta en validación | RevOps & CRM / Commercial / Talent / Finance / Legal | [EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md](EFEONCE_REGIONAL_CRM_CAPACITY_SERVICE_DECISION_V1.md) + [servicio](../services/revenue-operations-crm/CRM_SPECIALIST_CAPACITY_SERVICE_V1.md) | Staff Augmentation y operación gestionada con responsabilidades distintas; estándar regional, configuración contractual/capacidad/pricing por validar. Sin nuevos contratos ni rollout. |
 | Efeonce Talent Assurance: evidencia, formación, desempeño y continuidad | Accepted 2026-10-09 — aprobación explícita del operador | Talent / Hiring / Workforce / CX / Delivery / Finance / Agent Runtime | [Decision V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_DECISION_V1.md) + [Architecture V1](GREENHOUSE_EFEONCE_TALENT_ASSURANCE_ARCHITECTURE_V1.md) + [EPIC-038](../epics/to-do/EPIC-038-efeonce-talent-assurance-agentic-quality-system.md) | Estándar, arquitectura objetivo y guardrails aceptados; policy de claims, revisión cross-domain y sistema integrado pendientes. Sin sello público, claims ni promoción de autonomía por esta aceptación. |
@@ -327,6 +327,9 @@ Delta 2026-10-11: las versiones vigentes de catálogo, policy y créditos las no
 versión y digest (`data/pricing/v3-operating/current.json`), opt-in con `--current` y gestionado con
 `current show|set`; `apply` sigue sin activar y una prueba exige mover el puntero al emitir una versión. Descarta
 symlink `latest`, convención de nombre y cambio del default de la CLI.
+Delta 2026-10-11 (tarde), propuesta del agente aceptada por el operador (CEO): la puesta en marcha se costea con dos
+provisiones estimadas por persona (incorporación a la cuenta, por defecto; reclutamiento, opcional) en vez de la
+regla del workbook de un mes del costo del recurso, que no entra al cotizador. Catálogo v9; retira `trial-setup`.
 
 [Presupuesto de créditos IA y recargas](GREENHOUSE_PRICING_V3_AI_CREDIT_BUDGET_DECISION_V1.md): Accepted para prototipo local, TASK-2020; paquetes observados, costo/caja y caducidad separados, sin compra; binding local a quote mediante TASK-2021/2022, sin inventario live.
 Delta 2026-10-11: el catálogo de créditos vigente lo nombra el mismo puntero; «un precio unitario no vence» no
@@ -337,6 +340,11 @@ Delta 2026-10-11, decisión del operador (CEO): un precio unitario de herramient
 versión nueva de la policy lo reemplaza. La vigencia dura (`effectiveUntil`, bloquea) queda separada de la fecha de
 revisión (`reviewBy`, avisa y nunca bloquea), con lectura derivada `priceReview` en `resources inspect`. Policy v6;
 la fecha de revisión a seis meses la eligió el agente.
+Delta 2026-10-11 (tarde): `commitmentTermMonths`, cuánto hay que seguir pagando una licencia una vez tomada, como
+dato aparte de la facturación (del asiento, no del contrato firmado; plazos dichos por el CEO); Adobe como se
+factura, dos productos en CLP con IVA (policy v7); `fx:CLP:USD` al inverso del tipo de cambio de cotización
+(catálogo v9); y `BUNDLED_TOOL_DOUBLE_COUNT` acotada a la misma línea o persona. Policy v8 declara los plazos de
+Notion y Microsoft 365.
 
 [Operación local para agentes](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md): Accepted local,
 TASK-2022; reglas de revisión para 32 perfiles, discovery/scaffold/plan, reparto de cartera declarada,
@@ -350,6 +358,13 @@ fecha, fechas de los precios usados) y agrega `estimateExposure`, que ordena los
 costo que descansa sobre cada uno sin recalcular nada (`costEvidencePriority` en `assess`). Decisión del operador
 (CEO): el costo por persona del cotizador es el costo objetivo, no la nómina. Catálogo v6 agrega un tipo de
 cambio de cotización EUR→USD estimado, elegido por el agente.
+Deltas 2026-10-11 posteriores: piso de 25 % para una persona vendida por dedicación (catálogo v7) y oferta propia de
+la práctica SEO/AEO con objetivo 55 % y piso 45 % (catálogo v8), pisos del CEO; `compose split` (persona y kit de
+herramientas); y tres lecturas de un artefacto congelado: `compose schedule` (calendario de pagos por hitos),
+`compose cash` (caja nueva a proveedores y caja sobre capacidad contratada, que no es margen ni decide precio) y
+`compose commitments` (compromisos con proveedores que sobreviven a los períodos cotizados). `commitments` es un
+comando y no un aviso automático porque la cotización tiene períodos, no el plazo del contrato con el cliente.
+Todavía no se modelan costos de terceros ni una reserva de contingencia para alcance fijo.
 
 [Motor 1.1: precio acordado, redondeo comercial y versiones convivientes](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md):
 Accepted local 2026-10-10, aprobado por el operador (CEO); el ADR no declara unidad de trabajo. El kernel mantiene el contrato 1.0.0 byte a
@@ -362,3 +377,9 @@ Delta 2026-10-11, aprobado por el operador (CEO): el mismo ADR cubre ahora el co
 `floorBasis: "base_market"` (la resolución lo emite sólo si el factor elegido lo declara; el margen que se muestra
 es siempre el real), y los factores de país del catálogo v5: factor de talento sobre el costo según el país de la
 persona y factor de mercado sobre el precio humano según el país del cliente.
+Delta 2026-10-11 (tarde), diseño elegido por el operador (CEO): contrato 1.3.0, superconjunto de 1.2.0. El brief
+declara la forma del engagement en `engagementForm`, separada de `engagementCode`, y un registro `engagement_factor`
+por forma trae su razón de precio (On-Going 1, On-Demand 1,10; el CEO dejó el ajuste al agente, que mantuvo el 10 %). La
+razón multiplica el precio de toda la fila después de la política y del factor de mercado y antes del redondeo y de
+los ajustes; no toca el costo ni el piso, así que la prima cuenta como margen. La resolución emite 1.3.0 sólo si el
+brief declara la forma. Descarta duplicar las 96 políticas de precio por forma. El registro tiene cuatro contratos.

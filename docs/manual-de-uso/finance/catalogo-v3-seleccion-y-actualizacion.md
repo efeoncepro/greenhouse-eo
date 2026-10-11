@@ -7,7 +7,7 @@ operador (CEO).
 [Decisión](../../architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md),
 [contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md).
 
-Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Versiones vigentes: el puntero `current.json`](#versiones-vigentes-el-puntero-currentjson), [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización) y [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país), que operan sobre el catálogo operativo vigente: el que nombra el puntero y se carga con `--current`.
+Para un pedido con herramientas/consumo y costos compartidos, usar el [flujo operativo actual](operar-cotizador-v3-con-agentes.md): discovery, plan, portfolio, compose y mantenimiento de policy/créditos. La [referencia funcional completa](../../documentation/finance/cotizador-v3-superficie-implementada.md) describe ambos carriles. Los pasos siguientes conservan el carril legacy de kits explícitos y sus valores históricos, sin convertirlos en precios actuales. Las excepciones son [Versiones vigentes: el puntero `current.json`](#versiones-vigentes-el-puntero-currentjson), [Cambiar el redondeo o el FX de cotización](#cambiar-el-redondeo-o-el-fx-de-cotización), [Cambiar un factor de país o registrar el costo de un perfil en un país](#cambiar-un-factor-de-país-o-registrar-el-costo-de-un-perfil-en-un-país) y [Forma del compromiso, puesta en marcha y plazos de proveedor](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor), que operan sobre el catálogo operativo vigente: el que nombra el puntero y se carga con `--current`.
 
 ## Qué hace el agente
 
@@ -73,13 +73,16 @@ ofertas son de servicio gestionado, las dos con piso de 45 %: `creative-managed-
 
 Talent Assurance USD 25/mes, operación USD 25 y setup USD 100 son **placeholders de la prueba anterior**,
 identificados `trial-*`; no costos medidos ni promesas de formación/reemplazo. Se actualizan como recursos explícitos.
-No hay bolsas del expediente, cargos laborales 20% ni reserva 15% implícitos en este catálogo.
+No hay bolsas del expediente, cargos laborales 20% ni reserva 15% implícitos en este catálogo. En el catálogo
+operativo, `trial-setup` quedó retirado desde el 2026-10-11 (v9): la puesta en marcha son dos provisiones por
+persona ([cómo](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor)).
 
 ## Calendario y pagos de licencias
 
 El brief soporta `activePeriods` y `dedicationByPeriod`. Resolver genera un snapshot por mes y el orquestador
 invoca el kernel; no hay fórmulas de precio duplicadas en CLI. Meses sin actividad no generan venta.
-Setup de cuenta se carga una vez, incluso si se incorporan consumidores después.
+Setup de cuenta se carga una vez, incluso si se incorporan consumidores después. Eso vale para la baseline: en el
+catálogo operativo, desde el v9, el onboarding es por persona y quien se suma después trae el suyo.
 Anualidades estables devengan 1/12 del precio/costo por mes y comprometen pago anual al inicio y cada doce meses.
 Cambiar unidades anuales o reactivar tras una pausa devuelve `ANNUAL_ASSIGNMENT_CHANGE_REQUIRES_POLICY`, no inventa
 cancelación/reembolso. `cashLedger` consolida esos compromisos; no es emisión de factura ni caja real.
@@ -134,10 +137,11 @@ pnpm --silent pricing:v3 current show
 
 Devuelve `pointer` (el documento), `pointerDigest`, `consistent` y, por fuente, `path`, `status` y lo que se encontró
 en el archivo (`found.version`, `found.digest`). Exit 0 si `consistent` es `true`; exit 2 si alguna fuente no
-coincide. Lo que imprime es la respuesta vigente. Al 2026-10-11, tras la oferta SEO/AEO, apunta a
-`data/pricing/v3-operating/catalog.review-v8.json` (`operating-review-2026-10-11-v8`),
-`data/pricing/v3-operating/resources.review-v6.json` (`operating-review-2026-10-11-v6`) y
-`data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`).
+coincide. Lo que imprime es la respuesta vigente. Al cierre del 2026-10-11 apunta a
+`data/pricing/v3-operating/catalog.review-v9.json` (`operating-review-2026-10-11-v9`),
+`data/pricing/v3-operating/resources.review-v10.json` (`operating-review-2026-10-11-v10`) y
+`data/pricing/v3-resources/ai-credits.review-v1.json` (`operator-screenshots-2026-10-09-v1`). Los siguientes serían el
+catálogo v10 y la policy v11.
 
 | `status`           | Qué significa                                                              |
 | ------------------ | -------------------------------------------------------------------------- |
@@ -165,12 +169,14 @@ mover el puntero deja esa suite en rojo.
    ```bash
    pnpm --silent pricing:v3 current set \
      --catalog data/pricing/v3-operating/catalog.review-vN.json \
-     --policy data/pricing/v3-operating/resources.review-v6.json \
+     --policy data/pricing/v3-operating/resources.review-vM.json \
      --credits data/pricing/v3-resources/ai-credits.review-v1.json \
      --reason "Qué cambió, quién lo decidió y cuándo" \
      --confirm POINTER_DIGEST_ACTUAL
    ```
 
+   - `vN`, `vM` y `POINTER_DIGEST_ACTUAL` son marcadores: la versión que se emitió lleva su número nuevo y las fuentes
+     que no cambian llevan la ruta que imprime `current show`.
    - Las tres rutas son obligatorias, van escritas (`current set` no acepta `--current`) y deben quedar dentro del
      repo. Versión y digest no se escriben: la CLI los calcula de los archivos que nombran las rutas.
    - `--reason` es obligatorio y queda en el puntero.
@@ -220,8 +226,11 @@ En `search`, `"resolution": "ambiguous"` sólo dice que la consulta devolvió va
 - **FX de cotización** (`kind: "fx"`): `value` es `{ "from": "USD", "to": "COP", "rate": "3650" }`, con `recordId`
   `fx:USD:<MONEDA>`. USD es la moneda de referencia: un registro por par USD→moneda. Es un valor de política con
   margen prudencial, no un tipo de cambio de mercado; `note` debe decir quién lo decidió, cuándo y contra qué
-  observación. El único registro en otro sentido es `fx:EUR:USD` (EUR→USD), que convierte a USD el costo de una
+  observación. Hasta el v8 el único registro en otro sentido era `fx:EUR:USD` (EUR→USD), que convierte a USD el costo de una
   herramienta con precio en EUR. No hay USD→EUR ni regla de redondeo para EUR: una cotización no se emite en EUR.
+  Desde el v9 hay otro en sentido inverso, `fx:CLP:USD` (`0.001`), para el costo de una herramienta facturada en CLP;
+  es el inverso de `fx:USD:CLP` y los dos se cambian juntos
+  ([detalle](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor)).
 
 Cada cambio es una entrada de `changes` en un change-set `pricing-v3-catalog-change/1`:
 
@@ -307,13 +316,19 @@ produjo `catalog.review-v7.json` desde `catalog.review-v6.json`: 32 `replace`, u
 `minimumMargin` `0.25`. El piso de 25 % lo decidió el CEO; los objetivos por tier los propuso el agente y él los
 confirmó el mismo día, así que los registros están `confirmed`.
 
-El cambio más reciente al 2026-10-11 es
-[`seo-aeo-managed-service.change.json`](../../../data/pricing/v3-operating/seo-aeo-managed-service.change.json), que
+Después,
+[`seo-aeo-managed-service.change.json`](../../../data/pricing/v3-operating/seo-aeo-managed-service.change.json)
 produjo `catalog.review-v8.json` desde `catalog.review-v7.json`: 32 `add`, uno por perfil, que crean la oferta
 `seo-aeo-managed-service` (servicios gestionados de la práctica SEO/AEO) con margen objetivo `0.55` y `minimumMargin`
 `0.45`. El piso lo aprobó el CEO el 2026-07-13; el objetivo, extremo bajo de la banda 55–60 % de esa práctica, lo
 propuso el agente y él lo confirmó el 2026-10-11, así que los registros están `confirmed`. Una oferta nueva son 32
 registros, uno por perfil: ya hay tres ofertas y 96 políticas de precio vigentes.
+
+El cambio más reciente al 2026-10-11 es
+[`engagement-forms-setup-clp.change.json`](../../../data/pricing/v3-operating/engagement-forms-setup-clp.change.json),
+que produjo `catalog.review-v9.json` desde `catalog.review-v8.json`: la forma del compromiso, las provisiones de
+puesta en marcha y el tipo de cambio CLP→USD. Qué trae y cómo se mantiene:
+[Forma del compromiso, puesta en marcha y plazos de proveedor](#forma-del-compromiso-puesta-en-marcha-y-plazos-de-proveedor).
 
 Rechazos (exit 1, `error.code` en stderr): `CATALOG_BASE_CONFLICT` (el `baseDigest` no es el de la base entregada),
 `CATALOG_PREVIEW_CONFLICT` (el `--confirm` no es el del preview vigente: repetir el preview),
@@ -326,7 +341,7 @@ fuente anterior), `PRICE_ROUNDING_CURRENCY_NOT_REGISTERED` e `INVALID_PRICE_ROUN
 base. Las cotizaciones ya congeladas lo ignoran: `replay` las recalcula con el catálogo que llevan dentro, así que
 conservan su precio, su FX y su redondeo (o la falta de él). Una cotización nueva usa el sucesor cuando el puntero lo
 nombra. Después de aplicar: guardar el sucesor en `data/pricing/v3-operating/` con el nombre siguiente al del catálogo
-que nombra el puntero (al 2026-10-11 sería `catalog.review-v9.json`) junto a su change-set, probarlo con los casos
+que nombra el puntero (al cierre del 2026-10-11 sería `catalog.review-v10.json`) junto a su change-set, probarlo con los casos
 afectados y mover el puntero
 ([pasos](#versiones-vigentes-el-puntero-currentjson)), para que agentes y operador usen el mismo catálogo.
 
@@ -495,6 +510,203 @@ Como todo cambio, es una versión nueva del catálogo y rige por fecha:
   `--impact` de `catalog preview` sólo acepta briefs del carril de catálogo; una demanda de composición se compara
   cotizándola con la base y con el sucesor.
 
+## Forma del compromiso, puesta en marcha y plazos de proveedor
+
+**Para qué sirve.** Mantener los tres datos que entraron el 2026-10-11 por la tarde: la razón de precio de cada
+forma del compromiso, las provisiones de puesta en marcha y los kits que las piden (catálogo v9), y el precio de una
+herramienta facturada en CLP con su plazo de proveedor (policies v7 y v8). Qué significan al cotizar:
+[On-Demand u On-Going](operar-cotizador-v3-con-agentes.md#cotizar-on-demand-u-on-going),
+[puesta en marcha](operar-cotizador-v3-con-agentes.md#puesta-en-marcha-onboarding-y-reclutamiento) y
+[herramientas con contrato](operar-cotizador-v3-con-agentes.md#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor).
+
+**Antes de empezar.** Los valores los decide el operador (CEO); el agente prepara el change-set, le muestra el
+preview y aplica sólo con su confirmación. Para ver lo vigente (los cuatro devuelven exit 0; `"resolution":
+"ambiguous"` sólo dice que la consulta devolvió varios registros):
+
+```bash
+pnpm --silent pricing:v3 catalog search --kind engagement_factor --current --date 2026-10-11
+pnpm --silent pricing:v3 catalog search --kind resource --query provision --current --date 2026-10-11
+pnpm --silent pricing:v3 catalog show --kind kit --query visual-core --current --date 2026-10-11
+pnpm --silent pricing:v3 resources inspect --current --date 2026-10-11 --query adobe
+```
+
+### El registro `engagement_factor`
+
+Clase de registro nueva del catálogo monetario (contrato 1.3.0): la razón de precio de una forma del compromiso.
+
+```json
+{
+  "recordId": "engagement:on_demand",
+  "revision": 1,
+  "kind": "engagement_factor",
+  "source": {
+    "reference": "policy:ceo-engagement-form-2026-10-11",
+    "effectiveFrom": "2026-10-11",
+    "effectiveUntil": "9999-12-31",
+    "status": "confirmed"
+  },
+  "note": "Quién lo decidió, cuándo y por qué ese valor.",
+  "value": { "form": "on_demand", "priceRatio": "1.10" }
+}
+```
+
+- `value.form` es el id que la demanda declara en `brief.engagementForm`. Las formas son datos: la CLI no tiene una
+  lista. Hoy existen `engagement:on_going` (`priceRatio` `1`) y `engagement:on_demand` (`1.10`), los dos generales.
+- `value.priceRatio` es una cadena decimal mayor que cero. Multiplica el precio de toda la fila; nunca el costo ni el
+  piso.
+- `value.offerId` es opcional: con él, el registro es propio de esa oferta y prevalece sobre el general. Sin él rige
+  para toda oferta que no tenga uno propio.
+- **Un registro por forma y nivel.** Para cambiar una razón se hace `replace` del registro. Un segundo registro
+  general con otro `recordId` para la misma forma deja toda cotización que la declare en `AMBIGUOUS_SELECTION` con
+  `path` `engagementForm`; una forma sin registro vigente a la fecha de la demanda, en `MISSING_CATALOG_SELECTION`
+  en el mismo `path`.
+- Una forma nueva (Híbrido, Licencia/Consultoría) es un `add` con su decisión del operador. Hoy no están cargadas a
+  propósito: Híbrido se cotiza como dos cotizaciones.
+- Por qué un registro por forma y no un juego de políticas por forma: duplicar las 96 políticas de precio dejaría el
+  recargo repartido en 96 registros con tasas raras, y cada cambio de objetivo habría que hacerlo dos veces.
+
+### Provisiones de puesta en marcha y los kits que las piden
+
+Dos recursos (`kind: "resource"`) con `value.kind` `setup`, `unit` `once` y `scope` `person`, los dos `estimated`:
+
+| `recordId`                     | Monto   | `covers`       | Cómo entra a una cotización                                                      |
+| ------------------------------ | ------- | -------------- | -------------------------------------------------------------------------------- |
+| `provision-account-onboarding` | USD 200 | `setup`        | Requisito `setup` (obligatorio) de los siete kits de staffing                    |
+| `provision-recruiting`         | USD 500 | `recruiting`   | Requisito `recruiting` (opcional) de esos kits: sólo si la línea lo elige en `choices` |
+
+Los kits los referencian en sus requisitos. Así quedaron los dos en `visual-core` (revisión 2) y en los otros seis
+kits de staffing (`generic-core`, `seo-core`, `wordpress-core`, `community-core`, `development-core` y `crm-core`):
+
+```json
+{ "requirementId": "setup", "coverage": "setup", "required": true, "allowClientProvided": false,
+  "candidateResourceIds": ["provision-account-onboarding"], "quantityMode": "headcount", "shareMode": "full" },
+{ "requirementId": "recruiting", "coverage": "recruiting", "required": false, "allowClientProvided": false,
+  "candidateResourceIds": ["provision-recruiting"], "quantityMode": "headcount", "shareMode": "full" }
+```
+
+- `quantityMode: "headcount"` y `shareMode: "full"` hacen que se cobre una vez por persona: quien se suma después
+  trae la suya.
+- `managed-service-core` no tiene ninguno de los dos requisitos: un servicio gestionado no lleva puesta en marcha.
+- Los dos montos los propuso el agente y el CEO los aceptó; se miden en las próximas dos incorporaciones reales y
+  entonces se reemplazan con `replace` y una fuente nueva. La regla del Excel de un mes de costo del recurso no se
+  cargó.
+- `trial-setup` (USD 100, de prueba) quedó retirado desde el 2026-10-11; una cotización con fecha anterior lo sigue
+  resolviendo.
+
+**La trampa: un kit que sigue listando un recurso retirado.** `catalog preview` y `catalog apply` aceptan un
+change-set que retira un recurso aunque un kit todavía lo nombre en `candidateResourceIds`. El bloqueo aparece
+recién al cotizar: toda línea con ese kit devuelve exit 2 con `MISSING_CATALOG_SELECTION` en
+`lines.<lineId>.<requirementId>` (por ejemplo `lines.design.setup`) y `candidates` vacío. Por eso el change-set del
+v9 reemplaza los siete kits en el mismo cambio en que retira `trial-setup`. Al retirar o renombrar un recurso:
+
+1. Buscar qué kits lo nombran: `catalog search --kind kit --current --date <fecha>`.
+2. Reemplazar esos kits en el mismo change-set.
+3. Probar el sucesor cotizando una línea de cada kit tocado antes de mover el puntero
+   ([paso 2](#versiones-vigentes-el-puntero-currentjson)).
+
+### El change-set del catálogo v9
+
+[`engagement-forms-setup-clp.change.json`](../../../data/pricing/v3-operating/engagement-forms-setup-clp.change.json)
+produjo `catalog.review-v9.json` desde `catalog.review-v8.json` con 13 operaciones, todas con `effectiveFrom`
+2026-10-11: dos `add` de `engagement_factor`, dos `add` de las provisiones, siete `replace` de kits, un `retire` de
+`trial-setup` y un `add` de `fx:CLP:USD`. No toca ninguna política de precio ni ningún piso. El preview se reproduce
+sobre su base:
+
+```bash
+pnpm --silent pricing:v3 catalog preview --catalog data/pricing/v3-operating/catalog.review-v8.json \
+  --input data/pricing/v3-operating/engagement-forms-setup-clp.change.json
+```
+
+Devuelve exit 0 con `previewDigest` `9b349bdf98ae7067a17774ee90437f27b438261bb529ab2708b9148231e1ff62` y 13 entradas en
+`differences`; el sucesor tiene la versión `operating-review-2026-10-11-v9` y 376 registros.
+
+### Precio en CLP y plazo de proveedor en la policy
+
+Son campos de un precio de la policy de recursos (`resources.review-vN.json`), que se cambia con un reemplazo
+completo (`pricing-v3-resource-change/1`, `resources preview` → `resources apply` → mover el puntero).
+
+- **Precio en CLP.** `price.currency` admite `CLP`: el monto va como se factura (Adobe: el total de la factura, con
+  IVA, por decisión del CEO). Para que ese costo entre al cálculo, el catálogo monetario necesita el registro
+  `fx:CLP:USD`, y cada demanda que use la herramienta lo nombra en `fxRecordIds`. `fx:CLP:USD` vale `0.001`, el
+  inverso de `fx:USD:CLP` (`1000`): si se mueve uno se mueve el otro en el mismo change-set, o un costo en CLP dejaría
+  de volver a una cotización en CLP por el mismo monto.
+- **`commitmentTermMonths`.** Entero de 1 a 120, opcional: por cuántos meses hay que pagar una licencia una vez
+  tomada. `1` es una declaración (se paga mes a mes y se puede soltar), distinta de no declararlo. No va en un precio
+  pendiente (`pendingReason`). Es un hecho aparte de `price.unit`, que dice qué se factura: un plan anual pagado mes a
+  mes es `unit: "month"` con plazo `12`. Nunca entra a un cálculo ni a un resultado congelado; lo lee
+  `compose commitments`.
+- **`commitmentRenewsOn`.** Fecha ISO, opcional, y sólo se admite junto con `commitmentTermMonths`: la fecha en que
+  renueva el contrato (la da la consola del proveedor). El plazo dice cuánto obliga un asiento; la fecha dice en qué
+  punto está el plazo que ya corre. Con ella `compose commitments` cuenta lo que queda hasta la renovación en vez de
+  suponer un plazo entero. Tampoco entra a un cálculo. Los precios con `unit: "year"` ignoran los dos campos.
+- **`reviewBy`** de un precio que hay que volver a mirar en una fecha conocida se pone en esa fecha (los tres
+  precios de Adobe: `2026-11-16`, el día en que renueva su contrato).
+- **Un descuento que termina** se resuelve con dos `priceId`, y cuál es `current` lo decide el operador. Desde la
+  policy v10, por decisión del CEO, `current` de Creative Cloud Pro es el precio **sin** descuento (estimado) y el
+  importe facturado es `invoiced-with-discount` (confirmado), que sólo entra por elección explícita. Hasta la v9 era
+  al revés: `current` era el importe facturado y el precio de lista se llamaba `renewal-scenario`.
+- **`bundledToolIds`** dice qué otra herramienta ya incluye el plan (`adobe` incluye `adobe-express`). La regla
+  `BUNDLED_TOOL_DOUBLE_COUNT` sólo se dispara cuando la misma línea o persona tiene las dos.
+- **Tareas y recetas.** Un producto nuevo necesita su tarea en `taskCodes`, en `tools[].tasks` y en la receta de los
+  perfiles que lo usan (`profileTasks`). Agregar una tarea a una receta deja `needs_input` toda demanda existente con
+  ese perfil hasta que declare la asignación o excluya la tarea: revisar los casos abiertos.
+
+Los cuatro cambios de policy del 2026-10-11:
+
+- [`adobe-invoice.change.json`](../../../data/pricing/v3-operating/adobe-invoice.change.json) (v6 → v7): Adobe como
+  se factura, desde la factura 3582641940 del 2026-09-16 que mostró el CEO. Dos productos en CLP, cada uno con tres
+  licencias y plazo de 12 meses; `renewal-scenario` para Creative Cloud Pro tras el fin de su descuento; y la tarea
+  `express-design` en la receta de Social Media Manager, Community Manager, Content Manager y Content Creator, que el
+  CEO confirmó. La policy pasó a regir desde el 2026-10-11.
+- [`supplier-contract-terms.change.json`](../../../data/pricing/v3-operating/supplier-contract-terms.change.json)
+  (v7 → v8): los plazos que declaró el CEO. Notion `current` y los dos precios mensuales de Microsoft 365, `1` (quitar
+  una licencia baja la factura); Adobe sigue en `12`; HubSpot es anual, pero su precio vigente está pendiente de
+  evidencia y no declara plazo. Ningún monto, moneda ni unidad cambió.
+- [`microsoft-invoice-adobe-renewal.change.json`](../../../data/pricing/v3-operating/microsoft-invoice-adobe-renewal.change.json)
+  (v8 → v9): tres hechos que el CEO mostró. Microsoft 365 como se factura (factura G185142527 del 2026-09-16:
+  Business Standard, USD 14,70 por licencia al mes, seis licencias, sin impuesto): `current` deja de estar pendiente,
+  queda `confirmed` y con plazo `1`. Notion como se factura (factura 0D8C80A9-0039 del 2026-09-21: nueve miembros
+  Business a USD 24 y 3000 créditos a USD 30, sin impuesto): mismos montos, ahora citan la factura. Y
+  `commitmentRenewsOn: "2026-11-16"` en los tres precios de Adobe, con esa misma fecha como `reviewBy`.
+- [`adobe-without-discount.change.json`](../../../data/pricing/v3-operating/adobe-without-discount.change.json)
+  (v9 → v10): Creative Cloud Pro se cotiza sin su descuento, por decisión del CEO. `current` pasa a CLP 325.405,5 al
+  mes, `estimated`; el importe facturado, CLP 162.605, queda como `invoiced-with-discount`, `confirmed`;
+  `renewal-scenario` desaparece. Adobe Express y las demás herramientas no cambian.
+
+Los previews de los dos últimos se reprodujeron el 2026-10-11 sobre su base (v8 y v9), con los mismos argumentos y
+el mismo resultado. Los dos primeros previews se reproducen sobre su base (exit 0, `status` `review_only`); el digest de un preview de policy
+también depende del catálogo y de los créditos que se le pasan:
+
+```bash
+pnpm --silent pricing:v3 resources preview --catalog data/pricing/v3-operating/catalog.review-v9.json \
+  --policy data/pricing/v3-operating/resources.review-v6.json \
+  --credits data/pricing/v3-resources/ai-credits.review-v1.json \
+  --input data/pricing/v3-operating/adobe-invoice.change.json
+
+pnpm --silent pricing:v3 resources preview --catalog data/pricing/v3-operating/catalog.review-v9.json \
+  --policy data/pricing/v3-operating/resources.review-v7.json \
+  --credits data/pricing/v3-resources/ai-credits.review-v1.json \
+  --input data/pricing/v3-operating/supplier-contract-terms.change.json
+```
+
+**Qué significan las señales.** Un cambio de policy que mueve su `source.effectiveFrom` deja fuera a las demandas
+con fecha anterior: desde la v7 una demanda fechada antes del 2026-10-11 devuelve `RESOURCE_POLICY_NOT_EFFECTIVE`
+con `--current`. Un plazo que cambia entre versiones no cambia ningún precio ni total: cambia el digest y la lectura
+de `compose commitments`, y un artefacto congelado conserva la lectura de la policy que congeló.
+
+**Qué no hacer.**
+
+- No cargar una forma, una razón, un monto de puesta en marcha ni un plazo sin la decisión del operador, ni marcar
+  `confirmed` lo que es una estimación.
+- No retirar un recurso sin reemplazar en el mismo change-set los kits que lo nombran.
+- No expresar el recargo de una forma duplicando políticas de precio.
+- No convertir a USD un precio facturado en CLP ni quitarle el IVA: se registra como se factura.
+- No usar `commitmentTermMonths` para decir cuándo se renueva un contrato: dice por cuántos meses obliga una
+  licencia. La fecha va en `commitmentRenewsOn`, y sólo cuando el operador la mostró; sin ella la lectura de
+  compromisos supone un plazo entero desde el primer mes cotizado.
+- No dejar como `current` un precio con un descuento que está por terminar sin que el operador lo decida, ni volver
+  a cargar `renewal-scenario`.
+
 ## Problemas comunes
 
 | Síntoma                                                                                                  | Causa                                                                                                                                                 | Qué hacer                                                                                                                                                                                                                                             |
@@ -506,6 +718,10 @@ Como todo cambio, es una versión nueva del catálogo y rige por fecha:
 | Una cotización con el catálogo nuevo da el precio de antes y trae `runNotices.laterCatalogValues`        | La demanda está fechada antes del `effectiveFrom` del cambio: los valores se toman por `quoteDate`, no por el archivo                                 | Copiar la demanda con la fecha del día y volver a correr                                                                                                                                                                                              |
 | Exit 2, `AMBIGUOUS_SELECTION` en `lines.<lineId>.talentFactor` en toda cotización de un país             | Un segundo registro de factor con otro `recordId` para el mismo país. `catalog preview` y `catalog apply` lo aceptan; bloquea recién al cotizar       | Se detecta probando el sucesor antes de mover el puntero. Para corregir: versión nueva con `{ "operation": "retire", "recordId": "<duplicado>", "effectiveFrom": "<fecha posterior a su inicio>" }` y mover el puntero. Las fechas en que el duplicado estuvo vigente siguen ambiguas |
 | Exit 2, `AMBIGUOUS_PRICE_ROUNDING` en toda cotización de una moneda                                      | Una segunda regla general de redondeo para la misma moneda                                                                                            | El múltiplo se cambia con `replace` de la regla existente, no con un segundo `add`                                                                                                                                                                    |
+| Exit 2, `MISSING_CATALOG_SELECTION` en `lines.<lineId>.setup` (u otro requisito) en toda línea de un kit, tras un cambio de catálogo | Se retiró un recurso que el kit todavía lista en `candidateResourceIds`. `catalog preview` y `catalog apply` lo aceptan; bloquea recién al cotizar | Versión nueva que reemplace el kit para que nombre el recurso vigente, y mover el puntero. Se detecta cotizando una línea de cada kit antes de mover el puntero |
+| Exit 2, `AMBIGUOUS_SELECTION` o `MISSING_CATALOG_SELECTION` en `engagementForm`                          | Dos registros `engagement_factor` del mismo nivel para una forma, o ninguno vigente a la fecha de la demanda                                           | Un registro por forma y nivel: `replace` para cambiar la razón, `retire` del duplicado. Una forma nueva es un `add` con decisión del operador                                                                                                          |
+| Exit 2, `RESOURCE_POLICY_NOT_EFFECTIVE` en demandas que antes calculaban, tras emitir una policy          | El reemplazo movió `source.effectiveFrom` de la policy a una fecha posterior a la de esas demandas                                                     | Es lo esperado: una demanda nueva lleva la fecha del día; un caso anterior se repite con las versiones de su fecha                                                                                                                                     |
+| Exit 2, `RESOURCE_ALLOCATION_REQUIRED` en `<periodo>:<toolId>` en demandas que antes calculaban            | Se agregó una tarea a la receta de un perfil (`profileTasks`)                                                                                          | Cada demanda con ese perfil declara la asignación o excluye la tarea con motivo. Revisar los casos abiertos antes de mover el puntero                                                                                                                  |
 | Exit 2, `UNSUPPORTED_COUNTRY` con un país recién agregado                                                | Faltó `dimensions.countriesAdd` en el change-set                                                                                                      | Versión nueva que declare el país                                                                                                                                                                                                                     |
 | Exit 1, `CATALOG_BASE_CONFLICT` o `CATALOG_PREVIEW_CONFLICT`                                             | El `baseDigest` no es el de la base cargada, o el `--confirm` no es el del preview vigente                                                            | Tomar `digest` de `catalog validate --current`, repetir `preview` y usar su `previewDigest`                                                                                                                                                           |
 

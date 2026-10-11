@@ -295,9 +295,10 @@ Estado: **Approved for validation**.
 [Pricing V3](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) permite seleccionar
 el equipo interno y las herramientas necesarias, prorratear paquetes/plataforma por capacidad declarada y
 planear créditos IA adicionales. El expediente aporta demanda; el catálogo/policy aporta precios, unidades,
-variantes y reglas. Adobe se selecciona para trabajo visual, IA según necesidad; no todo perfil recibe toda suite.
-Notion/Microsoft 365 son base interna. La evidencia de Adobe combinado impide duplicar Express; capacidad
-nominativa y acceso contratado siguen verificándose.
+variantes y reglas. Adobe se selecciona según el trabajo (Creative Cloud Pro para diseño, Adobe Express para perfiles
+de contenido), IA según necesidad; no todo perfil recibe toda suite. Notion/Microsoft 365 son base interna. Creative
+Cloud Pro ya incluye Express: no se cargan ambos a la misma persona; capacidad nominativa y acceso contratado siguen
+verificándose.
 
 En `managed_service`, el preview muestra fee por período y setup cuando corresponde; personas, proveedores,
 rates, margen y país del talento quedan internos. Esa proyección respeta la unidad del pod; no convierte costo
@@ -312,6 +313,12 @@ margen real sobre personas hoy es mayor que el simulado. El país de cada person
 cliente ajusta el precio del componente humano; donde ese factor baja el precio, el piso se lee sobre el precio del
 mercado base. Cada moneda redondea a su múltiplo, el tipo de cambio de cotización es un valor de política y todavía
 no se puede cotizar en EUR; los valores vigentes están en el manual.
+Adobe se costea como se factura: dos productos, tres licencias cada uno, en CLP y con IVA por decisión del CEO, con
+contrato de doce meses pagado al mes. Creative Cloud Pro tiene un 50% de descuento que el CEO espera que termine en unos
+dos meses: un pod que dure más se cotiza con el precio de renovación. El onboarding por persona que el cotizador costea
+desde ese día (USD 200, estimado; reclutamiento USD 500 sólo si hay que contratar) aplica a una persona vendida por
+dedicación; el kit de servicio gestionado no trae requisito de puesta en marcha, así que el onboarding/immersion del §10
+no entra solo a la cotización del pod.
 
 Explicación/replay usan snapshots congelados. Readiness distingue cálculo de validación económica y aprobación.
 Portfolio declara clientes, interno y no asignado; no prueba inventario real. Cambios de salarios/licencias/packs

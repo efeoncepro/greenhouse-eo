@@ -20,3 +20,10 @@ Desde el 2026-10-11 el catálogo de créditos vigente lo nombra el puntero
 prueba exige que nombre la versión de número más alto y, si no, `pnpm pricing:v3:test` falla. El catálogo v6 del
 flujo operativo agrega además un tipo de cambio de cotización EUR→USD de 1,20 (estimado) que rige desde el
 2026-10-11 sin fecha de término; la referencia del BCE anterior valía sólo el 2026-10-09.
+
+Desde el 2026-10-11 dos lecturas de un artefacto congelado usan estos presupuestos sin recalcularlos. `compose cash`
+cuenta como caja nueva a proveedores sólo los packs extra; la parte de suscripción atribuida ya está financiada.
+`compose commitments` lista los créditos sobrantes de un pack con su vencimiento (si siguen válidos después del
+último período o caducan dentro de él). Por cuánto tiempo está comprometida la suscripción de cada proveedor no
+está en este catálogo: la lectura lo declara como no derivable (`CREDIT_SUBSCRIPTION_TERM_NOT_FROZEN`).
+[Decisión](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--tres-lecturas-de-una-cotización-congelada-calendario-caja-y-compromisos).

@@ -8,7 +8,7 @@
 - Modelo funcional: [prototipo V3](cotizador-cli-modelo-propuesto.md).
 - ADRs de referencia: [Quote API Parity](../../architecture/GREENHOUSE_QUOTE_API_PARITY_DECISION_V1.md) y [Full API Parity](../../architecture/GREENHOUSE_FULL_API_PARITY_DECISION_V1.md).
 
-Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)). El cotizador canónico no cambia. Las claves del resumen que imprime la CLI, los avisos de la corrida y la lectura de exposición a datos estimados, también del 2026-10-11, están en [Resumen: avisos de la corrida y exposición a estimados](#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
+Esta definición fija comportamiento, estructura y criterios de aceptación. No fija salarios, porcentajes de tier, factores comerciales, tarifas, piso de margen o costos de Talent Assurance. El [manual ejecutable](../../manual-de-uso/finance/cotizar-v3-por-cli.md) distingue operaciones implementadas y límites de los contratos locales: 1.0.0, desde el 2026-10-10 1.1.0 (ver [Contrato 1.1.0](#contrato-110--ajustes-comerciales-y-redondeo-2026-10-10)) y desde el 2026-10-11 1.2.0 (ver [Contrato 1.2.0](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11)) y 1.3.0 (ver [Contrato 1.3.0](#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11)): cuatro contratos conviven. El cotizador canónico no cambia. Las claves del resumen que imprime la CLI, los avisos de la corrida y la lectura de exposición a datos estimados, también del 2026-10-11, están en [Resumen: avisos de la corrida y exposición a estimados](#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
 
 ## Bloque 2 — Contrato del prototipo
 
@@ -33,9 +33,10 @@ Se distinguen `request` (qué se quiere cotizar), `resolvedContext` (datos y pol
 
 | Campo de `request`                           | Regla                                                                                                                           |
 | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `schemaVersion`                              | Obligatorio; versión inicial `1.0.0`; desde el 2026-10-10 también `1.1.0` y desde el 2026-10-11 `1.2.0`, cada una con su propio motor; rechazar versión no soportada |
+| `schemaVersion`                              | Obligatorio; versión inicial `1.0.0`; desde el 2026-10-10 también `1.1.0` y desde el 2026-10-11 `1.2.0` y `1.3.0`, cada una con su propio motor; rechazar versión no soportada |
 | `quoteDate`                                  | Fecha ISO `YYYY-MM-DD`, válida y explícita; el agente puede proponer la fecha actual, pero la registra en la solicitud          |
 | `offerId`, `deliveryModel`, `engagementCode` | Oferta, modalidad de entrega y engagement separados; resolver desde catálogo, sin crear otra oferta por usar Staff Augmentation |
+| `engagementForm`                             | Opcional, sólo en `1.3.0`: la forma del trabajo (`on_going`, `on_demand`), dato aparte de `engagementCode`; ausente, nada cambia                    |
 | `offerMarketCountry`                         | País/mercado de venta confirmado, código ISO de país; mercados regionales requieren futura extensión expresa                    |
 | `outputCurrency`                             | Moneda explícita y habilitada en el registro de monedas; ninguna moneda se deduce del país                                      |
 | `duration`                                   | En V1: `{ unit: "month", periods: entero positivo }`; meses completos, sin prorrateo de días implícito                          |
@@ -137,15 +138,15 @@ Mismas entradas/configuración y motor producen el mismo resultado y digest inde
 
 Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Todo lo anterior de este bloque describe el contrato 1.0.0, que no cambió; esta sección describe lo que agrega 1.1.0. Fuentes ejecutables: [`schemas.ts`](../../../src/lib/finance/pricing-v3/schemas.ts), [`calculate.ts`](../../../src/lib/finance/pricing-v3/calculate.ts) y [`catalog/resolve.ts`](../../../src/lib/finance/pricing-v3/catalog/resolve.ts).
 
-**Versiones.** El kernel acepta dos contratos de entrada (tres desde el 2026-10-11: la [sección siguiente](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11) agrega `1.2.0`) y firma cada resultado con el motor de su contrato. El registro cerrado es `PRICING_V3_ENGINES` (`schemas.ts`); `ENGINE_VERSION` dejó de existir. Cada contrato nombra su propia aritmética en `precisionPolicy` (`PRICING_V3_PRECISION_POLICIES`, `calculate.ts`).
+**Versiones.** El kernel acepta dos contratos de entrada (cuatro desde el 2026-10-11: las secciones siguientes agregan [`1.2.0`](#contrato-120--el-piso-acompaña-al-factor-de-mercado-2026-10-11) y [`1.3.0`](#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11)) y firma cada resultado con el motor de su contrato. El registro cerrado es `PRICING_V3_ENGINES` (`schemas.ts`); `ENGINE_VERSION` dejó de existir. Cada contrato nombra su propia aritmética en `precisionPolicy` (`PRICING_V3_PRECISION_POLICIES`, `calculate.ts`).
 
 | `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué admite |
 | --- | --- | --- |
 | `1.0.0` | `pricing-v3-local/1.0.0` | Lo de siempre, byte a byte: a lo más un `discount`, sin redondeo comercial. Rechaza cualquier campo nuevo |
 | `1.1.0` | `pricing-v3-local/1.1.0` | Hasta 10 ajustes (`discount` o `agreed_net`) sobre filas disjuntas y `snapshot.priceRounding` opcional |
 
-- La versión la declara la entrada, y request y snapshot llevan la misma. El motor no la infiere ni la sube. Una entrada que no declara `1.1.0` ni, desde el 2026-10-11, `1.2.0` (otra versión, ninguna o un documento mal formado) se juzga con el esquema 1.0.0 y conserva los diagnósticos de siempre.
-- En el carril de catálogo y composición el que llama no elige contrato: la resolución emite `1.1.0` sólo si el brief trae un ajuste que no sea un único `discount`, más de un ajuste, o si el catálogo tiene una regla `price_rounding` vigente a `quoteDate` para la moneda de salida. En cualquier otro caso emite `1.0.0`. La decisión depende sólo de lo congelado, así que una cotización anterior vuelve a resolver al mismo contrato y al mismo digest. Desde el 2026-10-11 hay una condición previa: si el factor de mercado elegido declara `floorBasis`, emite `1.2.0`; sin eso, vale lo dicho aquí.
+- La versión la declara la entrada, y request y snapshot llevan la misma. El motor no la infiere ni la sube. Una entrada que no declara `1.1.0` ni, desde el 2026-10-11, `1.2.0` o `1.3.0` (otra versión, ninguna o un documento mal formado) se juzga con el esquema 1.0.0 y conserva los diagnósticos de siempre.
+- En el carril de catálogo y composición el que llama no elige contrato: la resolución emite `1.1.0` sólo si el brief trae un ajuste que no sea un único `discount`, más de un ajuste, o si el catálogo tiene una regla `price_rounding` vigente a `quoteDate` para la moneda de salida. En cualquier otro caso emite `1.0.0`. La decisión depende sólo de lo congelado, así que una cotización anterior vuelve a resolver al mismo contrato y al mismo digest. Desde el 2026-10-11 hay dos condiciones previas, en este orden: si el brief declara la forma del trabajo (`engagementForm`), emite `1.3.0`; si no, y el factor de mercado elegido declara `floorBasis`, emite `1.2.0`; sin ninguna de las dos, vale lo dicho aquí.
 - Un cambio futuro de comportamiento agrega contrato y motor al registro; nunca modifica un contrato ya usado.
 
 **Ajustes.** En el kernel van en `request.adjustments`; en catálogo y composición, en `brief.adjustments`.
@@ -167,7 +168,7 @@ Decisión: [ADR del motor 1.1](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1
 - Conservación del piso: si la fila cumplía su `minimumMargin` antes de redondear, el precio redondeado es el menor múltiplo que también lo cumple sobre los importes presentados. Si no lo cumplía, sólo sube al múltiplo siguiente: el redondeo no repara una política que vende bajo su piso.
 - «Cumplía antes de redondear» se lee sobre los importes sin redondear, a 60 de los 80 dígitos de trabajo. `MARGIN_BELOW_FLOOR` sigue comparando sin tolerancia alguna.
 
-**Forma del resultado.** Filas y totales de un resultado 1.1.0 agregan `roundingAdjustment` y `uplift`. Identidad: `net = undiscountedPrice + uplift − discount`, y `undiscountedPrice` ya incluye el redondeo (precio de política = `undiscountedPrice − roundingAdjustment`). Un resultado 1.0.0 no tiene ninguna de las dos claves: no van en cero, no van, porque agregarlas cambiaría el digest de los artefactos anteriores. Los totales de una quote de catálogo o composición suman las dos claves sólo cuando la quote es 1.1.0 o, desde el 2026-10-11, 1.2.0.
+**Forma del resultado.** Filas y totales de un resultado 1.1.0 agregan `roundingAdjustment` y `uplift`. Identidad: `net = undiscountedPrice + uplift − discount`, y `undiscountedPrice` ya incluye el redondeo (precio de política = `undiscountedPrice − roundingAdjustment`). Un resultado 1.0.0 no tiene ninguna de las dos claves: no van en cero, no van, porque agregarlas cambiaría el digest de los artefactos anteriores. Los totales de una quote de catálogo o composición suman las dos claves sólo cuando la quote es 1.1.0 o, desde el 2026-10-11, 1.2.0 o 1.3.0.
 
 **Diagnósticos nuevos.** Todos son `error` del kernel y dejan el período en `invalid`; no son rechazos del registro de `errors.ts`.
 
@@ -189,7 +190,7 @@ En composición suben a `diagnostics` del resumen como bloqueos, con totales nul
 
 Decisión: [delta 1.2.0 del ADR del motor](../../architecture/GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado). Los contratos 1.0.0 y 1.1.0 no cambiaron, byte a byte; esta sección describe sólo lo que agrega 1.2.0. Fuentes ejecutables: las tres de la sección anterior y [`pricing-v3-market-floor.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-market-floor.test.ts), que deriva la regla a mano con entradas pequeñas.
 
-**Versiones.** Conviven tres contratos. `1.2.0` es un superconjunto de `1.1.0`: admite todo lo de la tabla anterior y un campo más.
+**Versiones.** Con éste conviven tres contratos (cuatro desde la tarde del mismo día, con [1.3.0](#contrato-130--la-forma-del-trabajo-como-dato-propio-2026-10-11)). `1.2.0` es un superconjunto de `1.1.0`: admite todo lo de la tabla anterior y un campo más.
 
 | `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué agrega |
 | --- | --- | --- |
@@ -235,9 +236,72 @@ Identidades: `net = undiscountedPrice + uplift − discount`, sin cambio, y `und
 
 **Fuera de 1.2.0.** Factores por tipo de cliente (se expresan como `agreed_net`), factores de talento por perfil o seniority (se expresan como costo `specific`), un piso distinto por país escrito a mano y cualquier otra base del piso.
 
+### Contrato 1.3.0 — la forma del trabajo como dato propio (2026-10-11)
+
+Los contratos 1.0.0, 1.1.0 y 1.2.0 no cambiaron, byte a byte; esta sección describe sólo lo que agrega 1.3.0. Qué es la forma del trabajo y por qué existe, en lenguaje simple: [superficie implementada](cotizador-v3-superficie-implementada.md#forma-del-trabajo-on-going-y-on-demand-2026-10-11). Fuentes ejecutables: [`schemas.ts`](../../../src/lib/finance/pricing-v3/schemas.ts), [`calculate.ts`](../../../src/lib/finance/pricing-v3/calculate.ts), [`catalog/resolve.ts`](../../../src/lib/finance/pricing-v3/catalog/resolve.ts) y [`pricing-v3-engagement-form.test.ts`](../../../src/lib/finance/pricing-v3/__tests__/pricing-v3-engagement-form.test.ts).
+
+**Versiones.** Conviven cuatro contratos. `1.3.0` es un superconjunto de `1.2.0`: admite todo lo anterior y dos campos más.
+
+| `schemaVersion` de request y snapshot | `engineVersion` del resultado | Qué agrega |
+| --- | --- | --- |
+| `1.3.0` | `pricing-v3-local/1.3.0` | `engagementForm` opcional en el request y `engagementFactors[]` opcional en el snapshot (`{ form, priceRatio, source }`); filas y totales con el ajuste de la forma |
+
+- **Dos datos distintos.** `engagementCode` (hoy `monthly`) es la cadencia de cobro y sigue eligiendo la política de precio. `engagementForm` es la forma del compromiso que se vende. Uno no reemplaza al otro.
+- **Las formas son datos.** El kernel no conoce una lista de formas: sólo la razón de la que nombra el request. Cuáles existen lo decide el catálogo, con un registro `engagement_factor` por forma, `{ form, priceRatio, offerId? }`. El registro de una oferta prevalece sobre el general de la misma forma. Hoy hay dos, ambos generales: `on_going` con razón 1 y `on_demand` con razón 1,10.
+- **Quién elige el contrato.** En catálogo y composición la resolución emite `1.3.0` si y sólo si el brief declara `engagementForm`, también cuando la razón es 1: la forma declarada es parte de lo que la cotización congela. Sin el campo emite el contrato de siempre (`1.0.0` a `1.2.0`) y el resultado es idéntico byte a byte al de antes. Un contrato anterior que traiga las claves nuevas se rechaza; no se reinterpreta.
+- **Nunca se asume una razón.** Una forma declarada sin registro vigente a `quoteDate` bloquea la cotización; no se cotiza a razón 1 en silencio.
+
+**Cómo entra al precio.** La razón multiplica el precio de cada componente de la fila —persona, fee de plataforma, provisiones y herramientas—, en las filas mensuales y en las de implementación. Orden: política de precio → factor de mercado → **razón de la forma** → redondeo comercial → `discount` o `agreed_net`.
+
+- El costo no cambia.
+- El piso no se mueve: `minimumMargin` y `floorNet` de una fila son, cifra por cifra, los de la misma fila cotizada sin forma. El neto que se compara contra ese piso sí lleva la razón. Una razón mayor que 1 es margen que la fila realmente tiene, y un descuento puede consumirla hasta el mismo piso. Una razón menor que 1 (un descuento por compromiso, que hoy no existe en el catálogo) podría dejar la fila bajo su piso, y se marcaría como cualquier otro precio.
+- Con un factor de mercado que lee su piso sobre el mercado base (`floorBasis`), el precio del mercado base se toma bajo la misma forma. Por eso `marketAdjustment`, `marketPriceRatio` y `floorNet` son los mismos con forma y sin ella.
+
+**Forma del resultado.** Un resultado 1.3.0 tiene todas las claves de 1.2.0 y además:
+
+| Dónde | Clave | Qué es |
+| --- | --- | --- |
+| Fila | `engagementAdjustment` | Precio de política con la razón menos el mismo precio a razón 1, antes del redondeo comercial; cero con razón 1 |
+| Fila | `engagementPriceRatio` | La razón aplicada, como cadena decimal; `"1"` sin forma o con la forma de referencia |
+| Totales | `engagementAdjustment` | Suma de las filas; en una quote de varios períodos, suma de los períodos |
+
+Identidades: `net = undiscountedPrice + uplift − discount`, sin cambio; `undiscountedPrice − roundingAdjustment − engagementAdjustment` es el precio del mercado de la oferta a razón 1, y restándole además `marketAdjustment` queda el precio del mercado base a esa razón. Un resultado 1.0.0, 1.1.0 o 1.2.0 no tiene ninguna de estas claves, tampoco en cero.
+
+**Lectura.** El resumen `pricing-v3-composition-summary/1` agrega, sólo cuando el brief declara la forma, el bloque `engagementForm` (`{ form, priceRatio, scope, offerId, recordId, revision, sourceStatus }`, con `scope` `"general"` u `"offer"`) y `engagementAdjustment` en `totals` y en los totales por período. `explain` y `compose assess` repiten el bloque (`commercialAdjustments.engagementForm` y `margin.policyFloor.engagementForm`). `compose preview` y las proyecciones cliente muestran sólo el neto final.
+
+**Modos de falla.**
+
+| Situación | Qué pasa |
+| --- | --- |
+| El brief declara una forma sin registro vigente a `quoteDate` (una forma que no existe, o una fecha anterior al 2026-10-11) | Bloqueo `MISSING_CATALOG_SELECTION` en la ruta `engagementForm`; `needs_input`, salida 2 |
+| Dos registros vigentes del nivel que prevalece (dos generales, o dos de la misma oferta) | Bloqueo `AMBIGUOUS_SELECTION` en `engagementForm`; salida 2 |
+| El kernel recibe directamente un request con forma y un snapshot sin su razón | Diagnóstico `MISSING_ENGAGEMENT_FACTOR`; sin total |
+| El brief no declara la forma | No es una falla: se cotiza como siempre, que equivale a On-Going, y **no hay aviso** |
+
+**Ejemplo congelado.** [`designer-on-demand.demand.json`](../../../data/pricing/v3-operating/designer-on-demand.demand.json) → `.artifact.json` es el primer artefacto firmado por el motor 1.3.0, y la guarda de artefactos lo exige. Cifras del artefacto congelado (corrida del 2026-10-11 con la policy v7, Adobe con el descuento con que se factura): neto CLP 2.790.000, costo 1.768.438, `engagementAdjustment` 252.635, ninguna línea bajo el piso. La misma demanda con `on_going` daba 2.540.000 con el mismo costo y los mismos `floorNet`. Vuelta a cotizar ese día con `--current` y la policy v10, que toma Creative Cloud Pro sin descuento: costo 1.822.704, neto 2.870.000 On-Demand (`engagementAdjustment` 260.387) y 2.610.000 con `on_going`, ninguna línea bajo el piso.
+
+**Fuera de 1.3.0.** Una forma híbrida (se cotiza como dos cotizaciones: una base On-Demand y una operación On-Going) y una de licencia o consultoría, que no están cargadas; un tope para la razón; la duración del contrato como dato de entrada (una cotización tiene períodos, no un plazo); períodos de menos de un mes (se expresan como horas dentro de un período); y los costos de terceros de un trabajo y una reserva de contingencia para alcance fijo, que tienen diseño pero no están construidos.
+
+### Lecturas de una cotización congelada (2026-10-11)
+
+Cuatro operaciones leen un artefacto de composición sin recalcular precios: `compose split` (que ya existía) y las tres nuevas. Todas verifican primero el artefacto por replay, todas llevan `binding: false` y ninguna cambia el total. Qué pregunta responde cada una: [superficie implementada](cotizador-v3-superficie-implementada.md#tres-lecturas-de-una-cotización-congelada-2026-10-11). Fuentes ejecutables: [`resources/engagement-view.ts`](../../../src/lib/finance/pricing-v3/resources/engagement-view.ts) y [`resources/commitment-exposure.ts`](../../../src/lib/finance/pricing-v3/resources/commitment-exposure.ts).
+
+| Operación | `schemaVersion` de la salida | Entrada además del artefacto | Salida | Falla |
+| --- | --- | --- | --- | --- |
+| `compose schedule` | `pricing-v3-payment-schedule/1` | `--milestones`: arreglo JSON de `{ id, label, share, periodId? \| when? }` | 3 | `SCHEDULE_MILESTONES_INVALID` (salida 1, `option: "milestones"`, `issues[]`); `SCHEDULE_REQUIRES_CALCULATED_QUOTE` (salida 1) |
+| `compose cash` | `pricing-v3-engagement-cash/1` | — | 3 | `ENGAGEMENT_CASH_REQUIRES_CALCULATED_QUOTE` (salida 1) |
+| `compose commitments` | `pricing-v3-commitment-exposure/1` | — | 3; 2 si la cotización no está calculada | — |
+
+- **Calendario.** `share` es una cadena decimal y las partes deben sumar exactamente 1 (regla `shares_must_sum_to_one`). Cada monto se lee al múltiplo de redondeo de la cotización; el último hito es el neto menos los anteriores (`takesRemainder: true`, y `remainder.absorbed` dice cuánto redondeo absorbió). `tax` y `total` son `null` salvo que la cotización haya resuelto el impuesto.
+- **Caja.** `results.marginAtFullCost` es el margen del resultado congelado y es la cifra que decide viabilidad. `results.cashAddedOnContractedCapacity` es `net − newSupplierCash`, y la salida lo marca `isMargin: false` y `decidesPrice: false`. `restsOn` enumera los supuestos y `notDerivable` lo que el artefacto no permite saber (si una licencia se compra para el trabajo, a quién se paga un fee, nada de lo cobrado).
+- **Compromisos.** Cada entrada de `commitments[]` trae `committed`, `attributedWithinPeriods`, `unrecovered`, y reparte ese resto entre `strandedIfNothingElseUsesIt` y `releasedToSharedCapacity` según si la demanda declara la capacidad como compartida. `shorterCommitmentPrices` lista los precios de menor compromiso que la policy ofrece para la misma herramienta. `notDerivable` nombra las herramientas cuyo precio no declara plazo de contrato (`CONTRACT_TERM_NOT_FROZEN`) y las suscripciones de créditos cuyo plazo no está en el artefacto (`CREDIT_SUBSCRIPTION_TERM_NOT_FROZEN`). La lectura usa la policy que el artefacto congeló: un artefacto anterior a la declaración de un plazo sigue mostrando esa herramienta como no declarada. Cuando el precio declara la fecha de renovación, la entrada trae además `commitment.termStartKnown`, `renewsOn`, `boundUntil` (hasta cuándo queda atada la licencia) y `renewsWithinQuotedPeriods`; `committed` es entonces lo atribuido dentro de la cotización más los meses que quedan, no un plazo entero, y su `notDerivable` lleva `commitment.exitTerms` en lugar de `commitment.termStart`. Si los períodos cotizados cruzan una renovación se suma la señal `COMMITMENT_RENEWS_WITHIN_ENGAGEMENT`, con el mismo importe del compromiso: no es dinero aparte. Límite conocido: un precio con plazo y sin fecha de renovación se sigue leyendo como un plazo entero desde el primer período cotizado que usa el precio, que sobrestima un contrato que ya está corriendo; con fecha, un mes cubierto en parte cuenta entero, así que puede sobrar hasta un mes.
+- **El plazo es un dato de la policy.** `commitmentTermMonths` (entero de 1 a 120, opcional, por precio de herramienta) dice cuántos meses hay que seguir pagando una licencia una vez tomada. Habla de la licencia, no del papel del contrato: un contrato anual cuya cuenta baja apenas se quita una licencia obliga por 1; uno cuya licencia se sigue cobrando hasta que el contrato se renueva obliga por 12. Facturación (`price.unit`) y compromiso son hechos separados. El valor 1 también es una declaración —se paga mes a mes y se puede dejar—, distinta de no declarar nada. El campo no entra a ningún cálculo ni a un resultado congelado; sólo alimenta la lectura de compromisos. Un precio todavía pendiente no admite plazo. `commitmentRenewsOn` (fecha ISO, opcional) es la fecha en que se renueva el contrato y sólo se admite junto con `commitmentTermMonths`: el plazo dice cuánto obliga una licencia, la fecha dice en qué punto está el plazo que ya corre. Las renovaciones son esa fecha y cada plazo después de ella (una fecha ya pasada avanza a la siguiente); la licencia queda atada hasta la primera renovación estrictamente posterior al último día del último mes cotizado que usa el precio, y los meses que quedan son los meses calendario posteriores a ese período que empiezan antes de esa fecha. Un plazo de 1 nunca produce una entrada ni levanta `CONTRACT_RENEWAL_NOT_DECLARED`, con fecha o sin ella. Los precios con `unit: "year"` ignoran los dos campos.
+
+Estas lecturas contienen costo y margen. Son vistas internas, no documentos para el cliente.
+
 ### Resumen: avisos de la corrida y exposición a estimados (2026-10-11)
 
-Este cambio no agrega contrato ni motor: los tres contratos del kernel (`1.0.0`, `1.1.0`, `1.2.0`) y los artefactos congelados quedan iguales. Cambia lo que la CLI **lee y avisa** alrededor del cálculo. Fuentes ejecutables: [`resources/summary.ts`](../../../src/lib/finance/pricing-v3/resources/summary.ts), [`resources/price-review.ts`](../../../src/lib/finance/pricing-v3/resources/price-review.ts), [`adapters/current-versions.ts`](../../../src/lib/finance/pricing-v3/adapters/current-versions.ts) y [la CLI](../../../scripts/commercial/pricing-v3.ts).
+Este cambio no agrega contrato ni motor: los contratos del kernel que existían esa mañana (`1.0.0`, `1.1.0`, `1.2.0`) y los artefactos congelados quedan iguales. El contrato `1.3.0` llegó esa tarde y está en la sección anterior. Cambia lo que la CLI **lee y avisa** alrededor del cálculo. Fuentes ejecutables: [`resources/summary.ts`](../../../src/lib/finance/pricing-v3/resources/summary.ts), [`resources/price-review.ts`](../../../src/lib/finance/pricing-v3/resources/price-review.ts), [`adapters/current-versions.ts`](../../../src/lib/finance/pricing-v3/adapters/current-versions.ts) y [la CLI](../../../scripts/commercial/pricing-v3.ts).
 
 **Qué versiones entran al cálculo.** Un puntero, `data/pricing/v3-operating/current.json` (`pricing-v3-current/1`), nombra el catálogo, la policy y el catálogo de créditos vigentes. Con `--current` la CLI toma de ahí las fuentes que no se pasaron y las verifica antes de usarlas. El contrato del kernel no conoce el puntero: recibe, como siempre, fuentes ya resueltas, y el artefacto congela las tres dentro. Operación del puntero: [mantenimiento del catálogo](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
 
@@ -247,7 +311,7 @@ Este cambio no agrega contrato ni motor: los tres contratos del kernel (`1.0.0`,
 | --- | --- |
 | ¿Qué corrida es y con qué motor? | `schemaVersion`, `version`, `binding` (siempre `false`), `commercialUnit`, `calculationId`, `replayDigest` (sólo `quote`), `engineVersion` |
 | ¿En qué estado quedó? | `calculationStatus`, `reviewStatus`, `quoteReviewStatus`, `diagnostics` (bloqueos), `assumptions`, `reviewSignals` |
-| ¿Cuánto da? | `totals`, `periods`, `marginRateRoundedDown`, `commercialAdjustments`, `priceRounding`, `marketFactor` (sólo si el factor de mercado cambia algo) |
+| ¿Cuánto da? | `totals`, `periods`, `marginRateRoundedDown`, `commercialAdjustments`, `priceRounding`, `marketFactor` (sólo si el factor de mercado cambia algo), `engagementForm` (sólo si el pedido declara la forma del trabajo) |
 | ¿Cumple el piso? | `marginFloor` |
 | ¿Qué herramientas y qué caja? | `toolSelections`, `attributions`, `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` |
 | ¿Qué dato estimado pesa más? | `estimateExposure` |

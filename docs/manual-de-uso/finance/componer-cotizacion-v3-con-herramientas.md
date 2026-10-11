@@ -36,7 +36,9 @@ Un pedido nuevo se cotiza con las versiones vigentes (`--current`, [cómo](opera
    conserva EUR; baseline carece de EUR/FX EUR→USD y por eso bloquea su suma hasta actualizar catálogo.
    El catálogo operativo vigente sí lo tiene: `fx:EUR:USD`, un FX de cotización estimado que rige desde el
    2026-10-11 ([detalle](operar-cotizador-v3-con-agentes.md#cotizar-en-otra-moneda)). Es sólo para el costo de la
-   herramienta: una cotización no se emite en EUR.
+   herramienta: una cotización no se emite en EUR. Con las versiones vigentes Adobe tiene precio en CLP y la
+   demanda nombra además `fx:CLP:USD`
+   ([Herramientas con contrato](operar-cotizador-v3-con-agentes.md#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor)).
    Usar [mantenimiento](catalogo-v3-seleccion-y-actualizacion.md), nunca una tasa inventada inline.
 8. Preparar, corregir diagnósticos, cotizar y guardar artefacto nuevo. Explain/replay leen sólo el artefacto,
    sin consultar una licencia o precio nuevo. La policy, catálogos, demanda y resultados quedan congelados.
@@ -60,7 +62,11 @@ Desde el 2026-10-10 `compose prepare` y `compose quote` imprimen un resumen agru
 sección están en el artefacto que escribe `--out` y en `explain`; un rechazo (exit 1) llega con `error.code`
 ([qué hacer con cada error](operar-cotizador-v3-con-agentes.md#qué-hacer-con-cada-error)). El resumen trae además
 `estimateExposure` (cuánto del costo depende de cada dato estimado) y, cuando corresponde, `runNotices` (avisos de la
-corrida, que no bloquean y se informan al operador junto al resultado).
+corrida, que no bloquean y se informan al operador junto al resultado). Si la demanda declara la forma del compromiso
+(`brief.engagementForm`), trae también `engagementForm` y `totals.engagementAdjustment`
+([On-Demand u On-Going](operar-cotizador-v3-con-agentes.md#cotizar-on-demand-u-on-going)). Sobre el artefacto
+congelado hay además tres lecturas —calendario de pagos, caja y compromisos con proveedores—:
+[Tres lecturas de una cotización](operar-cotizador-v3-con-agentes.md#tres-lecturas-de-una-cotización).
 
 `selections`: incluido/omitido, línea, mes y razón. `attributions`: plan/precio elegido, fuente, unidad,
 usuarios, cantidad, driver, costo mensual total de las unidades seleccionadas, cuota del trabajo y parte no
@@ -82,6 +88,6 @@ de ese modelo de capacidad, no precio comercial validado del programa ni certifi
 Valores en catálogo monetario usan `catalog preview|apply` y versión nueva. Reglas/planes o packsIA usan `resources preview|apply`: replacement completo, base/contexto, evidencia y digest del impacto confirmados antes de escribir sucesor. [Contrato de mantenimiento](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md). Se valida con los casos afectados antes de dejarla vigente, lo que en el catálogo y la policy operativos se hace moviendo el [puntero](catalogo-v3-seleccion-y-actualizacion.md#versiones-vigentes-el-puntero-currentjson). Artefactos anteriores mantienen su policy. No promover valores o capacidades por
 cambiar etiquetas; no pasar `commercial_draft`: composición sigue review_only y export comercial bloqueado.
 
-En la **baseline review-v1 de este manual**, Adobe conserva cobertura/base/fecha pendientes y bloquea si se elige `current`; el ejemplo de diseño elige `historical` expresamente. La [policy sucesora review-v2](../../../data/pricing/v3-operating/README.md) tiene 180 USD combinado confirmado y 306 condicional, Notion facturado y referencias públicas explícitas, sin modificar esta baseline ni sus resultados. Precios públicos Claude no son factura real. Notion/M365/SEMrush/ChatGPT
+En la **baseline review-v1 de este manual**, Adobe conserva cobertura/base/fecha pendientes y bloquea si se elige `current`; el ejemplo de diseño elige `historical` expresamente. La [policy sucesora review-v2](../../../data/pricing/v3-operating/README.md) tiene 180 USD combinado confirmado y 306 condicional, Notion facturado y referencias públicas explícitas, sin modificar esta baseline ni sus resultados. Esos 180 y 306 USD son historia: desde la policy v7 Adobe se cotiza como se factura, dos productos en CLP y una licencia de tres por persona ([Herramientas con contrato](operar-cotizador-v3-con-agentes.md#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor)). Precios públicos Claude no son factura real. Notion/M365/SEMrush/ChatGPT
 actuales y reparto de plataforma aún requieren datos de Finance/Operations. Ejemplos tienen fracciones,
 usuarios, seats y saldos hipotéticos. No son defaults del agente ni autorización de compartir licencias.

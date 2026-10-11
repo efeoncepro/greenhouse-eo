@@ -59,7 +59,9 @@ motor. Donde este documento dice que el replay «verifica contenido y versión»
 que firmó el artefacto, y la verificación sigue siendo por recálculo y digest. Contratos, reglas y guarda:
 [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md). Desde el 2026-10-11
 el registro tiene un tercer contrato, `1.2.0` (el piso de margen acompaña al factor de mercado que lo declara),
-agregado con el mismo patrón.
+agregado con el mismo patrón. Ese mismo día, más tarde, se agregó el cuarto, `1.3.0`: la forma del engagement
+(On-Going, On-Demand) como dato propio del brief, con una razón de precio que vive en el catálogo. La fuente del
+registro es `PRICING_V3_ENGINES` en `schemas.ts`.
 
 Tres precisiones del 2026-10-11 sobre lo que este documento dice arriba:
 
@@ -74,6 +76,21 @@ Tres precisiones del 2026-10-11 sobre lo que este documento dice arriba:
 - El operador declaró el 2026-10-11 que este cotizador está pensado para reemplazar con el tiempo al cotizador de
   Greenhouse. Es una dirección, no una migración hecha: el prototipo sigue sin DB, API ni escritura en el CRM, y la
   frontera de promoción de abajo sigue vigente.
+
+Tres precisiones más, de la tarde del 2026-10-11:
+
+- «El primer alcance es Staffing/Staff Augmentation mensual» describe TASK-2016. Un encargo acotado ya se puede
+  cotizar: la forma del compromiso se declara en `engagementForm` (contrato `1.3.0`) y tres lecturas de un artefacto
+  congelado dan el calendario de pagos, la caja y los compromisos con proveedores que sobreviven a los períodos
+  cotizados (`compose schedule|cash|commitments`). Son lecturas: ninguna forma un precio.
+  [Motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio)
+  y [lecturas](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--tres-lecturas-de-una-cotización-congelada-calendario-caja-y-compromisos).
+- «Talent Assurance/setup mediante coberturas y unidades declaradas»: la puesta en marcha dejó de ser un placeholder.
+  Desde el catálogo v9 son dos provisiones costeadas por persona, y la regla del workbook de cobrar un mes del
+  recurso no entra al cotizador.
+  [Decisión](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--provisiones-de-puesta-en-marcha-costeadas-catálogo-v9).
+- Todavía no se modelan los costos de terceros de un encargo ni una reserva de contingencia para trabajo de alcance
+  fijo.
 
 El [ADR operativo vigente](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md) identifica módulos,
 fuentes y límites. [TASK-2022](../tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md) está completa

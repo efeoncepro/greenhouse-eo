@@ -257,6 +257,11 @@ servicio gestionado creativo (`creative-managed-service`, objetivo y piso 45%), 
 (`seo-aeo-managed-service`, objetivo 55%, piso 45%) y una persona vendida por dedicación (staff augmentation,
 `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%); elegir por práctica y unidad vendida, y la
 excepción de una cuenta nunca es referencia para otra.
+Si las bases piden un trabajo acotado con hitos, decláralo `engagementForm: "on_demand"`: es la forma del compromiso,
+no una cuarta oferta (+10% al precio sobre On-Going, mismo piso). Antes de comprometer la oferta revisa `compose
+schedule` (calendario de pagos por hito) y `compose commitments` (compromisos con proveedores que sobreviven al
+encargo); `compose cash` no es margen ni decide precio. Sin modelar: terceros (freelancers, producción, derechos,
+medios), reserva de contingencia de alcance fijo y el plazo del contrato: costéalos aparte y declara el supuesto.
 
 Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
 gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. managed_service proyecta fee,

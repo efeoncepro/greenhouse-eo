@@ -78,6 +78,9 @@ Delta 2026-10-11 — decisión del operador (CEO): el costo de las personas en e
 objetivo del Excel de pricing, no la nómina actual; no lo reemplaces por costos de nómina ni propongas conectarlos.
 El margen real sobre personas hoy es mayor que el simulado. Usa `--current` para tomar catálogo, policy y créditos
 vigentes en vez de nombrar versiones a mano. Las cifras y excepciones de la etapa 5 las aprueba el operador.
+La puesta en marcha se costea por persona con provisiones estimadas: onboarding (USD 200, por defecto) y reclutamiento
+(USD 500, sólo si hay que contratar a alguien para ese cliente; se selecciona en la línea). Plazo mínimo y contratación
+directa se siguen negociando en el contrato, con revisión legal, no en el precio.
 
 El reparto por capacidad declarada mantiene cliente, interno y sin asignar reconciliados; no acredita
 ocupación ni acceso reales. El desglose congelado y la evaluación de pendientes respaldan la revisión de

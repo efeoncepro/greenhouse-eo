@@ -113,6 +113,17 @@ de moneda deben conciliarse por separado; Finance debe fijar si la meta de caja 
 conceptos antes de evaluar cumplimiento. Para comparación CLP se conserva moneda original, fuente/fecha y
 snapshot del tipo de cambio según el contrato financiero vigente; no se convierte toda venta a un cambio fijo.
 
+Nota 2026-10-11 — qué resuelve hoy el cotizador local V3 para un encargo (simulación; no cambia este modelo, su estado
+ni su veredicto). On-Demand se declara en la cotización como forma del compromiso, no como oferta ni delivery model:
+suma 10% al precio sobre On-Going con el mismo piso de la oferta que se use; es política del cotizador para la forma,
+no una banda de margen Factory. La puesta en marcha, la coordinación (como dedicación de una persona) y los compromisos
+con proveedores se costean como costo, y el 10% cubre sólo riesgo y política. De una cotización congelada salen tres
+lecturas: calendario de pagos por hitos, compromisos con proveedores que sobreviven al encargo y lectura de caja sobre
+capacidad ya contratada, que no es un margen ni decide el precio; antes de comprometer un encargo se revisan las dos
+primeras. Aún no modela costos de terceros (freelancers, producción, derechos, medios), reserva de contingencia para
+alcance fijo, duración del contrato ni períodos menores a un mes. Pasos en el
+[manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
+
 ## 6. Activación, OT, alcance y responsabilidad
 
 Flujo objetivo, todavía sin automatización Factory:

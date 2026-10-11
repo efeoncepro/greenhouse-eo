@@ -369,19 +369,30 @@ USD 10 · PEN 50 · COP 50.000 · MXN 100) y en EUR aún no se emite.
 No introducir cifras del expediente como costos centrales sin fuente/fecha/mantenimiento gobernado.
 
 Portfolio reconcilia cuentas + interno + sin asignar contra capacidad declarada; no inventa clientes ni reparte
-capacidad ociosa al comprador. Adobe180 es paquete3CC+3Express;306 es renovación condicional sin fecha efectiva.
+capacidad ociosa al comprador. Adobe va como se factura: CLP con IVA (decisión del CEO), tres licencias por producto,
+Creative Cloud Pro para diseño (incluye Express) y Adobe Express para perfiles de contenido; el 50% de descuento de
+Creative Cloud Pro termina pronto y, por decisión del CEO (2026-10-11), se cotiza desde ya sin él (`current`); el
+importe facturado (`invoiced-with-discount`) sólo si el CEO lo elige para un encargo corto. Cuánto se paga una
+licencia ya tomada (CEO): Adobe hasta que renueva su contrato anual (2026-11-16); Microsoft 365 y Notion, mes a mes.
 Seats nominativos no se reducen por FTE ni permiten compartir login. GCP/Vercel requieren escenario y denominador;
 créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y remanentes/validez separados.
 FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
-`trial-*` son costos no medidos y no provisiones aprobadas. Margen sobre venta y markup no son intercambiables;
+`trial-*` son costos no medidos y no provisiones aprobadas. La puesta en marcha de una persona por dedicación ya es
+provisión estimada: onboarding USD 200 una vez por persona (por defecto) y reclutamiento USD 500 sólo si hay que
+contratar; la regla del Excel de «un mes del recurso» no se usa. Margen sobre venta y markup no son intercambiables;
 40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
 Hay tres ofertas, todas del CEO: servicio gestionado creativo (`creative-managed-service`, objetivo 45%, piso 45%),
 servicio gestionado SEO/AEO (`seo-aeo-managed-service`, objetivo 55%, piso 45%, desde 2026-10-11) y una persona
 vendida por dedicación (staff augmentation, `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%, desde
 2026-10-11); sobre el piso el objetivo sube según el caso y nunca se baja un piso para que un precio pase.
+On-Demand no es una cuarta oferta ni un delivery model: es la forma del compromiso declarada en la cotización, +10% al
+precio sobre On-Going con el mismo piso; arranque, coordinación y compromisos con proveedores van como costo.
 Las cifras y sus excepciones las decide el CEO (SKY social care 2027, 40,26%, es una y no es referencia): el agente
 lleva una recomendación verificada contra sus datos.
 
 Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con
 preview/apply/digests/impacto y evidencia nueva para montos cambiados; nunca repricea artifacts. Este carril no
 registra ledger/payroll/pagos/CRM, no compra tools y no promueve automáticamente el motor al canon.
+Tres lecturas de un artefacto: calendario de pagos (no es factura ni cobro), caja (nunca es margen ni decide precio) y
+compromisos con proveedores (una licencia Adobe comprada para un encargo de un mes se sigue cobrando hasta que renueva
+el contrato si nadie más la usa). Sin modelar: costos de terceros, reserva de contingencia de alcance fijo y duración del contrato.

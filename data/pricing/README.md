@@ -11,6 +11,12 @@ Sin `--current` la CLI se comporta como antes (baseline histórica `v3-catalog/c
 `--catalog`). Los costos por persona de esos catálogos son el costo objetivo decidido por el operador, no la nómina
 actual.
 
+**Forma del engagement y lecturas (2026-10-11).** El brief puede declarar la forma del compromiso en `engagementForm`
+(`on_going`, `on_demand`), aparte de `engagementCode`; On-Demand lleva una razón de precio que vive en el catálogo.
+Sobre un artefacto congelado hay cuatro lecturas que derivan y nunca forman un precio: `compose split`,
+`compose schedule`, `compose cash` y `compose commitments`. Detalle y cifras medidas:
+[último delta del flujo operativo](v3-operating/README.md#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
+
 - [Prototipo del motor del cotizador V3](../../docs/documentation/finance/cotizador-cli-modelo-propuesto.md): dirección confirmada; CLI como primer consumidor, motor reutilizable y futura integración al cotizador canónico con Full API Parity. País del talento y mercado separados, fee genérico, tiers y herramientas por perfil. Contrato definido abajo; parámetros comerciales e integración canónica pendientes; primera vertical local implementada bajo ADR.
 - [Contrato y pruebas/convergencia V3](../../docs/documentation/finance/cotizador-v3-contrato-y-validacion.md): bloques 2 y 3 definidos; baseline inicial de código, casos y gates de integración. Parámetros comerciales pendientes; alcance implementado y extensiones se distinguen en el manual V3.
 - [Catálogo piloto V3](v3-pilot/README.md) y [tabla de parámetros](../../docs/documentation/finance/cotizador-v3-parametros-piloto.md): escalas HubSpot separadas, confirmación del significado del costo mensual, kits propuestos y controles históricos independientes; sin habilitación comercial.

@@ -150,7 +150,8 @@ preview redactado y mantenimiento con preview/apply/digests/impacto. La referenc
 canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
 
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
-`compose prepare|quote` → `explain|replay` → `compose assess|preview`. Las versiones vigentes no se nombran a
+`compose prepare|quote` → `explain|replay` → `compose assess|preview` → lecturas del artefacto
+(`compose split|schedule|cash|commitments`). Las versiones vigentes no se nombran a
 mano: las nombra el puntero `data/pricing/v3-operating/current.json` y los comandos las cargan con `--current`
 (`current show` lo muestra). Una versión nueva se emite con `catalog apply`/`resources apply` y después se
 mueve el puntero con `current set`; no sobrescribir artifacts. Se puede cotizar en CLP, USD, COP, MXN y PEN
@@ -160,6 +161,13 @@ El país entra por dos campos distintos de la demanda y rige con `quoteDate` 202
 (país de cada persona) ajusta el costo; país no es moneda y varios factores son estimados. Con cliente en Colombia o
 Perú el piso acompaña al factor de mercado: una cotización al precio de política no sale marcada aunque su margen
 real quede bajo el piso de su oferta, así que el margen que se informa es siempre `marginRateRoundedDown`.
+La forma del compromiso va en `brief.engagementForm`: `on_going` (razón 1) u `on_demand` (razón 1,10 sobre toda la
+fila; no mueve costo ni piso). Es una forma de compromiso, no una oferta ni un modelo de entrega; sin declararla
+cotiza como On-Going y no avisa, e Híbrido son dos cotizaciones. Tres lecturas de un artefacto congelado, que no
+cambian nada: `compose schedule` (calendario de pagos, no factura), `compose cash` (caja; no es margen ni decide
+precio) y `compose commitments` (compromisos con proveedores; informa y decide el operador). Puesta en marcha por
+persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
+licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.
 Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 `compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
 el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo

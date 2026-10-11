@@ -111,3 +111,77 @@ El código vive en `adapters/current-versions.ts` (funciones puras) y la lectura
 repositorio: no es un registro del runtime de Greenhouse ni un default del cotizador canónico. La revisión periódica
 que esta decisión proponía por calendario tiene desde hoy una fecha por precio de herramienta (`reviewBy`):
 [modelo de revisión de precios](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--un-precio-unitario-no-vence-vigencia-dura-y-fecha-de-revisión).
+
+*Nota 2026-10-11 (tarde):* «cinco versiones del catálogo operativo y cinco de la policy (v2 a v6)» es el conteo de
+esa mañana. El mismo día se emitieron más; cuáles rigen lo imprime `current show`.
+
+## Delta 2026-10-11 — provisiones de puesta en marcha costeadas (catálogo v9)
+
+**Contexto.** El workbook de pricing cobra la puesta en marcha con una regla: «recruiting & onboarding fee = un mes
+del costo del recurso». En el catálogo V3 el requisito `setup` de los kits de staffing apuntaba a `trial-setup`, un
+placeholder de USD 100 marcado «test only», una vez por cuenta. Ninguno de los dos es un costo: la regla del
+workbook es un precio de protección, y el placeholder nunca se midió.
+
+**Decisión.** La regla del workbook **no** entra al cotizador. La puesta en marcha se costea con dos provisiones del
+catálogo, las dos `estimated`, propuestas por el agente y aceptadas por el operador (CEO) el 2026-10-11:
+
+| Registro | Importe | Unidad y alcance | Cuándo entra |
+| --- | --- | --- | --- |
+| `provision-account-onboarding` | USD 200 | una vez, por persona que entra a una cuenta | Por defecto: es el requisito `setup` de los siete kits de staffing |
+| `provision-recruiting` | USD 500 | una vez, por persona | Opcional: sólo cuando hay que contratar a una persona nueva para ese cliente |
+
+- **Base de las cifras.** La incorporación (accesos, brief e inmersión de marca) es el importe redondo aceptado
+  sobre unos dos días del líder, tomados del costo de catálogo de ese perfil; el reclutamiento, sobre cerca de una
+  semana de trabajo de selección. Son estimaciones, no mediciones: se medirán en las próximas dos incorporaciones
+  reales y entonces se reemplazan.
+- **Cómo se pide el reclutamiento.** Por línea, en el brief:
+  `"choices": [{ "requirementId": "recruiting", "resourceId": "provision-recruiting" }]`. Nunca entra por defecto.
+- **Dónde caen.** En la única fila `setup` de la línea, y llevan el margen de la oferta, porque la política forma el
+  precio sobre todos los costos. Bajo el contrato 1.3.0 toman además la razón de la forma del engagement, como toda
+  la fila.
+- **`trial-setup` se retira** desde el 2026-10-11. Una cotización con fecha anterior lo sigue resolviendo, y los
+  artefactos que lo usaron no cambian.
+- **`managed-service-core` no tiene requisito de puesta en marcha**, ni antes ni después. Sus dos provisiones
+  mensuales opcionales (cobertura de reemplazo y guardia de alertas) no cambiaron.
+- **Consecuencia que hay que decir.** Antes la puesta en marcha era una vez por cuenta; ahora es por persona. Una
+  persona que se suma después paga su propia incorporación.
+- **Lo que la regla del workbook buscaba proteger** va en los términos del contrato: plazo mínimo cuando hubo
+  reclutamiento y cláusula de conversión. Es materia legal, no del cotizador.
+
+**Cómo se registró.** Con el flujo de siempre: change-set `engagement-forms-setup-clp.change.json` sobre el catálogo
+v8, `catalog preview|apply`, sucesor `catalog.review-v9.json` (versión `operating-review-2026-10-11-v9`) y puntero
+movido con `current set`. El change-set agrega las dos provisiones, emite la revisión 2 de los siete kits de
+staffing con los requisitos `setup` (obligatorio) y `recruiting` (opcional), y retira `trial-setup`. El mismo
+change-set lleva otras dos adiciones que se deciden en otro ADR: la clase de registro `engagement_factor`
+([ADR del motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio))
+y el tipo de cambio `fx:CLP:USD`
+([ADR de composición](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp)).
+Las políticas de precio y los pisos no se tocaron.
+
+**Alternativas descartadas.**
+
+- *Llevar la regla del workbook al cotizador (un mes del costo del recurso).* En un refuerzo de un mes duplicaría el
+  precio. Es un precio de protección, no un costo, y el cotizador forma el precio desde costos.
+- *Mantener el placeholder de USD 100.* Estaba marcado como prueba y no representaba ningún trabajo.
+- *Cobrar el reclutamiento por defecto.* Sólo ocurre cuando hay que contratar a alguien para ese cliente; cobrarlo
+  siempre pondría un costo que en los demás casos no existe.
+
+La primera es el motivo de la decisión. Las otras dos describen lo que el dato fija; no fueron alternativas
+presentadas al operador.
+
+**Reglas duras.**
+
+- **NUNCA** cobrar «un mes del recurso» como puesta en marcha ni sumarlo a mano a una cotización.
+- **NUNCA** seleccionar `provision-recruiting` si no hay que contratar a alguien para ese cliente, ni quitar
+  `provision-account-onboarding` para bajar un precio.
+- **NUNCA** tratar los USD 200 y USD 500 como costos medidos: son estimaciones aceptadas y se reportan como
+  `ESTIMATED_SOURCE`.
+- **NUNCA** resolver en el precio lo que es del contrato: plazo mínimo y conversión van a legal.
+- **SIEMPRE** decirle al operador que una persona que se suma después lleva su propia incorporación.
+- **SIEMPRE** reemplazar las dos cifras con una versión nueva del catálogo cuando estén medidas, sin heredar la
+  confirmación de la estimación.
+
+**Sigue abierto.** Medir las dos provisiones en las próximas dos incorporaciones reales. Si un servicio gestionado
+debe llevar puesta en marcha (hoy `managed-service-core` no la tiene). Los términos de contrato que reemplazan la
+protección del workbook son materia legal y quedan fuera de este ADR.
+

@@ -140,3 +140,8 @@ objetivo del Excel de pricing (costo del perfil en Chile, ajustado por el factor
 no la nómina actual, y no se conecta a ella. El margen real sobre personas hoy es mayor que el simulado; ese margen
 simulado no mide lo que Efeonce paga ni reemplaza la evidencia de recruitability de este gate. Las cifras
 comerciales y las excepciones al piso las decide el operador; `compose assess` no las aprueba.
+Desde ese día la puesta en marcha de una persona vendida por dedicación deja de ser un valor de prueba: onboarding
+(USD 200 una vez por persona, por defecto) y reclutamiento (USD 500, sólo si hay que contratar a alguien para ese
+cliente), propuestos por un agente, aceptados por el CEO y estimados hasta medirlos en las próximas dos incorporaciones;
+no acreditan recruitability. Assurance y operación siguen con importes de prueba. La regla del Excel de pricing de un
+mes del recurso no se usa: plazo mínimo y cláusula de conversión son materia de contrato y revisión legal.

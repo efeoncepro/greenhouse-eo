@@ -35,3 +35,5 @@ Diagnósticos: proveedor desconocido, capacidad disponible fuera del paquete, su
 ## Llevarlo a la cotización
 
 El [compositor de recursos](componer-cotizacion-v3-con-herramientas.md) integra presupuestos agregados por proveedor/mes al kernel y quote local. Este comando de presupuesto separado mantiene su propio formato. El resultado es evidencia de presupuesto, no input directo para quote. Finance/Operations normaliza recursos y reglas siguiendo [mantenimiento de catálogo](../../documentation/finance/cotizador-v3-mantenimiento-catalogo.md), conservando moneda, alcance, fuentes y costos sin duplicar. No emitir cotización comercial sólo porque el planner calcule.
+
+Una vez congelada la cotización, dos lecturas del artefacto retoman estos presupuestos: `compose cash` cuenta los packs extra como la caja nueva que la cotización hace pagar a proveedores (la parte de suscripción ya financiada no es caja nueva), y `compose commitments` informa los créditos que sobran de un pack y su vencimiento. Ninguna compra ni reserva créditos: [Tres lecturas de una cotización](operar-cotizador-v3-con-agentes.md#tres-lecturas-de-una-cotización).

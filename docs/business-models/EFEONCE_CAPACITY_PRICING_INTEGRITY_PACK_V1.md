@@ -135,7 +135,8 @@ fija sus fronteras. Expediente aporta demanda, el agente selecciona recursos jus
 No copiar honorarios del expediente a la rate card ni sumar todas las suites a todos los perfiles.
 
 La base Notion/Microsoft 365 es interna obligatoria. Perfiles/tareas y elecciones IA determinan el resto;
-planes, seats, cantidades, cuota y calendario se declaran. Paquete combinado evita duplicar Express con Adobe.
+planes, seats, cantidades, cuota y calendario se declaran. Creative Cloud Pro ya incluye Express: no se cargan ambos a
+la misma persona (§12).
 Recursos específicos aportados por el cliente necesitan evidencia de acceso por líneas y período; ese caso
 no elimina la base interna ni acredita gratuidad global. La modalidad de venta se elige antes del preview:
 rol/capacidad o fee de servicio, con los mismos costos internos completos y el SOW de la práctica correspondiente.
@@ -146,8 +147,8 @@ Seats nominativos requieren usuarios y capacidad, no reducción por FTE ni uso c
 En IA se separan suscripción atribuida, paquetes a demanda, compra mínima/caja, remanente y vencimiento.
 La reserva contable o laboral no se deriva de ese reparto; se mantiene el contrato de provisiones anterior.
 
-Evidencia incorporada: Adobe confirmado por operador como paquete mensual combinado, renovación condicional
-sin fecha; factura Notion por seat y créditos en su período, pago no comprobado; variantes oficiales públicas
+Evidencia incorporada: Adobe según su factura, dos productos en CLP (§12; reemplaza al paquete combinado declarado el
+2026-10-09); factura Notion por seat y créditos en su período, pago no comprobado; variantes oficiales públicas
 para planes que no acreditan contrato Efeonce. Valores ejecutables en
 [fuentes versionadas](../../data/pricing/v3-operating/README.md), sin replicar tablas como tarifas vigentes.
 
@@ -189,6 +190,36 @@ Las cifras comerciales y las excepciones las decide el operador (Julio Reyes, CE
 - **Herramientas.** Un precio unitario no vence: rige hasta que una versión nueva de la policy lo reemplaza y lleva
   una fecha de revisión que avisa sin bloquear. Lo que varía es la cantidad de seats, que se declara en cada
   cotización. La mayoría sigue siendo precio público de lista marcado como estimado (§6).
+- **Adobe y plazos de contrato.** Adobe se costea como se factura: dos productos, tres licencias cada uno, en CLP y con
+  IVA por decisión del CEO. Creative Cloud Pro es para diseñadores e incluye Express; Adobe Express es para los perfiles
+  de contenido (Social Media Manager, Community Manager, Content Manager y Content Creator, confirmados por el CEO). El
+  contrato es de doce meses pagado al mes y renueva el 2026-11-16. Creative Cloud Pro se factura hoy con un 50% de
+  descuento que termina pronto; por decisión del CEO (2026-10-11) se cotiza desde ya sin descuento, y el importe
+  facturado sólo se usa, si el CEO lo elige, en un encargo que termina antes que el descuento. Lo que
+  importa es cuánto tiempo se paga una licencia una vez tomada, según lo declaró el CEO: una licencia Adobe se sigue
+  cobrando hasta que renueva el contrato; en Microsoft 365 (contrato anual pagado al mes, con el precio de su
+  factura desde el 2026-10-11) quitar una licencia baja la cuenta, y Notion es mes a mes; HubSpot es anual,
+  pero su precio vigente espera evidencia y no tiene plazo declarado. Esto concreta la regla de §6 sobre compromiso y
+  pago: una licencia Adobe comprada para un encargo de un mes se sigue cobrando hasta la renovación del contrato si
+  nadie más la usa.
+- **Puesta en marcha.** La regla del Excel de pricing (fee de reclutamiento y onboarding = un mes del costo del recurso)
+  no se usa en el cotizador: en un refuerzo de un mes duplicaría el precio. En su lugar hay dos provisiones de costo,
+  propuestas por un agente y aceptadas por el CEO, ambas estimadas y por medir en las próximas dos incorporaciones:
+  onboarding de cuenta, USD 200 una vez por cada persona que entra (por defecto en una persona vendida por dedicación),
+  y reclutamiento, USD 500 una vez por persona, sólo cuando hay que contratar a alguien para ese cliente. Quien se suma
+  después paga su propio onboarding. Un servicio gestionado no trae requisito de puesta en marcha. La protección que
+  buscaba la regla (plazo mínimo cuando se recluta, cláusula de conversión si el cliente contrata a la persona) es
+  materia de contrato y revisión legal (§7), no de precio.
+- **Forma del compromiso.** On-Demand es una forma de compromiso que se declara en la cotización, no una oferta ni un
+  delivery model: suma 10% al precio de toda la fila sobre On-Going y no mueve el piso. El diseño lo eligió el CEO; el
+  10% es el multiplicador del Excel de pricing, que el agente mantuvo cuando el CEO le dejó el ajuste. En el cotizador
+  los costos reales de un trabajo acotado (puesta en marcha, coordinación como dedicación de una persona, compromisos
+  con proveedores) van como costo, y el 10% cubre sólo riesgo y política. No hay forma híbrida: se cotiza una fundación
+  On-Demand y una operación On-Going por separado. Una forma no declarada se cotiza como On-Going.
+- **Lecturas y pendientes.** De una cotización congelada salen tres lecturas: calendario de pagos, compromisos con
+  proveedores y lectura de caja, que nunca es un margen ni decide el precio. Todavía no se modelan costos de terceros
+  (freelancers, producción, derechos, medios), reserva de contingencia para alcance fijo, duración del contrato ni
+  períodos menores a un mes.
 - **Resultados de §8.** Son el registro del piloto del 2026-10-09, anterior al redondeo comercial, al FX de política y
   a los factores de país; una cotización nueva con las versiones vigentes no tiene por qué repetir esas cifras.
 - **Comandos.** Usa `--current` en lugar de nombrar a mano las versiones de catálogo, policy y créditos; los pasos y

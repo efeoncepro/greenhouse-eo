@@ -6,6 +6,8 @@ Fecha: 2026-10-09. Propuesta interna ligada a TASK-2017; no valores aprobados ni
 
 Actualización 2026-10-11: dos definiciones posteriores cambian cómo se lee el costo en el cotizador y están al final de este documento. [La base de costo de las personas es un costo objetivo](#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11), no la nómina de hoy, y el resumen de una cotización ordena [qué dato estimado conviene confirmar primero](#qué-dato-estimado-conviene-confirmar-primero-2026-10-11). El resto del documento conserva la propuesta del 2026-10-09.
 
+Actualización 2026-10-11 (tarde): dos secciones más, también al final. La [puesta en marcha](#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11) dejó de ser un importe de prueba y pasó a dos provisiones con costo propio, y [Adobe se cargó tal como se factura](#adobe-tal-como-se-factura-y-el-plazo-del-contrato-2026-10-11), en pesos, con su descuento temporal y el plazo de su contrato. Los importes de Adobe en USD que aparecen más abajo son el registro del 2026-10-09 y ya no son los vigentes.
+
 ## Perímetro y fórmula de cada componente
 
 | Componente           | Base de cálculo propuesta                                                              | Tratamiento y prevención de doble costo                                                                                      |
@@ -60,6 +62,8 @@ Compromiso anual con pago mensual necesita términos de contrato separados: unit
 [Registro 2026-10-09](../../../data/pricing/v3-pilot/economics/resource-inputs/README.md): Higgsfield 139 USD/mes con 3000 créditos, Magnific 40 EUR/mes con 45000 créditos, Adobe 180 USD/mes y 3 CC Teams+3 Express, Vercel 60–100 USD/mes, GCP/BBDD264 USD/mes. Son declaraciones del operador; no facturas verificadas, import automático, accesos asignados ni tarifa aprobada. Magnific mantiene EUR y requiere FX explícito al convertir.
 
 Adobe: el operador confirmó 180 USD/mes para todo el paquete 3 CC Teams+3 Express.306 USD/mes es escenario condicional del alza 70%; fecha y términos de renovación siguen pendientes. No dividir entre seis seats de planes distintos, duplicar Express ni anticipar renovación sin fecha. La policy sucesora aplica capacidad 3 CC por paquete y protección de bundle; la baseline histórica conserva su información original.
+
+> Nota 2026-10-11: los dos párrafos anteriores son el registro del 2026-10-09. Desde la policy v7 Adobe no es un paquete de 180 USD sino dos productos facturados en pesos, y el escenario de 306 USD se reemplazó por el precio de lista de la factura. Ver [Adobe tal como se factura](#adobe-tal-como-se-factura-y-el-plazo-del-contrato-2026-10-11).
 
 Tratamiento propuesto para revisar con Finance/Operations:
 
@@ -119,6 +123,8 @@ Ejemplo medido el 2026-10-11 con las versiones vigentes: servicio gestionado sin
 | Bandeja de atención de Sprout Social (precio de lista) | 17,7 % | 1,0 punto |
 | Reserva de cobertura por ausencias (hipótesis sin medir) | 4,4 % | 0,3 puntos |
 
+Nota 2026-10-11 (tarde): la demanda versionada de ese ejemplo necesita ahora declarar o excluir Adobe Express en sus dos líneas de community manager (desde la policy v7 los perfiles de contenido lo piden). Vuelto a medir con las versiones vigentes y esa tarea excluida con su motivo, el neto, el margen y las cifras de la tabla son los mismos.
+
 Lectura: en esa cotización lo primero que conviene validar es el factor de talento de Colombia, no el precio de una licencia. La misma demanda con equipo y cliente en Chile da otra lectura: sólo el 29,3 % del costo descansa en estimados y el primero de la lista es la bandeja de Sprout (15,3 % del costo, 0,8 puntos), porque el factor de talento de Chile es 1 por definición y el costo de las personas es el objetivo ya confirmado por su autor.
 
 Reglas para leerlo bien:
@@ -134,3 +140,59 @@ Reglas para leerlo bien:
 `compose assess` muestra los cinco primeros en `costEvidencePriority.confirmFirst`, junto a las brechas de evidencia. Pendiente conocido: `assess` todavía no lista como brecha propia que un factor de país sea estimado; hoy se ve en este ranking y en `reviewSignals`.
 
 Claves completas: [contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
+
+## Puesta en marcha: onboarding por persona y reclutamiento opcional (2026-10-11)
+
+La puesta en marcha es lo que cuesta, una sola vez, que una persona empiece a trabajar en una cuenta. Hasta el catálogo v8 el cotizador usaba para eso un importe de prueba (100 USD, marcado «sólo prueba, sin medir»). Desde el catálogo v9 hay dos provisiones con costo propio. Las dos las propuso el agente y las aceptó el CEO el 2026-10-11; las dos siguen marcadas como **estimadas** y se van a medir en las dos próximas incorporaciones reales.
+
+| Provisión | Importe | Cuándo se cobra | Cómo entra a la cotización |
+| --- | --- | --- | --- |
+| Onboarding a la cuenta (`provision-account-onboarding`) | 200 USD, una vez por persona | Siempre que una persona se suma a una cuenta: accesos, brief e inmersión en la marca | Por defecto. Es el requisito `setup` de los siete kits de staffing |
+| Reclutamiento (`provision-recruiting`) | 500 USD, una vez por persona | Sólo cuando hay que contratar a una persona nueva para ese cliente | Opcional. La línea la elige con `choices: [{ "requirementId": "recruiting", "resourceId": "provision-recruiting" }]`; nunca se aplica sola |
+
+Cómo se comportan:
+
+- Las dos llevan el margen de la oferta, igual que cualquier otro costo, y caen en la fila única de puesta en marcha de la línea. Si el trabajo declara una [forma](cotizador-v3-superficie-implementada.md#forma-del-trabajo-on-going-y-on-demand-2026-10-11), esa fila también lleva su razón de precio.
+- El onboarding es **por persona**, no por cuenta. Consecuencia: una persona que se suma más tarde paga su propio onboarding. Antes la puesta en marcha se cobraba una vez por cuenta.
+- El importe de prueba (`trial-setup`) dejó de seleccionarse desde el 2026-10-11. Una cotización con fecha anterior lo sigue resolviendo, y los artefactos ya congelados no cambian.
+- El servicio gestionado (`managed-service-core`) no tiene requisito de puesta en marcha, ni antes ni ahora.
+
+**Por qué no se trajo la regla del Excel.** El Excel de pricing cobraba un «recruiting & onboarding fee» igual a un mes del costo de la persona. En un refuerzo de un mes esa regla duplica el precio. Lo que la regla buscaba —no quedar descubierto si el cliente se va apenas se contrató a alguien para él— es una protección que pertenece a los términos del contrato (plazo mínimo cuando se recluta, cláusula de conversión). Eso es materia legal, no del cotizador. El cotizador cobra lo que la puesta en marcha cuesta.
+
+Medido el 2026-10-11 en el ejemplo del diseñador senior por un mes en Chile, On-Demand y CLP (simulación de prueba), con las versiones del artefacto congelado: Adobe con el descuento con que se factura. Con la policy v10, que cotiza Creative Cloud Pro sin descuento, las dos primeras columnas no cambian y el neto del mes es 2.870.000 y 3.650.000:
+
+| | Costo de puesta en marcha | Precio de la fila de puesta en marcha | Neto del mes |
+| --- | --- | --- | --- |
+| Sólo onboarding (el caso por defecto) | 200.000 | 320.000 | 2.790.000 |
+| Onboarding y reclutamiento | 700.000 | 1.100.000 | 3.570.000 |
+
+Ninguno de los dos importes es una medición. No los presentes como costo validado ni como tarifa aprobada.
+
+## Adobe tal como se factura y el plazo del contrato (2026-10-11)
+
+Desde la policy v7 el costo de Adobe sale de su factura (la del 2026-09-16, que mostró el CEO), no de una declaración. Quién usa cada producto está en [selección de herramientas](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11). Aquí está lo que cambia en el costo.
+
+| Producto | Licencias | Importe mensual | Una licencia |
+| --- | --- | --- | --- |
+| Adobe Creative Cloud Pro, como se factura hoy (50 % de descuento) | 3 | CLP 162.605 | CLP 54.202 (un tercio) |
+| Adobe Creative Cloud Pro, sin descuento: el precio con que se cotiza | 3 | CLP 325.405,5 | CLP 108.468,5 (un tercio) |
+| Adobe Express | 3 | CLP 16.240 | CLP 5.413 (un tercio) |
+
+**En pesos y con IVA.** Los importes son los totales de la factura, con IVA incluido, por decisión del CEO: el impuesto se recupera, pero no mes a mes, así que el costo mensual que el cotizador reconoce es el total pagado. La moneda es CLP, la de la factura. Para que un costo en pesos entre al cálculo y vuelva a una cotización en pesos por el mismo importe, el catálogo v9 tiene la tasa CLP→USD (0,001, la inversa del tipo de cambio de cotización de 1.000). La demanda que usa Adobe la nombra en `fxRecordIds` como `fx:CLP:USD`, igual que una herramienta en EUR nombra `fx:EUR:USD`; si falta, la cotización queda `needs_input`.
+
+**Una licencia es un tercio, no el paquete.** Una persona que usa una de las tres licencias carga un tercio del importe. Una simulación anterior le atribuyó el paquete entero a una sola persona; los ejemplos escritos con esa cifra sobrestiman las herramientas.
+
+**El descuento termina, y se cotiza sin él.** Creative Cloud Pro se factura hoy con un descuento de 50 % que, según el CEO, termina pronto: unos dos meses al cargarse la factura, unos 36 días al decidir esto. Si termina exactamente en la renovación del contrato no está confirmado. El CEO decidió el 2026-10-11 que se calcule sin descuento desde ya, porque un fee cotizado hoy tiene que sostenerse después. Desde la policy v10 la policy guarda estos dos precios:
+
+- `current`: CLP 325.405,5 al mes, el precio de lista de la factura (CLP 91.150 por licencia más IVA). Es **estimado** hasta que exista una factura a precio completo. Es el que usa por defecto toda cotización nueva.
+- `invoiced-with-discount`: CLP 162.605 al mes, lo que Adobe factura mientras dure el descuento, confirmado por la factura. Sólo entra si la demanda lo elige de forma explícita.
+
+Los dos llevan fecha de revisión el 2026-11-16, la de la renovación. Hasta la policy v9 era al revés: `current` era el importe facturado y el precio de lista se llamaba `renewal-scenario`, que ya no existe.
+
+Qué significa para una cotización: no hay que hacer nada para cubrir el fin del descuento, porque el precio por defecto ya es el que viene después. La excepción es un trabajo que termina antes que el descuento: ahí se puede elegir `invoiced-with-discount`, y esa elección es del operador, no del agente. Medido el 2026-10-11 en el mismo ejemplo del diseñador: con `current` el costo del mes es 1.822.704 y el neto 2.870.000; eligiendo `invoiced-with-discount`, 1.768.438 y 2.790.000, que son las cifras del artefacto congelado.
+
+**Cómo se factura y por cuánto obliga son dos hechos distintos.** Adobe es un plan anual que se paga mes a mes: una licencia que se compra sigue disponible y se sigue cobrando hasta que el contrato se renueva, y la cuenta no baja si se deja de usar. La policy guarda las dos cosas por separado: la unidad del precio (`unit: month`) y el plazo (`commitmentTermMonths: 12`), que dice cuántos meses hay que seguir pagando una licencia una vez tomada. El plazo habla de la licencia, no del papel del contrato. No entra a ningún cálculo ni cambia un precio; sirve para la [lectura de compromisos](cotizador-v3-superficie-implementada.md#tres-lecturas-de-una-cotización-congelada-2026-10-11), que muestra cuánto queda comprometido cuando el trabajo termina antes. Desde la policy v9 la policy guarda también la fecha en que se renueva el contrato (`commitmentRenewsOn`): el de Adobe se renueva el 2026-11-16, según la consola del proveedor que mostró el CEO (plan anual pagado mes a mes; en la renovación se puede cambiar el número de licencias o cancelar el plan). Con esa fecha la lectura cuenta lo que queda del plazo que ya corre, no un plazo entero: en el ejemplo del diseñador, vuelto a cotizar con la policy v10, queda un mes de una licencia, CLP 108.468, atada hasta el 2026-11-16. Límite conocido: un precio con plazo y sin fecha se sigue leyendo como un plazo entero desde el primer mes cotizado, que es un techo; y con fecha, un mes cubierto sólo en parte cuenta entero.
+
+Desde la policy v8 otros proveedores declaran su plazo, según lo dicho por el CEO el 2026-10-11. Microsoft 365 es el caso opuesto a Adobe: el contrato es anual y se paga mes a mes, pero asignar o quitar una licencia sube o baja el monto mensual, así que su plazo es un mes y no queda nada comprometido cuando termina un trabajo corto. Desde la policy v9 su precio `current` es el de la factura que mostró el CEO (G185142527, del 2026-09-16): Business Standard, USD 14,70 por licencia al mes, seis licencias, sin impuesto, confirmado. Los precios públicos de referencia (por ejemplo `public-standard-teams-monthly`, USD 16,80) siguen en la policy, y las demandas de ejemplo todavía los eligen; una cotización nueva debería elegir `current`. Notion se paga mes a mes, sin más compromiso: también un mes. Sus importes (nueve miembros Business a USD 24 y 3000 créditos a USD 30, sin impuesto) citan desde la v9 la factura 0D8C80A9-0039 del 2026-09-21. Un plazo de un mes es una declaración, distinta de no declarar nada. HubSpot es anual, pero su precio vigente está pendiente de evidencia y todavía no lleva plazo.
+
+Lo que esto no resuelve: la lectura de caja no puede restar una licencia comprada para el trabajo, porque la demanda no declara si la licencia ya existía o se compra; y la mayoría de los demás precios de herramientas sigue siendo precio de lista estimado.

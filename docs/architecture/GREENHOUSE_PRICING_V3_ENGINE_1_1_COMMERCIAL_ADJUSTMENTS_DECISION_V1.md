@@ -56,6 +56,12 @@ anteriores intactos. Nunca se modifica el comportamiento de un contrato ya usado
 > Nota 2026-10-11: el registro tiene desde hoy un tercer contrato, `1.2.0` (motor `pricing-v3-local/1.2.0`), agregado
 > con ese mismo patrón. La tabla y las reglas de esta sección siguen describiendo `1.0.0` y `1.1.0` sin cambio; lo
 > que agrega `1.2.0` está en el [delta del 2026-10-11](#delta-2026-10-11--contrato-120-el-piso-acompaña-al-factor-de-mercado).
+>
+> Nota 2026-10-11 (posterior): el registro tiene cuatro contratos. El cuarto es `1.3.0` (motor
+> `pricing-v3-local/1.3.0`), agregado con el mismo patrón: la forma del engagement como dato propio, con una razón
+> de precio. Ver el
+> [delta del contrato 1.3.0](#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio). La fuente del
+> registro es `PRICING_V3_ENGINES` en `schemas.ts`, no esta tabla.
 
 ### 2. Ajustes comerciales (contrato 1.1.0)
 
@@ -319,6 +325,160 @@ teniendo tres contratos (`1.0.0`, `1.1.0`, `1.2.0`); `calculate.ts`, `schemas.ts
 Decisiones, alternativas y reglas:
 [delta del flujo operativo](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones).
 `pnpm pricing:v3:test` al cierre de esa ronda: 16 archivos y 501 pruebas.
+
+*Nota 2026-10-11 (tarde):* «el registro sigue teniendo tres contratos» y «`calculate.ts`, `schemas.ts` y la
+resolución no cambiaron» describen esa ronda de la mañana. El mismo día, más tarde, los tres archivos cambiaron para
+agregar el contrato `1.3.0`: es el delta siguiente. Los contratos `1.0.0`, `1.1.0` y `1.2.0` siguen byte a byte.
+
+## Delta 2026-10-11 — contrato 1.3.0: la forma del engagement como dato propio
+
+Diseño elegido por el operador (CEO) el 2026-10-11. Sigue el patrón de este ADR: contrato nuevo, motor nuevo en el
+registro (`pricing-v3-local/1.3.0`, con su propio `precisionPolicy`), contratos anteriores intactos.
+
+**Contexto.** El brief tenía un solo dato sobre el engagement, `engagementCode` (`monthly`), que es una cadencia de
+facturación y es lo que selecciona la política de precio. No había dónde decir **qué forma de compromiso** se vende:
+un servicio continuo o un encargo acotado (alcance, inicio, término, aceptación y salida). Todo se cotizaba al precio
+de un compromiso continuo. El workbook de pricing y el cotizador de Greenhouse en producción ya llevan un
+multiplicador por modelo comercial (On-Going 0 %, On-Demand +10 %, Hybrid +5 %, Licence/Consulting +15 %); el V3 no
+lo tenía.
+
+**Decisión.** La forma del engagement es un dato propio del brief, separado de `engagementCode`, y su efecto es una
+razón de precio que vive en un registro de catálogo por forma.
+
+- **En el kernel.** El contrato `1.3.0` contiene todo lo de `1.2.0` y agrega dos claves opcionales:
+  `request.engagementForm` (un id) y `snapshot.engagementFactors[]` (`{ form, priceRatio, source }`, con
+  `priceRatio` decimal positivo). El request declara la forma y el snapshot trae su razón, igual que el request
+  declara el mercado de la oferta y el snapshot trae su factor. Las formas son datos: el kernel no conoce ninguna
+  lista, sólo la razón de la que el request nombra. Las dos claves existen sólo en `1.3.0`: un contrato anterior que
+  las traiga se rechaza, no se reinterpreta. Un input `1.2.0` reetiquetado `1.3.0` es válido y cotiza igual (razón 1,
+  ajuste cero).
+- **`engagementCode` no cambia.** Sigue seleccionando la política de precio. Con o sin forma, una cotización enlaza
+  los mismos registros de política.
+- **Dónde entra la razón en la formación del precio.** Por fila (línea × período × clase `monthly` o `setup`), en
+  este orden:
+  1. Costo de cada componente. La razón no lo toca; tampoco toca `cashCommitment`.
+  2. Precio de política de cada componente: costo por el multiplicador de la política (las herramientas, fees y
+     provisiones, sólo si la base de la política es `all_costs`).
+  3. Factor de mercado, sólo sobre el componente humano.
+  4. **Razón del engagement, sobre el precio de todos los componentes de la fila**: persona, fee de plataforma,
+     provisiones y herramientas, en filas mensuales y de implementación. Se aplica al importe sin redondear.
+  5. Presentación de la fila (`HALF_UP` a la precisión de la moneda): es el precio de política de esta cotización.
+     El precio presentado es el producto exacto redondeado, no el precio presentado anterior por la razón.
+  6. Redondeo comercial (`roundingAdjustment`), con su regla de conservación del piso.
+  7. Ajustes (`discount`, `agreed_net`): se aplican sobre el precio que ya lleva la razón.
+
+  El precio guardado de cada componente es el precio al que se vende, de modo que los componentes de una fila siguen
+  sumando su precio sin redondear; su `trace` nombra la razón (`engagementPriceRatio`).
+- **Forma del resultado 1.3.0.** Toda fila agrega `engagementAdjustment` (precio de política con la razón menos el
+  mismo precio a razón 1, los dos presentados y antes del redondeo comercial; con signo) y `engagementPriceRatio`
+  (la razón tal como la declara el snapshot; `"1"` cuando el request `1.3.0` no declara forma). Los totales agregan
+  `engagementAdjustment`. Un resultado de un contrato anterior no tiene ninguna de las dos claves.
+- **Identidad de la fila y de los totales**, exacta en cada paso:
+
+  ```text
+  precio del mercado base a razón 1
+    + marketAdjustment       → precio de política en el mercado de la oferta (lo que forman 1.0.0 a 1.2.0)
+    + engagementAdjustment   → precio de política de esta cotización
+    + roundingAdjustment     → undiscountedPrice
+    + uplift − discount      → net;   net − cost = marginAmount
+  ```
+
+  `undiscountedPrice − roundingAdjustment − engagementAdjustment − marketAdjustment` es el precio del mercado base
+  sin forma. Los totales son la suma de las filas, clave por clave.
+- **Con un factor de mercado cuyo piso sigue al mercado base** (`floorBasis: "base_market"`, hoy Colombia y Perú). La
+  forma es una condición comercial de la cotización, no un efecto de país: pertenece al precio del mercado base tanto
+  como al del mercado. La razón multiplica los dos términos de `ρ` y lo deja igual, y `ρ` se lee donde lo lee
+  `1.2.0`: sobre los dos precios a razón 1, como se presentan. Por eso `marketAdjustment`, `marketPriceRatio` y
+  `floorNet` son, dígito por dígito, los de la misma fila cotizada sin forma. En la conservación del piso del
+  redondeo, «cumplía antes de redondear» se lee sobre el precio del mercado base **con** la razón (es el precio de
+  esa fila a factor 1), y el mínimo conservado usa el mismo piso de siempre.
+- **El piso no se mueve.** `minimumMargin` y `floorNet` son los de la fila sin forma, sin relajarse ni por una
+  unidad de redondeo. Lo que cambia es el neto que se compara contra ese piso. Una razón mayor que 1 es margen que la
+  fila tiene de verdad: la prima cuenta como margen, y un descuento puede consumirla hasta el mismo piso que rige en
+  On-Going. Una razón menor que 1 es un precio como cualquier otro: puede dejar la fila bajo su piso, y entonces sale
+  marcada `MARGIN_BELOW_FLOOR`; el redondeo no la repara (sólo la sube al múltiplo siguiente).
+- **Errores del kernel.** Una forma declarada sin su razón en el snapshot retiene el cálculo:
+  `MISSING_ENGAGEMENT_FACTOR` en `snapshot.engagementFactors` (`needs_input`). Nunca se asume una razón. Una forma
+  repetida en el snapshot es `DUPLICATE_ID`. La fuente de la razón se juzga como cualquier otra (vigencia, `pending`,
+  `estimated`).
+- **En el catálogo.** Clase de registro `engagement_factor`: `{ form, priceRatio, offerId? }`. Un registro por forma
+  (general); un registro con `offerId` prevalece sobre el general para esa oferta, y el de otra oferta nunca aplica.
+  Se mantiene con el mismo `catalog preview|apply` que el resto; una revisión no puede convertir un registro en la
+  razón de otra forma o de otra oferta.
+- **En la resolución.** Emite `1.3.0` si y sólo si el brief declara `engagementForm`, también cuando la razón vale 1:
+  la forma declarada es parte de lo que la cotización congela. Como `1.3.0` es superconjunto, esta regla va antes
+  que las de `1.2.0` y `1.1.0`. Sin el campo no cambia nada: la cotización resuelve a su contrato `1.0.0`–`1.2.0`
+  byte a byte, tenga el catálogo los registros `engagement_factor` que tenga. Una forma sin registro vigente a la
+  fecha de la cotización es `MISSING_CATALOG_SELECTION` con ruta `engagementForm` (exit 2); dos vigentes en el nivel
+  que prevalece, `AMBIGUOUS_SELECTION`; una razón `pending` bloquea con `PENDING_CATALOG_VALUE` y una `estimated` se
+  cotiza bajo revisión.
+- **Lectura.** El resumen agrega en la raíz `engagementForm`
+  (`{ form, priceRatio, scope, offerId, recordId, revision, sourceStatus }`, con `scope` `general` u `offer`) y
+  `totals.engagementAdjustment`; la razón 1 también se nombra. `compose assess` repite el bloque dentro de
+  `margin.policyFloor`; `explain` lo agrega a `commercialAdjustments` y, por fila, `engagementAdjustment` y
+  `engagementPriceRatio`. `compose preview` y las proyecciones cliente muestran sólo el neto final. `compose split`
+  no cambia de propósito: el kit toma la razón como cualquier componente.
+
+**Datos (catálogo v9).** Dos registros generales, `confirmed`, vigentes desde el 2026-10-11: `engagement:on_going`
+con razón 1 y `engagement:on_demand` con razón 1,10. Sólo esas dos formas están cargadas. Una cotización con fecha
+anterior que declare una forma no tiene registro vigente y queda `needs_input`.
+
+**Quién decidió qué.** El CEO eligió este diseño (la «opción B») y preguntó si 10 % era lo correcto, dejando el
+ajuste al agente. El agente lo mantuvo: es el extremo bajo del 10–15 % que las agencias descuentan a un retainer
+frente a una tarifa de proyecto, y en el V3 la puesta en marcha, la coordinación y los compromisos con proveedores
+se costean aparte en vez de esconderse en la prima.
+
+**Qué es On-Demand.** Una **forma** de compromiso (acotado: alcance, inicio, término, aceptación y salida). No es
+una cuarta oferta ni un modelo de delivery: `offerId` se sigue eligiendo por lo que se vende. Efeonce Factory es la
+vía comercial reservada para los encargos On-Demand. Fuentes:
+[modelo operativo de engagements y proyectos](../business-models/EFEONCE_ENGAGEMENT_PROJECT_OPERATING_MODEL_V1.md) y
+[modelo de negocio de Factory](../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md).
+
+**Alternativa descartada.**
+
+- *Duplicar las 96 políticas de precio por forma.* La prima viviría en 96 registros con tasas raras y cada cambio de
+  objetivo habría que hacerlo dos veces. Un registro por forma deja la prima en un solo dato.
+
+**Lo que el diseño fija a propósito** (está en el código y en sus pruebas, no fue una alternativa presentada al
+operador):
+
+- El contrato lo decide el brief, no el catálogo. Un brief congelado antes de `1.3.0` no puede declarar la forma y
+  vuelve a resolver como siempre, aunque su catálogo gane registros después.
+- Declarar la forma con razón 1 también emite `1.3.0`: lo que se congela es la forma, no sólo su efecto.
+- La razón no entra al piso por ningún camino: ni a `minimumMargin` ni a `ρ` ni a `floorNet`.
+
+**Reglas duras.**
+
+- **NUNCA** usar `engagementCode` para decir la forma del compromiso, ni cambiarlo para que un encargo acotado
+  seleccione otra política: la forma va en `engagementForm`.
+- **NUNCA** crear políticas de precio por forma. La prima de una forma vive en su registro `engagement_factor`.
+- **NUNCA** aplicar la prima a mano (un `uplift`, un `agreed_net` calculado o un precio inline) ni asumir una razón
+  para una forma sin registro.
+- **NUNCA** mover un piso por la forma, ni presentar la prima como intocable: es margen, y un descuento puede
+  consumirla hasta el piso de la oferta.
+- **NUNCA** tratar On-Demand como una oferta o un modelo de delivery, ni elegir la forma por el precio que deja.
+- **NUNCA** cotizar Hybrid o Licence/Consulting con una razón inventada. Hybrid se cotiza como dos cotizaciones: una
+  base On-Demand y una operación On-Going.
+- **SIEMPRE** declarar `engagementForm` cuando el compromiso es acotado. Un brief sin el campo se cotiza como
+  On-Going y el resultado no lo dice.
+- **SIEMPRE** correr la guarda de artefactos congelados al tocar `calculate.ts`, `schemas.ts` o la resolución; exige
+  un artefacto firmado por cada motor del registro.
+
+**Verificación (2026-10-11, local).** El primer artefacto `1.3.0`, y el que la guarda exige para ese motor, es
+[`designer-on-demand.artifact.json`](../../data/pricing/v3-operating/designer-on-demand.artifact.json): un mes de un
+diseñador senior dedicado en Chile, On-Demand, en CLP. `replay` responde `verified: true`. Medido: costo 1.768.438,
+neto 2.790.000, margen 36,6 %, `engagementAdjustment` 252.635, `roundingAdjustment` 11.026, ninguna línea bajo el
+piso. La misma demanda sin `engagementForm`, con las mismas versiones, resuelve a `1.1.0`: mismo costo, neto
+2.540.000 y margen 30,4 %.
+
+**Sigue abierto.**
+
+- No hay forma Hybrid ni Licence/Consulting, ni un tope para la razón.
+- Una forma no declarada se cotiza como On-Going sin aviso.
+- El plazo del contrato con el cliente no es un input: una cotización tiene períodos, no un plazo.
+- Un encargo de menos de un mes se expresa como horas dentro de un período.
+- Todavía no se modelan los costos de terceros de un encargo ni una reserva de contingencia para trabajo de alcance
+  fijo. No hay contrato de entrada ni datos para eso.
 
 ## No decidido a propósito
 

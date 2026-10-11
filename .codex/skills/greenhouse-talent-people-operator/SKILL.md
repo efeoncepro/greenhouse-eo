@@ -1052,6 +1052,12 @@ fuera de Chile son estimaciones propuestas por un agente, sin validar con contra
 cambia el **precio** de la parte humana (factor de mercado). Mantener escalas de consultoría separadas:
 una necesidad SEO o CRM no autoriza sustituir el salario de la variante elegida. `planned-*` son slots,
 no personas contratadas, licencias asignadas ni capacidad disponible. No promover demanda local a Hiring por inferencia.
+Puesta en marcha de una persona por dedicación (staff augmentation): onboarding USD 200 una vez por persona, por
+defecto, y reclutamiento USD 500 sólo si Talent declara que hay que contratar para ese cliente; ambos estimados, a medir
+en las próximas dos incorporaciones. La regla del Excel de «un mes del recurso» no se usa: plazo mínimo al reclutar y
+cláusula de conversión si el cliente contrata a la persona son materia de contrato y revisión legal, no de precio.
+Persona nueva en un encargo corto: una licencia Adobe comprada para ella se sigue cobrando hasta el fin del contrato de
+doce meses si nadie más la usa (`compose commitments` lo muestra); Microsoft 365 y Notion bajan al quitar el seat.
 
 Notion/M365 son base; tools nominativas necesitan capacidad y acceso, no descuento automático por dedicación50%.
 Portfolio declarado separa clientes/interno/sin asignar; no certifica ICO ni inventario live. Talent Assurance

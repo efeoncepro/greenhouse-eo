@@ -91,6 +91,12 @@ gobierna seguimiento, costo comercial y cobros por entrada.
 5. Ejecutar con la práctica o equipo responsable y QA; usar la revisión acordada y conservar feedback/versiones.
 6. Entregar, obtener aceptación, resolver la facturación/cobro correspondiente y cerrar con contexto reutilizable.
 
+Nota 2026-10-11: para el paso 3, el cotizador local de Efeonce (simulación interna) ya permite declarar el encargo como
+On-Demand —una forma de compromiso, no una oferta— y entrega el calendario de pagos por hitos y los compromisos con
+proveedores que conviene revisar antes de comprometer. Todavía no modela costos de terceros (freelancers, producción,
+derechos, medios), reserva de contingencia para alcance fijo ni la duración del contrato: se costean y acuerdan aparte.
+Detalle en el [Business Model, §5](../../business-models/factory/EFEONCE_FACTORY_BUSINESS_MODEL_V1.md#5-ingresos-cobro-y-economía).
+
 El equipo se configura por encargo, con las disciplinas necesarias y un responsable de entrega. El cliente
 aporta información autorizada y una persona que aprueba. Un bloqueo de inputs, capacidad, pago o feedback se comunica
 con causa, responsable y siguiente paso; se ajustan las fechas según lo acordado, sin prometer producción inmediata.

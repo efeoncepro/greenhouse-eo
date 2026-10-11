@@ -135,6 +135,12 @@ cotización que use la oferta `talent-assurance-staffing`, incluida la capacidad
 modalidad. Eso no aprueba este modelo de negocio ni un precio objetivo para él: su estado y su veredicto no cambian.
 El 45% es el piso de los servicios gestionados de las prácticas creativa y SEO/AEO, y el 40%/35% del pack de
 capacidad es una propuesta sin aprobar; el objetivo de esta oferta se decide con el operador, no por analogía.
+Desde ese día el cotizador costea la puesta en marcha de esa persona con dos provisiones estimadas, propuestas por un
+agente y aceptadas por el CEO, por medir en las próximas dos incorporaciones: onboarding, USD 200 una vez por persona,
+por defecto, y reclutamiento, USD 500, sólo cuando hay que contratar a alguien para ese cliente. Van en la fila de
+puesta en marcha de la cotización: no las dupliques en un fee de activación. La regla del Excel de pricing (un mes del
+costo del recurso) no se usa; el plazo mínimo cuando se recluta y la contratación directa eventual siguen siendo
+materia de contrato y revisión legal, no de precio.
 
 `role_capacity` y `managed_service` distinguen presentación por capacidad y fee de servicio; roles siguen
 costeados internamente. La selección incluye base Notion/Microsoft 365, herramientas de CRM por trabajo y

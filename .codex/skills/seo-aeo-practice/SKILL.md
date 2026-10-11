@@ -572,6 +572,8 @@ aprobaciones de §2 y `modules/04_PRICING.md`. SEO→SEMrush, baseNotion/M365, I
 conservar variante salarial, países, dedicación y fuente real. Reparto declarado no acredita inventario.
 `managed_service` agrega fee sin publicar costos/horas internos. Un programa SEO/AEO gestionado usa
 `offerId: "seo-aeo-managed-service"` (objetivo 55%, piso 45%; desde el 2026-10-11), no la oferta creativa.
+Un encargo acotado se declara On-Demand en la cotización (forma de compromiso, no oferta: +10% sobre On-Going, mismo
+piso) y los perfiles de contenido llevan Adobe Express, no Creative Cloud Pro: detalle en `modules/04_PRICING.md`.
 Readiness40/35 son propuestas genéricas, **no
 reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del

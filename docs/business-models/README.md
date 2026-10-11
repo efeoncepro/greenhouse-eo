@@ -319,5 +319,8 @@ sigue sin aprobación y nunca es un piso; una excepción bajo un piso la decide 
 referencia para otro.
 El país de la persona ajusta el costo, el país del cliente ajusta el precio del
 componente humano, cada moneda redondea a su múltiplo y el tipo de cambio de cotización es un valor de política.
+On-Demand es una forma de compromiso que se declara en la cotización (10% más de precio que On-Going, mismo piso), no
+una oferta ni un delivery model; la puesta en marcha de una persona por dedicación se costea con provisiones estimadas
+(onboarding siempre, reclutamiento sólo si hay que contratar) y Adobe va como se factura, dos productos en CLP.
 Detalle en el [pack §12](EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md#12-delta-2026-10-11--decisiones-del-operador-que-acotan-este-pack);
 valores vigentes y comandos (`--current`) en el manual de agentes.

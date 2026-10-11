@@ -15,12 +15,15 @@ No hace falta conservar Excel en el flujo de cálculo: éste permanece como ante
 
 | Responsabilidad | Fuente vigente |
 | --- | --- |
-| Aritmética comercial: costo, markup/margen, descuento, neto pactado, FX, redondeo contable y redondeo comercial, por contrato de entrada (`1.0.0`, `1.1.0` y `1.2.0`); registro cerrado de motores `PRICING_V3_ENGINES` | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
+| Aritmética comercial: costo, markup/margen, descuento, neto pactado, FX, redondeo contable y redondeo comercial, por contrato de entrada (`1.0.0`, `1.1.0`, `1.2.0` y `1.3.0`); registro cerrado de motores `PRICING_V3_ENGINES` | `src/lib/finance/pricing-v3/calculate.ts` y `schemas.ts` |
 | Catálogo monetario (incluida la regla de redondeo por moneda), resolución de perfiles/variantes y calendario, y elección del contrato de entrada que se emite al kernel | `src/lib/finance/pricing-v3/catalog/` |
 | Selección de recursos por trabajo y atribución a snapshots | `resources/composition.ts` y `composition-contracts.ts` |
 | Presupuesto discreto de créditos y caducidad | `resources/credit-budget.ts` |
 | Discovery, scaffold, portfolio y plan | `resources/operating.ts` |
 | Preparación comercial y preview allowlisted | `resources/readiness.ts` |
+| Reparto de un precio congelado en persona y kit de herramientas (`pricing-v3-price-split/1`) | `resources/price-split.ts` |
+| Lecturas de un engagement sobre una cotización congelada: calendario de pagos (`pricing-v3-payment-schedule/1`) y lectura de caja (`pricing-v3-engagement-cash/1`) | `resources/engagement-view.ts` |
+| Compromisos con proveedores que sobreviven a los períodos cotizados (`pricing-v3-commitment-exposure/1`) | `resources/commitment-exposure.ts` |
 | Resumen derivado de una composición: motor que calculó, ajustes y regla de redondeo aplicados, líneas que el kernel marcó bajo su piso y exposición a datos estimados (`estimateExposure`) | `resources/summary.ts` |
 | Fechas de los precios: vigencias duras que bloquean y fechas de revisión que sólo avisan (`pricing-v3-price-review/1`) | `resources/price-review.ts` |
 | Puntero a las versiones vigentes (`pricing-v3-current/1`): verificación por versión y digest, sin leer ni escribir archivos | `adapters/current-versions.ts` |
@@ -34,6 +37,9 @@ La tabla refleja el estado tras el [ADR del motor 1.1](GREENHOUSE_PRICING_V3_ENG
 (2026-10-10) y su delta del 2026-10-11: los tres contratos conviven en el mismo módulo, no hay un segundo kernel. Las
 filas de fechas de los precios y del puntero, y la mención de `estimateExposure` en la del resumen, vienen del
 [delta del 2026-10-11](#delta-2026-10-11--versiones-vigentes-por-puntero-avisos-de-la-corrida-y-exposición-a-estimaciones).
+*Nota 2026-10-11 (tarde):* el registro tiene cuatro contratos: se agregó `1.3.0`, la forma del engagement con su
+razón de precio, en el mismo módulo. Las tres filas de lecturas (reparto, calendario y caja, compromisos) vienen de
+los deltas de `compose split` y de [las tres lecturas](#delta-2026-10-11--tres-lecturas-de-una-cotización-congelada-calendario-caja-y-compromisos).
 
 ## Contrato de entradas y selección
 
@@ -104,6 +110,12 @@ o fecha requiere sucesor y revisión; la existencia de la variante no prueba dis
 > fecha de revisión que avisa sin bloquear. El catálogo v6 agrega además un tipo de cambio de cotización EUR→USD sin
 > fecha de término. Decisión y reglas:
 > [modelo de revisión de precios](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--un-precio-unitario-no-vence-vigencia-dura-y-fecha-de-revisión).
+>
+> Nota 2026-10-11 (tarde): la viñeta de Adobe describe las policies v2 a v6. Desde la policy v7 Adobe se registra
+> como lo factura el proveedor: dos productos en CLP con IVA (Creative Cloud Pro, que ya incluye Express, y Adobe
+> Express aparte para perfiles de contenido), cada uno con tres licencias y doce meses de compromiso por licencia. «No añadir
+> Express separado» vale ahora por persona o línea, no por cotización. Decisión y reglas:
+> [Adobe como se factura y plazo de compromiso](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp).
 
 Demanda de créditos se agrega por proveedor/mes antes de seleccionar packs. Suscripción atribuida deriva de
 créditos normales asignados sobre créditos incluidos; disponibilidad se declara, no se infiere del plan. La compra
@@ -209,6 +221,9 @@ el motor** (el margen mínimo sale de la política; las herramientas excluidas, 
 **No decidido a propósito.** Setup paramétrico (hoy se cotiza fuera del kit); costos salariales localizados (siguen en
 `operational-gaps.json`); medición del consumo de agentes; si el piso de 45 % rige igual para toda oferta gestionada
 fuera de la práctica creativa; y la promoción de todo esto al canon de cotizaciones.
+*Nota 2026-10-11 (tarde):* desde el catálogo v9 los siete kits de staffing llevan la puesta en marcha como provisión
+costeada por persona; `managed-service-core` sigue sin requisito de puesta en marcha. Ver el
+[delta de provisiones de puesta en marcha](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--provisiones-de-puesta-en-marcha-costeadas-catálogo-v9).
 
 > Nota 2026-10-10 (posterior): el alcance del piso quedó decidido por el operador (CEO). 45 % es el piso de margen de
 > los servicios gestionados; un servicio en el que se puede ganar más sube su objetivo, no el piso. Ver el delta del
@@ -386,6 +401,9 @@ Este delta sólo registra el efecto sobre el flujo descrito arriba. No hay coman
   *Nota 2026-10-11 (posterior):* las versiones vigentes ya no se nombran en este documento. Las nombra el puntero
   `data/pricing/v3-operating/current.json`, se usan con `--current` y las imprime `current show` (al 2026-10-11,
   tras la oferta SEO/AEO: catálogo v8 y policy v6).
+  *Nota 2026-10-11 (tarde):* ese paréntesis es un hecho fechado de la mañana, no lo vigente. Lo vigente es lo que
+  imprime `current show`; la tarde del 2026-10-11, al escribirse esta nota, eran el catálogo v9 y la policy v8, y al
+  cierre de ese día el catálogo v9 y la policy v10.
 - **Lectura.** El resumen suma `engineVersion`, `commercialAdjustments` y `priceRounding`; `explain` suma
   `commercialAdjustments` con el recorrido de precio por fila. `compose preview` y la proyección cliente no cambian:
   muestran sólo el neto final.
@@ -506,7 +524,12 @@ dueño del tema y aquí sólo se anota su efecto sobre el flujo; los otros tres 
 - **Qué nombra el puntero.** Lo imprime `current show`; esa es la fuente, no este párrafo. Al emitirse esta ronda
   eran `catalog.review-v6.json`, `resources.review-v6.json` y `../v3-resources/ai-credits.review-v1.json`; al
   2026-10-11 el catálogo pasó a `catalog.review-v7.json` con el piso de staffing (delta siguiente) y a
-  `catalog.review-v8.json` con la oferta SEO/AEO (último delta).
+  `catalog.review-v8.json` con la oferta SEO/AEO (delta de esa oferta). Por la tarde del mismo día pasó a
+  `catalog.review-v9.json` (forma del engagement, provisiones de puesta en marcha y CLP→USD) y la policy a
+  `resources.review-v7.json` (Adobe como se factura), luego a `resources.review-v8.json` (plazos de compromiso de
+  las licencias), a `resources.review-v9.json` (Microsoft 365 y Notion como se facturan, y la fecha en que renueva
+  el contrato de Adobe) y por último a `resources.review-v10.json` (Creative Cloud Pro se cotiza sin su descuento).
+  Todo esto es historia fechada y puede haber seguido cambiando: para saber qué rige, corre `current show`.
 - **Una fecha de cotización posterior ya no se bloquea por la vigencia de un precio de herramienta.** Medido con la
   demanda `managed-care-colombia` fechada el 2026-12-15: con la policy v6 calcula; con la v5 queda `needs_input` con
   `RESOURCE_PRICE_NOT_EFFECTIVE` en Notion, Microsoft 365 y la bandeja social.
@@ -679,6 +702,13 @@ congelados conservan el recargo histórico. No hay cambio de motor ni de contrat
 defecto es CLP 2.580.000 con 30,5 % de margen (motor 1.1.0) y ninguna línea sale marcada; al declarar un neto
 acordado de CLP 1.900.000, el resumen lista la línea en `marginFloor.lines[]` con `MARGIN_BELOW_FLOOR`,
 `minimumMargin` 0,25 y margen de línea 10,8 %.
+*Nota 2026-10-11 (tarde):* esas cifras son de una corrida con el catálogo v7 y la policy v6; las herramientas y la
+puesta en marcha de entonces no son las de hoy (Adobe iba como paquete en USD y la puesta en marcha era el
+placeholder de USD 100). Con el catálogo v9 y la policy v10 (Creative Cloud Pro sin descuento), un diseñador senior
+dedicado en Chile con una licencia de tres de Creative Cloud Pro y la provisión de incorporación cotiza CLP
+2.610.000 con 30,2 % de margen (motor 1.1.0, sin forma declarada), sin líneas marcadas: es
+`designer-on-demand.demand.json` sin `engagementForm`, medido fuera de la carpeta de datos. Con la policy v8, que
+todavía cotizaba Adobe con descuento, la misma corrida daba CLP 2.540.000 y 30,4 %. La regla del piso no cambió.
 
 **Reglas para agentes.**
 
@@ -709,6 +739,8 @@ change-set `seo-aeo-managed-service.change.json`: 32 `add`, uno por perfil
 `rate` 0,55 sobre todos los costos y `minimumMargin` 0,45, marcados `confirmed`. Ninguna política existente se tocó. El
 puntero `current.json` pasó a nombrar el catálogo v8; policy y créditos no cambiaron. El siguiente catálogo sería v9.
 No hay cambio de motor, de esquema ni de contrato.
+*Nota 2026-10-11 (tarde):* el catálogo v9 se emitió ese mismo día y el puntero dejó de nombrar el v8. Las tres
+ofertas y sus políticas no cambiaron en v9.
 
 **Por qué una oferta propia y no la creativa.** En SEO/AEO el objetivo no es el piso. Y el `offerId` es lo que un
 agente elige en el brief: una práctica sin oferta propia termina cotizada al objetivo de otra práctica.
@@ -722,6 +754,11 @@ ofertas siguen multiplicándose, la alternativa es una dimensión de práctica e
 en Chile, CLP), cotizado con `offerId: "seo-aeo-managed-service"` y fecha 2026-10-11, calcula con 55,07 % de margen,
 motor `pricing-v3-local/1.1.0`, sin ninguna línea bajo el piso. Con una fecha anterior al 2026-10-11 esa oferta no
 tiene política y la corrida queda `needs_input` con `MISSING_CATALOG_SELECTION` en `lines.<lineId>.pricing`.
+*Nota 2026-10-11 (tarde):* desde la policy v7 la receta de Community Manager incluye `express-design`, y esa demanda
+tiene dos líneas con ese perfil. Tal como está versionada, con `--current` queda `needs_input` con
+`RESOURCE_ALLOCATION_REQUIRED` para `adobe-express`. Excluyendo la tarea en esas dos líneas
+(`work[].excludedProfileTasks`, con motivo) vuelve a calcular lo mismo: CLP 11.640.000, 55,07 % de margen, motor
+1.1.0, ninguna línea bajo el piso. La alternativa es declarar la asignación de Adobe Express.
 
 **Reglas para agentes.**
 
@@ -740,6 +777,17 @@ tiene política y la corrida queda `needs_input` con `MISSING_CATALOG_SELECTION`
 **Contexto.** En la venta de una persona por dedicación, las herramientas y provisiones son cerca de un quinto del
 costo de un perfil creativo. Con todo dentro de un solo fee, el precio se compara mal con una contratación directa.
 El operador pidió una recomendación y aceptó mostrar las herramientas especializadas como un ítem propio.
+
+*Corrección 2026-10-11 (tarde):* «cerca de un quinto» salió de una simulación que atribuía el paquete completo de
+Adobe a una sola persona; sobrestima las herramientas. Medido sobre
+[`designer-on-demand.artifact.json`](../../data/pricing/v3-operating/designer-on-demand.artifact.json) (diseñador
+senior dedicado en Chile, un mes, una licencia de tres de Creative Cloud Pro con el descuento que regía en la policy
+v7, la que congeló el artefacto; `compose cash` y `compose split`): la
+persona es el 74,1 % del costo; las herramientas, el 9,0 % (el kit que se separa —Adobe, Higgsfield y Magnific— es
+el 6,7 %); las provisiones mensuales, el 2,8 %; el fee de plataforma, el 2,8 %; y la provisión de incorporación,
+que se cobra una vez, el 11,3 % de ese único mes. El reparto de ese artefacto es kit CLP 190.000 y persona
+CLP 2.600.000, que suman el neto de 2.790.000. El motivo de la decisión no cambia: lo que cambia es el tamaño del
+kit.
 
 **Decisión.** `compose split` deriva, de un artefacto congelado y de una lista de herramientas que entrega quien
 llama, dos cifras por fila y periodo: kit y persona. Vive en `resources/price-split.ts` (función pura) y en el
@@ -764,10 +812,249 @@ persona, porque el kernel los aplica al componente humano y a la fila.
 - **NUNCA** elegir por cuenta propia qué herramientas van aparte; es decisión del operador.
 - **SIEMPRE** informar si una parte queda bajo el piso mientras la fila lo cumple.
 - La salida es interna: trae costos y márgenes.
+- Bajo el contrato 1.3.0 el kit toma la razón del engagement como cualquier componente: el kernel guarda cada
+  componente al precio al que se vende, así que el reparto no mueve nada entre las partes.
 
 **Abierto.** Si el kit de un servicio gestionado de varias líneas debe redondearse una vez por periodo y no por
 fila; si el redondeo del kit debe ser hacia arriba cuando objetivo y piso coinciden; una vista del reparto apta
 para el cliente.
+
+## Delta 2026-10-11 — forma del engagement, puesta en marcha y Adobe como se factura: qué cambia en el flujo operativo
+
+Posterior a los deltas anteriores del mismo día. Las decisiones viven en el ADR dueño de cada tema; este delta sólo
+registra su efecto sobre el flujo.
+
+| Cambio | Dónde está la decisión |
+| --- | --- |
+| Forma del engagement con razón de precio; contrato `1.3.0` | [ADR del motor](GREENHOUSE_PRICING_V3_ENGINE_1_1_COMMERCIAL_ADJUSTMENTS_DECISION_V1.md#delta-2026-10-11--contrato-130-la-forma-del-engagement-como-dato-propio) |
+| Provisiones de puesta en marcha costeadas | [ADR de mantenimiento](GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md#delta-2026-10-11--provisiones-de-puesta-en-marcha-costeadas-catálogo-v9) |
+| Plazo de compromiso de una licencia, Adobe como se factura, costos en CLP y regla de bundle | [ADR de composición](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--plazo-de-compromiso-de-una-licencia-adobe-como-se-factura-y-costos-en-clp) |
+| Tres lecturas de una cotización congelada | [delta siguiente](#delta-2026-10-11--tres-lecturas-de-una-cotización-congelada-calendario-caja-y-compromisos) |
+
+- **El brief gana un campo opcional, `engagementForm`** (hoy `on_going` u `on_demand`; los ids son datos del
+  catálogo). Es distinto de `engagementCode`, que sigue siendo `monthly` y sigue eligiendo la política de precio. Un
+  encargo acotado se declara `"engagementForm": "on_demand"` y sale con la prima de esa forma sobre toda la fila; sin
+  el campo la cotización se calcula como siempre y no dice nada sobre la forma.
+- **Qué contrato calcula.** A las reglas anteriores se suma una, que va primero: si el brief declara
+  `engagementForm`, la resolución emite `1.3.0`, también con razón 1. `engineVersion` del resumen dice cuál firmó.
+- **Lectura.** El resumen nombra la forma en `engagementForm` y lo que movió en `totals.engagementAdjustment`.
+  `assess` y `explain` lo repiten; `preview` muestra sólo el neto final.
+- **Errores.** Una forma sin registro vigente a la fecha de la cotización: `MISSING_CATALOG_SELECTION` con ruta
+  `engagementForm`, exit 2. Dos registros vigentes del nivel que prevalece: `AMBIGUOUS_SELECTION`.
+- **Puesta en marcha.** En los siete kits de staffing cada persona que entra a una cuenta lleva por defecto
+  `provision-account-onboarding`. El reclutamiento es opcional y se pide por línea:
+  `"choices": [{ "requirementId": "recruiting", "resourceId": "provision-recruiting" }]`. Las dos caen en la fila
+  `setup` y llevan el margen de la oferta. Una persona que se suma después paga su propia incorporación.
+- **Herramienta con precio en CLP.** Adobe está en CLP desde la policy v7. La demanda que la use debe nombrar
+  `fx:CLP:USD` en `fxRecordIds`, igual que una herramienta en EUR necesita `fx:EUR:USD`; un id que no se usa se
+  rechaza (`UNUSED_FX_SELECTION`).
+- **Demandas anteriores con perfiles de contenido.** Social Media Manager, Community Manager, Content Manager y
+  Content Creator incluyen `express-design` desde la policy v7. Una demanda escrita antes que tenga uno de esos
+  perfiles, cotizada con `--current`, queda `needs_input` con `RESOURCE_ALLOCATION_REQUIRED` para `adobe-express`
+  hasta que declare la asignación o excluya la tarea con motivo (`work[].excludedProfileTasks`). Es el caso de
+  `managed-care-colombia.demand.json`; su artefacto congelado sigue respondiendo `verified: true`.
+- **Un encargo On-Demand o un trabajo acotado ya se puede representar**: la forma en `engagementForm`, el plazo como
+  períodos (o, si dura menos de un mes, como horas dentro de un período), los hitos de pago con `compose schedule` y
+  lo que queda comprometido con proveedores con `compose commitments`. Lo que sigue sin representarse está en
+  «Todavía no se modela», al final del delta siguiente.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** preguntar o declarar la forma del compromiso antes de cotizar; un brief sin `engagementForm` se cotiza
+  como On-Going.
+- **NUNCA** cotizar Hybrid con una razón propia: son dos cotizaciones, una base On-Demand y una operación On-Going.
+- **NUNCA** agregar reclutamiento por defecto ni quitar la incorporación para bajar el precio: el primero entra sólo
+  cuando hay que contratar a alguien para ese cliente; la segunda es el requisito del kit.
+- **NUNCA** resolver un `RESOURCE_ALLOCATION_REQUIRED` de `adobe-express` editando la receta del perfil: se declara la
+  asignación o se excluye la tarea en la demanda, con motivo.
+
+## Delta 2026-10-11 — tres lecturas de una cotización congelada: calendario, caja y compromisos
+
+**Contexto.** Un encargo acotado trae tres preguntas que una cotización mensual no respondía: cuándo se cobra, cuánta
+caja nueva obliga a pagar a proveedores y qué queda comprometido con ellos después del último período. Las tres se
+pueden contestar con lo que el artefacto ya congeló.
+
+**Decisión.** Tres comandos que **leen** un artefacto de composición, como `compose split`. Ninguno forma un precio,
+cambia un costo, un estado o un digest, ni recalcula con el kernel. Los tres verifican primero el artefacto por
+replay; uno que no reproduce su digest se rechaza. Reciben sólo `--input` (más `--milestones` en el calendario) y
+`--out` opcional; no reciben catálogo, policy ni `--current`, porque leen las fuentes que el artefacto lleva dentro.
+Salen con exit 3 (una composición siempre está bajo revisión) y `binding: false`.
+
+### `compose schedule` — calendario de pagos
+
+`pnpm --silent pricing:v3 compose schedule --input artifact.json --milestones milestones.json [--out …]`.
+Función `presentPaymentSchedule` en `resources/engagement-view.ts`, contrato `pricing-v3-payment-schedule/1`.
+
+- `milestones.json` es un arreglo JSON de `{ id, label, share, periodId? | when? }`, de 1 a 60 hitos. `share` es una
+  cadena decimal mayor que 0 y hasta 1. `periodId` es un período de la cotización; `when` es texto libre para una
+  condición o fecha que la cotización no modela. Un hito lleva uno de los dos o ninguno, nunca ambos.
+- Las participaciones deben sumar **exactamente 1**, sin tolerancia.
+- Cada importe es su participación del neto leída al múltiplo de redondeo con que se congeló la cotización (el más
+  cercano, mitad hacia arriba), o a la unidad de la moneda si la cotización no tiene regla. El último hito es lo que
+  queda del neto: absorbe el redondeo de los anteriores. Los importes suman el neto a la unidad.
+- Impuesto sólo si la cotización lo resolvió; entonces se reparte en proporción a los importes y suma `totals.tax`.
+  Si no, `tax` y `total` van en `null`: no se asume tasa.
+- Rechazos (exit 1): `SCHEDULE_MILESTONES_INVALID`, con `option: "milestones"` e `issues[]` de `{ path, rule }`
+  (hasta 20; por ejemplo `shares_must_sum_to_one`, `unknown_period`, `period_and_when`, `amount_not_representable`
+  cuando una participación es tan chica que el hito quedaría sin importe), y `SCHEDULE_REQUIRES_CALCULATED_QUOTE`
+  cuando la cotización no tiene totales.
+- Es un calendario: dice cuándo vence un importe. No es una factura ni un monto cobrado, y no revisa fechas,
+  aceptaciones ni pagos.
+
+### `compose cash` — lectura de caja del engagement
+
+`pnpm --silent pricing:v3 compose cash --input artifact.json [--out …]`. Función `readEngagementCash` en
+`resources/engagement-view.ts`, contrato `pricing-v3-engagement-cash/1`.
+
+- **Lee, no recalcula:** neto, costo completo y margen (`totals` y por período), tal como los congeló el kernel.
+- **Costo por naturaleza** (`fullCostByNature`): `people`, `provisions`, `platformFee`, `setup`,
+  `toolCreditBudgets` y `toolSeatsAndPackages`, que suman el costo congelado. `capacityCostAbsorbed` es personas
+  más provisiones: costo real del trabajo, nunca cero ni «capacidad gratis».
+- **Caja nueva a proveedores** (`newSupplierCash`): sólo lo que el artefacto declara como compra incremental, que
+  son los packs extra de créditos (`resourceIncrementalCash`), convertidos con el tipo de cambio congelado y leídos
+  hacia arriba. La parte de suscripción que un presupuesto atribuye ya está financiada y no cuenta.
+- **Dos resultados con nombre.** `marginAtFullCost` decide si el trabajo es viable; el veredicto de piso sigue
+  siendo el `MARGIN_BELOW_FLOOR` del kernel. `cashAddedOnContractedCapacity` = neto − caja nueva a proveedores: la
+  caja que el trabajo agrega **si** las personas son capacidad ya contratada. Lleva `isMargin: false` y
+  `decidesPrice: false`.
+- **En qué descansa** (`restsOn`): que cada persona del trabajo ya se paga con o sin él; que las provisiones son
+  reservas y no compras; y que no se compra ningún asiento, paquete, fee de plataforma ni recurso de puesta en marcha
+  para este trabajo.
+- **Lo que declara como no derivable** (`notDerivable`): si un asiento o paquete es una compra nueva (el artefacto
+  atribuye una parte y no registra si el asiento ya existe; uno comprado para el trabajo se paga entero, no por su
+  parte atribuida); si el fee de plataforma o la puesta en marcha son caja pagada a un tercero; y lo cobrado (una
+  cotización no tiene facturas ni pagos). También un pack sin tipo de cambio congelado hacia la moneda de la
+  cotización, y componentes de una clase que la lectura no conoce.
+- `modeledCommitment` repite `totals.cashCommitment` y el `cashLedger`; ninguna otra cifra se deriva de ahí.
+- Rechazo (exit 1): `ENGAGEMENT_CASH_REQUIRES_CALCULATED_QUOTE`.
+
+### `compose commitments` — compromisos que sobreviven a los períodos cotizados
+
+`pnpm --silent pricing:v3 compose commitments --input artifact.json [--out …]`. Función `commitmentExposure` en
+`resources/commitment-exposure.ts`, contrato `pricing-v3-commitment-exposure/1`. Exit 3, o 2 si la cotización no
+está calculada. Necesita, además del resultado, la policy, la demanda y el catálogo congelados en el artefacto.
+
+Lee tres clases de compromiso:
+
+1. **Precio por año.** El kernel lo cobra entero en el primer período que lo usa y costea un doceavo por período.
+2. **Precio por mes bajo un plazo de compromiso** (`commitmentTermMonths` en la entrada de precio de la policy): una
+   licencia que, una vez tomada, se sigue cobrando hasta que termina el contrato. Lo declara la policy; el kernel no
+   lo registra. Sin fecha de renovación se lee como **un** plazo que abre en el primer período que usa el precio; no
+   se asume renovación. Cuando la entrada declara además la fecha en que renueva el contrato (`commitmentRenewsOn`,
+   sólo junto con el plazo), el plazo se lee como **ya corriendo**: las renovaciones son esa fecha y cada plazo
+   después de ella (una fecha pasada avanza a la siguiente de la serie), y la licencia queda atada hasta la primera
+   renovación estrictamente posterior al último día del último mes calendario cotizado que usa el precio
+   (`commitment.boundUntil`). Lo que queda son los meses calendario posteriores a ese período que empiezan antes de
+   esa fecha; un mes cubierto en parte cuenta entero, así que la lectura puede sobrestimar hasta un mes. Si los
+   períodos cotizados cruzan una renovación, la licencia queda atada hasta la **siguiente** y se suma la señal
+   `COMMITMENT_RENEWS_WITHIN_ENGAGEMENT`: en la renovación se puede cambiar el número de licencias, pero sólo de las
+   que ya no se necesitan. Un plazo de 1 (se paga mes a mes y se suelta) no deja nada después del último período,
+   con fecha o sin ella. Hoy es la diferencia entre Adobe, que sigue cobrando una licencia hasta que el contrato
+   renueva, y Microsoft 365 y Notion, cuya cuenta baja cuando se quita un asiento.
+3. **Packs de créditos de IA más grandes que su uso**: créditos comprados, usados y sobrantes, con su vencimiento
+   (si siguen válidos después del engagement o caducan dentro de él).
+
+Por cada compromiso de las dos primeras clases: `committed`, `attributedWithinPeriods` (lo cubierto dentro de la
+cotización) y `unrecovered` (la diferencia). Quién carga con lo no recuperado depende de la parte que declaró la
+demanda: con la cuota entera la cotización es el único usuario declarado y el importe queda **varado si nada más lo
+usa**; con una cuota menor que 1 el asiento es compartido y el importe **se libera a esa capacidad**, nunca se cuenta
+como varado. `shorterCommitmentPrices` lista los precios por mes que la misma policy tiene para esa herramienta con
+un compromiso más corto; es información, nada se elige. `signals[]` resume con seis códigos:
+`COMMITMENT_OUTLIVES_ENGAGEMENT`, `SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT`, `COMMITMENT_RENEWS_WITHIN_ENGAGEMENT`
+(acompaña a uno de los dos anteriores con el mismo importe; no es dinero que se sume),
+`SHORTER_COMMITMENT_PRICE_IN_POLICY`, `CREDITS_LEFT_OVER_AFTER_ENGAGEMENT` y `CREDITS_LAPSE_WITHIN_ENGAGEMENT`.
+Con fecha de renovación, la entrada trae `commitment.termStartKnown`, `renewsOn`, `boundUntil` y
+`renewsWithinQuotedPeriods`, y `committed` es lo atribuido dentro de la cotización más los meses que quedan, no un
+plazo entero.
+
+**Lo que declara como no derivable** (`notDerivable`, que se lee «no se sabe», nunca «no hay»):
+
+- `CONTRACT_TERM_NOT_FROZEN`: herramientas con precio por mes cuya entrada no declara plazo. Sin el dato no se puede
+  leer un contrato anual facturado mes a mes, un asiento que no se suelta a mitad de plazo ni un preaviso.
+- `CONTRACT_RENEWAL_NOT_DECLARED`: la cotización usa el precio más allá del plazo declarado y no se sabe si renueva.
+  Sólo sale para un plazo mayor que 1 sin fecha de renovación: un plazo de 1 nunca la levanta, y con fecha la
+  renovación está declarada.
+- `CREDIT_SUBSCRIPTION_TERM_NOT_FROZEN`: por cuánto tiempo está comprometida la suscripción de un proveedor de
+  créditos.
+- `QUOTE_NOT_CALCULATED`: sin totales no hay nada que leer.
+- Por compromiso: si es caja nueva (`incrementalCash` va en `null`: el artefacto no dice si el asiento ya existe),
+  cuándo abrió de verdad el plazo (`commitment.termStart`, sin fecha de renovación) o, con fecha, las condiciones de
+  salida (`commitment.exitTerms`: salir antes, su cargo o reembolso, lo que se factura por un mes cubierto en parte y
+  si el contrato se renueva), y quién tiene el resto de un asiento compartido.
+
+**Por qué es un comando y no un aviso automático.** La lectura conoce los períodos cotizados, no el plazo del
+contrato con el cliente. No puede distinguir un trabajo de un mes de un mes representativo de un servicio continuo: en el segundo
+caso el «compromiso que sobrevive» no sobrevive a nada: la herramienta se sigue usando el mes siguiente. Como aviso
+en cada resumen daría esa señal también en los servicios continuos, donde es falsa. Se corre a pedido, para un
+engagement acotado, y su `basis` lo dice.
+
+**Alternativa descartada.**
+
+- *Un aviso de compromisos dentro de `runNotices` en cada `compose prepare|quote`.* Por lo anterior: sin el plazo del
+  contrato como dato, sería ruido en los servicios continuos.
+
+**Lo que el código fija a propósito.**
+
+- Las lecturas no viven en la demanda ni en el artefacto: hitos y herramientas a separar los entrega quien llama,
+  después de cotizar, igual que en `compose split`.
+- Una participación que no llega a un importe se rechaza; no se presenta un pago de cero.
+- La suma de participaciones es 1 exacto: con 0,9999 quedaría dinero que nadie cobra.
+- La caja nueva se lee hacia arriba: dinero que sale nunca se presenta más chico de lo que es.
+
+**Medido el 2026-10-11** sobre
+[`designer-on-demand.artifact.json`](../../data/pricing/v3-operating/designer-on-demand.artifact.json) (un mes, CLP,
+neto 2.790.000, costo completo 1.768.438; son las cifras del artefacto congelado, con Adobe con descuento):
+
+- `compose schedule` con 50/30/20: 1.400.000, 840.000 y 550.000; suman el neto. Sin impuesto, porque la cotización
+  no lo resolvió.
+- `compose cash`: caja nueva a proveedores 43.770 (packs de créditos) y caja sobre capacidad contratada 2.746.230.
+- `compose commitments` sobre el artefacto versionado, que congeló la policy v7: un solo compromiso, la licencia de
+  Adobe Creative Cloud Pro, leído como liberado al paquete compartido (la demanda declara una licencia de tres);
+  Notion y Microsoft 365 en `CONTRACT_TERM_NOT_FROZEN`.
+  Ese artefacto no conoce la fecha de renovación: su lectura es la de un plazo sin fecha (un plazo entero desde el
+  primer mes cotizado) y sus importes son un techo, no lo que queda del contrato.
+- La misma demanda vuelta a cotizar con `--current` (policy v10, fuera de la carpeta de datos): costo 1.822.704 y
+  neto 2.870.000, margen 0,3649, porque Creative Cloud Pro entra sin descuento. La demanda elige el precio público
+  de Microsoft 365 y no `current`, así que ese costo no se mueve. El único compromiso sigue siendo Adobe, ahora leído
+  contra su renovación: queda **un** mes después del cotizado, CLP 108.468 (una licencia de tres del precio sin
+  descuento, 325.405,5 / 3), liberado al paquete compartido; la licencia queda atada hasta el 2026-11-16 y la señal
+  es `SHARED_COMMITMENT_OUTLIVES_ENGAGEMENT`. Con la policy v9, que aún cotizaba con descuento, ese mes eran CLP
+  54.202 (162.605 / 3). Notion y Microsoft 365 declaran un mes: no salen como no declarados y no dejan nada
+  comprometido. Sólo quedan las suscripciones de créditos en `CREDIT_SUBSCRIPTION_TERM_NOT_FROZEN`.
+
+**Reglas para agentes.**
+
+- **NUNCA** presentar una lectura como otro precio ni como una condición aprobada: el total es el del artefacto.
+- **NUNCA** presentar `cashAddedOnContractedCapacity` como margen ni usarlo para decidir o defender un precio. El
+  margen que decide es `marginAtFullCost` y el piso es el del kernel.
+- **NUNCA** leer el calendario como factura, cobro o compromiso contractual de fechas.
+- **NUNCA** leer un `notDerivable` como cero: es un dato que falta.
+- **NUNCA** correr `compose commitments` como paso de rutina sobre un servicio continuo ni reportar sus señales como
+  pérdida: en un mes representativo no dicen nada. Es para engagements acotados.
+- **NUNCA** elegir por cuenta propia un precio de compromiso más corto porque la lectura lo lista.
+- **SIEMPRE** entregar junto a la cifra de caja lo que dicen `restsOn` y `notDerivable`.
+- **SIEMPRE** informar al operador lo varado y lo liberado por separado. Si un compromiso es aceptable lo decide él.
+- Las tres salidas son internas: traen costos, márgenes y proveedores.
+
+**Sigue abierto.**
+
+- El plazo del contrato con el cliente no es un input: una cotización tiene períodos, no un plazo. Por eso
+  `commitments` no es automático.
+- **Límite conocido de la lectura de plazos.** La fecha de renovación es opcional (`commitmentRenewsOn`). Un precio
+  que declara plazo **sin** fecha se sigue leyendo como un plazo entero contado desde el primer mes cotizado: para un
+  contrato que ya está corriendo eso sobrestima lo comprometido, y sus importes se leen como un techo, no como una
+  medida. Con fecha se cuenta lo que queda del plazo en curso, con dos límites propios: un mes cubierto en parte
+  cuenta entero (hasta un mes de más) y las condiciones de salida no están en el artefacto. Al 2026-10-11 sólo los
+  precios de Adobe declaran fecha (2026-11-16). Los precios con `unit: 'year'` ignoran los dos campos.
+- No se declara si un asiento se compra para el trabajo, así que la lectura de caja no puede restarlo.
+- Sólo Adobe (12), Notion (1) y los precios mensuales de Microsoft 365 (1) declaran plazo. Para el resto la lectura
+  responde «no declarado». HubSpot se contrata por año, según el operador, pero su precio vigente está pendiente de
+  evidencia y una entrada pendiente no admite plazo.
+- Un engagement de menos de un mes se expresa como horas dentro de un período.
+- No hay una vista de ninguna de las tres lecturas apta para el cliente.
+
+**Todavía no se modela.** Los costos de terceros de un encargo y una reserva de contingencia para trabajo de alcance
+fijo. No hay contrato de entrada, registros ni comando para eso; hoy no entran a la cotización.
 
 ## Evidencia y rutas de operación
 

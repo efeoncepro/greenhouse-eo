@@ -269,6 +269,13 @@ Precio mensual = suma de líneas de capacidad + capa de gobierno. Contrato ≥ 1
 Se dimensiona el squad **para la ventana del proyecto** y se aplica la misma fórmula.
 🔴 **Con un recargo:** un proyecto cerrado tiene **costo de arranque y de cierre** que un on-going amortiza
 en 12 meses. **Un proyecto no es "un mes de retainer".** Si lo cobras como si lo fuera, pierdes plata.
+**En V3 (2026-10-11) esto se expresa en parte:** `engagementForm: "on_demand"` declara la forma del compromiso (no es
+oferta ni delivery model) y suma 10% al precio sobre On-Going con el mismo piso; arranque, coordinación (dedicación de
+una persona) y compromisos con proveedores van como costo, y el 10% cubre sólo riesgo y política. Antes de comprometer
+un encargo (Factory, licitación) revisa `compose schedule` (calendario de pagos) y `compose commitments` (una licencia
+Adobe comprada para un mes se sigue cobrando hasta el fin del contrato si nadie más la usa); `compose cash` no es
+margen ni decide precio. Sin modelar: terceros (freelancers, producción, derechos, medios), reserva de contingencia de
+alcance fijo, duración del contrato y períodos menores a un mes.
 
 ### (c) Ad-hoc / trabajo fuera del plan
 🩸 **BUG (oferta original del blog SKY, superseded 2026-09-23):** el ad-hoc (**CLP 260.000/artículo**) era **más barato que el marginal del plan
@@ -277,7 +284,7 @@ romper la planificación — que es justo lo que destruye la capacidad.
 
 🔴 **Regla:** **el ad-hoc SIEMPRE cuesta MÁS que el marginal del plan.** Rompe la planificación, consume
 coordinación no presupuestada y desordena la cola. **Fix propuesto para SKY: ad-hoc ≥ CLP 550.000 — o, mejor,
-sin precio unitario publicado.**
+sin precio unitario publicado.** V3 no modela esta regla: `on_demand` no compara contra el marginal del plan; hazlo tú.
 
 ### (d) 🩸 BUG VIVO — el plan ampliado está **dominado**
 
@@ -305,7 +312,9 @@ por el outcome**. **Cobrar un Managed Squad a precio de staff-aug es regalar la 
 Su piso también es otro: **25%** de margen (decisión del CEO, 2026-10-11; oferta `talent-assurance-staffing` de V3),
 y de ahí sube según el caso. El 45% sigue siendo el piso del servicio gestionado (oferta `creative-managed-service`
 en esta práctica; SEO/AEO tiene la suya, `seo-aeo-managed-service`, objetivo 55%); no uses la oferta de staff-aug
-para bajarlo.
+para bajarlo. Su puesta en marcha se costea aparte en V3: onboarding USD 200 una vez por persona (por defecto) y
+reclutamiento USD 500 sólo si hay que contratar a alguien; ambos son estimaciones. La regla del Excel («un mes del
+recurso») no se usa: plazo mínimo al reclutar y cláusula de conversión son materia de contrato y revisión legal.
 
 ---
 

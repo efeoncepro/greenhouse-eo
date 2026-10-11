@@ -115,6 +115,9 @@ Ninguna convierte por sí misma delivery model, compromiso, SOW o madurez de pro
 costear un servicio no implican vender horas/personas. Talent Assurance sigue dirección aceptada; los costos de
 sus actividades y el caso comercial requieren evidencia. Herramientas base/específicas, crédito incremental,
 plataforma, setup, riesgos y límites deben estar en economics aunque la proyección comercial sea un fee.
+On-Demand tampoco es oferta ni delivery model: es la forma del compromiso declarada en la cotización (`engagementForm`;
++10% al precio sobre On-Going, mismo piso) y Factory es su vía comercial. Costos de terceros y reserva de contingencia
+de alcance fijo aún no se modelan en V3: se llevan aparte en economics.
 
 Portfolio usa capacidad declarada y separa cliente/interno/sin asignar. Los salarios del Excel de pricing son
 válidos como costo objetivo (los fijó el CEO; no son la nómina actual: el margen real en personas hoy es mayor que

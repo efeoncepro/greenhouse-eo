@@ -21,6 +21,11 @@ No ejecutar el Excel, no modificar baseline in-place, no inventar costos ausente
 
 Las licencias usan precio completo del paquete histórico: permisos de compartir/plan/seat count aún pendientes.
 Talent Assurance/operación/setup `trial-*` son placeholders visibles del ensayo previo, no costos medidos.
+*Nota 2026-10-11:* eso describe esta baseline. En el catálogo operativo, desde v9, `trial-setup` está retirado y la
+puesta en marcha son dos provisiones estimadas por persona; el paquete de Adobe se registra como se factura, por
+licencia. Ese catálogo agrega además la clase de registro `engagement_factor` (la razón de precio de cada forma de
+engagement), que esta baseline no tiene.
+[Detalle](../v3-operating/README.md#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
 
 [Antecedentes actuales declarados por el operador](../v3-pilot/economics/resource-inputs/README.md): Higgsfield, Magnific, Adobe y plataforma Vercel/GCP. Registro local para normalizar; aún no reemplaza valores de esta baseline ni asigna usuarios/costos por servicio automáticamente.
 

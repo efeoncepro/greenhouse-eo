@@ -307,6 +307,9 @@ El contrato verificado en el repositorio ya ofrece piezas reutilizables:
 La brecha vigente es que `services.engagement_kind` separa `regular` de `pilot | trial | poc | discovery`, pero no
 separa un engagement comercial regular On-Going de uno regular On-Demand. En el catálogo, el mapping documentado
 también traduce `on_going` y `on_demand` a `retainer`, por lo que duración, pricing y validación todavía se colapsan.
+Nota 2026-10-11: el cotizador local V3 (simulación; no cambia ese runtime) ya declara la forma en la cotización,
+separada de la cadencia de cobro, y On-Demand ajusta el precio sin ser oferta ni delivery model; ver el
+[manual de agentes](../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
 
 Este documento no decide todavía si:
 

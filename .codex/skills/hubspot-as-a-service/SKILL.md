@@ -204,7 +204,9 @@ Para dimensionar la capacidad regional CRM/Talent Assurance aceptada, cargar
 Resolver variante de consultor, seniority, país del talento y mercado de oferta sin colapsar escalas del Excel;
 el costo del catálogo es el nivel salarial objetivo, no la nómina vigente, y fuera de Chile el factor de talento es
 una estimación (`estimateExposure` del resumen dice cuál confirmar primero). La práctica define tareas/acceso necesarios y el motor calcula
-salario, provisiones, tools/plataforma y margen. No exigir comprar HubSpot si el cliente dispone acceso válido:
+salario, provisiones, tools/plataforma y margen. La puesta en marcha se costea por persona: onboarding por defecto y
+reclutamiento sólo si hay que contratar para ese cliente (`choices`), ambos estimados. HubSpot es contrato anual, pero
+su precio vigente espera evidencia y aún no declara plazo: `compose commitments` no avisa de ese compromiso. No exigir comprar HubSpot si el cliente dispone acceso válido:
 `clientProvidedTools` exige evidencia/ventana/líneas; acceso de partner o Solutions Partner no lo demuestra.
 Notion/M365 permanecen base del equipo y las IA se seleccionan por motivo. Preservar cliente-dirigido vs managed
 service; un fee con roles internos no crea nueva solución comercial ni garantía. Explain es interno, preview

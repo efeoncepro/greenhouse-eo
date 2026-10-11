@@ -18,7 +18,7 @@ son antecedentes confirmados de necesidades, no un schema ejecutable, catálogo 
 | Notion                | Requerido para todos los roles que participan: PMS de Efeonce                                     |
 | Microsoft 365         | Requerido para todos los roles que participan: base común de trabajo                              |
 | SEMrush               | Requerido en redacción SEO, según el ejemplo confirmado por el operador                           |
-| Adobe                 | Redacción SEO sola no lo requiere; una tarea de producción visual puede justificarlo              |
+| Adobe                 | Redacción SEO sola no lo requiere; una tarea de producción visual puede justificarlo. Desde el 2026-10-11 son dos productos: [ver abajo](#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11) |
 | Higgsfield y Magnific | Seleccionar por trabajo visual y presupuesto de consumo; asignaciones concretas pendientes        |
 | ChatGPT y Claude Team | Incluir licencia cuando el trabajo y la asignación la necesitan; planes y asignaciones pendientes |
 | Vercel y GCP          | Reparto de plataforma según cobertura del servicio y driver aprobado; no seat por persona         |
@@ -84,7 +84,8 @@ Quote/prepare legacy conservan kits explícitos previos; el binding nuevo ocurre
 TASK-2022 agrega [flujo operativo](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) y
 [policy sucesora](../../../data/pricing/v3-operating/README.md):32 perfiles/25 tools históricas más nuevos recursos,
 feeETG-017 separado, portfolio de capacidad declarada, cobertura cliente, readiness y preview seguro.
-Adobe 180 USD cubre 3 CC+3 Express (operador confirmado),306 es escenario sin fecha conocida. Notion 24/seat y
+Adobe 180 USD cubre 3 CC+3 Express (operador confirmado),306 es escenario sin fecha conocida (registro del
+2026-10-09; desde la policy v7 no son los importes vigentes: ver la sección de Adobe más abajo). Notion 24/seat y
 créditos 30 USD tienen respaldo de factura por periodo; públicoM365/SEMrush/ChatGPT/Claude sigue separado de gasto
 real. EUR/FX referencial explícito permite simularMagnific. Planes, salarios, usuarios y cartera reales pendientes
 quedan en evaluación; no inventario live o integración canónica. Legacy permanece intacto y TASK-2017 parcial.
@@ -93,6 +94,55 @@ Nota 2026-10-11, precio y cantidad son dos cosas distintas. Por decisión del op
 una herramienta no vence: vale hasta que se reemplaza por otro y lleva una fecha de revisión que avisa sin bloquear.
 Lo que cambia de una cotización a otra es la cantidad de licencias, que se declara en cada cotización junto con las
 asignaciones. Esto no confirma ningún precio: la mayoría sigue siendo precio de lista público marcado como estimado,
-y el plan realmente contratado sigue pendiente. La policy vigente la nombra el puntero de versiones y se usa con
+y el plan realmente contratado sigue pendiente. Microsoft 365 dejó de estar en ese grupo con la policy v9: su precio
+`current` es el de la factura que mostró el CEO (G185142527, del 2026-09-16: Business Standard, USD 14,70 por
+licencia al mes, seis licencias, sin impuesto), confirmado. Sus precios públicos (por ejemplo
+`public-standard-teams-monthly`, USD 16,80) siguen en la policy y las demandas de ejemplo todavía los eligen; una
+cotización nueva debería elegir `current`. Notion (nueve miembros Business a USD 24 y 3000 créditos a USD 30, sin
+impuesto) cita desde la v9 su factura 0D8C80A9-0039 del 2026-09-21. La policy vigente la nombra el puntero de
+versiones y se usa con
 `--current`. Detalle: [precios unitarios](cotizador-v3-mantenimiento-catalogo.md#precios-unitarios-vigencia-y-fecha-de-revisión-2026-10-11)
 y [puntero](cotizador-v3-mantenimiento-catalogo.md#puntero-de-versiones-vigentes-2026-10-11).
+
+## Adobe: dos productos y quién usa cada uno (2026-10-11)
+
+Hasta la policy v6 Adobe figuraba como un solo paquete declarado por el operador. Desde la policy v7 está cargado
+como aparece en su factura (la del 2026-09-16, que mostró el CEO), y son dos productos distintos con usuarios
+distintos:
+
+| Producto | Quién lo usa | Tareas que lo piden | Licencias e importe |
+| --- | --- | --- | --- |
+| Adobe Creative Cloud Pro (`adobe`) | Diseñadores | Diseño visual y edición de video (`visual-design`, `video-editing`) | 3 licencias. Se cotiza a CLP 325.405,5 al mes, el precio sin descuento; hoy se factura a CLP 162.605. Ya incluye Adobe Express |
+| Adobe Express (`adobe-express`) | Perfiles de contenido: Social Media Manager, Community Manager, Content Manager y Content Creator | Diseño con Adobe Express (`express-design`) | 3 licencias, CLP 16.240 al mes |
+
+Qué perfiles de contenido usan Adobe Express lo confirmó el CEO. Desde la policy v7 esos cuatro perfiles traen la
+tarea `express-design` en su receta, así que el cotizador les pide la herramienta sin que nadie la agregue.
+
+Reglas para cotizar:
+
+- **Una licencia es un tercio del paquete.** Cada producto se compra como un paquete de tres licencias. Una persona
+  que usa una carga un tercio del importe (CLP 108.468,5 al mes en Creative Cloud Pro al precio sin descuento, CLP
+  54.202 al importe facturado hoy, y CLP 5.413 en Adobe Express); no se le atribuye el paquete entero. La demanda lo
+  declara en la asignación: una licencia de tres.
+- **Un equipo mixto es normal.** Un diseñador con Creative Cloud Pro y un community manager con Adobe Express en la
+  misma cotización calculan sin problema. Lo que el cotizador rechaza (`BUNDLED_TOOL_DOUBLE_COUNT`) es que la **misma**
+  persona o línea lleve Creative Cloud Pro y además Adobe Express, porque el primero ya lo incluye.
+- **Los importes están en pesos y con IVA**, por decisión del CEO. La demanda que usa cualquiera de los dos productos
+  nombra la tasa `fx:CLP:USD` en `fxRecordIds`.
+- **Si el rol no diseña, se excluye la tarea con su motivo.** Por ejemplo, un community manager que sólo responde
+  comentarios. Se declara en `work[].excludedProfileTasks`. Sin la asignación ni la exclusión, la cotización queda
+  `needs_input` con `RESOURCE_ALLOCATION_REQUIRED`. Las demandas escritas antes de la policy v7 con alguno de esos
+  cuatro perfiles están en ese caso.
+- **Creative Cloud Pro se cotiza sin su descuento.** El descuento de 50 % termina pronto y el CEO decidió el
+  2026-10-11 que se calcule sin él desde ya. Desde la policy v10 el precio `current` es el de lista y es el que toma
+  toda cotización nueva; no hay que elegir nada. El importe facturado con descuento queda como
+  `invoiced-with-discount`, sólo para un trabajo que termina antes que el descuento, y elegirlo es decisión del
+  operador. Ya no existe `renewal-scenario`.
+- **Una licencia de Adobe se sigue cobrando hasta que su contrato anual se renueva**, el 2026-11-16 según la consola
+  del proveedor que mostró el CEO; en la renovación se puede cambiar el número de licencias o cancelar el plan. Que
+  el descuento termine justo en esa fecha no está confirmado. Qué significa el plazo:
+  [provisiones y costos](cotizador-v3-provisiones-y-costos.md#adobe-tal-como-se-factura-y-el-plazo-del-contrato-2026-10-11).
+
+El importe de Adobe Express y el importe facturado de Creative Cloud Pro están confirmados por la factura; el precio
+sin descuento con que se cotiza es estimado hasta que exista una factura a precio completo. Nada de eso confirma
+quién tiene asignada cada licencia: las asignaciones de los ejemplos siguen siendo simulaciones.

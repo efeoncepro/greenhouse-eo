@@ -14,6 +14,13 @@ aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad 
 `offerId: "seo-aeo-managed-service"` — objetivo 55% (extremo bajo del target 55-60% de abajo, confirmado por el CEO)
 y piso 45% (el del 2026-07-13). No usar `creative-managed-service` (objetivo = piso: saldría a 45%) ni la oferta de
 staffing; `--current` y fecha de cotización desde el 2026-10-11.
+**Forma del compromiso (2026-10-11):** un encargo acotado (p. ej. la Fundación de la capa 1) declara
+`engagementForm: "on_demand"` en su propia cotización: +10% al precio sobre On-Going, mismo piso; es forma de
+compromiso, no otra oferta ni delivery model, y la Operación va On-Going (dos cotizaciones; no hay forma híbrida).
+Arranque, coordinación y compromisos con proveedores van como costo; antes de comprometer revisa `compose schedule`
+y `compose commitments` (`compose cash` no es margen ni decide precio). Sin modelar: terceros, contingencia de alcance
+fijo, duración del contrato, períodos bajo un mes y la regla del ad-hoc (bug 2). Los perfiles de contenido llevan
+Adobe Express (CEO): declara su reparto o excluye la tarea con motivo.
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
 nómina real del §4: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.

@@ -18,6 +18,13 @@
 > [superficie implementada](cotizador-v3-superficie-implementada.md#qué-versiones-se-usan-hoy-2026-10-11),
 > [factores y versiones](cotizador-v3-mantenimiento-catalogo.md) y
 > [base de costo](cotizador-v3-provisiones-y-costos.md#la-base-de-costo-de-las-personas-es-un-costo-objetivo-2026-10-11).
+>
+> Nota 2026-10-11 (tarde). Otros dos parámetros que abajo figuran como pendientes o históricos ya tienen valor en el
+> catálogo operativo. El setup dejó de estar pendiente: hay un onboarding por persona y un reclutamiento opcional, los
+> dos estimados, y la regla de un mes de talento no se adoptó
+> ([puesta en marcha](cotizador-v3-provisiones-y-costos.md#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11)).
+> Y Adobe ya no se costea con el importe histórico del libro: son dos productos facturados en pesos
+> ([Adobe](cotizador-v3-seleccion-herramientas.md#adobe-dos-productos-y-quién-usa-cada-uno-2026-10-11)).
 
 ## Procedencia y estados
 
