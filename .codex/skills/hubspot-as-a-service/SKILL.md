@@ -59,6 +59,14 @@ For sent-email logging, reminders and repeated prospect touches, load [manual-ou
 
 ## Prospect segmentation handoff
 
+For Contact/Company/Deal/Lead field selection, creation or qualification, load
+[property-inventory](references/property-inventory.md): the complete dated portal dictionary and phase-based
+capture manual. Revalidate the fields being changed; writable metadata, API requirements and UI/stage
+requiredness are different. The historical Bow-tie design is not a live property or pipeline catalog.
+Prepare a capture plan per object and phase: complete supported relevant facts, preserve existing facts,
+declare pending fields and exclude system writers. Use the plan in the changeset template; a minimal create
+payload does not replace known actionable information or justify creating a Lead/Deal automatically.
+
 For account research, contact discovery and access strategy, load
 [efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). It owns the prospecting method; this skill
 retains CRM identity, dedupe, dictionaries, associations, writes and independent readback.

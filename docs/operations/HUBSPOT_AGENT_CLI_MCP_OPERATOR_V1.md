@@ -15,6 +15,12 @@ CLI y MCP son rutas alternativas de operación directa cuando la operación est�
 
 ## Estado observado en esta máquina y portal
 
+Para elegir propiedades de Contact/Company/Deal/Lead, cargar el
+[inventario completo 2026-10-11](../audits/commercial/hubspot-properties-2026-10-11/README.md) y la
+[guía de captura](../manual-de-uso/hubspot/llenar-propiedades-comerciales.md). El snapshot contiene todas
+las definiciones activas devueltas, no archivadas ni una exportación de registros; reconsultar campos
+y catálogos de la operación. Metadata editable no certifica writer humano, permiso ni requiredness UI.
+
 ### 2026-09-29
 
 - Agent CLI oficial instalada en `~/.hubspot/bin/hubspot`; versión `0.15.0` (build 1250). El instalador verificó SHA-256 y agregó el directorio al `PATH` de `~/.zshrc`. Una shell no interactiva puede requerir la ruta absoluta.

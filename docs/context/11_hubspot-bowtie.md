@@ -1,6 +1,13 @@
 # 11 · Arquitectura HubSpot + Bow-tie
 
-> Greenhouse sincroniza con HubSpot (portal `48713323`) vía Account 360. Este archivo da los **nombres internos exactos** de stages, pipelines y properties — porque para un agente eso es esquema real que debe mapearse, no contexto narrativo. Fuente de verdad: Arquitectura de Pipelines HubSpot v1.0 + Arquitectura Bow-tie v1.1.
+> **Precedencia operativa, 2026-10-11:** este archivo conserva el diseño Bow-tie histórico, no el
+> diccionario live. El [inventario completo](../audits/commercial/hubspot-properties-2026-10-11/README.md)
+> detecta nombres/propiedades y pipelines distintos. Para captura, usar el
+> [manual por objeto](../manual-de-uso/hubspot/llenar-propiedades-comerciales.md) y reconsultar runtime.
+> La auditoría no cambió schema, registros ni el contrato de proyección Greenhouse.
+
+> Greenhouse sincroniza con HubSpot (portal `48713323`) vía Account 360. Fuente del diseño histórico:
+> Arquitectura de Pipelines HubSpot v1.0 + Arquitectura Bow-tie v1.1.
 
 ## Estado del portal (abril 2026, punto de partida)
 

@@ -1,0 +1,146 @@
+{
+  "portalId": 48713323,
+  "asOf": "2026-10-11",
+  "source": "HubSpot MCP discover_hubspot_schema GET_PIPELINES",
+  "data": {
+    "pipelineResults": {
+      "objectType": "DEAL",
+      "results": [
+        {
+          "id": "default",
+          "label": "Pipeline de ventas",
+          "displayOrder": 0,
+          "stages": [
+            {
+              "id": "appointmentscheduled",
+              "label": "Cita programada",
+              "displayOrder": 0,
+              "metadata": {
+                "probability": "0.1"
+              }
+            },
+            {
+              "id": "qualifiedtobuy",
+              "label": "Calificado para comprar",
+              "displayOrder": 1,
+              "metadata": {
+                "probability": "0.25"
+              }
+            },
+            {
+              "id": "presentationscheduled",
+              "label": "Presentación de soluciones",
+              "displayOrder": 2,
+              "metadata": {
+                "probability": "0.35"
+              }
+            },
+            {
+              "id": "1356915244",
+              "label": "Sample Sprint / Validación",
+              "displayOrder": 3,
+              "metadata": {
+                "probability": "0.55"
+              }
+            },
+            {
+              "id": "decisionmakerboughtin",
+              "label": "Precios y terminos",
+              "displayOrder": 4,
+              "metadata": {
+                "probability": "0.75"
+              }
+            },
+            {
+              "id": "contractsent",
+              "label": "Listo para firma",
+              "displayOrder": 5,
+              "metadata": {
+                "probability": "0.9"
+              }
+            },
+            {
+              "id": "closedwon",
+              "label": "Cierre ganado",
+              "displayOrder": 6,
+              "metadata": {
+                "probability": "1.0"
+              }
+            },
+            {
+              "id": "closedlost",
+              "label": "Cierre perdido",
+              "displayOrder": 7,
+              "metadata": {
+                "probability": "0.0"
+              }
+            }
+          ]
+        },
+        {
+          "id": "81ee3345-1b0f-42aa-9e78-580614546602",
+          "label": "HubSpot Shared Selling Pipeline",
+          "displayOrder": 99,
+          "stages": [
+            {
+              "id": "deal_registration_discovery",
+              "label": "Discovery",
+              "displayOrder": 0,
+              "metadata": {
+                "probability": "0.2"
+              }
+            },
+            {
+              "id": "deal_registration_Solution Demo",
+              "label": "Solution Demo",
+              "displayOrder": 1,
+              "metadata": {
+                "probability": "0.3"
+              }
+            },
+            {
+              "id": "deal_registration_Business Considerations",
+              "label": "Business Considerations",
+              "displayOrder": 2,
+              "metadata": {
+                "probability": "0.3"
+              }
+            },
+            {
+              "id": "deal_registration_Pricing and Terms",
+              "label": "Pricing and Terms",
+              "displayOrder": 3,
+              "metadata": {
+                "probability": "0.6"
+              }
+            },
+            {
+              "id": "deal_registration_Out for Signature",
+              "label": "Out for Signature",
+              "displayOrder": 4,
+              "metadata": {
+                "probability": "0.9"
+              }
+            },
+            {
+              "id": "deal_registration_closed_lost",
+              "label": "Closed Lost",
+              "displayOrder": 5,
+              "metadata": {
+                "probability": "0.0"
+              }
+            },
+            {
+              "id": "deal_registration_closed_won",
+              "label": "Closed Won",
+              "displayOrder": 6,
+              "metadata": {
+                "probability": "1.0"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

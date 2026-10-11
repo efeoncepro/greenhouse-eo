@@ -1,0 +1,11 @@
+{
+  "portalId": 48713323,
+  "method": "CLI objects list leads limit 1; only pipeline/stage retained; object id and record values discarded",
+  "rows": [
+    {
+      "hs_pipeline": "lead-pipeline-id",
+      "hs_pipeline_stage": "new-stage-id"
+    }
+  ],
+  "scope": "One existing record; only pipeline and stage retained. IDs/cursor and personal values discarded. No write test."
+}

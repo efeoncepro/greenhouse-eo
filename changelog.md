@@ -9,6 +9,9 @@
 
 ## 2026-10-11 — Cotizador V3: factores por país
 
+- [Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): 1.126 definiciones activas completas, CSV/JSON y guía por fase de Contact/Company/Deal/Lead, revisados por tres subagentes. Routing HubSpot/Prospecting/Commercial y contexto histórico conciliados; requiredness UI/etapa y Lead write siguen sin certificar. Sólo documentación y lectura de portal.
+  Skill actualizada por aprobación posterior: familias de campos y plan por objeto/fase con completar/conservar/pendiente/sistema, evidencia y requisitos por carril; plantillas de handoff/changeset Codex/Claude incorporan el plan. Sin nuevas escrituras CRM.
+
 - Prospección: adapter operativo HubSpot (Agent CLI/API por capability, roles globales vs iniciativa, cambios mínimos/readback), capacity/costo, discovery/proof y aprendizaje por iniciativa. Plantillas/mirrors y routing Commercial/HubSpot sincronizados; fixtures ampliados a 30 conservando los anteriores. [Verificación](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md). Método aprobado, sin software nuevo, acciones SaaS o automatizaciones.
 
 - ABM/ABS incorporado a prospección: módulo por demanda, coordinación Digital Marketing/Commercial, inversión por cuenta y mapas por iniciativa, consenso, costo total y medición; plantillas/espejos y escenarios ampliados a 26. [Verificación](docs/audits/commercial/2026-10-11-abm-abs-skill-update.md). Método aprobado; piloto, gastos, CRM y envío conservan su propia autoridad.

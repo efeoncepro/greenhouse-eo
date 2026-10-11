@@ -24,6 +24,7 @@ Customer Model y práctica disponible, declarar la limitación y no fingir módu
   aprendizaje de cuenta → [resultados y vigencia](../efeonce-b2b-prospecting/references/experiments-and-learning.md).
 - Empaquetado/precio → [Pricing](../efeonce-pricing-operator/SKILL.md) + Business Model/práctica.
 - Operaciones CRM → [HubSpot](../hubspot-as-a-service/SKILL.md).
+  Creación/calificación/cierre → [diccionario y captura por objeto](../hubspot-as-a-service/references/property-inventory.md): nombres/enums reales, evidencia por fase y campos del sistema.
   Cuentas objetivo/roles → su [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md).
 
 No cargar recursivamente ambos entrypoints: cada owner conserva su fase. Una oportunidad/etapa o una

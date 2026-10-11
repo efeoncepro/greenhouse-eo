@@ -1,0 +1,251 @@
+{
+  "portalId": 48713323,
+  "asOf": "2026-10-11",
+  "source": "HubSpot MCP hubspot_get_properties; configured enums only; record-reference options excluded",
+  "properties": [
+    {
+      "object": "deals",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "PEN",
+          "label": "PEN"
+        },
+        {
+          "value": "COP",
+          "label": "COP"
+        },
+        {
+          "value": "CLF",
+          "label": "CLF"
+        },
+        {
+          "value": "MXN",
+          "label": "MXN"
+        },
+        {
+          "value": "USD",
+          "label": "USD"
+        },
+        {
+          "value": "CLP",
+          "label": "CLP"
+        }
+      ],
+      "name": "deal_currency_code",
+      "label": "Currency",
+      "description": "Currency code for the deal."
+    },
+    {
+      "object": "deals",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "Core Pipeline",
+          "label": "Core Pipeline"
+        },
+        {
+          "value": "Strategic Bets",
+          "label": "Strategic Bets"
+        },
+        {
+          "value": "Opportunistic / Administrative",
+          "label": "Opportunistic / Administrative"
+        }
+      ],
+      "name": "pipeline_bucket",
+      "label": "Pipeline Bucket",
+      "description": ""
+    },
+    {
+      "object": "deals",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "newbusiness",
+          "label": "New Business"
+        },
+        {
+          "value": "existingbusiness",
+          "label": "Existing Business"
+        }
+      ],
+      "name": "dealtype",
+      "label": "Deal Type",
+      "description": "The type of deal. By default, categorize your deal as either a New Business or Existing Business."
+    },
+    {
+      "object": "leads",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "ORGANIC_SEARCH",
+          "label": "Organic Search"
+        },
+        {
+          "value": "PAID_SEARCH",
+          "label": "Paid Search"
+        },
+        {
+          "value": "EMAIL_MARKETING",
+          "label": "Email Marketing"
+        },
+        {
+          "value": "SOCIAL_MEDIA",
+          "label": "Organic Social"
+        },
+        {
+          "value": "REFERRALS",
+          "label": "Referrals"
+        },
+        {
+          "value": "OTHER_CAMPAIGNS",
+          "label": "Other Campaigns"
+        },
+        {
+          "value": "DIRECT_TRAFFIC",
+          "label": "Direct Traffic"
+        },
+        {
+          "value": "OFFLINE",
+          "label": "Offline Sources"
+        },
+        {
+          "value": "PAID_SOCIAL",
+          "label": "Paid Social"
+        },
+        {
+          "value": "AI_REFERRALS",
+          "label": "AI Referrals"
+        }
+      ],
+      "name": "hs_lead_source",
+      "label": "Lead Source",
+      "description": "The analytics source of the lead, inherited from primary associated contact or company at the time of lead creation"
+    },
+    {
+      "object": "leads",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "NEW_BUSINESS",
+          "label": "New business"
+        },
+        {
+          "value": "UPSELL",
+          "label": "Upsell"
+        },
+        {
+          "value": "RE_ATTEMPTING",
+          "label": "Re-attempting"
+        }
+      ],
+      "name": "hs_lead_type",
+      "label": "Lead Type",
+      "description": "The type of lead. By default, categorize your lead as either a New Business, Existing Business, or Re-attempting"
+    },
+    {
+      "object": "leads",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "HOT",
+          "label": "Hot"
+        },
+        {
+          "value": "WARM",
+          "label": "Warm"
+        },
+        {
+          "value": "COLD",
+          "label": "Cold"
+        }
+      ],
+      "name": "hs_lead_label",
+      "label": "Lead Label",
+      "description": "Current status of a given lead"
+    },
+    {
+      "object": "contacts",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "subscriber",
+          "label": "Subscriber"
+        },
+        {
+          "value": "lead",
+          "label": "Lead"
+        },
+        {
+          "value": "marketingqualifiedlead",
+          "label": "Marketing Qualified Lead"
+        },
+        {
+          "value": "salesqualifiedlead",
+          "label": "Sales Qualified Lead"
+        },
+        {
+          "value": "opportunity",
+          "label": "Opportunity"
+        },
+        {
+          "value": "customer",
+          "label": "Customer"
+        },
+        {
+          "value": "evangelist",
+          "label": "Evangelist"
+        },
+        {
+          "value": "other",
+          "label": "Other"
+        }
+      ],
+      "name": "lifecyclestage",
+      "label": "Lifecycle Stage",
+      "description": "The qualification of contacts to sales readiness. It can be set through imports, forms, workflows, and manually on a per contact basis."
+    },
+    {
+      "object": "companies",
+      "type": "enumeration",
+      "options": [
+        {
+          "value": "subscriber",
+          "label": "Subscriber"
+        },
+        {
+          "value": "lead",
+          "label": "Lead"
+        },
+        {
+          "value": "marketingqualifiedlead",
+          "label": "Marketing Qualified Lead"
+        },
+        {
+          "value": "salesqualifiedlead",
+          "label": "Sales Qualified Lead"
+        },
+        {
+          "value": "opportunity",
+          "label": "Opportunity"
+        },
+        {
+          "value": "customer",
+          "label": "Customer"
+        },
+        {
+          "value": "evangelist",
+          "label": "Evangelist"
+        },
+        {
+          "value": "other",
+          "label": "Other"
+        }
+      ],
+      "name": "lifecyclestage",
+      "label": "Lifecycle Stage",
+      "description": "The qualification of companies to sales readiness throughout the buying journey"
+    }
+  ]
+}

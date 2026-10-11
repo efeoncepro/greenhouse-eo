@@ -2,6 +2,13 @@
 
 Portal **48713323**. Contrato técnico: [decisión aceptada](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
 Operación: [manual](../../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
+La [captura por objeto y fase](../../manual-de-uso/hubspot/llenar-propiedades-comerciales.md) y el
+[inventario completo fechado](../../audits/commercial/hubspot-properties-2026-10-11/README.md) distinguen
+campos de investigación, calificación, oportunidad y sistema. La presencia en segmentos no convierte
+fit en interés ni Lead/Contact en Deal; el catálogo no certifica requisitos UI/etapa.
+La skill convierte estos datos en un plan por objeto/fase: completar hechos pertinentes confirmados,
+conservar valores vigentes, declarar pendientes y separar writers del sistema. El mínimo técnico de alta
+no reemplaza evidencia disponible; tampoco se completan desconocidos para aparentar un registro completo.
 Las expresiones completas, nombres e IDs leídos en HubSpot están en el
 [catálogo fechado](../../operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json). Es evidencia de configuración; HubSpot sigue siendo la fuente viva.
 

@@ -14,7 +14,7 @@ CMP: [manifiesto y MCP](docs/operations/EFEONCE_CAMPAIGN_REGISTRY_V1.md).
 
 [CRM/TA](docs/operations/CRM_SPECIALIST_CAPACITY_ACTIVATION_V1.md); [V3](data/pricing/README.md).
 
-## Actualización documental
+## Documentación
 
 CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first | híbrida | no-fit`.
 [Transformación humano-agente de RevOps & CRM](docs/services/revenue-operations-crm/HYBRID_HUMAN_AGENT_TRANSFORMATION_V1.md): aprobada y probada comercialmente por el operador; pruebas publicables, pricing y elegibilidad de cada capacidad requieren verificación.
@@ -22,7 +22,8 @@ CRM (Dreamforce/UNBOUND, 19/09): provider-fit `HubSpot-first | Salesforce-first 
 Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 `docs/operations/agent-context-history/2026-07-19/project_context.legacy.md`.
 
-[Comercial](docs/commercial/README.md). [Prospección operativa](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
+[Comercial](docs/commercial/README.md). [Prospección](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
+[CRM](docs/context/11_hubspot-bowtie.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 

@@ -10,6 +10,10 @@
 
 ## Context
 
+Evidencia operativa del mismo día: [diccionario completo del portal](../audits/commercial/hubspot-properties-2026-10-11/README.md)
+y [captura por objeto/fase](../manual-de-uso/hubspot/llenar-propiedades-comerciales.md). El inventario readonly
+documenta el schema observado; no introduce nuevas propiedades, permisos ni cambios a esta decisión.
+
 La prospección ya tiene radar personal, reglas CRM, modelo de cliente, métodos comerciales y seguimiento.
 El [discovery](../audits/commercial/2026-10-11-prospecting-skill-discovery.md) encontró reglas repartidas y
 un routing Codex ausente para Commercial. El operador exige datos accionables y objetivo más 2–3 contactos
@@ -88,6 +92,14 @@ Plantillas/mirrors y routing Commercial/HubSpot se actualizan; fixtures v4 añad
 de contenido. Continúan los gates de correo/cobertura y owners. La aprobación actualiza método, no
 habilita beta, software externo, créditos, schema, gastos, comunicaciones o lotes CRM.
 [Verificación](../audits/commercial/2026-10-11-prospecting-operational-modules-update.md).
+
+### Delta aceptado 2026-10-11 — inventario aplicado a la captura CRM
+
+El operador pidió actualizar la skill con el inventario completo del portal. El módulo HubSpot convierte
+evidencia en plan por objeto/fase (completar/conservar/pendiente/sistema) antes del changeset; incluye hechos
+pertinentes confirmados, conserva writers y separa requisitos operativos, del carril y UI/etapa. Las plantillas
+de entrega/cambio lo consumen. La selección de campos y enums se revalida; el snapshot no autoriza nuevos
+objetos, schema o mutaciones. Es extensión del método compartido, sin nuevo runtime ni APIs.
 
 ## Alternatives Considered
 

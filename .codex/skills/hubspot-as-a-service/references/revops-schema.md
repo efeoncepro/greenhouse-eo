@@ -1,5 +1,9 @@
 # RevOps and CRM Schema
 
+For Efeonce Contact, Company, Deal or Lead writes, load [property-inventory](property-inventory.md).
+The 2026-10-11 complete active dictionary and capture manual document actual names/enums, system writers
+and gaps in creation/stage requiredness; reconsult the relevant metadata before executing a changeset.
+
 ## Property decision contract
 
 For every requested field determine:

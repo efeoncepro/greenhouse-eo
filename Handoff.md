@@ -6,6 +6,14 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 
 ## 2026-10-11 — Diseño de skill de prospección B2B
 
+[Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): tres subagentes,
+1.126 definiciones activas de Contact/Company/Deal/Lead verificadas por CLI; CSV/JSON completos y
+[captura por fase](docs/manual-de-uso/hubspot/llenar-propiedades-comerciales.md) enlazados desde skills
+Codex/Claude. Catálogos MCP y un readback mínimo Lead conciliados. Pendiente: reglas UI/formulario/etapa
+(navegador sin sesión) y permiso efectivo de Lead write. Sin cambios CRM, schema, acceso, créditos o envío.
+Actualización posterior aprobada: módulo HubSpot con familias de captura, plan por objeto/fase
+(completar/conservar/pendiente/sistema) y plantillas changeset/action-pack sincronizadas Codex/Claude.
+
 [Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md): método Codex/Claude implementado, revisión Sales y 12 escenarios offline aceptados. Adapter personal conserva HSP/radar y Commercial Codex resuelve routing. [Decisión](docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md), [discovery](docs/audits/commercial/2026-10-11-prospecting-skill-discovery.md) y [verificación](docs/audits/commercial/2026-10-11-prospecting-skill-implementation.md). Sin nuevos schedulers, créditos, CRM ni envíos. Eficacia comercial y discrepancia económica pendientes de evidencia/decisión del caso.
 
 [Buying group](docs/audits/commercial/2026-10-11-buying-group-coverage-research.md): tres subagentes y revisión crítica completados; cobertura por roles/fase y 2–3 adicionales como base, ampliable según brechas. Evolución aprobada e implementada: núcleo, espejos, plantillas y canon CRM sincronizados; personas, roles y autoridad/correo/acceso separados. [Verificación](docs/audits/commercial/2026-10-11-buying-group-skill-update.md); 22 escenarios offline aceptados; validaciones mecánicas aprobadas. Sin acciones externas.

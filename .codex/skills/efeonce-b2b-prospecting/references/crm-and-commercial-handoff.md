@@ -7,13 +7,19 @@ Approval vigente para un lote se reutiliza; no pedir confirmación por segunda v
 ## Registro o reutilización autorizado
 
 1. Leer [HubSpot](../../hubspot-as-a-service/SKILL.md), su [segmentación](../../hubspot-as-a-service/references/prospecting-segmentation.md)
+   y su [diccionario/captura por objeto](../../hubspot-as-a-service/references/property-inventory.md),
    y [manual de carriles](../../../../docs/operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md). Verificar identidad,
    portal, transporte pedido y diccionario real. El portal Efeonce/Kortex no autoriza otro cliente.
 2. Resolver Company, dominio/grupo y posibles Contact/Lead/Deal existentes; documentar IDs. Dedupe por email
    no resuelve un cambio de empleador. Una Company creada vía API puede no deduplicar por dominio.
-3. Preparar changeset con valores, asociaciones, notas/cohorte y evidencia. Sólo nuevos contactos elegibles;
+3. Preparar changeset con valores, asociaciones, notas/fecha de investigación y evidencia. Las cohortes
+   fechadas son históricas, sin nuevas asignaciones. Sólo nuevos contactos elegibles;
    objetivo sin correo queda en investigación o nota de Company autorizada. Registrar adyacentes no les atribuye
    la demanda del objetivo. Clasificación local no crea propiedades HubSpot por sí sola.
+   Incluir plan por objeto/fase: campos pertinentes conocidos a completar, valores a conservar,
+   desconocidos/conflictos pendientes y campos del sistema. Separar requisito operativo, del carril
+   y UI/etapa; citar diccionario consultado y lectura actual. No reducir el registro al mínimo de alta
+   cuando ya existe evidencia adicional accionable, ni rellenar vacíos sin ella.
 4. Ejecutar los objetos/campos aprobados. No crear Deal, enrollment, schema/filtro, fusionar ni borrar porque
    parezca conveniente. Dry-run si existe. Ante respuesta de escritura ambigua, leer estado antes de reintentar.
 5. Leer independientemente IDs, email/empresa, propiedades, asociaciones y Primary Company tras automatización.
@@ -36,7 +42,7 @@ propuesta y negociación; el seguimiento existente recibe hilo, tarea y compromi
 
 Estados se informan separados: investigada, elegible, changeset preparado, aprobado, escrito, leído de vuelta,
 borrador preparado, enviado, registrado; sólo afirmar los observados. Reutilizar aprobaciones/historia HSP y
-cohortes actuales; no tratar lotes pendientes como nuevos ni asignar una cohorte antigua a todo el radar.
+fechas de investigación por objeto; no tratar lotes pendientes como nuevos ni asignar una cohorte antigua a todo el radar.
 
 ## Sales como apoyo disponible
 

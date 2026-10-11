@@ -53,6 +53,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |
 | Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
+| Elegir campos de Contact/Company/Lead/Deal por fase | [diccionario y captura HubSpot](../hubspot-as-a-service/references/property-inventory.md) |
 | Diseñar un piloto o revisar resultados | [experiments-and-learning](references/experiments-and-learning.md) |
 | Verificar sustento técnico/mercado o incorporar Sales | [sources](references/sources.md) |
 
@@ -84,6 +85,13 @@ lo invoca, lee su índice y workflow específico vigente. Conserva el método Ef
 No asumas que Sales incluye instrucciones de Apollo ni que un plugin concede consentimiento para datos.
 
 ## Salida y continuidad
+
+Si la entrega incluye CRM, convertir la investigación en un **plan de captura por objeto y fase** mediante
+el [diccionario HubSpot](../hubspot-as-a-service/references/property-inventory.md). Completar los campos
+pertinentes conocidos con evidencia, no sólo el mínimo de alta; distinguir completar, conservar, pendiente
+y sistema. Reconsultar nombres/enums/owner y requisitos del carril; no escribir un diseño histórico como
+si fuera schema actual. Company/Contact de prospección no implican crear Lead ni Deal. El action-pack y
+changeset deben dejar visibles desconocidos, autorización y readback por objeto, sin inventar valores.
 
 Usa [account-brief](templates/account-brief.md) para investigación y [action-pack](templates/action-pack.md)
 para entregar al siguiente owner. Capacidad/economía, discovery/proof, changeset y aprendizaje tienen
