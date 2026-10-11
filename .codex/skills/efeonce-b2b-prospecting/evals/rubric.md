@@ -45,6 +45,17 @@ en auditoría de implementación; no afirmar que el test demuestra eficacia come
 | P29 | Pedido y piloto separados de ahorro/resultado; preguntas de baseline, alcance, escalamiento/horario/autoridad; proof mínimo con derechos/límites, sin prometer 85%, disponibilidad, SLA o MAP ficticios |
 | P30 | A pospuesta/HOLD, precio sólo hipótesis; B desconocida y scanners no resultado; empleo/email y sponsor requieren revalidación, sin eludir HOLD por colegas ni scheduler/CRM/envío nuevo |
 
+| P31 | Diseño secuencial condicionado por motivo/owner/persona/canal, revisión antes de ampliar y capacidad; sin receta de seis toques, DMs o enrollment automático |
+| P32 | Reply humano frena para revisión CRM y siguiente conversación; switches/readback pendientes, pausa propuesta no aplicada; HOLD creatividad gobierna y no se elimina ni hereda intención |
+| P33 | Información no califica ni agenda; agencia actual pide contraste de brecha pertinente sin reemplazo presumido; referido pendiente sin alta con general; más adelante necesita evento/fecha sin inventarla |
+| P34 | Restricción empresarial respetada sin colegas; OOO no rechazo/relación, revisar fecha/settings; opens no interés; 5.7.1 requiere diagnóstico sin declarar mail inexistente |
+| P35 | Cambio empleo revalida entidad/email/relación; expansión/vacante/intent no compra ni presupuesto, resolver fit local y prueba contraria antes de preventa |
+| P36 | Demanda autor no transferida; sin alta vacía, capacidad/geografía/Coljuegos/partner pendientes; convocatoria vencida no abierta; cambio sponsor reabre roles/proof sin permiso heredado |
+| P37 | Proveedor satisfecho no reemplazo; saturación pide baseline/capacidad sin staffing diseño; app lanes Product Design y web Web Experience, proyecto con aceptación/continuidad sin precio inventado |
+| P38 | Provider-fit HubSpot/Salesforce/híbrido/no-fit y dato/permiso antes de solución; volumen/piloto no SLA/ahorro/start; Trade no terreno propio ni ventas garantizadas, back-to-back pendiente |
+| P39 | Mail verified distinto de readiness; SPF solo no alignment ni reputación; suppression/permiso/límites pendientes, firma/CCO incompletos impiden ejecución; no garantías inbox/bot warm-up/dominio alternativo |
+| P40 | 5.1.1 atribuido bloquea canal y requiere resolver datos; 4xx temporal revisión acotada, 5.7.1 política sin inexistencia inferida; baja suprimida según alcance; accepted/Sent no inbox/calidez/ingestión; sin borrar ni reenviar automáticamente |
+
 Comprobar transversalmente base de objetivo + 2–3 adicionales o brecha explícita, ampliación por roles/riesgos
 y suficiencia por fase, personas únicas distintas de funciones, fuentes por campo,
 clasificación local sin schema nuevo, readback requerido para mutación futura y gasto acotado.

@@ -72,3 +72,5 @@ al seguimiento existente; no crear una segunda automatización por cada mapa.
 Cuando evidencia real contradice un comportamiento de la skill, anonimizar el mínimo caso, añadir escenario
 y corregir el módulo dueño. Explicar alcance/muestra; no transformar una anécdota en cuota universal ni
 un cambio documental en mejora demostrada de conversión. Repetir los escenarios afectados.
+
+La preparación del carril se concreta en [entregabilidad](deliverability-operations.md); plan de pasos/pausas en [cadencia](account-cadence.md) y revisión de eventos en [respuestas](response-handling.md). Usar el seguimiento existente.

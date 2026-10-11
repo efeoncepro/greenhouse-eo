@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "scope": "Offline, synthetic identities/domains. Prepare local decisions and proposed actions only; never call providers, write CRM, enroll or send. All dates have cut 2026-10-11.",
   "scenarios": [
     {
@@ -265,6 +265,96 @@
         "La iniciativa A recibió mensaje humano: presupuesto pospuesto, esperen confirmación y no contacten colegas. El equipo anotó perdida por precio, sin declaración del comprador. La iniciativa B de la misma cuenta sigue sin respuesta; etapa CRM open y dos opens de scanner.",
         "Un directorio anuncia nuevo sponsor. Un contacto cambió de empleador y su dirección vieja aún es técnicamente valid; su ficha decía revisar el próximo mes. No llegó confirmación para reactivar A. Introducción prometida por un colega nunca ocurrió.",
         "El radar ya tiene expediente/HSP/tarea y heartbeat. No permiso de nuevos envíos, cambios CRM/schema o automatizaciones. El trigger permite preparar revisión de evidencia, no ignorar HOLD. Datos privados no deben versionarse."
+      ]
+    },
+    {
+      "id": "P31",
+      "request": "Prepara una cadencia para cuatro personas de una cuenta; solo diseño offline.",
+      "facts": [
+        "Cuenta elegible, iniciativa CRM; cuatro personas únicas con empleo y correo individual verificados. Dos operadores, un responsable TI y una potencial sponsor sin autoridad confirmada.",
+        "No hay respuestas ni permiso de envío/enrollment. Comercial dispone de dos horas esta semana y necesita conservar seguimiento de conversaciones activas.",
+        "Un colega sugiere seis toques por persona a diario y DMs paralelos; no conocemos preferencias de canal."
+      ]
+    },
+    {
+      "id": "P32",
+      "request": "Revisa el plan de CRM y decide qué pasos seguir al responder una persona; solo propuesta offline.",
+      "facts": [
+        "La cuenta tiene iniciativas CRM y creatividad separadas con el mismo owner. TI respondió sobre CRM: hablemos de acceso a datos la próxima semana; no habló de creatividad.",
+        "Hay tres personas en secuencias de CRM. Los switches de unenrollment por reply/Company no se leyeron y no existe readback de parada. Enrollment ejecutaría el primer paso inmediatamente.",
+        "Creatividad tiene un HOLD explícito vigente hasta confirmación. Ninguna acción externa está autorizada."
+      ]
+    },
+    {
+      "id": "P33",
+      "request": "Clasifica las respuestas y prepara un próximo paso útil por cuenta, sin enviar ni cambiar CRM.",
+      "facts": [
+        "Alba responde envíame información, sin pedir reunión ni confirmar problema. Bruma responde ya tenemos agencia, sin negativa de contacto ni interés en reemplazo.",
+        "Cauce dice habla con Irene; no hay introducción realizada ni email de Irene, solo correo general. Duna pide escríbeme después del cierre de presupuesto, fecha desconocida.",
+        "Todas las entidades tienen fit verificado y cobertura inicial investigada. No hay permiso de nuevas revelaciones."
+      ]
+    },
+    {
+      "id": "P34",
+      "request": "Prepara tratamiento de respuestas técnicas y negativas; sólo decisiones offline.",
+      "facts": [
+        "El destinatario de Este dice no contacten a nadie más de nuestra empresa por esto. Dos colegas tienen emails verified.",
+        "Oeste devuelve OOO hasta el 19/10; el sistema muestra unenrolled, sin verificar por qué. Norte tiene cinco opens sin respuesta humana. Sur arroja 5.7.1, sin reporte completo; su email estaba verified.",
+        "No hay permiso de contactos, CRM o cambios de proveedor; el owner debe conservar restricciones y condiciones de revisión."
+      ]
+    },
+    {
+      "id": "P35",
+      "request": "Usa estas señales para decidir qué investigar y cómo entrar; no operaciones externas.",
+      "facts": [
+        "Banco Faro confirma que la persona conocida cambió de Banco Roca a Faro este mes; el mail de Roca todavía responde técnicamente valid. No hay demanda declarada de Faro.",
+        "Grupo Vela anunció expansión; el titular no identifica entidad que compra ni dueño de marketing. Una vacante pide diseñador interno; otro proveedor muestra intent score alto para CRM.",
+        "Las candidatas tienen hard filters de ICP sin resolver; solo existe evidencia pública de los hechos señalados."
+      ]
+    },
+    {
+      "id": "P36",
+      "request": "Aprovecha la búsqueda pública de agencia y un cambio de sponsor para preparar acciones hoy; sólo propuesta.",
+      "facts": [
+        "Atlas publicó necesidad de promociones en Colombia hace dos días; identidad de autor y entidad verificadas. El objetivo no tiene email; dos colegas elegibles, sin participación confirmada.",
+        "La capacidad para trámites Coljuegos/geografía/partner back-to-back no está acreditada. La antigua convocatoria del mismo grupo cerró el 8/10 y no confirmó readmisión.",
+        "En una segunda iniciativa CRM cambió el sponsor; roles y permiso para usar una prueba vieja siguen sin revalidar."
+      ]
+    },
+    {
+      "id": "P37",
+      "request": "Propón entrada para estas tres situaciones; sólo plan, no contacto ni propuesta económica.",
+      "facts": [
+        "Cuenta Uno tiene agencia satisfecha y no pide reemplazarla; desconoce si tiene brechas entre proveedores. Cuenta Dos declara equipo saturado por entregas pero no medimos baseline ni capacidad disponible de Efeonce.",
+        "Cuenta Tres pide proyecto puntual de sitio público y diseño de app. Sus criterios, aceptación, responsable económico y operación posterior siguen desconocidos.",
+        "Las tres tienen fit y contactos elegibles. No hay precios/tarifas ni disponibilidad aprobadas."
+      ]
+    },
+    {
+      "id": "P38",
+      "request": "Prepara entrada de CRM y operación continua sin alterar proveedores ni modelo comercial.",
+      "facts": [
+        "Cuenta CRM tiene Salesforce en operación y pregunta sobre agentes: no leyó arquitectura de datos/permisos, no aprobó cambio a HubSpot y no hay prueba de problema concreto.",
+        "Cuenta Social solicita operación mensual; 1300 respuestas es volumen solicitado, un piloto de 96 comentarios no demuestra ahorro, SLA o start.",
+        "Cuenta Trade pide personal de campo e incremento garantizado de ventas sin partner ni términos back-to-back. Solo diagnóstico/plan local; no gastos ni escrituras."
+      ]
+    },
+    {
+      "id": "P39",
+      "request": "¿Está lista esta campaña para enviarse? Solo diagnóstico, sin envío o cambios de DNS.",
+      "facts": [
+        "Un contacto tiene empleo actual/email individual verified; no hay opt-out conocido pero su suppression efectiva no fue consultada. El sender corporativo está conectado a Outlook.",
+        "Se leyó SPF publicado; DKIM, DMARC alignment, restricciones y avisos de reputación son desconocidos. No existe baseline local de bounce ni volumen aprobado.",
+        "Hay un borrador de Julio con firma textual incompleta y BCC ausente. El plan afirma que Apollo verified garantiza inbox y propone bot warm-up y otro dominio."
+      ]
+    },
+    {
+      "id": "P40",
+      "request": "Diagnostica resultados y decide el siguiente chequeo, sin reenviar ni registrar.",
+      "facts": [
+        "Una dirección verified produjo 5.1.1 con reporte atribuido a ese destinatario. Otra produjo 4xx temporal; una tercera 5.7.1 de política con detalle limitado.",
+        "El proveedor aceptó un mensaje y Outlook muestra Enviados; no hay lectura ni respuesta humana ni registro HubSpot confirmado. Otro destinatario pidió baja.",
+        "El equipo quiere reenviar todos, eliminar los contactos y marcar la cuenta cálida; no hay permiso para estas acciones."
       ]
     }
   ]

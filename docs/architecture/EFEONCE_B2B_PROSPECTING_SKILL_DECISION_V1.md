@@ -101,6 +101,21 @@ pertinentes confirmados, conserva writers y separa requisitos operativos, del ca
 de entrega/cambio lo consumen. La selección de campos y enums se revalida; el snapshot no autoriza nuevos
 objetos, schema o mutaciones. Es extensión del método compartido, sin nuevo runtime ni APIs.
 
+### Delta aceptado 2026-10-11 — recorridos y entregabilidad
+
+El operador aprobó las cinco extensiones recomendadas con «Hazlas todas... lanza subagentes para paralelizar».
+Se incorporan módulos progresivos de señal→acción, entrada por situación, cadencia coordinada, tratamiento
+de respuestas y entregabilidad operativa, con plantillas, routing Commercial y escenarios sintéticos.
+Cada señal conserva vigencia/contraste y siguiente validación; los pasos tienen persona/canal/motivo/owner,
+esfuerzo y stops según persona/iniciativa/cuenta. Respuestas revisan el plan y respetan restricciones;
+Commercial conserva objeciones/negociación. Los settings de pausa/enrollment se verifican por carril y
+pausa propuesta no consta aplicada sin ejecución/readback. Correo verificado no certifica remitente listo,
+inbox o ingestión CRM; el proveedor y su owner conservan configuración/autenticación/restricciones.
+
+Es extensión del método aprobado, sin nuevo runtime, scheduler, schema, oferta, tarifas ni autonomía.
+La aprobación autoriza los archivos/revisión delegada, sin iniciar piloto, DNS, créditos, CRM o comunicaciones.
+[Verificación y límites](../audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md).
+
 ## Alternatives Considered
 
 - **Ampliar sólo la skill personal:** no comparte método ni corrige routing/deriva entre agentes.

@@ -30,6 +30,12 @@ Antes de crear/calificar/cerrar Contact, Company, Lead o Deal, cargar su
 el diseño Bow-tie histórico no prueba fields/pipelines efectivos ni requisitos UI/API.
 Los módulos comparten método; no crean ofertas, presupuesto, schema, Deals ni nuevas automatizaciones.
 
+Para preparar entrada por situación, usar [playbooks de entrada](../efeonce-b2b-prospecting/references/situation-entry-playbooks.md).
+Cadencias y respuestas se coordinan con [cadencia de cuenta](../efeonce-b2b-prospecting/references/account-cadence.md)
+y [tratamiento de respuestas](../efeonce-b2b-prospecting/references/response-handling.md); Commercial conserva
+objeciones, calificación y negociación. Preparación del remitente/canal: [entregabilidad](../efeonce-b2b-prospecting/references/deliverability-operations.md),
+sin convertir método en autorización de envío, enrollment, cambios DNS o pausas aplicadas.
+
 # commercial-expert — Greenhouse Overlay
 
 ## Envíos desde el Outlook de Julio

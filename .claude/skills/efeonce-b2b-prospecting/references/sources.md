@@ -79,3 +79,13 @@ en CRUD ni roles globales en autoridad por iniciativa. Properties, KB Buying Gro
 reabiertos en esta ampliación; no hubo nuevos writes ni se auditó beta/layout.
 Capacidad, discovery/proof y aprendizaje son procedimientos Efeonce sobre los owners vigentes, no técnicas
 con uplift demostrado ni una extensión de pricing/schema/oferta. Los ejemplos y evals son sintéticos.
+
+## Recorridos y entregabilidad — ampliación aprobada 2026-10-11
+
+[Cadencia](account-cadence.md) y [respuestas](response-handling.md) incorporan lecturas primarias HubSpot
+sobre pasos/enrollment, paradas configurables y OOO; [entregabilidad](deliverability-operations.md) conserva
+fuentes Microsoft, Google, HubSpot y Apollo con alcance, consulta y límites al pie. No certifican settings
+Efeonce, acceso API/CLI, sender/DNS, reputación ni inbox. No adoptar cifras bulk como cuotas de envío.
+[Señal→acción](signal-to-action.md) y [entradas](situation-entry-playbooks.md) son procedimientos Efeonce sobre
+fuentes dueñas locales; no benchmarks ni técnicas con eficacia comercial demostrada. Las fechas/hitos del
+caso y su revisión no constituyen consentimiento, vigencia garantizada ni scheduler nuevo.

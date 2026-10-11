@@ -24,6 +24,8 @@ Actualización posterior aprobada: módulo HubSpot con familias de captura, plan
 
 [Ampliación operativa de prospección](docs/audits/commercial/2026-10-11-prospecting-operational-modules-update.md): cuatro mejoras aprobadas e incorporadas a skills/espejos: adapter HubSpot con changeset/readback y roles por iniciativa, capacidad/costo por owner/período, discovery/proof por oferta/función y aprendizaje/vigencia. Fixtures v4 preservan 26 casos y añaden cuatro; revisión/validación del alcance registrada en auditoría. Método sin nuevo software/API de gráfico, activación beta, schema, gastos, CRM, envíos ni scheduler.
 
+[Recorridos y entregabilidad](docs/audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md): cinco módulos aprobados y repartidos entre tres subagentes; señal→acción, entradas por situación, cadencia, respuestas y preparación de entrega. Plantillas/routing Commercial y fixtures v5 (40, 30 previos conservados) incorporados. Verificación y límites en auditoría; ningún piloto ni acción externa iniciados.
+
 ## 2026-10-11 — Contactos conocidos de banca y retail
 
 Contrato vigente de [prospección B2B](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#gate-previo-al-alta-correo-y-contactos-adyacentes): objetivo + 2–3 adicionales como base ampliable por roles/riesgos; no dar de alta contactos sin correo corporativo individual verificado. Docs y skills Codex/Claude actualizadas; los registros sin correo descritos abajo son históricos. Sin migración ni cambios live por esta actualización.

@@ -12,7 +12,9 @@ Decisión a habilitar: <registro, acceso, discovery, prueba, propuesta o seguimi
 6. **Resultado observado:** preparado/aprobado/escrito/readback/enviado/registrado, separados; errores reconciliados.
 7. **Siguiente paso:** acción/owner/fecha o evento; bloqueos y condición de parada/revisión.
 8. **Fuentes y cobertura:** links/etiquetas, corte, conjunto y limitaciones; detalle sensible sólo en ubicación privada.
-9. **Aprendizaje y vigencia cuando aplique:** [resultado](account-learning.md), motivo declarado vs hipótesis y datos/eventos a revalidar, sin nuevo scheduler.
+9. **Recorrido cuando aplique:** [señal→acción](signal-action.md), [entrada por situación](situation-entry.md) y [cadencia coordinada](account-cadence.md); motivo de cada paso, límite de esfuerzo y stops por persona/iniciativa/cuenta.
+10. **Respuesta y entrega cuando aplique:** [clasificación](response-triage.md) y [preparación del canal](delivery-readiness.md); evidencia/alcance, owner y siguiente chequeo; pausa propuesta distinta de aplicada/readback, accepted/Enviados distinto de inbox o ingestión CRM.
+11. **Aprendizaje y vigencia cuando aplique:** [resultado](account-learning.md), motivo declarado vs hipótesis y datos/eventos a revalidar, sin nuevo scheduler.
 
 Sin permiso de escritura, entregar changeset. Sin permiso de contacto, entregar borrador. Una aprobación
 existente para esas acciones sigue válida dentro de su alcance; no solicitarla de nuevo.

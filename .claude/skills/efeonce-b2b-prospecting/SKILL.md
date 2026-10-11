@@ -1,6 +1,6 @@
 ---
 name: efeonce-b2b-prospecting
-description: Investiga cuentas B2B para Efeonce, identifica compradores y contactos relacionados con correo accionable y prepara rutas de acceso, mensajes y entregas a Commercial/HubSpot. Úsala para prospección fría, tibia, cálida, referidos, reactivación, expansión y coordinación ABM/ABS por cuenta; el radar personal conserva su ejecución recurrente.
+description: Investiga cuentas B2B para Efeonce, identifica compradores y contactos relacionados con correo accionable y prepara rutas de acceso, mensajes y entregas a Commercial/HubSpot. Úsala para prospección fría, tibia, cálida, referidos, reactivación, expansión y coordinación ABM/ABS, señales, cadencias, respuestas y entregabilidad por cuenta; el radar personal conserva su ejecución recurrente.
 ---
 
 # Prospección B2B Efeonce
@@ -54,13 +54,21 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |
 | Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
 | Elegir campos de Contact/Company/Lead/Deal por fase | [diccionario y captura HubSpot](../hubspot-as-a-service/references/property-inventory.md) |
+| Convertir una señal en validación y siguiente acción | [signal-to-action](references/signal-to-action.md) |
+| Elegir entrada por proveedor/equipo/proyecto/transformación/operación | [situation-entry-playbooks](references/situation-entry-playbooks.md) + Commercial/práctica |
+| Coordinar personas, canales, pasos y pausas de una cuenta | [account-cadence](references/account-cadence.md) |
+| Clasificar respuesta y preparar revisión o handoff | [response-handling](references/response-handling.md) + Commercial |
+| Comprobar preparación de entrega antes de envío autorizado | [deliverability-operations](references/deliverability-operations.md) + owner del canal |
 | Diseñar un piloto o revisar resultados | [experiments-and-learning](references/experiments-and-learning.md) |
 | Verificar sustento técnico/mercado o incorporar Sales | [sources](references/sources.md) |
 
 Carga sólo los módulos necesarios. Recorre investigación → calificación → acceso → mensaje/changeset →
 acción autorizada → verificación → entrega según el pedido; no fuerces todas las fases para una consulta.
 Detén sólo el carril que carece de evidencia o permiso y avanza en el resto. Declara cobertura parcial y
-qué falta para actuar. La suficiencia es para el siguiente paso, no calificación o compra; ampliar cobertura
+qué falta para actuar. Cada señal necesita vigencia y contraste; cada paso de cadencia, persona/canal,
+motivo, owner y condición de parada. Respuestas humanas/OOO/rebotes actualizan la propuesta antes de avanzar;
+una pausa propuesta requiere ejecución/readback del carril para constar aplicada. Correo verificado no
+certifica preparación del remitente, entrega o llegada a inbox. La suficiencia es para el siguiente paso, no calificación o compra; ampliar cobertura
 no permite gasto ilimitado, crear Deals ni contactar a todos como efecto de investigarlos.
 
 En una candidata fuera de ICP, entrega descarte/evidencia antes de invertir en contactos o preventa; el gate
@@ -95,7 +103,7 @@ changeset deben dejar visibles desconocidos, autorización y readback por objeto
 
 Usa [account-brief](templates/account-brief.md) para investigación y [action-pack](templates/action-pack.md)
 para entregar al siguiente owner. Capacidad/economía, discovery/proof, changeset y aprendizaje tienen
-plantillas en sus módulos; cargar sólo las que habiliten la decisión pedida. Resume en chat lo accionable y las brechas; conserva detalle privado donde
+plantillas en sus módulos, al igual que señal/entrada, cadencia/respuesta y preparación de entrega; cargar sólo las que habiliten la decisión pedida. Resume en chat lo accionable y las brechas; conserva detalle privado donde
 corresponda, sin emails reales en ejemplos versionados. Evita duplicar una empresa por persona o servicio.
 
 Entrega entidad/fit, hechos vs hipótesis, relación/demanda/proceso, decisión/fase y mapa de roles/personas,

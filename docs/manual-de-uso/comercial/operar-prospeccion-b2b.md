@@ -55,6 +55,29 @@ El piloto del informe es propuesta y requiere parámetros/capacidad aprobados an
 - Aprendizaje: [módulo](../../../.codex/skills/efeonce-b2b-prospecting/references/experiments-and-learning.md)
   y ficha por iniciativa; motivo declarado separado de hipótesis, datos a revalidar y restricciones del seguimiento existente.
 
+## Señal, entrada, cadencia, respuesta y entrega
+
+1. Convertir la señal en [validación y acción](../../../.codex/skills/efeonce-b2b-prospecting/references/signal-to-action.md):
+   hecho/fuente/fecha, hipótesis, evidencia que la refutaría y menor chequeo útil. Confirmar entidad/ICP y
+   vigencia antes de invertir; cambio de empleo reabre identidad/canal, no traslada demanda ni confianza.
+2. Elegir [entrada por situación](../../../.codex/skills/efeonce-b2b-prospecting/references/situation-entry-playbooks.md):
+   proveedor actual, equipo saturado, proyecto, transformación CRM u operación continua. Preparar una
+   pregunta y prueba proporcional; Commercial/práctica conserva alcance, capacidad y criterios de compra.
+3. Preparar [cadencia de cuenta](../../../.codex/skills/efeonce-b2b-prospecting/references/account-cadence.md):
+   una tesis/owner, persona/canal/orden/motivo por paso, esfuerzo y fecha/evento de revisión. Revisar
+   historial/restricciones antes de ampliar interlocutores; no enrolar como efecto de diseñar pasos.
+4. Ante evento, [clasificar respuesta](../../../.codex/skills/efeonce-b2b-prospecting/references/response-handling.md)
+   leyendo el hilo completo: alcance persona/iniciativa/cuenta, pausa/revisión/next step y handoff. Confirmar
+   settings y parada aplicada/readback en el proveedor; OOO, silencio y bots no equivalen a rechazo o interés.
+5. Antes del envío autorizado, comprobar [preparación de entrega](../../../.codex/skills/efeonce-b2b-prospecting/references/deliverability-operations.md):
+   correo/persona, suppression, permiso, remitente/autenticación, restricciones/reputación, contenido y
+   capacidad con su owner. Unknowns no son checks aprobados; corregir configuración exige su alcance.
+   Outlook de Julio conserva firma/CCO. API accepted, Enviados, entrega, inbox, respuesta e ingestión CRM
+   se verifican por separado; rebote de política no demuestra persona inexistente.
+
+Usar sólo las plantillas del paso actual y enlazar expediente/HSP/seguimiento existente. Las cinco mejoras
+actualizan el método; la autorización para crearlas no inicia piloto, campañas, pausas, DNS ni registros CRM.
+
 ## Problemas frecuentes
 
 | Observación | Acción |

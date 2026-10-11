@@ -54,3 +54,5 @@ Product Design 360 vende lanes; sitio público corresponde a Web Experience. Cha
 geografía, expertise y partner/back-to-back para terreno/producción. No prometer operación Coljuegos en
 Colombia por encontrar una señal. RevOps & CRM puede ser HubSpot-first, Salesforce-first, híbrido o no-fit.
 No reutilizar casos, licencias, claims o hibernación como prueba de capacidad disponible hoy.
+
+Para convertir evidencia en validación/acción, cargar [señal→acción](signal-to-action.md): vigencia, prueba contraria y siguiente chequeo.

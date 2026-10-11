@@ -9,6 +9,8 @@
 
 ## 2026-10-11 — Cotizador V3: factores por país
 
+- Prospección: cinco recorridos operativos aprobados (señal→acción, entrada por situación, cadencia coordinada, respuestas y entregabilidad) con plantillas, Commercial, espejos y escenarios v5. [Verificación](docs/audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md). Sin acciones externas ni cambio de permisos.
+
 - [Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): 1.126 definiciones activas completas, CSV/JSON y guía por fase de Contact/Company/Deal/Lead, revisados por tres subagentes. Routing HubSpot/Prospecting/Commercial y contexto histórico conciliados; requiredness UI/etapa y Lead write siguen sin certificar. Sólo documentación y lectura de portal.
   Skill actualizada por aprobación posterior: familias de campos y plan por objeto/fase con completar/conservar/pendiente/sistema, evidencia y requisitos por carril; plantillas de handoff/changeset Codex/Claude incorporan el plan. Sin nuevas escrituras CRM.
 

@@ -27,5 +27,11 @@ Customer Model y práctica disponible, declarar la limitación y no fingir módu
   Creación/calificación/cierre → [diccionario y captura por objeto](../hubspot-as-a-service/references/property-inventory.md): nombres/enums reales, evidencia por fase y campos del sistema.
   Cuentas objetivo/roles → su [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md).
 
+Para preparar entrada por situación, usar [playbooks de entrada](../efeonce-b2b-prospecting/references/situation-entry-playbooks.md).
+Cadencias y respuestas se coordinan con [cadencia de cuenta](../efeonce-b2b-prospecting/references/account-cadence.md)
+y [tratamiento de respuestas](../efeonce-b2b-prospecting/references/response-handling.md); Commercial conserva
+objeciones, calificación y negociación. Preparación del remitente/canal: [entregabilidad](../efeonce-b2b-prospecting/references/deliverability-operations.md),
+sin convertir método en autorización de envío, enrollment, cambios DNS o pausas aplicadas.
+
 No cargar recursivamente ambos entrypoints: cada owner conserva su fase. Una oportunidad/etapa o una
 invocación comercial no autoriza precio, contrato, consumo pagado, CRM ni envío adicionales al pedido.

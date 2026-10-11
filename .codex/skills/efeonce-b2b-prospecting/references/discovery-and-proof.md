@@ -44,3 +44,5 @@ antes de discovery; proponerlo en evaluación bilateral y no llamar acuerdo a un
 
 Salida: tesis compartible breve, preguntas prioritarias, prueba mínima por incertidumbre y criterio de
 aceptación/refutación, con claims/unknowns/costo. Preparado no significa enviado, probado ni aceptado.
+
+Elegir el punto de entrada con [situaciones](situation-entry-playbooks.md) cuando haya proveedor actual, equipo saturado, proyecto, transformación o continuidad; Commercial conserva calificación/negociación.

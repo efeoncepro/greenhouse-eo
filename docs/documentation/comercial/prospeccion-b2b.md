@@ -57,6 +57,20 @@ conecta criterios con oferta/función, material y derechos. [Aprendizaje](../../
 conserva outcomes/motivos y vigencia por iniciativa. Plantillas progresivas evitan cargar detalle irrelevante.
 [Actualización y verificación](../../audits/commercial/2026-10-11-prospecting-operational-modules-update.md).
 
+## Recorridos operativos por cuenta
+
+La skill convierte señales en hipótesis comprobables y siguiente validación; ofrece entradas para proveedor
+actual, saturación del equipo, proyecto puntual, transformación CRM y operación continua. Coordina los pasos
+por persona/canal bajo una tesis y owner, con esfuerzo y paradas explícitas. Una respuesta reorganiza el plan:
+pedir información no califica, referido no confirma introducción, silencio no demuestra rechazo e interés
+no se infiere de bots. Restricciones por persona/iniciativa/cuenta se conservan en el alcance observado.
+
+Correo verificado es un requisito de alta distinto de la preparación del remitente/canal. El módulo de
+entregabilidad diagnostica autenticación, suppression, restricciones, reputación y rebotes con evidencia/owner;
+no garantiza inbox ni cambia configuración. La pausa diseñada y aplicada, envío y entrega, respuesta e
+ingestión HubSpot se informan separadas. Commercial conserva venta/objeciones; HubSpot/proveedor las acciones.
+[Manual del recorrido](../../manual-de-uso/comercial/operar-prospeccion-b2b.md#se%C3%B1al-entrada-cadencia-respuesta-y-entrega).
+
 ## Roles y continuidad
 
 Commercial dirige avance de venta; Customer Model el ICP/grupo comprador; prácticas oferta/capacidad/proof;

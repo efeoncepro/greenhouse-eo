@@ -50,3 +50,5 @@ Dimensionar esfuerzo extenso con [capacidad y economía](capacity-and-economics.
 apertura en diagnóstico completo ni una muestra preparada en evidencia de resultado del comprador.
 Si se autoriza envío desde Outlook de Julio, cargar la [política de firma/CCO](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md)
 y verificar el canal real. Borrador, envío, Enviados e ingestión HubSpot son estados separados.
+
+Para concretar pasos por persona/canal y coordinación de cuenta, usar [cadencia](account-cadence.md); ante respuesta, [tratamiento](response-handling.md). Antes de ejecución por email autorizada, comprobar [entregabilidad](deliverability-operations.md).

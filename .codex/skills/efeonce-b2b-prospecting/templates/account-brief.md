@@ -57,6 +57,13 @@ No incluir direcciones reales en fixtures/versionados. Roles y vínculos inferid
 - Vigencia del mapa y aprendizaje: <datos a revalidar, motivo comprador vs hipótesis, evento/owner;
   [detalle](account-learning.md) cuando haya revisión de resultado>.
 
+## Recorrido operativo — sólo para la decisión actual
+
+Anexar [señal y validación](signal-action.md) y [entrada por situación](situation-entry.md) cuando expliquen
+el acercamiento. Para plan de contactos, [cadencia por cuenta](account-cadence.md); ante una respuesta,
+[clasificación](response-triage.md). Si se prepara ejecución por correo, [entrega](delivery-readiness.md).
+Referenciar el expediente, sin duplicar datos ni convertir preparación en envío, pausa o CRM aplicado.
+
 ## Fuentes y cobertura
 
 Usadas: <links/etiquetas y campos aportados>.
