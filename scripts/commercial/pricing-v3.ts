@@ -334,7 +334,7 @@ try {
           withoutBrief:
             'Prints the scaffold of the document brief (every line of the quote under its key, with its default label and group, and the texts to fill) and exits 2. --out keeps the brief alone.',
           brief:
-            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote and the tax must be the one the template computes, or no data is emitted.'
+            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote, and the tax printed is the frozen tax of the quote, which must correspond to its rate within the rounding of its months; otherwise no data is emitted.'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
