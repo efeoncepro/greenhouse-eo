@@ -697,7 +697,9 @@ try {
         'market_factor',
         'fx',
         'price_rounding',
-        'engagement_factor'
+        'engagement_factor',
+        'third_party_policy',
+        'contingency_reserve'
       ] as const
 
       if (values.kind && !kinds.includes(values.kind as (typeof kinds)[number]))

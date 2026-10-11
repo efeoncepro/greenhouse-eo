@@ -225,8 +225,46 @@ const creditEntries = (reading: Reading) =>
 
 const entryOf = (reading: Reading, toolId: string) => annualEntries(reading).find(entry => entry.toolId === toolId)
 
-/** Rows the quote froze in its cash ledger for year-priced resources: everything but the monthly bucket. */
-const annualLedger = (result: Composition) => result.quote.cashLedger.filter(c => c.key !== 'human-monthly-and-once')
+/**
+ * Ledger key of every component the kernel priced per year, as the quote groups them: resource, scope and scope
+ * reference. Read from the frozen rows and the input they were calculated from, never from the names in the ledger.
+ */
+const annualLedgerKeys = (result: Composition) =>
+  new Set(
+    result.quote.periods.flatMap(period => {
+      const input = result.quote.resolution.inputs.find(i => i.periodId === period.periodId)!.input
+
+      return period.result.lines.flatMap(row =>
+        row.components
+          .filter(component => component.trace.unit === 'year')
+          .map(component => {
+            const assignment = input.request.lines
+              .find(line => line.lineId === row.parentLineId)!
+              .assignments.find(a => a.allocationId === component.componentId)!
+
+            return `${assignment.resourceId}:${component.trace.scope}:${component.trace.scopeRef}`
+          })
+      )
+    })
+  )
+
+/** Rows the quote froze in its cash ledger for year-priced resources, and for nothing else. */
+const annualLedger = (result: Composition) => {
+  const keys = annualLedgerKeys(result)
+
+  return result.quote.cashLedger.filter(c => keys.has(c.key))
+}
+
+/** Rows of re-invoiced third-party costs (contract 1.4.0), one per cost and period; none in an earlier quote. */
+const thirdPartyRows = (result: Composition) =>
+  result.quote.periods.flatMap(period => period.result.lines.filter(row => row.kind === 'third_party'))
+
+/** The entry the cash ledger gives each of those rows, named after the cost it belongs to. */
+const thirdPartyLedger = (result: Composition) => {
+  const keys = new Set(thirdPartyRows(result).map(row => `third-party:${row.parentLineId}`))
+
+  return result.quote.cashLedger.filter(c => keys.has(c.key))
+}
 
 /** Cost the kernel stored for one tool, in the output currency: over the whole quote or in one period. */
 const kernelCost = (result: Composition, toolId: string, periodId?: number) =>
@@ -275,6 +313,35 @@ describe('commitment exposure over every committed composition artifact', () => 
     expect(reading.engagement.quoteDate).toBe(demand.brief.quoteDate)
     expect(reading.cashMeaning).toBe(result.cashMeaning)
     expect(reading.reviewed.creditBudgets).toBe(result.creditBudgets.length)
+
+    // The ledger of a quote is the entry of the team, the years of its year-priced resources and one entry per
+    // third-party row. Every entry is one of the three: nothing in it is read here under a name it does not have.
+    const purchases = thirdPartyRows(result)
+
+    expect(
+      result.quote.cashLedger.filter(c => c.key === 'human-monthly-and-once').length +
+        annualLedger(result).length +
+        thirdPartyLedger(result).length
+    ).toBe(result.quote.cashLedger.length)
+    expect(thirdPartyLedger(result)).toHaveLength(purchases.length)
+
+    // A purchase from a supplier is seen and counted, and is no commitment: no entry, no signal and no total has it.
+    if (purchases.length) {
+      expect(reading.reviewed.thirdPartyPurchasesOutsideThisReading).toBe(purchases.length)
+      expect(reading.notDerivable.map(entry => entry.code)).toContain('THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN')
+    } else {
+      expect(reading.reviewed).not.toHaveProperty('thirdPartyPurchasesOutsideThisReading')
+      expect(reading.notDerivable.map(entry => entry.code)).not.toContain('THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN')
+    }
+
+    const listed = JSON.stringify([reading.commitments, reading.signals, reading.totals])
+
+    for (const row of purchases) {
+      // Neither the cost, nor its ledger entry, nor its row is named anywhere a commitment is.
+      expect(listed).not.toContain(JSON.stringify(row.parentLineId))
+      expect(listed).not.toContain(`third-party:${row.parentLineId}`)
+      expect(listed).not.toContain(row.lineId)
+    }
 
     const annual = annualEntries(reading)
     const termed = termedEntries(reading)

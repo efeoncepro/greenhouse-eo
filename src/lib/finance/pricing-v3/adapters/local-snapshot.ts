@@ -26,7 +26,20 @@ const ExactDecimal = Decimal.clone({ precision: 80 })
 
 const hash = (value: unknown) => createHash('sha256').update(stableJson(value)).digest('hex')
 
-type Amounts = Partial<Record<'marketAdjustment' | 'engagementAdjustment' | 'roundingAdjustment' | 'uplift', string>> &
+type Amounts = Partial<
+  Record<
+    | 'contingencyReserve'
+    | 'contingencyBase'
+    | 'contingencyReserveWaived'
+    | 'marketAdjustment'
+    | 'engagementAdjustment'
+    | 'roundingAdjustment'
+    | 'uplift'
+    | 'thirdPartyCost'
+    | 'thirdPartyNet',
+    string
+  >
+> &
   Record<'cost' | 'undiscountedPrice' | 'discount' | 'net' | 'marginAmount', string>
 
 export type PricingV3Artifact = {
@@ -106,6 +119,9 @@ export function comparePricingV3(left: unknown, right: unknown) {
           (
             [
               'cost',
+              'contingencyReserve',
+              'contingencyBase',
+              'contingencyReserveWaived',
               'marketAdjustment',
               'engagementAdjustment',
               'undiscountedPrice',
@@ -113,7 +129,9 @@ export function comparePricingV3(left: unknown, right: unknown) {
               'discount',
               'uplift',
               'net',
-              'marginAmount'
+              'marginAmount',
+              'thirdPartyCost',
+              'thirdPartyNet'
             ] as const
           )
             .map(key => [key, (totalsA as Amounts)[key], (totalsB as Amounts)[key]] as const)

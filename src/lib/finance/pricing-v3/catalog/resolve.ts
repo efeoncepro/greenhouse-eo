@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js'
 
-import { PRICING_V3_MARKET_FLOOR_BASIS } from '../schemas'
-import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV13 } from '../schemas'
+import { PRICING_V3_MARKET_FLOOR_BASIS, PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
+import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV14 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
 import { briefSchema } from './contracts'
 import type { CatalogRecord, Diagnostic } from './contracts'
@@ -11,9 +11,9 @@ const D = Decimal.clone({ precision: 80 })
 type Row<K extends CatalogRecord['kind']> = Extract<CatalogRecord, { kind: K }>
 
 // Built as the widest contract; `schemaVersion` says which one each quote declares and the kernel parses it as such.
-// The keys contract 1.3.0 added are optional in it and are set only for a quote of that contract.
-type KernelSnapshot = Omit<PricingV3InputV13['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
-type KernelRequest = Omit<PricingV3InputV13['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+// The keys contracts 1.3.0 and 1.4.0 added are optional in it and are set only for a quote of a contract that has them.
+type KernelSnapshot = Omit<PricingV3InputV14['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+type KernelRequest = Omit<PricingV3InputV14['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
 
 type KitAssignment = {
   requirement: Row<'kit'>['value']['requirements'][number]
@@ -77,7 +77,29 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   if (new Set(brief.lines.map(l => l.lineId)).size !== brief.lines.length)
     diagnostics.push({ code: 'DUPLICATE_LINE_ID', path: 'lines' })
 
-  if (brief.adjustments.some(a => a.lineIds.some(id => !brief.lines.some(l => l.lineId === id))))
+  // Third-party costs of the engagement (contract 1.4.0). Only the re-invoiced ones are priced: a cost the client pays
+  // to the supplier stays in the brief as a note and never reaches a kernel input, a conversion or a total.
+  const thirdPartyCosts = brief.thirdPartyCosts ?? []
+  const reinvoiced = thirdPartyCosts.filter(c => c.settlement === 'reinvoiced')
+
+  // An adjustment names its rows by the id of their parent, so costs and lines share one namespace.
+  if (
+    new Set(thirdPartyCosts.map(c => c.costId)).size !== thirdPartyCosts.length ||
+    thirdPartyCosts.some(c => brief.lines.some(l => l.lineId === c.costId))
+  )
+    diagnostics.push({ code: 'DUPLICATE_THIRD_PARTY_COST_ID', path: 'thirdPartyCosts' })
+
+  // A discount and an agreed net of a team billing class name lines; an agreed net of third-party costs names
+  // re-invoiced costs, the only ones that have a row.
+  if (
+    brief.adjustments.some(a =>
+      a.lineIds.some(id =>
+        a.kind === 'agreed_net' && a.billing === PRICING_V3_THIRD_PARTY_BILLING
+          ? !reinvoiced.some(c => c.costId === id)
+          : !brief.lines.some(l => l.lineId === id)
+      )
+    )
+  )
     diagnostics.push({ code: 'INVALID_ADJUSTMENT_LINE', path: 'adjustments' })
 
   const market = unique(
@@ -123,6 +145,74 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
 
   if (engagement) bind('*', 'engagement_factor', engagement)
 
+  // The price rule of a re-invoiced cost is the `third_party_policy` of its category: the record of the offer
+  // prevails over the general one, none in force is a missing selection and two of the prevailing level an
+  // ambiguous one. The brief carries the category and never a rate.
+  const thirdPartyPolicies = new Map<string, Row<'third_party_policy'>>()
+
+  for (const cost of reinvoiced) {
+    const candidates = kind('third_party_policy').filter(r => r.value.category === cost.category)
+    const ofOffer = candidates.filter(r => r.value.offerId === brief.offerId)
+
+    const policy = unique(
+      ofOffer.length ? ofOffer : candidates.filter(r => !r.value.offerId),
+      `thirdPartyCosts.${cost.costId}.policy`
+    )
+
+    if (policy) {
+      thirdPartyPolicies.set(cost.costId, policy)
+      bind(cost.costId, 'third_party_policy', policy)
+    }
+  }
+
+  // The contingency reserve of the quote. A record applies when it names nothing the brief contradicts (its offer,
+  // its form of engagement), and the one that names the most prevails. Two at the prevailing level cannot be ranked,
+  // also when one names only the offer and the other only the form: they block instead of picking one.
+  const applicableReserves = kind('contingency_reserve').filter(
+    r =>
+      (!r.value.offerId || r.value.offerId === brief.offerId) &&
+      (!r.value.engagementForm || r.value.engagementForm === brief.engagementForm)
+  )
+
+  const specificity = (r: Row<'contingency_reserve'>) =>
+    Number(Boolean(r.value.offerId)) + Number(Boolean(r.value.engagementForm))
+
+  const prevailing = Math.max(...applicableReserves.map(specificity))
+  const prevailingReserves = applicableReserves.filter(r => specificity(r) === prevailing)
+  const reserve = prevailingReserves.length === 1 ? prevailingReserves[0] : undefined
+
+  if (prevailingReserves.length > 1)
+    diagnostics.push({
+      code: 'AMBIGUOUS_CONTINGENCY_RESERVE',
+      path: 'contingency',
+      candidates: prevailingReserves.map(r => r.recordId)
+    })
+
+  if (reserve) {
+    if (reserve.source.status === 'pending') diagnostics.push({ code: 'PENDING_CATALOG_VALUE', path: 'contingency' })
+    bind('*', 'contingency_reserve', reserve)
+  }
+
+  // A waiver is a statement about a reserve this quote would otherwise carry. With none to waive it is a mistake in
+  // the brief (another offer, another form, an earlier date), and it is named instead of ignored.
+  if (brief.contingency?.kind === 'waived' && !applicableReserves.length)
+    diagnostics.push({ code: 'CONTINGENCY_WAIVER_WITHOUT_RESERVE', path: 'contingency' })
+
+  // A reserve keyed by form of engagement can only be matched against a declared form. Without one it is not
+  // evaluated, and saying so is what keeps a forgotten form from silently meaning "no reserve".
+  const formKeyedReserves = kind('contingency_reserve').filter(
+    r => r.value.engagementForm && (!r.value.offerId || r.value.offerId === brief.offerId)
+  )
+
+  if (brief.engagementForm === undefined && formKeyedReserves.length)
+    assumptions.push({
+      code: 'CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM',
+      path: 'engagementForm',
+      candidates: formKeyedReserves.map(r => r.recordId),
+      detail:
+        'The catalog holds a contingency reserve keyed by form of engagement for this offer and the brief declares no form: that reserve was not evaluated.'
+    })
+
   // Contract 1.1.0 only when the frozen inputs use what 1.0.0 cannot express; everything else stays 1.0.0, so a quote
   // frozen before 1.1.0 existed resolves to the contract and digest it was signed with. Same answer for every period.
   //
@@ -132,16 +222,25 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   // Contract 1.3.0 only when the brief declares the form of the engagement, also when its ratio is 1: the declared
   // form is part of what the quote freezes. A brief frozen before 1.3.0 cannot declare it and resolves as it did,
   // whatever `engagement_factor` records its catalog later holds.
+  //
+  // Contract 1.4.0 only when the brief declares a re-invoiced third-party cost or a contingency reserve is selected
+  // for the quote, also when the brief waives it: the waiver is part of what the quote freezes, like a form at ratio
+  // 1. A cost the client pays directly is a note and keeps the quote on its earlier contract; so does a reserve of
+  // another offer or another form. A catalog frozen before 1.4.0 holds no reserve and a brief frozen before it no
+  // cost, so both resolve as they did. The sequencing that keeps this true for quotes frozen later: a
+  // `contingency_reserve` record is issued only in a catalog version newer than every quote it must not reach.
   const contract: PricingV3ContractVersion =
-    brief.engagementForm !== undefined
-      ? '1.3.0'
-      : market?.value.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS
-        ? '1.2.0'
-        : applicableRules.length > 0 ||
-            brief.adjustments.length > 1 ||
-            brief.adjustments.some(a => a.kind !== 'discount')
-          ? '1.1.0'
-          : '1.0.0'
+    reinvoiced.length > 0 || reserve
+      ? '1.4.0'
+      : brief.engagementForm !== undefined
+        ? '1.3.0'
+        : market?.value.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS
+          ? '1.2.0'
+          : applicableRules.length > 0 ||
+              brief.adjustments.length > 1 ||
+              brief.adjustments.some(a => a.kind !== 'discount')
+            ? '1.1.0'
+            : '1.0.0'
 
   const selected = brief.lines.flatMap(line => {
     const path = `lines.${line.lineId}`
@@ -323,6 +422,12 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
         fxPairs.add(`${item.resource.value.currency}:${catalog.calculationCurrency}`)
   }
 
+  // A supplier that charges in the output currency is not converted at all (the kernel prices it at factor 1). Any
+  // other currency goes through the calculation currency, so it needs its own record into it.
+  for (const cost of reinvoiced)
+    if (cost.currency !== brief.outputCurrency && cost.currency !== catalog.calculationCurrency)
+      fxPairs.add(`${cost.currency}:${catalog.calculationCurrency}`)
+
   const fx: Row<'fx'>[] = []
 
   for (const pair of fxPairs) {
@@ -341,14 +446,47 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
 
   if (brief.mode === 'commercial_draft' && bindings.some(b => b.record.source.status !== 'confirmed'))
     diagnostics.push({ code: 'UNCONFIRMED_COMMERCIAL_SELECTION', path: 'bindings' })
+
+  // The schedule of a cost is its own: the full `amount x quantity` in each period it lists. Every listed period must
+  // exist in the term, and a re-invoiced cost needs a period that is quoted (one with an active line), because each
+  // period is its own kernel input and a period without lines has none.
+  for (const cost of thirdPartyCosts) {
+    const path = `thirdPartyCosts.${cost.costId}`
+
+    if (new Set(cost.periodIds).size !== cost.periodIds.length || cost.periodIds.some(p => p > brief.periods))
+      diagnostics.push({ code: 'INVALID_THIRD_PARTY_SCHEDULE', path })
+    else if (
+      cost.settlement === 'reinvoiced' &&
+      cost.periodIds.some(
+        p =>
+          !brief.lines.some(l =>
+            (l.activePeriods ?? Array.from({ length: brief.periods }, (_, i) => i + 1)).includes(p)
+          )
+      )
+    )
+      diagnostics.push({ code: 'THIRD_PARTY_COST_OUTSIDE_ACTIVE_PERIOD', path })
+
+    // A commercial draft is issued on confirmed values only; the evidence of an amount is one of them.
+    if (brief.mode === 'commercial_draft' && cost.settlement === 'reinvoiced' && cost.evidence.status !== 'confirmed')
+      diagnostics.push({ code: 'UNCONFIRMED_THIRD_PARTY_COST', path: `${path}.evidence` })
+  }
+
   const chargedOnce = new Set<string>()
-  const setupAgreed = brief.adjustments.filter(a => a.kind === 'agreed_net' && a.billing === 'setup')
+
+  // Agreed nets whose rows do not exist in every period: setup rows, and the rows of third-party costs.
+  const agreedOnRows = brief.adjustments.filter(
+    a => a.kind === 'agreed_net' && (a.billing === 'setup' || a.billing === PRICING_V3_THIRD_PARTY_BILLING)
+  )
+
   const landed = new Set<string>()
 
   for (let periodId = 1; periodId <= brief.periods; periodId++) {
     const active = selected.filter(s => s.periods.includes(periodId))
 
     if (!active.length) continue
+
+    // Each period is its own kernel input, so a cost reaches the periods it lists as a cost of period 1 of each.
+    const costs = reinvoiced.filter(c => c.periodIds.includes(periodId))
 
     const snapshot: KernelSnapshot = {
       schemaVersion: contract,
@@ -367,11 +505,28 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       fx: fx.map(r => ({ ...r.value, source: r.source })),
       ...(rounding ? { priceRounding: { multiple: rounding.value.multiple, source: rounding.source } } : {}),
       // Only the ratio resolution selected reaches the kernel; which offer the record governs was decided above.
-      ...(contract === '1.3.0'
+      ...(contract === '1.3.0' || contract === '1.4.0'
         ? {
             engagementFactors: engagement
               ? [{ form: engagement.value.form, priceRatio: engagement.value.priceRatio, source: engagement.source }]
               : []
+          }
+        : {}),
+      // Only the rule selected for each category of this period, and the reserve selected for the quote. The label
+      // of a record and the offer or form it governs stay in the bindings.
+      ...(contract === '1.4.0'
+        ? {
+            thirdPartyPolicies: [...new Set(costs.flatMap(c => thirdPartyPolicies.get(c.costId) ?? []))].map(r => ({
+              category: r.value.category,
+              method: r.value.method,
+              rate: r.value.rate,
+              minimumMargin: r.value.minimumMargin,
+              rounding: r.value.rounding,
+              source: r.source
+            })),
+            ...(reserve
+              ? { contingencyReserve: { rate: reserve.value.rate, base: reserve.value.base, source: reserve.source } }
+              : {})
           }
         : {})
     }
@@ -388,9 +543,32 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
       duration: { unit: 'month', periods: 1 },
       lines: [],
       adjustments: brief.adjustments
-        .map(a => ({ ...a, lineIds: a.lineIds.filter(id => active.some(s => s.line.lineId === id)) }))
+        .map(a => ({
+          ...a,
+          lineIds: a.lineIds.filter(id =>
+            a.kind === 'agreed_net' && a.billing === PRICING_V3_THIRD_PARTY_BILLING
+              ? costs.some(c => c.costId === id)
+              : active.some(s => s.line.lineId === id)
+          )
+        }))
         .filter(a => a.lineIds.length),
-      taxTreatment: brief.taxTreatment
+      taxTreatment: brief.taxTreatment,
+      // The supplier stays in the brief: the kernel receives the amount, its currency and its evidence.
+      ...(contract === '1.4.0'
+        ? {
+            thirdPartyCosts: costs.map(c => ({
+              costId: c.costId,
+              label: c.label,
+              category: c.category,
+              amount: c.amount,
+              currency: c.currency,
+              quantity: c.quantity,
+              periodIds: [1],
+              source: c.evidence
+            })),
+            ...(brief.contingency?.kind === 'waived' ? { contingencyWaiver: { reason: brief.contingency.reason } } : {})
+          }
+        : {})
     }
 
     const shared = new Map<string, { lineId: string; share: string }[]>()
@@ -541,9 +719,10 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
     inputs.push({ periodId, input: { request, snapshot } as PricingV3AnyInput })
   }
 
-  // Same condition the kernel names, seen across the whole term: no period has a setup row for this agreed net.
+  // Same condition the kernel names, seen across the whole term: no period has a row for this agreed net (a setup
+  // row, or the row of one of the third-party costs it names).
   if (selected.length === brief.lines.length)
-    for (const a of setupAgreed)
+    for (const a of agreedOnRows)
       if (!landed.has(a.adjustmentId))
         diagnostics.push({ code: 'AGREED_NET_WITHOUT_BASE', path: `adjustments.${a.adjustmentId}` })
 

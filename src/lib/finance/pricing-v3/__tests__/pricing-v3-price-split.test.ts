@@ -67,7 +67,8 @@ const kernelRows = (result: Composition) =>
 
 const attributedTools = (result: Composition) => [...new Set(result.attributions.map(a => a.toolId))]
 const sum = (values: string[]) => values.reduce((total, value) => total.plus(value), new D(0))
-const unitOf = (money: string) => new D(10).pow(-(money.split('.')[1]?.length ?? 0))
+const scaleOfMoney = (money: string) => money.split('.')[1]?.length ?? 0
+const unitOf = (money: string) => new D(10).pow(-scaleOfMoney(money))
 
 const inputOf = (result: Composition, periodId: number) =>
   result.quote.resolution.inputs.find(i => i.periodId === periodId)!.input
@@ -86,9 +87,24 @@ const kernelToolPrice = (row: KernelRow) =>
     .filter(component => component.kind === 'tool')
     .reduce((total, component) => total.plus(new D(component.price).mul(component.trace.outputFx ?? 1)), new D(0))
 
+type Part = { cost: string; net: string; marginAmount: string }
+
+/**
+ * The parts a split presents: the kit and the person, and from contract 1.4.0 a third one for what a supplier is
+ * paid. A quote without third-party rows has no third part at all (absent, not zero), so its two parts are the whole.
+ */
+const partsOf = (holder: { tools: Part; person: Part; thirdParty?: Part }) => [
+  holder.tools,
+  holder.person,
+  ...(holder.thirdParty ? [holder.thirdParty] : [])
+]
+
+const hasThirdPartyRows = (result: Composition) => kernelRows(result).some(({ row }) => row.kind === 'third_party')
+
 /** The split must hold in every row, period and total, whatever tools were chosen. */
 const expectExact = (result: Composition, s: Split) => {
   const rows = kernelRows(result)
+  const thirdParty = hasThirdPartyRows(result)
 
   // One split row per kernel row, in the same order, carrying the frozen amounts untouched.
   expect(s.rows.map(r => `${r.periodId}:${r.lineId}`)).toEqual(rows.map(r => `${r.periodId}:${r.row.lineId}`))
@@ -99,11 +115,21 @@ const expectExact = (result: Composition, s: Split) => {
     expect(part.net).toBe(row.net)
     expect(part.cost).toBe(row.cost)
     expect(part.marginAmount).toBe(row.marginAmount)
-    expect(new D(part.tools.net).plus(part.person.net).eq(row.net)).toBe(true)
-    expect(new D(part.tools.cost).plus(part.person.cost).eq(row.cost)).toBe(true)
-    expect(new D(part.tools.marginAmount).plus(part.person.marginAmount).eq(row.marginAmount)).toBe(true)
+    expect(sum(partsOf(part).map(p => p.net)).eq(row.net)).toBe(true)
+    expect(sum(partsOf(part).map(p => p.cost)).eq(row.cost)).toBe(true)
+    expect(sum(partsOf(part).map(p => p.marginAmount)).eq(row.marginAmount)).toBe(true)
 
-    for (const amount of [part.tools.net, part.person.net, part.tools.cost, part.person.cost]) {
+    // A row is own work or a supplier's, never both: a third-party row is all third part, and no other row has one.
+    expect('thirdParty' in part).toBe(row.kind === 'third_party')
+
+    if (part.thirdParty) {
+      expect(part.thirdParty).toMatchObject({ net: row.net, cost: row.cost, marginAmount: row.marginAmount })
+      expect([part.tools.net, part.tools.cost, part.person.net, part.person.cost].every(a => new D(a).isZero())).toBe(
+        true
+      )
+    }
+
+    for (const amount of partsOf(part).flatMap(p => [p.net, p.cost])) {
       expect(new D(amount).gte(0)).toBe(true)
       // Same scale as the amount the kernel formatted for that row.
       expect(amount.split('.')[1]?.length ?? 0).toBe(row.net.split('.')[1]?.length ?? 0)
@@ -114,8 +140,9 @@ const expectExact = (result: Composition, s: Split) => {
     const read = s.periods.find(p => p.periodId === period.periodId)!
 
     expect(read.net).toBe(period.result.totals!.net)
-    expect(new D(read.tools.net).plus(read.person.net).eq(period.result.totals!.net)).toBe(true)
-    expect(new D(read.tools.cost).plus(read.person.cost).eq(period.result.totals!.cost)).toBe(true)
+    expect('thirdParty' in read).toBe(thirdParty)
+    expect(sum(partsOf(read).map(p => p.net)).eq(period.result.totals!.net)).toBe(true)
+    expect(sum(partsOf(read).map(p => p.cost)).eq(period.result.totals!.cost)).toBe(true)
   }
 
   const totals = result.quote.totals!
@@ -125,10 +152,23 @@ const expectExact = (result: Composition, s: Split) => {
   expect(s.totals.marginAmount).toBe(totals.marginAmount)
   expect(s.totals.tax).toBe(totals.tax)
   expect(s.totals.grandTotal).toBe(totals.grandTotal)
-  expect(new D(s.totals.tools.net).plus(s.totals.person.net).eq(totals.net)).toBe(true)
-  expect(new D(s.totals.tools.cost).plus(s.totals.person.cost).eq(totals.cost)).toBe(true)
+  // Two parts in a quote without third-party rows, three in one that has them; either way they are the whole quote.
+  expect('thirdParty' in s.totals).toBe(thirdParty)
+  expect(sum(partsOf(s.totals).map(p => p.net)).eq(totals.net)).toBe(true)
+  expect(sum(partsOf(s.totals).map(p => p.cost)).eq(totals.cost)).toBe(true)
   expect(sum(s.rows.map(r => r.tools.net)).eq(s.totals.tools.net)).toBe(true)
   expect(sum(s.rows.map(r => r.person.net)).eq(s.totals.person.net)).toBe(true)
+
+  if (s.totals.thirdParty) {
+    // The third part is the third-party rows as the kernel froze them, and what the kernel totals for them.
+    const supplierRows = rows.filter(({ row }) => row.kind === 'third_party')
+
+    expect(s.totals.thirdParty.net).toBe(sum(supplierRows.map(({ row }) => row.net)).toFixed(scaleOfMoney(totals.net)))
+    expect(s.totals.thirdParty.cost).toBe(
+      sum(supplierRows.map(({ row }) => row.cost)).toFixed(scaleOfMoney(totals.net))
+    )
+    expect(totals).toMatchObject({ thirdPartyNet: s.totals.thirdParty.net, thirdPartyCost: s.totals.thirdParty.cost })
+  }
 }
 
 /** Kernel verdicts, read straight from its diagnostics. */
@@ -256,7 +296,8 @@ describe('the tools part is the price the kernel formed for those components', (
 
       if (formed.isZero()) {
         expect(new D(part.tools.net).isZero()).toBe(true)
-        expect(part.person.net).toBe(row.net)
+        // With no kit in the row, the whole row is its other part: the person, or the supplier of a third-party row.
+        expect((part.thirdParty ?? part.person).net).toBe(row.net)
         continue
       }
 
@@ -503,6 +544,13 @@ describe('each part is measured against the floor of its row, and nothing is rep
       expect(kitFloor.isZero() || kitFloor.minus(unit).mul(keep).lt(part.tools.cost)).toBe(true)
 
       for (const side of [part.tools, part.person]) expect(side.belowFloor).toBe(new D(side.net).lt(side.floorNet))
+
+      // The third part is the row itself: its floor and its verdict are the kernel's for the row, never recomputed.
+      if (part.thirdParty)
+        expect(part.thirdParty).toMatchObject({
+          floorNet: 'floorNet' in row ? row.floorNet : undefined,
+          belowFloor: part.rowBelowFloor
+        })
 
       expect(part.partsBelowFloorWhileRowMeetsIt).toEqual(
         part.rowBelowFloor

@@ -318,6 +318,100 @@ export const pricingV3InputSchemaV13 = z
   })
   .strict()
 
+// Contract 1.4.0 extends 1.3.0 with two capabilities that share the same seams (the cost of a row, the totals and the
+// floor) and must agree on one thing: the contingency reserve never rests on a third-party cost.
+//
+// Third-party costs. What Efeonce buys for a job and re-invoices (production, talent, media, ...) is declared in the
+// request with the amount and currency of the supplier and its evidence; the snapshot carries the price rule of its
+// category. Each cost is a commercial row of its own, of kind `third_party`, with the floor of its category: it is
+// never a component of a team row, and neither the market factor nor the engagement ratio nor a rate discount
+// reaches it. Categories are data: the kernel knows no list of them, only the policy of the one a cost names.
+//
+// Contingency reserve. The snapshot may carry one reserve (a rate and the base it applies to). The kernel adds it as
+// a cost component of every team row, so it raises the policy price, raises the floor and lowers the margin when a
+// discount eats it. Only an explicit waiver in the request removes it, and the amount forgone is reported.
+//
+// Every key is optional, like every capability a contract added: a 1.3.0 input relabelled 1.4.0 is a valid 1.4.0
+// input and prices the same. The keys exist only in 1.4.0: an earlier contract that carries them is rejected.
+export const PRICING_V3_THIRD_PARTY_BILLING = 'third_party'
+export const PRICING_V3_MAX_THIRD_PARTY_COSTS = 50
+
+// An agreed net of billing `third_party` names third-party costs by `costId` in `lineIds`, never team lines.
+const agreedNetAdjustmentSchemaV14 = agreedNetAdjustmentSchema
+  .extend({ billing: z.enum(['monthly', 'setup', PRICING_V3_THIRD_PARTY_BILLING]) })
+  .strict()
+
+export const pricingV3AdjustmentSchemaV14 = z.discriminatedUnion('kind', [
+  discountAdjustmentSchema,
+  agreedNetAdjustmentSchemaV14
+])
+
+/** A re-invoiced cost: `amount` is the unit amount in the currency of the supplier, charged in each listed period. */
+export const pricingV3ThirdPartyCostSchemaV14 = z
+  .object({
+    costId: id,
+    label: z.string().min(1).max(200),
+    category: id,
+    amount: positive,
+    currency,
+    quantity: z.string().regex(/^[1-9]\d{0,3}$/),
+    periodIds: z.array(z.number().int().min(1).max(60)).min(1),
+    // Evidence of the amount: reference of the supplier quote, its date and its validity.
+    source: sourceSchema
+  })
+  .strict()
+
+/**
+ * Price rule of one category of third-party cost. `rounding` is declared, never inferred from the rate: `commercial`
+ * applies the rounding rule of the quote to the row, `none` leaves the policy price as it is.
+ */
+export const pricingV3ThirdPartyPolicySchemaV14 = z
+  .object({
+    category: id,
+    method: z.enum(['markup', 'target_margin']),
+    rate: decimal,
+    minimumMargin: fraction.refine(value => decimalPattern.test(value) && new Decimal(value).lt(1)),
+    rounding: z.enum(['commercial', 'none']),
+    source: sourceSchema
+  })
+  .strict()
+
+/** `human`: the reserve rests on the person cost of each team row; `own_costs`: on every cost component of the row. */
+export const pricingV3ContingencyReserveSchemaV14 = z
+  .object({
+    rate: positive.refine(value => decimalPattern.test(value) && new Decimal(value).lt(1)),
+    base: z.enum(['human', 'own_costs']),
+    source: sourceSchema
+  })
+  .strict()
+
+export const pricingV3RequestSchemaV14 = pricingV3RequestSchemaV13
+  .extend({
+    schemaVersion: z.literal('1.4.0'),
+    adjustments: z.array(pricingV3AdjustmentSchemaV14).max(PRICING_V3_MAX_ADJUSTMENTS_V11),
+    thirdPartyCosts: z.array(pricingV3ThirdPartyCostSchemaV14).max(PRICING_V3_MAX_THIRD_PARTY_COSTS).optional(),
+    contingencyWaiver: z
+      .object({ reason: z.string().min(1).max(1000) })
+      .strict()
+      .optional()
+  })
+  .strict()
+
+export const pricingV3SnapshotSchemaV14 = pricingV3SnapshotSchemaV13
+  .extend({
+    schemaVersion: z.literal('1.4.0'),
+    thirdPartyPolicies: z.array(pricingV3ThirdPartyPolicySchemaV14).max(PRICING_V3_MAX_THIRD_PARTY_COSTS).optional(),
+    contingencyReserve: pricingV3ContingencyReserveSchemaV14.optional()
+  })
+  .strict()
+
+export const pricingV3InputSchemaV14 = z
+  .object({
+    request: pricingV3RequestSchemaV14,
+    snapshot: pricingV3SnapshotSchemaV14
+  })
+  .strict()
+
 /** `PricingV3Input`, `PricingV3Request` and `PricingV3Snapshot` are contract 1.0.0, as every existing consumer types them. */
 export type PricingV3Input = z.infer<typeof pricingV3InputSchema>
 export type PricingV3Request = PricingV3Input['request']
@@ -335,7 +429,19 @@ export type PricingV3InputV13 = z.infer<typeof pricingV3InputSchemaV13>
 export type PricingV3RequestV13 = PricingV3InputV13['request']
 export type PricingV3SnapshotV13 = PricingV3InputV13['snapshot']
 export type PricingV3EngagementFactorV13 = z.infer<typeof pricingV3EngagementFactorSchemaV13>
-export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11 | PricingV3InputV12 | PricingV3InputV13
+export type PricingV3InputV14 = z.infer<typeof pricingV3InputSchemaV14>
+export type PricingV3RequestV14 = PricingV3InputV14['request']
+export type PricingV3SnapshotV14 = PricingV3InputV14['snapshot']
+export type PricingV3AdjustmentV14 = PricingV3RequestV14['adjustments'][number]
+export type PricingV3ThirdPartyCostV14 = z.infer<typeof pricingV3ThirdPartyCostSchemaV14>
+export type PricingV3ThirdPartyPolicyV14 = z.infer<typeof pricingV3ThirdPartyPolicySchemaV14>
+export type PricingV3ContingencyReserveV14 = z.infer<typeof pricingV3ContingencyReserveSchemaV14>
+export type PricingV3AnyInput =
+  | PricingV3Input
+  | PricingV3InputV11
+  | PricingV3InputV12
+  | PricingV3InputV13
+  | PricingV3InputV14
 export type PricingV3Source = z.infer<typeof sourceSchema>
 
 /**
@@ -346,7 +452,8 @@ export const PRICING_V3_ENGINES = {
   '1.0.0': 'pricing-v3-local/1.0.0',
   '1.1.0': 'pricing-v3-local/1.1.0',
   '1.2.0': 'pricing-v3-local/1.2.0',
-  '1.3.0': 'pricing-v3-local/1.3.0'
+  '1.3.0': 'pricing-v3-local/1.3.0',
+  '1.4.0': 'pricing-v3-local/1.4.0'
 } as const
 
 export type PricingV3ContractVersion = keyof typeof PRICING_V3_ENGINES
@@ -363,6 +470,7 @@ export const isPricingV3EngineVersion = (value: unknown): value is PricingV3Engi
 export function parsePricingV3Input(raw: unknown) {
   const declared = (raw as { request?: { schemaVersion?: unknown } } | null | undefined)?.request?.schemaVersion
 
+  if (declared === '1.4.0') return { contract: '1.4.0' as const, parsed: pricingV3InputSchemaV14.safeParse(raw) }
   if (declared === '1.3.0') return { contract: '1.3.0' as const, parsed: pricingV3InputSchemaV13.safeParse(raw) }
   if (declared === '1.2.0') return { contract: '1.2.0' as const, parsed: pricingV3InputSchemaV12.safeParse(raw) }
 

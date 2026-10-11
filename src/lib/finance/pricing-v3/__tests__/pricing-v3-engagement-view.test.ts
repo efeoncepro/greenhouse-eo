@@ -547,12 +547,54 @@ const packsBought = (result: Composition, periodId?: number) =>
       cash: sum(b.result.breakdown!.extra.packages.map(pack => new D(pack.priceEach).mul(pack.quantity)))
     }))
 
+/** Rows of re-invoiced third-party costs (contract 1.4.0); none in a quote of an earlier contract. */
+const thirdPartyRowsOf = (result: Composition, periodId?: number) =>
+  rowsOf(result, periodId).filter(row => row.kind === 'third_party')
+
+/** Whether the quote selected a contingency reserve (contract 1.4.0), waived or not: its inputs say so. */
+const selectedReserve = (result: Composition) =>
+  result.quote.resolution.inputs.some(
+    ({ input }) => 'contingencyReserve' in input.snapshot && Boolean(input.snapshot.contingencyReserve)
+  )
+
+/** The reserve the kernel states for each row, inside its cost; zero where the row has none. */
+const statedReserve = (rows: KernelRow[]) =>
+  sum(rows.map(row => ('contingencyReserve' in row ? row.contingencyReserve : '0')))
+
+/**
+ * The cash ledger of a period by what each entry is, read from the frozen rows and never from a list of names: the
+ * entry of the team, one entry per third-party row (named after its cost) and the years of year-priced resources.
+ */
+const ledgerOf = (result: Composition, periodId: number) => {
+  const entries = result.quote.cashLedger.filter(entry => entry.periodId === periodId)
+  const supplierKeys = new Set(thirdPartyRowsOf(result, periodId).map(row => `third-party:${row.parentLineId}`))
+
+  return {
+    entries,
+    team: entries.filter(entry => entry.key === 'human-monthly-and-once'),
+    thirdParty: entries.filter(entry => supplierKeys.has(entry.key)),
+    annual: entries.filter(entry => entry.key !== 'human-monthly-and-once' && !supplierKeys.has(entry.key))
+  }
+}
+
 /** What the cash reading has to hold for any calculated quote. */
 const expectCash = (result: Composition) => {
   const totals = result.quote.totals!
   const c = cash(result)
   const unit = unitOf(totals.net)
-  const natureKeys = ['people', 'provisions', 'platformFee', 'setup', 'toolCreditBudgets', 'toolSeatsAndPackages']
+  const suppliers = thirdPartyRowsOf(result).length > 0
+
+  // The natures of a quote: the six every contract has, and one more for each thing of contract 1.4.0 it holds.
+  const natureKeys = [
+    'people',
+    'provisions',
+    'platformFee',
+    'setup',
+    'toolCreditBudgets',
+    'toolSeatsAndPackages',
+    ...(suppliers ? ['thirdParty'] : []),
+    ...(selectedReserve(result) ? ['contingencyReserve'] : [])
+  ]
 
   // 1. Net, full cost and margin are the frozen ones, in total and in every period.
   expect(c.totals).toMatchObject({
@@ -593,6 +635,14 @@ const expectCash = (result: Composition) => {
       tools: storedCost(rows, ['tool'])
     }
 
+    // What suppliers charge is the cost of the third-party rows, and the reserve is the one the kernel states row
+    // by row: both to the unit, with no slack. Neither is capacity, so neither is in the capacity cost above.
+    const supplierCost = sum(thirdPartyRowsOf(result, period.periodId).map(row => row.cost))
+
+    expect(new D(p.fullCostByNature.thirdParty ?? '0').eq(supplierCost)).toBe(true)
+    expect(new D(p.fullCostByNature.contingencyReserve ?? '0').eq(statedReserve(rows))).toBe(true)
+    expect(p.fullCostByNature).not.toHaveProperty('unclassified')
+
     expect(new D(p.fullCostByNature.people).minus(stored.people).abs().lte(slack)).toBe(true)
     expect(new D(p.fullCostByNature.provisions).minus(stored.provisions).abs().lte(slack)).toBe(true)
     expect(new D(p.fullCostByNature.platformFee).minus(stored.platformFee).abs().lte(slack)).toBe(true)
@@ -621,22 +671,35 @@ const expectCash = (result: Composition) => {
     // People are a cost of the job in every period that has people: never zero, never left out.
     expect(new D(p.fullCostByNature.people).gt(0)).toBe(stored.people.gt(0))
 
-    // 3. New supplier cash is the packs the budgets buy, and nothing the quote merely attributes.
+    // 3. New supplier cash is the packs the budgets buy plus what the suppliers of re-invoiced costs are paid, and
+    // nothing the quote merely attributes.
     const packs = packsBought(result, period.periodId)
     const converted = packs.map(pack => toQuoteCurrency(result, period.periodId, pack.cash.toString(), pack.currency))
-    const exact = sum(converted)
+    const exact = sum(converted).plus(supplierCost)
 
     // Read up to the unit pack by pack: never under the exact conversion, never a unit or more per pack over it.
     expect(new D(p.newSupplierCash!).gte(exact)).toBe(true)
     expect(new D(p.newSupplierCash!).minus(exact).lt(unit.mul(Math.max(packs.length, 1)))).toBe(true)
     expect(new D(p.cashAddedOnContractedCapacity!).eq(new D(p.net).minus(p.newSupplierCash!))).toBe(true)
 
-    // 4. The modeled commitment is the ledger of the quote for the period.
-    const ledger = result.quote.cashLedger.filter(entry => entry.periodId === period.periodId)
+    // 4. The modeled commitment is the ledger of the quote for the period, each entry read as what it is: the team,
+    // the years paid up front, and the purchases from suppliers, which are not a year of anything.
+    const ledger = ledgerOf(result, period.periodId)
 
-    expect(new D(p.modeledCommitment.total).eq(sum(ledger.map(entry => entry.amount)))).toBe(true)
+    expect(new D(p.modeledCommitment.total).eq(sum(ledger.entries.map(entry => entry.amount)))).toBe(true)
+    expect(new D(p.modeledCommitment.monthlyAndOnce).eq(sum(ledger.team.map(entry => entry.amount)))).toBe(true)
+    expect(new D(p.modeledCommitment.annualUpFront).eq(sum(ledger.annual.map(entry => entry.amount)))).toBe(true)
+    expect('thirdParty' in p.modeledCommitment).toBe(suppliers)
+    expect(new D(p.modeledCommitment.thirdParty ?? '0').eq(sum(ledger.thirdParty.map(entry => entry.amount)))).toBe(
+      true
+    )
+    // What the ledger commits to suppliers is what they charge: the same rows, read twice.
+    expect(sum(ledger.thirdParty.map(entry => entry.amount)).eq(supplierCost)).toBe(true)
     expect(
-      new D(p.modeledCommitment.monthlyAndOnce).plus(p.modeledCommitment.annualUpFront).eq(p.modeledCommitment.total)
+      new D(p.modeledCommitment.monthlyAndOnce)
+        .plus(p.modeledCommitment.annualUpFront)
+        .plus(p.modeledCommitment.thirdParty ?? '0')
+        .eq(p.modeledCommitment.total)
     ).toBe(true)
   }
 
@@ -653,8 +716,19 @@ const expectCash = (result: Composition) => {
     ledger: result.quote.cashLedger
   })
 
-  // 6. The two results: the frozen margin, and net minus new supplier cash, which is not a margin.
-  expect(c.supplierCash.declaredNew.amount).toBe(c.totals.newSupplierCash)
+  // 6. The two results: the frozen margin, and net minus new supplier cash, which is not a margin. New supplier cash
+  // is the declared credit packs plus, in a quote that has them, the re-invoiced third-party costs.
+  const supplierCostOfQuote = sum(thirdPartyRowsOf(result).map(row => row.cost))
+
+  expect('thirdParty' in c.supplierCash).toBe(suppliers)
+  expect(new D(c.supplierCash.thirdParty?.amount ?? '0').eq(supplierCostOfQuote)).toBe(true)
+  expect(new D(c.supplierCash.declaredNew.amount!).plus(supplierCostOfQuote).eq(c.totals.newSupplierCash!)).toBe(true)
+  if (!suppliers) expect(c.supplierCash.declaredNew.amount).toBe(c.totals.newSupplierCash)
+  // A cost the client pays directly is listed as declared and is in no figure: every figure here is reconciled with
+  // rows and ledger entries, and it is in none of them.
+  expect('paidByClientDirectly' in c.supplierCash).toBe(
+    (result.quote.resolution.brief?.thirdPartyCosts ?? []).some(cost => cost.settlement === 'client_direct')
+  )
   expect(new D(c.totals.cashAddedOnContractedCapacity!).eq(new D(totals.net).minus(c.totals.newSupplierCash!))).toBe(
     true
   )
@@ -727,9 +801,12 @@ describe('engagement cash: attributed cost is not new cash', () => {
     expect(storedCost(rowsOf(result), ['tool']).gt(0)).toBe(true)
     expect(new D(c.modeledCommitment.total).gt(0)).toBe(true)
 
+    // What a supplier of a re-invoiced cost is paid is a purchase for the job, not an attribution: it is new cash.
+    const supplierCost = sum(thirdPartyRowsOf(result).map(row => row.cost))
+
     if (!packs.some(pack => pack.cash.gt(0))) {
-      expect(new D(c.totals.newSupplierCash!).isZero()).toBe(true)
-      expect(c.totals.cashAddedOnContractedCapacity).toBe(c.totals.net)
+      expect(new D(c.totals.newSupplierCash!).eq(supplierCost)).toBe(true)
+      expect(new D(c.totals.cashAddedOnContractedCapacity!).eq(new D(c.totals.net).minus(supplierCost))).toBe(true)
     }
 
     // Seats and packages stay in the cost and out of the new cash, and wherever the quote has them the reading says

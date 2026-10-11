@@ -1,7 +1,15 @@
 import Decimal from 'decimal.js'
 
-import type { PricingV3LineV12 } from '../calculate'
-import { describeCommercialTerms, describeEngagementForm, describeMarketFactor } from '../catalog/explain'
+import type { PricingV3LineV12, PricingV3LineV14 } from '../calculate'
+import {
+  CONTINGENCY_RESERVE_COMPONENT,
+  describeCommercialTerms,
+  describeContingencyReserve,
+  describeEngagementForm,
+  describeMarketFactor,
+  describeThirdPartyPolicies
+} from '../catalog/explain'
+import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -18,8 +26,15 @@ const ratioForReading = (value: Decimal) =>
 
 const unique = <T>(items: T[]) => [...new Set(items)]
 
+/** Decimals the kernel formatted an amount with: every amount derived from it is shown at the same scale. */
+const scaleOf = (amount: string) => amount.split('.')[1]?.length ?? 0
+
 /** Rows of contract 1.2.0 carry the floor of their market; rows of earlier contracts have no such key. */
 const hasMarketFloor = (line: object): line is PricingV3LineV12 => 'floorNet' in line
+
+/** A re-invoiced third-party cost in one period (contract 1.4.0): a row of its own, never a component of a team row. */
+const isThirdPartyRow = (line: { kind: string }): line is PricingV3LineV14 =>
+  line.kind === PRICING_V3_THIRD_PARTY_BILLING
 
 /** Rows that differ only by period collapse into one entry, in the order the result first produced them. */
 const acrossPeriods = <T extends object>(rows: { periodId: number; row: T }[]) => {
@@ -96,14 +111,19 @@ type CostInputKind =
   | 'talent_assurance'
   | 'operations'
   | 'setup'
+  | 'third_party'
 
-/** Part of one kernel row that rests on something: its raw cost in the output currency and how many components. */
-type RowPart = { row: KernelRow; raw: Decimal; components: number }
+/**
+ * Part of one kernel row that rests on something: its raw cost in the output currency, how many components, and how
+ * many components of the row rest on an input at all (`of`: every one except the contingency reserve, which is
+ * counted inside the components it is computed from).
+ */
+type RowPart = { row: KernelRow; raw: Decimal; components: number; of: number }
 
-const addPart = (parts: Map<string, RowPart>, key: string, row: KernelRow, cost: Decimal) => {
-  const part = parts.get(key) ?? { row, raw: new D(0), components: 0 }
+const addPart = (parts: Map<string, RowPart>, key: string, row: KernelRow, cost: Decimal, of: number) => {
+  const part = parts.get(key) ?? { row, raw: new D(0), components: 0, of }
 
-  parts.set(key, { row, raw: part.raw.plus(cost), components: part.components + 1 })
+  parts.set(key, { row, raw: part.raw.plus(cost), components: part.components + 1, of })
 }
 
 /**
@@ -115,8 +135,7 @@ const addPart = (parts: Map<string, RowPart>, key: string, row: KernelRow, cost:
  */
 const partsCost = (parts: Map<string, RowPart>) =>
   [...parts.values()].reduce(
-    (sum, { row, raw, components }) =>
-      sum.plus(components === row.components.length ? new D(row.cost) : D.min(raw, row.cost)),
+    (sum, { row, raw, components, of }) => sum.plus(components === of ? new D(row.cost) : D.min(raw, row.cost)),
     new D(0)
   )
 
@@ -130,6 +149,15 @@ const partsCost = (parts: Map<string, RowPart>) =>
  * the human component of a line carries the cost of its profile, the talent factor of its country when the cost is a
  * reference adjusted by country, and the FX of its currency; every other component is one assignment of one resource,
  * with the FX of that resource; and every component carries the FX from the calculation to the output currency.
+ *
+ * Contract 1.4.0 adds two things, read the same way:
+ * - A re-invoiced third-party cost is an input of its own (`third_party`, by `costId`), with the status of the
+ *   evidence of its amount. It is the whole of its row. A supplier that charges in the output currency carries no
+ *   FX, because the kernel does not convert it; any other currency carries the FX into the calculation currency and
+ *   from it to the output currency.
+ * - The contingency reserve is NOT an input. It is `rate x base` of its own row, so it moves with the components it
+ *   is computed from and with nothing else: the cost that rests on each of them is `cost x (1 + rate)`, and the
+ *   reserve is estimated exactly where they are. The rate itself is a rule, reported in `estimatedRules`.
  */
 export function costInputExposure(result: Composition) {
   const { quote } = result
@@ -137,7 +165,7 @@ export function costInputExposure(result: Composition) {
   if (!quote.totals) return null
 
   const totals = quote.totals
-  const scale = totals.cost.split('.')[1]?.length ?? 0
+  const scale = scaleOf(totals.cost)
   const money = (value: Decimal) => value.toFixed(scale, D.ROUND_HALF_UP)
   const bindings = quote.resolution.bindings
 
@@ -146,6 +174,8 @@ export function costInputExposure(result: Composition) {
     id: string
     recordId: string | null
     priceId?: string
+    /** Third-party costs only: the category whose rule prices the cost. */
+    category?: string
     label: string
     billing?: 'month' | 'year' | 'once' | 'credit_packs'
     sourceStatus: SourceStatus
@@ -155,7 +185,13 @@ export function costInputExposure(result: Composition) {
   const estimated = new Map<string, RowPart>()
 
   type Rule = {
-    kind: 'allocation_policy' | 'pricing_policy' | 'price_rounding' | 'tax'
+    kind:
+      | 'allocation_policy'
+      | 'pricing_policy'
+      | 'price_rounding'
+      | 'tax'
+      | 'third_party_policy'
+      | 'contingency_reserve'
     side: 'cost' | 'price' | 'tax'
     ids: string[]
     lineIds: string[]
@@ -212,6 +248,19 @@ export function costInputExposure(result: Composition) {
     if (request.taxTreatment.kind === 'exclusive' && request.taxTreatment.source.status === 'estimated')
       rule('tax', 'tax', request.taxTreatment.policyRef)
 
+    // Contract 1.4.0, read from the frozen input of the period: the third-party costs the kernel priced with the
+    // rule of each category, and the reserve of the quote. Absent in every earlier contract.
+    const thirdPartyCosts = ('thirdPartyCosts' in request ? request.thirdPartyCosts : undefined) ?? []
+    const thirdPartyPolicies = ('thirdPartyPolicies' in snapshot ? snapshot.thirdPartyPolicies : undefined) ?? []
+
+    const reserveId =
+      'contingencyReserve' in snapshot && snapshot.contingencyReserve?.source.status === 'estimated'
+        ? (bindings.find(b => b.purpose === 'contingency_reserve')?.record.recordId ?? CONTINGENCY_RESERVE_COMPONENT)
+        : null
+
+    // An estimated reserve is a rule of the quote also when the brief waives it: the record was selected all the same.
+    if (reserveId) rule('contingency_reserve', 'cost', reserveId)
+
     const marketFactor = snapshot.marketFactors.find(m => m.country === request.offerMarketCountry)
     const marketEstimated = marketFactor?.source.status === 'estimated'
 
@@ -235,9 +284,25 @@ export function costInputExposure(result: Composition) {
       const profile = line && snapshot.profiles.find(p => p.profileId === line.profileId)
       const rowKey = `${period.periodId}\n${row.lineId}`
 
-      for (const component of row.components) {
+      // The reserve of the row, as the kernel traced it: its rate, and whether it rests on the person cost alone
+      // (`human`) or on every cost of the row (`own_costs`). It is folded into those components below and is never
+      // walked as a component of its own, so `own` is what the row rests on.
+      const reserve = row.components.find(c => c.kind === CONTINGENCY_RESERVE_COMPONENT)
+      const own = row.components.filter(c => c !== reserve)
+
+      if (reserve && reserveId) rule('contingency_reserve', 'cost', reserveId, row.parentLineId)
+
+      for (const component of own) {
         const outputFx = new D(component.trace.outputFx ?? 1)
-        const cost = new D(component.cost).mul(outputFx)
+
+        const ownCost = new D(component.cost).mul(outputFx)
+
+        // Cost that moves with this component: its own and the reserve the row computes from it.
+        const cost =
+          reserve && (component.kind === 'human' || reserve.trace.base === 'own_costs')
+            ? ownCost.mul(new D(1).plus(reserve.trace.rate))
+            : ownCost
+
         const carried: { key: string; meta: Meta }[] = []
 
         const carriesFx = (from: string, to: string) => {
@@ -312,7 +377,8 @@ export function costInputExposure(result: Composition) {
           if (allocation?.source.status === 'estimated') {
             const entry = rule('allocation_policy', 'cost', allocation.policyId, line.lineId)
 
-            entry.human = entry.human.plus(cost)
+            // The person cost itself, without the reserve that rests on it.
+            entry.human = entry.human.plus(ownCost)
             // The rule, not the dedication asked for, decided the capacity charged on this line.
             if (line.dedication.unit !== 'fte' || component.trace.billedFte !== component.trace.requestedFte)
               note(entry.billedFteSetByRuleOn, line.lineId)
@@ -336,6 +402,44 @@ export function costInputExposure(result: Composition) {
           if (marketEstimated) {
             note(market.lineIds, line.lineId)
             market.price = market.price.plus(new D(component.price).mul(outputFx))
+          }
+        } else if (component.kind === PRICING_V3_THIRD_PARTY_BILLING) {
+          const declared = thirdPartyCosts.find(c => c.costId === row.parentLineId)
+
+          if (!declared) {
+            unmappedComponents += 1
+            continue
+          }
+
+          carried.push({
+            key: `third_party\n${declared.costId}`,
+            meta: {
+              kind: 'third_party',
+              id: declared.costId,
+              recordId: null,
+              category: declared.category,
+              label: declared.label,
+              // The status of the evidence of the amount, as the kernel judged it.
+              sourceStatus: declared.source.status
+            }
+          })
+
+          const policy = thirdPartyPolicies.find(p => p.category === declared.category)
+
+          if (policy?.source.status === 'estimated')
+            rule(
+              'third_party_policy',
+              'price',
+              bindings.find(b => b.lineId === declared.costId && b.purpose === 'third_party_policy')?.record.recordId ??
+                declared.category,
+              declared.costId
+            )
+
+          // The kernel converts only a supplier that does not charge in the output currency, and then through the
+          // calculation currency. The component is stored in the output currency either way.
+          if (declared.currency !== request.outputCurrency) {
+            carriesFx(declared.currency, calculation)
+            carriesFx(calculation, request.outputCurrency)
           }
         } else {
           const assignment = line?.assignments.find(a => a.allocationId === component.componentId)
@@ -375,7 +479,8 @@ export function costInputExposure(result: Composition) {
           carriesFx(resource.currency, calculation)
         }
 
-        carriesFx(calculation, request.outputCurrency)
+        // Every component the kernel priced in the calculation currency; a third-party one said above what it carries.
+        if (component.kind !== PRICING_V3_THIRD_PARTY_BILLING) carriesFx(calculation, request.outputCurrency)
 
         for (const { key, meta } of carried) {
           const entry = inputs.get(key) ?? { meta, lineIds: [], periodIds: [], parts: new Map<string, RowPart>() }
@@ -383,11 +488,11 @@ export function costInputExposure(result: Composition) {
           inputs.set(key, entry)
           note(entry.lineIds, row.parentLineId)
           note(entry.periodIds, period.periodId)
-          addPart(entry.parts, rowKey, row, cost)
+          addPart(entry.parts, rowKey, row, cost, own.length)
         }
 
         // Union: a component counts once however many of its inputs are estimated.
-        if (carried.some(c => c.meta.sourceStatus === 'estimated')) addPart(estimated, rowKey, row, cost)
+        if (carried.some(c => c.meta.sourceStatus === 'estimated')) addPart(estimated, rowKey, row, cost, own.length)
       }
     }
   }
@@ -461,11 +566,14 @@ export function costInputExposure(result: Composition) {
  *   factors it is the product of is estimated, and it counts once: an estimated person cost and an estimated talent
  *   factor on the same line do not add up twice. That is also why the entries of `costInputs` can add up to more.
  * - `priceInputs`: an estimated market factor moves price, never cost, and is never ranked with the cost inputs.
- * - `estimatedRules`: estimated policies that are rules, not amounts (capacity billed, target margin, rounding, tax).
- *   A "10 % higher" reading does not apply to them and they stay out of the ranking and of the union.
- *   `billedFteSetByRuleOn` lists the lines where the allocation rule, not the dedication asked for, decided the
- *   capacity charged (a minimum billed FTE, or hours converted to FTE): there the person cost does not follow the
- *   dedication in proportion.
+ * - `estimatedRules`: estimated policies that are rules, not amounts (capacity billed, target margin, rounding, tax,
+ *   the price rule of a category of third-party cost, the contingency reserve). A "10 % higher" reading does not
+ *   apply to them and they stay out of the ranking and of the union. `billedFteSetByRuleOn` lists the lines where the
+ *   allocation rule, not the dedication asked for, decided the capacity charged (a minimum billed FTE, or hours
+ *   converted to FTE): there the person cost does not follow the dedication in proportion.
+ * - A re-invoiced third-party cost whose evidence is estimated is a cost input like any other (`kind: third_party`,
+ *   `id` its `costId`): the amount of a supplier that has not confirmed it. The contingency reserve is in none of
+ *   the lists as an entry: it is inside the `costAtRisk` of the inputs it is computed from, and estimated with them.
  */
 export function estimateExposure(result: Composition) {
   const exposure = costInputExposure(result)
@@ -487,6 +595,195 @@ export function estimateExposure(result: Composition) {
       }),
     // Cost components whose inputs could not be read back from the frozen result; they are counted as confirmed.
     ...(unmappedComponents ? { unmappedComponents } : {})
+  }
+}
+
+/** Share of the net of the quote, at reading precision. Null while the quote sells nothing. */
+const shareOfNet = (amount: string, net: string) =>
+  new D(net).gt(0) ? new D(amount).div(net).toFixed(RATIO_DISPLAY_DECIMALS) : null
+
+/**
+ * Own work of a quote of contract 1.4.0: what is left of its totals once the re-invoiced third-party costs are taken
+ * out, so `ownWork + thirdParty.reinvoiced = totals` in cost, net and margin, to the unit. Null for a quote of an
+ * earlier contract, whose totals do not separate the two, and while the quote has no totals.
+ *
+ * `marginRateRoundedDown` is the kernel's `totals.ownWorkMarginRate` at reading precision: the margin to hold against
+ * the floor of the offer. The margin of the whole quote, in `totals.marginRate`, is the real one and falls with every
+ * cost re-invoiced at or near cost; this one does not, because those costs are in neither of its terms.
+ */
+export function readOwnWork(result: Composition) {
+  const totals = result.quote.totals
+
+  if (!totals || totals.thirdPartyCost === undefined || totals.thirdPartyNet === undefined) return null
+
+  const money = (value: Decimal) => value.toFixed(scaleOf(totals.cost), D.ROUND_HALF_UP)
+  const cost = new D(totals.cost).minus(totals.thirdPartyCost)
+  const net = new D(totals.net).minus(totals.thirdPartyNet)
+
+  return {
+    cost: money(cost),
+    net: money(net),
+    marginAmount: money(net.minus(cost)),
+    // Null when the quote sells no own work at a net above zero.
+    marginRateRoundedDown: totals.ownWorkMarginRate ? ratioForReading(new D(totals.ownWorkMarginRate)) : null
+  }
+}
+
+/**
+ * Third-party costs of a quote, as its frozen brief declares them and as the kernel priced the re-invoiced ones.
+ * Null when the brief declares none.
+ *
+ * - `reinvoiced`: present when the brief re-invoices a cost (contract 1.4.0); null while the quote has no totals. Its
+ *   cost and net are the kernel's `totals.thirdPartyCost` and `totals.thirdPartyNet`, and `rows` are the kernel rows
+ *   of kind `third_party`, with the rule resolution bound for each, the evidence of the amount as the kernel judged it
+ *   and the price walk the kernel stored. A row is under its floor when `net < floorNet`; the verdict is the
+ *   kernel's and is listed in `marginFloor` with every other row.
+ * - `clientDirect`: costs the client pays to the supplier. They are a note of the brief: in no row, no total and no
+ *   conversion, whatever their currency.
+ * - `fxExposed`: re-invoiced costs whose supplier does not charge in the output currency of the quote, so their cost
+ *   moves with an exchange rate while the price quoted does not.
+ *
+ * The supplier and the reference of its quote are internal detail of the brief and are not repeated here: a cost is
+ * named by its `costId`, as a catalog value is named by its `recordId`.
+ */
+export function readThirdPartyCosts(result: Composition) {
+  const { quote } = result
+  const brief = quote.resolution.brief
+  const declared = brief?.thirdPartyCosts ?? []
+
+  if (!brief || !declared.length) return null
+
+  const totals = quote.totals
+  const reinvoiced = declared.filter(cost => cost.settlement === 'reinvoiced')
+  const policies = describeThirdPartyPolicies(quote.resolution)
+
+  const validity = (source: { status: SourceStatus; effectiveFrom: string; effectiveUntil: string }) => ({
+    status: source.status,
+    effectiveFrom: source.effectiveFrom,
+    effectiveUntil: source.effectiveUntil
+  })
+
+  const rows = quote.periods.flatMap(period => {
+    const request = quote.resolution.inputs.find(i => i.periodId === period.periodId)?.input.request
+    const priced = (request && 'thirdPartyCosts' in request ? request.thirdPartyCosts : undefined) ?? []
+
+    return period.result.lines.flatMap(line => {
+      const component = line.components.find(c => c.kind === PRICING_V3_THIRD_PARTY_BILLING)
+
+      if (!isThirdPartyRow(line) || !component) return []
+
+      const evidence = priced.find(cost => cost.costId === line.parentLineId)?.source
+      const policy = policies.find(p => p.costIds.includes(line.parentLineId))
+
+      return [
+        {
+          periodId: period.periodId,
+          row: {
+            costId: line.parentLineId,
+            label: line.label,
+            category: component.trace.category,
+            quantity: component.trace.quantity,
+            supplierAmount: component.trace.supplierAmount,
+            supplierCurrency: component.trace.supplierCurrency,
+            // Only for a supplier that does not charge in the output currency: the path and the rate it was priced at.
+            ...(component.trace.supplierCurrency !== component.trace.denominatedIn
+              ? { fxPath: component.trace.fxPath, fxRate: component.trace.fxRate }
+              : {}),
+            evidence: evidence ? validity(evidence) : null,
+            policy: policy
+              ? {
+                  method: policy.method,
+                  rate: policy.rate,
+                  rounding: policy.rounding,
+                  recordId: policy.recordId,
+                  revision: policy.revision,
+                  sourceStatus: policy.sourceStatus
+                }
+              : null,
+            cost: line.cost,
+            // Already includes `roundingAdjustment`; the price the rule of the category forms is the difference.
+            undiscountedPrice: line.undiscountedPrice,
+            roundingAdjustment: line.roundingAdjustment,
+            discount: line.discount,
+            uplift: line.uplift,
+            net: line.net,
+            marginAmount: line.marginAmount,
+            minimumMargin: line.minimumMargin,
+            floorNet: line.floorNet
+          }
+        }
+      ]
+    })
+  })
+
+  return {
+    basis:
+      'reinvoiced: kernel rows of kind third_party, inside totals. clientDirect: declared in the brief and paid by the client to the supplier, in no total. Supplier and evidence reference stay in the frozen brief, by costId.',
+    ...(reinvoiced.length
+      ? {
+          reinvoiced:
+            totals && totals.thirdPartyCost !== undefined && totals.thirdPartyNet !== undefined
+              ? {
+                  cost: totals.thirdPartyCost,
+                  net: totals.thirdPartyNet,
+                  marginAmount: new D(totals.thirdPartyNet)
+                    .minus(totals.thirdPartyCost)
+                    .toFixed(scaleOf(totals.cost), D.ROUND_HALF_UP),
+                  shareOfNet: shareOfNet(totals.thirdPartyNet, totals.net),
+                  rows: acrossPeriods(rows)
+                }
+              : null
+        }
+      : {}),
+    clientDirect: declared
+      .filter(cost => cost.settlement === 'client_direct')
+      .map(cost => ({
+        costId: cost.costId,
+        label: cost.label,
+        category: cost.category,
+        amount: cost.amount,
+        currency: cost.currency,
+        quantity: cost.quantity,
+        periodIds: cost.periodIds,
+        evidence: cost.evidence ? validity(cost.evidence) : null
+      })),
+    fxExposed: reinvoiced.filter(cost => cost.currency !== brief.outputCurrency).map(cost => cost.costId)
+  }
+}
+
+/**
+ * Contingency reserve of a quote: the record resolution selected, and what it amounts to in the kernel's totals.
+ * Null when no reserve applies to the quote. This is what reads "reserve: `amount` (`rate` of `base` cost
+ * `baseAmount`)": `amount` is `totals.contingencyReserve`, inside `totals.cost`, and `baseAmount` is the cost it rests
+ * on, which never includes a third-party cost. Both are sums of rows presented at the currency unit, so
+ * `rate x baseAmount` matches `amount` to within one unit per team row.
+ *
+ * A waived reserve is reported too: `waived` with the reason of the brief, `amount` and `baseAmount` at zero, and in
+ * `waivedAmount` the reserve the quote would have carried. Amounts are null while the quote has no totals.
+ */
+export function readContingencyReserve(result: Composition) {
+  const { quote } = result
+  const reserve = describeContingencyReserve(quote.resolution)
+
+  if (!reserve) return null
+
+  const totals = quote.totals
+  const amount = totals?.contingencyReserve ?? null
+
+  return {
+    rate: reserve.rate,
+    base: reserve.base,
+    amount,
+    baseAmount: totals?.contingencyBase ?? null,
+    shareOfNet: totals && amount !== null ? shareOfNet(amount, totals.net) : null,
+    waived: reserve.waived,
+    ...(reserve.waived
+      ? { waiverReason: reserve.waiverReason, waivedAmount: totals?.contingencyReserveWaived ?? null }
+      : {}),
+    recordId: reserve.recordId,
+    revision: reserve.revision,
+    scope: reserve.scope,
+    sourceStatus: reserve.sourceStatus
   }
 }
 
@@ -515,6 +812,9 @@ export function summarizeComposition(result: Composition, identity: { calculatio
   const floorLines = linesBelowPolicyFloor(result)
   const marketFactor = describeMarketFactor(quote.resolution)
   const engagementForm = describeEngagementForm(quote.resolution)
+  const ownWork = readOwnWork(result)
+  const thirdParty = readThirdPartyCosts(result)
+  const contingencyReserve = readContingencyReserve(result)
 
   const selection = (s: Composition['selections'][number]) => ({
     lineId: s.lineId,
@@ -542,11 +842,14 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     quoteReviewStatus: quote.reviewStatus,
     // Contract the kernel calculated with: 1.1.0 only when the demand or the catalog uses agreed nets or rounding;
     // 1.2.0 only when the market factor of the quote declares its floor on the base market; 1.3.0 only when the
-    // demand declares the form of the engagement.
+    // demand declares the form of the engagement; 1.4.0 only when the demand re-invoices a third-party cost or a
+    // contingency reserve applies to the quote, also when the demand waives it.
     engineVersion: quote.periods[0]?.result.engineVersion ?? null,
     // 1.1.0 totals add `roundingAdjustment` (already inside `undiscountedPrice`) and `uplift`; 1.2.0 totals add
     // `marketAdjustment` (price with the market factor minus price of the base market, also inside it); 1.3.0 totals
-    // add `engagementAdjustment` (price with the ratio of the form minus the same price at ratio 1, also inside it).
+    // add `engagementAdjustment` (price with the ratio of the form minus the same price at ratio 1, also inside it);
+    // 1.4.0 totals add the reserve inside `cost` (`contingencyReserve`, the cost it rests on and what a waiver left
+    // out) and what of `cost` and `net` is re-invoiced third-party cost, with the margin of the rest.
     totals: quote.totals,
     // Adjustments as the frozen demand declares them and the rounding rule in force for the output currency.
     ...describeCommercialTerms(quote.resolution),
@@ -556,8 +859,18 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     // record that states it. What it moved is `totals.engagementAdjustment`.
     ...(engagementForm ? { engagementForm } : {}),
     // `totals.marginRate` keeps the exact stored ratio; this is the same ratio at reading precision. It is the real
-    // margin of the final net in every contract, never a base-market equivalent.
+    // margin of the final net in every contract, never a base-market equivalent. In a quote that re-invoices
+    // third-party costs it is the blended margin of the whole quote, diluted by them; `ownWork` sits next to it.
     marginRateRoundedDown: quote.totals?.marginRate ? ratioForReading(new D(quote.totals.marginRate)) : null,
+    // The three keys below exist only where contract 1.4.0 put something; every other quote keeps the keys it had.
+    // Contract 1.4.0 only: the quote without its re-invoiced third-party costs. Its margin is the one to hold
+    // against the floor of the offer.
+    ...(ownWork ? { ownWork } : {}),
+    // Only when the demand declares third-party costs: the re-invoiced ones as the kernel priced them, and the ones
+    // the client pays to the supplier, which are in no total.
+    ...(thirdParty ? { thirdParty } : {}),
+    // Only when a contingency reserve applies to the quote, also when the demand waives it.
+    ...(contingencyReserve ? { contingencyReserve } : {}),
     // Blockers: complete and in the result's order. A non-empty list is why `totals` is null.
     diagnostics: quote.diagnostics,
     assumptions: quote.resolution.assumptions,

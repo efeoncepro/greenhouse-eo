@@ -51,6 +51,24 @@ export function validateCatalog(raw: unknown): Catalog {
       if (!new D(row.value.multiple).mod(new D(10).pow(-currency.precision)).isZero())
         throw new PricingV3Error('INVALID_PRICE_ROUNDING_MULTIPLE')
     }
+
+    if (row.kind === 'third_party_policy') {
+      const rate = new D(row.value.rate)
+      const floor = new D(row.value.minimumMargin)
+
+      // The margin the method gives is rate / (1 + rate) for a markup and the rate itself for a target margin. A
+      // floor above it would flag every row at its own policy price; compared as a product, never as a quotient.
+      if (row.value.method === 'target_margin' ? rate.gte(1) || floor.gt(rate) : floor.mul(rate.plus(1)).gt(rate))
+        throw new PricingV3Error('INVALID_THIRD_PARTY_POLICY')
+    }
+
+    if (row.kind === 'contingency_reserve') {
+      const rate = new D(row.value.rate)
+
+      // A reserve of nothing is not a reserve (the quote that should carry none declares a waiver), and a cost
+      // cannot carry a reserve as large as itself.
+      if (!rate.gt(0) || rate.gte(1)) throw new PricingV3Error('INVALID_CONTINGENCY_RESERVE')
+    }
   }
 
   return catalog
@@ -190,6 +208,21 @@ export function changeCatalog(raw: unknown, changeRaw: unknown) {
             return `${r.value.currency}:${r.value.offerId ?? '*'}`
           case 'engagement_factor':
             return `${r.value.form}:${r.value.offerId ?? '*'}`
+          case 'third_party_policy':
+            return `${r.value.category}:${r.value.offerId ?? '*'}`
+          case 'contingency_reserve':
+            return `${r.value.offerId ?? '*'}:${r.value.engagementForm ?? '*'}`
+
+          default: {
+            // Every kind states what a revision may not change. A kind added to the record union without a case
+            // here stops compiling at this assignment; and should one ever arrive at run time, it is a conflict,
+            // never two `undefined` that compare equal and let a revision become another record in silence.
+            const unhandled: never = r
+
+            void unhandled
+
+            throw new PricingV3Error('CATALOG_IDENTITY_CONFLICT')
+          }
         }
       }
 

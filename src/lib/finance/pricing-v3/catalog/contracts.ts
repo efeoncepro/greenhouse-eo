@@ -1,12 +1,16 @@
 import { z } from 'zod'
 
 import {
+  PRICING_V3_MAX_THIRD_PARTY_COSTS,
+  pricingV3ContingencyReserveSchemaV14,
   pricingV3EngagementFactorSchemaV13,
   pricingV3MarketFactorSchemaV12,
   pricingV3PriceRoundingSchema,
   pricingV3RequestSchema,
-  pricingV3RequestSchemaV11,
+  pricingV3RequestSchemaV14,
   pricingV3SnapshotSchema,
+  pricingV3ThirdPartyCostSchemaV14,
+  pricingV3ThirdPartyPolicySchemaV14,
   sourceSchema
 } from '../schemas'
 
@@ -103,6 +107,33 @@ export const catalogRecordSchema = z.union([
   record(
     'engagement_factor',
     pricingV3EngagementFactorSchemaV13.omit({ source: true }).extend({ offerId: id.optional() }).strict()
+  ),
+  // Price rule of one category of third-party cost (contract 1.4.0): what Efeonce buys for a job and re-invoices is
+  // priced by its category and by nothing a quote writes. Categories are data, so the catalog decides which exist.
+  // `markup` with rate 0, floor 0 and rounding `none` is a cost re-invoiced at cost. With `offerId` the record
+  // governs that offer and prevails over the general one of the same category. `minimumMargin` is the floor of the
+  // row and cannot ask for more than the method gives: validation refuses a rule that would flag itself.
+  record(
+    'third_party_policy',
+    pricingV3ThirdPartyPolicySchemaV14
+      .omit({ source: true })
+      .extend({ label: z.string().min(1).max(120), offerId: id.optional() })
+      .strict()
+  ),
+  // Contingency reserve (contract 1.4.0): a rate over the person cost (`human`) or over every own cost (`own_costs`)
+  // of each team row, added as cost. It is selected by what the record names: an offer, a form of engagement, both,
+  // or neither (general). The rate is checked by catalog validation, so a rate out of range is named as such.
+  record(
+    'contingency_reserve',
+    pricingV3ContingencyReserveSchemaV14
+      .omit({ source: true })
+      .extend({
+        label: z.string().min(1).max(120),
+        rate: decimal,
+        offerId: id.optional(),
+        engagementForm: id.optional()
+      })
+      .strict()
   )
 ])
 
@@ -141,6 +172,12 @@ export const catalogSchema = z
   .strict()
 
 const dedication = pricingV3RequestSchema.shape.lines.element.shape.dedication
+
+// A third-party cost as the brief declares it: what the kernel receives (see `pricingV3ThirdPartyCostSchemaV14`)
+// plus the supplier, which is internal and never leaves the brief. The evidence takes the place of `source`.
+const thirdPartyCost = pricingV3ThirdPartyCostSchemaV14
+  .omit({ source: true })
+  .extend({ supplier: z.string().min(1).max(200) })
 
 export const briefSchema = z
   .object({
@@ -198,9 +235,32 @@ export const briefSchema = z
       .min(1)
       .max(100),
     // The 1.1.0 union is a superset: a brief with no adjustment or one discount parses to what it always did, and
-    // resolution only declares contract 1.1.0 when the brief uses more than that.
-    adjustments: pricingV3RequestSchemaV11.shape.adjustments.default([]),
-    taxTreatment: pricingV3RequestSchema.shape.taxTreatment.default({ kind: 'not_resolved' })
+    // resolution only declares contract 1.1.0 when the brief uses more than that. Contract 1.4.0 widens it once more:
+    // an agreed net of billing `third_party` names third-party costs by `costId`.
+    adjustments: pricingV3RequestSchemaV14.shape.adjustments.default([]),
+    taxTreatment: pricingV3RequestSchema.shape.taxTreatment.default({ kind: 'not_resolved' }),
+    // Third-party costs of the engagement (contract 1.4.0). The quote declares the amount and its evidence; the price
+    // rule comes from the `third_party_policy` of `category` and is never written here. `reinvoiced`: Efeonce buys
+    // and invoices it, so it becomes a commercial row of its own. `client_direct`: the client pays the supplier; it
+    // is frozen here as a note and reaches no calculation and no total. `periodIds` is required: the full
+    // `amount x quantity` is charged in each listed period, so a one-off is never multiplied by the term.
+    // No default: the parsed brief is inside every frozen result, and a defaulted key would move every old digest.
+    thirdPartyCosts: z
+      .array(
+        z.discriminatedUnion('settlement', [
+          thirdPartyCost.extend({ settlement: z.literal('reinvoiced'), evidence: sourceSchema }).strict(),
+          thirdPartyCost.extend({ settlement: z.literal('client_direct'), evidence: sourceSchema.optional() }).strict()
+        ])
+      )
+      .max(PRICING_V3_MAX_THIRD_PARTY_COSTS)
+      .optional(),
+    // The contingency reserve of a quote is selected from the catalog and leaves it only through this declaration,
+    // with its reason. A union on `kind` so another declaration can be added later without touching this one.
+    contingency: z
+      .discriminatedUnion('kind', [
+        z.object({ kind: z.literal('waived'), reason: z.string().min(1).max(1000) }).strict()
+      ])
+      .optional()
   })
   .strict()
 

@@ -1,14 +1,22 @@
 import Decimal from 'decimal.js'
 
-import { PRICING_V3_ENGINES, PRICING_V3_MARKET_FLOOR_BASIS, parsePricingV3Input } from './schemas'
+import {
+  PRICING_V3_ENGINES,
+  PRICING_V3_MARKET_FLOOR_BASIS,
+  PRICING_V3_THIRD_PARTY_BILLING,
+  parsePricingV3Input
+} from './schemas'
 import type {
-  PricingV3AdjustmentV11,
+  PricingV3AdjustmentV14,
+  PricingV3ContingencyReserveV14,
   PricingV3ContractVersion,
   PricingV3EngagementFactorV13,
   PricingV3Input,
   PricingV3MarketFactorV12,
   PricingV3PriceRounding,
-  PricingV3Source
+  PricingV3Source,
+  PricingV3ThirdPartyCostV14,
+  PricingV3ThirdPartyPolicyV14
 } from './schemas'
 
 const D = Decimal.clone({ precision: 80, rounding: Decimal.ROUND_HALF_UP })
@@ -22,7 +30,9 @@ export const PRICING_V3_PRECISION_POLICIES = {
   '1.0.0': 'decimal-80-half-up-final-line-largest-remainder-v1',
   '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2',
   '1.2.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-v3',
-  '1.3.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-v4'
+  '1.3.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-v4',
+  '1.4.0':
+    'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-engagement-ratio-third-party-reserve-v5'
 } as const
 
 // "Met the floor before rounding" is read on the unrounded amounts, whose last digits are division noise: a price
@@ -54,7 +64,10 @@ type Billable = {
   lineId: string
   parentLineId: string
   periodId: number
-  kind: 'monthly' | 'setup'
+  // `monthly` and `setup` are the billing classes of a team row. `third_party` exists only from contract 1.4.0 on: a
+  // row of an earlier contract never has it. It is typed here, on the row every contract shares, so a consumer that
+  // reads rows of any contract keeps one common row type.
+  kind: 'monthly' | 'setup' | typeof PRICING_V3_THIRD_PARTY_BILLING
   label: string
   cost: string
   undiscountedPrice: string
@@ -118,6 +131,36 @@ type EngagementAmounts = { engagementAdjustment: string }
 /** Contract 1.3.0 only, per row: the ratio of the engagement form the request declares, as the snapshot states it. */
 type EngagementRatio = { engagementPriceRatio: string }
 
+/**
+ * Contract 1.4.0 only, per row and in totals: the contingency reserve inside `cost`, so `cost - contingencyReserve`
+ * is the cost of the same row quoted without a reserve. A difference of presented amounts, like `marketAdjustment`.
+ * Always "0" on a third-party row: the reserve never rests on what a supplier charges.
+ */
+type ReserveAmounts = { contingencyReserve: string }
+
+/**
+ * Contract 1.4.0 only, in totals. Each one is the sum of its rows, and own work is what is left of the quote once the
+ * third-party rows are taken out:
+ *
+ *   ownWorkMarginRate = ((net - thirdPartyNet) - (cost - thirdPartyCost)) / (net - thirdPartyNet)
+ *
+ * `marginRate` stays the real blended margin of the whole quote; `ownWorkMarginRate` is the one to hold against the
+ * floor of the offer, because a cost re-invoiced at or near cost dilutes the first and not the second.
+ */
+type ThirdPartyTotals = {
+  thirdPartyCost: string
+  thirdPartyNet: string
+  /** Null when the quote sells no own work at a net above zero. */
+  ownWorkMarginRate: string | null
+}
+
+/**
+ * Contract 1.4.0 only, in totals. `contingencyBase` is the cost the applied reserve rests on (person cost, or every
+ * own cost, as the reserve declares). `contingencyReserveWaived` is the reserve a waiver left out of `cost`: what
+ * `contingencyReserve` would have been. With a waiver the first two are "0"; without one the last is.
+ */
+type ReserveTotals = { contingencyBase: string; contingencyReserveWaived: string }
+
 type Envelope<Contract extends PricingV3ContractVersion, Line, Sum> = {
   engineVersion: (typeof PRICING_V3_ENGINES)[Contract]
   binding: false
@@ -145,16 +188,34 @@ export type PricingV3LineV13 = PricingV3LineV12 & EngagementAmounts & Engagement
 export type PricingV3TotalsV13 = PricingV3TotalsV12 & EngagementAmounts
 export type PricingV3ResultV13 = Envelope<'1.3.0', PricingV3LineV13, PricingV3TotalsV13>
 
-/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
-export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11 | PricingV3ResultV12 | PricingV3ResultV13
+/** From contract 1.4.0 a row is either a team row or one re-invoiced third-party cost in one period. */
+export type PricingV3LineV14 = PricingV3LineV13 & ReserveAmounts
 
-type Row = Billable & Partial<CommercialAmounts & MarketAmounts & MarketFloor & EngagementAmounts & EngagementRatio>
+export type PricingV3TotalsV14 = PricingV3TotalsV13 & ReserveAmounts & ReserveTotals & ThirdPartyTotals
+export type PricingV3ResultV14 = Envelope<'1.4.0', PricingV3LineV14, PricingV3TotalsV14>
+
+/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
+export type PricingV3Result =
+  | PricingV3ResultV10
+  | PricingV3ResultV11
+  | PricingV3ResultV12
+  | PricingV3ResultV13
+  | PricingV3ResultV14
+
+type Row = Billable &
+  Partial<CommercialAmounts & MarketAmounts & MarketFloor & EngagementAmounts & EngagementRatio & ReserveAmounts>
 
 type Draft = Envelope<
   PricingV3ContractVersion,
   Row,
-  Totals & Partial<CommercialAmounts & MarketAmounts & EngagementAmounts>
+  Totals &
+    Partial<CommercialAmounts & MarketAmounts & EngagementAmounts & ReserveAmounts & ReserveTotals & ThirdPartyTotals>
 >
+
+// The reserve is one component per team row. Its label is fixed here because the snapshot states a rate and a base,
+// not a name: the catalog record that names it stays in the bindings of the quote.
+const CONTINGENCY_RESERVE_KIND = 'contingency_reserve'
+const CONTINGENCY_RESERVE_LABEL = 'Contingency reserve'
 
 /** Pure calculation: all costs, country policies and FX are supplied, never fetched. */
 export function calculatePricingV3(raw: unknown): PricingV3Result {
@@ -163,12 +224,14 @@ export function calculatePricingV3(raw: unknown): PricingV3Result {
 
 // One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys;
 // 1.1.0 is the case with no market floor basis and no 1.2.0 keys; 1.2.0 is the case with no engagement form, where
-// every price is the price at engagement ratio 1, and no 1.3.0 keys.
+// every price is the price at engagement ratio 1, and no 1.3.0 keys; 1.3.0 is the case with no third-party cost and
+// no contingency reserve, and no 1.4.0 keys.
 function calculate(raw: unknown): Draft {
   const { contract, parsed } = parsePricingV3Input(raw)
-  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added, 1.3.0 everything 1.2.0 added.
+  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added, 1.3.0 everything 1.2.0 added, and so on.
   const v11 = contract !== '1.0.0'
-  const v13 = contract === '1.3.0'
+  const v14 = contract === '1.4.0'
+  const v13 = contract === '1.3.0' || v14
   const v12 = contract === '1.2.0' || v13
   const diagnostics: Diagnostic[] = []
   const lines: Row[] = []
@@ -211,7 +274,7 @@ function calculate(raw: unknown): Draft {
   }
 
   const { request: req, snapshot: config } = parsed.data
-  const adjustments: PricingV3AdjustmentV11[] = req.adjustments
+  const adjustments: PricingV3AdjustmentV14[] = req.adjustments
   const rounding: PricingV3PriceRounding | undefined = 'priceRounding' in config ? config.priceRounding : undefined
   const currency = config.currencies.find(item => item.code === req.outputCurrency)
   const baseCurrency = config.currencies.find(item => item.code === config.calculationCurrency)
@@ -321,6 +384,40 @@ function calculate(raw: unknown): Draft {
   // The ratio every row of a 1.3.0 result is priced with; undefined in the contracts that have no such thing.
   const engagementRatio = v13 ? (engagement?.priceRatio ?? '1') : undefined
 
+  // Contract 1.4.0: third-party costs the request declares with the price rule of their category, and the
+  // contingency reserve of the quote. In every earlier contract the three are absent and nothing below is reached.
+  const thirdPartyCosts: PricingV3ThirdPartyCostV14[] =
+    ('thirdPartyCosts' in req ? req.thirdPartyCosts : undefined) ?? []
+
+  const thirdPartyPolicies: PricingV3ThirdPartyPolicyV14[] =
+    ('thirdPartyPolicies' in config ? config.thirdPartyPolicies : undefined) ?? []
+
+  const reserve: PricingV3ContingencyReserveV14 | undefined =
+    'contingencyReserve' in config ? config.contingencyReserve : undefined
+
+  const waiver = 'contingencyWaiver' in req ? req.contingencyWaiver : undefined
+
+  // Adjustments address rows by the id of their parent, a line or a cost: the two share one namespace.
+  duplicate(
+    [...new Set(req.lines.map(item => item.lineId)), ...thirdPartyCosts.map(item => item.costId)],
+    'request.thirdPartyCosts'
+  )
+  duplicate(
+    thirdPartyPolicies.map(item => item.category),
+    'snapshot.thirdPartyPolicies'
+  )
+
+  if (reserve) sourceOk(reserve.source, 'snapshot.contingencyReserve')
+
+  // The reserve leaves a quote only by a declared waiver, and a waiver always shows: with a reserve it puts the quote
+  // under review, without one it has nothing to waive and the input is wrong.
+  if (waiver)
+    report(
+      reserve ? 'CONTINGENCY_RESERVE_WAIVED' : 'CONTINGENCY_WAIVER_WITHOUT_RESERVE',
+      'request.contingencyWaiver',
+      reserve ? 'review' : 'error'
+    )
+
   if (config.mode === 'historical') report('HISTORICAL_ONLY', 'snapshot.mode', 'review')
 
   const allocatedCoverage = new Map<string, Decimal>()
@@ -333,6 +430,12 @@ function calculate(raw: unknown): Draft {
     rawFormlessPrice: Decimal
     rawBasePrice: Decimal
     rawCash: Decimal
+    /** Contract 1.4.0: the reserve inside `rawCost`, the cost it rests on, and the reserve a waiver left out. */
+    rawReserve: Decimal
+    rawReserveBase: Decimal
+    rawWaivedReserve: Decimal
+    /** Set on a third-party row: its amounts are already in the output currency, and its policy decides rounding. */
+    thirdParty?: { commercialRounding: boolean }
   }[] = []
 
   for (const [index, line] of req.lines.entries()) {
@@ -560,6 +663,43 @@ function calculate(raw: unknown): Draft {
         const sum = (key: 'cost' | 'price' | 'cashCommitment') =>
           group.reduce((total, component) => total.plus(component[key]), new D(0))
 
+        // Contract 1.4.0. The contingency reserve is a cost of this row: its rate over the person cost of the row or
+        // over every cost of the row, as the reserve declares. It is read before the component is added, so the
+        // reserve never rests on itself, and only on the components of this row, so never on a third-party cost.
+        // Being a cost it is priced like every non-human component (through the multiplier when the policy prices
+        // all costs, with no market factor), takes the engagement ratio below with the rest of the row, raises the
+        // floor of the row and lowers its margin when a discount eats it. It commits no cash. A row with nothing
+        // to rest it on (a setup row under a `human` base) carries none.
+        const reserveBase = !reserve
+          ? new D(0)
+          : reserve.base === 'human'
+            ? group.reduce(
+                (total, component) => (component.kind === 'human' ? total.plus(component.cost) : total),
+                new D(0)
+              )
+            : sum('cost')
+
+        const reserveCost = reserve ? reserveBase.mul(reserve.rate) : new D(0)
+        const reserved = Boolean(reserve) && !waiver && reserveCost.gt(0)
+
+        if (reserve && reserved)
+          group.push({
+            componentId: `${line.lineId}:${kind}:${CONTINGENCY_RESERVE_KIND}`,
+            kind: CONTINGENCY_RESERVE_KIND,
+            label: CONTINGENCY_RESERVE_LABEL,
+            cost: reserveCost.toString(),
+            price: reserveCost.mul(policy.basis === 'all_costs' ? multiplier : 1).toString(),
+            cashCommitment: '0',
+            coverage: [],
+            trace: {
+              rate: reserve.rate,
+              base: reserve.base,
+              baseAmount: reserveBase.toString(),
+              marketFactor: '1',
+              pricingMultiplier: policy.basis === 'all_costs' ? multiplier.toString() : '1'
+            }
+          })
+
         // Price of the row at engagement ratio 1: what the pricing policy and the market factor form, and all that
         // contracts 1.0.0 to 1.2.0 ever price.
         const formlessPrice = sum('price')
@@ -592,6 +732,10 @@ function calculate(raw: unknown): Draft {
             new D(0)
           ),
           rawCash: sum('cashCommitment'),
+          rawReserve: reserved ? reserveCost : new D(0),
+          rawReserveBase: reserved ? reserveBase : new D(0),
+          // What the waiver took out of this row: the reserve it would have carried.
+          rawWaivedReserve: waiver ? reserveCost : new D(0),
           line: {
             lineId: `${line.lineId}:${period}:${kind}`,
             parentLineId: line.lineId,
@@ -599,6 +743,7 @@ function calculate(raw: unknown): Draft {
             kind,
             label: profile.label,
             cost: '',
+            ...(v14 ? { contingencyReserve: '' } : {}),
             ...(v12 ? { marketAdjustment: '' } : {}),
             ...(v13 ? { engagementAdjustment: '' } : {}),
             undiscountedPrice: '',
@@ -617,9 +762,127 @@ function calculate(raw: unknown): Draft {
     }
   }
 
+  // Contract 1.4.0. Each third-party cost is a row of its own in every period it lists, never a component of a team
+  // row: it takes no pricing multiplier of a line, no market factor and no engagement ratio, and its floor is the one
+  // of its category. Its price is the cost under the rule of that category and nothing else.
+  for (const [index, item] of thirdPartyCosts.entries()) {
+    const path = `request.thirdPartyCosts.${index}`
+    const policy = thirdPartyPolicies.find(candidate => candidate.category === item.category)
+    const supplierCurrency = config.currencies.find(candidate => candidate.code === item.currency)
+
+    if (
+      new Set(item.periodIds).size !== item.periodIds.length ||
+      item.periodIds.some(period => period > req.duration.periods)
+    )
+      report('INVALID_PERIOD', `${path}.periodIds`, 'error', item.costId)
+    if (supplierCurrency && new D(item.amount).decimalPlaces() > supplierCurrency.precision)
+      report('INVALID_THIRD_PARTY_AMOUNT', `${path}.amount`, 'error', item.costId)
+
+    // The evidence of the amount is judged like every source: an expired or pending supplier quote withholds the
+    // calculation, an estimated one puts it under review.
+    sourceOk(item.source, `${path}.source`, undefined, item.costId)
+
+    // A supplier that charges in the currency of the quote is never converted: a round trip through the calculation
+    // currency would not return the amount. Any other currency goes through it, with the frozen records.
+    const sameCurrency = item.currency === req.outputCurrency
+
+    const conversion = sameCurrency
+      ? new D(1)
+      : fx(item.currency, config.calculationCurrency, `${path}.fx`).mul(outputFx)
+
+    if (!policy) {
+      report('MISSING_THIRD_PARTY_POLICY', `${path}.category`, 'missing', item.costId)
+      continue
+    }
+
+    sourceOk(policy.source, `snapshot.thirdPartyPolicies.${item.category}`, undefined, item.costId)
+
+    if (policy.method === 'target_margin' && new D(policy.rate).gte(1)) {
+      report('INVALID_MARGIN_RATE', path, 'error', item.costId)
+      continue
+    }
+
+    const rawCost = new D(item.amount).mul(item.quantity).mul(conversion)
+
+    const rawPrice =
+      policy.method === 'markup' ? rawCost.mul(new D(1).plus(policy.rate)) : rawCost.div(new D(1).minus(policy.rate))
+
+    for (const period of item.periodIds) {
+      pendingRows.push({
+        rawCost,
+        rawPrice,
+        // No market factor and no engagement ratio: the three prices of the walk are one and the same.
+        rawFormlessPrice: rawPrice,
+        rawBasePrice: rawPrice,
+        rawCash: rawCost,
+        rawReserve: new D(0),
+        rawReserveBase: new D(0),
+        rawWaivedReserve: new D(0),
+        thirdParty: { commercialRounding: policy.rounding === 'commercial' },
+        line: {
+          lineId: `${item.costId}:${period}:${PRICING_V3_THIRD_PARTY_BILLING}`,
+          parentLineId: item.costId,
+          periodId: period,
+          kind: PRICING_V3_THIRD_PARTY_BILLING,
+          label: item.label,
+          cost: '',
+          contingencyReserve: '',
+          marketAdjustment: '',
+          engagementAdjustment: '',
+          undiscountedPrice: '',
+          roundingAdjustment: '',
+          discount: '',
+          uplift: '',
+          net: '',
+          marginAmount: '',
+          components: [
+            {
+              componentId: `${item.costId}:${PRICING_V3_THIRD_PARTY_BILLING}`,
+              kind: PRICING_V3_THIRD_PARTY_BILLING,
+              label: item.label,
+              // Unlike every other component, already in the output currency: `outputFx` is 1 and stays 1.
+              cost: rawCost.toString(),
+              price: rawPrice.toString(),
+              cashCommitment: rawCost.toString(),
+              coverage: [],
+              trace: {
+                category: item.category,
+                quantity: item.quantity,
+                supplierCurrency: item.currency,
+                supplierAmount: item.amount,
+                fxPath: [
+                  ...new Set([item.currency, ...(sameCurrency ? [] : [config.calculationCurrency]), req.outputCurrency])
+                ].join('>'),
+                fxRate: conversion.toString(),
+                pricingMethod: policy.method,
+                pricingRate: policy.rate,
+                rounding: policy.rounding,
+                marketFactor: '1',
+                engagementPriceRatio: '1',
+                denominatedIn: req.outputCurrency,
+                outputFx: '1'
+              }
+            }
+          ],
+          minimumMargin: policy.minimumMargin,
+          marketPriceRatio: '',
+          floorNet: '',
+          engagementPriceRatio: ''
+        }
+      })
+    }
+  }
+
+  // A discount and an agreed net of a team billing class name lines; an agreed net of third-party costs names costs.
+  // Anything else is an unknown line, so a rate discount can never reach what a supplier charges.
   for (const adjustment of adjustments) {
+    const parents =
+      adjustment.kind === 'agreed_net' && adjustment.billing === PRICING_V3_THIRD_PARTY_BILLING
+        ? thirdPartyCosts.map(item => item.costId)
+        : req.lines.map(line => line.lineId)
+
     duplicate(adjustment.lineIds, 'request.adjustments.lineIds')
-    if (adjustment.lineIds.some(id => !req.lines.some(line => line.lineId === id)))
+    if (adjustment.lineIds.some(id => !parents.includes(id)))
       report('UNKNOWN_ADJUSTMENT_LINE', 'request.adjustments', 'error')
   }
 
@@ -683,16 +946,22 @@ function calculate(raw: unknown): Draft {
 
   const marketFloor = new Map<Row, { price: Decimal; basePrice: Decimal }>()
 
-  for (const { line, rawCost, rawPrice, rawFormlessPrice, rawBasePrice } of pendingRows) {
-    line.cost = money(rawCost.mul(outputFx))
-    line.undiscountedPrice = money(rawPrice.mul(outputFx))
+  for (const { line, rawCost, rawPrice, rawFormlessPrice, rawBasePrice, rawReserve, thirdParty } of pendingRows) {
+    // A team row is priced in the calculation currency; a third-party row already is in the output currency.
+    const toOutput = thirdParty ? new D(1) : outputFx
+
+    line.cost = money(rawCost.mul(toOutput))
+    line.undiscountedPrice = money(rawPrice.mul(toOutput))
+
+    // Presented cost of the row minus the presented cost it would have without the reserve.
+    if (v14) line.contingencyReserve = money(new D(line.cost).minus(money(rawCost.minus(rawReserve).mul(toOutput))))
 
     if (v11) {
       // Policy price of this quote: with the engagement ratio when the contract has one.
       const policyPrice = new D(line.undiscountedPrice)
       // Policy price in the offer market at engagement ratio 1. Before contract 1.3.0 it is the policy price itself.
-      const marketPrice = new D(money(rawFormlessPrice.mul(outputFx)))
-      const basePrice = new D(money(rawBasePrice.mul(outputFx)))
+      const marketPrice = new D(money(rawFormlessPrice.mul(toOutput)))
+      const basePrice = new D(money(rawBasePrice.mul(toOutput)))
       const marginShare = new Wide(1).minus(line.minimumMargin)
 
       // A row whose price has no human component was not lowered by the market: rho is 1 and nothing changes for it.
@@ -705,17 +974,19 @@ function calculate(raw: unknown): Draft {
 
       if (scaled) marketFloor.set(line, scaled)
 
-      if (rounding && policyPrice.gt(0)) {
+      // Contract 1.4.0: a third-party row is raised to the multiple only when the policy of its category says so.
+      // Under `none` its policy price stands, so a cost re-invoiced at cost in its own currency nets exactly itself.
+      if (rounding && policyPrice.gt(0) && (!thirdParty || thirdParty.commercialRounding)) {
         const multiple = new D(rounding.multiple)
 
         // With a base-market floor, "met the floor before rounding" is read on the base-market price: the price of
         // this row at market factor 1, which under contract 1.3.0 carries the engagement ratio like the price does.
         const unroundedPrice = (
           scaled ? (engagementRatio === undefined ? rawBasePrice : rawBasePrice.mul(engagementRatio)) : rawPrice
-        ).mul(outputFx)
+        ).mul(toOutput)
 
         const compliant = !unroundedPrice
-          .minus(rawCost.mul(outputFx))
+          .minus(rawCost.mul(toOutput))
           .div(unroundedPrice)
           .toSignificantDigits(UNROUNDED_COMPLIANCE_DIGITS)
           .lt(line.minimumMargin)
@@ -749,7 +1020,8 @@ function calculate(raw: unknown): Draft {
       if (engagementRatio !== undefined) {
         // What the form added to (or took from) the price of this row in its market, before commercial rounding.
         line.engagementAdjustment = money(policyPrice.minus(marketPrice))
-        line.engagementPriceRatio = engagementRatio
+        // A third-party row is never multiplied by the ratio of the form: its own ratio is 1 whatever the quote declares.
+        line.engagementPriceRatio = thirdParty ? '1' : engagementRatio
       }
 
       line.roundingAdjustment = money(rounded.minus(policyPrice))
@@ -759,10 +1031,13 @@ function calculate(raw: unknown): Draft {
 
     line.net = line.undiscountedPrice
     line.discount = money(new D(0))
-    line.components = line.components.map(component => ({
-      ...component,
-      trace: { ...component.trace, calculationCurrency: config.calculationCurrency, outputFx: outputFx.toString() }
-    }))
+
+    // The component of a third-party row states its own denomination (the output currency, `outputFx` 1).
+    if (!thirdParty)
+      line.components = line.components.map(component => ({
+        ...component,
+        trace: { ...component.trace, calculationCurrency: config.calculationCurrency, outputFx: outputFx.toString() }
+      }))
     lines.push(line)
   }
 
@@ -856,6 +1131,7 @@ function calculate(raw: unknown): Draft {
   const sumLines = (
     key:
       | 'cost'
+      | 'contingencyReserve'
       | 'marketAdjustment'
       | 'engagementAdjustment'
       | 'undiscountedPrice'
@@ -885,9 +1161,35 @@ function calculate(raw: unknown): Draft {
   const uniform = periodNets.every(value => value.eq(periodNets[0]))
   const result = base('calculated')
 
+  // Contract 1.4.0. Sums of presented amounts over the third-party rows; own work is the rest of the quote.
+  const thirdPartyRows = lines.filter(line => line.kind === PRICING_V3_THIRD_PARTY_BILLING)
+  const thirdPartyCost = thirdPartyRows.reduce((sum, line) => sum.plus(line.cost), new D(0))
+  const thirdPartyNet = thirdPartyRows.reduce((sum, line) => sum.plus(line.net), new D(0))
+  const ownWorkNet = net.minus(thirdPartyNet)
+
   result.reviewStatus = diagnostics.some(item => item.severity === 'review') ? 'requires_review' : 'within_policy'
   result.totals = {
     cost: money(sumLines('cost')),
+    ...(v14
+      ? {
+          contingencyReserve: money(sumLines('contingencyReserve')),
+          // Only team rows carry a base or a waived reserve, and a team row is converted with the output FX.
+          contingencyBase: money(
+            pendingRows.reduce((sum, row) => sum.plus(money(row.rawReserveBase.mul(outputFx))), new D(0))
+          ),
+          // Per row, as `contingencyReserve` is read: the presented cost the row would have with the reserve the
+          // waiver left out, minus the presented cost it has.
+          contingencyReserveWaived: money(
+            pendingRows.reduce(
+              (sum, row) =>
+                row.rawWaivedReserve.isZero()
+                  ? sum
+                  : sum.plus(money(row.rawCost.plus(row.rawWaivedReserve).mul(outputFx))).minus(row.line.cost),
+              new D(0)
+            )
+          )
+        }
+      : {}),
     ...(v12 ? { marketAdjustment: money(sumLines('marketAdjustment')) } : {}),
     ...(v13 ? { engagementAdjustment: money(sumLines('engagementAdjustment')) } : {}),
     undiscountedPrice: money(sumLines('undiscountedPrice')),
@@ -897,10 +1199,22 @@ function calculate(raw: unknown): Draft {
     net: money(net),
     marginAmount: money(margin),
     marginRate: net.isZero() ? null : margin.div(net).toString(),
+    ...(v14
+      ? {
+          thirdPartyCost: money(thirdPartyCost),
+          thirdPartyNet: money(thirdPartyNet),
+          ownWorkMarginRate: ownWorkNet.isZero()
+            ? null
+            : ownWorkNet.minus(sumLines('cost').minus(thirdPartyCost)).div(ownWorkNet).toString()
+        }
+      : {}),
     tax: tax === null ? null : money(tax),
     grandTotal: tax === null ? null : money(net.plus(money(tax))),
     cashCommitment: money(
-      pendingRows.reduce((sum, row) => sum.plus(row.rawCash.mul(outputFx).toDecimalPlaces(precision)), new D(0))
+      pendingRows.reduce(
+        (sum, row) => sum.plus(row.rawCash.mul(row.thirdParty ? 1 : outputFx).toDecimalPlaces(precision)),
+        new D(0)
+      )
     ),
     uniformMonthlyNet: uniform ? money(periodNets[0]) : null
   }

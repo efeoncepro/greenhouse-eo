@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 
 import { PricingV3Error } from '../errors'
+import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -34,6 +35,9 @@ const ceilDiv = (value: Decimal, by: Decimal) => {
 }
 
 type Amounts = { cost: Decimal; net: Decimal }
+
+// Kind of the component the kernel adds to a team row for the contingency reserve of the quote (contract 1.4.0).
+const CONTINGENCY_RESERVE_KIND = 'contingency_reserve'
 
 /**
  * Presents the net of a frozen composed quote as two figures per commercial row: a kit of the tools the caller chose
@@ -81,6 +85,17 @@ type Amounts = { cost: Decimal; net: Decimal }
  *
  * A setup row is split by the same rule and no other: it is a part of the kit only for the selected tool components
  * it actually holds. Tools are monthly or annual resources, so a setup row normally holds none and is all person.
+ *
+ * Third-party rows (contract 1.4.0). A row of kind `third_party` is a cost bought from a supplier and re-invoiced:
+ * it is neither a tool of the kit nor the person, so it is a third part, `thirdParty`, that takes the whole frozen
+ * row (cost and net) and leaves `tools` and `person` at zero in that row. In a quote that has such rows every
+ * identity above reads with three terms: `tools.net + person.net + thirdParty.net` is the row net, and the three
+ * totals add up to the totals of the quote. Its floor is the kernel's `floorNet` for the row, which rests on the
+ * minimum margin of its category, and its verdict is the kernel's. A quote without third-party rows has no such
+ * part: the key is absent, not zero.
+ *
+ * Contingency reserve (contract 1.4.0). It is a cost component of a team row, priced with the row, and no tool: it
+ * stays in the person part, in its cost and in its net.
  */
 export function splitQuotedPrice(
   result: Composition,
@@ -179,7 +194,14 @@ export function splitQuotedPrice(
             : new Wide(money(toolsPrice.mul(net).div(undiscounted)))
 
       const tools: Amounts = { cost: Wide.min(new Wide(money(toolsCost)), rowCost), net: Wide.min(presented, net) }
-      const person: Amounts = { cost: rowCost.minus(tools.cost), net: net.minus(tools.net) }
+
+      // What is left of the row once the kit is taken out belongs to one part: the supplier's when the row is a
+      // re-invoiced third-party cost, the person's otherwise. A row is never both.
+      const rest: Amounts = { cost: rowCost.minus(tools.cost), net: net.minus(tools.net) }
+      const nothing: Amounts = { cost: new Wide(0), net: new Wide(0) }
+      const isThirdParty = row.kind === PRICING_V3_THIRD_PARTY_BILLING
+      const person = isThirdParty ? nothing : rest
+      const thirdParty = isThirdParty ? rest : nothing
 
       const marginShare = new Wide(1).minus(row.minimumMargin)
 
@@ -223,6 +245,9 @@ export function splitQuotedPrice(
       const toolsBelowFloor = tools.net.lt(toolsFloor)
       const personBelowFloor = person.net.lt(personFloor)
 
+      // The third-party part is the row, so its floor and its verdict are the ones the kernel stored for the row.
+      const thirdPartyFloor = 'floorNet' in row ? new Wide(row.floorNet) : floorNet(thirdParty.cost)
+
       const readPart = (part: Amounts, floor: Decimal, belowFloor: boolean) => ({
         cost: money(part.cost),
         net: money(part.net),
@@ -233,7 +258,8 @@ export function splitQuotedPrice(
       })
 
       return {
-        amounts: { tools, person },
+        amounts: { tools, person, thirdParty },
+        hasReserve: row.components.some(component => component.kind === CONTINGENCY_RESERVE_KIND),
         row: {
           periodId: period.periodId,
           lineId: row.lineId,
@@ -257,6 +283,7 @@ export function splitQuotedPrice(
             components
           },
           person: readPart(person, personFloor, personBelowFloor),
+          ...(isThirdParty ? { thirdParty: readPart(thirdParty, thirdPartyFloor, rowBelowFloor) } : {}),
           // Empty when the row itself is under its floor: then that is the finding, and each part still says its own.
           partsBelowFloorWhileRowMeetsIt: rowBelowFloor
             ? []
@@ -293,6 +320,9 @@ export function splitQuotedPrice(
 
   const everyRow = periods.flatMap(period => period.rows)
 
+  // The third part exists only in a quote that re-invoices a third-party cost; every other reading keeps two.
+  const hasThirdParty = everyRow.some(({ row }) => row.kind === PRICING_V3_THIRD_PARTY_BILLING)
+
   return {
     schemaVersion: PRICE_SPLIT_VERSION,
     binding: false as const,
@@ -300,8 +330,9 @@ export function splitQuotedPrice(
     replayDigest: identity.replayDigest,
     commercialUnit: result.commercialUnit,
     currency: totals.currency,
-    statement:
-      'Presentation of a frozen quote in two figures. The quoted total is unchanged: in every row and period tools.net + person.net is the row net, and the totals below add up to the totals of the quote. It is not a new price.',
+    statement: hasThirdParty
+      ? 'Presentation of a frozen quote in three figures. The quoted total is unchanged: in every row and period tools.net + person.net + thirdParty.net is the row net, and the totals below add up to the totals of the quote. It is not a new price.'
+      : 'Presentation of a frozen quote in two figures. The quoted total is unchanged: in every row and period tools.net + person.net is the row net, and the totals below add up to the totals of the quote. It is not a new price.',
     basis: [
       'tools.net: stored price of the selected tool components (cost x pricing multiplier; a market factor never applies to a tool) x row net / row undiscountedPrice, raised to the price-rounding multiple of the quote when it has one and read at the currency unit otherwise; never above the row net.',
       'person.net: row net - tools.net. It keeps the person, the market adjustment, the platform fee, provisions, every tool not shown apart and the commercial rounding of the row.',
@@ -310,6 +341,18 @@ export function splitQuotedPrice(
       ...(everyRow.some(({ row }) => 'engagementPriceRatio' in row)
         ? [
             'engagement form: the stored price of every component, tools included, already carries the price ratio of the declared form (engagementPriceRatio), so each part holds its own share of the engagement adjustment. The ratio moves no floor.'
+          ]
+        : []),
+      // Said only of a quote that re-invoices a third-party cost.
+      ...(hasThirdParty
+        ? [
+            'thirdParty: a row of kind third_party is a cost bought from a supplier and re-invoiced. It is neither a tool nor the person: its whole frozen cost and net are the third part, and tools and person are zero in that row. Its floorNet and its verdict are the ones the kernel stored for the row, on the minimum margin of its category. person.net and tools.net are therefore own work only.'
+          ]
+        : []),
+      // Said only of a quote whose team rows carry a contingency reserve.
+      ...(everyRow.some(({ hasReserve }) => hasReserve)
+        ? [
+            'contingency reserve: a cost component of each team row, priced with the row. It is no tool, so it stays in the person part: in person.cost and in person.net.'
           ]
         : [])
     ],
@@ -326,7 +369,8 @@ export function splitQuotedPrice(
       // Multiple the kit was raised to in this period; null when the quote has no rounding rule.
       toolsRoundedUpTo: period.multiple ? period.multiple.toString() : null,
       tools: sum(period.rows.map(({ amounts }) => amounts.tools)),
-      person: sum(period.rows.map(({ amounts }) => amounts.person))
+      person: sum(period.rows.map(({ amounts }) => amounts.person)),
+      ...(hasThirdParty ? { thirdParty: sum(period.rows.map(({ amounts }) => amounts.thirdParty)) } : {})
     })),
     totals: {
       // The totals of the quote, as frozen.
@@ -337,7 +381,8 @@ export function splitQuotedPrice(
       tax: totals.tax,
       grandTotal: totals.grandTotal,
       tools: sum(everyRow.map(({ amounts }) => amounts.tools)),
-      person: sum(everyRow.map(({ amounts }) => amounts.person))
+      person: sum(everyRow.map(({ amounts }) => amounts.person)),
+      ...(hasThirdParty ? { thirdParty: sum(everyRow.map(({ amounts }) => amounts.thirdParty)) } : {})
     },
     floor: {
       source: 'kernel:MARGIN_BELOW_FLOOR for rows; each part is measured against the minimumMargin of its row.',

@@ -2,6 +2,7 @@ import Decimal from 'decimal.js'
 
 import { activeRecords } from '../catalog/catalog'
 import type { Catalog } from '../catalog/contracts'
+import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 import type { CompositionDemand, CompositionPolicy } from './composition-contracts'
 
@@ -200,6 +201,14 @@ type Signal = {
  * nothing left after the last one. Whether a contract stands behind it is then not declared, so it cannot show
  * here; those tools are listed in `notDerivable`. The engagement is the periods the quote prices: an agreement longer
  * than `brief.periods` is not in the artifact either.
+ *
+ * Third-party costs (contract 1.4.0) are outside this reading. A cost the quote buys from a supplier and re-invoices
+ * is a purchase for the job, due with it: the cash ledger holds it on the period it falls in
+ * (`third-party:<costId>`), it is no resource priced per year or per month, and nothing in the artifact says it
+ * binds anyone after the engagement. It is therefore in no entry, no signal and no total here, and no commitment is
+ * read into it. The reading says how many it saw (`reviewed.thirdPartyPurchasesOutsideThisReading`) and that their
+ * terms are not frozen (`notDerivable`), so their absence is not taken for "none". Their amounts are in the cash
+ * reading (`engagement-view.ts`).
  *
  * Amounts in the currency of the tool are frozen amounts multiplied by frozen quantities and shares. Amounts in the
  * currency of the quote are the ledger and component amounts as frozen; only what the quote never priced (an
@@ -737,6 +746,8 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
   let annualPriceUses = 0
   let termedMonthlyPriceUses = 0
   let renewalDatedPriceUses = 0
+  // Rows of re-invoiced third-party costs, one per cost and period: seen, counted and read into nothing.
+  let thirdPartyPurchases = 0
 
   // A blocked quote has no cash ledger to read a commitment from, and a credit plan that may be incomplete.
   if (quote.calculationStatus === 'calculated' && quote.totals) {
@@ -751,6 +762,13 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       if (!input) continue
 
       for (const row of period.result.lines) {
+        // A purchase for the job, not a resource with a term: it is neither a year the kernel booked nor a month
+        // under a contract the policy declares.
+        if (row.kind === PRICING_V3_THIRD_PARTY_BILLING) {
+          thirdPartyPurchases += 1
+          continue
+        }
+
         const line = input.request.lines.find(l => l.lineId === row.parentLineId)
 
         for (const component of row.components) {
@@ -911,6 +929,13 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         reason:
           'The credit catalog freezes a monthly subscription fee and the plan attributes a share of it as already funded. How long that subscription is committed for is not in the artifact.'
       })
+    if (thirdPartyPurchases)
+      notDerivable.push({
+        code: 'THIRD_PARTY_PURCHASE_TERMS_NOT_FROZEN',
+        toolIds: [],
+        reason:
+          'A re-invoiced third-party cost is frozen as an amount in a period, with the evidence of the supplier quote. Whether the purchase binds past the engagement (a minimum term, a cancellation charge, a licence or a right of use that runs on) is not in the artifact, so nothing is read for it here.'
+      })
   } else {
     notDerivable.push({
       code: 'QUOTE_NOT_CALCULATED',
@@ -1043,7 +1068,13 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
         : []),
       'shorter-commitment prices: every price per month the frozen policy holds for the same tool on the quote date that binds for less than the price the quote uses, over the same periods, quantity and share. The policy does not link the prices of one plan.',
       'credit pack: the plan of the artifact (creditBudgets), never recomputed. incrementalCash is the cash of whole packs (resourceIncrementalCash); the subscription share is attributed cost with no new cash.',
-      'amounts in the quote currency use the FX the quote froze; none of them is new cash unless it is named incrementalCash.'
+      'amounts in the quote currency use the FX the quote froze; none of them is new cash unless it is named incrementalCash.',
+      // Stated only of a quote that re-invoices a third-party cost, so every other reading says what it always said.
+      ...(thirdPartyPurchases
+        ? [
+            'third-party costs: outside this reading. A cost bought from a supplier and re-invoiced is a purchase for the job, due with it: the cash ledger holds it on the period it falls in (third-party:<costId>) and it is no resource priced per year or per month. It is in no entry, no signal and no total here. reviewed.thirdPartyPurchasesOutsideThisReading counts the ones seen, one per cost and period; their amounts are in the cash reading.'
+          ]
+        : [])
     ],
     cashMeaning: result.cashMeaning,
     // What was looked at, so an empty reading can be told apart from one that looked at nothing.
@@ -1055,7 +1086,9 @@ export function commitmentExposure(artifact: CommitmentExposureSource) {
       ...(renewalDatedPriceUses ? { renewalDatedPriceUses } : {}),
       creditBudgets: result.creditBudgets.length,
       creditBudgetsWithPacks: result.creditBudgets.filter(b => (b.result.breakdown?.extra.purchasedCredits ?? 0) > 0)
-        .length
+        .length,
+      // Re-invoiced third-party costs seen, one per cost and period, and left out on purpose. Absent when none.
+      ...(thirdPartyPurchases ? { thirdPartyPurchasesOutsideThisReading: thirdPartyPurchases } : {})
     },
     commitments: [...annualPrices, ...termedMonthlyPrices, ...creditPacks],
     signals,

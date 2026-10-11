@@ -1,11 +1,17 @@
 import Decimal from 'decimal.js'
 
+import { clientPaidDirectly } from '../catalog/client'
 import { describeEngagementForm, describeMarketFactor } from '../catalog/explain'
 import { PricingV3Error } from '../errors'
+import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 import { estimateExposure, linesBelowPolicyFloor } from './summary'
 
 type Composition = ReturnType<typeof composeResourceQuote>
+
+// Generic references, never approved: the margin a quote is held against before anyone has decided its policy.
+const PROPOSED_MARGIN_TARGET = '0.40'
+const PROPOSED_MARGIN_FLOOR = '0.35'
 
 /** Economic evidence gaps are separate from mathematical completion and never grant commercial authority. */
 export function assessCompositionReadiness(result: Composition) {
@@ -85,21 +91,100 @@ export function assessCompositionReadiness(result: Composition) {
       'Validate deliverables, acceptance, capacity, responsibilities, limits and continuity; internal role cost is not a service contract.'
     )
 
+  // Third-party costs of the engagement (contract 1.4.0), read from the brief the quote froze: the supplier, the
+  // evidence and the costs the client pays directly never leave it. A brief of an earlier contract declares none.
+  const brief = result.quote.resolution.brief
+  const declaredCosts = brief?.thirdPartyCosts ?? []
+  let reinvoicedCosts = 0
+
+  for (const cost of declaredCosts) {
+    if (cost.settlement !== 'reinvoiced') continue
+
+    reinvoicedCosts += 1
+
+    if (cost.evidence.status !== 'confirmed')
+      gap(
+        'THIRD_PARTY_COST_EVIDENCE_REQUIRED',
+        `thirdPartyCosts.${cost.costId}.evidence`,
+        'Commercial/Finance',
+        'The amount of this re-invoiced cost rests on evidence that is not confirmed. Obtain the quote of the supplier with its reference, date and validity: an estimated amount keeps the quote under review and a pending one withholds the calculation.'
+      )
+    if (brief && cost.currency !== brief.outputCurrency)
+      gap(
+        'THIRD_PARTY_FX_EXPOSURE',
+        `thirdPartyCosts.${cost.costId}.currency`,
+        'Finance/Commercial',
+        `The supplier charges in ${cost.currency} and the quote is in ${brief.outputCurrency}. The row was converted with the FX frozen in the quote, and the supplier is paid at the FX of the day it is paid. Agree a readjustment clause or carry an explicit FX buffer before issuing.`
+      )
+  }
+
+  if (declaredCosts.length)
+    gap(
+      'THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED',
+      'thirdPartyCosts',
+      'Practice/Commercial',
+      'Validate each third-party cost before issuing: what it covers, who contracts and pays the supplier, the payment terms of the supplier against those of the client, usage rights and what a cancellation costs. A re-invoiced amount is not a supplier contract, and a cost the client pays directly is outside every total of this quote.'
+    )
+
+  // One tax treatment per quote: the kernel applies an exclusive rate to the whole net, third-party rows included.
+  if (reinvoicedCosts && brief?.taxTreatment.kind === 'exclusive')
+    gap(
+      'THIRD_PARTY_TAX_TREATMENT_REVIEW',
+      'taxTreatment',
+      'Finance',
+      'The exclusive tax rate of the quote was applied to its whole net, the re-invoiced third-party rows included. Confirm that each of them carries the tax treatment of the service: media, talent or a foreign supplier may not.'
+    )
+
+  // The reserve leaves a quote only through a declared waiver. Whether there was one to waive is read from what
+  // resolution selected, so a quote that is not calculated says it too.
+  const totals = result.quote.totals
+  const reserveSelected = result.quote.resolution.bindings.some(b => b.record.kind === 'contingency_reserve')
+
+  if (brief?.contingency?.kind === 'waived' && reserveSelected)
+    gap(
+      'CONTINGENCY_RESERVE_WAIVED',
+      'contingency',
+      'Commercial/Finance',
+      `The brief waives the contingency reserve of this quote (reason in brief.contingency.reason)${
+        totals && 'contingencyReserveWaived' in totals
+          ? `: ${totals.contingencyReserveWaived} ${totals.currency} of cost were left out`
+          : ''
+      }. Neither the price nor the floor of a row covers an overrun. Approve the waiver or restore the reserve.`
+    )
+
   // The floor verdict is the kernel's (MARGIN_BELOW_FLOOR per line); readiness only turns it into an owned decision.
   const belowPolicyFloor = linesBelowPolicyFloor(result)
   const marketFactor = describeMarketFactor(result.quote.resolution)
   const engagementForm = describeEngagementForm(result.quote.resolution)
+
+  // A third-party row is judged on the floor of the price rule of its category, which is another record than a
+  // pricing policy and usually another number: the gap says which rule it is.
+  const categoryRule = (costId: string | null) => {
+    const record = result.quote.resolution.bindings.find(
+      b => b.lineId === costId && b.record.kind === 'third_party_policy'
+    )?.record
+
+    return record?.kind === 'third_party_policy'
+      ? `category ${record.value.category}, record ${record.recordId} revision ${record.revision}, minimum margin ${record.value.minimumMargin}`
+      : 'the third_party_policy record selected for it'
+  }
 
   for (const line of belowPolicyFloor)
     gap(
       'MARGIN_BELOW_POLICY_FLOOR',
       `periods.${line.periodId}.result.lines.${line.lineId}`,
       'Commercial/Finance',
-      'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.'
+      line.kind === PRICING_V3_THIRD_PARTY_BILLING
+        ? `The price of this re-invoiced third-party cost is under the margin floor of the price rule of its category (${categoryRule(line.parentLineId)}), not of a pricing policy. Decide: raise its price, have the client pay the supplier directly or approve an exception. The system does not raise the price.`
+        : 'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.'
     )
 
   // The ranking is the summary's (`estimateExposure`); readiness only points at where the evidence matters most.
   const exposure = estimateExposure(result)
+
+  // Null when the quote sells no own work at a net above zero: there is no margin of own work to hold to a floor.
+  const ownWorkRate = totals && 'ownWorkMarginRate' in totals ? (totals.ownWorkMarginRate ?? null) : undefined
+  const heldAgainstFloor = ownWorkRate !== undefined ? ownWorkRate : (totals?.marginRate ?? null)
 
   return {
     calculationStatus: result.quote.calculationStatus,
@@ -116,18 +201,24 @@ export function assessCompositionReadiness(result: Composition) {
           confirmFirst: exposure.costInputs.slice(0, 5)
         }
       : null,
-    margin: result.quote.totals
+    margin: totals
       ? {
-          modeledRate: result.quote.totals.marginRate,
-          proposedTarget: '0.40',
-          proposedFloor: '0.35',
+          // The real margin of the whole quote, third-party rows included.
+          modeledRate: totals.marginRate,
+          // From contract 1.4.0: the margin of the quote without its third-party rows. A cost re-invoiced at or near
+          // cost dilutes `modeledRate` and not this one, so the generic floor below is read on it. Absent for a
+          // quote of an earlier contract, which has no third-party row and one margin.
+          ...(ownWorkRate !== undefined ? { ownWorkRate, proposedFloorReadOn: 'ownWorkRate' as const } : {}),
+          proposedTarget: PROPOSED_MARGIN_TARGET,
+          proposedFloor: PROPOSED_MARGIN_FLOOR,
           approved: false,
           belowProposedFloor:
-            result.quote.totals.marginRate === null ? null : new Decimal(result.quote.totals.marginRate).lt('0.35'),
+            heldAgainstFloor === null ? null : new Decimal(heldAgainstFloor).lt(PROPOSED_MARGIN_FLOOR),
           // Per-line floors of the pricing policy actually selected, as judged by the kernel. Independent of the
           // generic proposals above, which stay unapproved references. With a market factor whose floor follows the
           // base market, `modeledRate` (the real margin) can sit under the policy minimum with no line flagged. The
           // form of the engagement moves the net and never the floor: a ratio under 1 can be why a line is flagged.
+          // A third-party row is listed here on the floor of its category, never on the floor of a pricing policy.
           policyFloor: {
             source: 'kernel:MARGIN_BELOW_FLOOR',
             ...(marketFactor ? { marketFactor } : {}),
@@ -142,6 +233,12 @@ export function assessCompositionReadiness(result: Composition) {
 /**
  * Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin.
  * Every amount is a final net (after commercial rounding, discount and uplift); none of those is itemized.
+ *
+ * From contract 1.4.0 a re-invoiced third-party cost is an item of its own in the period it falls in, by the concept
+ * the brief declares and its final net: it is never folded into the fee of a managed service, which is the period net
+ * minus the setup and minus those items. A cost the client pays directly is listed apart under `clientPaidDirectly`
+ * (concept, amount and currency as declared), outside every item, period and total; the key is absent when the brief
+ * declares none. Neither carries the supplier, what the supplier charges or the rule that priced it.
  */
 export function projectCompositionPreview(result: Composition) {
   if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
@@ -153,6 +250,7 @@ export function projectCompositionPreview(result: Composition) {
     if (!p.result.totals) throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
     const lines = p.result.lines
     const setup = lines.filter(l => l.kind === 'setup').reduce((s, l) => s.plus(l.net), new D(0))
+    const thirdParty = lines.filter(l => l.kind === PRICING_V3_THIRD_PARTY_BILLING)
 
     // The kernel already formatted this period at the currency's precision; an amount derived here keeps that scale
     // instead of assuming two decimals (CLP has none).
@@ -163,14 +261,20 @@ export function projectCompositionPreview(result: Composition) {
         ? [
             {
               label: 'Servicio gestionado — fee del periodo',
-              net: new D(p.result.totals.net).minus(setup).toFixed(scale)
+              // What the service itself is sold for: nothing a supplier is paid for is presented as fee.
+              net: thirdParty
+                .reduce((fee, l) => fee.minus(l.net), new D(p.result.totals.net).minus(setup))
+                .toFixed(scale)
             },
-            ...(setup.gt(0) ? [{ label: 'Implementación inicial', net: setup.toFixed(scale) }] : [])
+            ...(setup.gt(0) ? [{ label: 'Implementación inicial', net: setup.toFixed(scale) }] : []),
+            ...thirdParty.map(l => ({ label: l.label, net: l.net }))
           ]
         : lines.map(l => ({ label: l.kind === 'setup' ? 'Implementación inicial' : l.label, net: l.net }))
 
     return { periodId: p.periodId, currency, items, net: p.result.totals.net }
   })
+
+  const paidDirectly = clientPaidDirectly(result.quote.resolution.brief)
 
   return {
     schemaVersion: 'pricing-v3-composition-preview/1',
@@ -182,12 +286,21 @@ export function projectCompositionPreview(result: Composition) {
     net: result.quote.totals.net,
     tax: result.quote.totals.tax,
     grandTotal: result.quote.totals.grandTotal,
+    ...(paidDirectly.length ? { clientPaidDirectly: paidDirectly } : {}),
     note: 'No es una oferta emitida. Validar alcance, recursos, precio, impuestos y condiciones antes de presentación.'
   }
 }
 
 export function compositionPreviewMarkdown(result: Composition) {
   const p = projectCompositionPreview(result)
+  const oneLine = (value: string) => value.replace(/[\r\n]/g, ' ')
+
+  // After the net of the term, so that no amount above it reads as including these.
+  const paidDirectly = p.clientPaidDirectly?.length
+    ? `\n\nPagado directamente por el cliente a su proveedor. No forma parte de esta cotización ni de su neto:\n\n${p.clientPaidDirectly
+        .map(item => `- ${oneLine(item.label)}: ${item.amount} ${item.currency} (periodo ${item.periodIds.join(', ')})`)
+        .join('\n')}`
+    : ''
 
   return (
     `# Simulación de cotización\n\n${p.status}. No vinculante.\n\n` +
@@ -195,9 +308,9 @@ export function compositionPreviewMarkdown(result: Composition) {
       .map(
         period =>
           `Periodo ${period.periodId} — ${period.currency}\n\n` +
-          period.items.map(i => `- ${i.label.replace(/[\r\n]/g, ' ')}: ${i.net} ${period.currency}`).join('\n')
+          period.items.map(i => `- ${oneLine(i.label)}: ${i.net} ${period.currency}`).join('\n')
       )
       .join('\n\n') +
-    `\n\nNeto del plazo: ${p.net} ${p.currency}.\n\n${p.note}\n`
+    `\n\nNeto del plazo: ${p.net} ${p.currency}.${paidDirectly}\n\n${p.note}\n`
   )
 }

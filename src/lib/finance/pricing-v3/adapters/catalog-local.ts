@@ -54,9 +54,18 @@ export function explainCatalogQuote(raw: unknown) {
     },
     ...result,
     maintenance: 'Frozen catalog. New values affect only a new quote or explicit revision.',
-    // An `engagement_factor` binding exists only in a quote whose brief declares the form (contract 1.3.0).
+    // An `engagement_factor` binding exists only in a quote whose brief declares the form (contract 1.3.0); a
+    // `third_party_policy` one per re-invoiced cost and a `contingency_reserve` one only in a quote that has them
+    // (contract 1.4.0). They are the records that set a price or a cost without being a line's own.
     factorAndFxReferences: result.resolution.bindings.filter(b =>
-      ['talent_factor', 'market_factor', 'engagement_factor', 'fx'].includes(b.purpose)
+      [
+        'talent_factor',
+        'market_factor',
+        'engagement_factor',
+        'third_party_policy',
+        'contingency_reserve',
+        'fx'
+      ].includes(b.purpose)
     ),
     costBreakdown: explainCostComponents(result),
     commercialAdjustments: explainCommercialAdjustments(result)

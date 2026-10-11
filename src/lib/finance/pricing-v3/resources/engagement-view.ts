@@ -1,8 +1,18 @@
 import Decimal from 'decimal.js'
 
+import { clientPaidDirectly } from '../catalog/client'
+import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
+type QuoteRow = Composition['quote']['periods'][number]['result']['lines'][number]
+
+// Contract 1.4.0, as the kernel and the quote wrote them: the kind of the row and of the single component of a
+// re-invoiced third-party cost, the kind of the reserve component of a team row, and the cash ledger entry that
+// `catalog/quote.ts` gives each third-party row, named after the cost it belongs to.
+const THIRD_PARTY = PRICING_V3_THIRD_PARTY_BILLING
+const CONTINGENCY_RESERVE_KIND = 'contingency_reserve'
+const thirdPartyLedgerKey = (row: QuoteRow) => `third-party:${row.parentLineId}`
 
 // Share x net, provider amount x two FX rates and component cost x output FX must be exact for any amount the kernel
 // can store, as in price-split.ts. Nothing is divided here except through an integer quotient or for a ratio that is
@@ -82,6 +92,15 @@ const rejected = (code: EngagementViewRejectionCode, issues: EngagementViewIssue
  * tax gets no tax here.
  *
  * It says when an amount is due. It is not an invoice and not an amount collected.
+ *
+ * Third-party costs (contract 1.4.0). `totals.net` includes the net of the re-invoiced third-party rows, so the
+ * calendar distributes it like the rest: the client pays for them through the milestones, and the company pays the
+ * suppliers on their own terms. For a quote that has such rows the reading adds `thirdParty`: what the suppliers are
+ * paid (the frozen cost of those rows) in total and in each period that holds any, next to what the calendar places
+ * in that same period. A milestone that declares its period also carries `thirdPartyCostInPeriod`. That is as far
+ * as the artifact goes: it freezes the period a cost falls in, never the date a supplier is paid, and a milestone
+ * timed by `when`, or not timed, is in no period. An advance smaller than the supplier cost of its period is cash
+ * the company puts up before it collects; nothing here decides whether that is acceptable.
  */
 export function presentPaymentSchedule(
   result: Composition,
@@ -160,6 +179,7 @@ export function presentPaymentSchedule(
   const scale = scaleOf(totals.net)
   const unit = new Wide(10).pow(-scale)
   const money = (value: Decimal) => value.toFixed(scale, Wide.ROUND_HALF_UP)
+  const sumOf = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new Wide(0))
   const net = new Wide(totals.net)
 
   // The rule the kernel rounded this quote with, read from the inputs it was frozen with, as price-split.ts reads
@@ -215,6 +235,17 @@ export function presentPaymentSchedule(
 
   const treatment = quote.resolution.inputs[0]?.input.request.taxTreatment
 
+  // Frozen cost of the third-party rows, by period: what the suppliers of each period are paid, in the quote currency.
+  const supplierCost = new Map<number, Decimal>()
+
+  for (const period of quote.periods)
+    for (const row of period.result.lines)
+      if (row.kind === THIRD_PARTY)
+        supplierCost.set(period.periodId, (supplierCost.get(period.periodId) ?? new Wide(0)).plus(row.cost))
+
+  const placedIn = (periodId: number) =>
+    valid.reduce((total, m, index) => (m.periodId === periodId ? total.plus(amounts[index]) : total), new Wide(0))
+
   return {
     ok: true as const,
     reading: {
@@ -229,7 +260,13 @@ export function presentPaymentSchedule(
       basis: [
         'amount: share x totals.net, read at the nearest price-rounding multiple of the quote (half up) when the quote froze one and at the currency unit otherwise. The last milestone is totals.net minus every amount before it.',
         'tax and total: present only when the quote resolved tax. Tax is totals.tax spread in proportion to the amounts, on the running total, so it adds up to totals.tax. A quote without resolved tax carries null: no rate is assumed here.',
-        'periodId and when are the timing the caller declared. Nothing here checks a due date, an acceptance or a payment.'
+        'periodId and when are the timing the caller declared. Nothing here checks a due date, an acceptance or a payment.',
+        // Said only of a quote that re-invoices a third-party cost; every earlier reading keeps its three entries.
+        ...(supplierCost.size
+          ? [
+              'third-party costs: totals.net includes the net of the re-invoiced third-party rows (totals.thirdPartyNet), so the calendar covers what the client pays for them. thirdParty.supplierCost is the frozen cost of those rows: what the suppliers are paid, in total and by the period of the quote each row falls in. thirdPartyCostInPeriod repeats it on a milestone that declares that period. The artifact freezes the period of a cost, not the date a supplier is paid: a milestone timed by `when`, or not timed, is compared with nothing.'
+            ]
+          : [])
       ],
       rounding: {
         // Multiple every milestone but the last is read at; null when the quote has no rounding rule.
@@ -250,9 +287,42 @@ export function presentPaymentSchedule(
           amount: money(amounts[index]),
           tax: taxes[index] ? money(taxes[index]) : null,
           total: taxes[index] ? money(amounts[index].plus(taxes[index])) : null,
-          takesRemainder: index === last
+          takesRemainder: index === last,
+          // What the suppliers of the declared period are paid; the same figure on every milestone of that period.
+          ...(supplierCost.size && milestone.periodId !== undefined
+            ? { thirdPartyCostInPeriod: money(supplierCost.get(milestone.periodId) ?? new Wide(0)) }
+            : {})
         }
       }),
+      ...(supplierCost.size
+        ? {
+            thirdParty: {
+              statement:
+                'The milestones distribute the whole net, the re-invoiced third-party costs included. supplierCost is what the company pays the suppliers of those costs. Where a period places less in milestones than its suppliers are paid, the company puts up the difference until a later milestone is collected.',
+              // Sum of the third-party rows, as the kernel froze them: what the client pays and what suppliers get.
+              net: money(
+                sumOf(
+                  quote.periods.flatMap(period =>
+                    period.result.lines.filter(row => row.kind === THIRD_PARTY).map(row => new Wide(row.net))
+                  )
+                )
+              ),
+              supplierCost: money(sumOf([...supplierCost.values()])),
+              // Only the periods that hold a third-party row.
+              byPeriod: [...supplierCost.entries()].map(([periodId, cost]) => ({
+                periodId,
+                supplierCost: money(cost),
+                // Amounts of the milestones that declare this period. Milestones in no period are not counted.
+                milestonesPlacedInPeriod: money(placedIn(periodId)),
+                supplierCostAboveMilestones: money(Wide.max(cost.minus(placedIn(periodId)), 0))
+              })),
+              // Milestones the caller did not place in a period: their amounts are in no comparison above.
+              milestonesInNoPeriod: valid.filter(m => m.periodId === undefined).length,
+              notDerivable:
+                'The date a supplier is paid and the terms of the supplier are not in the artifact; only the period of the quote each cost falls in.'
+            }
+          }
+        : {}),
       remainder: {
         milestoneId: valid[last].id,
         // What the last milestone is above (or, negative, below) its own share of the net, to the last decimal.
@@ -279,6 +349,9 @@ const COST_NATURES = [
   'setup',
   'toolCreditBudgets',
   'toolSeatsAndPackages',
+  // Contract 1.4.0: what suppliers charge for the re-invoiced costs, and the contingency reserve of the team rows.
+  'thirdParty',
+  'contingencyReserve',
   'unclassified'
 ] as const
 
@@ -297,7 +370,9 @@ const natureOf = (kind: string, creditBudget: boolean): CostNature =>
             ? creditBudget
               ? 'toolCreditBudgets'
               : 'toolSeatsAndPackages'
-            : 'unclassified'
+            : kind === THIRD_PARTY
+              ? 'thirdParty'
+              : 'unclassified'
 
 type FxStep = { from: string; to: string; rate: string; sourceStatus: string }
 
@@ -313,13 +388,30 @@ type CreditPurchase = {
   inQuoteCurrency: string | null
 }
 
+/** One re-invoiced third-party cost in one period: what the supplier charges and what the quote froze for it. */
+type ThirdPartyPurchase = {
+  periodId: number
+  costId: string
+  label: string
+  /** As declared, in the currency of the supplier: `amount x quantity`. */
+  supplierCurrency: string | null
+  supplierAmount: string | null
+  /** Currencies the frozen conversion went through, and its rate. Rate "1" when the supplier charges in the quote currency. */
+  fxPath: string | null
+  fxRate: string | null
+  /** Frozen cost of the row: what the company pays the supplier, in the quote currency. */
+  inQuoteCurrency: string
+  /** Frozen net of the row: what the client is invoiced for it. */
+  reinvoicedNet: string
+}
+
 type PeriodCash = {
   periodId: number
   net: string
   fullCost: string
   marginAtFullCost: string
   marginRateRoundedDown: string | null
-  modeledCommitment: { total: string; monthlyAndOnce: string; annualUpFront: string }
+  modeledCommitment: { total: string; monthlyAndOnce: string; annualUpFront: string; thirdParty?: string }
   newSupplierCash: string | null
   cashAddedOnContractedCapacity: string | null
 }
@@ -357,6 +449,20 @@ const emptyNatures = () =>
  *
  * What the frozen artifact does not let anyone separate is listed under `notDerivable` and left out of every figure:
  * whether a tool seat, a package, a platform fee or a setup resource is a new purchase for this job.
+ *
+ * Contract 1.4.0 adds two natures of cost, and each key below exists only in a quote that has the thing it names:
+ *
+ * - `thirdParty`: the frozen cost of the re-invoiced third-party rows. It is bought for this job and paid to a
+ *   supplier, so, unlike a seat, it IS new supplier cash: it is counted in `newSupplierCash` next to the credit
+ *   packs and it lowers `cashAddedOnContractedCapacity`. Its entries of the cash ledger are read as what they are
+ *   (`modeledCommitment.thirdParty`), never as an annual resource paid up front. A cost in another currency is
+ *   stated at the FX the quote froze; the supplier is paid at the FX of the day.
+ * - `contingencyReserve`: the reserve the team rows carry inside their cost, as the kernel states it per row. It is
+ *   a provision of the quote for overruns: no supplier is paid it, it commits no cash and it is in no cash figure.
+ *   It is not capacity either, so it stays out of `capacityCostAbsorbed`.
+ *
+ * A cost the client pays directly to a supplier is in no row of the quote: it is listed under
+ * `supplierCash.paidByClientDirectly` as the brief declares it and enters no figure of this reading.
  */
 export function readEngagementCash(result: Composition, identity: { calculationId: string; replayDigest: string }) {
   const { quote } = result
@@ -369,7 +475,16 @@ export function readEngagementCash(result: Composition, identity: { calculationI
   const sumOf = (values: Decimal[]) => values.reduce((total, value) => total.plus(value), new Wide(0))
   const notDerivable: { figure: string; reason: string }[] = []
   const purchases: CreditPurchase[] = []
+  const thirdPartyPurchases: ThirdPartyPurchase[] = []
   const periods: { read: PeriodCash; natures: Record<CostNature, Decimal>; newCash: Decimal | null }[] = []
+
+  // What the quote holds of contract 1.4.0, read from the frozen rows and inputs. Each one decides whether the keys
+  // that speak of it exist at all: a quote without it reads exactly as it did before the contract.
+  const hasThirdParty = quote.periods.some(period => period.result.lines.some(row => row.kind === THIRD_PARTY))
+
+  const hasReserve = quote.resolution.inputs.some(
+    ({ input }) => 'contingencyReserve' in input.snapshot && Boolean(input.snapshot.contingencyReserve)
+  )
 
   for (const period of quote.periods) {
     const input = quote.resolution.inputs.find(i => i.periodId === period.periodId)?.input
@@ -384,7 +499,15 @@ export function readEngagementCash(result: Composition, identity: { calculationI
       const line = request.lines.find(l => l.lineId === row.parentLineId)
       const raw = new Map<CostNature, Decimal>()
 
+      // The reserve of a row is the amount the kernel states for it (`contingencyReserve`, a difference of presented
+      // costs), never its component: read from there, the nature adds up to `totals.contingencyReserve` to the
+      // unit, which a component rounded on its own would not. Every row of contract 1.4.0 states it.
+      if ('contingencyReserve' in row && new Wide(row.contingencyReserve).gt(0))
+        raw.set('contingencyReserve', new Wide(row.contingencyReserve))
+
       for (const component of row.components) {
+        if (component.kind === CONTINGENCY_RESERVE_KIND) continue
+
         // Read back the way the kernel and the composition wrote it: a tool component is one assignment of one
         // resource, a composed tool is the resource of one attribution in its period, and a credit tool is the one
         // the composition planned a budget for.
@@ -431,7 +554,32 @@ export function readEngagementCash(result: Composition, identity: { calculationI
       }
 
       if (holder) natures[holder] = natures[holder].plus(left)
+
+      if (row.kind !== THIRD_PARTY) continue
+
+      // A third-party row is one purchase from one supplier. Its trace keeps what the supplier charges and the
+      // conversion the quote froze; the supplier itself stays in the brief.
+      const trace = row.components.find(component => component.kind === THIRD_PARTY)?.trace
+
+      thirdPartyPurchases.push({
+        periodId: period.periodId,
+        costId: row.parentLineId,
+        label: row.label,
+        supplierCurrency: trace?.supplierCurrency ?? null,
+        supplierAmount:
+          trace?.supplierAmount && trace.quantity
+            ? new Wide(trace.supplierAmount).mul(trace.quantity).toFixed(scaleOf(trace.supplierAmount))
+            : null,
+        fxPath: trace?.fxPath ?? null,
+        fxRate: trace?.fxRate ?? null,
+        inQuoteCurrency: row.cost,
+        reinvoicedNet: row.net
+      })
     }
+
+    // Paid to the suppliers of this period: the frozen cost of its third-party rows, already in the quote currency.
+    const thirdPartyRows = period.result.lines.filter(row => row.kind === THIRD_PARTY)
+    const thirdPartyCash = sumOf(thirdPartyRows.map(row => new Wide(row.cost)))
 
     // FX exactly as the kernel reads it: one frozen record for the pair, or none.
     const rate = (from: string, to: string): FxStep[] | null => {
@@ -441,7 +589,7 @@ export function readEngagementCash(result: Composition, identity: { calculationI
       return record ? [{ from, to, rate: record.rate, sourceStatus: record.source.status }] : null
     }
 
-    let newCash: Decimal | null = new Wide(0)
+    let newCash: Decimal | null = thirdPartyCash
 
     for (const purchase of result.resourceIncrementalCash.filter(c => c.periodId === period.periodId)) {
       const toCalculation = rate(purchase.currency, snapshot.calculationCurrency)
@@ -481,7 +629,13 @@ export function readEngagementCash(result: Composition, identity: { calculationI
     }
 
     const ledger = quote.cashLedger.filter(entry => entry.periodId === period.periodId)
-    const annual = ledger.filter(entry => entry.key !== 'human-monthly-and-once')
+
+    // The ledger gives each third-party row its own entry, named after its cost. What is neither that nor the entry
+    // of the team is an annual resource, paid whole on the period its term opens.
+    const thirdPartyKeys = new Set(thirdPartyRows.map(thirdPartyLedgerKey))
+    const thirdPartyLedger = ledger.filter(entry => thirdPartyKeys.has(entry.key))
+
+    const annual = ledger.filter(entry => entry.key !== 'human-monthly-and-once' && !thirdPartyKeys.has(entry.key))
     const net = new Wide(frozen.net)
 
     periods.push({
@@ -501,7 +655,9 @@ export function readEngagementCash(result: Composition, identity: { calculationI
             sumOf(ledger.filter(entry => entry.key === 'human-monthly-and-once').map(e => new Wide(e.amount)))
           ),
           // Annual resources, whole, on the period the ledger pays them.
-          annualUpFront: money(sumOf(annual.map(entry => new Wide(entry.amount))))
+          annualUpFront: money(sumOf(annual.map(entry => new Wide(entry.amount)))),
+          // Re-invoiced third-party costs, on the period they fall in: a purchase for the job, not a term.
+          ...(hasThirdParty ? { thirdParty: money(sumOf(thirdPartyLedger.map(entry => new Wide(entry.amount)))) } : {})
         },
         newSupplierCash: newCash ? money(newCash) : null,
         cashAddedOnContractedCapacity: newCash ? money(net.minus(newCash)) : null
@@ -521,6 +677,9 @@ export function readEngagementCash(result: Composition, identity: { calculationI
     setup: money(natures.setup),
     toolCreditBudgets: money(natures.toolCreditBudgets),
     toolSeatsAndPackages: money(natures.toolSeatsAndPackages),
+    // Present, in every period, only in a quote that re-invoices a third-party cost or that selected a reserve.
+    ...(hasThirdParty ? { thirdParty: money(natures.thirdParty) } : {}),
+    ...(hasReserve ? { contingencyReserve: money(natures.contingencyReserve) } : {}),
     // Present only when the result holds a component of a kind this reading does not know.
     ...(natures.unclassified.isZero() ? {} : { unclassified: money(natures.unclassified) })
   })
@@ -547,6 +706,12 @@ export function readEngagementCash(result: Composition, identity: { calculationI
       reason:
         'The frozen result holds cost components of a kind this reading does not know. Their cost is inside the full cost and is not assigned to people, provisions or tools.'
     })
+  if (hasThirdParty)
+    notDerivable.push({
+      figure: 'supplierCash.thirdParty.paymentDate',
+      reason:
+        'A third-party cost is frozen with its amount, its evidence and the period of the quote it falls in. The date the supplier is paid, the terms of the supplier and the FX of that day are not in the artifact: whether the company pays a supplier before it collects from the client cannot be read here.'
+    })
   notDerivable.push({
     figure: 'collected',
     reason:
@@ -555,6 +720,16 @@ export function readEngagementCash(result: Composition, identity: { calculationI
 
   const net = new Wide(totals.net)
   const capacity = (natures: Record<CostNature, Decimal>) => money(natures.people.plus(natures.provisions))
+
+  const creditPackCash = purchases.every(p => p.inQuoteCurrency)
+    ? sumOf(purchases.map(p => new Wide(p.inQuoteCurrency as string)))
+    : null
+
+  const thirdPartyCost = sumOf(thirdPartyPurchases.map(p => new Wide(p.inQuoteCurrency)))
+  const thirdPartyNet = sumOf(thirdPartyPurchases.map(p => new Wide(p.reinvoicedNet)))
+  const ownWorkNet = net.minus(thirdPartyNet)
+  const ownWorkCost = new Wide(totals.cost).minus(thirdPartyCost)
+  const paidByClient = clientPaidDirectly(quote.resolution.brief)
 
   const belowFloor = quote.periods.flatMap(period =>
     period.result.diagnostics
@@ -577,16 +752,48 @@ export function readEngagementCash(result: Composition, identity: { calculationI
         'net, fullCost and marginAtFullCost: totals of the quote and of each period, as the kernel froze them.',
         'fullCostByNature: cost of the stored components by kind, in the quote currency. Each nature is read at the currency unit and the people part of a row (its largest part when it has no person) is what is left of the row cost, so the natures add up to fullCost.',
         'capacityCostAbsorbed: people + provisions. Capacity cost that the quote absorbs: it is inside fullCost and inside the margin, and it is never zero or free capacity because the people are already contracted.',
-        'newSupplierCash: resourceIncrementalCash, the extra credit packs of each credit budget, converted with the FX frozen in the quote and read up to the currency unit. The subscription share a budget allocates is already funded and is not new cash.',
-        'modeledCommitment: totals.cashCommitment and cashLedger. Attributed cost at its payment timing, people included; not new cash and not an invoice. No other figure here uses it.'
+        hasThirdParty
+          ? 'newSupplierCash: resourceIncrementalCash, the extra credit packs of each credit budget, converted with the FX frozen in the quote and read up to the currency unit, plus the frozen cost of every re-invoiced third-party row (supplierCash.thirdParty), which is bought for this job and paid to its supplier. The subscription share a budget allocates is already funded and is not new cash.'
+          : 'newSupplierCash: resourceIncrementalCash, the extra credit packs of each credit budget, converted with the FX frozen in the quote and read up to the currency unit. The subscription share a budget allocates is already funded and is not new cash.',
+        'modeledCommitment: totals.cashCommitment and cashLedger. Attributed cost at its payment timing, people included; not new cash and not an invoice. No other figure here uses it.',
+        // Each of the three is said only of a quote that has what it speaks of.
+        ...(hasThirdParty
+          ? [
+              'thirdParty: cost of the rows of kind third_party, as frozen and already in the quote currency (a supplier in another currency at the FX the quote froze). It is inside fullCost and it is new supplier cash. modeledCommitment.thirdParty is the same cost in the cash ledger, on the period each cost falls in; it is not an annual resource and annualUpFront does not hold it.'
+            ]
+          : []),
+        ...(hasReserve
+          ? [
+              'contingencyReserve: the contingency reserve inside the cost of the team rows, as the kernel states it per row. A provision of the quote for overruns: nobody is paid it, it commits no cash and it is in no cash figure. It is not capacity cost and is not in capacityCostAbsorbed. A waived reserve reads 0 here; what was left out is totals.contingencyReserveWaived of the quote.'
+            ]
+          : []),
+        ...(paidByClient.length
+          ? [
+              'paidByClientDirectly: costs the brief declares as paid by the client to their supplier. They are in no row, no cost and no cash figure of this reading.'
+            ]
+          : [])
       ],
       results: {
         marginAtFullCost: {
           amount: totals.marginAmount,
           rateRoundedDown: totals.marginRate ? ratioForReading(new Wide(totals.marginRate)) : null,
           decides: 'viability' as const,
-          statement:
-            'Margin of the quoted net over the full attributed cost: people, provisions, fees and tools. It is the figure that decides whether the job is viable.',
+          statement: hasThirdParty
+            ? 'Margin of the quoted net over the full attributed cost: people, provisions, fees, tools and the re-invoiced third-party costs. A cost re-invoiced at or near cost lowers this rate without the job being less viable: ownWork is the same margin without the third-party rows, and each row is judged on its own floor.'
+            : 'Margin of the quoted net over the full attributed cost: people, provisions, fees and tools. It is the figure that decides whether the job is viable.',
+          // The quote without its third-party rows. Only in a quote that has them; otherwise it is the quote itself.
+          ...(hasThirdParty
+            ? {
+                ownWork: {
+                  net: money(ownWorkNet),
+                  cost: money(ownWorkCost),
+                  marginAmount: money(ownWorkNet.minus(ownWorkCost)),
+                  rateRoundedDown: ownWorkNet.gt(0)
+                    ? ratioForReading(ownWorkNet.minus(ownWorkCost).div(ownWorkNet))
+                    : null
+                }
+              }
+            : {}),
           floor: { source: 'kernel:MARGIN_BELOW_FLOOR', rowsBelowFloor: belowFloor }
         },
         cashAddedOnContractedCapacity: {
@@ -599,13 +806,27 @@ export function readEngagementCash(result: Composition, identity: { calculationI
           restsOn: [
             'Every person on the job is capacity the company already pays, with or without this job. The artifact does not say so and this reading does not ask: where a person has to be hired or paid extra for the job, that cost is new cash and this figure is too high.',
             'Provisions are reserves the quote carries, not purchases.',
-            'No tool seat, package, platform fee or setup resource is bought for this job: the artifact does not record procurement (see notDerivable). Only declared extra credit packs are taken as new supplier cash.'
+            hasThirdParty
+              ? 'No tool seat, package, platform fee or setup resource is bought for this job: the artifact does not record procurement (see notDerivable). Only declared extra credit packs and re-invoiced third-party costs are taken as new supplier cash.'
+              : 'No tool seat, package, platform fee or setup resource is bought for this job: the artifact does not record procurement (see notDerivable). Only declared extra credit packs are taken as new supplier cash.',
+            ...(hasThirdParty
+              ? [
+                  'Every re-invoiced third-party cost is paid at the amount the quote froze. A supplier that charges more, or an FX that moves before a supplier in another currency is paid, lowers this figure.'
+                ]
+              : [])
           ]
         }
       },
       supplierCash: {
         declaredNew: {
-          amount: totalNewCash ? money(totalNewCash) : null,
+          // Without third-party rows this is the whole of `totals.newSupplierCash`; with them, its credit-pack part.
+          amount: hasThirdParty
+            ? creditPackCash
+              ? money(creditPackCash)
+              : null
+            : totalNewCash
+              ? money(totalNewCash)
+              : null,
           source: 'resourceIncrementalCash: extra credit packs of the frozen credit budgets',
           // One entry per credit budget and period, in the currency of the provider and in the quote currency.
           purchases
@@ -615,7 +836,28 @@ export function readEngagementCash(result: Composition, identity: { calculationI
           toolCreditBudgets: money(natureTotals.toolCreditBudgets),
           toolSeatsAndPackages: money(natureTotals.toolSeatsAndPackages),
           note: 'toolCreditBudgets holds the already funded subscription share and the extra packs; only the packs are new cash, under declaredNew.'
-        }
+        },
+        // Re-invoiced third-party costs: bought for this job, so new supplier cash. One entry per cost and period.
+        ...(hasThirdParty
+          ? {
+              thirdParty: {
+                amount: money(thirdPartyCost),
+                source: 'rows of kind third_party: costs the quote buys from a supplier and re-invoices',
+                // What the client is invoiced for them; the difference is the handling the category rule adds.
+                reinvoicedNet: money(thirdPartyNet),
+                purchases: thirdPartyPurchases
+              }
+            }
+          : {}),
+        // Declared in the brief and paid by the client to their supplier: no cash of the company, in no figure.
+        ...(paidByClient.length
+          ? {
+              paidByClientDirectly: {
+                note: 'Not paid by the company and not invoiced by it: outside the net, the cost, the commitment and every cash figure of this reading. Amounts are as declared, in their own currency, and are not converted.',
+                costs: paidByClient
+              }
+            }
+          : {})
       },
       modeledCommitment: {
         total: totals.cashCommitment,

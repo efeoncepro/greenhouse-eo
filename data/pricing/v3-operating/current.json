@@ -1,11 +1,11 @@
 {
   "schemaVersion": "pricing-v3-current/1",
   "updatedAt": "2026-10-11",
-  "reason": "Policy v10: Adobe Creative Cloud Pro is quoted without its 50% discount from now on (CEO decision of 2026-10-11); the invoiced amount with discount stays selectable for a job that ends before the discount does. Catalog v9 unchanged.",
+  "reason": "Catalog v10: price rules for third-party costs by category, a contingency reserve for managed services sold On-Demand, and the country factors closed as policy values (CEO decisions of 2026-10-11). Policy v10 unchanged.",
   "catalog": {
-    "path": "data/pricing/v3-operating/catalog.review-v9.json",
-    "version": "operating-review-2026-10-11-v9",
-    "digest": "2a329a9dd1c9fe672d221584a62f18c4146c3f2042103cd9478fa705cb11a29c"
+    "path": "data/pricing/v3-operating/catalog.review-v10.json",
+    "version": "operating-review-2026-10-11-v10",
+    "digest": "9a3bbf4eea14e1e0b7782b829b1a7dbde3effba28c1ced9f0b8f07029d2d3f91"
   },
   "policy": {
     "path": "data/pricing/v3-operating/resources.review-v10.json",

@@ -6,6 +6,11 @@ import type { PricingV3Artifact } from './adapters/local-snapshot'
  *
  * It serves every contract unchanged: the client sees `net`, which is the final net (after commercial rounding,
  * discount and uplift). Rounding, uplift and discount breakdowns are internal and are never listed here.
+ *
+ * From contract 1.4.0 a re-invoiced third-party cost is a row of `schedule` like any other (kind `third_party`): its
+ * label and its final net, inside the totals. A cost the client pays directly never reaches a kernel input (the brief
+ * keeps it and resolution sends the kernel the re-invoiced ones only), so a kernel artifact holds nothing to list it
+ * from: the views of a quote that froze its brief list it under `clientPaidDirectly`, outside every total.
  */
 export function projectPricingV3ForClient(artifact: PricingV3Artifact) {
   const { input, result } = artifact.semantic
