@@ -23,12 +23,13 @@ Caso fechado: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2
 
 ## Elegir el carril: documento de licitación o sistema Greenhouse
 
-- **Oferta económica documental rápida:** ante licitación/Compra Ágil urgente, HTML para PDF y alcance/precio/condiciones ya aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Puede emitir una oferta formal para presentar. El ejemplo no autoriza copiar sus precios, alcance ni supuestos; `net` representa el programa completo y la división mensual sólo es referencial.
-- **Sistema Greenhouse:** si se pide operar catálogo, pricing engine, Quote Builder, snapshots, maker-checker o quote-to-cash, seguir [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y sus contratos, verificando la superficie disponible. No responder a ese encargo generando el HTML local.
+- **Oferta económica documental rápida:** ante licitación/Compra Ágil urgente, HTML para PDF y alcance/precio/condiciones ya aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Puede emitir una oferta formal para presentar. El ejemplo no autoriza copiar sus precios, alcance ni supuestos. La plantilla tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas (`net` representa el programa completo y la división mensual sólo es referencial); la **2** cotiza varias líneas con precio y pagina su sección de inversión, sin reducir la tipografía.
+- **Cotización de una cotización V3 («la cotización»):** el documento que recibe el cliente de una cotización V3 congelada es esa misma plantilla, versión 2 (decisión del CEO, 2026-10-11). Sus cifras **no se digitan**: las emite `pricing:v3 compose document` desde el artefacto, y el agente sólo escribe los textos. Pasos en [Cotizador V3](#cotizador-v3-flujo-completo-local-para-agentes).
+- **Sistema Greenhouse:** si se pide operar catálogo, pricing engine, Quote Builder, snapshots, maker-checker o quote-to-cash, seguir [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y sus contratos, verificando la superficie disponible. No responder a ese encargo generando el HTML local. Número de cotización, versiones, verificación por QR, firmas, aprobación, envío y CRM existen sólo ahí; la plantilla no los tiene.
 
-El JSON/data slots de la plantilla son datos documentales y el generador sólo deriva neto/IVA/total: no crea `quoteId`, costea, verifica margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Conservar fuente y autoridad del precio aprobado en el expediente; costos o margen sin comprobar siguen sin validar. La aprobación comercial existente no se reabre por cambiar de formato ni obliga a recrear la oferta UTEM presentada. La revisión del PDF y la presentación son pasos separados. El documento no satisface un `quotation_id` persistido ni el GO de Proposal Studio; nunca inventar un ID o un margen para vincularlo.
+Los datos de la plantilla son datos documentales con dos orígenes: un precio aprobado fuera de V3 se digita en un documento versión 1 (o versión 2, si son varias líneas aprobadas); un precio que viene de V3 lo emite `compose document` y **no se edita a mano**: si una cifra debe cambiar, se cambia la cotización y se vuelve a correr. En ambos casos el generador sólo comprueba sumas y deriva impuestos/total: no crea `quoteId`, costea, verifica margen, aprueba precio, ejecuta maker-checker ni registra CRM/facturación/envío. Un documento salido de V3 es un borrador (`status: draft`) de una cotización en revisión; no es un precio aprobado ni una cotización emitida. Conservar fuente y autoridad del precio aprobado en el expediente; costos o margen sin comprobar siguen sin validar. La aprobación comercial existente no se reabre por cambiar de formato ni obliga a recrear la oferta UTEM presentada. La revisión del PDF y la presentación son pasos separados. El documento no satisface un `quotation_id` persistido ni el GO de Proposal Studio; nunca inventar un ID o un margen para vincularlo.
 
-La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer.
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer. La versión 2 se emite en una sola moneda y rechaza la conversión FX: un documento salido de V3 va en la moneda de la cotización, y otra moneda es otra cotización V3, nunca una conversión en el documento.
 
 Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
 
@@ -146,13 +147,13 @@ Ante pedidos de cotizar roles o servicios sin UI, cargar
 [manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
 Cubre selección de variantes/países/tareas, catálogo monetario, licencias, cartera/capacidad declarada,
 créditos por proveedor/mes, provisiones, fuente/FX/vigencia, snapshots, explain/replay, readiness,
-preview redactado y mantenimiento con preview/apply/digests/impacto. La referencia enlaza fuentes
-canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
+preview redactado, documento A4 de cotización para el cliente y mantenimiento con preview/apply/digests/impacto.
+La referencia enlaza fuentes canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
 
 El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
 `compose prepare|quote` → `explain|replay` → `compose assess|preview` → lecturas del artefacto
-(`compose split|schedule|cash|commitments`). Las versiones vigentes no se nombran a
-mano: las nombra el puntero `data/pricing/v3-operating/current.json` y los comandos las cargan con `--current`
+(`compose split|schedule|cash|commitments`) → `compose document` cuando hay que entregar la cotización.
+Las versiones vigentes no se nombran a mano: las nombra el puntero `data/pricing/v3-operating/current.json` y los comandos las cargan con `--current`
 (`current show` lo muestra). Una versión nueva se emite con `catalog apply`/`resources apply` y después se
 mueve el puntero con `current set`; no sobrescribir artifacts. Se puede cotizar en CLP, USD, COP, MXN y PEN
 (`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo; no en EUR (España se cotiza en USD).
@@ -166,7 +167,18 @@ La forma del compromiso va en `brief.engagementForm`: `on_going` (razón 1) u `o
 fila; no mueve costo ni piso). Es una forma de compromiso, no una oferta ni un modelo de entrega; sin declararla
 cotiza como On-Going y no avisa, e Híbrido son dos cotizaciones. Tres lecturas de un artefacto congelado, que no
 cambian nada: `compose schedule` (calendario de pagos, no factura), `compose cash` (caja; no es margen ni decide
-precio) y `compose commitments` (compromisos con proveedores; informa y decide el operador). Puesta en marcha por
+precio) y `compose commitments` (compromisos con proveedores; informa y decide el operador).
+**«La cotización» para el cliente** es una cuarta lectura, `compose document`, que emite los datos (versión 2) de la
+[plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md): `compose document --input artefacto.json`
+imprime el andamio del brief (exit 2) → llenar el brief **sólo con textos** → `compose document --input artefacto.json
+--brief brief.json --out data.json` (exit 3) → `node scripts/documents/render-cotizacion-a4.mjs --data data.json --out
+<carpeta nueva>` → leer las capturas de `qa/` y el PDF página por página. Monto, moneda, impuesto y fecha salen de la
+cotización congelada; el brief no tiene dónde ponerlos y se rechaza si los trae. **Nunca digitar ni editar una cifra
+en el brief ni en los datos emitidos: se cambia la cotización y se vuelve a correr.** El PDF se entrega como borrador
+mientras el precio no esté aprobado: no es `quotation_id`, precio aprobado ni cotización emitida. Claves de línea,
+plegado por meses, impuesto, rechazos y ejemplos:
+[referencia](references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre).
+Puesta en marcha por
 persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
 licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.
 Contrato 1.4.0: una compra a un tercero para un trabajo va en `brief.thirdPartyCosts[]` (`reinvoiced` = fila propia

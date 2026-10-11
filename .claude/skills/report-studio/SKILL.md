@@ -33,11 +33,11 @@ Carga según la decisión pendiente, no todo el paquete por defecto:
 
 Plantillas operativas: [brief](templates/report-brief.md), [ledger de evidencia](templates/evidence-ledger.csv), [plan de acciones](templates/action-register.csv), [revisión](templates/review.md) y [manifiesto de PDF](templates/pdf-check.json). Son formatos adaptables, no formularios que deban aparecer en el informe del cliente.
 
-Para una **oferta económica documental rápida de licitación/Compra Ágil urgente**, solicitada en HTML para PDF y desde alcance/precio/condiciones aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Pricing/Tenders gobiernan los datos comerciales; Report Studio verifica todas las páginas del PDF final. La salida puede ser una oferta formal; únicamente `ejemplo.json` es ilustrativo sin validez comercial.
+Para una **oferta económica documental rápida de licitación/Compra Ágil urgente**, solicitada en HTML para PDF y desde alcance/precio/condiciones aprobados, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Pricing/Tenders gobiernan los datos comerciales; Report Studio verifica todas las páginas del PDF final. La salida puede ser una oferta formal; únicamente los archivos `ejemplo*.json` son ilustrativos sin validez comercial. La plantilla tiene dos versiones de datos: la 1, un único precio en cuatro páginas; la 2, varias líneas con precio y una sección de inversión que pagina según su contenido, así que el número de páginas no es fijo.
 
 El JSON/data slots y el manifiesto pertenecen al documento local: no crean `quoteId`, aprueban precio, verifican margen, ejecutan maker-checker ni registran CRM/facturación/envío. Si se pide operar el **sistema Greenhouse de cotizaciones**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y verificar Quote Builder/catálogo/engine/snapshots/aprobaciones; este recurso editorial no sustituye ese sistema. Preservar las versiones firmadas/presentadas.
 
-La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer.
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer. La versión 2 se emite en una sola moneda y rechaza la conversión FX.
 
 Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
 
@@ -108,5 +108,10 @@ Si los importes vienen del prototipo local V3, cargar
 `compose preview` devuelve una simulación redactada local; `explain` y artifact contienen costos/márgenes y son
 internos. Report Studio no completa faltantes económicos ni cambia estado por maquetar PDF. Preservar moneda,
 neto/impuestos/plazo, fuente/snapshot y la marca de simulación hasta aprobación y emisión por el canal aplicable.
-La plantilla documental formal desde precio autorizado sigue siendo otro carril; un previewV3 no le otorga esa
-aprobación ni quoteId, emisión, factura, sincronización o envío. Verificar pixels del documento que se entregue.
+El documento de cotización que recibe el cliente no se maqueta a mano desde el preview: `compose document` emite los
+datos (versión 2) de la plantilla A4 desde la cotización congelada y su generador compone el PDF
+([pasos](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre)).
+Nunca digitar ni editar una cifra en su brief o en los datos emitidos: se cambia la cotización y se vuelve a correr.
+Ese documento es un borrador: no otorga aprobación ni quoteId, emisión, factura, sincronización o envío. La versión 2
+pagina su sección de inversión (cuatro páginas o más) y nunca reduce la tipografía; si no cabe, se acorta el texto.
+Verificar pixels de todas las páginas del documento que se entregue.

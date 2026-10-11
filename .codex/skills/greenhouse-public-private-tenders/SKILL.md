@@ -165,7 +165,7 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
 
 ### Oferta económica documental rápida para licitación
 
-Ante una licitación o Compra Ágil urgente que requiere HTML para PDF, con **alcance, precio y condiciones ya aprobados para ese proceso**, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Produce una oferta económica formal de cuatro páginas para incorporar al paquete de presentación; sólo el ejemplo carece de validez comercial. Su origen es la cotización UTEM aprobada, no una nueva modalidad de pricing.
+Ante una licitación o Compra Ágil urgente que requiere HTML para PDF, con **alcance, precio y condiciones ya aprobados para ese proceso**, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Produce una oferta económica formal para incorporar al paquete de presentación; sólo el ejemplo carece de validez comercial. Su origen es la cotización UTEM aprobada, no una nueva modalidad de pricing. Tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas; la **2** cotiza varias líneas con precio (perfiles, servicio con puesta en marcha, costos de terceros) y pagina su sección de inversión según el contenido, sin reducir la tipografía.
 
 Desde la raíz del repo, copiar el JSON de ejemplo al expediente, reemplazar todos los datos y generar en una carpeta nueva o vacía:
 
@@ -173,11 +173,13 @@ Desde la raíz del repo, copiar el JSON de ejemplo al expediente, reemplazar tod
 node scripts/documents/render-cotizacion-a4.mjs --data ruta/cotizacion.json --out ruta/cotizacion-v1
 ```
 
+Si el precio viene de una cotización del Cotizador V3, las cifras **no se digitan**: `pnpm --silent pricing:v3 compose document` emite los datos versión 2 desde la cotización congelada y el agente sólo escribe los textos en un brief. Nunca editar una cifra en ese brief ni en los datos emitidos; si un número debe cambiar, se cambia la cotización y se vuelve a correr. Pasos y rechazos: [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre). Un precio aprobado fuera de V3 se sigue digitando en el JSON, con su fuente en el expediente.
+
 `status: draft` es preparación documental; no es un estado de quote persistida ni prueba falta de aprobación del precio. Los data slots y el JSON son datos del documento. El generador calcula neto/IVA/total, pero **no crea `quoteId`, valida costos/margen, aprueba el precio, ejecuta maker-checker, registra CRM/facturación ni envía la oferta**. Registrar por separado fuente y autoridad del alcance/precio y cada acción posterior. Revisar todos los folios del PDF final; conservar los bytes de documentos firmados o presentados.
 
 Si el pedido es operar el **sistema de cotizaciones Greenhouse**, cargar [Cotizador](../../../docs/documentation/finance/cotizador.md) y [Pricing Comercial](../../../docs/documentation/finance/pricing-comercial.md) y el contrato de Quote Builder/catálogo/engine/snapshots/aprobaciones, verificando su disponibilidad real. No sustituir ese trabajo por este HTML ni tratar su manifiesto local como snapshot del sistema. Tampoco satisface el `quotation_id` ni el GO de Proposal Studio: no inventar IDs o margen para pasar esos gates. El deck y Proposal Studio conservan sus propios catálogos, identidades y gates; emitir este documento no cierra una Proposal ni exige recrear el paquete UTEM ya aprobado/presentado.
 
-La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer.
+La plantilla documental tiene [soporte multimoneda](../../../docs/commercial/templates/cotizacion-a4/MULTIMONEDA.md): conservar moneda/precio base, usar snapshot FX explícito con par, fecha y fuente, y revisar el PDF convertido completo. Moneda de presentación e impuestos son independientes; no inferir tasas, exenciones ni soporte runtime de Finance/pricing desde el renderer. La versión 2 se emite en una sola moneda y rechaza la conversión FX: otra moneda es otra cotización, no una conversión en el documento.
 
 Para entregar varias monedas, identificar cada HTML/PDF con su código ISO en el nombre y guardar ambas versiones en la carpeta del cliente autorizada, según el manual anterior. Conservar fuente, versionado y snapshot FX en el expediente; verificar las copias por hash. Una copia local no acredita sincronización remota, envío, cambio CRM ni aprobación.
 
@@ -271,7 +273,9 @@ licitación), cuándo se le paga al proveedor, derechos de uso que sobreviven al
 costéalos aparte y declara el supuesto.
 
 Quote congela inputs; explain es desglose interno y replay prueba reproducibilidad. `compose assess` conserva
-gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. managed_service proyecta fee,
+gaps económicos/SOW/impuestos y preview redactado sigue simulación no vinculante. `compose document` emite desde esa
+cotización congelada los datos de la oferta económica A4 (versión 2; sección anterior): es un borrador, sus cifras no
+se digitan ni se editan, y no lleva número de cotización, firma ni aprobación. managed_service proyecta fee,
 no vende por defecto las horas internas. Este carril no genera quotation_id remoto ni satisface GO de Proposal
 Studio: emisión, precio aprobado, garantías/caja y presentación del expediente conservan contratos propios.
 No adjuntar el artifact interno al cliente ni tratar exit3 como aprobación. Sólo promover al canon mediante

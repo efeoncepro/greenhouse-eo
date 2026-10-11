@@ -70,6 +70,8 @@ readback live; ausencia de conflictos/deudas y modalidad de equipo/subcontrataci
 
 Para avanzar en una licitación/Compra Ágil urgente con alcance y precio aprobados, usar el [manual de la plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md). La salida puede integrar formalmente el paquete presentado; no es una quote persistida de Greenhouse.
 
+La plantilla tiene dos versiones de datos: la 1, un único precio en cuatro páginas (`ejemplo.json`); la 2, varias líneas con precio y una sección de inversión que pagina según su contenido (`ejemplo-lineas.json`, `ejemplo-lineas-terceros.json`). Si el precio viene de una cotización del Cotizador V3, los datos versión 2 los emite `pricing:v3 compose document` desde la cotización congelada y no se digitan ni se editan: seguir el [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre) y retomar aquí en el paso 3. Los pasos 1 y 2 son para un precio aprobado fuera de V3.
+
 1. Copiar `ejemplo.json` al expediente; adaptar cliente, proceso, alcance, plazo, vigencia y condiciones aprobadas. Usar `status: draft`, quitar la etiqueta de ejemplo y conservar la autoridad comercial en el expediente.
 2. Ingresar en `net` el precio neto **del servicio completo**, con tasa de IVA confirmada. La referencia mensual opcional no define cuotas ni cobro mensual.
 3. Generar HTML/PDF con el comando del manual en una carpeta nueva o vacía. Revisar todas las páginas del PDF y sus montos; el manifiesto conserva la revisión manual pendiente hasta registrar su evidencia.
