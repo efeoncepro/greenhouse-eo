@@ -26,7 +26,10 @@ lecturas nuevas):
 [delta del catálogo v9](#delta-2026-10-11--catálogo-v9-y-policies-v7-y-v8-forma-del-engagement-puesta-en-marcha-adobe-y-lecturas).
 Qué trae el catálogo v10 (costos de terceros de un encargo, reserva de contingencia y factores de país cerrados) y
 cómo se lee una cotización con terceros:
-[último delta](#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
+[delta del catálogo v10](#delta-2026-10-11--catálogo-v10-y-contrato-140-costos-de-terceros-reserva-de-contingencia-y-factores-de-país).
+Cómo sale el documento de cotización para el cliente de una cotización congelada (`compose document`) y qué ejemplos
+lo muestran:
+[último delta](#delta-2026-10-11--compose-document-el-documento-de-cotización-de-una-cotización-congelada).
 Donde una viñeta o un delta anterior dice «el vigente es…», «último delta» o «hay que pasar la ruta», léelo como
 historia fechada.
 
@@ -158,6 +161,15 @@ historia fechada.
   producción en CLP, talento en USD y medios al costo, refacturados, y una licencia que el cliente paga directo. Es
   el primer artefacto firmado por el motor `pricing-v3-local/1.4.0` y el que la guarda exige para ese motor. Los
   proveedores del ejemplo son marcadores, no proveedores reales. Se congeló con el catálogo v10 y la policy v10.
+- `designer-three-months-iva.demand.json` → `designer-three-months-iva.artifact.json`: el mismo diseñador senior
+  dedicado en Chile, On-Demand y en CLP, por **tres meses** y con un impuesto resuelto: IVA de 19 %, declarado sólo
+  para el ejemplo y no como criterio tributario para ningún cliente. Es la primera cotización versionada con varios
+  períodos y con impuesto. Motor `pricing-v3-local/1.3.0`; se congeló con el catálogo v10 y la policy v11.
+- `<nombre>.document-brief.json` → `<nombre>.document.json`, para `designer-on-demand`, `designer-three-months-iva`
+  y `managed-on-demand-third-party`: el brief del documento de cotización (sólo textos y presentación; el comprador
+  es inventado) y los datos que `compose document` emite desde el artefacto del mismo nombre, en la versión 2 de los
+  datos de la [plantilla A4 de cotización](../../../docs/commercial/templates/cotizacion-a4/README.md). Un
+  `.document.json` no se edita: se vuelve a emitir.
 - `managed-care.workload.json` + `managed-care.brief.json` → `managed-care.demand.json`: servicio gestionado sintético
   dimensionado por volumen; lo verifica `pricing-v3-workload.test.ts` derivando el margen mínimo del catálogo.
 - `operational-gaps.json`: faltantes económicos/operativos por owner y acción, sin solicitar otra vez salarios que el operador no tiene.
@@ -670,3 +682,66 @@ su concepto.
 - `replay` de los 19 artefactos versionados bajo `data/pricing/**`: todos `verified: true`.
 
 Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `managed-on-demand-third-party`.
+
+## Delta 2026-10-11 — `compose document`: el documento de cotización de una cotización congelada
+
+Decisión: [el documento de una cotización V3 es la plantilla A4](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--el-documento-de-cotización-de-una-cotización-v3-compose-document).
+Paso a paso: [manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#producir-el-documento-de-cotización).
+Datos y reglas de la plantilla: [su README](../../../docs/commercial/templates/cotizacion-a4/README.md).
+
+- **Archivos nuevos.** `designer-three-months-iva.demand.json` y `designer-three-months-iva.artifact.json`; y tres
+  pares de brief y datos de documento: `designer-on-demand.document-brief.json` y `.document.json`,
+  `designer-three-months-iva.document-brief.json` y `.document.json`, y
+  `managed-on-demand-third-party.document-brief.json` y `.document.json`.
+- **Qué no se toca.** Catálogo, policy, créditos y puntero no cambiaron: lo vigente lo imprime `current show`. Ningún
+  artefacto anterior cambió, y `compose preview` imprime lo mismo que antes.
+- **Qué hace.** Lee un artefacto de composición, lo verifica por replay y emite los datos del documento para el
+  cliente. No recalcula nada y no cambia un total.
+
+  ```bash
+  pnpm --silent pricing:v3 compose document --input artifact.json                       # andamio del brief, exit 2
+  pnpm --silent pricing:v3 compose document --input artifact.json --brief brief.json \
+    --out data.json                                                                     # datos, exit 3
+  node scripts/documents/render-cotizacion-a4.mjs --data data.json --out carpeta-nueva  # HTML, PDF y capturas
+  ```
+
+- **De dónde sale cada cosa.** Las cifras, la moneda, el impuesto, el total y la fecha salen de la cotización. El
+  brief (`pricing-v3-quote-document-brief/1`) trae los textos y la presentación de las líneas, y no tiene clave para
+  un importe, una moneda, una tasa ni una fecha: uno que la trae se rechaza con `QUOTE_DOCUMENT_BRIEF_INVALID`.
+- **Qué ve el cliente.** Lo mismo que decide `compose preview`, reunido a lo largo del plazo: un servicio gestionado
+  es su fee; cada costo de terceros refacturado, una línea con su concepto. Sin costos, márgenes, tarifas ni
+  proveedores. Los meses consecutivos con el mismo neto son una línea («3 meses»); un cobro único, «1 pago único».
+- **Impuesto.** Se imprime el de la cotización: la tasa y el importe congelado, «Por confirmar» si no se resolvió, o
+  «No aplica».
+- **Es un borrador.** Los datos salen con `status: "draft"` y exit 3. No es una `quotation_id`, un precio aprobado
+  ni una cotización emitida, y nada se escribe en Greenhouse ni en el CRM.
+- **Lo que todavía no se puede.** Traer los textos de un catálogo o de una biblioteca de condiciones. Presentar el
+  reparto en persona y kit (`compose split`) como documento. Número de cotización, versiones, verificación por QR,
+  firmas, aprobación y envío: existen sólo en el cotizador de Greenhouse. Un documento en otra moneda que la de la
+  cotización. Una portada, un alcance o unas condiciones de más de una página.
+
+### Corridas del 2026-10-11 (documento)
+
+Cada documento se emitió con el brief versionado de su artefacto y se generó con la plantilla. Importes en CLP.
+
+- `designer-three-months-iva.artifact.json`: `replay` responde `verified: true`. Motor `pricing-v3-local/1.3.0`,
+  tres períodos, costo 5.068.112, neto 7.970.000, margen 0,3641, impuesto 1.514.300 y total 9.484.300; ninguna
+  línea marcada.
+- Su documento: «Diseñador visual sénior», 3 meses a 2.550.000, que son 7.650.000; «Puesta en marcha del servicio»,
+  1 pago único, 320.000. Neto 7.970.000; IVA 19 %, 1.514.300; total 9.484.300. Cuatro páginas.
+- `compose document` sobre ese artefacto sin brief: exit 2, con las dos líneas bajo las claves `design` y
+  `design:setup`.
+- Documento de `designer-on-demand`: «Diseñador visual sénior», 1 mes, 2.470.000; «Puesta en marcha del servicio»,
+  1 pago único, 320.000. Neto 2.790.000; impuesto y total «Por confirmar». Cuatro páginas. La mensualidad es menor
+  que la del ejemplo de tres meses porque este artefacto congeló la policy v7, con Creative Cloud Pro todavía con
+  su descuento.
+- Documento de `managed-on-demand-third-party`: fee 11.370.000 y tres costos de terceros (producción 4.950.000,
+  talento 1.380.000 y medios 3.333.333). Neto 21.033.333; impuesto y total «Por confirmar». Aparte, la licencia que
+  paga el cliente, USD 890, sin convertir. Calendario de pagos de 50 %, 30 % y 20 %: 10.520.000, 6.310.000 y
+  4.203.333. Cinco páginas.
+- Los tres `.document.json` vueltos a emitir son idénticos byte a byte a los versionados.
+- `replay` de los 20 artefactos versionados bajo `data/pricing/**`: todos `verified: true`.
+- `pnpm pricing:v3:test`: 25 archivos y 1.208 pruebas. Pruebas de la plantilla
+  (`node --test scripts/documents/render-cotizacion-a4.test.mjs scripts/documents/document-money.test.mjs`): 25.
+
+Evidencia fechada. El único artefacto que se agregó a esta carpeta es el de `designer-three-months-iva`.

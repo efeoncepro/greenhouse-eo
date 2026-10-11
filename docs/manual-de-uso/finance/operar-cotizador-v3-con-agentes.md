@@ -25,6 +25,8 @@ Por la noche del 2026-10-11: contrato 1.4.0 y catálogo v10, con los costos de t
 ([Reserva de contingencia](#reserva-de-contingencia)) y el margen del trabajo propio junto al margen total
 ([Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros)); y los factores de país cerrados
 como valores de política, confirmados desde el 2026-10-12 ([Valores vigentes](#valores-vigentes)).
+Lo último de esa noche: `compose document` convierte una cotización congelada en su documento para el cliente, sobre
+la plantilla A4 de cotización ([Producir el documento de cotización](#producir-el-documento-de-cotización)).
 
 El operador puede pedir «cotiza un diseñador senior al 50%, talento Colombia, mercado Chile».
 El agente consulta perfiles y recursos, interpreta las tareas, completa una demanda explícita y usa la CLI.
@@ -145,8 +147,8 @@ contingencia ni el supuesto que la acompaña ([Reserva de contingencia](#reserva
 2026-10-11 el resumen trae `runNotices.laterCatalogValues` por los ocho factores de país que rigen desde el día
 siguiente ([Versiones vigentes](#versiones-vigentes)). Sin `fx:CLP:USD` en `fxRecordIds`, `compose plan`
 devuelve exit 2 con `RESOURCE_FX_SELECTION_REQUIRED` en `1:adobe`: Adobe tiene precio en CLP. `explain`, `replay`,
-`compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash` y `compose commitments`
-leen sólo el artefacto: no reciben `--current` ni versiones.
+`compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash`, `compose commitments` y
+`compose document` leen sólo el artefacto: no reciben `--current` ni versiones.
 
 **Repetir un ejemplo con las versiones de su fecha.** El ejemplo original del diseñador está fechado el 2026-10-09 y
 usa una herramienta con precio en EUR cuya referencia de cambio de entonces rige sólo ese día. Para reproducirlo tal
@@ -223,6 +225,7 @@ No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interp
 | `compose schedule`                                     | Artefacto compuesto calculado + `--milestones` (arreglo JSON)      | Calendario de pagos: el neto repartido en hitos que suman exactamente el neto, terceros incluidos; no es factura ni cobro; exit 3 |
 | `compose cash`                                         | Artefacto compuesto calculado                                      | Lectura de caja: neto, costo completo por naturaleza, caja nueva a proveedores (incluye los terceros refacturados) y caja sobre capacidad ya contratada; no es margen ni decide precio; exit 3 |
 | `compose commitments`                                  | Artefacto compuesto                                                | Compromisos con proveedores que duran más que los periodos cotizados; deja fuera las compras a terceros y lo dice; informa, no recomienda; exit 3 (2 si la cotización no está calculada) |
+| `compose document`                                     | Artefacto compuesto calculado; `--brief` con los textos del documento | Sin `--brief`, el andamio del brief (exit 2). Con `--brief`, los datos del documento para el cliente sobre la plantilla A4: toda cifra sale de la cotización; borrador, no emisión; exit 3. El PDF lo genera `render-cotizacion-a4.mjs` |
 | `catalog preview` / `catalog apply`                    | Change-set monetario; impacto de briefs opcional                   | Preview / sucesor nuevo; apply exige digest confirmado y `--out`                                             |
 | `resources preview` / `resources apply`                | Replacement completo policy/créditos; impacto de demandas opcional | Preview / sucesor nuevo; mismo contexto/hash/impacto, sin selección automática                               |
 | `export`                                               | Artefacto completo dentro de policy                                | Gate propio de borrador: composiciones review-only actuales siguen bloqueadas                                |
@@ -269,6 +272,9 @@ Códigos del adaptador (argumentos, archivos y formatos). La lista completa y lo
 | `SCHEDULE_MILESTONES_INVALID`            | `compose schedule`: el archivo de `--milestones` no sirve; `option` es `milestones` e `issues` trae `path` y `rule` | Corregir cada `path` ([reglas](#calendario-de-pagos-compose-schedule)); `shares_must_sum_to_one` pide que las partes sumen exactamente 1 |
 | `SCHEDULE_REQUIRES_CALCULATED_QUOTE`     | `compose schedule` sobre una cotización bloqueada (`needs_input`)      | No hay neto que repartir: resolver los bloqueos de la demanda y volver a cotizar                  |
 | `ENGAGEMENT_CASH_REQUIRES_CALCULATED_QUOTE` | `compose cash` sobre una cotización bloqueada                       | Lo mismo: resolver los bloqueos y volver a cotizar                                                |
+| `QUOTE_DOCUMENT_BRIEF_INVALID`           | `compose document`: el brief del documento no sirve; `option` es `brief` e `issues` trae `path` y `rule` | Corregir cada `path` ([casos](#problemas-comunes-del-documento)); `unrecognized_keys` suele ser un importe, una moneda, una tasa o una fecha, que el brief no admite |
+| `QUOTE_DOCUMENT_REQUIRES_CALCULATED_QUOTE` | `compose document` sobre una cotización bloqueada                    | No hay cifras que imprimir: resolver los bloqueos de la demanda y volver a cotizar                |
+| `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP`, `QUOTE_DOCUMENT_NOT_REPRESENTABLE`, `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE` | `compose document`: la cotización no se puede representar en el documento; `option` es `input` | No se arregla en el brief ni a mano: leer `issues` ([casos](#problemas-comunes-del-documento)) y cambiar la cotización o reportarlo |
 | `ADAPTER_FAILURE`                        | Falla que nadie clasificó: es un hueco de la herramienta               | No es un error del pedido. No reintentar a ciegas: reportar el comando exacto a quien la mantiene |
 
 Los conflictos de dominio llegan con su propio código, sin `option`: `REPLAY_MISMATCH` (el artefacto fue modificado o
@@ -1941,6 +1947,10 @@ Licencia/Consultoría y una vista de las lecturas internas lista para el cliente
 reserva, lo que lista
 [Lo que todavía no está modelado](#lo-que-todavía-no-está-modelado).
 No resolver nada de esto por cuenta propia en una cotización.
+Nota 2026-10-11 (noche): desde `compose document` el cliente sí tiene un documento propio, con las líneas de la
+cotización y, si se pide, su calendario de pagos. Sigue sin existir una versión para el cliente del reparto en
+persona y kit, de la lectura de caja y de los compromisos; lo que falta del documento está en
+[Lo que el documento todavía no hace](#lo-que-el-documento-todavía-no-hace).
 
 ## Presentar el precio en fee de la persona y kit de herramientas
 
@@ -2162,6 +2172,231 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 - No leer la falta de un compromiso como «no hay contrato»: puede ser un plazo que nadie declaró.
 - No entregar ninguna de las tres al cliente tal cual: traen costos y márgenes.
 
+## Producir el documento de cotización
+
+**Para qué sirve.** Convertir una cotización ya congelada en el documento que lee el cliente: un PDF A4 con portada,
+alcance, precio y condiciones. `compose document` emite los datos del documento y la
+[plantilla A4 de cotización](../../commercial/templates/cotizacion-a4/README.md) los convierte en HTML y PDF. Como
+`compose split` y las tres lecturas, lee un artefacto de composición, lo verifica con `replay` antes de leerlo (uno
+alterado se rechaza con `REPLAY_MISMATCH`), no recalcula ni cambia nada y no recibe `--current`. A diferencia de
+ellas, lo que produce no trae costos, márgenes, tarifas, proveedores ni identificadores internos: es la única salida
+de este manual pensada para entregarse a un cliente.
+
+**La regla que ordena todo.** Las cifras salen de la cotización; los textos, del brief del documento. El brief no
+tiene dónde escribir un importe, una moneda, una tasa de impuesto ni una fecha, y si trae uno se rechaza. Cuando una
+cifra del documento no es la que se quiere, se cambia la cotización y se vuelve a emitir.
+
+**Por qué la plantilla A4.** El CEO decidió el 2026-10-11 que el documento para el cliente de una cotización V3 es
+esta plantilla y no el PDF del cotizador de Greenhouse
+([decisión](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--el-documento-de-cotización-de-una-cotización-v3-compose-document)).
+Que ese cotizador adopte más adelante este diseño es la dirección acordada; todavía no empieza.
+
+**Antes de empezar.**
+
+- El artefacto que escribió `compose quote --out`, con la cotización calculada. Los ejemplos usan
+  `data/pricing/v3-operating/designer-three-months-iva.artifact.json`: un diseñador por tres meses, neto CLP
+  7.970.000, con un IVA de 19 % declarado sólo para el ejemplo.
+- La cotización ya revisada: `compose assess`, pisos, avisos de la corrida. El documento no revisa nada de eso, y
+  una excepción la decide el operador (CEO).
+- Los textos: quién emite, para quién, alcance, calendario del trabajo y condiciones. Los datos del oferente y del
+  comprador se confirman antes de escribirlos, como indica la
+  [plantilla](../../commercial/templates/cotizacion-a4/README.md#datos-y-slots).
+- Para generar el PDF: Node, Playwright con su Chromium y las dependencias de marca de este repo.
+
+### Paso a paso
+
+**1. Sacar el andamio del brief.**
+
+```bash
+artefacto=data/pricing/v3-operating/designer-three-months-iva.artifact.json
+
+pnpm --silent pricing:v3 compose document --input "$artefacto" --out /tmp/documento-brief.json
+```
+
+Devuelve exit 2 —falta información, no es un error— e imprime `pricing-v3-quote-document-scaffold/1`. `--out` guarda
+sólo el brief, listo para editar. Qué leer en stdout:
+
+- `quote`: fecha, moneda, períodos, neto, impuesto y total de la cotización. Aquí: 2026-10-11, CLP, 3 períodos,
+  7.970.000, 1.514.300 y 9.484.300. Son para quien escribe los textos; no se copian al brief.
+- `lines[]`: cada línea como saldría sin cambios, con su `key`. Aquí `design` (3 meses a 2.550.000, que son
+  7.650.000) y `design:setup` (1 pago único, 320.000).
+- `clientPaidDirectly[]`: sólo si la cotización declara costos que el cliente paga directo.
+- `optional`: las claves optativas del brief y qué hace cada una.
+- `brief`: el brief con cada texto vacío y cada línea bajo su clave, con el nombre y el grupo que tendría por
+  defecto.
+
+**2. Llenar el brief. Sólo textos.**
+
+- Llenar **todos** los textos vacíos: `reference`, `supplier`, `buyer`, `cover`, `service`, `scope`, `schedule`,
+  `pricing` y `conditions`. Un texto vacío se rechaza.
+- `scope.rows` admite de 1 a 7 filas; `schedule.phases`, de 1 a 3; `conditions.rows`, de 1 a 6. Un título es una
+  línea o un arreglo de hasta tres líneas cortas. `schedule` es el calendario **del trabajo**; el de pagos es
+  `paymentMilestones`.
+- `lines` presenta cada línea por su clave, con `label`, `detail` y `group`, los tres optativos. El nombre por
+  defecto viene de la cotización («Senior Visual Designer», «Implementación inicial»): cámbialo por el que debe leer
+  el cliente. Una clave que no se nombra conserva su nombre y su grupo; una clave que la cotización no tiene es un
+  error. Las claves nunca se imprimen.
+
+  ```json
+  "lines": {
+    "design": { "label": "Diseñador visual sénior", "detail": "Dedicación completa" },
+    "design:setup": { "label": "Puesta en marcha del servicio" }
+  }
+  ```
+
+- Mientras el precio no esté aprobado, la portada y las condiciones lo dicen. Los ejemplos usan «Borrador · Sin
+  validez comercial» en `cover.label`.
+- Optativos, según `optional`: `paymentMilestones` y `paymentScheduleTexts` (calendario de pagos),
+  `pricing.monthly` (`{ months, note }`: una cantidad de meses, no un importe), `pricing.taxLabel`, `buyer.logo` y
+  `locale`.
+
+Las claves según el tipo de cotización:
+
+| Cotización                                      | Claves                                                |
+| ----------------------------------------------- | ----------------------------------------------------- |
+| Servicio gestionado                             | `fee`, `setup` y `third_party:<costId>`               |
+| Vendida por líneas (una persona por dedicación) | `<lineId>`, `<lineId>:setup` y `third_party:<costId>` |
+
+**3. Emitir los datos del documento.**
+
+```bash
+pnpm --silent pricing:v3 compose document --input "$artefacto" \
+  --brief data/pricing/v3-operating/designer-three-months-iva.document-brief.json \
+  --out /tmp/documento-datos.json
+```
+
+Devuelve exit 3: es el borrador de una cotización en revisión. Imprime y guarda los datos del documento (la versión
+2 de los datos de la plantilla). Con este ejemplo: dos líneas que suman 7.970.000, `vatRate` `0.19` y `taxAmount`
+`1514300`, el impuesto que la cotización congeló. El archivo es idéntico al versionado
+`designer-three-months-iva.document.json`. Con tu propio brief, usa la ruta del paso 1 ya llena.
+
+**4. Generar el HTML y el PDF.**
+
+```bash
+node scripts/documents/render-cotizacion-a4.mjs --data /tmp/documento-datos.json --out /tmp/documento-v1
+```
+
+La carpeta de `--out` debe ser nueva o estar vacía. Quedan `cotizacion.html`, `cotizacion.pdf`, `datos.json`,
+`manifest.json` y las capturas de revisión en `qa/` (`pagina-1.png`… y `mobile.png`). Con este ejemplo, exit 0 y
+cuatro páginas. Si el contenido no cabe, falla con «Contenido fuera del A4», dice qué página y no deja nada escrito.
+
+**5. Revisar las capturas y el PDF, página por página.**
+
+- Portada: título completo, comprador, neto y total.
+- Alcance y calendario del trabajo: sin textos de ejemplo ni frases cortadas.
+- Precio: cada línea con su cantidad, su valor unitario y su neto; el subtotal; el impuesto y el total, o «Por
+  confirmar»; y, si existen, el calendario de pagos y los costos que paga el cliente.
+- Condiciones: vigencia y forma de pago.
+- Las cifras impresas son las del resumen de la cotización. Si no coinciden, es un defecto de la herramienta: se
+  reporta, no se corrige a mano.
+
+Las capturas son del navegador y no reemplazan abrir el PDF. El manifiesto nace con la revisión visual y la del PDF
+pendientes: qué mirar y cómo registrarlo está en la
+[plantilla](../../commercial/templates/cotizacion-a4/README.md#uso-rápido).
+
+**6. Entregar.** Como borrador, salvo que el operador haya aprobado el precio. Enviarlo, registrarlo en el CRM o
+crear la cotización en Greenhouse son acciones aparte, con su propia autorización; este flujo no hace ninguna.
+
+### Cómo sale cada cosa en el documento
+
+- **Líneas y meses.** Los meses consecutivos en que un concepto cuesta lo mismo son una línea: «3 meses», el valor
+  de un mes y el neto de los tres. Un cobro único es «1 pago único», sin valor unitario. Si el neto de un concepto
+  cambia durante el plazo, sale una línea por tramo y el detalle dice qué meses cubre («Mes 3», «Meses 1 a 2»). Un
+  mes con neto cero no imprime nada.
+- **Grupos.** Por defecto «Servicio», «Puesta en marcha» y «Costos de terceros». El brief puede mover una línea a
+  otro grupo con `group`.
+- **Servicio gestionado.** Una línea de fee. Nunca el equipo ni sus horas.
+- **Costos de terceros refacturados.** Una línea por costo, con el concepto que declaró la cotización y su neto
+  final. Nunca el proveedor.
+- **Costos que el cliente paga directo.** Un bloque aparte, en su propia moneda, sin convertir y fuera de todo total.
+  Sale solo cuando la cotización los declara.
+- **Calendario de pagos.** Sale cuando el brief declara `paymentMilestones`, la misma lista de
+  [`compose schedule`](#calendario-de-pagos-compose-schedule): partes del neto que suman exactamente 1. Los importes
+  los calcula la herramienta y suman el neto. Aquí cada hito necesita `periodId` o `when`.
+- **Impuesto.** El de la cotización: la tasa y el importe que congeló, «Por confirmar» si no lo resolvió, o «No
+  aplica» si lo declaró así.
+
+Ejemplos versionados, emitidos y generados el 2026-10-11 (importes en CLP; el comprador es inventado):
+
+| Ejemplo (`data/pricing/v3-operating/`) | Qué muestra                                                                                                                                                      | Neto       | Impuesto y total                     | Páginas |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------ | ------- |
+| `designer-on-demand`                   | Un mes y una puesta en marcha: 2.470.000 y 320.000                                                                                                               | 2.790.000  | «Por confirmar»                      | 4       |
+| `designer-three-months-iva`            | Tres meses en una línea (3 × 2.550.000) y una puesta en marcha de 320.000                                                                                        | 7.970.000  | IVA 19 %: 1.514.300; total 9.484.300 | 4       |
+| `managed-on-demand-third-party`        | Fee de 11.370.000 y tres costos de terceros (4.950.000, 1.380.000 y 3.333.333); aparte, un costo de USD 890 que paga el cliente; calendario de 50 %, 30 % y 20 % | 21.033.333 | «Por confirmar»                      | 5       |
+
+El calendario del tercer ejemplo: 10.520.000, 6.310.000 y 4.203.333. Cada ejemplo tiene su
+`<nombre>.document-brief.json` y su `<nombre>.document.json`.
+
+### Qué significan los estados
+
+| Señal                                  | Qué significa                                                                                                                                 |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exit 2 sin `--brief`                   | Salió el andamio: falta el brief. No es un error                                                                                              |
+| Exit 3 con `--brief`                   | Se emitieron los datos de un borrador. La cotización sigue en revisión: no es una aprobación                                                  |
+| Exit 1                                 | Rechazo: stdout vacío, `error.code` en stderr y ningún dato emitido. `option` dice si se corrige el brief (`brief`) o la cotización (`input`) |
+| `status: "draft"` en los datos         | Siempre. Es el estado de preparación del archivo, no un estado de aprobación de Greenhouse                                                    |
+| Impuesto y total «Por confirmar»       | La cotización no resolvió el impuesto. No se arregla en el brief                                                                              |
+| Impuesto «No aplica»                   | La cotización declaró que no aplica; el total es igual al neto                                                                                |
+| Una tasa con su importe                | La cotización resolvió el impuesto; se imprime su cifra, no un cálculo nuevo                                                                  |
+| `source` en los datos                  | El cálculo de origen. Llega al manifiesto y no se imprime                                                                                     |
+| Exit 0 del generador                   | HTML y PDF generados y la comprobación de páginas pasó. La revisión visual sigue pendiente                                                    |
+| «Contenido fuera del A4» del generador | Un contenido no cabe en su página. No se generó nada                                                                                          |
+
+### Qué no hacer con el documento
+
+- **No escribir una cifra a mano.** En el brief se rechaza. Tampoco repetir importes dentro de los textos libres:
+  nada los compara con la cotización y quedan viejos al volver a cotizar.
+- **No editar los datos emitidos** ni el `datos.json` de una carpeta generada. Se cambia la cotización o el brief y
+  se emite de nuevo, en rutas nuevas.
+- **No resolver un impuesto «Por confirmar» en un texto.** El tratamiento lo decide el operador, se declara en la
+  demanda y se vuelve a cotizar.
+- **No presentar el documento como una cotización aprobada o emitida**, ni ponerle un número de cotización de
+  Greenhouse. No es una `quotation_id` y nada lo registró.
+- **No quitar la leyenda de borrador** mientras el operador no haya aprobado el precio.
+- **No agregar al documento lo que traen las lecturas internas** (costos, márgenes, la reserva, el nombre de un
+  proveedor, el reparto en persona y kit), ni entregar el andamio.
+- **No reutilizar la carpeta de un documento ya entregado.** Una corrección es una versión nueva en una carpeta
+  nueva.
+- **No acortar un contenido quitando una obligación** para que quepa en la página.
+
+### Problemas comunes del documento
+
+| Síntoma                                                                                      | Causa                                                                                                                                         | Qué hacer                                                                                                                                  |
+| -------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con la regla `unrecognized_keys`                      | El brief trae una clave que no existe. El caso típico es un importe, una moneda, una tasa o una fecha                                         | Quitarla. `path` dice en qué objeto está (vacío es la raíz). Las cifras salen de la cotización                                             |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con `unknown_key` en `lines.<n>`                      | `lines` nombra una clave que la cotización no tiene: un error de tipeo o el brief de otra cotización                                          | Copiar las claves del andamio. `<n>` es la posición de la entrada, contando desde 0                                                        |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con muchas entradas                                   | Quedaron textos vacíos, o se entregó el andamio sin llenar                                                                                    | Llenar cada `path` de `issues`                                                                                                             |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con `timing_required` o `requires_payment_milestones` | Un hito sin `periodId` ni `when`, o `paymentScheduleTexts` sin `paymentMilestones`                                                            | Decir cuándo se cobra cada hito; quitar los textos del calendario si no hay hitos                                                          |
+| Exit 1, `SCHEDULE_MILESTONES_INVALID` con `option: "brief"`                                  | La lista de hitos no cumple las reglas del calendario de pagos                                                                                | [Tabla de reglas](#calendario-de-pagos-compose-schedule); la ruta empieza en `paymentMilestones`                                           |
+| Exit 1, `QUOTE_DOCUMENT_REQUIRES_CALCULATED_QUOTE`                                           | La cotización está bloqueada (`needs_input`)                                                                                                  | Resolver los `diagnostics` de la demanda, cotizar con un `--out` nuevo y leer ese artefacto                                                |
+| Exit 1, `QUOTE_DOCUMENT_NOT_REPRESENTABLE`                                                   | La cotización no cabe en el documento: más de 40 líneas, más de 8 costos pagados por el cliente, o un importe que su moneda no puede escribir | No se arregla en el brief. Leer `issues` y llevarle al operador qué excede; se cambia la cotización                                        |
+| Exit 1, `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` o `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE`        | Las líneas no suman el neto, o el impuesto congelado no corresponde a su tasa                                                                 | No emitir a mano. Es una cotización que el documento no puede representar: reportar el comando exacto a quien mantiene la herramienta      |
+| El documento imprime impuesto y total «Por confirmar»                                        | La cotización se congeló con el impuesto sin resolver                                                                                         | Es correcto. Si el operador ya decidió el tratamiento, declararlo en la demanda y volver a cotizar                                         |
+| El generador falla con «Contenido fuera del A4» y nombra la página 1                         | El título de la portada es demasiado largo: la portada es una página fija                                                                     | Acortar `cover.title` (hasta tres líneas cortas) o `cover.subtitle`, emitir de nuevo y generar. La tipografía no se reduce                 |
+| El generador falla con «Contenido fuera del A4» en alcance o condiciones                     | Demasiadas filas o textos largos para una página fija                                                                                         | Acortar la redacción sin quitar obligaciones                                                                                               |
+| El generador dice que la carpeta de salida contiene archivos                                 | `--out` apunta a una carpeta con contenido                                                                                                    | Usar una carpeta nueva; cada versión conserva la suya                                                                                      |
+| Una línea sale partida en dos, con «Mes 1» y «Meses 2 a 3»                                   | El neto de ese concepto cambia entre meses                                                                                                    | Es lo que dice la cotización. Un `detail` del brief en esa clave reemplaza el texto de los meses en todos sus tramos: mejor no ponerlo ahí |
+| Exit 1, `REPLAY_MISMATCH`                                                                    | El artefacto fue editado, o `--input` no es un artefacto de composición                                                                       | No editarlo: volver a cotizar                                                                                                              |
+| Exit 1, `OUTPUT_EXISTS`                                                                      | La ruta de `--out` ya existe                                                                                                                  | Elegir una ruta nueva                                                                                                                      |
+
+### Lo que el documento todavía no hace
+
+Se dice cuando el pedido lo toca; no se resuelve por cuenta propia:
+
+- Traer los textos de alcance o de condiciones de un catálogo o de una biblioteca: se escriben por cotización.
+- Presentar el reparto en persona y kit de herramientas (`compose split`): el documento imprime las líneas propias
+  de la cotización.
+- Número de cotización, historial de versiones, verificación por QR, firmas, aprobación y envío: existen sólo en el
+  cotizador de Greenhouse, y este flujo no escribe en él.
+- Una portada, un alcance o unas condiciones de más de una página: son páginas fijas.
+- Un documento en una moneda distinta de la de la cotización.
+
+Referencias: [plantilla, datos y reglas de composición](../../commercial/templates/cotizacion-a4/README.md),
+[registro de revisión de la plantilla](../../commercial/templates/cotizacion-a4/VERIFICACION.md),
+[una sola moneda por documento](../../commercial/templates/cotizacion-a4/MULTIMONEDA.md),
+[contrato del brief y rechazos](../../documentation/finance/cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11)
+y [qué es y qué no es](../../documentation/finance/cotizador-v3-superficie-implementada.md#el-documento-de-cotización-para-el-cliente-2026-10-11).
+
 ## Qué no hacer
 
 - **No nombrar versiones a mano en una cotización nueva.** Se usa `--current`. Una ruta `…review-vN.json` queda sólo
@@ -2218,8 +2453,13 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 - **No comparar el margen mezclado con el piso de la oferta.** Con costos de terceros el número que se compara es
   `ownWork.marginRateRoundedDown`; se informan los dos, cada uno con su nombre.
 - **No mostrarle al cliente las lecturas internas** (resumen, `explain`, `assess`, `split`, `cash`, `schedule`,
-  `commitments`): traen costos, márgenes, la reserva y montos de proveedor. Al cliente va lo que arma
-  `compose preview`.
+  `commitments`): traen costos, márgenes, la reserva y montos de proveedor. Al cliente va el documento que arma
+  `compose document` ([Producir el documento de cotización](#producir-el-documento-de-cotización)); `compose preview`
+  es la misma proyección, para revisar antes.
+- **No escribir a mano una cifra del documento de cotización ni editar los datos que emite `compose document`.**
+  Toda cifra sale de la cotización congelada: si hay que cambiar una, se cambia la cotización y se emite de nuevo.
+  Y no presentar ese documento como una cotización aprobada, emitida o registrada en Greenhouse: es un borrador
+  ([lista completa](#qué-no-hacer-con-el-documento)).
 - **No usar el redondeo, un ajuste ni un cambio de fecha para «cumplir» un piso** o para llegar a un precio.
 - **No editar un archivo versionado** (catálogo, policy, demanda de ejemplo, artefacto): se copia a una ruta nueva o
   se emite una versión.
@@ -2246,7 +2486,7 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 | `compose commitments` no lista una herramienta que se esperaba, o la lista bajo `CONTRACT_TERM_NOT_FROZEN`                               | El artefacto congeló una policy que no declaraba ese plazo, o el plazo declarado no supera los periodos cotizados                                                         | Mirar qué policy congeló el artefacto; volver a cotizar con `--current` si se quiere la lectura de hoy                                                                                                                                            |
 | Exit 2, `RESOURCE_FX_SELECTION_REQUIRED` junto a `UNUSED_FX_SELECTION`                                                                   | Una herramienta con precio en EUR y `fxRecordIds` nombra la referencia de un solo día (`fx:EUR:USD:ECB:2026-10-09`)                                                       | Nombrar `fx:EUR:USD` en `fxRecordIds` ([Cotizar en otra moneda](#cotizar-en-otra-moneda))                                                                                                                                                         |
 | Exit 2, `MISSING_CATALOG_SELECTION` en `fx.USD:EUR`                                                                                      | Se pidió `outputCurrency: "EUR"`                                                                                                                                          | Cotizar en USD. No hay cotización en EUR                                                                                                                                                                                                          |
-| Exit 1, `INVALID_ARGUMENT` con `option: "current"`                                                                                       | `--current` con un valor (`--current=…`) o en un comando que no carga fuentes (`explain`, `replay`, `compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash`, `compose commitments`, `current`) | Quitarlo, o escribirlo sin valor                                                                                                                                                                                                                  |
+| Exit 1, `INVALID_ARGUMENT` con `option: "current"`                                                                                       | `--current` con un valor (`--current=…`) o en un comando que no carga fuentes (`explain`, `replay`, `compose assess`, `compose preview`, `compose split`, `compose schedule`, `compose cash`, `compose commitments`, `compose document`, `current`) | Quitarlo, o escribirlo sin valor                                                                                                                                                                                                                  |
 | El resumen de un servicio gestionado trae `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM` en `assumptions`                  | La demanda no declara `engagementForm` y la oferta tiene una reserva de contingencia para la forma On-Demand: no se evaluó. Le pasa a los ejemplos `managed-care` | Preguntar la forma, declarar `on_going` u `on_demand` y volver a correr ([reserva](#reserva-de-contingencia))                                                                                                                                     |
 | Un servicio gestionado On-Demand sale más caro que antes del catálogo v10 y el motor es `1.4.0`                                          | Ahora lleva la reserva de contingencia: 12 % del costo de persona, como costo                                                                                             | Es lo esperado. `contingencyReserve` en el resumen dice cuánto. No se quita cambiando la forma: se renuncia con motivo, si el operador lo decide                                                                                                  |
 | Una cotización fechada 2026-10-11 trae `runNotices.laterCatalogValues` con `records` `8`                                                 | Los ocho factores de país confirmados rigen desde el 2026-10-12                                                                                                           | Informarlo. No es una fecha atrasada: desde el 2026-10-12, con la fecha del día, no sale                                                                                                                                                           |
@@ -2259,7 +2499,9 @@ declarado, para llevarle al operador qué queda comprometido y si es capacidad c
 | Exit 1, `OUTPUT_EXISTS`                                                                                                                  | La ruta de `--out` ya existe                                                                                                                                              | Elegir una ruta nueva; no borrar un artefacto para reutilizar su nombre                                                                                                                                                                           |
 
 Los demás rechazos están en [Qué hacer con cada error](#qué-hacer-con-cada-error); los de costos de terceros y
-reserva, en [su tabla](#si-un-costo-de-terceros-o-la-reserva-fallan).
+reserva, en [su tabla](#si-un-costo-de-terceros-o-la-reserva-fallan); y los del documento de cotización (un brief
+con un importe, una clave de línea desconocida, un título de portada que no cabe, un impuesto «Por confirmar»), en
+[Problemas comunes del documento](#problemas-comunes-del-documento).
 
 ## Pendientes que permanecen visibles
 

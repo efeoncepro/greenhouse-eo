@@ -13,7 +13,7 @@ Para costear localmente sin depender de la UI: [CLI de Excel y planes editables]
 > **Tipo de documento:** Documentacion funcional (lenguaje simple)
 > **Version:** 1.0
 > **Creado:** 2026-04-18 por Claude (TASK-469)
-> **Ultima actualizacion:** 2026-10-09: rutas de las tasks, remisión a V3 local y separación del cotizador vigente; se conserva el diseño original 2026-04-18 por Claude (TASK-469)
+> **Ultima actualizacion:** 2026-10-11: una cotización V3 alimenta la plantilla A4 (`compose document`). 2026-10-09: rutas de las tasks, remisión a V3 local y separación del cotizador vigente; se conserva el diseño original 2026-04-18 por Claude (TASK-469)
 > **Estado de este documento:** diseño histórico del programa (18/04/2026). El cotizador vigente se documenta en [Cotizador](cotizador.md) y la [arquitectura canónica](../../architecture/GREENHOUSE_COMMERCIAL_QUOTATION_ARCHITECTURE_V1.md); la disponibilidad en cada entorno se verifica por separado.
 > **Documentacion tecnica:**
 > - Plano UI: [TASK-469 — Commercial Pricing UI Interface Plan](../../tasks/complete/TASK-469-commercial-pricing-ui-interface-plan.md)
@@ -23,6 +23,8 @@ Para costear localmente sin depender de la UI: [CLI de Excel y planes editables]
 ## Oferta documental rápida de licitación
 
 Para preparar rápidamente la oferta económica HTML/PDF de una licitación o Compra Ágil, desde precio y alcance aprobados, existe una [plantilla documental local](../../commercial/templates/cotizacion-a4/README.md). Puede producir el documento formal de presentación; no crea una cotización persistida, valida margen ni ejecuta approvals o quote-to-cash. Si se pide operar el sistema Greenhouse, seguir el [cotizador](cotizador.md), sus comandos y su estado verificado. El JSON de la plantilla no es una entrada de importación ni un `quotation_id` del sistema.
+
+Desde el 2026-10-11 esa plantilla tiene una segunda fuente de datos: una cotización congelada del prototipo V3. `pnpm --silent pricing:v3 compose document` emite los datos del documento con todos los importes tomados de la cotización ([paso a paso](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#producir-el-documento-de-cotización)). Sigue siendo un borrador local, no una cotización del sistema. Que el [cotizador](cotizador.md) de Greenhouse adopte más adelante ese diseño de documento es la dirección acordada por el CEO; no ha empezado.
 
 ## Que es
 

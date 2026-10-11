@@ -28,6 +28,11 @@ Los párrafos marcados «motor 1.4» describen el cambio de la noche de ese mism
 (los costos de terceros de un trabajo y una reserva de contingencia para trabajos de alcance fijo) y el catálogo v10,
 que además deja cerrados los factores de país. El resumen para leer primero está en
 [Costos de terceros y reserva de contingencia](#costos-de-terceros-y-reserva-de-contingencia-2026-10-11).
+Los párrafos marcados «documento (2026-10-11)» describen el último cambio de esa noche, que no toca ningún contrato
+del kernel ni ninguna cotización congelada: una lectura nueva, `compose document`, que convierte una cotización
+congelada en los datos de su documento para el cliente (la plantilla A4 de cotización, en su versión 2). El resumen
+para leer primero está en
+[El documento de cotización para el cliente](#el-documento-de-cotización-para-el-cliente-2026-10-11).
 
 ## Qué versiones se usan hoy (2026-10-11)
 
@@ -406,6 +411,128 @@ cambiar un total. Medido sobre el
 - **Persona y kit (`compose split`).** Con filas de terceros son tres partes que suman el neto: kit 2.020.000,
   persona 9.350.000 y terceros 9.663.333. La reserva queda dentro de la parte de la persona.
 
+## El documento de cotización para el cliente (2026-10-11)
+
+Las lecturas anteriores son internas. Ésta produce lo que el cliente lee. `compose document` toma una cotización ya
+congelada y emite los datos de su documento, que la
+[plantilla A4 de cotización](../../commercial/templates/cotizacion-a4/README.md) convierte en HTML y PDF. Como las
+demás lecturas, comprueba primero que el artefacto se reproduce igual y **no cambia un precio, un costo ni un
+total**. A diferencia de ellas no trae costos: el documento no muestra costo, margen, tarifa, proveedor, política ni
+identificadores internos.
+
+**Por qué este documento.** Efeonce tiene dos documentos de cotización: el PDF del cotizador de Greenhouse, que se
+arma desde las tablas de cotizaciones, y la plantilla A4, que ya se usó en cotizaciones entregadas. El CEO los
+comparó sobre renders reales el 2026-10-11 y decidió que el documento de una cotización V3 es la plantilla A4:
+presenta un precio por un servicio, no horas y una tarifa por rol, en pocas páginas densas y con la línea gráfica
+vigente. Lo que la plantilla no tiene es un registro detrás: número de cotización, versiones, verificación, firmas,
+aprobación, envío y CRM existen sólo en el cotizador de Greenhouse. La dirección acordada es llevar más adelante
+este diseño a ese cotizador, que aporta lo que falta; ese paso no ha empezado.
+[Decisión y alternativas descartadas](../../architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--el-documento-de-cotización-de-una-cotización-v3-compose-document).
+
+**Dos fuentes que no se mezclan.**
+
+| Sale de | Qué |
+| --- | --- |
+| La cotización congelada | Toda cifra: la moneda, la fecha del documento, las líneas y su neto, el impuesto, el total, los costos que el cliente paga directo y los importes de un calendario de pagos |
+| El brief del documento | Todo texto: referencia, quién emite y para quién, portada, nombre del servicio, alcance, calendario del trabajo, textos de la sección de precio y condiciones. También cómo se presentan las líneas: nombre, detalle y grupo |
+
+El brief (`pricing-v3-quote-document-brief/1`) no tiene dónde escribir un importe, una moneda, una tasa de impuesto
+ni una fecha: uno que trae alguno se rechaza. Por eso un documento no puede contradecir a su cotización. Para cambiar
+una cifra se cambia la cotización y se vuelve a emitir.
+
+**Cómo se usa.** Tres pasos; el detalle está en el
+[manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#producir-el-documento-de-cotización).
+
+1. `compose document --input <artefacto>`, sin brief, imprime un andamio: las cifras de la cotización, cada línea
+   bajo su clave con el nombre y el grupo que tendría por defecto, y los textos por llenar. Sale con código 2
+   (falta información).
+2. Con el brief lleno, `compose document --input <artefacto> --brief <brief> --out <datos>` emite los datos del
+   documento. Sale con código 3: es el borrador de una cotización en revisión.
+3. `node scripts/documents/render-cotizacion-a4.mjs --data <datos> --out <carpeta nueva>` genera el HTML, el PDF,
+   un manifiesto y las capturas para revisar.
+
+**Las líneas.** Salen de la misma función que decide lo que muestra `compose preview`: hay una sola frontera entre
+una cotización y lo que lee un cliente. `compose preview` las imprime período por período y su salida no cambió; el
+documento las reúne a lo largo del plazo.
+
+- Un servicio gestionado es una línea de fee, nunca su equipo ni sus horas. Una cotización vendida por líneas (una
+  persona por dedicación) tiene una línea por cada una. La puesta en marcha y cada costo de terceros refacturado van
+  en líneas propias.
+- Los meses consecutivos en que un concepto cuesta lo mismo son una sola línea: la cantidad es «n meses», el valor
+  unitario es el neto de un mes y el neto es su suma exacta. Un cobro único es «1 pago único», sin valor unitario.
+- Si el neto de un concepto cambia durante el plazo, sale una línea por cada tramo y el detalle dice qué meses cubre
+  («Mes 3», «Meses 1 a 2»). Un mes con neto cero no se cobra y no imprime nada.
+- Las líneas se agrupan por defecto en «Servicio», «Puesta en marcha» y «Costos de terceros».
+- Cada línea tiene una clave con la que el brief puede cambiarle el nombre, agregarle un detalle o moverla de grupo.
+  La clave nunca se imprime.
+
+**El impuesto es el de la cotización.**
+
+| Cómo quedó el impuesto en la cotización | Qué imprime el documento |
+| --- | --- |
+| Tasa aplicada sobre el neto (`exclusive`) | La tasa y el impuesto que la cotización congeló; el total es el de la cotización |
+| Sin resolver (`not_resolved`) | Impuesto y total «Por confirmar» |
+| No aplica (`not_applicable`) | «No aplica»; el total es igual al neto |
+
+El documento imprime la cifra de la cotización y nunca hace un segundo cálculo. La cotización calcula el impuesto mes
+a mes y suma los resultados; calcularlo una sola vez sobre el total puede dar una unidad de diferencia, y entonces
+habría dos cifras para la misma cotización. La plantilla trae un
+[ejemplo de esa diferencia](../../commercial/templates/cotizacion-a4/README.md#versión-2-varias-líneas-con-precio).
+
+**Dos bloques opcionales.**
+
+- **Costos que el cliente paga directo a su proveedor.** Aparecen si la cotización los declara. Se imprimen aparte,
+  cada uno en su propia moneda, sin convertir y fuera de todo total.
+- **Calendario de pagos.** Aparece si el brief declara `paymentMilestones`, la misma lista que recibe
+  `compose schedule --milestones`: partes del neto, nunca importes. Los importes se derivan y suman exactamente el
+  neto. Cada hito dice cuándo se cobra: en un período de la cotización o con un texto.
+
+**Cuándo no se emite.** Cada garantía es un rechazo, no un documento equivocado: las líneas suman exactamente el
+neto de la cotización; la cotización está calculada; cada importe se puede escribir en su moneda y el contenido
+cabe en los límites de la plantilla (hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos); y el impuesto
+corresponde a su tasa. Códigos y reglas:
+[contrato](cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11).
+
+**Es un borrador.** Los datos salen con `status: "draft"`. Un documento producido aquí no es una `quotation_id`, un
+precio aprobado ni una cotización emitida, y nada lo registra en Greenhouse ni en el CRM. Los datos llevan además el
+origen del cálculo (`source`: sistema, identidad del cálculo, digest y motor), que llega al manifiesto del render y
+nunca se imprime.
+
+**Ejemplos congelados, vueltos a emitir y a generar el 2026-10-11.** Cada uno tiene su brief
+(`<nombre>.document-brief.json`, con un comprador inventado) y los datos que emite la CLI
+(`<nombre>.document.json`), en [`data/pricing/v3-operating/`](../../../data/pricing/v3-operating/README.md). Importes
+en CLP.
+
+| Ejemplo | Líneas | Neto | Impuesto y total | Páginas |
+| --- | --- | --- | --- | --- |
+| `designer-on-demand` (contrato 1.3.0, un mes) | «Diseñador visual sénior», 1 mes, 2.470.000; «Puesta en marcha del servicio», 1 pago único, 320.000 | 2.790.000 | Sin resolver: «Por confirmar» | 4 |
+| `designer-three-months-iva` (contrato 1.3.0, tres meses) | El mismo diseñador, 3 meses × 2.550.000 = 7.650.000; puesta en marcha, 320.000 | 7.970.000 | IVA 19 %: 1.514.300; total 9.484.300 | 4 |
+| `managed-on-demand-third-party` (contrato 1.4.0, un mes) | Fee del servicio 11.370.000; tres costos de terceros: 4.950.000, 1.380.000 y 3.333.333 | 21.033.333 | Sin resolver: «Por confirmar» | 5 |
+
+- `designer-three-months-iva` es una cotización congelada nueva (demanda y artefacto), la primera versionada con
+  varios períodos y con el impuesto resuelto. Su IVA de 19 % es la fuente de impuesto de un ejemplo, no un criterio
+  tributario para ningún cliente. Su mensualidad difiere de la del ejemplo de un mes porque aquél se congeló con una
+  policy anterior, cuando Creative Cloud Pro todavía se cotizaba con su descuento.
+- En `managed-on-demand-third-party` el documento imprime aparte el costo que paga el cliente (USD 890, sin
+  convertir) y un calendario de pagos de 50 %, 30 % y 20 %: 10.520.000, 6.310.000 y 4.203.333, que suman el neto.
+
+**Qué no está modelado.** No describir nada de esto como existente:
+
+- Los textos del documento (alcance, condiciones) se escriben por cotización en el brief. Nada los trae de un
+  catálogo ni de una biblioteca de condiciones.
+- El reparto en persona y kit de herramientas (`compose split`) todavía no es una forma del documento: un documento
+  imprime las líneas propias de la cotización.
+- No hay número de cotización, historial de versiones, verificación por QR, firmas, aprobación ni envío. Existen
+  sólo en el cotizador de Greenhouse, y esta lectura no escribe en él.
+- La portada es una página fija; las de alcance y de condiciones, también (hasta 7 filas de alcance, 3 fases de
+  calendario y 6 condiciones). Un título de portada demasiado largo hace fallar la generación: se acorta.
+- El documento se emite en la moneda de la cotización, sin conversión a otra.
+- Generar el HTML y el PDF necesita un Chromium local (Playwright), como todos los documentos de
+  `scripts/documents/`.
+
+Datos, reglas de composición y límites de la plantilla:
+[su manual](../../commercial/templates/cotizacion-a4/README.md).
+
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
@@ -426,6 +553,7 @@ cambiar un total. Medido sobre el
 | Preview                   | `pricing-v3-composition-preview/1`                          | Proyección local de precio, calendario e impuestos; no una cotización emitida                  |
 | Resumen de composición    | `pricing-v3-composition-summary/1`                          | Lectura derivada del resultado congelado: bloqueos, señales, piso y caja; no decide nada. Motor 1.1 (aditivo): `engineVersion`, `commercialAdjustments`, `priceRounding`. Motor 1.2 (aditivo): `marketFactor` cuando el factor elegido cambia algo, y `floorNet` y `netShortOfFloor` por línea marcada. Versiones vigentes (2026-10-11, aditivo): `estimateExposure`; la CLI agrega además `runNotices`, que describe la corrida y no viene del resultado congelado. Motor 1.3 (aditivo): bloque `engagementForm` y `totals.engagementAdjustment`, sólo cuando el pedido declara la forma. Motor 1.4 (aditivo): bloques `ownWork`, `thirdParty` y `contingencyReserve`, sólo en una cotización 1.4.0 |
 | Lecturas de una cotización congelada | `pricing-v3-price-split/1`, `pricing-v3-payment-schedule/1`, `pricing-v3-engagement-cash/1`, `pricing-v3-commitment-exposure/1` | Lecturas (2026-10-11): persona y kit, calendario de pagos, lectura de caja y compromisos con proveedores. Verifican el artefacto por replay y no cambian ningún total. Motor 1.4: las cuatro reconocen las filas de terceros y la reserva |
+| Documento de cotización   | `pricing-v3-quote-document-brief/1`, `pricing-v3-quote-document-scaffold/1` (`resources/quote-document.ts`) | Documento (2026-10-11): recibe un artefacto congelado y un brief de textos; devuelve la versión 2 de los datos de la plantilla A4 de cotización, o el andamio del brief si no se entrega uno. Verifica el artefacto por replay, toma toda cifra de la cotización y no cambia ningún total |
 | Rechazos                  | `errors.ts`, `PricingV3Error`                               | Registro cerrado de códigos de dominio y adaptador; el detalle sólo nombra opción o ruta       |
 | Registro de motores       | `PRICING_V3_ENGINES` en `schemas.ts`                        | Contrato de entrada → motor que firma: `1.0.0` → `pricing-v3-local/1.0.0`, `1.1.0` → `pricing-v3-local/1.1.0`, `1.2.0` → `pricing-v3-local/1.2.0` (motor 1.2), `1.3.0` → `pricing-v3-local/1.3.0` (motor 1.3), `1.4.0` → `pricing-v3-local/1.4.0` (motor 1.4); cada uno con su `precisionPolicy` |
 | Guarda de artefactos      | `__tests__/pricing-v3-frozen-artifacts.test.ts`             | Reproduce cada `*.artifact.json` bajo `data/pricing/**` y los dos del caso SKY versionados; exige uno firmado por cada motor registrado |
@@ -740,6 +868,9 @@ Desde el 2026-10-10, en `managed_service` los importes derivados (fee del perío
 escala con que el kernel formateó la moneda: CLP mostraba `9508946.00` en la línea y `9508946` en el total.
 `export` conserva el gate propio de cálculo completo dentro de policy; los ejemplos de composición en revisión
 no lo evaden mediante preview. Ninguna salida crea quote canónica, aprobación, documento emitido o CRM write.
+Documento (2026-10-11): `compose preview` sigue siendo la proyección para revisar. El documento que lee el cliente
+lo produce `compose document` sobre esa misma proyección, sin agregar cifras propias, y sale como borrador
+([El documento de cotización para el cliente](#el-documento-de-cotización-para-el-cliente-2026-10-11)).
 
 CLI: JSON limpio por stdout con `pnpm --silent`; exit 0 técnico, exit 2 pendiente, exit 3 cálculo/revisión y exit 1
 schema/argumentos/conflicto/adaptador/export rechazado, error sanitizado en stderr. `--out` usa ruta nueva
@@ -938,6 +1069,30 @@ claves que siguen existen sólo en una cotización 1.4.0; una cotización de un 
   dependen de la forma y el pedido no declara ninguna.
 - `catalog search|show` aceptan `--kind third_party_policy` y `--kind contingency_reserve`.
 
+Documento (2026-10-11), qué imprime cada comando. Hay una operación nueva bajo `compose`, `document`, y cinco
+rechazos nuevos; los códigos de salida significan lo mismo que antes. Ningún otro comando cambió su salida.
+
+- `compose document --input <artefacto>` (sin `--brief`) imprime el andamio `pricing-v3-quote-document-scaffold/1`:
+  `quote` (fecha, moneda, períodos, neto, impuesto y total de la cotización), `lines[]` (cada línea como se
+  imprimiría sin cambios, con su `key` y su `kind`), `clientPaidDirectly[]` si la cotización declara costos que paga
+  el cliente, `optional` (las claves optativas del brief) y `brief` (el brief con cada texto vacío). Sale con 2.
+  Con `--out` guarda sólo el `brief`. Un andamio sin llenar no pasa: cada texto vacío es un rechazo.
+- `compose document --input <artefacto> --brief <brief> [--out <datos>]` imprime los datos del documento: la
+  versión 2 del contrato de datos de la
+  [plantilla A4](../../commercial/templates/cotizacion-a4/README.md#versión-2-varias-líneas-con-precio) y nada
+  alrededor, porque la plantilla rechaza claves que no conoce. Sale con 3.
+- No acepta `--current`, catálogo, policy ni créditos: lee un artefacto que ya lleva sus fuentes dentro. Un
+  artefacto alterado se rechaza con `REPLAY_MISMATCH`.
+- Rechazos nuevos del [registro](../../../src/lib/finance/pricing-v3/errors.ts), todos con salida 1 y, cuando hay
+  un lugar que señalar, con `issues[]` de ruta y regla: `QUOTE_DOCUMENT_BRIEF_INVALID` (`option: "brief"`),
+  `QUOTE_DOCUMENT_REQUIRES_CALCULATED_QUOTE`, `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP`,
+  `QUOTE_DOCUMENT_NOT_REPRESENTABLE` y `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE` (los cuatro con `option: "input"`: se
+  corrige la cotización, no el brief). Una lista de hitos inválida conserva el código de su propia lectura,
+  `SCHEDULE_MILESTONES_INVALID`, aquí con `option: "brief"`. Tabla completa:
+  [contrato](cotizador-v3-contrato-y-validacion.md#documento-de-cotización-compose-document-2026-10-11).
+- El HTML y el PDF no los genera la CLI de pricing sino el generador de la plantilla:
+  `node scripts/documents/render-cotizacion-a4.mjs --data <datos> --out <carpeta nueva>`.
+
 Verificación de implementación TASK-2022: 135 tests V3 + 78 V2 = 213, 26 smokes CLI y replay de baselines preservados.
 Readback del 2026-10-10 tras el endurecimiento de la CLI: `pnpm pricing:v3:test` con 9 archivos y 179 pruebas V3,
 ESLint y `pnpm typecheck` limpios, y `pricing:v3 replay` con `verified: true` en los `*.artifact.json` presentes ese
@@ -1078,6 +1233,29 @@ día con `--current`; salvo la primera, usan copias de la demanda con un solo ca
 | La misma con una categoría sin regla en el catálogo | 2 | `needs_input`: `MISSING_CATALOG_SELECTION` en `thirdPartyCosts.tp-production.policy` |
 | La misma con un costo refacturado sin evidencia | 1 | Rechazo `SCHEMA_INVALID` en `brief.thirdPartyCosts.0.evidence` |
 | `designer-on-demand.demand.json` (una persona por dedicación, On-Demand) | 3 | Contrato 1.3.0, sin reserva: costo 1.822.704, neto 2.870.000, las cifras de antes |
+
+Readback del 2026-10-11, último de la noche, tras `compose document` y la versión 2 de la plantilla A4, hecho con la
+CLI: `pnpm pricing:v3:test` con 25 archivos y 1.208 pruebas V3; las pruebas de la plantilla
+(`node --test scripts/documents/render-cotizacion-a4.test.mjs scripts/documents/document-money.test.mjs`) con 25; y
+`replay` con `verified: true` en los 20 `*.artifact.json` bajo `data/pricing/`, entre ellos el nuevo
+`designer-three-months-iva.artifact.json` (motor 1.3.0, tres períodos: costo 5.068.112, neto 7.970.000, margen
+0,3641, impuesto 1.514.300 y total 9.484.300; ninguna línea marcada). El puntero nombra el catálogo v10, la policy
+v11 y los créditos v1, con `consistent: true`. Corridas de ese día sobre artefactos versionados; las de rechazo usan
+copias de un brief con un solo cambio y no están versionadas:
+
+| Caso | Salida | Resultado |
+| --- | --- | --- |
+| `compose document` sobre `designer-three-months-iva.artifact.json`, sin brief | 2 | Andamio: neto 7.970.000, impuesto 1.514.300, total 9.484.300; dos líneas, `design` (3 meses a 2.550.000) y `design:setup` (1 pago único, 320.000) |
+| El mismo con su brief versionado | 3 | Datos idénticos byte a byte a `designer-three-months-iva.document.json`; `vatRate` 0,19 y `taxAmount` 1.514.300 |
+| `designer-on-demand` y `managed-on-demand-third-party` con sus briefs | 3 | Datos idénticos a los versionados; sin impuesto resuelto, `vatRate` es `null` y no hay `taxAmount` |
+| Los tres documentos generados con la plantilla | 0 | 4, 4 y 5 páginas; el manifiesto registra el impuesto como declarado (`stated`) en el de tres meses y por confirmar (`pending`) en los otros dos |
+| Un brief con una clave de importe, en la raíz o en `pricing` | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`, regla `unrecognized_keys` |
+| Un brief que nombra una línea que la cotización no tiene | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`, regla `unknown_key` en la posición de esa entrada |
+| Un brief con hitos que suman 0,9 | 1 | `SCHEDULE_MILESTONES_INVALID`, regla `shares_must_sum_to_one`, `option: "brief"` |
+| Un brief con un hito sin período ni texto de cuándo | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`, regla `timing_required` |
+| El andamio sin llenar entregado como brief | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`, una entrada por texto vacío |
+| Un título de portada de tres líneas largas | 3 al emitir; 1 al generar | Los datos se emiten; el generador falla con «Contenido fuera del A4» y no deja documento |
+| `compose document` con `--current` | 1 | `INVALID_ARGUMENT` con `option: "current"` |
 
 Las cifras son evidencia fechada de esa corrida, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios
