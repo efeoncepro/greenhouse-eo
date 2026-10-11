@@ -26,6 +26,10 @@ import { quotePriceNotices } from '../../src/lib/finance/pricing-v3/resources/pr
 import { splitQuotedPrice } from '../../src/lib/finance/pricing-v3/resources/price-split'
 import { commitmentExposure } from '../../src/lib/finance/pricing-v3/resources/commitment-exposure'
 import { presentPaymentSchedule, readEngagementCash } from '../../src/lib/finance/pricing-v3/resources/engagement-view'
+import {
+  composeQuoteDocument,
+  scaffoldQuoteDocumentBrief
+} from '../../src/lib/finance/pricing-v3/resources/quote-document'
 import { summarizeComposition } from '../../src/lib/finance/pricing-v3/resources/summary'
 import { applyWorkloadToBrief, dimensionWorkload } from '../../src/lib/finance/pricing-v3/resources/workload'
 import { compositionPolicySchema } from '../../src/lib/finance/pricing-v3/resources/composition-contracts'
@@ -313,7 +317,7 @@ try {
           resources:
             'budget --input request.json --catalog credits.json | inspect --policy policy.json --date YYYY-MM-DD [--query text] | portfolio --input portfolio.json --policy policy.json [--date YYYY-MM-DD] | preview|apply --input change.json --policy policy.json --credits credits.json [--impact demands.json]; apply --confirm previewDigest --out new-version.json',
           compose:
-            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json]',
+            'workload --input workload.json [--brief brief.json --out dimensioned-brief.json] | scaffold --input brief.json --policy policy.json | plan --input plan.json --policy policy.json --credits credits.json [--out demand.json] | prepare|quote --input demand.json --policy policy.json --credits credits.json [--out artifact.json] | assess|preview --input artifact.json [--format json|markdown] [--out preview.json|md] | split --input artifact.json --tools id,id|all [--label text] [--out split.json] | schedule --input artifact.json --milestones milestones.json [--out schedule.json] | cash --input artifact.json [--out cash.json] | commitments --input artifact.json [--out commitments.json] | document --input artifact.json [--brief document-brief.json] [--out data.json]',
           catalog:
             'search|show|validate|preview|apply [--catalog file] [--query text] [--kind kind] [--date YYYY-MM-DD]; preview/apply --input change.json [--impact briefs.json]; apply --confirm previewDigest --out new-version.json',
           current:
@@ -323,6 +327,14 @@ try {
           pointer: 'data/pricing/v3-operating/current.json',
           flag: '--current fills each of --catalog, --policy and --credits the caller did not pass, on every operation that takes them. It is verified first (version and digest); an explicit flag wins. For `resources budget` it fills --catalog with the credit catalog.',
           withoutFlag: 'Unchanged: no --catalog means the historical baseline, and --policy/--credits stay mandatory.'
+        },
+        quoteDocument: {
+          command:
+            '`compose document` turns a frozen quote into version 2 of the data of the A4 quote template (docs/commercial/templates/cotizacion-a4). Render it with `node scripts/documents/render-cotizacion-a4.mjs --data data.json --out folder`. Exit 3: the document is a draft of a quote under review.',
+          withoutBrief:
+            'Prints the scaffold of the document brief (every line of the quote under its key, with its default label and group, and the texts to fill) and exits 2. --out keeps the brief alone.',
+          brief:
+            'Texts and presentation only (pricing-v3-quote-document-brief/1). Every amount, the currency, the tax and the date of the document come from the frozen quote; a brief that carries one is rejected. Lines must add up to the net of the quote and the tax must be the one the template computes, or no data is emitted.'
         },
         limits: [
           'Local prototype. No DB/API/CRM write.',
@@ -412,6 +424,7 @@ try {
         'schedule',
         'cash',
         'commitments',
+        'document',
         'workload'
       ].includes(subcommand) ||
       positionals.length !== 2
@@ -426,11 +439,13 @@ try {
           ? ['input', 'out', 'milestones', 'help']
           : ['cash', 'commitments'].includes(subcommand)
             ? ['input', 'out', 'help']
-        : subcommand === 'workload'
-          ? ['input', 'brief', 'out', 'help']
-          : subcommand === 'scaffold'
-            ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
-            : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
+            : subcommand === 'document'
+              ? ['input', 'brief', 'out', 'help']
+              : subcommand === 'workload'
+                ? ['input', 'brief', 'out', 'help']
+                : subcommand === 'scaffold'
+                  ? ['catalog', 'policy', 'current', 'input', 'out', 'help']
+                  : ['catalog', 'policy', 'credits', 'current', 'input', 'out', 'help']
 
     permit(allowed)
 
@@ -535,6 +550,40 @@ try {
       if (values.out) writeNew(values.out, json(outcome.reading))
       process.stdout.write(json(outcome.reading))
       process.exitCode = 3
+    } else if (subcommand === 'document') {
+      // A reading of a frozen quote, like `split` and `schedule`: verified by replay first, and every figure of the
+      // document comes from the verified result. The brief only brings the texts and the presentation of the lines.
+      const artifact = replayResourceComposition(load('input'))
+
+      // What the caller corrects: the brief (its texts, its line keys, its milestones) or the quote itself.
+      const reject = (outcome: { code: PricingV3Error['code']; issues: { path: string; rule: string }[] }) =>
+        new PricingV3Error(outcome.code, {
+          option: ['QUOTE_DOCUMENT_BRIEF_INVALID', 'SCHEDULE_MILESTONES_INVALID'].includes(outcome.code)
+            ? 'brief'
+            : 'input',
+          issues: outcome.issues
+        })
+
+      if (values.brief) {
+        const outcome = composeQuoteDocument(artifact.semantic.result, artifact, readJson('brief', values.brief))
+
+        if (!outcome.ok) throw reject(outcome)
+
+        // Version 2 of the data of the A4 quote template, and nothing around it: the template rejects unknown keys.
+        if (values.out) writeNew(values.out, json(outcome.reading))
+        process.stdout.write(json(outcome.reading))
+        process.exitCode = 3
+      } else {
+        // No brief yet: the scaffold to fill, with the keys of this quote. Missing input, so exit 2 like `scaffold`;
+        // `--out` keeps the brief alone, ready to edit.
+        const outcome = scaffoldQuoteDocumentBrief(artifact.semantic.result, artifact)
+
+        if (!outcome.ok) throw reject(outcome)
+
+        if (values.out) writeNew(values.out, json(outcome.reading.brief))
+        process.stdout.write(json(outcome.reading))
+        process.exitCode = 2
+      }
     } else if (subcommand === 'commitments') {
       // Needs the frozen policy, demand and catalog besides the result: alternatives and declared contract terms
       // live there. It reports; whether a commitment is acceptable is the operator's call.

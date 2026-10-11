@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "Borrador · Servicio gestionado con costos de terceros",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de marketing",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": ["Contenidos y", "comunidad", "gestionados."],
+    "subtitle": "Un servicio gestionado de un mes para Cliente de ejemplo, con la producción y los medios de su campaña."
+  },
+  "service": {
+    "name": "Servicio gestionado de contenidos y comunidad"
+  },
+  "scope": {
+    "title": ["Un servicio completo,", "con su campaña incluida."],
+    "intro": "Borrador de alcance. La cotización final debe especificar las entregas, las cantidades y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {"title": "Servicio gestionado", "text": "Gestión de comunidad y de contenidos en los canales acordados, con un responsable del servicio y reportes de resultados."},
+      {"title": "Producción audiovisual", "text": "Producción de las piezas audiovisuales de la campaña con un proveedor externo, coordinada y facturada por Efeonce."},
+      {"title": "Talento", "text": "Locución de las piezas y derechos de uso por doce meses, contratados para la campaña."},
+      {"title": "Medios pagados", "text": "Inversión en medios de la campaña, administrada según el plan aprobado por el cliente."},
+      {"title": "Coordinación", "text": "Reunión de inicio, seguimiento semanal y revisión de resultados al cierre del mes."}
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de un mes",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {"label": "Semana 1", "title": "Inicio y planificación", "text": "Accesos, plan de contenidos, plan de medios y preparación de la producción."},
+      {"label": "Semanas 2 y 3", "title": "Producción y operación", "text": "Producción audiovisual, publicación de contenidos, gestión de comunidad y activación de medios."},
+      {"label": "Semana 4", "title": "Resultados y cierre", "text": "Optimización de medios, reporte de resultados y recomendaciones."}
+    ]
+  },
+  "pricing": {
+    "title": ["Una cotización por", "el servicio y su campaña."],
+    "intro": "Valores netos en pesos chilenos (CLP) para un mes de servicio y los costos de terceros de la campaña.",
+    "summary": "Un mes · Pesos chilenos · Impuestos por confirmar",
+    "taxNote": "Los valores son netos. El tratamiento tributario del servicio y de cada costo de terceros se confirma antes de emitir la cotización final."
+  },
+  "conditions": {
+    "title": ["Alcance, responsabilidades", "y condiciones de cobro."],
+    "rows": [
+      {"title": "Plazo e inicio", "text": "Un mes desde la fecha acordada. El calendario de entregas y de publicación se define con la contraparte del cliente."},
+      {"title": "Costos de terceros", "text": "La producción, el talento y los medios se contratan una vez aceptada la cotización. Sus valores dependen de la vigencia de la oferta de cada proveedor."},
+      {"title": "Pagos directos del cliente", "text": "Lo que el cliente contrata y paga directamente a su proveedor no forma parte de esta cotización ni de sus totales."},
+      {"title": "Aprobaciones y accesos", "text": "El cliente aprueba el plan de contenidos, las piezas y el plan de medios antes de su publicación. Facilita los accesos acordados."},
+      {"title": "Vigencia", "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."}
+    ]
+  },
+  "lines": {
+    "fee": {
+      "label": "Servicio gestionado de contenidos y comunidad",
+      "detail": "Gestión de comunidad, contenidos y reportes"
+    },
+    "third_party:tp-media": {
+      "detail": "Según el plan de medios aprobado"
+    }
+  },
+  "paymentMilestones": [
+    {"id": "advance", "label": "Anticipo", "share": "0.5", "when": "A la aceptación de la cotización"},
+    {"id": "campaign", "label": "Salida de la campaña", "share": "0.3", "when": "Al publicar la primera pieza"},
+    {"id": "closing", "label": "Cierre", "share": "0.2", "when": "Al entregar el reporte de resultados"}
+  ],
+  "paymentScheduleTexts": {
+    "note": "Importes netos, sin impuestos. Cada hito se factura al cumplirse; la suma de los hitos es el valor neto de esta cotización."
+  }
+}

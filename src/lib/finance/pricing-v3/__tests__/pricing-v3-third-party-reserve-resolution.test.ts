@@ -749,9 +749,15 @@ describe('the corpus frozen before contract 1.4.0 is not reached by the new reco
     rerun: (records: unknown[]) => { quote: Quote }
   }
 
+  // Kinds of record contract 1.4.0 added to the catalog.
+  const NEW_RECORD_KINDS = ['third_party_policy', 'contingency_reserve']
+
   // The corpus of the permanent guard (`pricing-v3-frozen-artifacts.test.ts`): everything under data/pricing plus the
   // two committed artifacts of the SKY social care case. A quote signed by 1.4.0 is left out on purpose: it uses the
-  // new records, so a rule added for one of its categories is meant to reach it.
+  // new records, so a rule added for one of its categories is meant to reach it. So is a quote frozen with a catalog
+  // that already holds records of those kinds, whatever engine signed it (a quote without third-party costs or
+  // reserve, quoted once the catalog had them): it was not frozen before the contract, and a catalog cannot take
+  // the rule of a category twice.
   const corpus: Frozen[] = [
     ...walk(resolve(root, 'data/pricing')),
     resolve(root, 'docs/commercial/prospects/sky-social-care-2027/pricing/acordado.artifact.json'),
@@ -760,6 +766,11 @@ describe('the corpus frozen before contract 1.4.0 is not reached by the new reco
     .flatMap(path => {
       const artifact = read(path)
       const s = artifact.semantic
+
+      // An artifact of the kernel lane holds no catalog and is not part of this corpus.
+      const frozenCatalog = s.catalog as CatalogDoc | undefined
+
+      if (frozenCatalog?.records.some(record => NEW_RECORD_KINDS.includes(record.kind as string))) return []
 
       if (artifact.artifactVersion === 'pricing-v3-resource-composition/1')
         return [

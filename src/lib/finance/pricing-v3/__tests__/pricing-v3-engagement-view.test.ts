@@ -41,6 +41,10 @@ const DESIGNER = 'data/pricing/v3-operating/designer.artifact.json'
 const COLOMBIA = 'data/pricing/v3-operating/managed-care-colombia.artifact.json'
 const SKY_AGREED_NET = 'docs/commercial/prospects/sky-social-care-2027/pricing/acordado-neto.artifact.json'
 
+// The one committed quote over several periods and with a resolved tax (exclusive, 19 %): the example of the quote
+// document. Every other committed quote is one period with tax not resolved.
+const THREE_MONTHS_IVA = 'data/pricing/v3-operating/designer-three-months-iva.artifact.json'
+
 const walk = (dir: string): string[] =>
   readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
     const path = join(dir, entry.name)
@@ -204,8 +208,13 @@ describe('the committed corpus covers the cases the readings have to hold in', (
     expect(facts.get(DESIGNER)).toMatchObject({ multiple: null, topUps: 2 })
     expect(facts.get(CRM)).toMatchObject({ multiple: null, topUps: 0 })
     expect([...facts.values()].every(f => f.tools > 0)).toBe(true)
-    // No committed quote spans several periods or resolves tax: both cases are composed in memory below.
-    expect([...facts.values()].every(f => f.periods === 1 && f.tax === null)).toBe(true)
+    // One committed quote spans several periods and resolves tax; for every other one both cases are composed in
+    // memory below.
+    expect([...facts].filter(([, f]) => f.periods !== 1 || f.tax !== null).map(([path]) => path)).toEqual([
+      THREE_MONTHS_IVA
+    ])
+    expect(facts.get(THREE_MONTHS_IVA)!.periods).toBe(3)
+    expect(new D(facts.get(THREE_MONTHS_IVA)!.tax!).gt(0)).toBe(true)
   })
 })
 
@@ -346,15 +355,31 @@ describe('payment schedule: tax is carried only when the quote resolved it', () 
       })
     )
 
-  it.each(corpus)('%s: an unresolved tax stays unresolved in every milestone', path => {
-    const result = frozen(path).semantic.result
+  it.each(corpus.filter(path => path !== THREE_MONTHS_IVA))(
+    '%s: an unresolved tax stays unresolved in every milestone',
+    path => {
+      const result = frozen(path).semantic.result
 
-    expect(result.quote.totals!.tax).toBeNull()
+      expect(result.quote.totals!.tax).toBeNull()
+
+      const s = accepted(result, milestones(['0.5', '0.3', '0.2']))
+
+      expect(s.taxTreatment).toEqual({ kind: 'not_resolved' })
+      expect(s.milestones.every(m => m.tax === null && m.total === null)).toBe(true)
+    }
+  )
+
+  it('the committed quote with a resolved tax: its milestones add up to the tax and the total it froze', () => {
+    const result = frozen(THREE_MONTHS_IVA).semantic.result
+    const totals = result.quote.totals!
+
+    expect(new D(totals.grandTotal!).eq(new D(totals.net).plus(totals.tax!))).toBe(true)
 
     const s = accepted(result, milestones(['0.5', '0.3', '0.2']))
 
-    expect(s.taxTreatment).toEqual({ kind: 'not_resolved' })
-    expect(s.milestones.every(m => m.tax === null && m.total === null)).toBe(true)
+    expect(s.taxTreatment).toMatchObject({ kind: 'exclusive', rate: '0.19' })
+    expect(sum(s.milestones.map(m => m.tax!)).eq(totals.tax!)).toBe(true)
+    expect(sum(s.milestones.map(m => m.total!)).eq(totals.grandTotal!)).toBe(true)
   })
 
   it('a resolved tax adds up to the tax of the quote, milestone by milestone', () => {

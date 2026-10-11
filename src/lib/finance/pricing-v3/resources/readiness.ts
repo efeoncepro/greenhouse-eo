@@ -230,23 +230,32 @@ export function assessCompositionReadiness(result: Composition) {
   }
 }
 
+/** What a client-safe item is: the fee of a managed service, a commercial line, a setup or a re-invoiced cost. */
+export type ClientSafeItemKind = 'fee' | 'line' | 'setup' | 'third_party'
+
 /**
- * Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin.
- * Every amount is a final net (after commercial rounding, discount and uplift); none of those is itemized.
+ * The one firewall between a composed quote and anything a client reads. Per period, the items a client may see:
+ * a concept and its final net (after commercial rounding, discount and uplift), and nothing else of the row it came
+ * from. No cost, margin, rate, supplier, policy or profile. A managed service is one fee, never its team and hours.
  *
- * From contract 1.4.0 a re-invoiced third-party cost is an item of its own in the period it falls in, by the concept
- * the brief declares and its final net: it is never folded into the fee of a managed service, which is the period net
- * minus the setup and minus those items. A cost the client pays directly is listed apart under `clientPaidDirectly`
- * (concept, amount and currency as declared), outside every item, period and total; the key is absent when the brief
- * declares none. Neither carries the supplier, what the supplier charges or the rule that priced it.
+ * Every presentation of a quote to a client is built on this function and adds no figure of its own: the preview
+ * below prints `label` and `net` as they are, and the quote document (`quote-document.ts`) folds the same items
+ * over the term.
+ *
+ * `key` and `kind` exist for those presentations and are never printed. `key` names the same thing in every period
+ * it appears in, so a presentation can follow it over the term; it derives from kernel identifiers only:
+ * a managed service has `fee`, `setup` and `third_party:<costId>`; a quote sold by lines has the id of each line
+ * for its monthly row, `<lineId>:setup` for its setup row and `third_party:<costId>`. Ids are free text, so two rows
+ * of a period could in principle collide on a key: a presentation that depends on the keys checks them, this
+ * function only derives them.
  */
-export function projectCompositionPreview(result: Composition) {
+export function clientSafePeriodItems(result: Composition) {
   if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
     throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
   const D = Decimal.clone({ precision: 80 })
-  const currency = result.quote.totals.currency
+  const thirdPartyKey = (costId: string) => `${PRICING_V3_THIRD_PARTY_BILLING}:${costId}`
 
-  const periods = result.quote.periods.map(p => {
+  return result.quote.periods.map(p => {
     if (!p.result.totals) throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
     const lines = p.result.lines
     const setup = lines.filter(l => l.kind === 'setup').reduce((s, l) => s.plus(l.net), new D(0))
@@ -256,23 +265,63 @@ export function projectCompositionPreview(result: Composition) {
     // instead of assuming two decimals (CLP has none).
     const scale = p.result.totals.net.split('.')[1]?.length ?? 0
 
-    const items =
+    const items: { key: string; kind: ClientSafeItemKind; label: string; net: string }[] =
       result.commercialUnit === 'managed_service'
         ? [
             {
+              key: 'fee',
+              kind: 'fee',
               label: 'Servicio gestionado — fee del periodo',
               // What the service itself is sold for: nothing a supplier is paid for is presented as fee.
               net: thirdParty
                 .reduce((fee, l) => fee.minus(l.net), new D(p.result.totals.net).minus(setup))
                 .toFixed(scale)
             },
-            ...(setup.gt(0) ? [{ label: 'Implementación inicial', net: setup.toFixed(scale) }] : []),
-            ...thirdParty.map(l => ({ label: l.label, net: l.net }))
+            ...(setup.gt(0)
+              ? [{ key: 'setup', kind: 'setup' as const, label: 'Implementación inicial', net: setup.toFixed(scale) }]
+              : []),
+            ...thirdParty.map(l => ({
+              key: thirdPartyKey(l.parentLineId),
+              kind: 'third_party' as const,
+              label: l.label,
+              net: l.net
+            }))
           ]
-        : lines.map(l => ({ label: l.kind === 'setup' ? 'Implementación inicial' : l.label, net: l.net }))
+        : lines.map(l =>
+            l.kind === 'setup'
+              ? { key: `${l.parentLineId}:setup`, kind: 'setup' as const, label: 'Implementación inicial', net: l.net }
+              : l.kind === PRICING_V3_THIRD_PARTY_BILLING
+                ? { key: thirdPartyKey(l.parentLineId), kind: 'third_party' as const, label: l.label, net: l.net }
+                : { key: l.parentLineId, kind: 'line' as const, label: l.label, net: l.net }
+          )
 
-    return { periodId: p.periodId, currency, items, net: p.result.totals.net }
+    return { periodId: p.periodId, items, net: p.result.totals.net }
   })
+}
+
+/**
+ * Client-shaped local simulation preview. No internal identifiers, cost stack, providers, rates or margin.
+ * Every amount is a final net (after commercial rounding, discount and uplift); none of those is itemized.
+ *
+ * From contract 1.4.0 a re-invoiced third-party cost is an item of its own in the period it falls in, by the concept
+ * the brief declares and its final net: it is never folded into the fee of a managed service, which is the period net
+ * minus the setup and minus those items. A cost the client pays directly is listed apart under `clientPaidDirectly`
+ * (concept, amount and currency as declared), outside every item, period and total; the key is absent when the brief
+ * declares none. Neither carries the supplier, what the supplier charges or the rule that priced it.
+ *
+ * The items are the ones of `clientSafePeriodItems`, printed by concept and net: the keys it derives stay internal.
+ */
+export function projectCompositionPreview(result: Composition) {
+  if (result.quote.calculationStatus !== 'calculated' || !result.quote.totals)
+    throw new PricingV3Error('PREVIEW_REQUIRES_CALCULATED_SIMULATION')
+  const currency = result.quote.totals.currency
+
+  const periods = clientSafePeriodItems(result).map(period => ({
+    periodId: period.periodId,
+    currency,
+    items: period.items.map(item => ({ label: item.label, net: item.net })),
+    net: period.net
+  }))
 
   const paidDirectly = clientPaidDirectly(result.quote.resolution.brief)
 
