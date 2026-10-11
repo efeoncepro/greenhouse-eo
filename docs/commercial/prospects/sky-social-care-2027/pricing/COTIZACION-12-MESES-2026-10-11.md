@@ -61,16 +61,18 @@ versión anterior expresaba el asiento compartido quitándole la tarea a la pers
 El documento vigente agrega los dos opcionales de la propuesta entregada, con su precio, en un bloque aparte que no
 entra en el neto ni en el total. Cada uno sale de su propia cotización congelada:
 
-| Opcional | Archivos | Precio | Costo | Margen |
+| Opcional | Precio | Costo incremental al mes | Margen | Respaldo del margen |
 | --- | --- | --- | --- | --- |
-| Cobertura extendida (noches, fines de semana y feriados) | `cotizacion-2027.opcion-cobertura-extendida.*` | CLP 1.290.000 al mes | CLP 498.806 | 61,3 % |
-| Conversaciones adicionales | `cotizacion-2027.opcion-bloque-conversaciones.*` | CLP 290.000 por bloque de 200 | CLP 204.096 | 29,6 % |
+| Cobertura extendida (noches, fines de semana y feriados) | CLP 1.290.000 al mes | CLP 400.807 | 68,9 % | `cotizacion-2027.con-cobertura-extendida.*` |
+| Conversaciones adicionales | CLP 290.000 por bloque de 200 | CLP 155.096 | 46,5 % | `cotizacion-2027.con-bloque-conversaciones.*` |
 
 - Los precios son los de la propuesta entregada; los costos descansan en supuestos sin medir de esa propuesta.
-- El margen de los opcionales es un piso, no una medición: cada opcional es una cotización propia y vuelve a cargar el
-  fee de plataforma por línea y la parte de las herramientas base, que estas personas ya tienen en la cotización
-  principal (pendiente `OPTION_QUOTES_REPEAT_PER_LINE_FEES` del registro del cotizador). En el bloque de
-  conversaciones ese fee es cerca de un cuarto del costo.
+- El margen se lee como incremento: cada `con-*.artifact.json` es la cotización principal con el opcional adentro, y
+  `con-*.increment.json` (`compose increment`) da la diferencia de neto, costo y margen contra la principal. El costo
+  incremental de la cobertura extendida coincide con el que la propuesta había estimado aparte.
+- El precio que imprime el documento sale de las cotizaciones propias de cada opcional
+  (`cotizacion-2027.opcion-*.artifact.json`). Su precio es correcto; su costo no sirve de referencia, porque vuelven a
+  cargar el fee de plataforma por línea (mostraban 61,3 % y 29,6 %).
 - La cobertura extendida no puede partir el primer día: depende de una consola propia. El documento no lo dice.
 - La puesta en marcha sigue como texto («bonificadas») y sin valor de referencia: un servicio gestionado no tiene
   puesta en marcha en el catálogo, así que no hay cifra congelada que mostrar.
