@@ -2,7 +2,7 @@
 
 Plantilla reutilizable solicitada por Julio el 08/10/2026, derivada del diseño aprobado de la cotización UTEM. Cuatro páginas: portada, alcance/calendario, inversión y condiciones. La cotización presentada a UTEM conserva sus archivos originales; esta plantilla tiene datos de ejemplo sin validez comercial.
 
-Desde el 11/10/2026 la plantilla tiene dos versiones del contrato de datos. La **versión 1** cotiza un único precio en cuatro páginas fijas y no cambia: las cotizaciones ya entregadas se regeneran byte a byte. La **versión 2** cotiza varias líneas con precio, pagina la sección de inversión según su contenido y admite dos bloques opcionales; se describe en [Versión 2: varias líneas con precio](#versión-2-varias-líneas-con-precio). Todo lo demás de este manual vale para ambas.
+Desde el 11/10/2026 la plantilla tiene dos versiones del contrato de datos. La **versión 1** cotiza un único precio en cuatro páginas fijas y no cambia: las cotizaciones ya entregadas se regeneran byte a byte. La **versión 2** cotiza varias líneas con precio, pagina la sección de inversión según su contenido y admite bloques opcionales (calendario de pagos, costos que paga el cliente, opciones adicionales) y líneas bonificadas; se describe en [Versión 2: varias líneas con precio](#versión-2-varias-líneas-con-precio). Todo lo demás de este manual vale para ambas.
 
 ## Elegir la vía según el pedido
 
@@ -32,8 +32,8 @@ Ejemplos de ruteo para agentes:
 - [Vista previa HTML](vista-previa/cotizacion.html), autónoma y lista para imprimir.
 - [Vista previa PDF](vista-previa/cotizacion.pdf), cuatro páginas A4 verificadas.
 - [Datos de ejemplo](ejemplo.json): copiar y editar para una nueva cotización de un único precio (versión 1).
-- Datos de ejemplo de la versión 2: [dos perfiles por dedicación y una puesta en marcha](ejemplo-lineas.json); [servicio gestionado con costos de terceros, calendario de pagos y un costo que paga el cliente](ejemplo-lineas-terceros.json).
-- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño. La versión 2 usa [su propio HTML](template-lineas.html) y añade [sus estilos](template-lineas.css) a los comunes; portada, alcance y condiciones son idénticos en ambos HTML y una prueba lo comprueba.
+- Datos de ejemplo de la versión 2: [dos perfiles por dedicación y una puesta en marcha](ejemplo-lineas.json); [servicio gestionado con costos de terceros, calendario de pagos y un costo que paga el cliente](ejemplo-lineas-terceros.json); [servicio de doce meses con la puesta en marcha bonificada y opciones adicionales](ejemplo-lineas-opcionales.json).
+- [HTML con slots](template.html) y [estilos](template.css): fuente del diseño. La versión 2 usa [su propio HTML](template-lineas.html) y añade [sus estilos](template-lineas.css) a los comunes; portada, alcance y condiciones son idénticos en ambos HTML y una prueba lo comprueba. Los estilos de la línea bonificada y del bloque de opciones viven en [un archivo aparte](template-lineas-opciones.css), que el generador incluye sólo en el documento que usa alguno de los dos: los demás conservan su HTML byte a byte.
 - [Generador](../../../../scripts/documents/render-cotizacion-a4.mjs): resuelve slots, incrusta recursos y exporta HTML/PDF.
 
 ## Uso rápido
@@ -100,12 +100,13 @@ Usar `"version": 2` cuando la cotización tiene más de un concepto con precio: 
 
 | Campo JSON | Contenido |
 | --- | --- |
-| `lines` | Entre 1 y 40 líneas, en el orden de impresión. Cada una: `label`; `detail` opcional; `group` opcional; `quantity` con `value` (entero de 1 a 9999) y `unit` (texto: `meses`, `pago único`); `unitNet` opcional; `net`, el importe de la línea por todo el plazo. |
+| `lines` | Entre 1 y 40 líneas, en el orden de impresión. Cada una: `label`; `detail` opcional; `group` opcional; `quantity` con `value` (entero de 1 a 9999) y `unit` (texto: `meses`, `pago único`); `unitNet` opcional; `net`, el importe de la línea por todo el plazo; `referenceNet` opcional, sólo en una línea bonificada. |
 | `net` | Opcional. Si se declara, debe ser exactamente igual a la suma de `lines[].net`. El subtotal neto siempre es esa suma. |
 | `vatRate`, `taxStatus` | `vatRate` como en la versión 1. Con `vatRate: null`, `taxStatus` distingue `pending` (por defecto: «Por confirmar» y «Total facturable») de `not_applicable` («No aplica»; el total es igual al neto y se rotula «Total»). |
 | `taxAmount` | Opcional, sólo con una tasa explícita. Declara el impuesto de la cotización cuando difiere en unidades del calculado sobre el subtotal. Ver más abajo. |
 | `clientPaidDirectly` | Opcional, de 1 a 8 entradas: `label`, `amount`, `currency` y `detail` opcional. Costos que el cliente contrata y paga a su proveedor. |
 | `paymentSchedule` | Opcional: `title`, `note` y de 1 a 12 `milestones` con `label`, `when` y `net`. La suma de los hitos debe ser exactamente igual al neto. |
+| `options` | Opcional: `title` y `note` (ambos opcionales) y de 1 a 8 `items` con `label`, `detail` opcional, `net` y `unit` (texto: `al mes`, `pago único`). Opciones que el cliente puede contratar aparte; no entran en ningún total. |
 | `source` | Opcional: objeto plano de textos con el origen de los datos (`system`, `calculationId`, `digest`…). Se copia al manifiesto y nunca se imprime. |
 | `pricing.monthly` | Como en la versión 1; lo decide el operador. |
 
@@ -115,20 +116,41 @@ Reglas que el generador hace cumplir:
 - **Columna de valor unitario.** Existe sólo cuando al menos una línea declara `unitNet`; las líneas que no lo declaran muestran una raya en esa columna.
 - **Encabezados de grupo.** Se imprime un encabezado cada vez que `group` cambia, y sólo si el documento tiene dos o más grupos distintos. En ese caso todas las líneas declaran su grupo: una línea sin grupo quedaría bajo el encabezado anterior y se rechaza.
 - **Costos que paga el cliente.** `clientPaidDirectly` se imprime en un bloque aparte, «Pagado directamente por el cliente a su proveedor», que declara que no forma parte de la cotización ni de su valor neto o total. Cada importe conserva su propia moneda: no se convierte ni se suma.
-- **Campos desconocidos.** En la versión 2 se rechazan las claves que el contrato no define, en la raíz y en `lines`, `quantity`, `clientPaidDirectly`, `paymentSchedule` e hitos. Un bloque mal escrito no se omite en silencio.
+- **Línea bonificada.** Una línea con `"net": "0"` y `referenceNet` es una cortesía: en su columna de valor neto se lee «Bonificado» y, debajo, «Valor de referencia» con ese importe. No suma al subtotal, al impuesto ni al total. `referenceNet` es un importe positivo en la moneda del documento y sólo se admite con `net` cero y sin `unitNet`; en la columna de valor unitario, si existe, la línea muestra una raya. Una línea a cero sin `referenceNet` sigue imprimiendo su importe en cero.
+- **Opciones adicionales.** `options` se imprime en un bloque aparte, el último de la sección de inversión, bajo el rótulo «Opcional · Fuera de esta cotización». La plantilla declara siempre que las opciones no forman parte de la cotización ni de su valor neto o total y que cada valor es neto, sin impuestos; ese texto no se edita. Cada opción muestra su valor neto y, debajo, su unidad. `title` es el título del bloque («Opciones adicionales» si se omite) y `note`, un texto del operador que se imprime después de la advertencia. Los valores van en la moneda del documento.
+- **Campos desconocidos.** En la versión 2 se rechazan las claves que el contrato no define, en la raíz y en `lines`, `quantity`, `clientPaidDirectly`, `paymentSchedule`, hitos, `options` y sus entradas. Un bloque mal escrito no se omite en silencio.
 - **Una sola moneda.** El documento se emite en `currency`. `presentation` con otra moneda o con tipo de cambio se rechaza; ver [MULTIMONEDA.md](MULTIMONEDA.md).
 
 **Impuesto declarado (`taxAmount`).** El documento calcula el impuesto una vez, sobre el subtotal. Una cotización que tributa mes a mes y suma los resultados redondeados puede diferir en unidades: tres meses de 3.333.333 al 19 % suman 1.899.999, y el cálculo sobre 9.999.999 da 1.900.000. Con `"taxAmount": "1899999"` el documento imprime el impuesto de la cotización, nunca una segunda cifra; el total es subtotal más ese impuesto, la etiqueta de la tasa no cambia y el equivalente mensual, si existe, deriva de él. Se acepta sólo si corresponde a la tasa: puede diferir del impuesto calculado en tantas unidades menores como sume `lines[].quantity.value` (cada mes aporta como máximo una unidad de redondeo); más allá se rechaza. No se admite con `vatRate: null` ni en la versión 1. El manifiesto registra en `amounts.taxSource` si el impuesto fue declarado (`stated`), calculado (`computed`), está por confirmar (`pending`) o no aplica (`not_applicable`).
 
-**Paginación.** La sección de inversión ocupa las páginas que necesita, sin reducir la tipografía. La tabla continúa en la página siguiente con su cabecera repetida y, si corta un grupo, lo vuelve a anunciar con «(continuación)»; un encabezado de grupo nunca queda solo al pie. Los totales con su nota tributaria, el calendario de pagos, el bloque de costos pagados por el cliente y el equivalente mensual son bloques enteros: el que no cabe pasa completo a la página siguiente. Folios, anclas de la barra, capturas de `qa/` y manifiesto siguen el número real de páginas. Portada, alcance y condiciones siguen siendo de una página cada una, con los límites de la versión 1.
+**Paginación.** La sección de inversión ocupa las páginas que necesita, sin reducir la tipografía. La tabla continúa en la página siguiente con su cabecera repetida y, si corta un grupo, lo vuelve a anunciar con «(continuación)»; un encabezado de grupo nunca queda solo al pie. Los totales con su nota tributaria, el calendario de pagos, el bloque de costos pagados por el cliente, el equivalente mensual y el bloque de opciones son bloques enteros, en ese orden: el que no cabe pasa completo a la página siguiente. Hay una excepción, para que los totales no se separen de una tabla que les deja sitio: si bajo la tabla caben los totales pero no su nota tributaria, los totales quedan con la tabla y la nota abre la página siguiente, siempre que el bloque que sigue quepa allí con ella. Una nota nunca queda sola en una página: sin bloque siguiente, totales y nota pasan juntos. Folios, anclas de la barra, capturas de `qa/` y manifiesto siguen el número real de páginas. Portada, alcance y condiciones siguen siendo de una página cada una, con los límites de la versión 1.
 
 El reparto se decide sin navegador, con un presupuesto de altura calculado desde las fuentes incrustadas y las medidas de los estilos; después, la comprobación del render lo verifica en Chromium. Si un contenido no puede componerse —una línea o un bloque más altos que una página, importes que no caben en su columna—, el generador falla con «Contenido fuera del A4» y dice qué acortar. No recorta ni omite. El manifiesto guarda en `checks.pagination` la altura estimada y la medida de cada página de inversión; el [registro de revisión](VERIFICACION.md) explica cómo se calibró.
 
-Límites de la versión 2: una sola moneda por documento; hasta 40 líneas, 8 costos pagados por el cliente y 12 hitos; cada bloque debe caber en una página; el generador no calcula precios, márgenes ni calendarios, sólo comprueba que lo declarado suma.
+Límites de la versión 2: una sola moneda por documento; hasta 40 líneas, 8 costos pagados por el cliente, 12 hitos y 8 opciones; cada bloque debe caber en una página; el generador no calcula precios, márgenes ni calendarios, sólo comprueba que lo declarado suma.
 
 ```sh
 node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-terceros.json --out .captures/cotizacion-a4-lineas-nueva
+node scripts/documents/render-cotizacion-a4.mjs --data docs/commercial/templates/cotizacion-a4/ejemplo-lineas-opcionales.json --out .captures/cotizacion-a4-opcionales-nueva
 ```
+
+Una línea bonificada y un bloque de opciones se declaran así:
+
+```json
+"lines": [
+  { "label": "Servicio mensual", "quantity": { "value": 12, "unit": "meses" }, "unitNet": "3900000", "net": "46800000" },
+  { "label": "Puesta en marcha", "quantity": { "value": 1, "unit": "pago único" }, "net": "0", "referenceNet": "1450000" }
+],
+"options": {
+  "title": "Servicios opcionales",
+  "note": "Cada opción se cotiza y se acuerda por separado.",
+  "items": [
+    { "label": "Informe ejecutivo mensual", "detail": "Análisis y recomendaciones.", "net": "480000", "unit": "al mes" }
+  ]
+}
+```
+
+`options` no existe en la versión 1: declararlo allí se rechaza, porque el bloque no se imprimiría.
 
 ## Multimoneda
 

@@ -54,3 +54,42 @@ Revisión de la versión 2 del contrato de datos y de su paginación. Los render
 El presupuesto es conservador: nunca estima menos de lo que mide el navegador, y a veces pasa un bloque a la página siguiente cuando habría cabido por poco. La guarda sigue siendo la comprobación del render: si la estimación quedara corta, el documento falla con «Contenido fuera del A4» y no se escribe ningún archivo.
 
 Hay que recalibrar si cambian `template.css` o `template-lineas.css`, las fuentes de marca, el pie institucional o los tokens de espaciado. La señal está en cada manifiesto: `checks.pagination` guarda `estimatedPx` y `measuredPx` por página de inversión, y `checks.layout[].gapPx` el aire real sobre el pie. Si la medida supera a la estimación, ajustar las alturas del plan (`planPricing`) o `FLOW` en el generador y volver a comprobar los límites con las pruebas.
+
+## Línea bonificada, opciones y posición de los totales · 11/10/2026
+
+Tres cambios en la versión 2: la línea bonificada (`lines[].referenceNet`), el bloque de opciones (`options`) y la regla que mantiene los totales junto a su tabla. Los renders de esta revisión se generaron en una carpeta de trabajo fuera del repositorio.
+
+- **Documentos existentes.** Los estilos nuevos viven en `template-lineas-opciones.css` y sólo se incluyen en el documento que usa una línea bonificada o el bloque de opciones. Medido antes y después del cambio: el HTML de los tres ejemplos de la versión 1 conserva su SHA-256 (`623988f8…`, `3bebc250…`, `d5ce5915…`); el de `ejemplo-lineas.json` (`9cab83ed…`) y `ejemplo-lineas-terceros.json` (`433ee479…`) también, y ambos quedan fijados como prueba permanente. De los tres documentos emitidos por el puente de Pricing V3, dos no cambian (`c29e3688…`, `076891f8…`) y uno cambia a propósito, por la regla de los totales que se describe abajo.
+- **Pruebas.** 30 pruebas Node PASS (26 del generador, 4 de dinero). Las cinco nuevas cubren: HTML y estilos sin cambio cuando no se usan las capacidades nuevas; línea bonificada (texto, valor de referencia fuera de los totales, altura de fila, ancho de columna y cada rechazo); bloque de opciones (posición, advertencia fija, unidad, moneda, escape y título por defecto); cada regla de validación de `options`; y la posición de los totales en sus cuatro casos.
+- **Ejemplo nuevo.** `ejemplo-lineas-opcionales.json`, cinco páginas: tabla con la línea bonificada, totales y nota en la página 3; bloque de opciones en la 4. Las cinco páginas se revisaron en captura del navegador; PDF A4 de cinco páginas, etiquetado, sin JavaScript, fuentes incrustadas y texto extraíble («Bonificado», «Valor de referencia», importes y unidades de las opciones). A 390 px, sin desborde: la tabla conserva sus columnas y cada opción apila valor y unidad bajo su texto.
+- **Validación más estricta.** Todo importe de la versión 2 se comprueba al validar contra la precisión segura de presentación, con el nombre de su campo. Antes, un importe fuera de esa precisión pasaba la validación y fallaba al componer, sin decir cuál era.
+
+### Posición de los totales: qué se midió
+
+En `managed-on-demand-third-party.document.json` (cuatro líneas en dos grupos) los totales pasaban a la página siguiente y dejaban un tercio de la página en blanco bajo la tabla. Medido en Chromium:
+
+| Magnitud | Valor |
+| --- | --- |
+| Alto útil de la página | 882,56 px |
+| Fin de la tabla | 587,47 px (quedan 295,09 px) |
+| Totales: separación y tres filas | 22 + 232 = 254 px (terminarían en 841,47 px) |
+| Nota tributaria, dos líneas: separación y texto | 14 + 36,27 = 50,27 px (terminaría en 891,74 px) |
+
+Los totales cabían; con su nota, el conjunto se pasaba 9,18 px del alto útil y habría invadido el divisor del pie. No era un exceso de prudencia del presupuesto: tampoco cabía con el alto real. El defecto estaba en tratar los totales y la nota como un bloque indivisible. Ahora, si bajo la tabla caben los totales y no la nota, los totales quedan con la tabla y la nota abre la página siguiente, siempre que el bloque que sigue quepa allí con ella; sin bloque siguiente, o si este no cabe junto a la nota, totales y nota pasan juntos como antes, porque una nota sola en una página es peor que un salto. El presupuesto (`FLOW.capacity`, 870 px) no cambió.
+
+Resultado en ese documento: sigue en cinco páginas; la página 3 lleva tabla y totales (841,47 px medidos, 47,1 px de aire sobre el pie) y la 4 abre con la nota, seguida del calendario de pagos y del bloque de costos pagados por el cliente. Su HTML pasa de `e5f7d04a…` a `aff31c17…`. Ningún otro documento del repositorio cambia.
+
+### Calibración de los bloques nuevos
+
+| Magnitud | Valor |
+| --- | --- |
+| Página de inversión del ejemplo nuevo (estimada − medida) | 0,14 px en la página 3; 0,12 px en la 4 |
+| Rótulo «Valor de referencia» a 8 pt | 101,8 px: cabe en la columna mínima del valor neto (117,5 px útiles) sin ensancharla |
+| Importe más ancho probado en la columna de las opciones (USD, en el límite de la precisión segura) | 174,6 px de 197,6 px disponibles |
+| Barrido: 300 documentos aleatorios con líneas bonificadas (211) y bloque de opciones (217), tres monedas | 267 compuestos, 770 páginas de inversión: 0 desbordes, 0 páginas subestimadas; aire mínimo sobre el pie 19,0 px; sobrestimación máxima 43,1 px |
+| Bloque de opciones (estimado − medido), 217 bloques | entre 0 y 42,3 px; nunca por debajo |
+| Filas con línea bonificada (estimado − medido), 595 filas | entre 0 y 21,4 px; nunca por debajo |
+| Páginas donde la nota abrió la página siguiente | 24, todas sin desborde |
+| Rechazados por el plan | 33, con mensaje: un bloque de opciones más alto que una página |
+
+La sobrestimación viene del conteo de líneas, que es conservador a propósito. Las reglas de recalibración de la sección anterior valen también para `template-lineas-opciones.css`.

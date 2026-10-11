@@ -50,6 +50,8 @@ La equivalencia con `presentation` es una capacidad de la versión 1, que cotiza
 
 Los costos de `clientPaidDirectly` no son una conversión: cada uno se imprime en su propia moneda (`currency` de la entrada, con su código ISO), fuera de todo total. Un costo en USD dentro de una cotización en CLP se lee tal cual, sin tasa ni equivalencia.
 
+El valor de referencia de una línea bonificada (`lines[].referenceNet`) y los valores del bloque de opciones (`options.items[].net`) se expresan en la moneda del documento, con sus decimales: no declaran moneda propia ni se convierten. Ninguno entra en el neto, el impuesto o el total.
+
 ## Impuestos, precisión y redondeo
 
 - `vatRate` es explícito e independiente de la moneda. `null` mantiene impuesto y total facturable pendientes; `0` declara una tasa cero confirmada. Nunca transformar desconocido en cero ni asignar IVA/IGV al elegir PEN.

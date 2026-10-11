@@ -1,0 +1,183 @@
+{
+  "version": 2,
+  "status": "example",
+  "date": "2026-10-11",
+  "reference": "Ejemplo · Sin validez comercial",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Cliente de ejemplo",
+    "unit": "Equipo de experiencia de clientes",
+    "taxId": "Identificación del cliente por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Ejemplo · Sin validez comercial",
+    "title": [
+      "Atención de",
+      "comunidad",
+      "todo el año."
+    ],
+    "subtitle": "Un servicio gestionado de doce meses para Cliente de ejemplo, con refuerzo en las semanas de campaña."
+  },
+  "service": {
+    "name": "Servicio gestionado de atención de comunidad"
+  },
+  "scope": {
+    "title": [
+      "Un servicio continuo,",
+      "con refuerzo en campaña."
+    ],
+    "intro": "Ejemplo de alcance. Cada cotización debe especificar los canales, los horarios, las cantidades y las responsabilidades acordadas con el cliente.",
+    "rows": [
+      {
+        "title": "Atención de comunidad",
+        "text": "Respuesta a consultas y comentarios en los canales acordados, con pautas de respuesta aprobadas por el cliente."
+      },
+      {
+        "title": "Refuerzo de campaña",
+        "text": "Una persona adicional durante las cinco semanas de campaña del año, en las fechas que el cliente confirma con anticipación."
+      },
+      {
+        "title": "Puesta en marcha",
+        "text": "Accesos, configuración de las bandejas de atención, pautas de respuesta y capacitación inicial del equipo."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Un responsable del servicio, seguimiento semanal y escalamiento de casos según el protocolo acordado."
+      },
+      {
+        "title": "Informes",
+        "text": "Reporte mensual de volumen atendido, tiempos de respuesta y temas recurrentes."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario de doce meses",
+    "note": "Desde el inicio acordado",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Puesta en marcha",
+        "text": "Accesos, bandejas, pautas de respuesta y capacitación. Inicio de la atención en los canales acordados."
+      },
+      {
+        "label": "Meses 2 a 12",
+        "title": "Operación continua",
+        "text": "Atención diaria, seguimiento semanal y reporte mensual de resultados."
+      },
+      {
+        "label": "Semanas de campaña",
+        "title": "Refuerzo",
+        "text": "Una persona adicional en las cinco semanas de mayor volumen del año."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Una cotización por",
+      "el servicio y su refuerzo."
+    ],
+    "intro": "El servicio se cotiza por mes y el refuerzo por semana de campaña; la puesta en marcha se bonifica. Valores en pesos chilenos (CLP).",
+    "summary": "Doce meses · Pesos chilenos · IVA no incluido",
+    "taxNote": "Los valores netos excluyen IVA. El total incluye IVA: doce meses de servicio y cinco semanas de refuerzo. Las opciones adicionales no forman parte del total."
+  },
+  "lines": [
+    {
+      "label": "Atención de comunidad en redes sociales",
+      "detail": "Respuesta a consultas y comentarios en los canales acordados.",
+      "group": "Servicio",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "3900000",
+      "net": "46800000"
+    },
+    {
+      "label": "Refuerzo en semanas de campaña",
+      "detail": "Una persona adicional en las cinco semanas de campaña del año.",
+      "group": "Servicio",
+      "quantity": {
+        "value": 5,
+        "unit": "semanas"
+      },
+      "unitNet": "620000",
+      "net": "3100000"
+    },
+    {
+      "label": "Incorporación y configuración inicial",
+      "detail": "Accesos, bandejas de atención, pautas de respuesta y capacitación.",
+      "group": "Puesta en marcha",
+      "quantity": {
+        "value": 1,
+        "unit": "pago único"
+      },
+      "net": "0",
+      "referenceNet": "1450000"
+    }
+  ],
+  "net": "49900000",
+  "options": {
+    "title": "Servicios opcionales",
+    "note": "Cada opción se cotiza y se acuerda por separado si el cliente decide contratarla.",
+    "items": [
+      {
+        "label": "Informe ejecutivo mensual",
+        "detail": "Análisis de temas, tiempos de respuesta y recomendaciones para la dirección.",
+        "net": "480000",
+        "unit": "al mes"
+      },
+      {
+        "label": "Cobertura de feriados",
+        "detail": "Turno adicional en los feriados del calendario acordado.",
+        "net": "290000",
+        "unit": "por día cubierto"
+      },
+      {
+        "label": "Segundo puesto en la bandeja de atención",
+        "net": "1290000",
+        "unit": "al mes"
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "Doce meses desde la fecha acordada. Las semanas de refuerzo se confirman con la contraparte del cliente antes de cada campaña."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Las condiciones de recepción, facturación y pago se acuerdan antes de emitir la cotización final. Este ejemplo no establece un calendario de cobro."
+      },
+      {
+        "title": "Puesta en marcha bonificada",
+        "text": "La puesta en marcha no se cobra. Su valor de referencia se informa en el detalle y no forma parte del valor neto ni del total."
+      },
+      {
+        "title": "Opciones adicionales",
+        "text": "Las opciones informadas no forman parte de esta cotización. Contratar una de ellas requiere su propia cotización o un anexo aceptado por ambas partes."
+      },
+      {
+        "title": "Aprobaciones y accesos",
+        "text": "El cliente aprueba las pautas de respuesta y facilita los accesos y permisos acordados."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Ejemplo sin validez comercial. La cotización final debe indicar su vigencia y los documentos que la complementan."
+      }
+    ]
+  }
+}

@@ -25,7 +25,13 @@ const fontDir = path.join(repo, 'src/lib/artifact-composer/brand-packs/axis/font
 // La versión 1 conserva sus dos archivos intactos: cotizaciones ya entregadas se regeneran byte a byte.
 const TEMPLATES = {
   1: { html: 'template.html', css: ['template.css'] },
-  2: { html: 'template-lineas.html', css: ['template.css', 'template-lineas.css'] }
+  2: {
+    html: 'template-lineas.html',
+    css: ['template.css', 'template-lineas.css'],
+    // Estilos de la línea bonificada y del bloque de opciones. Se añaden sólo al documento que usa alguno de
+    // los dos: los que no los usan conservan su HTML byte a byte.
+    extrasCss: 'template-lineas-opciones.css'
+  }
 }
 
 const esc = value =>
@@ -61,10 +67,14 @@ const V2_KEYS = new Set([
   'net',
   'clientPaidDirectly',
   'paymentSchedule',
+  'options',
   'source'
 ])
 
-const V2_LIMITS = { lines: 40, quantity: 9999, clientPaidDirectly: 8, milestones: 12 }
+const V2_LIMITS = { lines: 40, quantity: 9999, clientPaidDirectly: 8, milestones: 12, options: 8 }
+
+// Una línea bonificada (net 0 con referenceNet) o el bloque de opciones: lo que añade estilos propios.
+const usesExtras = q => q.options != null || q.lines.some(line => line.referenceNet != null)
 
 const OWN_CURRENCY_ONLY =
   'La versión 2 se emite en la moneda de la cotización (currency): no admite presentation con otra moneda ni tipo de cambio. Quita presentation.currency y presentation.fx.'
@@ -136,9 +146,14 @@ function validateLines(q, fail, string) {
     if (extra.length) fail(`${name}: campos no reconocidos (${extra.join(', ')}). Se admiten: ${allowed.join(', ')}.`)
   }
 
+  // Todo importe debe poder imprimirse: uno fuera de la precisión segura se rechaza aquí, con su nombre.
   const amount = (value, currency, name) => {
     try {
-      return toMinor(value, currency)
+      const minor = toMinor(value, currency)
+
+      fromMinor(minor, currency)
+
+      return minor
     } catch (error) {
       return fail(`${name}: ${error.message}.`)
     }
@@ -154,7 +169,7 @@ function validateLines(q, fail, string) {
   q.lines.forEach((line, i) => {
     const at = `lines.${i}`
 
-    record(line, at, ['label', 'detail', 'group', 'quantity', 'unitNet', 'net'])
+    record(line, at, ['label', 'detail', 'group', 'quantity', 'unitNet', 'net', 'referenceNet'])
     string(line.label, `${at}.label`)
     if (line.detail != null) string(line.detail, `${at}.detail`)
     if (line.group != null) string(line.group, `${at}.group`)
@@ -173,6 +188,18 @@ function validateLines(q, fail, string) {
       amount(line.unitNet, q.currency, `${at}.unitNet`) * BigInt(line.quantity.value) !== lineNet
     )
       fail(`${at}: unitNet × quantity.value debe ser exactamente igual a net.`)
+
+    if (line.referenceNet != null) {
+      const reference = amount(line.referenceNet, q.currency, `${at}.referenceNet`)
+
+      if (lineNet !== 0n || line.unitNet != null)
+        fail(
+          `${at}.referenceNet: sólo acompaña a una línea bonificada. La línea debe tener net 0 y no declarar unitNet; el valor de referencia se informa y no se suma al subtotal.`
+        )
+      if (reference <= 0n)
+        fail(`${at}.referenceNet debe ser positivo: es el valor que la línea tendría sin la bonificación.`)
+    }
+
     net += lineNet
   })
 
@@ -239,6 +266,23 @@ function validateLines(q, fail, string) {
       fail('paymentSchedule: la suma de milestones[].net debe ser exactamente igual al neto de la cotización.')
   }
 
+  if (q.options != null) {
+    record(q.options, 'options', ['title', 'note', 'items'])
+    if (q.options.title != null) string(q.options.title, 'options.title')
+    if (q.options.note != null) string(q.options.note, 'options.note')
+    list(q.options.items, 'options.items', V2_LIMITS.options)
+    q.options.items.forEach((item, i) => {
+      const at = `options.items.${i}`
+
+      record(item, at, ['label', 'detail', 'net', 'unit'])
+      string(item.label, `${at}.label`)
+      if (item.detail != null) string(item.detail, `${at}.detail`)
+      string(item.unit, `${at}.unit`)
+      if (amount(item.net, q.currency, `${at}.net`) <= 0n)
+        fail(`${at}.net debe ser positivo: una opción se informa con su valor neto.`)
+    })
+  }
+
   if (q.source != null) {
     if (!isRecord(q.source)) fail('source debe ser un objeto plano de textos.')
     for (const [key, value] of Object.entries(q.source)) string(value, `source.${key}`)
@@ -267,6 +311,8 @@ export function validateQuote(q) {
   if (netMinor <= 0n) fail('net debe ser positivo para el servicio completo.')
   if (!v2 && q.taxAmount != null)
     fail('taxAmount sólo existe en la versión 2; en la versión 1 el impuesto se calcula desde vatRate.')
+  if (!v2 && q.options != null)
+    fail('options sólo existe en la versión 2; en la versión 1 el bloque no se imprimiría. Usa version: 2 con lines.')
   if (q.vatRate !== null) taxMinor(netMinor, q.vatRate)
   if (v2) taxOf(q, netMinor)
   if (
@@ -603,6 +649,16 @@ const CLIENT_PAID_TITLE = 'Pagado directamente por el cliente a su proveedor'
 const CLIENT_PAID_NOTE =
   'El cliente contrata y paga estos costos directamente a su proveedor. No forman parte de esta cotización ni de su valor neto o total. Cada importe se informa en su propia moneda, sin conversión ni suma.'
 
+// Línea bonificada: lo que se imprime en su columna de valor neto, sobre el valor de referencia.
+const COURTESY_NET = 'Bonificado'
+const COURTESY_REFERENCE = 'Valor de referencia'
+
+const OPTIONS_OVERLINE = 'Opcional · Fuera de esta cotización'
+const OPTIONS_TITLE = 'Opciones adicionales'
+
+const OPTIONS_NOTE =
+  'Estas opciones no forman parte de esta cotización ni de su valor neto o total. Cada valor es neto, no incluye impuestos y se expresa en la unidad que lo acompaña.'
+
 // Reparte la sección de precios de la versión 2 en páginas. Devuelve, por página, los bloques en el orden
 // del documento con su separación y altura estimadas. No imprime nada: renderPricingPages usa este plan.
 async function planPricing(q, { money, locale, monthlyTexts }) {
@@ -664,16 +720,24 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
   // Cabecera de tabla: relleno vertical de 11 px y una línea de 8 pt.
   const head = 22 + line.small
   const hasUnit = q.lines.some(item => item.unitNet != null)
-  const netTexts = q.lines.map(item => money(item.net))
+  // Una línea bonificada imprime «Bonificado» y, debajo, su valor de referencia en el cuerpo de las unidades.
+  const netTexts = q.lines.map(item => (item.referenceNet == null ? money(item.net) : COURTESY_NET))
+  const referenceTexts = q.lines.map(item => (item.referenceNet == null ? null : money(item.referenceNet)))
   const unitTexts = q.lines.map(item => (item.unitNet == null ? null : money(item.unitNet)))
   const widest = (texts, amountFont) => Math.max(0, ...texts.filter(Boolean).map(text => textWidth(text, amountFont)))
+
+  const netColumn = Math.max(
+    widest(netTexts, font.amount),
+    widest(referenceTexts, { ...font.unit, scale: FLOW.amountScale }),
+    referenceTexts.some(Boolean) ? textWidth(COURTESY_REFERENCE, font.unit) : 0
+  )
 
   // Anchos de columna, en % del ancho útil. Las columnas de importes parten del ancho del diseño y sólo
   // crecen si un importe del documento lo exige; el concepto recibe el resto y nunca baja del 40 %.
   const percent = px => Math.ceil((px / FLOW.width) * 1e5) / 1e3
   const quantityShare = 14
   const unitShare = hasUnit ? Math.max(19, percent(widest(unitTexts, font.unitAmount) + step * 6 + 2)) : 0
-  const netShare = Math.max(hasUnit ? 20 : 22, percent(widest(netTexts, font.amount) + step * 3 + 2))
+  const netShare = Math.max(hasUnit ? 20 : 22, percent(netColumn + step * 3 + 2))
   const conceptShare = Math.round((100 - quantityShare - unitShare - netShare) * 1e3) / 1e3
 
   if (conceptShare < 40)
@@ -704,13 +768,16 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
       (item.detail == null ? 0 : step + countLines(item.detail, conceptWidth, font.detail) * line.detail)
 
     const quantity = line.label + countLines(item.quantity.unit, quantityWidth, font.unit) * line.unit
+    // Bonificada: «Bonificado», el rótulo y el valor de referencia, una línea cada uno y sin partirse.
+    const courtesy = item.referenceNet == null ? 0 : line.label + 2 * line.unit
 
     rows.push({
       type: 'line',
       index,
       netText: netTexts[index],
+      referenceText: referenceTexts[index],
       unitText: unitTexts[index],
-      height: step * 6 + Math.max(concept, quantity) + 1
+      height: step * 6 + Math.max(concept, quantity, courtesy) + 1
     })
   })
 
@@ -725,10 +792,13 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
     { key: 'intro', gap: 14, height: countLines(q.pricing.intro, FLOW.width * 0.95, font.intro) * line.intro }
   ]
 
-  // Bloques que siguen a la tabla. Cada uno pasa entero a la página siguiente si no cabe.
+  // Bloques que siguen a la tabla. Cada uno pasa entero a la página siguiente si no cabe. La única excepción
+  // es la nota tributaria (tail): puede abrir la página siguiente para que los totales no se separen de una
+  // tabla que les deja sitio.
   const blocks = [
     {
       name: 'los totales',
+      tail: 1,
       items: [
         { key: 'totals', gap: 22, height: 2 * (30 + pt(12) * 1.5 + 1) + 18 + 44 + pt(30) * 1.5 },
         { key: 'taxNote', gap: 14, height: countLines(q.pricing.taxNote, FLOW.width, font.note) * line.note }
@@ -831,6 +901,47 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
     })
   }
 
+  if (q.options != null) {
+    // Misma caja que los costos pagados por el cliente; a la derecha, el valor y debajo su unidad.
+    const inner = FLOW.width - step * 10
+    const right = inner * 0.32
+    const left = inner - right - step * 4
+    const title = q.options.title ?? OPTIONS_TITLE
+
+    let height =
+      step * 10 +
+      line.small +
+      step * 1.5 +
+      countLines(title, inner, font.heading) * line.heading +
+      step * 2 +
+      countLines(OPTIONS_NOTE, inner, font.note) * line.note +
+      (q.options.note == null ? 0 : step * 2 + countLines(q.options.note, inner, font.note) * line.note) +
+      step * 3 -
+      step * 2.5
+
+    const entries = q.options.items.map((item, index) => {
+      const netText = money(item.net)
+
+      // Guarda del diseño: con la columna actual cabe cualquier importe imprimible; fallaría si se estrecha.
+      amountFits(netText, right, font.amount, `options.items.${index}.net`)
+      height +=
+        1 +
+        step * 5 +
+        Math.max(
+          countLines(item.label, left, font.label) * line.label +
+            (item.detail == null ? 0 : countLines(item.detail, left, font.detail) * line.detail),
+          line.label + countLines(item.unit, right, font.unit) * line.unit
+        )
+
+      return { netText }
+    })
+
+    blocks.push({
+      name: 'el bloque de opciones',
+      items: [{ key: 'options', gap: step * 6, height, title, entries }]
+    })
+  }
+
   const pages = []
   let page
 
@@ -892,16 +1003,36 @@ async function planPricing(q, { money, locale, monthlyTexts }) {
     page.used += row.height
   })
 
-  for (const block of blocks) {
-    const cost = () => block.items.reduce((sum, item, i) => sum + (i ? item.gap : gapFor(item)) + item.height, 0)
+  // Altura de unos bloques apilados, sin la separación del primero.
+  const stack = items => items.reduce((sum, item, i) => sum + (i ? item.gap : 0) + item.height, 0)
+  const cost = items => gapFor(items[0]) + stack(items)
+  // Lo que ocuparían al abrir una página de continuación: sobretítulo, su separación fija y los bloques.
+  const freshCost = items => firstHead[0].height + step * 3 + stack(items)
 
-    if (!fits(cost())) {
+  blocks.forEach((block, index) => {
+    if (!fits(cost(block.items))) {
+      const head = block.items.slice(0, block.items.length - (block.tail ?? 0))
+      const tail = block.items.slice(head.length)
+      const next = blocks[index + 1]
+
+      // Los totales no se separan de una tabla que les deja sitio. Si sólo su nota no cabe, la nota abre la
+      // página siguiente, y sólo cuando el bloque que sigue la acompaña allí: una nota nunca queda sola en una
+      // página. Sin bloque siguiente, totales y nota pasan juntos.
+      if (tail.length && next && fits(cost(head)) && freshCost([...tail, ...next.items]) <= FLOW.capacity) {
+        head.forEach(put)
+        open(false)
+        tail.forEach(put)
+
+        return
+      }
+
       open(false)
-      if (!fits(cost())) fail(`No cabe ${block.name} en una página; acorta sus textos o reduce sus entradas.`)
+      if (!fits(cost(block.items)))
+        fail(`No cabe ${block.name} en una página; acorta sus textos o reduce sus entradas.`)
     }
 
     block.items.forEach(put)
-  }
+  })
 
   return { columns, hasUnit, pages }
 }
@@ -914,7 +1045,7 @@ function renderPricingPages(q, plan, parts) {
     const item = q.lines[row.index]
     const at = `lines.${row.index}`
 
-    return `<tr><td><strong data-slot="${at}.label">${esc(item.label)}</strong>${item.detail == null ? '' : `<span data-slot="${at}.detail">${esc(item.detail)}</span>`}</td><td data-slot="${at}.quantity">${quantity.format(item.quantity.value)}<span>${esc(item.quantity.unit)}</span></td>${plan.hasUnit ? `<td data-slot="${at}.unitNet">${row.unitText ?? '—'}</td>` : ''}<td data-slot="${at}.net">${row.netText}</td></tr>`
+    return `<tr><td><strong data-slot="${at}.label">${esc(item.label)}</strong>${item.detail == null ? '' : `<span data-slot="${at}.detail">${esc(item.detail)}</span>`}</td><td data-slot="${at}.quantity">${quantity.format(item.quantity.value)}<span>${esc(item.quantity.unit)}</span></td>${plan.hasUnit ? `<td data-slot="${at}.unitNet">${row.unitText ?? '—'}</td>` : ''}<td data-slot="${at}.net">${row.referenceText == null ? row.netText : `${COURTESY_NET}<span>${COURTESY_REFERENCE}</span><span data-slot="${at}.referenceNet">${row.referenceText}</span>`}</td></tr>`
   }
 
   const render = {
@@ -954,7 +1085,14 @@ function renderPricingPages(q, plan, parts) {
             `<div><div><strong data-slot="clientPaidDirectly.${i}.label">${esc(entry.label)}</strong>${entry.detail == null ? '' : `<span data-slot="clientPaidDirectly.${i}.detail">${esc(entry.detail)}</span>`}</div><b data-slot="clientPaidDirectly.${i}.amount">${esc(item.entries[i].amountText)}${item.entries[i].code ? `<span>${esc(item.entries[i].code)}</span>` : ''}</b></div>`
         )
         .join('')}</div></div>`,
-    monthly: () => parts.monthly
+    monthly: () => parts.monthly,
+    options: item =>
+      `<div class="quote-options" data-slot="options"><p class="overline">${esc(OPTIONS_OVERLINE)}</p><h3 data-slot="options.title">${esc(item.title)}</h3><p>${esc(OPTIONS_NOTE)}</p>${q.options.note == null ? '' : `<p data-slot="options.note">${esc(q.options.note)}</p>`}<div class="quote-options-rows">${q.options.items
+        .map(
+          (entry, i) =>
+            `<div><div><strong data-slot="options.items.${i}.label">${esc(entry.label)}</strong>${entry.detail == null ? '' : `<span data-slot="options.items.${i}.detail">${esc(entry.detail)}</span>`}</div><div><b data-slot="options.items.${i}.net">${item.entries[i].netText}</b><span data-slot="options.items.${i}.unit">${esc(entry.unit)}</span></div></div>`
+        )
+        .join('')}</div></div>`
   }
 
   return plan.pages
@@ -1085,9 +1223,10 @@ export async function buildHtml(q, dataPath) {
     'brand.tracking': gl.type.answer.tracking
   }
 
+  const cssFiles = [...template.css, ...(v2 && usesExtras(q) ? [template.extrasCss] : [])]
   let css = ''
 
-  for (const name of template.css) css += fillSlots(await fs.readFile(path.join(templateDir, name), 'utf8'), brandSlots)
+  for (const name of cssFiles) css += fillSlots(await fs.readFile(path.join(templateDir, name), 'utf8'), brandSlots)
 
   const pricingPlan = v2 ? await planPricing(q, { money, locale: presentation.locale, monthlyTexts }) : null
   const pageTotal = v2 ? 3 + pricingPlan.pages.length : 4
@@ -1198,7 +1337,7 @@ export async function buildHtml(q, dataPath) {
     html,
     amounts,
     pageCount: pageTotal,
-    templateFiles: [template.html, ...template.css],
+    templateFiles: [template.html, ...cssFiles],
     pagination: pricingPlan
       ? pricingPlan.pages.map((page, i) => ({
           page: 3 + i,

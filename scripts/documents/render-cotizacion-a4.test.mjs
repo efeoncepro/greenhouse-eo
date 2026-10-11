@@ -607,6 +607,301 @@ test('versión 2: bloques opcionales, importes en su moneda y origen de datos fu
   assert.equal((await build(linesExample)).pageCount, 4)
 })
 
+// ── Versión 2: línea bonificada, opciones y posición de los totales ───────────────────────────────────────
+// SHA-256 del HTML de los ejemplos de la versión 2 que no usan línea bonificada ni opciones, medido antes de
+// añadirlas. Un documento que no usa una capacidad nueva debe salir byte a byte como antes: sus estilos viajan
+// en un archivo aparte que sólo se incluye cuando hace falta. Vale la misma salvedad que en la versión 1.
+const V2_BASELINE = {
+  'ejemplo-lineas.json': '9cab83eda0620ef833cb143d2fcfe971bbdf5ce6e21a7558aa2d1e8f0f339d40',
+  'ejemplo-lineas-terceros.json': '433ee4798736af5e13818fd91998985b445c4386897a5ccc0f39465670e8553c'
+}
+
+const optionalExample = await load('ejemplo-lineas-opcionales.json')
+const blockKeys = pagination => pagination.map(page => page.blocks.map(block => block.key))
+const EXTRAS_CSS = 'template-lineas-opciones.css'
+
+test('versión 2: sin línea bonificada ni opciones, el HTML conserva su SHA-256 y sus estilos', async () => {
+  for (const [name, expected] of Object.entries(V2_BASELINE)) {
+    const { html, templateFiles } = await buildHtml(await load(name), templatePath(name))
+
+    assert.equal(createHash('sha256').update(html).digest('hex'), expected, name)
+    assert.deepEqual(templateFiles, ['template-lineas.html', 'template.css', 'template-lineas.css'])
+    assert.ok(!html.includes('quote-options'))
+  }
+
+  // Los estilos propios se añaden cuando el documento usa cualquiera de las dos capacidades, y sólo entonces.
+  const both = await buildHtml(optionalExample, templatePath('ejemplo-lineas-opcionales.json'))
+
+  assert.equal(both.templateFiles.at(-1), EXTRAS_CSS)
+  assert.ok(both.html.includes('.quote-options{'))
+
+  const onlyCourtesy = structuredClone(optionalExample)
+
+  delete onlyCourtesy.options
+  assert.equal((await build(onlyCourtesy)).templateFiles.at(-1), EXTRAS_CSS)
+
+  const onlyOptions = structuredClone(optionalExample)
+
+  delete onlyOptions.lines[2].referenceNet
+  assert.equal((await build(onlyOptions)).templateFiles.at(-1), EXTRAS_CSS)
+})
+
+test('versión 2: una línea bonificada imprime «Bonificado» y su valor de referencia, sin sumar', async () => {
+  const totals = { net: 49900000, vat: 9481000, total: 59381000, monthly: null, taxSource: 'computed' }
+
+  validateQuote(optionalExample)
+  assert.deepEqual(quoteAmounts(optionalExample), totals)
+  const { html, pagination } = await build(optionalExample)
+
+  assert.ok(
+    html.includes(
+      'data-slot="lines.2.net">Bonificado<span>Valor de referencia</span><span data-slot="lines.2.referenceNet">$1.450.000</span></td>'
+    )
+  )
+  assert.equal(count(html, 'Bonificado<span>'), 1)
+  // La bonificación no se imprime como $0, y su valor de referencia no entra en ningún total.
+  assert.ok(!html.includes('>$0<'))
+  assert.equal(count(html, '1.450.000'), 1)
+  assert.equal(count(html, 'data-slot="amount.net">$49.900.000<'), 2)
+  // La línea no declara valor unitario: su celda queda señalada, como en cualquier otra línea sin él.
+  assert.ok(html.includes('data-slot="lines.2.unitNet">—</td>'))
+
+  // Sin valor de referencia es la línea a costo cero de siempre: mismo total, importe impreso.
+  const plain = structuredClone(optionalExample)
+
+  delete plain.lines[2].referenceNet
+  assert.deepEqual(quoteAmounts(plain), totals)
+  assert.ok((await build(plain)).html.includes('data-slot="lines.2.net">$0</td>'))
+
+  // Tres líneas de texto en la celda del neto: la fila reserva esa altura aunque el concepto sea de una línea.
+  const short = withLines([
+    ...plainLines(1),
+    { label: 'Puesta en marcha', quantity: { value: 1, unit: 'pago único' }, net: '0', referenceNet: '320000' }
+  ])
+
+  const [plainRow, courtesyRow] = (await build(short)).pagination[0].blocks.find(block => block.key === 'lines').rowsPx
+
+  assert.ok(courtesyRow > plainRow)
+  assert.equal(pagination[0].blocks.find(block => block.key === 'lines').rowsPx.length, 5)
+
+  // La columna del neto crece si el valor de referencia lo exige; nunca se parte ni se reduce.
+  const netColumn = async referenceNet => {
+    const q = withLines(
+      [
+        ...plainLines(1, { unitNet: '100000', net: '100000' }),
+        { label: 'Puesta en marcha', quantity: { value: 1, unit: 'pago único' }, net: '0', referenceNet }
+      ],
+      { currency: 'USD' }
+    )
+
+    return Number([...(await build(q)).html.matchAll(/<col style="width:([\d.]+)%">/g)].at(-1)[1])
+  }
+
+  assert.equal(await netColumn('320000'), 20)
+  assert.ok((await netColumn('9007199254740.99')) > 20)
+
+  const rejects = (mutate, pattern) => {
+    const q = structuredClone(optionalExample)
+
+    delete q.net
+    mutate(q.lines[2], q)
+    assert.throws(() => validateQuote(q), pattern)
+  }
+
+  rejects(line => (line.net = '1450000'), /lines\.2\.referenceNet: sólo acompaña a una línea bonificada/)
+  rejects(line => (line.unitNet = '0'), /lines\.2\.referenceNet: sólo acompaña a una línea bonificada/)
+  rejects(line => (line.referenceNet = '0'), /lines\.2\.referenceNet debe ser positivo/)
+  rejects(line => (line.referenceNet = '1450000.5'), /lines\.2\.referenceNet: CLP: máximo 0 decimales/)
+  rejects(line => (line.referenceNet = '1.450.000'), /lines\.2\.referenceNet: Decimal positivo sin separadores/)
+  rejects(line => (line.referenceValue = '1450000'), /lines\.2: campos no reconocidos \(referenceValue\)/)
+  // Una cotización bonificada por completo no es una cotización.
+  rejects((line, q) => (q.lines = [line]), /suma de lines\[\]\.net debe ser positiva/)
+})
+
+test('versión 2: las opciones se imprimen aparte, después de todo lo demás y fuera de los totales', async () => {
+  const { html, pagination, amounts, pageCount } = await build(optionalExample)
+  const without = structuredClone(optionalExample)
+
+  delete without.options
+  // Nada de una opción entra en el neto, el impuesto o el total, ni en la portada.
+  assert.deepEqual(amounts, quoteAmounts(without))
+  assert.deepEqual((await build(without)).amounts, amounts)
+  assert.equal(count(html, 'data-slot="amount.total">$59.381.000<'), 2)
+  assert.equal(pageCount, 5)
+  assert.equal((await build(without)).pageCount, 4)
+
+  assert.equal(count(html, 'class="quote-options"'), 1)
+  assert.ok(html.includes('<p class="overline">Opcional · Fuera de esta cotización</p>'))
+  assert.ok(html.includes('data-slot="options.title">Servicios opcionales</h3>'))
+  assert.ok(html.includes('Estas opciones no forman parte de esta cotización ni de su valor neto o total.'))
+  assert.ok(html.includes('Cada valor es neto, no incluye impuestos y se expresa en la unidad que lo acompaña.'))
+  assert.ok(html.includes('data-slot="options.note">Cada opción se cotiza y se acuerda por separado'))
+  // Cada opción: su valor neto seguido de su unidad.
+  assert.deepEqual(
+    [
+      ...html.matchAll(
+        /data-slot="options\.items\.(\d)\.net">([^<]+)<\/b><span data-slot="options\.items\.\1\.unit">([^<]+)</g
+      )
+    ].map(match => `${match[2]} ${match[3]}`),
+    ['$480.000 al mes', '$290.000 por día cubierto', '$1.290.000 al mes']
+  )
+  assert.equal(count(html, 'data-slot="options.items.2.detail"'), 0)
+  assert.deepEqual(blockKeys(pagination), [
+    ['overline', 'title', 'intro', 'lines', 'totals', 'taxNote'],
+    ['overline', 'options']
+  ])
+
+  // Con todos los bloques, las opciones cierran la sección de inversión.
+  const everything = structuredClone(thirdPartyExample)
+
+  everything.options = structuredClone(optionalExample.options)
+  everything.pricing.monthly = { months: 3, note: 'Referencia aritmética.' }
+  const full = await build(everything)
+
+  assert.deepEqual(
+    blockKeys(full.pagination)
+      .flat()
+      .filter(key => !['overline', 'title', 'intro', 'lines'].includes(key)),
+    ['totals', 'taxNote', 'schedule', 'clientPaid', 'monthly', 'options']
+  )
+  assert.deepEqual(full.amounts.net, quoteAmounts(thirdPartyExample).net)
+  for (const page of full.pagination) assert.ok(page.estimatedPx <= page.capacityPx, `página ${page.page}`)
+
+  // Título y nota son del operador y opcionales; la advertencia fija es de la plantilla y no se puede quitar.
+  const bare = structuredClone(optionalExample)
+
+  delete bare.options.title
+  delete bare.options.note
+  bare.options.items = [{ label: 'Opción <b>única</b> & {{amount.total}}', net: '1000', unit: 'pago único' }]
+  const bareHtml = (await build(bare)).html
+
+  assert.ok(bareHtml.includes('data-slot="options.title">Opciones adicionales</h3>'))
+  assert.ok(!bareHtml.includes('data-slot="options.note"'))
+  assert.ok(bareHtml.includes('no forman parte de esta cotización ni de su valor neto o total'))
+  assert.ok(bareHtml.includes('Opción &lt;b&gt;única&lt;/b&gt; &amp; {{amount.total}}'))
+
+  // En la moneda del documento, con sus decimales.
+  const usd = withLines(plainLines(1, { net: '1500.00' }), {
+    currency: 'USD',
+    options: { items: [{ label: 'Informe ejecutivo', net: '480.50', unit: 'al mes' }] }
+  })
+
+  assert.ok((await build(usd)).html.includes('data-slot="options.items.0.net">US$480,50</b>'))
+})
+
+test('versión 2: cada regla del bloque de opciones se valida con un mensaje propio', async () => {
+  const rejects = (mutate, pattern) => {
+    const q = structuredClone(optionalExample)
+
+    mutate(q)
+    assert.throws(() => validateQuote(q), pattern)
+  }
+
+  const item = () => ({ label: 'Opción', net: '1000', unit: 'al mes' })
+
+  rejects(q => (q.option = q.options), /no reconocidos en version 2: option/)
+  rejects(q => (q.options = q.options.items), /options debe ser un objeto/)
+  rejects(q => (q.options.subtitle = 'Texto'), /options: campos no reconocidos \(subtitle\)/)
+  rejects(q => (q.options.title = ' '), /options\.title debe ser texto/)
+  rejects(q => (q.options.note = 7), /options\.note debe ser texto/)
+  rejects(q => delete q.options.items, /options\.items: entre 1 y 8/)
+  rejects(q => (q.options.items = []), /options\.items: entre 1 y 8/)
+  rejects(q => (q.options.items = Array.from({ length: 9 }, item)), /options\.items: entre 1 y 8/)
+  rejects(q => (q.options.items[0] = 'Informe'), /options\.items\.0 debe ser un objeto/)
+  rejects(q => (q.options.items[0].currency = 'USD'), /options\.items\.0: campos no reconocidos \(currency\)/)
+  rejects(q => delete q.options.items[1].label, /options\.items\.1\.label debe ser texto/)
+  rejects(q => (q.options.items[1].detail = ''), /options\.items\.1\.detail debe ser texto/)
+  rejects(q => delete q.options.items[1].unit, /options\.items\.1\.unit debe ser texto/)
+  rejects(q => delete q.options.items[2].net, /options\.items\.2\.net: Importe decimal inválido/)
+  rejects(q => (q.options.items[2].net = '0'), /options\.items\.2\.net debe ser positivo/)
+  rejects(q => (q.options.items[2].net = '-1'), /options\.items\.2\.net: Decimal positivo/)
+  rejects(q => (q.options.items[2].net = '1290000.5'), /options\.items\.2\.net: CLP: máximo 0 decimales/)
+  validateQuote({ ...structuredClone(optionalExample), options: null })
+  // La versión 1 no imprime el bloque: declararlo allí se rechaza en vez de omitirse en silencio.
+  assert.throws(
+    () => validateQuote({ ...example, options: { items: [item()] } }),
+    /options sólo existe en la versión 2/
+  )
+
+  // El bloque es entero: si no cabe en una página, el documento falla y dice qué acortar.
+  const endless = structuredClone(optionalExample)
+
+  endless.options.items = Array.from({ length: 8 }, () => ({ ...item(), detail: 'Alcance de la opción. '.repeat(60) }))
+  await assert.rejects(build(endless), /Contenido fuera del A4\. No cabe el bloque de opciones en una página/)
+
+  // Un importe que no puede imprimirse con exactitud se rechaza al validar, con el nombre del campo.
+  const unsafe = withLines(plainLines(1, { net: '1500.00' }), {
+    currency: 'USD',
+    options: { items: [{ ...item(), net: '90071992547409.91' }] }
+  })
+
+  assert.throws(() => validateQuote(unsafe), /options\.items\.0\.net: Importe excede precisión monetaria segura/)
+})
+
+test('versión 2: los totales no se separan de una tabla que les deja sitio', async () => {
+  // Una nota tributaria larga: cabe la tabla con los totales, pero no con la nota.
+  const pricing = { ...linesExample.pricing, taxNote: 'Los valores netos excluyen impuestos. '.repeat(14).trim() }
+  const options = { items: [{ label: 'Informe ejecutivo', net: '480000', unit: 'al mes' }] }
+  const doc = (total, extra = {}) => withLines(plainLines(total), { pricing, ...extra })
+  const last = pagination => pagination[0].blocks.at(-1).key
+  let total = 1
+
+  while (total < 40 && last((await build(doc(total, { options }))).pagination) !== 'totals') total++
+  assert.ok(total < 40, 'se esperaba un número de líneas que deja sitio a los totales y no a su nota')
+
+  // Con un bloque después: los totales quedan con la tabla y la nota abre la página siguiente, acompañada.
+  const split = await build(doc(total, { options }))
+
+  assert.deepEqual(blockKeys(split.pagination), [
+    ['overline', 'title', 'intro', 'lines', 'totals'],
+    ['overline', 'taxNote', 'options']
+  ])
+  for (const page of split.pagination) assert.ok(page.estimatedPx <= page.capacityPx, `página ${page.page}`)
+  assert.equal(count(split.html, 'class="totals"'), 1)
+  assert.equal(count(split.html, 'class="tax-note"'), 1)
+  assert.ok(split.html.indexOf('class="totals"') < split.html.indexOf('02 · Inversión · continuación'))
+  assert.ok(split.html.indexOf('02 · Inversión · continuación') < split.html.indexOf('class="tax-note"'))
+  assert.equal(split.pageCount, 5)
+
+  // Sin bloque después, la nota quedaría sola en una página: totales y nota pasan juntos.
+  assert.deepEqual(blockKeys((await build(doc(total))).pagination), [
+    ['overline', 'title', 'intro', 'lines'],
+    ['overline', 'totals', 'taxNote']
+  ])
+
+  // Lo mismo si el bloque siguiente no cabe junto a la nota: tampoco la acompañaría.
+  let alone = null
+
+  for (let repeat = 1; repeat <= 80 && !alone; repeat++) {
+    const tall = {
+      items: Array.from({ length: 8 }, (_, i) => ({
+        label: `Opción ${i + 1}`,
+        detail: 'Alcance de la opción. '.repeat(repeat).trim(),
+        net: '1000',
+        unit: 'al mes'
+      }))
+    }
+
+    const keys = await build(doc(total, { options: tall })).then(
+      result => blockKeys(result.pagination),
+      () => null
+    )
+
+    if (keys?.length === 3) alone = keys
+  }
+
+  assert.deepEqual(alone, [
+    ['overline', 'title', 'intro', 'lines'],
+    ['overline', 'totals', 'taxNote'],
+    ['overline', 'options']
+  ])
+
+  // Si todo cabe, nada cambia: totales y nota siguen a la tabla en la misma página.
+  assert.deepEqual(blockKeys((await build(doc(1, { options }))).pagination), [
+    ['overline', 'title', 'intro', 'lines', 'totals', 'taxNote', 'options']
+  ])
+})
+
 test('medición de texto: nunca cuenta menos líneas de las que caben en el ancho', async () => {
   const { fontDir, fontAdvance, textWidth, countLines } = paginationInternals
   const font = { advance: await fontAdvance(path.join(fontDir, 'poppins-400.ttf')), size: 12 }
