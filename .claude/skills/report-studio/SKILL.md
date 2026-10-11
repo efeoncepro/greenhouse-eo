@@ -114,4 +114,9 @@ datos (versión 2) de la plantilla A4 desde la cotización congelada y su genera
 Nunca digitar ni editar una cifra en su brief o en los datos emitidos: se cambia la cotización y se vuelve a correr.
 Ese documento es un borrador: no otorga aprobación ni quoteId, emisión, factura, sincronización o envío. La versión 2
 pagina su sección de inversión (cuatro páginas o más) y nunca reduce la tipografía; si no cabe, se acorta el texto.
+Al revisar sus páginas, tres cosas son correctas y no un defecto: una línea «Bonificado» con «Valor de referencia»
+(una cortesía; no suma al subtotal ni al total), un bloque final «Opcional · Fuera de esta cotización» (servicios
+opcionales con su valor neto y su unidad; no entran en ningún total) y una nota tributaria que abre la página
+siguiente junto al bloque que le sigue, mientras los totales quedan bajo su tabla (una nota sola en una página sí es
+un defecto). Comprobar que el total no incluye las opciones.
 Verificar pixels de todas las páginas del documento que se entregue.

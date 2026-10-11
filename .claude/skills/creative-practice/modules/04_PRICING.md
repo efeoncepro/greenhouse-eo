@@ -18,7 +18,11 @@ más se sube el objetivo de la oferta, no el piso. El FX de cotización de V3 es
 referencia (CLP 1000 · COP 3650 · MXN 19,25 · PEN 3,70), no el snapshot del §9, y cada moneda redondea hacia arriba
 (CLP 10.000 · USD 10 · PEN 50 · COP 50.000 · MXN 100): cotiza en la moneda pedida, nunca conviertas a mano; en EUR
 aún no se emite. `estimateExposure` ordena qué insumo estimado confirmar primero; el precio unitario de una
-herramienta no vence (los seats se declaran por cotización).
+herramienta no vence (los seats se declaran por cotización, como se compran: varios planes en un periodo, un seat
+pagado sin uso con `idleSeats` o uno que usan varias personas con `seatSharing`, cada uno con su motivo; nunca le
+quites una tarea a una persona —p. ej. al refuerzo de campaña— para que la cuenta de seats cuadre). Un servicio
+opcional se cotiza aparte y el documento lo imprime fuera del total (`--option`); una cortesía se bonifica en la
+demanda y el documento la muestra con su valor de referencia: ninguno de los dos importes se digita.
 
 > **La regla que ordena todo el módulo:**
 > **Un precio sin loaded cost detrás no es un precio: es una corazonada con decimales.**

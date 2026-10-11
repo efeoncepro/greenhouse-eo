@@ -178,9 +178,16 @@ en el brief ni en los datos emitidos: se cambia la cotización y se vuelve a cor
 mientras el precio no esté aprobado: no es `quotation_id`, precio aprobado ni cotización emitida. Claves de línea,
 plegado por meses, impuesto, rechazos y ejemplos:
 [referencia](references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre).
+El documento también imprime **servicios opcionales** (cada uno es su propia cotización, pasada con `--option`;
+fuera del neto y del total) y una **cortesía** (`courtesy: true` sobre una fila que la demanda bonifica): ni el precio
+de una opción ni un valor de referencia se digitan.
 Puesta en marcha por
 persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
 licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.
+Los asientos nominativos se declaran **como se compran** —varios planes en un periodo, `idleSeats` con motivo,
+`seatSharing` con motivo; nunca se le quita una tarea a una persona para que la cuenta cuadre— y los meses idénticos
+van una vez con `periodIds`:
+[referencia](references/cotizador-v3-agent-workflow.md#asientos-como-se-compran-y-periodos-declarados-una-vez-delta-2026-10-11-primer-caso-real).
 Contrato 1.4.0: una compra a un tercero para un trabajo va en `brief.thirdPartyCosts[]` (`reinvoiced` = fila propia
 con la regla de su categoría; `client_direct` = nota fuera de todo total) con monto, moneda, `periodIds` y
 `evidence`: categoría, nunca una tasa. Un servicio gestionado `on_demand` recibe sola la reserva de contingencia
@@ -189,7 +196,8 @@ terceros, contra el piso de la oferta se lee `ownWork.marginRateRoundedDown`, no
 [referencia](references/cotizador-v3-agent-workflow.md#costos-de-terceros-y-reserva-de-contingencia-delta-2026-10-11-noche).
 Exit0=técnico,2=faltante,3=revisión,1=rechazo.
 `compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
-el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`. Un rechazo
+el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`; una corrida que
+no calcula no escribe nada ahí y la corregida usa el mismo `--out`. Un rechazo
 deja stdout vacío y trae en stderr `error.code` de un registro cerrado, con `option`/`issues` para ubicar el
 arreglo; `ADAPTER_FAILURE` es una falla sin clasificar de la herramienta, no del pedido.
 El resumen trae además `runNotices` (avisos de la corrida: nunca bloquean y se informan al operador junto al

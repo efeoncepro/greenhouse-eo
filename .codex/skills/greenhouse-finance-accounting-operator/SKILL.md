@@ -375,7 +375,12 @@ Creative Cloud Pro para diseño (incluye Express) y Adobe Express para perfiles 
 Creative Cloud Pro termina pronto y, por decisión del CEO (2026-10-11), se cotiza desde ya sin él (`current`); el
 importe facturado (`invoiced-with-discount`) sólo si el CEO lo elige para un encargo corto. Cuánto se paga una
 licencia ya tomada (CEO): Adobe hasta que renueva su contrato anual (2026-11-16); Microsoft 365 y Notion, mes a mes.
-Seats nominativos no se reducen por FTE ni permiten compartir login. GCP/Vercel requieren escenario y denominador;
+Seats nominativos no se reducen por FTE y un costo compartido no autoriza compartir login. Se declaran como se
+compran: varios planes en un periodo, un asiento pagado sin uso (`idleSeats` con motivo; su costo se queda en la
+cotización, sobre las líneas que usan la herramienta, y `compose commitments` lo informa como `idle_seat`) o un
+asiento que usan varias personas (`seatSharing` con motivo; es una declaración, V3 no valida que el proveedor lo
+permita). Cada asiento pagado queda usado, compartido o declarado ocioso, o la cotización no calcula; nunca se quita
+la tarea de una persona para que la cuenta cuadre. GCP/Vercel requieren escenario y denominador;
 créditos requieren proveedor/mes, parte base atribuida, caja de packs extra y remanentes/validez separados.
 FacturaNotion acredita importe/período facturado, no pago. Público/operador/histórico no acreditan contrato actual.
 `trial-*` son costos no medidos y no provisiones aprobadas. La puesta en marcha de una persona por dedicación ya es
