@@ -1,20 +1,26 @@
 import Decimal from 'decimal.js'
 
-import { PRICING_V3_ENGINES, parsePricingV3Input } from './schemas'
+import { PRICING_V3_ENGINES, PRICING_V3_MARKET_FLOOR_BASIS, parsePricingV3Input } from './schemas'
 import type {
   PricingV3AdjustmentV11,
   PricingV3ContractVersion,
   PricingV3Input,
+  PricingV3MarketFactorV12,
   PricingV3PriceRounding,
   PricingV3Source
 } from './schemas'
 
 const D = Decimal.clone({ precision: 80, rounding: Decimal.ROUND_HALF_UP })
 
+// Products of three presented amounts (contract 1.2.0 floor) must be exact for any amount the schema admits; 80 digits
+// only cover two. Nothing is ever divided at this precision except through an integer quotient.
+const Wide = Decimal.clone({ precision: 240, rounding: Decimal.ROUND_HALF_UP })
+
 /** Each contract names its own arithmetic; a result is never relabelled with the policy of another version. */
 export const PRICING_V3_PRECISION_POLICIES = {
   '1.0.0': 'decimal-80-half-up-final-line-largest-remainder-v1',
-  '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2'
+  '1.1.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-v2',
+  '1.2.0': 'decimal-80-half-up-final-line-ceil-multiple-largest-remainder-market-floor-v3'
 } as const
 
 // "Met the floor before rounding" is read on the unrounded amounts, whose last digits are division noise: a price
@@ -77,6 +83,21 @@ type CommercialAmounts = {
   uplift: string
 }
 
+/**
+ * Contract 1.2.0 only. `marketAdjustment` is the policy price with the market factor minus the policy price at factor
+ * 1 (signed, before commercial rounding), so `undiscountedPrice - roundingAdjustment - marketAdjustment` is the price
+ * of the base market. It describes the price; `marginAmount` and `marginRate` stay those of the final net.
+ */
+type MarketAmounts = { marketAdjustment: string }
+
+/** Contract 1.2.0 only, per row. The row is flagged MARGIN_BELOW_FLOOR when its final net is under `floorNet`. */
+type MarketFloor = {
+  /** Policy price over base-market price when the floor follows the base market and the factor lowered it; else "1". */
+  marketPriceRatio: string
+  /** Smallest net, at the currency unit, that meets `minimumMargin` in this market. */
+  floorNet: string
+}
+
 type Envelope<Contract extends PricingV3ContractVersion, Line, Sum> = {
   engineVersion: (typeof PRICING_V3_ENGINES)[Contract]
   binding: false
@@ -96,21 +117,28 @@ export type PricingV3LineV11 = Billable & CommercialAmounts
 export type PricingV3TotalsV11 = Totals & CommercialAmounts
 export type PricingV3ResultV11 = Envelope<'1.1.0', PricingV3LineV11, PricingV3TotalsV11>
 
-/** A 1.0.0 result has no 1.1.0 keys at all (absent, not zero): adding one would change its frozen digest. */
-export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11
+export type PricingV3LineV12 = PricingV3LineV11 & MarketAmounts & MarketFloor
+export type PricingV3TotalsV12 = PricingV3TotalsV11 & MarketAmounts
+export type PricingV3ResultV12 = Envelope<'1.2.0', PricingV3LineV12, PricingV3TotalsV12>
 
-type Row = Billable & Partial<CommercialAmounts>
-type Draft = Envelope<PricingV3ContractVersion, Row, Totals & Partial<CommercialAmounts>>
+/** A result carries only the keys of its own contract (absent, not zero): one more would change its frozen digest. */
+export type PricingV3Result = PricingV3ResultV10 | PricingV3ResultV11 | PricingV3ResultV12
+
+type Row = Billable & Partial<CommercialAmounts & MarketAmounts & MarketFloor>
+type Draft = Envelope<PricingV3ContractVersion, Row, Totals & Partial<CommercialAmounts & MarketAmounts>>
 
 /** Pure calculation: all costs, country policies and FX are supplied, never fetched. */
 export function calculatePricingV3(raw: unknown): PricingV3Result {
   return calculate(raw) as PricingV3Result
 }
 
-// One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys.
+// One code path for every contract: 1.0.0 is the case with at most one discount, no rounding and no 1.1.0 keys;
+// 1.1.0 is the case with no market floor basis and no 1.2.0 keys.
 function calculate(raw: unknown): Draft {
   const { contract, parsed } = parsePricingV3Input(raw)
-  const v11 = contract === '1.1.0'
+  // Capabilities are cumulative: 1.2.0 has everything 1.1.0 added.
+  const v11 = contract !== '1.0.0'
+  const v12 = contract === '1.2.0'
   const diagnostics: Diagnostic[] = []
   const lines: Row[] = []
 
@@ -232,7 +260,8 @@ function calculate(raw: unknown): Draft {
   }
 
   const outputFx = fx(config.calculationCurrency, req.outputCurrency, 'snapshot.fx.output')
-  const market = config.marketFactors.find(item => item.country === req.offerMarketCountry)
+  const marketFactors: PricingV3MarketFactorV12[] = config.marketFactors
+  const market = marketFactors.find(item => item.country === req.offerMarketCountry)
 
   if (!market) report('MISSING_MARKET_POLICY', 'snapshot.marketFactors', 'missing')
   else sourceOk(market.source, 'snapshot.marketFactors')
@@ -240,7 +269,7 @@ function calculate(raw: unknown): Draft {
 
   const allocatedCoverage = new Map<string, Decimal>()
   const allocationIds = new Set<string>()
-  const pendingRows: { line: Row; rawCost: Decimal; rawPrice: Decimal; rawCash: Decimal }[] = []
+  const pendingRows: { line: Row; rawCost: Decimal; rawPrice: Decimal; rawBasePrice: Decimal; rawCash: Decimal }[] = []
 
   for (const [index, line] of req.lines.entries()) {
     const path = `request.lines.${index}`
@@ -322,7 +351,9 @@ function calculate(raw: unknown): Draft {
           ? new D(1).div(new D(1).minus(policy.rate))
           : new D(1)
 
-    const humanPrice = human.mul(multiplier).mul(market?.factor ?? 1)
+    // Price of the human component in the base market (factor 1); tools and fees never take a market factor.
+    const humanBasePrice = human.mul(multiplier)
+    const humanPrice = humanBasePrice.mul(market?.factor ?? 1)
     const humanCoverage = new Set(profile.cost?.covers ?? [])
     const covered = new Set(humanCoverage)
 
@@ -468,6 +499,11 @@ function calculate(raw: unknown): Draft {
         pendingRows.push({
           rawCost: sum('cost'),
           rawPrice: sum('price'),
+          // Same components in the same order, with the human one at its base-market price.
+          rawBasePrice: group.reduce(
+            (total, component) => total.plus(component.kind === 'human' ? humanBasePrice : component.price),
+            new D(0)
+          ),
           rawCash: sum('cashCommitment'),
           line: {
             lineId: `${line.lineId}:${period}:${kind}`,
@@ -476,6 +512,7 @@ function calculate(raw: unknown): Draft {
             kind,
             label: profile.label,
             cost: '',
+            ...(v12 ? { marketAdjustment: '' } : {}),
             undiscountedPrice: '',
             ...(v11 ? { roundingAdjustment: '' } : {}),
             discount: '',
@@ -483,7 +520,8 @@ function calculate(raw: unknown): Draft {
             net: '',
             marginAmount: '',
             components: group,
-            minimumMargin: policy.minimumMargin
+            minimumMargin: policy.minimumMargin,
+            ...(v12 ? { marketPriceRatio: '', floorNet: '' } : {})
           }
         })
       }
@@ -538,17 +576,37 @@ function calculate(raw: unknown): Draft {
     return whole.mul(by).lt(value) ? whole.plus(1) : whole
   }
 
-  for (const { line, rawCost, rawPrice } of pendingRows) {
+  // Contract 1.2.0: the market factor declared its floor on the base market and lowered the price. The floor of a row
+  // is then its base-market floor scaled by how much the market lowered that row, rho = price / base price, both as
+  // presented. Rows are kept here as the two terms of rho so every comparison stays a product, never a quotient.
+  const floorFollowsBaseMarket =
+    v12 && market?.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS && new D(market.factor).lt(1)
+
+  const marketFloor = new Map<Row, { price: Decimal; basePrice: Decimal }>()
+
+  for (const { line, rawCost, rawPrice, rawBasePrice } of pendingRows) {
     line.cost = money(rawCost.mul(outputFx))
     line.undiscountedPrice = money(rawPrice.mul(outputFx))
 
     if (v11) {
       const policyPrice = new D(line.undiscountedPrice)
+      const basePrice = new D(money(rawBasePrice.mul(outputFx)))
+      const marginShare = new Wide(1).minus(line.minimumMargin)
+
+      // A row whose price has no human component was not lowered by the market: rho is 1 and nothing changes for it.
+      const scaled =
+        floorFollowsBaseMarket && policyPrice.lt(basePrice)
+          ? { price: new Wide(policyPrice), basePrice: new Wide(basePrice) }
+          : undefined
+
       let rounded = policyPrice
+
+      if (scaled) marketFloor.set(line, scaled)
 
       if (rounding && policyPrice.gt(0)) {
         const multiple = new D(rounding.multiple)
-        const unroundedPrice = rawPrice.mul(outputFx)
+        // With a base-market floor, "met the floor before rounding" is read on the base-market price.
+        const unroundedPrice = (scaled ? rawBasePrice : rawPrice).mul(outputFx)
 
         const compliant = !unroundedPrice
           .minus(rawCost.mul(outputFx))
@@ -562,10 +620,24 @@ function calculate(raw: unknown): Draft {
           compliant
             ? D.max(
                 ceilDiv(policyPrice, multiple),
-                ceilDiv(new D(line.cost), multiple.mul(new D(1).minus(line.minimumMargin)))
+                scaled
+                  ? ceilDiv(new Wide(line.cost).mul(scaled.price), marginShare.mul(scaled.basePrice).mul(multiple))
+                  : ceilDiv(new D(line.cost), multiple.mul(new D(1).minus(line.minimumMargin)))
               )
             : ceilDiv(policyPrice, multiple)
         ).mul(multiple)
+      }
+
+      if (v12) {
+        line.marketAdjustment = money(policyPrice.minus(basePrice))
+        line.marketPriceRatio = scaled ? policyPrice.div(basePrice).toString() : '1'
+        // cost x rho / (1 - minimumMargin), raised to the currency unit: an exact count of units, never a quotient.
+        line.floorNet = money(
+          (scaled
+            ? ceilDiv(new Wide(line.cost).mul(scaled.price), marginShare.mul(scaled.basePrice).mul(unit))
+            : ceilDiv(new Wide(line.cost), marginShare.mul(unit))
+          ).mul(unit)
+        )
       }
 
       line.roundingAdjustment = money(rounded.minus(policyPrice))
@@ -651,13 +723,34 @@ function calculate(raw: unknown): Draft {
   if (diagnostics.some(item => item.severity === 'error')) return base('invalid')
 
   for (const line of lines) {
+    const scaled = marketFloor.get(line)
+
     line.marginAmount = money(new D(line.net).minus(line.cost))
-    if (new D(line.net).isZero() || new D(line.marginAmount).div(line.net).lt(line.minimumMargin))
+
+    // The real margin above is never rescaled. Under a base-market floor the verdict is net < cost x rho / (1 - m),
+    // written without dividing: net x (1 - m) x base price < cost x price.
+    if (
+      new D(line.net).isZero() ||
+      (scaled
+        ? new Wide(line.net)
+            .mul(new Wide(1).minus(line.minimumMargin))
+            .mul(scaled.basePrice)
+            .lt(new Wide(line.cost).mul(scaled.price))
+        : new D(line.marginAmount).div(line.net).lt(line.minimumMargin))
+    )
       report('MARGIN_BELOW_FLOOR', `result.lines.${line.lineId}`, 'review', line.parentLineId)
   }
 
   const sumLines = (
-    key: 'cost' | 'undiscountedPrice' | 'roundingAdjustment' | 'discount' | 'uplift' | 'net' | 'marginAmount'
+    key:
+      | 'cost'
+      | 'marketAdjustment'
+      | 'undiscountedPrice'
+      | 'roundingAdjustment'
+      | 'discount'
+      | 'uplift'
+      | 'net'
+      | 'marginAmount'
   ) => lines.reduce((sum, line) => sum.plus(line[key] ?? 0), new D(0))
 
   const net = sumLines('net')
@@ -682,6 +775,7 @@ function calculate(raw: unknown): Draft {
   result.reviewStatus = diagnostics.some(item => item.severity === 'review') ? 'requires_review' : 'within_policy'
   result.totals = {
     cost: money(sumLines('cost')),
+    ...(v12 ? { marketAdjustment: money(sumLines('marketAdjustment')) } : {}),
     undiscountedPrice: money(sumLines('undiscountedPrice')),
     ...(v11 ? { roundingAdjustment: money(sumLines('roundingAdjustment')) } : {}),
     discount: money(sumLines('discount')),

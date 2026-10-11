@@ -26,7 +26,7 @@ const ExactDecimal = Decimal.clone({ precision: 80 })
 
 const hash = (value: unknown) => createHash('sha256').update(stableJson(value)).digest('hex')
 
-type Amounts = Partial<Record<'roundingAdjustment' | 'uplift', string>> &
+type Amounts = Partial<Record<'marketAdjustment' | 'roundingAdjustment' | 'uplift', string>> &
   Record<'cost' | 'undiscountedPrice' | 'discount' | 'net' | 'marginAmount', string>
 
 export type PricingV3Artifact = {
@@ -102,8 +102,19 @@ export function comparePricingV3(left: unknown, right: unknown) {
   const differences =
     matchingCurrency && totalsA && totalsB
       ? Object.fromEntries(
-          // 1.1.0 amounts are compared only when both sides carry them; a 1.0.0 comparison keeps its shape.
-          (['cost', 'undiscountedPrice', 'roundingAdjustment', 'discount', 'uplift', 'net', 'marginAmount'] as const)
+          // Amounts of a later contract are compared only when both sides carry them; a 1.0.0 comparison keeps its shape.
+          (
+            [
+              'cost',
+              'marketAdjustment',
+              'undiscountedPrice',
+              'roundingAdjustment',
+              'discount',
+              'uplift',
+              'net',
+              'marginAmount'
+            ] as const
+          )
             .map(key => [key, (totalsA as Amounts)[key], (totalsB as Amounts)[key]] as const)
             .flatMap(([key, before, after]) =>
               before === undefined || after === undefined

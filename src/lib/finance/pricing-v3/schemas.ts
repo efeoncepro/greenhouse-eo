@@ -262,6 +262,31 @@ export const pricingV3InputSchemaV11 = z
   })
   .strict()
 
+// Contract 1.2.0 extends 1.1.0 with one declared property of a market factor: where its price floor is read.
+// `base_market` says the factor is an approved price decision for that country, so the floor of each row is judged on
+// the price it would have had at factor 1 and the market adjustment is not punished again. Absent, the floor is read on
+// the final net, as in every earlier contract. It is declared data, never inferred from the value of the factor.
+export const PRICING_V3_MARKET_FLOOR_BASIS = 'base_market'
+
+export const pricingV3MarketFactorSchemaV12 = pricingV3SnapshotSchema.shape.marketFactors.element
+  .extend({ floorBasis: z.literal(PRICING_V3_MARKET_FLOOR_BASIS).optional() })
+  .strict()
+
+export const pricingV3RequestSchemaV12 = pricingV3RequestSchemaV11
+  .extend({ schemaVersion: z.literal('1.2.0') })
+  .strict()
+
+export const pricingV3SnapshotSchemaV12 = pricingV3SnapshotSchemaV11
+  .extend({ schemaVersion: z.literal('1.2.0'), marketFactors: z.array(pricingV3MarketFactorSchemaV12) })
+  .strict()
+
+export const pricingV3InputSchemaV12 = z
+  .object({
+    request: pricingV3RequestSchemaV12,
+    snapshot: pricingV3SnapshotSchemaV12
+  })
+  .strict()
+
 /** `PricingV3Input`, `PricingV3Request` and `PricingV3Snapshot` are contract 1.0.0, as every existing consumer types them. */
 export type PricingV3Input = z.infer<typeof pricingV3InputSchema>
 export type PricingV3Request = PricingV3Input['request']
@@ -271,7 +296,11 @@ export type PricingV3RequestV11 = PricingV3InputV11['request']
 export type PricingV3SnapshotV11 = PricingV3InputV11['snapshot']
 export type PricingV3AdjustmentV11 = PricingV3RequestV11['adjustments'][number]
 export type PricingV3PriceRounding = z.infer<typeof pricingV3PriceRoundingSchema>
-export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11
+export type PricingV3InputV12 = z.infer<typeof pricingV3InputSchemaV12>
+export type PricingV3RequestV12 = PricingV3InputV12['request']
+export type PricingV3SnapshotV12 = PricingV3InputV12['snapshot']
+export type PricingV3MarketFactorV12 = z.infer<typeof pricingV3MarketFactorSchemaV12>
+export type PricingV3AnyInput = PricingV3Input | PricingV3InputV11 | PricingV3InputV12
 export type PricingV3Source = z.infer<typeof sourceSchema>
 
 /**
@@ -280,7 +309,8 @@ export type PricingV3Source = z.infer<typeof sourceSchema>
  */
 export const PRICING_V3_ENGINES = {
   '1.0.0': 'pricing-v3-local/1.0.0',
-  '1.1.0': 'pricing-v3-local/1.1.0'
+  '1.1.0': 'pricing-v3-local/1.1.0',
+  '1.2.0': 'pricing-v3-local/1.2.0'
 } as const
 
 export type PricingV3ContractVersion = keyof typeof PRICING_V3_ENGINES
@@ -292,10 +322,12 @@ export const isPricingV3EngineVersion = (value: unknown): value is PricingV3Engi
 /**
  * Parse with the schema of the version the request declares. Anything that does not declare a later registered
  * contract (1.0.0, an unknown version, no version, not an object) is judged by contract 1.0.0, so its diagnostics
- * stay what they always were. A union of both schemas would bury them under `invalid_union`.
+ * stay what they always were. A union of the schemas would bury them under `invalid_union`.
  */
 export function parsePricingV3Input(raw: unknown) {
   const declared = (raw as { request?: { schemaVersion?: unknown } } | null | undefined)?.request?.schemaVersion
+
+  if (declared === '1.2.0') return { contract: '1.2.0' as const, parsed: pricingV3InputSchemaV12.safeParse(raw) }
 
   return declared === '1.1.0'
     ? { contract: '1.1.0' as const, parsed: pricingV3InputSchemaV11.safeParse(raw) }

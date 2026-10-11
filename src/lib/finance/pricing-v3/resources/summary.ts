@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 
-import { describeCommercialTerms } from '../catalog/explain'
+import type { PricingV3LineV12 } from '../calculate'
+import { describeCommercialTerms, describeMarketFactor } from '../catalog/explain'
 import type { composeResourceQuote } from './composition'
 
 type Composition = ReturnType<typeof composeResourceQuote>
@@ -16,6 +17,9 @@ const ratioForReading = (value: Decimal) =>
   value.toDecimalPlaces(RATIO_DISPLAY_DECIMALS, D.ROUND_FLOOR).toFixed(RATIO_DISPLAY_DECIMALS)
 
 const unique = <T>(items: T[]) => [...new Set(items)]
+
+/** Rows of contract 1.2.0 carry the floor of their market; rows of earlier contracts have no such key. */
+const hasMarketFloor = (line: object): line is PricingV3LineV12 => 'floorNet' in line
 
 /** Rows that differ only by period collapse into one entry, in the order the result first produced them. */
 const acrossPeriods = <T extends object>(rows: { periodId: number; row: T }[]) => {
@@ -35,6 +39,10 @@ const acrossPeriods = <T extends object>(rows: { periodId: number; row: T }[]) =
 /**
  * Lines the kernel reported under the margin floor of their pricing policy. The verdict is `MARGIN_BELOW_FLOOR` from
  * calculate.ts and nothing else: this only attaches the stored amounts of the flagged line so a reader can size it.
+ *
+ * `net`, `marginAmount` and `marginRateRoundedDown` are always the real ones, on the final net. A contract 1.2.0 row
+ * also carries the kernel's `floorNet` (the smallest net that meets the floor in that market) and the gap is read
+ * from it; it is never recomputed here, because under a base-market floor `minimumMargin x net` is not the floor.
  */
 export function linesBelowPolicyFloor(result: Composition) {
   return result.quote.periods.flatMap(period =>
@@ -44,6 +52,10 @@ export function linesBelowPolicyFloor(result: Composition) {
         const line = period.result.lines.find(l => d.fieldPath === `result.lines.${l.lineId}`)
         // A zero net is flagged by the kernel without a ratio, so there is none to show.
         const sized = line && new D(line.net).gt(0) ? line : null
+        const floor = line && hasMarketFloor(line) ? line : null
+        // The margin missing at the current net is `minimumMargin x net - margin` only while the floor is read on the
+        // final net. On a base-market floor that figure would be the base-market margin, which is never shown.
+        const onFinalNet = !floor || floor.marketPriceRatio === '1'
 
         return {
           periodId: period.periodId,
@@ -56,9 +68,17 @@ export function linesBelowPolicyFloor(result: Composition) {
           marginAmount: line?.marginAmount ?? null,
           marginRateRoundedDown: sized ? ratioForReading(new D(sized.marginAmount).div(sized.net)) : null,
           // Margin missing at the current net. Tells a rounding-sized gap apart from a pricing decision.
-          marginAmountShortOfFloor: sized
-            ? new D(sized.minimumMargin).mul(sized.net).minus(sized.marginAmount).toString()
-            : null
+          marginAmountShortOfFloor:
+            sized && onFinalNet ? new D(sized.minimumMargin).mul(sized.net).minus(sized.marginAmount).toString() : null,
+          ...(floor
+            ? {
+                floorNet: floor.floorNet,
+                // Net missing to reach the floor of this market, at the scale the kernel formatted both amounts with.
+                netShortOfFloor: new D(floor.floorNet)
+                  .minus(floor.net)
+                  .toFixed(floor.floorNet.split('.')[1]?.length ?? 0)
+              }
+            : {})
         }
       })
   )
@@ -87,6 +107,7 @@ export function summarizeComposition(result: Composition, identity: { calculatio
   })
 
   const floorLines = linesBelowPolicyFloor(result)
+  const marketFactor = describeMarketFactor(quote.resolution)
 
   const selection = (s: Composition['selections'][number]) => ({
     lineId: s.lineId,
@@ -112,13 +133,18 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     calculationStatus: quote.calculationStatus,
     reviewStatus: result.reviewStatus,
     quoteReviewStatus: quote.reviewStatus,
-    // Contract the kernel calculated with: 1.1.0 only when the demand or the catalog uses agreed nets or rounding.
+    // Contract the kernel calculated with: 1.1.0 only when the demand or the catalog uses agreed nets or rounding;
+    // 1.2.0 only when the market factor of the quote declares its floor on the base market.
     engineVersion: quote.periods[0]?.result.engineVersion ?? null,
-    // 1.1.0 totals add `roundingAdjustment` (already inside `undiscountedPrice`) and `uplift`.
+    // 1.1.0 totals add `roundingAdjustment` (already inside `undiscountedPrice`) and `uplift`; 1.2.0 totals add
+    // `marketAdjustment` (price with the market factor minus price of the base market, also inside it).
     totals: quote.totals,
     // Adjustments as the frozen demand declares them and the rounding rule in force for the output currency.
     ...describeCommercialTerms(quote.resolution),
-    // `totals.marginRate` keeps the exact stored ratio; this is the same ratio at reading precision.
+    // Present only for a market factor that changes something (not 1, or with a declared floor basis).
+    ...(marketFactor ? { marketFactor } : {}),
+    // `totals.marginRate` keeps the exact stored ratio; this is the same ratio at reading precision. It is the real
+    // margin of the final net in every contract, never a base-market equivalent.
     marginRateRoundedDown: quote.totals?.marginRate ? ratioForReading(new D(quote.totals.marginRate)) : null,
     // Blockers: complete and in the result's order. A non-empty list is why `totals` is null.
     diagnostics: quote.diagnostics,

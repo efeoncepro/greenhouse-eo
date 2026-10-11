@@ -1,0 +1,1939 @@
+{
+  "schemaVersion": "pricing-v3-catalog-change/1",
+  "changeId": "operating-country-factors-2026-10-11",
+  "baseDigest": "d2d64709edf0b3a4f7b3c7aae6baf20292d0d286403716f947737be0eac10925",
+  "nextVersion": "operating-review-2026-10-11-v5",
+  "actor": "operator-authorized-agent",
+  "reason": "CEO decisions of 2026-10-11: the workbook costs are the Chile reference and the person's country adjusts cost through a talent factor (CO 0.80, PE 0.85, MX 0.90, ES 3, US 5, all estimates); the client's country adjusts price through a market factor (CL 1, CO 0.90, US 1.10 decided; PE 0.95, MX 1, ES 1.10 estimates); and in markets below 1 the margin floor follows the factor. Spain added as a country. No cost amount changes.",
+  "dimensions": {
+    "countriesAdd": [
+      "ES"
+    ]
+  },
+  "changes": [
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-001:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-001:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-001",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-002:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-002:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-002",
+          "seniorityCode": "senior",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "950"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-003:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-003:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-003",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "675"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-004:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-004:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-004",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "550"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "150"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-005:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-005:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-005",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-006:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-006:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-006",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-007:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-007:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-007",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "900"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-008:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-008:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-008",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "2500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-009:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-009:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-009",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-010:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-010:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-010",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-011:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-011:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-011",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-012:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-012:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-012",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-013:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-013:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-013",
+          "seniorityCode": "junior",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "900"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-014:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-014:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-014",
+          "seniorityCode": "mid",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-015:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-015:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-015",
+          "seniorityCode": "senior",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-016:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-016:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-016",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-017:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-017:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-017",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-018:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-018:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-018",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "100"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-019:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-019:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-019",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-020:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-020:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-020",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-021:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-021:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-021",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-022:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-022:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-022",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1500"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-023:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-023:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-023",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-024:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-024:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-024",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-025:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-025:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-025",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "7200"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-026:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-026:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-026",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "3000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-027:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-027:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-027",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "10400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "300"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-028:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-028:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-028",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1100"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-029:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-029:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-029",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1000"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "75"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "35"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-030:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-030:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-030",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1400"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "250"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-031:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-031:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-031",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "1300"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "200"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "100"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "50"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "150"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "cost:ECG-032:unknown",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "cost:ECG-032:unknown",
+        "revision": 3,
+        "kind": "cost",
+        "source": {
+          "reference": "operator-declaration:pricing-workbook-author:chile-reference:2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Pricing workbook value, confirmed by its author (CEO). Declared on 2026-10-11 as the cost of the profile in Chile; the cost for a person in another country is this amount times the talent factor of that country. Amounts unchanged.",
+        "value": {
+          "profileId": "ECG-032",
+          "seniorityCode": "not_specified",
+          "localization": {
+            "kind": "reference_adjusted",
+            "referenceCountry": "CL"
+          },
+          "currency": "USD",
+          "components": [
+            {
+              "coverage": "human_salary",
+              "amount": "23140"
+            },
+            {
+              "coverage": "human_bonus_jit",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_rpa",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_ar",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_bonus_overperformance",
+              "amount": "0"
+            },
+            {
+              "coverage": "human_charges",
+              "amount": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:CL:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:CL:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "policy:ceo-talent-factor-chile-reference-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Chile is the reference country of the workbook costs: factor 1 by definition.",
+        "value": {
+          "country": "CL",
+          "referenceCountry": "CL",
+          "factor": "1"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:CO:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:CO:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "hypothesis-only:talent-factor-CO-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from job postings and salary guides (senior graphic designer about USD 930-1860 per month in Colombia), set on the prudent side. Not validated with real hires; a real cost per profile and country replaces it.",
+        "value": {
+          "country": "CO",
+          "referenceCountry": "CL",
+          "factor": "0.80"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:PE:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:PE:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "hypothesis-only:talent-factor-PE-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from job postings and salary guides (senior graphic designer about USD 870-1380 per month in Peru), set on the prudent side. Not validated with real hires.",
+        "value": {
+          "country": "PE",
+          "referenceCountry": "CL",
+          "factor": "0.85"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:MX:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:MX:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "hypothesis-only:talent-factor-MX-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from job postings (senior graphic designer about USD 1110-1725 per month in Mexico), set on the prudent side. Not validated with real hires.",
+        "value": {
+          "country": "MX",
+          "referenceCountry": "CL",
+          "factor": "0.90"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:ES:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:ES:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "hypothesis-only:talent-factor-ES-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from a 2026 salary guide (senior graphic designer EUR 38000-55000 per year in Spain). Lands in the lower part of that range. Not validated with real hires.",
+        "value": {
+          "country": "ES",
+          "referenceCountry": "CL",
+          "factor": "3"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "talent:US:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "talent:US:CL",
+        "revision": 1,
+        "kind": "talent_factor",
+        "source": {
+          "reference": "hypothesis-only:talent-factor-US-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from BLS and 2026 salary guides (senior graphic designer about USD 78000-85000 per year in the United States). Lands in the lower part of that range. Not validated with real hires.",
+        "value": {
+          "country": "US",
+          "referenceCountry": "CL",
+          "factor": "5"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:CL",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:CL",
+        "revision": 2,
+        "kind": "market_factor",
+        "source": {
+          "reference": "policy:ceo-market-factors-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "Chile corporate is the base market of the pricing workbook: factor 1.",
+        "value": {
+          "country": "CL",
+          "factor": "1"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:CO",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:CO",
+        "revision": 2,
+        "kind": "market_factor",
+        "source": {
+          "reference": "policy:ceo-market-factors-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "CEO decision of 2026-10-11: conservative end of the workbook range for Colombia (0.85-0.9). The margin floor follows this factor: it is read on the base-market price.",
+        "value": {
+          "country": "CO",
+          "factor": "0.90",
+          "floorBasis": "base_market"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:US",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:US",
+        "revision": 2,
+        "kind": "market_factor",
+        "source": {
+          "reference": "policy:ceo-market-factors-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "confirmed"
+        },
+        "note": "CEO decision of 2026-10-11: conservative end of the workbook range for international clients in USD (1.1-1.2).",
+        "value": {
+          "country": "US",
+          "factor": "1.10"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:PE",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:PE",
+        "revision": 2,
+        "kind": "market_factor",
+        "source": {
+          "reference": "hypothesis-only:market-factor-PE-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11; the workbook has no value for Peru. Not validated with closed deals. The margin floor follows this factor.",
+        "value": {
+          "country": "PE",
+          "factor": "0.95",
+          "floorBasis": "base_market"
+        }
+      }
+    },
+    {
+      "operation": "replace",
+      "recordId": "market:MX",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:MX",
+        "revision": 2,
+        "kind": "market_factor",
+        "source": {
+          "reference": "hypothesis-only:market-factor-MX-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11; the workbook has no value for Mexico. Kept neutral until validated with closed deals.",
+        "value": {
+          "country": "MX",
+          "factor": "1"
+        }
+      }
+    },
+    {
+      "operation": "add",
+      "recordId": "market:ES",
+      "effectiveFrom": "2026-10-11",
+      "record": {
+        "recordId": "market:ES",
+        "revision": 1,
+        "kind": "market_factor",
+        "source": {
+          "reference": "hypothesis-only:market-factor-ES-2026-10-11",
+          "effectiveFrom": "2026-10-11",
+          "effectiveUntil": "9999-12-31",
+          "status": "estimated"
+        },
+        "note": "Estimate of 2026-10-11 from the workbook row for international clients (USA, Europe with budget, 1.1-1.2), conservative end. Not explicitly decided for Spain.",
+        "value": {
+          "country": "ES",
+          "factor": "1.10"
+        }
+      }
+    }
+  ]
+}

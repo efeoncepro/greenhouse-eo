@@ -1,6 +1,7 @@
 import Decimal from 'decimal.js'
 
-import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV11 } from '../schemas'
+import { PRICING_V3_MARKET_FLOOR_BASIS } from '../schemas'
+import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV12 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
 import { briefSchema } from './contracts'
 import type { CatalogRecord, Diagnostic } from './contracts'
@@ -10,8 +11,8 @@ const D = Decimal.clone({ precision: 80 })
 type Row<K extends CatalogRecord['kind']> = Extract<CatalogRecord, { kind: K }>
 
 // Built as the widest contract; `schemaVersion` says which one each quote declares and the kernel parses it as such.
-type KernelSnapshot = Omit<PricingV3InputV11['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
-type KernelRequest = Omit<PricingV3InputV11['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+type KernelSnapshot = Omit<PricingV3InputV12['snapshot'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
+type KernelRequest = Omit<PricingV3InputV12['request'], 'schemaVersion'> & { schemaVersion: PricingV3ContractVersion }
 
 type KitAssignment = {
   requirement: Row<'kit'>['value']['requirements'][number]
@@ -106,10 +107,15 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
 
   // Contract 1.1.0 only when the frozen inputs use what 1.0.0 cannot express; everything else stays 1.0.0, so a quote
   // frozen before 1.1.0 existed resolves to the contract and digest it was signed with. Same answer for every period.
+  //
+  // Contract 1.2.0 only when the market factor selected for this quote declares its floor basis. It is a property of
+  // the record, never of the factor's value: a catalog frozen before 1.2.0 cannot declare it and resolves as it did.
   const contract: PricingV3ContractVersion =
-    applicableRules.length > 0 || brief.adjustments.length > 1 || brief.adjustments.some(a => a.kind !== 'discount')
-      ? '1.1.0'
-      : '1.0.0'
+    market?.value.floorBasis === PRICING_V3_MARKET_FLOOR_BASIS
+      ? '1.2.0'
+      : applicableRules.length > 0 || brief.adjustments.length > 1 || brief.adjustments.some(a => a.kind !== 'discount')
+        ? '1.1.0'
+        : '1.0.0'
 
   const selected = brief.lines.flatMap(line => {
     const path = `lines.${line.lineId}`

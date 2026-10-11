@@ -1,6 +1,6 @@
 {
   "schemaVersion": "pricing-v3-operational-gaps/1",
-  "asOf": "2026-10-10",
+  "asOf": "2026-10-11",
   "commercialStatus": "requires_review",
   "items": [
     {
@@ -23,9 +23,9 @@
     },
     {
       "code": "LOCALIZED_TALENT_COSTS",
-      "owner": "People/Finance",
-      "required": "The country each workbook salary corresponds to (localization per cost record) and its effective date; then burden, bonus and coverage by profile variant where they differ",
-      "known": "The CEO, author of the pricing workbook, confirmed its salary values on 2026-10-10 and catalog v4 records them as confirmed. The resolver still reports each cost as ESTIMATED_SOURCE with the assumption UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY because no record declares its country; one declaration of the country per record closes it. Component check: Community Manager is salary 900 + bonuses 500 + employer charges 0 (USD per month)"
+      "owner": "CEO/People",
+      "required": "The real cost of a profile in a country, registered as a specific cost record, wherever it departs from the Chile reference times the talent factor; and burden, bonus and coverage by profile variant where they differ",
+      "known": "Catalog v5 (2026-10-11) declares the 32 workbook costs, confirmed by their author (CEO), as the cost of each profile in Chile. The person's country adjusts them through one talent factor per country. The costs are no longer reported as estimated or unlocalized. Component check: Community Manager is salary 900 + bonuses 500 + employer charges 0 (USD per month)"
     },
     {
       "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
@@ -92,6 +92,12 @@
       "owner": "CEO",
       "required": "Multiples for any further quote currency (CLF, EUR) and any offer that should round differently from its currency",
       "known": "Catalog v4 rounds every offer per currency by CEO decision of 2026-10-10: CLP 10000, USD 10, PEN 50, COP 50000, MXN 100. A currency without a rule is not rounded. Rounding is per billable row; rounding on the period total or to commercial endings such as 990000 is expressed as an agreed net"
+    },
+    {
+      "code": "COUNTRY_FACTORS_UNVALIDATED",
+      "owner": "CEO",
+      "required": "Validation of each factor with real hires (talent) and closed or lost deals (market), and a specific cost record wherever a profile or seniority departs from its country factor",
+      "known": "Catalog v5 holds two country axes. Talent factor on cost, relative to Chile: CL 1; CO 0.80, PE 0.85, MX 0.90, ES 3, US 5 are estimates from job postings and salary guides read on 2026-10-11, one factor per country for every profile. Market factor on the human price: CL 1, CO 0.90 and US 1.10 decided by the CEO from the workbook ranges; PE 0.95, MX 1 and ES 1.10 are estimates. In CO and PE the margin floor follows the factor (floorBasis base_market), so a quote at policy price shows about 41% and 43% real margin without being flagged. Factors by client type (SME, public tender, strategic client) exist in the workbook and are expressed today as an agreed net"
     }
   ]
 }

@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import {
+  pricingV3MarketFactorSchemaV12,
   pricingV3PriceRoundingSchema,
   pricingV3RequestSchema,
   pricingV3RequestSchemaV11,
@@ -79,7 +80,9 @@ export const catalogRecordSchema = z.union([
   record('allocation', snapshot.allocationPolicies.element.omit({ source: true })),
   record('pricing', snapshot.pricingPolicies.element.omit({ source: true })),
   record('talent_factor', snapshot.talentFactors.element.omit({ source: true })),
-  record('market_factor', snapshot.marketFactors.element.omit({ source: true })),
+  // Optional `floorBasis: 'base_market'` (contract 1.2.0): the price floor of this market is read on the base-market
+  // price. A record without it parses to exactly what it always did.
+  record('market_factor', pricingV3MarketFactorSchemaV12.omit({ source: true }).strict()),
   record('fx', snapshot.fx.element.omit({ source: true })),
   // Commercial rounding, per quoting currency. With `offerId` it governs that offer and prevails over the general rule.
   record(
