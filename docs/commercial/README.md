@@ -9,6 +9,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 
 ## Fuentes y autoridad
 
+- [Prospección B2B compartida](../documentation/comercial/prospeccion-b2b.md): [skill](../../.codex/skills/efeonce-b2b-prospecting/SKILL.md), [manual](../manual-de-uso/comercial/operar-prospeccion-b2b.md) y [decisión](../architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md); coordina Commercial, Customer Model, prácticas, Copy, HubSpot y Sales opcional. Radar/historial conservados.
+
 - [Bancos de Chile — segmento activo 188](prospects/bancos-chile-2026-10/README.md): 28 personas con email de 14 bancos, definición por empresa principal, propiedades y brechas de canal verificadas el 11/10. Incluye 20 de la ronda adicional y ocho contactos conocidos; sin outreach.
 
 - [Contactos conocidos — BCI, BICE, Cencosud e Itaú](prospects/contactos-conocidos-banca-retail-2026-10/README.md): 12 contactos incorporados el 11/10 (10 nuevos, 2 reutilizados), focos comerciales y segmentos verificados. Sin outreach; pendientes de canal y vigencia documentados.

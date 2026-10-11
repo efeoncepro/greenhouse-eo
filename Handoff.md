@@ -4,7 +4,13 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-11 — Diseño de skill de prospección B2B
+
+[Prospección B2B](.codex/skills/efeonce-b2b-prospecting/SKILL.md): método Codex/Claude implementado, revisión Sales y 12 escenarios offline aceptados. Adapter personal conserva HSP/radar y Commercial Codex resuelve routing. [Decisión](docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md), [discovery](docs/audits/commercial/2026-10-11-prospecting-skill-discovery.md) y [verificación](docs/audits/commercial/2026-10-11-prospecting-skill-implementation.md). Sin nuevos schedulers, créditos, CRM ni envíos. Eficacia comercial y discrepancia económica pendientes de evidencia/decisión del caso.
+
 ## 2026-10-11 — Contactos conocidos de banca y retail
+
+Contrato vigente de [prospección B2B](docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#gate-previo-al-alta-correo-y-contactos-adyacentes): investigar objetivo + 2–3 contactos adicionales relevantes; no dar de alta contactos sin correo corporativo individual verificado. Docs y skills Codex/Claude actualizadas; los registros sin correo descritos abajo son históricos. Sin migración ni cambios live por esta actualización.
 
 [Bancos Chile](docs/commercial/prospects/bancos-chile-2026-10/README.md): 22 Contact adicionales (18 nuevos, cuatro reutilizados) de 11 bancos; 20 con correo, Arturo/Isabel sin correo. ACTIVE **188** reúne esos 20 y ocho conocidos de BCI/BICE/Itaú: **28 personas de 14 bancos**, definición ACTIVE y conjunto completo verificados. Focos SEO/web de Luisa/Carolina/Rafael/Natalia en notas, sin fit forzado. Antes de contacto: validación conflictiva de Andrés/María Beatriz, vigencia de Cristian y campos pendientes. Sin envíos ni Deals nuevos.
 

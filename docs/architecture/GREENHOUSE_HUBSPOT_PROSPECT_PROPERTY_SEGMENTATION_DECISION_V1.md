@@ -136,6 +136,38 @@ y automática dentro de esas cuentas; añadir otra cuenta requiere ampliar la de
 cero faltantes/extras, definición ACTIVE leída por CLI y tamaño procesado en UI. Aplicación del ADR existente,
 sin cambio de source of truth, permisos o propiedades. No altera 180–187 ni las rondas históricas.
 
+### Delta 2026-10-11 — contactos accionables y cobertura de la cuenta B2B
+
+**Accepted — instrucción explícita del operador, Julio Reyes.** La unidad de investigación es la cuenta y
+su grupo de compra: investigar al contacto objetivo **y buscar siempre 2–3 personas adicionales relevantes**,
+incluso cuando el objetivo ya tenga correo. Priorizar responsables del área, pares, jefatura y decisores
+relacionados con la necesidad. Registrar cargo, empresa, fuente, fecha y razón de acceso al objetivo; trabajar
+en la misma empresa no prueba relación personal ni jefatura. Distinguir vínculo confirmado de hipótesis funcional.
+
+**No registrar nuevos contactos de prospección sin correo.** Antes del alta, disponer de un correo corporativo
+individual verificado, atribuible a esa persona, con fuente y estado de validación conservados. No inferir una
+dirección desde un patrón ni usar un buzón general o personal como correo individual corporativo. Presencia,
+validación del proveedor y entregabilidad son hechos distintos; conservar contradicciones y resolverlas antes
+de tratar el canal como accionable.
+
+Si el objetivo no tiene correo, conservar su identidad y señal en el expediente de investigación o en una
+nota de la empresa, sin crear Contact/Lead para esa persona, y continuar por los contactos adyacentes. Apollo
+`emails: []` detiene el alta de esa persona, no la investigación de la cuenta. Un buzón compartido puede quedar
+como vía secundaria en la nota de cuenta; no satisface el requisito ni se atribuye a una persona.
+
+El resultado debe identificar el objetivo y los 2–3 contactos adicionales con datos accionables, relación y
+fuente, o declarar qué falta y qué vías se agotaron. Los contactos que sí cumplan el requisito pueden darse de
+alta dentro del alcance autorizado; una cobertura parcial no se presenta como investigación completa ni se
+rellena con contactos vacíos. La solicitud del objetivo no se atribuye como intención de compra de sus colegas.
+
+Este delta rige nuevas altas de prospección; `individual_no_email`, `shared_inbox` e `identity_pending` siguen
+describiendo registros históricos. No se eliminan registros ni enums, ni se cambian filtros o esquema por esta
+decisión. Reutilizar registros existentes exige preservar su estado y documentar brechas, sin duplicarlos.
+El enriquecimiento que consuma créditos requiere autorización explícita para el conjunto acotado, salvo que
+ya exista; una autorización individual no se extiende a otros contactos. Investigar o registrar no autoriza
+envíos, secuencias ni Deals. Después de escribir, verificar correo, propiedades, empresa Primary, notas y
+membresía por lectura independiente según el contrato vigente.
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

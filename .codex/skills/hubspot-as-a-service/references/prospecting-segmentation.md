@@ -18,6 +18,38 @@ still describe the historical rounds. In Agent CLI 0.15.1 the single-record `obj
 form hung without writing in a non-interactive shell: use JSONL on stdin (preview + digest) or the MCP connector.
 [Decision delta and verification](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
 
+## Current admission rule (2026-10-11): email and B2B account coverage
+
+Operator-approved canon: [actionable contacts and account coverage](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
+Research the target AND always seek **2–3 additional relevant people**, even when the target has email.
+Prioritize functional peers, area owners, management and related decision makers as routes to the target.
+
+1. Reconcile the account and every person's identity, current role and source. Record why each adjacent person
+   is relevant and whether the connection is confirmed or only a functional hypothesis. Same-company employment
+   does not prove reporting lines, personal relationships or willingness to introduce the target.
+2. **Do not create a prospect Contact/Lead without a verified individual corporate email attributable to that
+   person.** Keep the exact returned address, source, research date and validation status. Never infer an address
+   from a pattern; do not substitute personal or shared mailboxes. Presence and provider verification do not
+   guarantee delivery; preserve and resolve conflicting validation before treating the channel as actionable.
+3. Apollo `emails: []` stops admission of that person, not account research. Keep the target's identity, source
+   and need in the research manifest or a Company note; continue seeking adjacent contacts. A shared mailbox
+   may be documented only as a secondary account route, not the person's email or a substitute for admission.
+4. Before credit-consuming enrichment, resolve authorization for the bounded set of people and provider scope.
+   Existing authorization is reusable within that scope; a single-person approval does not cover new people.
+   Prioritize existing authorized sources while preserving any unfilled email or coverage gaps.
+5. Create/reuse eligible contacts within the authorized scope, with the correct Primary Company, research date
+   and evidence-backed properties. Keep observed buying intent attached to its actual author; adjacent contacts
+   are access routes, not automatically interested buyers. Never create Deals or send outreach from this alone.
+6. Independently read back email, properties, Primary Company, source notes and native segment membership.
+   Report target status and each additional person's role, email provenance/quality, relationship evidence and
+   route priority. If fewer than 2–3 actionable adjacent contacts are found, state missing coverage and exhausted
+   routes; eligible partial intake may proceed, but account research remains incomplete. Never fabricate contacts
+   or register people without email to meet the count.
+
+Historical `individual_no_email`, `shared_inbox` and `identity_pending` values remain readable classifications,
+not exceptions to new-contact admission. Preserve existing records and enums; this rule does not authorize
+deletion, schema/filter changes or historical migration. Do not duplicate an existing no-email record.
+
 ## Entry points and deployed configuration
 
 Read the [functional model](../../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md),
@@ -48,7 +80,8 @@ If scope is already explicit, proceed within it; ask only when a material ambigu
    authority to create a qualified opportunity. Preserve existing Deals when the operator explicitly says to
    leave them unchanged; document the exception instead of retroactively moving or deleting them.
 2. Keep source identity, source date, signal, service fit, observed intent/state and contact type in a bounded
-   local manifest. Never invent individual email; Apollo `emails: []` is a stop for email population. Preserve
+   local manifest. Apply the admission and account-coverage rule above before creating records. Never invent
+   individual email; Apollo `emails: []` stops that person's admission and requires adjacent-contact research. Preserve
    extrapolated, shared and employment-unconfirmed evidence as such.
 3. Reuse live writable properties and exact enum values under [revops-schema.md](revops-schema.md). Publish
    source-backed changes and preserve unresolved conflicts. Do not infer exact employees from a range, personal

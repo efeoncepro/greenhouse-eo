@@ -15,9 +15,27 @@ Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.m
 
 1. Cargar [modelo funcional y catálogo](../../documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) y la [decisión](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md).
 2. Revalidar `hubspot whoami` y la identidad/permisos del conector MCP; portal objetivo **48713323**.
-3. Resolver empresa/contacto existentes y el universo autorizado. Cohorte en **ambos** objetos; tipo y fit en Contact. No asignar esta ronda a una futura búsqueda sin autorización de ampliación.
+3. Resolver empresa/contactos existentes y el universo autorizado; investigar al objetivo y buscar siempre 2–3 personas adicionales relevantes. Aplicar el gate de correo siguiente antes del alta.
 4. Preparar valores exactos y ejecutar dentro de la autorización del operador. Preservar multiselects previos; registrar señal y fuentes en nota asociada.
-5. Leer propiedades, asociaciones y miembros reales después del recálculo. El alta no termina sólo por guardar el registro.
+5. Poblar fecha de investigación en **ambos** objetos; tipo y fit respaldados en Contact. Leer correo, propiedades, asociaciones Primary, notas y miembros reales después del recálculo. El alta no termina sólo por guardar el registro.
+
+### Gate previo al alta: correo y contactos adyacentes
+
+- Investigar al objetivo **más 2–3 contactos relevantes** de la cuenta, incluso si ya tiene correo. Priorizar
+  pares, responsables del área, jefatura y decisores relacionados; registrar fuente, rol y razón de acceso.
+  Etiquetar la relación como confirmada o hipótesis funcional, sin inventar jefatura ni intención de compra.
+- **No crear Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a la persona.**
+  Conservar dirección exacta, procedencia, fecha y estado de validación; resolver contradicciones antes de
+  declarar el canal accionable. No deducir emails ni usar un buzón compartido como email de una persona.
+- Si Apollo devuelve `emails: []` o no se obtiene correo, conservar identidad y señal en el expediente o nota
+  de Company y seguir por personas adyacentes. Un buzón compartido queda sólo como vía secundaria de cuenta.
+- Verificar autorización del conjunto acotado antes de gastar créditos; no extender un permiso individual.
+  Crear sólo los contactos elegibles dentro del alcance autorizado y leerlos de vuelta. Si faltan contactos
+  accionables para cubrir 2–3 adicionales, reportar la brecha y vías agotadas; no cerrar como investigación completa.
+
+[Canon de admisión y cobertura](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
+La clasificación de registros históricos sin correo se conserva; este cambio no elimina registros ni altera
+filtros, esquema o permisos de envío.
 
 **Estado más reciente, 06/10 tras Sika:** 81 empresas/81 contactos en la cohorte; **19 ACTIVE 159–177** y 15 generales 144–158 conservados. 174 = **63**, 176 = **51**, 175 = **26**, 177 = **1**. Las cuatro propiedades ya existen: no volver a crearlas en cada alta. [Catálogo exacto sin PII](../../operations/HUBSPOT_PROSPECT_SEGMENTS_CATALOG_2026-10-06.json).
 

@@ -59,6 +59,17 @@ For sent-email logging, reminders and repeated prospect touches, load [manual-ou
 
 ## Prospect segmentation handoff
 
+For account research, contact discovery and access strategy, load
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). It owns the prospecting method; this skill
+retains CRM identity, dedupe, dictionaries, associations, writes and independent readback.
+
+For B2B prospecting, research the target AND always seek 2–3 additional relevant account contacts with
+actionable corporate email. **Never create a prospect Contact/Lead without an individual corporate email
+verified against that person's identity.** If the target has no email, keep the signal in research or a Company
+note and continue through adjacent people. Report missing coverage; do not invent addresses or relationships.
+Historical no-email records do not authorize new empty contacts. Credit spend and outreach retain their
+separate authorization requirements. The reference below owns the procedure and evidence checklist.
+
 For any prospect create/reuse or segment correction, load [prospecting-segmentation.md](references/prospecting-segmentation.md)
 and the [operator manual](../../../docs/manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md).
 The [functional model](../../../docs/documentation/hubspot-as-a-service/prospeccion-segmentos-activos.md) and

@@ -11,6 +11,10 @@ Para el modelo transversal de cliente —ICP, JTBD, buying group, stakeholder ma
 `efeonce-pricing-operator`. Esta skill conserva la ejecución comercial: discovery, negociación, pipeline, proposal,
 win/loss y deal tactics.
 
+Para prospección por cuenta, contactos y rutas frías/tibias/cálidas, cargar
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md). Esa skill conserva investigación, cobertura
+objetivo + 2–3 adicionales y entrega; Commercial conserva avance de venta. No cargar ambos recursivamente.
+
 # commercial-expert — Greenhouse Overlay
 
 ## Envíos desde el Outlook de Julio

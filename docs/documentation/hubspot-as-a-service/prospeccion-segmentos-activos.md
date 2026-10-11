@@ -15,6 +15,21 @@ guarda la última investigación; el historial queda en las notas. Las secciones
 históricas y siguen siendo válidas para ellas.
 [Decisión y verificación](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--la-fecha-de-investigación-sustituye-a-las-cohortes-fechadas).
 
+## Admisión vigente: correo y cobertura B2B de la cuenta
+
+Investigar al objetivo **y buscar siempre 2–3 contactos adicionales relevantes**, aunque el objetivo ya tenga
+correo. El resultado útil combina correo corporativo individual, cargo, fuente y una ruta razonada de acceso
+al objetivo. Distinguir relación confirmada de proximidad funcional; no atribuir a colegas su intención de compra.
+
+**No registrar nuevos contactos de prospección sin correo corporativo individual verificado.** Si el objetivo
+no tiene correo, conservar la señal en el expediente o en una nota de empresa y continuar por personas
+adyacentes. No inventar direcciones ni atribuir un buzón compartido a una persona. Declarar validaciones
+contradictorias y brechas si no se alcanzan 2–3 contactos adicionales accionables; un alta parcial no completa
+la investigación. Los tipos históricos sin correo siguen existiendo, sin habilitar nuevas altas ni su borrado.
+
+[Decisión del operador y límites](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
+No cambia segmentos ni autoriza créditos fuera del alcance aprobado, envíos o Deals.
+
 ## Bancos de Chile: selección continua por empresa principal
 
 El [segmento activo 188](https://app.hubspot.com/contacts/48713323/objectLists/188/filters) selecciona contactos
@@ -50,7 +65,7 @@ retirar al registro del segmento correspondiente; el recálculo es asíncrono.
 | --- | --- | --- |
 | Company y Contact, por separado | `efeonce_prospecting_researched_on` | Fecha de la investigación (`AAAA-MM-DD`). Es el límite del universo de prospección continua desde el 2026-10-11 |
 | Company y Contact, por separado | `efeonce_prospecting_cohorts` | Histórica: sólo las rondas del 06 al 10 de octubre. No añadir opciones ni asignarla a registros nuevos |
-| Contact | `efeonce_prospecting_contact_kind` | `individual_email`, `individual_no_email`, `shared_inbox` o `identity_pending`, según la identidad/canal respaldados |
+| Contact | `efeonce_prospecting_contact_kind` | Nuevas altas: `individual_email` con correo corporativo individual verificado. Los otros valores clasifican registros históricos y no autorizan altas sin correo |
 | Contact | `efeonce_prospecting_service_fit` | `creative`, `hubspot_crm` o ambas cuando haya evidencia; conservar valores compatibles previos |
 | Company | `industry`, `country`, `hs_employee_range` | Industria y datos de cuenta respaldados, usando las opciones exactas existentes |
 | Contact | `industria`, `jobtitle`, `email` | Clasificación y datos personales respaldados; no inferir cargo ni inventar email |

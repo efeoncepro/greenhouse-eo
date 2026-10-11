@@ -254,7 +254,8 @@ JTBD y oportunidad concreta. Mantener el mapa de estados y su fecha en el audit 
 - [Customer Model Integrity Pack template](references/customer-model-integrity-pack-template.md) — artefacto reusable.
 - `docs/context/13_icp-buyer-personas-jtbd.md` — contexto existente de Efeonce; no sustituye evidencia de una oferta.
 - `.codex/skills/gtm-architect/modules/01_MARKET_SEGMENT_SELECTION.md` — segmentación y beachhead.
-- `.codex/skills/commercial-expert/` — ejecución comercial y qualification.
+- [Prospección B2B](../efeonce-b2b-prospecting/SKILL.md) — investigación por cuenta, contactos accionables y rutas de acceso; conserva ICP/JTBD en este owner.
+- [Commercial](../commercial-expert/SKILL.md) — ejecución comercial y qualification, companion del overlay/global disponible.
 - `.codex/skills/research-benchmark-operator/` — rigor de research y confidence.
 
 ## Continuidad de campañas CMP

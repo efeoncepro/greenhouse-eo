@@ -641,6 +641,32 @@
       ]
     },
     {
+      "id": "b2b-prospecting",
+      "triggers": [
+        "prospección B2B",
+        "Apollo",
+        "prospección fría",
+        "prospección tibia",
+        "prospección cálida",
+        "contactos adyacentes",
+        "grupo comprador",
+        "reactivación comercial",
+        "expansión de cuenta"
+      ],
+      "skills": [
+        "efeonce-b2b-prospecting",
+        "commercial-expert",
+        "efeonce-customer-model-operator"
+      ],
+      "sources": [
+        "docs/architecture/EFEONCE_B2B_PROSPECTING_SKILL_DECISION_V1.md",
+        ".codex/skills/efeonce-b2b-prospecting/SKILL.md",
+        "docs/documentation/comercial/prospeccion-b2b.md",
+        "docs/manual-de-uso/comercial/operar-prospeccion-b2b.md",
+        "docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md"
+      ]
+    },
+    {
       "id": "hubspot",
       "triggers": [
         "HubSpot",

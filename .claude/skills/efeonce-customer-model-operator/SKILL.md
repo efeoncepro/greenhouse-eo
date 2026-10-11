@@ -10,6 +10,9 @@ Companion transversal para Claude. Su fuente canónica de método es
 `.codex/skills/efeonce-customer-model-operator/`; cargar primero su `SKILL.md` y, cuando corresponda,
 `references/customer-model-method.md` y `references/customer-model-integrity-pack-template.md`.
 
+Para investigar cuentas/personas y preparar rutas de acceso, usar
+[efeonce-b2b-prospecting](../efeonce-b2b-prospecting/SKILL.md); este owner conserva ICP/JTBD y buying group.
+
 ## Contrato
 
 No producir buyer personas decorativas ni declarar ICP, urgencia, champion, economic buyer, presupuesto o WTP sin

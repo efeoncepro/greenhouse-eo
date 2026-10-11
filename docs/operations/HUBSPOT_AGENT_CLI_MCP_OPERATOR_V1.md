@@ -119,6 +119,8 @@ Para enriquecimiento y personalización, cargar
 Fit, solicitud observada, vigencia, identidad y elegibilidad del email tienen evidencias distintas. Preparar
 segmentos no autoriza envíos, cambios de suscripciones, contactos de marketing ni activación de secuencias.
 
+Antes de nuevas altas de prospección, aplicar el [gate de correo y cobertura B2B](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#gate-previo-al-alta-correo-y-contactos-adyacentes): objetivo más 2–3 contactos adicionales relevantes; no crear Contact/Lead sin correo corporativo individual verificado. Sin correo del objetivo, preservar la señal en investigación o nota de Company y continuar por personas adyacentes. Los registros históricos sin email no habilitan nuevas altas vacías.
+
 ## Contexto del carril bridge
 
 Texto de routing preservado desde CLAUDE.md para reducir su presupuesto; este carril no sustituye las altas directas por Agent CLI/MCP ni autoriza despertar Kortex.
