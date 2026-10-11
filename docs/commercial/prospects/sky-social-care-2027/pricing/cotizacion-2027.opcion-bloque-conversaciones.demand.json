@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "sky-airline-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 1,
+    "lines": [
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.08"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "sky-precio-opcional",
+        "kind": "agreed_net",
+        "amount": "290000",
+        "billing": "monthly",
+        "lineIds": [
+          "lider"
+        ],
+        "reason": "Opcional de la propuesta entregada el 10/10/2026: CLP 290.000 más IVA por bloque de 200 conversaciones sobre las 1.300 incluidas. Costo: unas 10 horas del líder (200 conversaciones a 3 minutos), supuesto sin medir."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "tax:cl-iva-19",
+      "source": {
+        "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    },
+    "engagementForm": "on_going"
+  },
+  "work": [
+    {
+      "lineId": "lider",
+      "assigneeIds": [
+        "sky-care-lider"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    }
+  ],
+  "serviceToolIds": [],
+  "allocations": [
+    {
+      "periodId": 1,
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.08",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.08"
+      },
+      "reason": "Parte incremental del opcional: 1 asiento(s) nominativo(s) que estas personas ya tienen en la cotización base; aquí se carga sólo la dedicación adicional, 0.08 de 1. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodId": 1,
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "1",
+      "serviceShare": "0.08",
+      "seatCapacity": 1,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "1",
+        "allocatedUnits": "0.08"
+      },
+      "reason": "Parte incremental del opcional: 1 asiento(s) nominativo(s) que estas personas ya tienen en la cotización base; aquí se carga sólo la dedicación adicional, 0.08 de 1. No es cartera real ni permiso de acceso."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": []
+}

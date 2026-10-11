@@ -50,18 +50,42 @@ Lecturas anteriores a la decisión, con un asiento propio para la persona de ref
 - Siguen siendo estimaciones: costos de las personas, provisiones de reemplazo y alerta, consumo de agentes, plan de
   Sprout sin contratar y las horas por conversación.
 
+## Versión vigente: `cotizacion-2027.*` y `../cotizacion/v3/` (11/10/2026, noche)
+
+El cotizador ya permite declarar el asiento compartido como lo que es. `cotizacion-2027.demand.json` dice lo mismo que
+la decisión del CEO, sin rodeos: cuenta mensual, un asiento, y en los cinco meses de campaña la persona dedicada y la
+de refuerzo lo comparten (`seatSharing`); la persona de refuerzo conserva su tarea de responder. Da los mismos totales
+que `cotizacion-12-meses-asiento-compartido.*`, mes a mes: costo CLP 38.972.628 en doce meses, margen 34,9 %. Esa
+versión anterior expresaba el asiento compartido quitándole la tarea a la persona de refuerzo; queda como historia.
+
+El documento vigente agrega los dos opcionales de la propuesta entregada, con su precio, en un bloque aparte que no
+entra en el neto ni en el total. Cada uno sale de su propia cotización congelada:
+
+| Opcional | Archivos | Precio | Costo | Margen |
+| --- | --- | --- | --- | --- |
+| Cobertura extendida (noches, fines de semana y feriados) | `cotizacion-2027.opcion-cobertura-extendida.*` | CLP 1.290.000 al mes | CLP 498.806 | 61,3 % |
+| Conversaciones adicionales | `cotizacion-2027.opcion-bloque-conversaciones.*` | CLP 290.000 por bloque de 200 | CLP 204.096 | 29,6 % |
+
+- Los precios son los de la propuesta entregada; los costos descansan en supuestos sin medir de esa propuesta.
+- El margen de los opcionales es un piso, no una medición: cada opcional es una cotización propia y vuelve a cargar el
+  fee de plataforma por línea y la parte de las herramientas base, que estas personas ya tienen en la cotización
+  principal (pendiente `OPTION_QUOTES_REPEAT_PER_LINE_FEES` del registro del cotizador). En el bloque de
+  conversaciones ese fee es cerca de un cuarto del costo.
+- La cobertura extendida no puede partir el primer día: depende de una consola propia. El documento no lo dice.
+- La puesta en marcha sigue como texto («bonificadas») y sin valor de referencia: un servicio gestionado no tiene
+  puesta en marcha en el catálogo, así que no hay cifra congelada que mostrar.
+
 ## Documento
 
-`cotizacion-12-meses.document-brief.json` (texto, tomado de la propuesta entregada) →
-`cotizacion-12-meses-asiento-compartido.document.json` (datos emitidos por el cotizador; no se editan a mano) →
-`../cotizacion/v2/` (HTML, PDF de cuatro páginas, manifiesto y capturas de revisión). Es la versión vigente.
+`cotizacion-2027.document-brief.json` (texto, tomado de la propuesta entregada) →
+`cotizacion-2027.document.json` (datos emitidos por el cotizador; no se editan a mano) →
+`../cotizacion/v3/` (HTML, PDF de cinco páginas, manifiesto y capturas de revisión). Es la versión vigente.
 
-`../cotizacion/v1/` es la primera emisión, respaldada por la lectura de dos asientos anuales. Lo que ve el cliente es
-idéntico en las dos versiones; cambia sólo la cotización que la respalda.
+`../cotizacion/v1/` y `../cotizacion/v2/` son emisiones anteriores, sin los opcionales con precio. El neto, el IVA y el
+total son los mismos en las tres.
 
-Es un borrador: sin número de cotización, firma ni verificación. El RUT del cliente figura «por confirmar». Los
-opcionales de la propuesta (cobertura extendida y bloques adicionales de conversaciones) se mencionan sin precio y se
-cotizan aparte. La forma y el plazo de pago, el reajuste y la salida anticipada siguen abiertos.
+Es un borrador: sin número de cotización, firma ni verificación. El RUT del cliente figura «por confirmar». La forma y
+el plazo de pago, el reajuste y la salida anticipada siguen abiertos.
 
 Para reproducir: `pnpm --silent pricing:v3 replay --input <archivo>.artifact.json` y
-`pnpm --silent pricing:v3 compose document --input cotizacion-12-meses-asiento-compartido.artifact.json --brief cotizacion-12-meses.document-brief.json`.
+`pnpm --silent pricing:v3 compose document --input cotizacion-2027.artifact.json --brief cotizacion-2027.document-brief.json --option extendida=cotizacion-2027.opcion-cobertura-extendida.artifact.json --option bloque=cotizacion-2027.opcion-bloque-conversaciones.artifact.json`.

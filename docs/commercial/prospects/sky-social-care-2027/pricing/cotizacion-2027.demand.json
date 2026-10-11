@@ -1,0 +1,348 @@
+{
+  "schemaVersion": "pricing-v3-composition-demand/1",
+  "commercialUnit": "managed_service",
+  "brief": {
+    "schemaVersion": "pricing-v3-brief/1",
+    "mode": "simulation",
+    "quoteDate": "2026-10-11",
+    "offerId": "creative-managed-service",
+    "engagementCode": "monthly",
+    "accountId": "sky-airline-simulation",
+    "offerMarketCountry": "CL",
+    "outputCurrency": "CLP",
+    "periods": 12,
+    "lines": [
+      {
+        "lineId": "titular",
+        "profile": "ECG-007",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "1"
+        },
+        "allocationMode": "dedicated",
+        "allocationPolicyId": "allocation:dedicated",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [
+          {
+            "requirementId": "assurance",
+            "resourceId": "provision-backfill-coverage"
+          },
+          {
+            "requirementId": "operations",
+            "resourceId": "provision-on-call-alert-guard"
+          }
+        ]
+      },
+      {
+        "lineId": "refuerzo",
+        "profile": "ECG-007",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.25"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": [],
+        "activePeriods": [
+          3,
+          5,
+          8,
+          10,
+          11
+        ]
+      },
+      {
+        "lineId": "lider",
+        "profile": "ECG-001",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.2"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      },
+      {
+        "lineId": "agentes",
+        "profile": "ECG-021",
+        "talentCountry": "CL",
+        "headcount": 1,
+        "dedication": {
+          "unit": "fte",
+          "value": "0.1"
+        },
+        "allocationMode": "shared",
+        "allocationPolicyId": "allocation:shared",
+        "kitId": "managed-service-core",
+        "allowUnlocalizedCost": true,
+        "choices": []
+      }
+    ],
+    "adjustments": [
+      {
+        "adjustmentId": "sky-precio-acordado",
+        "kind": "agreed_net",
+        "amount": "4990000",
+        "billing": "monthly",
+        "lineIds": [
+          "titular",
+          "refuerzo",
+          "lider",
+          "agentes"
+        ],
+        "reason": "Precio acordado CLP 4.990.000 más IVA al mes, todo incluido, con el refuerzo de campaña dentro del fee (hasta cinco semanas al año). Excepción al piso de 45 % aprobada por el CEO el 2026-10-10 por ser cliente vigente."
+      }
+    ],
+    "taxTreatment": {
+      "kind": "exclusive",
+      "rate": "0.19",
+      "policyRef": "tax:cl-iva-19",
+      "source": {
+        "reference": "DL 825, artículo 14: tasa general de IVA de 19 % (servicio afecto prestado en Chile)",
+        "effectiveFrom": "2026-01-01",
+        "effectiveUntil": "9999-12-31",
+        "status": "confirmed"
+      }
+    },
+    "engagementForm": "on_going"
+  },
+  "work": [
+    {
+      "lineId": "titular",
+      "assigneeIds": [
+        "sky-care-titular"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "Este rol responde comentarios; no programa ni publica contenido."
+        },
+        {
+          "task": "express-design",
+          "reason": "Este rol responde comentarios; no diseña piezas ni usa Adobe Express."
+        }
+      ]
+    },
+    {
+      "lineId": "refuerzo",
+      "assigneeIds": [
+        "sky-care-refuerzo"
+      ],
+      "tasks": [
+        "social-care"
+      ],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "social-publishing",
+          "reason": "Este rol responde comentarios; no programa ni publica contenido."
+        },
+        {
+          "task": "express-design",
+          "reason": "Este rol responde comentarios; no diseña piezas ni usa Adobe Express."
+        }
+      ]
+    },
+    {
+      "lineId": "lider",
+      "assigneeIds": [
+        "sky-care-lider"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": []
+    },
+    {
+      "lineId": "agentes",
+      "assigneeIds": [
+        "sky-care-agentes"
+      ],
+      "tasks": [],
+      "aiToolIds": [],
+      "creditDemand": [],
+      "excludedProfileTasks": [
+        {
+          "task": "crm-automation",
+          "reason": "Este rol mantiene los agentes y la base de conocimiento; sin automatización de CRM en el alcance."
+        }
+      ]
+    }
+  ],
+  "serviceToolIds": [
+    "agent-runtime-usage"
+  ],
+  "allocations": [
+    {
+      "periodIds": [
+        1,
+        2,
+        4,
+        6,
+        7,
+        9,
+        12
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.45",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.35"
+      },
+      "reason": "Hipótesis de simulación: 3 asientos nominativos (titular, líder y especialista de agentes); al servicio se le carga 1.35 de 3, su dedicación declarada. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        4,
+        6,
+        7,
+        9,
+        12
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "3",
+      "serviceShare": "0.45",
+      "seatCapacity": 3,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "3",
+        "allocatedUnits": "1.35"
+      },
+      "reason": "Hipótesis de simulación: 3 asientos nominativos (titular, líder y especialista de agentes); al servicio se le carga 1.35 de 3, su dedicación declarada. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "agent-runtime-usage",
+      "priceId": "hypothesis-per-1000-items",
+      "quantity": "10",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "thousand-items-processed",
+        "totalUnits": "10",
+        "allocatedUnits": "10"
+      },
+      "reason": "Hipótesis de simulación: unos 10.000 comentarios entrantes clasificados al mes. No está medido."
+    },
+    {
+      "periodIds": [
+        3,
+        5,
+        8,
+        10,
+        11
+      ],
+      "toolId": "notion",
+      "priceId": "current",
+      "quantity": "4",
+      "serviceShare": "0.3875",
+      "seatCapacity": 4,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "4",
+        "allocatedUnits": "1.55"
+      },
+      "reason": "Hipótesis de simulación: 4 asientos nominativos (titular, refuerzo, líder y especialista de agentes); al servicio se le carga 1.55 de 4, su dedicación declarada. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodIds": [
+        3,
+        5,
+        8,
+        10,
+        11
+      ],
+      "toolId": "microsoft-365",
+      "priceId": "current",
+      "quantity": "4",
+      "serviceShare": "0.3875",
+      "seatCapacity": 4,
+      "driver": {
+        "unit": "declared-fte-share",
+        "totalUnits": "4",
+        "allocatedUnits": "1.55"
+      },
+      "reason": "Hipótesis de simulación: 4 asientos nominativos (titular, refuerzo, líder y especialista de agentes); al servicio se le carga 1.55 de 4, su dedicación declarada. No es cartera real ni permiso de acceso."
+    },
+    {
+      "periodIds": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "toolId": "social-inbox",
+      "priceId": "sprout-advanced-monthly",
+      "quantity": "1",
+      "serviceShare": "1",
+      "driver": {
+        "unit": "named-seats",
+        "totalUnits": "1",
+        "allocatedUnits": "1"
+      },
+      "reason": "Decisión del CEO (11/10/2026): Sprout Social Advanced con facturación mensual y un solo asiento durante los doce meses. Precio mensual tomado de guías de terceros; la página oficial sólo muestra el precio con facturación anual."
+    }
+  ],
+  "creditBudgets": [],
+  "fxRecordIds": [],
+  "seatSharing": [
+    {
+      "periodIds": [
+        3,
+        5,
+        8,
+        10,
+        11
+      ],
+      "toolId": "social-inbox",
+      "assigneeIds": [
+        "sky-care-titular",
+        "sky-care-refuerzo"
+      ],
+      "reason": "Decisión del CEO (11/10/2026): no hay un segundo asiento; en las semanas de campaña la persona dedicada y la de refuerzo comparten el asiento de la bandeja. Que Sprout permita compartir un asiento nominativo no está validado."
+    }
+  ]
+}
