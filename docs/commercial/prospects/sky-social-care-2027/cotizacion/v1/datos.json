@@ -1,0 +1,152 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-11",
+  "reference": "Social care 2027 · Oferta económica",
+  "currency": "CLP",
+  "vatRate": 0.19,
+  "taxAmount": "11377200",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "SKY Airline",
+    "unit": "SKY Airline",
+    "taxId": "RUT por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Oferta económica · Servicio gestionado",
+    "title": [
+      "Social care",
+      "2027."
+    ],
+    "subtitle": "Respuesta pública a los comentarios en las 13 cuentas de SKY, con un fee mensual fijo y el equipo reforzado en las campañas grandes."
+  },
+  "service": {
+    "name": "Servicio gestionado de social care 2027"
+  },
+  "scope": {
+    "title": [
+      "Un servicio completo,",
+      "todo incluido."
+    ],
+    "intro": "Hasta 1.300 conversaciones al mes. Lunes a viernes, de 09:00 a 18:00, y con el equipo reforzado en las campañas grandes.",
+    "rows": [
+      {
+        "title": "Cobertura",
+        "text": "Respuesta pública a comentarios de precio y destinos, consultas generales y reclamos en 13 cuentas de 5 mercados: 5 de Facebook, 5 de Instagram, 1 de TikTok, 1 de LinkedIn y 1 de X."
+      },
+      {
+        "title": "Equipo",
+        "text": "Especialista dedicado, con respaldo y supervisión."
+      },
+      {
+        "title": "Horario y respuesta",
+        "text": "Lunes a viernes, de 09:00 a 18:00. Respuesta en 2 a 4 horas hábiles y alerta automática de lo crítico fuera de horario."
+      },
+      {
+        "title": "Campañas",
+        "text": "Refuerzo del equipo en Travel Sale, Cyber SKY y Black Friday, hasta cinco semanas al año."
+      },
+      {
+        "title": "Tecnología",
+        "text": "Agentes de IA, base de conocimiento y plataforma. SKY no contrata ni instala nada."
+      },
+      {
+        "title": "Medición",
+        "text": "27 indicadores en Efeonce Insights."
+      },
+      {
+        "title": "Puesta en marcha",
+        "text": "Seis semanas de preparación, bonificadas."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Cómo se pone en marcha",
+    "note": "Desde la fecha de inicio que defina SKY",
+    "phases": [
+      {
+        "label": "Seis semanas",
+        "title": "Preparación",
+        "text": "Accesos a las cuentas, base de conocimiento y configuración de la plataforma y los agentes."
+      },
+      {
+        "label": "Doce meses",
+        "title": "Operación",
+        "text": "Respuesta diaria en horario hábil e indicadores en Efeonce Insights."
+      },
+      {
+        "label": "Hasta cinco semanas al año",
+        "title": "Campañas",
+        "text": "Una persona más en Travel Sale, Cyber SKY y Black Friday."
+      }
+    ]
+  },
+  "conditions": {
+    "title": [
+      "Supuestos",
+      "y condiciones."
+    ],
+    "rows": [
+      {
+        "title": "Plazo e inicio",
+        "text": "Contrato a 12 meses. La fecha de inicio la define SKY dentro de 2027; la preparación toma seis semanas desde esa definición."
+      },
+      {
+        "title": "Qué es una conversación",
+        "text": "Cada conversación es un comentario y su hilo. El servicio cubre hasta 1.300 conversaciones al mes."
+      },
+      {
+        "title": "Fuera del alcance",
+        "text": "Engagement y mensajes directos. X y los comentarios en anuncios entran si se cuenta con los accesos."
+      },
+      {
+        "title": "Reclamos",
+        "text": "Los reclamos se derivan; el caso de cada pasajero lo resuelve SKY."
+      },
+      {
+        "title": "Opcionales",
+        "text": "La cobertura extendida (noches, fines de semana y feriados) y los bloques adicionales de conversaciones se cotizan aparte."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Fee mensual fijo. La forma y el plazo de pago, el reajuste y la salida anticipada se acuerdan en el contrato."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un fee mensual fijo,",
+      "todo incluido."
+    ],
+    "intro": "Valores netos en pesos chilenos (CLP) para doce meses de servicio.",
+    "summary": "Doce meses · Pesos chilenos · IVA no incluido",
+    "taxNote": "Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027, desde la fecha de inicio que defina SKY. Contrato a 12 meses."
+  },
+  "lines": [
+    {
+      "label": "Servicio gestionado de social care",
+      "detail": "Fee mensual fijo, todo incluido",
+      "group": "Servicio",
+      "quantity": {
+        "value": 12,
+        "unit": "meses"
+      },
+      "unitNet": "4990000",
+      "net": "59880000"
+    }
+  ],
+  "net": "59880000",
+  "source": {
+    "system": "pricing-v3",
+    "calculationId": "composition-275d0369d3d8241c10a95bcf",
+    "digest": "275d0369d3d8241c10a95bcfc08d02c62a5905eec7814c53c9a279c4eb51d9a5",
+    "engineVersion": "pricing-v3-local/1.3.0"
+  }
+}

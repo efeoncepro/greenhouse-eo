@@ -134,6 +134,12 @@
       "owner": "CEO",
       "required": "Adjust the handling rates and the reserve rate with the first real job that carries third-party costs or a fixed scope. Decide whether the reserve also applies to an On-Going service won in a tender with penalties, and how a supplier's payment terms and any commitment that outlives the job are declared",
       "known": "Built on 2026-10-11 (contract 1.4.0, catalog v10) on the CEO's go-ahead («seguiré tu recomendación»). A third-party cost is declared in the quote with its evidence and priced by the rule of its category: production, talent and printing with a 10% handling and a 5% floor; media and licences at cost. Each is its own row, outside the market factor, the engagement ratio and rate discounts; a cost the client pays directly is a note in no total. A contingency reserve of 12% of the person cost applies to the two managed-service offers when sold On-Demand, as a cost, and leaves a quote only by a declared waiver. All these rates are estimates proposed by the agent. The summary shows the margin of own work next to the blended one. Not frozen in a quote: when a supplier is paid, and whether a purchase binds past the job"
+    },
+    {
+      "code": "NAMED_SEATS_UNDER_TWO_PLANS",
+      "owner": "Finance/Architecture",
+      "required": "Let a quote declare, for one named-seat tool in one period, seats held under different plans (an annual seat plus a monthly seat for a campaign) and a paid seat that nobody uses that month. Until then, choose one consistent purchase plan per tool and say which one the quote assumes",
+      "known": "Found on 2026-10-11 quoting a real managed service with a reinforcement person in five campaign weeks a year. The composer takes one price per tool and period; a seat-priced tool must have exactly as many seats as people using it that period; and an annual subscription cannot change its units or have gaps without a renewal policy. So «one annual seat all year plus one monthly seat in the campaign months» cannot be expressed. Two consistent readings were quoted instead: two annual seats all year with the reinforcement spread evenly over the twelve months, and a monthly-billed account with a second seat in the campaign months. They bracket the real cost; the difference between them is about 2.4 margin points on that quote"
     }
   ]
 }
