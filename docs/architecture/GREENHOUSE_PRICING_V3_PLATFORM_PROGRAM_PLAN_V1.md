@@ -98,14 +98,16 @@ versión nueva que reemplaza a la anterior. El número público sale de una secu
    mismas huellas de confirmación de hoy— y el repo recibe una copia exportada. Aplicar nunca activa: mover el puntero
    sigue siendo un acto aparte.
 
-**D6 — Lo humano es humano.** Un agente puede cotizar, registrar una versión y preparar el documento. No puede aprobar
-una excepción bajo el piso, mover el puntero del catálogo ni emitir: esos actos exigen una persona con la capacidad
-correspondiente y quedan registrados con su motivo. Quien cotiza no fija pisos ni costos: salen del catálogo vigente.
+**D6 — Los agentes operan con autonomía.** Un agente cotiza, registra una versión, prepara el documento y emite
+dentro de política, sin esperar a nadie. Sólo dos actos son de persona: aprobar una excepción bajo el piso
+(administración) y activar una versión del catálogo (administración y finanzas). Quien cotiza no fija pisos ni
+costos: salen del catálogo vigente. *(Corregido por el CEO el 2026-10-12: la primera redacción dejaba la emisión a una
+persona.)*
 
 **D7 — Dos carriles de la API.** El carril de aplicación para personas y el de ecosistema para agentes sin sesión
-interactiva (la CLI de un agente usa un token de consumidor guardado en Secret Manager, como ya hace `pnpm studio`).
-Los actos humanos van sólo por el carril de aplicación. La organización sale de la identidad, nunca de un dato que mande
-quien llama.
+interactiva (la CLI de un agente usa un token de consumidor propio, guardado en Secret Manager). Los dos actos de
+persona van sólo por el carril de aplicación; mientras no haya interfaz, la persona inicia sesión desde la CLI.
+Efeonce es siempre la dueña y emisora; el destinatario es una organización cliente o potencial cliente.
 
 **D8 — El documento.** La API entrega los datos del documento (los de `compose document`), con número y versión cuando
 la cotización está emitida. Mientras no haya interfaz, el PDF se sigue generando en local con la plantilla A4, como hoy.

@@ -40,16 +40,23 @@ API → MCP → interfaz**, y con una regla que manda sobre las demás: **la CLI
 4. **Una versión es el artefacto congelado tal cual**: se guarda su texto canónico y su huella, verificada al escribir
    y al leer. Las columnas adicionales son índices de lectura. Sólo se registra una cotización calculada.
 5. **Historial de sólo agregar**, con guardas en la base. Corregir es crear una versión que reemplaza a la anterior. El
-   número público sale de una secuencia.
+   número público sale de una secuencia, se asigna en la primera emisión, lleva el prefijo `EO-QTE-` y la serie real
+   empieza en 15 (`EO-QTE-15`). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.
 6. **El catálogo cambia de autoridad en dos pasos**: primero la base refleja el repo por huella (el repo manda);
    después los cambios se hacen por la API con las mismas huellas de confirmación y el repo recibe una copia. Aplicar
    nunca activa: mover el puntero es un acto aparte.
-7. **Actos humanos.** Aprobar una excepción bajo el piso: sólo administración (`efeonce_admin`). Mover el puntero del
-   catálogo: administración y finanzas (`efeonce_admin`, `finance_admin`). Emitir: una persona con la capacidad
-   correspondiente. Un agente cotiza, registra y prepara el documento; nunca aprueba, activa ni emite, y una sesión de
-   agente no cuenta como aprobación humana. Quien cotiza no fija pisos, costos, organización ni estado.
-8. **Dos carriles de la API de plataforma**: aplicación para personas, ecosistema para agentes sin sesión interactiva.
-   Los actos humanos van sólo por el de aplicación. La organización sale de la identidad.
+7. **Los agentes operan con autonomía.** Cotizar, registrar, preparar el documento y **emitir** una cotización que
+   está dentro de política son actos que un agente hace solo, sin aprobación de una persona. Quedan como actos de
+   persona únicamente dos: aprobar una **excepción bajo el piso** (sólo administración, `efeonce_admin`) y **activar
+   una versión del catálogo** moviendo el puntero (administración y finanzas, `efeonce_admin` y `finance_admin`). Una
+   sesión de agente no cuenta como persona para esos dos actos. Además de los agentes, pueden emitir administración,
+   cuentas y finanzas (`efeonce_admin`, `efeonce_account`, `finance_admin`). Quien cotiza —persona o agente— no fija
+   pisos, costos ni estado: salen del catálogo vigente y del motor.
+8. **Dos carriles de la API de plataforma**: aplicación para personas, ecosistema para agentes sin sesión
+   interactiva. Los dos actos de persona van sólo por el de aplicación; todo lo demás, incluida la emisión dentro de
+   política, está en ambos. Mientras no exista interfaz, una persona ejerce esos dos actos iniciando sesión desde la
+   CLI. Efeonce es siempre la dueña y emisora de la cotización; el destinatario es una organización cliente o
+   potencial cliente, que es un dato validado de la cotización y no confiere acceso.
 9. **La CLI gana una capa de transporte.** Cada comando corre en local o contra la API con las mismas entradas,
    salidas, códigos de salida y errores tipados. El modo local no se retira. El modo por defecto cambia una sola vez,
    cuando la paridad entre ambos caminos esté medida y en verde. Si la API no responde, el comando falla con un error
@@ -104,7 +111,10 @@ crean aplicaciones, paquetes ni servicios nuevos. Cada tarea declara su contrato
 - **NUNCA** aceptar de quien llama el piso, el costo, la organización o el estado.
 - **NUNCA** un respaldo silencioso de la CLI al modo local cuando se pidió el modo plataforma.
 - **NUNCA** retirar, degradar o condicionar el modo local de la CLI.
-- **NUNCA** que un agente apruebe una excepción, mueva el puntero del catálogo o emita.
+- **NUNCA** que un agente apruebe una excepción bajo el piso o mueva el puntero del catálogo.
+- **NUNCA** una aprobación humana en el flujo normal de un agente: dentro de política, cotizar, registrar y emitir no
+  esperan a nadie. Un acto de persona nuevo exige una decisión del CEO.
+- **NUNCA** emitir una versión que el motor marca bajo el piso sin su aprobación de excepción registrada.
 - **NUNCA** fecha de inicio ni duración de contrato en el cotizador; **NUNCA** la nómina como base de costo.
 - **NUNCA** una segunda proyección para el cliente: sale del único filtro existente (`clientSafePeriodItems`).
 - **NUNCA** escribir en `greenhouse_commercial.quotations*` desde el registro de V3, ni leer sus tablas para calcular.
@@ -123,6 +133,22 @@ crean aplicaciones, paquetes ni servicios nuevos. Cada tarea declara su contrato
 - El render del PDF en producción (exige convertir la plantilla A4 en un catálogo del compositor de artefactos).
 - El retiro del cotizador actual: vínculo de las propuestas de licitación, herramientas de Nexa y MCP sobre V2, salida a
   HubSpot.
+- Quién ve costo y margen por MCP (se decide al abrir la tarea de MCP).
 - Firmas, cobro, facturación y cierre de negocio.
 - Las decisiones de negocio abiertas del catálogo (prorrateo del fee de plataforma, costo de puesta en marcha de un
   servicio gestionado).
+
+## Delta 2026-10-12 — decisiones del CEO tras la planificación
+
+Respondidas el mismo día, después de escritas las tareas. Están incorporadas arriba; se listan para que quede el
+antes y el después.
+
+- **Autonomía de los agentes.** La primera redacción reservaba la emisión a una persona. El CEO lo corrigió: el
+  trabajo lo hacen agentes y sumar aprobaciones por la CLI les quita autonomía. Un agente emite dentro de política.
+  Los únicos actos de persona son la excepción bajo el piso y la activación del catálogo.
+- **Dueña y emisora.** Efeonce siempre. Emite a organizaciones que son clientes o potenciales clientes.
+- **Quién puede emitir, además de los agentes.** Administración, cuentas y finanzas.
+- **Cotizaciones de prueba.** Sintéticas, con numeración aparte.
+- **Número.** Prefijo `EO-QTE-`; la serie real empieza en 15.
+- **Propuestas de licitación.** El flujo que exige una cotización del cotizador actual no se usa: la contención no
+  tiene ese bloqueo.

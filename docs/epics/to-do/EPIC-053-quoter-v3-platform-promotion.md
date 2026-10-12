@@ -257,13 +257,13 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 | Prorrateo del fee de plataforma | **Abierta.** No bloquea: entra por el catálogo cuando se decida |
 | Costo de puesta en marcha de un servicio gestionado | **Abierta.** No bloquea |
 | Excepción del diseñador por dedicación | **Abierta.** No bloquea |
-| Quién puede emitir una cotización (roles) | **Abierta.** La decisión exige una persona con la capacidad y no nombra roles; propuesta en `TASK-2025` |
-| Prefijo visible del número de cotización | **Abierta.** Propuesta en `TASK-2025`; queda fijo desde la primera emisión |
+| Quién puede emitir una cotización | Resuelta 2026-10-12: los agentes, dentro de política, y administración, cuentas y finanzas |
+| Prefijo y arranque del número de cotización | Resuelta 2026-10-12: `EO-QTE-`, la serie real empieza en 15; se asigna en la primera emisión |
 | Si V3 publica cotizaciones en HubSpot | **Abierta.** La contención detiene la salida actual; el destino se decide en la unidad U2 |
-| Cómo se vincula una propuesta de licitación mientras dure la contención | **Abierta.** Ver `TASK-2023` |
-| Ejemplos de cotización en la base compartida | **Abierta.** Hay una sola base y la historia no se borra; propuesta de marcarlos como sintéticos en `TASK-2025` |
-| Actos humanos desde la CLI antes de que exista interfaz | **Abierta, bloquea el uso real del registro.** No habrá pantalla hasta la fase 8; sin admitir el inicio de sesión de una persona desde la CLI nadie puede aprobar una excepción, emitir ni activar el catálogo. `TASK-2027` lo admite de forma acotada (persona verificada, nunca sesión de agente) y espera confirmación; `TASK-2028` y `TASK-2029` dependen de ella |
-| A qué organización pertenece una cotización creada por un agente sin sesión | **Abierta, bloquea `TASK-2027` (slice 2).** `TASK-2025` exige organización dueña derivada de la identidad y un agente no trae ninguna |
+| Cómo se vincula una propuesta de licitación mientras dure la contención | Resuelta 2026-10-12: ese flujo no se usa; no bloquea `TASK-2023` |
+| Ejemplos de cotización en la base compartida | Resuelta 2026-10-12: sintéticos, con numeración aparte |
+| Actos humanos y autonomía de los agentes | Resuelta 2026-10-12: los agentes cotizan, registran y emiten dentro de política sin aprobación. Sólo son actos de persona la excepción bajo el piso y la activación del catálogo; hasta que haya interfaz, la persona inicia sesión desde la CLI |
+| Organización dueña de una cotización | Resuelta 2026-10-12: Efeonce siempre es la dueña y emisora; el destinatario es una organización cliente o potencial cliente |
 | Solicitud y rechazo de una excepción | **Abierta.** El modelo registra sólo la aprobación; no queda rastro de una solicitud ni de un rechazo, ni existe cola de pendientes. Ver `TASK-2027` |
 | Quién ve costo y margen por MCP | **Abierta, bloquea la federación de `TASK-2030`.** Casi toda lectura del cálculo es de audiencia interna y el carril de ecosistema no distingue personas |
 | Alcance de escritura por MCP para registrar cotizaciones | **Abierta.** Exige una clase de permiso nueva entre sistemas; `TASK-2030` puede cerrar sólo con lectura y simulación |
