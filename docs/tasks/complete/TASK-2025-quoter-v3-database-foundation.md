@@ -102,7 +102,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -115,7 +115,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Código completo, rollout pendiente (2026-10-12): 117 pruebas verdes en PostgreSQL 16 local y suite completa verde (20.231); las tres migraciones ya viven en migrations/ pero NO están aplicadas; develop sin empujar (el push quedó bloqueado por permisos de la sesión); el build local se cortó y no se repitió; falta aplicar, importar y cerrar`
+- Status real: `Completa y aplicada (2026-10-12): tres migraciones en la base compartida, 24 documentos del catálogo importados y el puntero reflejado; sin cotizaciones todavía. El build local no se verificó: la compuerta es el CI del push`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -458,13 +458,13 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Toda tabla nueva queda declarada con su justificación en el allowlist de destinos de escritura del dominio
       (`src/lib/commercial/quoter/boundary-domain.test.ts`), en el mismo cambio.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -1202,22 +1202,48 @@ visto bueno y la importación del catálogo.
 
 ## Acceptance Criteria
 
-- [ ] El visto bueno del operador para aplicar migraciones y para importar con escritura quedó registrado en la task
+**Evidencia del cierre (2026-10-12).** Lo que sigue se verificó contra la base compartida, no contra un documento:
+
+- Autorización del operador, en este orden y con estas palabras: «te autorizo a que hagas push» y «te autorizo a
+  aplicar todo lo que falte». Antes de eso no se empujó ni se aplicó nada.
+- `pnpm test` completo: 2.050 archivos, 20.231 pruebas, exit 0. `pnpm local:check` (lint y typecheck): exit 0.
+  `pnpm quoter:test:local`: 117 pruebas en PostgreSQL 16.15 conectando como `greenhouse_app`, contra los archivos
+  de `migrations/` tal como se aplicaron.
+- `pnpm migrate:status` antes de aplicar: correrían sólo las tres de esta task. `pnpm pg:connect:migrate`: las tres
+  aplicadas; sus bloques de verificación pasaron con los roles reales.
+- Lectura posterior como `greenhouse_app`: 12 tablas y 2 vistas `quoter_*`, dueño `greenhouse_ops`, 30
+  disparadores; contador real en 15001 y sintético en 1; 13 pares de estado, ninguno con compuerta; seis
+  capacidades `commercial.quoter.*` vigentes; la aplicación inserta y no actualiza ni borra; nadie más que el dueño
+  escribe números, contador o matriz; el usuario de migraciones sólo lee.
+- `pnpm quoter:import documents --apply`: 24 guardados (12 catálogos, 11 políticas, 1 de créditos); segunda corrida:
+  24 ya presentes, cero escrituras. La huella del texto de las 24 filas la recalcula la base y coincide.
+- `pnpm quoter:import pointer --apply`: activado como `repo_mirror`, sin persona, con su commit; segunda corrida:
+  `already_current`. El puntero de la base es el de `data/pricing/v3-operating/current.json` byte a byte, con las
+  mismas tres huellas (catálogo y política `operating-review-2026-10-11-v11`, créditos
+  `operator-screenshots-2026-10-09-v1`).
+- Ninguna cotización registrada todavía: la primera real emitida será `EO-QTE-15001`.
+- `pnpm pg:doctor` sano. La prueba de paridad registro ↔ catálogo contra la base ya no falla por las capacidades de
+  esta task; sigue en rojo por una ajena, `marketing_studio.catalog.manage` (`TASK-1905`, con su propia migración
+  pendiente).
+- **No verificado en local:** `pnpm build`. Colgó el equipo y se cortó a medias. La compuerta de build es el CI del
+  push (`62e3773ec`).
+
+- [x] El visto bueno del operador para aplicar migraciones y para importar con escritura quedó registrado en la task
       (fecha y alcance) antes de cada acción sobre la base compartida.
       2026-10-12: el operador respondió «Ok, termina lo pendiente» al pedido de empujar `develop`, aplicar las tres
       migraciones y correr la suite y el build. La suite corrió. El push y la lectura de estado de migraciones
       quedaron bloqueados por los permisos de la sesión, así que **no se aplicó nada**; antes de aplicar se pide una
       confirmación explícita para ese acto.
-- [ ] Hasta el visto bueno las tres migraciones viven en `docs/tasks/pending-migrations/` y ninguna en `migrations/`.
+- [x] Hasta el visto bueno las tres migraciones viven en `docs/tasks/pending-migrations/` y ninguna en `migrations/`.
       Al cierre viven en `migrations/`, nacidas con `pnpm migrate:create`.
-- [ ] Las tres migraciones empiezan con `-- Up Migration`, llevan bloque `DO` de verificación, no tienen `CREATE` bajo
+- [x] Las tres migraciones empiezan con `-- Up Migration`, llevan bloque `DO` de verificación, no tienen `CREATE` bajo
       `-- Down Migration` y `pnpm migration-marker-gate` pasa.
-- [ ] En el clúster local las tres suben, bajan y vuelven a subir sin dejar objetos (`pnpm quoter:test:local`).
-- [ ] Ninguna migración nombra `greenhouse_commercial.quotations` ni altera un objeto existente.
-- [ ] Existen las doce tablas `greenhouse_commercial.quoter_*`, las dos vistas y sus funciones, todas con dueño
+- [x] En el clúster local las tres suben, bajan y vuelven a subir sin dejar objetos (`pnpm quoter:test:local`).
+- [x] Ninguna migración nombra `greenhouse_commercial.quotations` ni altera un objeto existente.
+- [x] Existen las doce tablas `greenhouse_commercial.quoter_*`, las dos vistas y sus funciones, todas con dueño
       `greenhouse_ops`; `greenhouse_runtime` no tiene `UPDATE`, `DELETE` ni `TRUNCATE` sobre las tablas de historia,
       ni `INSERT` sobre los números, y la migración lo comprueba con `has_table_privilege`.
-- [ ] La huella de cada documento y de cada artefacto la comprueba la base al insertar (restricción o disparador,
+- [x] La huella de cada documento y de cada artefacto la comprueba la base al insertar (restricción o disparador,
       según el resultado del Slice 1) y el adaptador al leer.
 - [x] `UPDATE`, `DELETE` y `TRUNCATE` fallan en `quoter_source_documents`, `quoter_pointer_history`, `quoter_quotes`,
       `quoter_quote_recipients`, `quoter_quote_numbers`, `quoter_quote_versions`, `quoter_state_transitions`,
@@ -1226,7 +1252,7 @@ visto bueno y la importación del catálogo.
 - [x] La destinataria se asigna y se reasigna sólo en `draft`, rige la última, y una cotización sin destinataria no
       pasa a `issued` (prueba 11).
       Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; almacén y SQL directo (`quoter_quote_recipients_only_in_draft`).
-- [ ] El mismo cálculo no entra dos veces en una cotización ni en una segunda cotización viva; retirar lo libera
+- [x] El mismo cálculo no entra dos veces en una cotización ni en una segunda cotización viva; retirar lo libera
       (prueba 12). Sólo `quote-store.ts` escribe en las tablas del agregado, y versión y cambio de estado exigen
       `command_execution_id` (prueba 13).
 - [x] Guardar un documento no agrega una fila a `quoter_pointer_history`; una activación en la plataforma exige
@@ -1258,16 +1284,16 @@ visto bueno y la importación del catálogo.
       Una decisión sobre una excepción con un actor que no es una persona identificada falla en la base y exige la
       huella de su versión; una activación del puntero en la plataforma sin persona identificada falla.
       Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; un agente emite y retira; decisión de excepción por un agente rechazada; activación sin persona rechazada.
-- [ ] Prueba 1: los artefactos calculados del corpus (47 de 48 al planificar) se guardan y se leen con el mismo
+- [x] Prueba 1: los artefactos calculados del corpus (47 de 48 al planificar) se guardan y se leen con el mismo
       texto, el mismo `artifact_digest` y el mismo `replay_digest`, y su reproducción verifica; el no calculado se
       rechaza con `quote_not_calculated`.
-- [ ] Prueba 2: con el índice de lectura corrompido, el lector devuelve lo que dice el artefacto y el índice se
+- [x] Prueba 2: con el índice de lectura corrompido, el lector devuelve lo que dice el artefacto y el índice se
       reconstruye; la prueba estática confirma que nada en `src/lib/commercial/quoter/` construye un resultado desde
       filas.
 - [x] `runStorageConformance` pasa contra el adaptador PostgreSQL en el clúster local.
       Evidencia 2026-10-12: `storage-postgres-conformance.local-postgres.test.ts`, once casos, con las dos
       diferencias declaradas del registro; los adaptadores de archivos y de memoria siguen en verde.
-- [ ] Las pruebas con base de datos corrieron con el clúster local arriba (evidencia de corrida, no omitidas).
+- [x] Las pruebas con base de datos corrieron con el clúster local arriba (evidencia de corrida, no omitidas).
 - [x] Después de emitir: `accepted` y `rejected` como estados, vigencia fijada por cada emisión, `expired` derivado
       en un solo lugar, una vencida se puede aceptar y queda marcada fuera de vigencia, y sólo `withdrawn` es
       terminal (pruebas 17 y 18).
@@ -1279,29 +1305,29 @@ visto bueno y la importación del catálogo.
       Evidencia 2026-10-12: la misma corrida.
 - [x] El veredicto «calculó» y «bajo el piso» sale de una sola función del motor sobre el resultado recalculado
       (`pricing-v3-artifact-verdict.test.ts`, sobre los 48 artefactos del repo).
-- [ ] Las capacidades `commercial.quoter.catalog`, `commercial.quoter.catalog.activate`, `commercial.quoter.simulate`,
+- [x] Las capacidades `commercial.quoter.catalog`, `commercial.quoter.catalog.activate`, `commercial.quoter.simulate`,
       `commercial.quoter.quote`, `commercial.quoter.issue` y `commercial.quoter.exception` existen en el
       registro, en `entitlements-catalog.ts` y otorgadas en `runtime.ts`; `commercial.quoter.exception:approve` sólo a
       `efeonce_admin`, `commercial.quoter.catalog.activate:execute` sólo a `efeonce_admin` y `finance_admin`, y
       `commercial.quoter.issue:approve` a `efeonce_admin`, `efeonce_account` y `finance_admin`.
-- [ ] `capability-grant-coverage.test.ts` pasa y ve las llamadas `can()` de la puerta (escritas con literales). La
+- [x] `capability-grant-coverage.test.ts` pasa y ve las llamadas `can()` de la puerta (escritas con literales). La
       prueba de paridad registro ↔ catálogo (`parity.live.test.ts`, contra la base real) pasa después de aplicar la
       migración 3; entre el commit del catálogo y esa aplicación queda en rojo, y así se reporta.
 - [x] El sujeto máquina de un binding interno (rol `efeonce_account`) pasa la puerta única para emitir y retirar, y
       no la pasa para aprobar una excepción, activar el puntero ni guardar un documento de catálogo (probado).
       Evidencia 2026-10-12: `src/lib/commercial/quoter/__tests__/authz.test.ts`.
-- [ ] La organización dueña de una cotización se resuelve en una sola función por el identificador público
+- [x] La organización dueña de una cotización se resuelve en una sola función por el identificador público
       `EO-ORG-0007` y falla cerrado si la fila no es la entidad operativa activa; ningún archivo de
       `src/lib/commercial/quoter/` ni migración de esta task contiene un UUID de organización.
-- [ ] `pnpm quoter:import --apply` dejó en la base todos los documentos de catálogo, política y créditos del repo,
+- [x] `pnpm quoter:import --apply` dejó en la base todos los documentos de catálogo, política y créditos del repo,
       incluidas las versiones históricas que nombra el corpus; una segunda corrida no escribe; cada huella en la base
       es igual a la del repo.
-- [ ] `quoter_current_pointer` nombra las mismas tres huellas que `data/pricing/v3-operating/current.json`.
-- [ ] Ningún archivo de `src/lib/commercial/quoter/` nombra `greenhouse_commercial.quotations`, y ningún archivo de
+- [x] `quoter_current_pointer` nombra las mismas tres huellas que `data/pricing/v3-operating/current.json`.
+- [x] Ningún archivo de `src/lib/commercial/quoter/` nombra `greenhouse_commercial.quotations`, y ningún archivo de
       `src/lib/finance/pricing-v3/` importa algo de `src/lib/commercial/`.
-- [ ] Ninguna ruta bajo `src/app/` importa `src/lib/commercial/quoter/` al cierre de esta task.
-- [ ] `pnpm pricing:v3:test` sigue en verde y ningún archivo de `data/pricing/**` cambió.
-- [ ] Modelo de datos, documentación funcional y manual del importador publicados; `EPIC-053` y `TASK-2026`/`TASK-2027`
+- [x] Ninguna ruta bajo `src/app/` importa `src/lib/commercial/quoter/` al cierre de esta task.
+- [x] `pnpm pricing:v3:test` sigue en verde y ningún archivo de `data/pricing/**` cambió.
+- [x] Modelo de datos, documentación funcional y manual del importador publicados; `EPIC-053` y `TASK-2026`/`TASK-2027`
       informadas de los nombres finales.
 
 ## Verification
@@ -1319,18 +1345,19 @@ visto bueno y la importación del catálogo.
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas (`TASK-2027`, `TASK-2028` y `TASK-2029`
+      alineadas con el almacén; `TASK-2026` no cambia de alcance)
 
-- [ ] `EPIC-053` refleja la puerta de salida de la fase 2 («catálogo vigente importado; huellas en la base = huellas
+- [x] `EPIC-053` refleja la puerta de salida de la fase 2 («catálogo vigente importado; huellas en la base = huellas
       del repo») con su evidencia
-- [ ] si el estado es código completo sin migraciones aplicadas, la task se reporta como
+- [x] si el estado es código completo sin migraciones aplicadas, la task se reporta como
       `code complete, rollout pendiente` y no se mueve a `complete/`
-- [ ] CLAUDE.md §«Data Architecture» menciona `greenhouse_commercial` entre los esquemas activos si sigue sin
+- [x] CLAUDE.md §«Data Architecture» menciona `greenhouse_commercial` entre los esquemas activos si sigue sin
       figurar (deriva documental detectada al planificar)
 
 ## Follow-ups

@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — Cotizador V3: el registro de cotizaciones existe en la base
+
+- Nuevo en `greenhouse_commercial`: las tablas `quoter_*` (catálogo por huella, puntero de versiones vigentes,
+  cotizaciones con versiones inmutables, estados, destinataria, número y excepciones bajo el piso). Aplicadas a la
+  base compartida; el catálogo del repo quedó importado (24 documentos) y su puntero reflejado. Ninguna API ni
+  pantalla las usa todavía (`TASK-2026`, `TASK-2027`).
+- Comando nuevo `pnpm quoter:import plan | documents | pointer`: hay que correrlo cada vez que el catálogo del repo
+  cambie. Carril de pruebas nuevo `pnpm quoter:test:local` (PostgreSQL 16 local).
+- Seis capacidades nuevas `commercial.quoter.*`. La primera cotización real emitida será `EO-QTE-15001`.
+- [Modelo de datos](docs/architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
+  [manual del importador](docs/manual-de-uso/finance/importar-catalogo-v3-a-la-plataforma.md). `TASK-2025`.
+
 ## 2026-10-12 — Growth: el regrade AEO respeta el contrato y la captura de rankings tiene segunda pasada
 
 - El regrade recurrente fallaba todos los días desde el 3 de octubre con los 6 mercados secundarios de Sky: tenían
@@ -493,7 +505,3 @@ Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco
 ## 2026-10-02 — Traje biónico de Nexa: kit, catálogo y escena cine con Sparks (TASK-1940)
 
 El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde `NX5b` (aisladas, puestas en Nexa A, macro de la placa y lentes biónicos), entradas `traje-bionico-nexa` y `lentes-bionicos-nexa` en `foto:prompt` con la guarda `validarTrajeNexa` (sólo Nexa, sólo `"registro": "cine"`), marcas armadas en la referencia (isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, con `foto:isotipo --marca logotipo`) y la escena aprobada `NX7d`, canonizada en el registro cine 1.7.
-
-## 2026-10-01 — Sparks: los agentes de Efeonce como personajes del kit (TASK-1941)
-
-Diseño elegido por el operador (el Spark de «Agents» alejado de Astro Bot: flota, chispa del Nexa Mark, órbita y tres ventanas de la nave). Spark base en 26 vistas + 4 escenas con Nexa, plantel de cinco con accesorio y gesto, entradas `spark-*` en `foto:prompt` con la guarda `validarRobots` (robots sólo como Sparks; nunca documental) y canon [`SPARKS_V1.md`](docs/operations/brand-characters/SPARKS_V1.md) con revisión de colisión del nombre. Kits en OneDrive `13- Branding/Sparks/`. Plantel aprobado; task cerrada.

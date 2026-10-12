@@ -1,7 +1,7 @@
 # Cotizador V3 en la plataforma — modelo de datos del registro
 
-- Estado: **escrito y probado en PostgreSQL 16 local; migraciones creadas y todavía sin aplicar** (`TASK-2025`, fase 2
-  de `EPIC-053`, 2026-10-12). Son `migrations/20261012123154614_task-2025-quoter-source-documents-and-pointer.sql`,
+- Estado: **vigente y aplicado a la base compartida el 2026-10-12** (`TASK-2025`, fase 2 de `EPIC-053`). El catálogo
+  del repo está importado y su puntero reflejado; todavía no hay cotizaciones ni APIs. Migraciones: `migrations/20261012123154614_task-2025-quoter-source-documents-and-pointer.sql`,
   `…155887_task-2025-quoter-quote-aggregate.sql` y `…157583_task-2025-quoter-capabilities.sql`.
 - Decisión que lo origina: [promoción de V3 a la plataforma](GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md),
   decisiones 2 (registro nuevo, sin tocar el cotizador actual), 4 (una versión es el artefacto congelado), 5 (ciclo

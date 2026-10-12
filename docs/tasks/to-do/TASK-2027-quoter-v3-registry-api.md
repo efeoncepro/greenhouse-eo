@@ -80,7 +80,7 @@ almacén ya está escrito y probado en PostgreSQL 16 local; este documento se al
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform|finance`
-- Blocked by: `TASK-2025, TASK-2026`
+- Blocked by: `TASK-2026`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -172,7 +172,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/in-progress/TASK-2025-quoter-v3-database-foundation.md` — esquema, matriz sembrada, número,
+- `docs/tasks/complete/TASK-2025-quoter-v3-database-foundation.md` — esquema, matriz sembrada, número,
   aprobaciones de excepción, `data_origin`, capacidades. **Manda sobre este documento en todo lo que es estructura
   de datos**: aquí no se repite su matriz ni sus columnas, se referencian.
 - `docs/tasks/to-do/TASK-2026-quoter-v3-compute-api.md` — tabla de traducción, forma de `data`/`meta`, versiones.

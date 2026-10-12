@@ -235,8 +235,11 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
       carpeta llenada por el puerto, memoria); la línea base de 107 comandos, capturada antes de tocar la CLI, pasa
       sin regenerar un fixture; `pnpm build` exit 0; `pnpm test` completo con 3 rojos ajenos (desfase del paquete
       AXIS). Detalle en la task.
-- [ ] **Fase 2 (`TASK-2025`).** Catálogo vigente importado; huellas en la base iguales a las del repo; un artefacto
-      guardado se lee con la misma huella.
+- [x] **Fase 2 (`TASK-2025`).** Catálogo vigente importado; huellas en la base iguales a las del repo; un artefacto
+      guardado se lee con la misma huella. Cerrada el 2026-10-12: tres migraciones aplicadas a la base compartida,
+      24 documentos importados (segunda corrida sin escrituras), puntero de la base idéntico byte a byte al del
+      repo; la lectura de un artefacto con su misma huella está probada con los 47 artefactos calculados del repo en
+      PostgreSQL 16 local (todavía no hay cotizaciones en la base). El build local no se verificó.
 - [ ] **Fase 3 (`TASK-2026`).** Paridad en staging: cada ejemplo del repo da la misma huella por la API.
 - [ ] **Fase 4 (`TASK-2027`).** Cotizaciones de ejemplo registradas y verificadas recalculando desde la base; un acto
       humano intentado por un agente es rechazado.

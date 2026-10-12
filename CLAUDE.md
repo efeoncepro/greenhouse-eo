@@ -102,7 +102,7 @@ nunca Chromium en Vercel ni `ops-worker`.
 - **PostgreSQL** (Cloud SQL `greenhouse-pg-dev`, Postgres 16, `us-east4`) — OLTP, workflows mutables, runtime-first
 - **BigQuery** (`efeonce-group`) — raw snapshots, conformed analytics, marts, histórico
 - Patrón de lectura: **Postgres first, BigQuery fallback**
-- Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`, `greenhouse_insights`
+- Schemas PostgreSQL activos: `greenhouse_core`, `greenhouse_serving`, `greenhouse_sync`, `greenhouse_payroll`, `greenhouse_finance`, `greenhouse_hr`, `greenhouse_crm`, `greenhouse_delivery`, `greenhouse_ai`, `greenhouse_insights`, `greenhouse_commercial`
 
 ### BigQuery DML Struct Timestamp Hard Rules (ISSUE-082 / TASK-941)
 

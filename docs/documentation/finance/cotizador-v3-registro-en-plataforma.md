@@ -1,14 +1,14 @@
 # Cotizador V3 — registro de cotizaciones en la plataforma
 
 > **Tipo de documento:** Documentación funcional (lenguaje simple)
-> **Versión:** 1.0
+> **Versión:** 1.1
 > **Creado:** 2026-10-12 por Claude (TASK-2025)
 > **Última actualización:** 2026-10-12 por Claude
 > **Documentación técnica:** [modelo de datos](../../architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
 > [decisión](../../architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md)
 
-**Estado:** la base del registro está escrita y probada en local. Todavía no está aplicada a la base de datos de la
-plataforma y ninguna pantalla ni API la usa: eso llega con las siguientes etapas del programa.
+**Estado:** la base del registro existe en la plataforma desde el 2026-10-12, con el catálogo vigente copiado. Todavía
+no hay cotizaciones registradas, y ninguna pantalla ni API la usa: eso llega con las siguientes etapas del programa.
 
 ## Qué es
 

@@ -122,6 +122,11 @@ En el catálogo operativo, una versión nueva queda vigente cuando se mueve el p
 
 ## Versiones vigentes: el puntero `current.json`
 
+> **Después de mover el puntero, actualiza la copia de la plataforma.** Desde el 2026-10-12 la base guarda una copia
+> del catálogo y del puntero, y no se actualiza sola: con el cambio commiteado y empujado, corre la importación que
+> describe [Importar el catálogo de V3 a la plataforma](importar-catalogo-v3-a-la-plataforma.md). Cotizar por CLI no
+> depende de esa copia.
+
 **Para qué sirve.** Cada versión del catálogo monetario, de la policy de recursos y del catálogo de créditos es un
 archivo que no se edita ni se borra, porque las cotizaciones congeladas dependen de las anteriores. «Vigente» no
 puede ser entonces un nombre de archivo: lo dice un único documento, `data/pricing/v3-operating/current.json`

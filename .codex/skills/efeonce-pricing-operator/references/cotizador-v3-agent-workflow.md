@@ -1253,6 +1253,16 @@ Dilo cuando el negocio lo toca; no lo presentes como existente ni lo resuelvas d
   puntero con `current set --catalog A --policy B --credits C --reason "…" --confirm <pointerDigest>` → `current
   show` con `consistent: true` y `pnpm pricing:v3:test` verde. `apply` no mueve el puntero ni repricea cotizaciones
   previas. Pasos completos y campos de cada clase de registro: manual del catálogo.
+- **La copia del catálogo en la plataforma** (desde el 2026-10-12): la base guarda el catálogo, la policy, los
+  créditos y el puntero como reflejo del repo. No se actualiza sola. Después de mover el puntero, y con el cambio ya
+  commiteado y empujado, hay que correr `pnpm quoter:import documents --reason "…" --apply` y luego `pnpm
+  quoter:import pointer --reason "…" --apply`; sin `--apply` sólo simulan, y `pnpm quoter:import plan` no toca ninguna
+  base. Escriben en la base de producción: pide el visto bueno del operador antes. Cotizar por CLI no depende de esa
+  copia: el modo local sigue leyendo los archivos.
+  [Manual](../../../../docs/manual-de-uso/finance/importar-catalogo-v3-a-la-plataforma.md).
+- **Registro de cotizaciones en la plataforma:** existe en la base (versiones, estados, número `EO-QTE-15001` en
+  adelante) pero todavía no tiene API ni comandos: no hay forma de registrar una cotización desde este carril.
+  [Qué es](../../../../docs/documentation/finance/cotizador-v3-registro-en-plataforma.md).
 - **Código:**
 
 | Qué | Dónde |

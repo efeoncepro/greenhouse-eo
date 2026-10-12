@@ -1949,6 +1949,234 @@ export interface GreenhouseCommercialQuotePdfAssets {
   version_number: number;
 }
 
+export interface GreenhouseCommercialQuoterCurrentPointer {
+  activated_at: Timestamp | null;
+  activated_by_member_id: string | null;
+  activated_by_principal_id: string | null;
+  catalog_digest: string | null;
+  command_execution_id: string | null;
+  credits_digest: string | null;
+  origin: string | null;
+  pointer_digest: string | null;
+  pointer_seq: Int8 | null;
+  pointer_text: string | null;
+  pointer_text_digest: string | null;
+  policy_digest: string | null;
+  previous_pointer_digest: string | null;
+  reason: string | null;
+  source_commit_sha: string | null;
+}
+
+export interface GreenhouseCommercialQuoterExceptionApprovals {
+  actor_kind: Generated<string>;
+  approval_seq: number;
+  artifact_digest: string;
+  command_execution_id: string;
+  decided_at: Generated<Timestamp>;
+  decided_by_member_id: string;
+  decided_by_principal_id: string;
+  decision: string;
+  owner_organization_id: string;
+  quote_id: string;
+  reason: string;
+  request_hash: string | null;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuoterPointerHistory {
+  activated_at: Generated<Timestamp>;
+  activated_by_member_id: string | null;
+  activated_by_principal_id: string;
+  catalog_digest: string;
+  catalog_role: Generated<string>;
+  command_execution_id: string | null;
+  credits_digest: string;
+  credits_role: Generated<string>;
+  origin: string;
+  pointer_digest: string;
+  pointer_seq: Int8;
+  pointer_text: string;
+  pointer_text_digest: string;
+  policy_digest: string;
+  policy_role: Generated<string>;
+  previous_pointer_digest: string | null;
+  reason: string;
+  request_hash: string | null;
+  source_commit_sha: string | null;
+}
+
+export interface GreenhouseCommercialQuoterQuoteCurrent {
+  accepted_after_validity: boolean | null;
+  accepted_at: Timestamp | null;
+  accepted_days_after_validity: number | null;
+  accepted_valid_until: Timestamp | null;
+  client_organization_id: string | null;
+  created_at: Timestamp | null;
+  data_origin: string | null;
+  effective_state: string | null;
+  issued_artifact_digest: string | null;
+  issued_at: Timestamp | null;
+  issued_document_digest: string | null;
+  issued_document_seq: number | null;
+  issued_version_number: number | null;
+  latest_below_floor: boolean | null;
+  latest_currency: string | null;
+  latest_replay_digest: string | null;
+  latest_version_number: number | null;
+  owner_organization_id: string | null;
+  quote_id: string | null;
+  quote_number: string | null;
+  state: string | null;
+  state_since: Timestamp | null;
+  valid_until: Timestamp | null;
+}
+
+export interface GreenhouseCommercialQuoterQuoteNumberCounters {
+  next_value: Int8;
+  prefix: string;
+  series: string;
+}
+
+export interface GreenhouseCommercialQuoterQuoteNumbers {
+  assigned_at: Generated<Timestamp>;
+  issued_transition_seq: number;
+  quote_id: string;
+  quote_number: string;
+}
+
+export interface GreenhouseCommercialQuoterQuoteRecipients {
+  assigned_at: Generated<Timestamp>;
+  assigned_by_actor_kind: string;
+  assigned_by_member_id: string | null;
+  assigned_by_principal_id: string;
+  assignment_seq: number;
+  client_organization_id: string;
+  command_execution_id: string;
+  owner_organization_id: string;
+  quote_id: string;
+  reason: string;
+  request_hash: string | null;
+}
+
+export interface GreenhouseCommercialQuoterQuotes {
+  command_execution_id: string;
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_member_id: string | null;
+  created_by_principal_id: string;
+  data_origin: string;
+  owner_organization_id: string;
+  quote_id: Generated<string>;
+  request_hash: string | null;
+}
+
+export interface GreenhouseCommercialQuoterQuoteVersionIndex {
+  catalog_digest: string | null;
+  catalog_version: string | null;
+  contract_version: string | null;
+  credits_digest: string | null;
+  credits_version: string | null;
+  currency: string | null;
+  engine_version: string | null;
+  indexed_at: Generated<Timestamp>;
+  policy_digest: string | null;
+  policy_version: string | null;
+  quote_id: string;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuoterQuoteVersions {
+  artifact_digest: string;
+  artifact_text: string;
+  artifact_version: string;
+  below_floor: boolean;
+  calculation_id: string;
+  calculation_status: string;
+  command_execution_id: string;
+  origin: string;
+  owner_organization_id: string;
+  quote_id: string;
+  registered_at: Generated<Timestamp>;
+  registered_by_actor_kind: string;
+  registered_by_member_id: string | null;
+  registered_by_principal_id: string;
+  replay_digest: string;
+  request_hash: string | null;
+  version_number: number;
+}
+
+export interface GreenhouseCommercialQuoterSourceDocuments {
+  command_execution_id: string | null;
+  document_digest: string;
+  /**
+   * El documento tal como se recibió; nunca reserializado. Su sha256 es document_text_digest. document_digest es otra cosa: la huella de identidad que nombra el puntero.
+   */
+  document_text: string;
+  document_text_digest: string;
+  origin: string;
+  parent_digest: string | null;
+  reason: string;
+  request_hash: string | null;
+  role: string;
+  /**
+   * read index; never the source of a result
+   */
+  schema_version: string | null;
+  source_commit_sha: string | null;
+  source_path: string | null;
+  stored_at: Generated<Timestamp>;
+  stored_by_actor_kind: string;
+  stored_by_member_id: string | null;
+  stored_by_principal_id: string;
+  version: string;
+}
+
+export interface GreenhouseCommercialQuoterStateMatrix {
+  from_state: string;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+}
+
+export interface GreenhouseCommercialQuoterStateTransitions {
+  actor_kind: string;
+  actor_member_id: string | null;
+  actor_principal_id: string;
+  artifact_digest: string | null;
+  command_execution_id: string;
+  document_digest: string | null;
+  document_seq: number | null;
+  from_state: string;
+  occurred_at: Generated<Timestamp>;
+  owner_organization_id: string;
+  quote_id: string;
+  reason: string;
+  request_hash: string | null;
+  requires_human_gate: Generated<boolean>;
+  to_state: string;
+  transition_id: Generated<string>;
+  transition_seq: number;
+  valid_until: Timestamp | null;
+  version_number: number | null;
+}
+
+export interface GreenhouseCommercialQuoterVersionDocuments {
+  brief_digest: string;
+  brief_text: string;
+  command_execution_id: string;
+  document_digest: string;
+  document_seq: number;
+  document_text: string;
+  owner_organization_id: string;
+  quote_id: string;
+  request_hash: string | null;
+  stored_at: Generated<Timestamp>;
+  stored_by_actor_kind: string;
+  stored_by_member_id: string | null;
+  stored_by_principal_id: string;
+  template_data_version: string;
+  version_number: number;
+}
+
 export interface GreenhouseCommercialQuoteShareViews {
   ip_address: string | null;
   quotation_id: string;
@@ -13942,6 +14170,20 @@ export interface DB {
   "greenhouse_commercial.quote_short_links": GreenhouseCommercialQuoteShortLinks;
   "greenhouse_commercial.quote_template_items": GreenhouseCommercialQuoteTemplateItems;
   "greenhouse_commercial.quote_templates": GreenhouseCommercialQuoteTemplates;
+  "greenhouse_commercial.quoter_current_pointer": GreenhouseCommercialQuoterCurrentPointer;
+  "greenhouse_commercial.quoter_exception_approvals": GreenhouseCommercialQuoterExceptionApprovals;
+  "greenhouse_commercial.quoter_pointer_history": GreenhouseCommercialQuoterPointerHistory;
+  "greenhouse_commercial.quoter_quote_current": GreenhouseCommercialQuoterQuoteCurrent;
+  "greenhouse_commercial.quoter_quote_number_counters": GreenhouseCommercialQuoterQuoteNumberCounters;
+  "greenhouse_commercial.quoter_quote_numbers": GreenhouseCommercialQuoterQuoteNumbers;
+  "greenhouse_commercial.quoter_quote_recipients": GreenhouseCommercialQuoterQuoteRecipients;
+  "greenhouse_commercial.quoter_quote_version_index": GreenhouseCommercialQuoterQuoteVersionIndex;
+  "greenhouse_commercial.quoter_quote_versions": GreenhouseCommercialQuoterQuoteVersions;
+  "greenhouse_commercial.quoter_quotes": GreenhouseCommercialQuoterQuotes;
+  "greenhouse_commercial.quoter_source_documents": GreenhouseCommercialQuoterSourceDocuments;
+  "greenhouse_commercial.quoter_state_matrix": GreenhouseCommercialQuoterStateMatrix;
+  "greenhouse_commercial.quoter_state_transitions": GreenhouseCommercialQuoterStateTransitions;
+  "greenhouse_commercial.quoter_version_documents": GreenhouseCommercialQuoterVersionDocuments;
   "greenhouse_commercial.revenue_metric_config": GreenhouseCommercialRevenueMetricConfig;
   "greenhouse_commercial.role_blended_cost_basis_snapshots": GreenhouseCommercialRoleBlendedCostBasisSnapshots;
   "greenhouse_commercial.role_employment_compatibility": GreenhouseCommercialRoleEmploymentCompatibility;

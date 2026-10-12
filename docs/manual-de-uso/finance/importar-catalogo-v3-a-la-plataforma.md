@@ -1,11 +1,17 @@
 # Importar el catálogo de V3 a la plataforma
 
-- Estado: **el comando existe; todavía no se ha corrido contra la base de la plataforma** (`TASK-2025`, 2026-10-12).
+- Estado: **vigente**. Primera importación hecha el 2026-10-12 (`TASK-2025`): 24 documentos y el puntero.
 - Para quién: quien opera el catálogo de V3 (Finanzas o administración de Efeonce) junto con el operador que autoriza
   cambios en la base.
 - Referencias: [qué es el registro](../../documentation/finance/cotizador-v3-registro-en-plataforma.md) ·
   [modelo de datos](../../architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md) ·
   [mantenimiento del catálogo en el repo](catalogo-v3-seleccion-y-actualizacion.md).
+
+## Cuándo hay que correrlo
+
+Cada vez que el catálogo del repositorio cambia: una versión nueva del catálogo, de la política o de los créditos, o
+un puntero nuevo (`current set`). Mientras la plataforma no sea la autoridad del catálogo, la copia de la base sólo
+se actualiza con este comando. Si no se corre, la plataforma sigue con el catálogo anterior.
 
 ## Para qué sirve
 
@@ -18,7 +24,7 @@ refleja el puntero que dice cuáles rigen. El repositorio sigue siendo la fuente
   `--apply` queda en producción. Necesita el visto bueno del operador en ese momento.
 - Lo que se importa tiene que estar **commiteado y empujado**. El comando rechaza un archivo con cambios sin
   commitear o cuyo commit no está en el remoto, y guarda con cada fila el commit del que salió.
-- Las migraciones de `TASK-2025` tienen que estar aplicadas.
+- Las tablas del registro ya existen en la base (migraciones de `TASK-2025`, aplicadas el 2026-10-12).
 - Conexión a la base: `pnpm pg:connect`.
 
 ## Paso a paso
