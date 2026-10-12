@@ -1,6 +1,7 @@
 # BICE Vida — equipo creativo y SEO
 
-Corte 12-10-2026. **Prospección fría; sin relación previa con estas personas.** Julio pidió identificar a los
+Corte 12-10-2026. **Relación por persona sin declarar.** Julio trabajó en BICE y conoce parte de la organización;
+qué personas de esta lista conoce y con qué cercanía lo declara él, no se infiere. Pidió identificar a los
 responsables de creatividad y SEO y autorizó enriquecimiento en Apollo y registro en HubSpot. No se envió
 comunicación ni se creó Lead o Deal.
 
@@ -34,10 +35,16 @@ investigados (180) y personas con email (181); cuatro en fit creativo (182); nin
 **Sin registro:** Pilar García, Jefe de Marca y Contenido desde 2026 según Apollo, es el objetivo creativo
 principal. Apollo no devolvió correo (`unavailable`), así que no se creó el contacto. Queda como brecha.
 
+**Sin registro:** Gisela Maass. Julio indica, por conocimiento directo, que hoy es subgerente y depende de
+Felipe Otarola. Apollo (enriquecimiento del 12-10-2026, 1 crédito, confianza alta) aún la muestra como Jefe
+Productos Banca Personas en Banco Security y devuelve un correo del dominio de Security, `verified` sobre un
+dominio catch-all. Ese correo corresponde al cargo anterior: no se usa ni se registra bajo BICE Vida, y la
+dirección actual no se deduce por patrón. Cargo exacto y correo vigente pendientes; no existía en HubSpot.
+
 ## Correos
 
 Apollo, enriquecimiento estándar por ID del 12-10-2026: nueve personas, **9 créditos**, ocho `verified` y una
-sin correo. Sin waterfall, teléfonos ni correos personales. No hubo segundo validador: un correo verificado no
+sin correo; más **1 crédito** por Gisela Maass, con correo de su empleador anterior. Sin waterfall, teléfonos ni correos personales. No hubo segundo validador: un correo verificado no
 es permiso de envío ni prueba de entregabilidad.
 
 ## Señales y criterio de abordaje
@@ -58,6 +65,7 @@ Ninguna señal es interés declarado. Los cargos son dato de Apollo (actualizado
 
 ## Brechas y siguiente paso
 
+- Correo vigente y cargo exacto de Gisela Maass: pedírselo Julio directamente o por una introducción interna.
 - Correo de Pilar García: ruta por colegas de marca ya registrados o por una introducción; no deducir la dirección.
 - No está identificado quién lidera Marketing Digital hoy, jefatura directa de la especialista SEO.
 - Ruta tibia posible: los cinco contactos de [Banco BICE](../contactos-conocidos-banca-retail-2026-10/README.md),
