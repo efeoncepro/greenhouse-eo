@@ -1225,8 +1225,11 @@ visto bueno y la importación del catálogo.
 - `pnpm pg:doctor` sano. La prueba de paridad registro ↔ catálogo contra la base ya no falla por las capacidades de
   esta task; sigue en rojo por una ajena, `marketing_studio.catalog.manage` (`TASK-1905`, con su propia migración
   pendiente).
-- **No verificado en local:** `pnpm build`. Colgó el equipo y se cortó a medias. La compuerta de build es el CI del
-  push (`62e3773ec`).
+- **No verificado en local:** `pnpm build`. Colgó el equipo y se cortó a medias. **Verificado por Vercel:** el
+  despliegue de staging del commit empujado (`62e3773ec`) terminó bien, así que el build de producción pasa.
+- **CI del push, en rojo por tiempo y no por una prueba:** el paso `Test` se cortó a los 14 minutos con 1.879 de
+  ~2.121 archivos corridos y ninguno fallado; el build condicional de ese job no llegó a correr. La misma suite
+  pasó completa en local sobre el mismo código. Subir ese límite o repartir la suite es trabajo aparte.
 
 - [x] El visto bueno del operador para aplicar migraciones y para importar con escritura quedó registrado en la task
       (fecha y alcance) antes de cada acción sobre la base compartida.
