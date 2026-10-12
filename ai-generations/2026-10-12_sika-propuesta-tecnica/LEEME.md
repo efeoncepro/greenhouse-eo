@@ -59,7 +59,7 @@ de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo 
 | 15 | Nombres y cargos | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; fotos reales del catálogo del compositor |
 | 15 | «+85 profesionales en toda Latinoamérica» | Cifra del operador (comentario del 12/10), con el tratamiento de la lámina «Expertos multidisciplinarios» canonizada el 10/10; sin fuente en el repo |
 | 16 | Personas en Chile y en México; Teams, Notion y Frame.io | Indicación del operador del 12/10 (pidió quitar «desde Chile» y las horas en común: «nos puede jugar en contra»); herramientas del brochure «Agencia Creativa» |
-| 17 | Caso Sky: +2.000 piezas, 39 campañas, 88 %, −25 % | Lámina aprobada `decision-case` del compositor (`composer/caso.json`, foto `SK1-vuelo-amanecer` del brochure «Agencia Creativa»; se compone como lámina clara de Efeonce, línea growth: el contrato rechaza Brand en claro). El operador rechazó la lámina hecha a mano el 12/10. Autorización de Sky para citarlo fuera, sin verificar |
+| 17 | Caso Sky: +2.000 piezas, 39 campañas, 88 %, −25 % | Lámina aprobada `decision-case` del compositor (`composer/caso.json`, foto `ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png`, el avión de Sky sobre las nubes (el operador la pidió el 12/10 en lugar del ala al amanecer); se compone como lámina clara de Efeonce, línea growth: el contrato rechaza Brand en claro). El operador rechazó la lámina hecha a mano el 12/10. Autorización de Sky para citarlo fuera, sin verificar |
 
 ## Por confirmar antes de enviar
 
@@ -115,3 +115,13 @@ En OneDrive, carpeta de la licitación:
   Parte del PDF del 06/10 y cambia tres páginas: la 17 (storyboard del reel aprobado) y, en la 3 y la 13, el texto que hablaba de
   Sika en tercera persona (se pega sólo la franja del texto nuevo sobre la página original). El v1 (`Efeonce-Propuesta-Sika-POSIBLE.pdf`) se conserva.
 - `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` — el reel aprobado.
+
+## Página del reel en Think + QR (12/10)
+
+- Página: `https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c` (repo `efeonce-think`, `src/pages/muestras/sika-posible-dde148ea051c.astro`
+  + `public/muestras/sika-posible-dde148ea051c/`). Reproductor canónico de AXIS (`AxisVideoPlayer`, skin Cinema, 9:16, subtítulos VTT), firma POSIBLE
+  de la campaña (render de `gen.firma(200, 'negro')`), `noindex` y sin analítica. Commit local `9a36dac` en Think; **sin push** hasta que el operador lo autorice
+  (el push a `main` despliega a producción y arrastra el commit local `cf78762` de otra sesión).
+- El token de la URL es discreción, no seguridad: el MP4 queda público por URL directa.
+- QR: `img/qr-reel.png` (`qrcode`, nivel M). Va en la lámina 13 del deck y en el storyboard del anexo (página 17); ambos PDF llevan además un enlace clicable sobre el QR.
+- Caso Sky (lámina 18): recompuesto con la foto del avión de Sky (`ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png`).

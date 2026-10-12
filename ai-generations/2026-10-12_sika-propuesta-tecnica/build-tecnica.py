@@ -15,6 +15,7 @@ BG, INK, SOFT, RULE = '#001a33', '#ffffff', '#c9d6e2', 'rgba(255, 255, 255, 0.14
 ID = "'Bricolage Grotesque', system-ui, sans-serif"; ST = "'Poppins', system-ui, sans-serif"
 FONTS = '<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800&amp;family=Poppins:wght@300;400;500;600&amp;display=swap" rel="stylesheet">'
 CLIENT = 'Sika'
+REEL_URL = 'think.efeoncepro.com/muestras/sika-posible-dde148ea051c'  # página en Think con el reproductor de AXIS (noindex); el QR de img/qr-reel.png apunta ahí
 
 
 def A(name):
@@ -399,10 +400,14 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 
 # ── Reel ───────────────────────────────────────────────────────────────────────────────────────────────────────
 def s_reel():
-    base = obj(okicker('Qué incluye el reel') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso"])}</div>', 820, 456, 465, True, '; height: 364px')
-    extra = obj(okicker('Formatos de salida') + f'<div style="margin-top: 12px">{bullets(["Vertical 9:16 para Instagram", "Adaptación para TikTok, con las prácticas de esa plataforma", "Las mismas escenas sirven para las historias"])}</div>', 1315, 456, 465, False, '; height: 364px')
+    qr = (f'<div style="display: flex; align-items: center; gap: 24px; margin-top: 18px"><img src="{A("qr-reel.png")}" alt="Código QR del reel en video" style="width: 190px; height: 190px; border-radius: 14px; display: block; flex-shrink: 0">'
+          f'<div><div style="font-family: {ID}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08">Escanee el código</div>'
+          f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 10px">o abra el enlace:</div>'
+          f'<div style="font-size: 16px; font-weight: 500; line-height: 1.4; margin-top: 6px; word-break: break-all">{REEL_URL}</div></div></div>')
+    base = obj(okicker('Véalo en video · 25 segundos') + qr, 820, 456, 465, True, '; height: 364px')
+    extra = obj(okicker('Qué incluye el reel') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares, locución y música con licencia de uso", "Vertical para Instagram, con adaptación para TikTok"])}</div>', 1315, 456, 465, False, '; height: 364px')
     return page('Sika · Reel', halo(1300, 460, None) + frame('story-v2.jpg', 'Ocho cuadros del reel de SikaSeal-170', 820, 204, 960, 206) + base + extra +
-                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel se construye con las escenas y el envase de la pieza madre, sin rodaje.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
+                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel se construye con las escenas y el envase de la pieza madre, sin rodaje.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música. Puede verlo con el código o el enlace de esta lámina.')) +
                 means('El reel sale de la misma pieza madre que el resto del lanzamiento, y se ve como la campaña.',
                       'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
 
@@ -532,7 +537,7 @@ def s_experiencia():
 
 # Lámina de caso de éxito aprobada (receta decision-case, compositor oficial): composer/caso.json. La lámina hecha a mano
 # (s_experiencia) quedó fuera por indicación del operador del 12/10: «esta no es la lámina de caso de éxito nuestra».
-add('experiencia', 'Caso de éxito · Sky', lambda: img_page('Sika · Caso de éxito', 'caso-sky.png', 'Caso Sky, 12 meses. ¿Qué cambió con Sky? Más rápido: más de 2.000 piezas aprobadas, 39 campañas, 88 % de entregas a tiempo y 25 % menos de tiempo de producción. Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses.'))
+add('experiencia', 'Caso de éxito · Sky', lambda: img_page('Sika · Caso de éxito', 'caso-sky.png', 'Caso Sky, 12 meses, con un avión de Sky sobre las nubes. ¿Qué cambió con Sky? Más rápido: más de 2.000 piezas aprobadas, 39 campañas, 88 % de entregas a tiempo y 25 % menos de tiempo de producción. Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses.'))
 
 
 # ── Continuidad ────────────────────────────────────────────────────────────────────────────────────────────────

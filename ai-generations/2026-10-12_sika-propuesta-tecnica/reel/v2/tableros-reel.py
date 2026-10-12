@@ -30,13 +30,16 @@ def card(b, n, t, tit, img, vo, sfx):
             f'<div style="font-size: 13px; color: {G2}"><b style="color: {K}">Sonido:</b> {sfx}</div></div>')
 
 
-body = head('ENTREGABLE 3 · REEL 9:16 · 25 S · VIDEO CON LOCUCIÓN Y MÚSICA · STORYBOARD', 'El agua siempre busca una entrada.') + (
+QR = ('<div style="display: flex; align-items: center; gap: 16px; background: #FFFFFF; border-radius: 4px; padding: 12px 20px 12px 12px; flex-shrink: 0">'
+      '<img src="/_blob/748e26a939d29ec4642e7c225a51275d" alt="Código QR del reel en video" style="width: 112px; height: 112px; display: block">'
+      f'<div><div style="font-size: 18px; font-weight: 800">Vea el reel en video</div><div style="font-size: 14px; line-height: 1.4; color: {G3}; margin-top: 4px">Escanee el código o abra<br>think.efeoncepro.com/muestras/<br>sika-posible-dde148ea051c</div></div></div>')
+body = (f'<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 40px">{head('ENTREGABLE 3 · REEL 9:16 · 25 S · VIDEO CON LOCUCIÓN Y MÚSICA · STORYBOARD', 'El agua siempre busca una entrada.')}{QR}</div>') + (
     f'<div style="display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 22px">{"".join(card(*c) for c in C)}</div>'
     f'<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 6px">'
     f'<div style="font-size: 15px; line-height: 1.45; color: {G3}"><b style="color: {K}">Narrativa.</b> El agua como antagonista: busca una entrada en tres lugares de la casa → giro («uno solo») → el producto aplicándose → el envase frente al agua → cierre con la firma de campaña, que se arma y se queda en pantalla.</div>'
     f'<div style="font-size: 15px; line-height: 1.45; color: {G3}"><b style="color: {K}">Locución.</b> Voz de locutor mexicano, grave y segura. El reel se entrega como video, con locución y música, junto a esta propuesta.</div>'
     f'<div style="font-size: 15px; line-height: 1.45; color: {G3}"><b style="color: {K}">Imagen y edición.</b> Planos de video generados con IA a partir de cuadros clave; el envase es el render oficial. Cortes en 4 · 6 · 8 · 10 · 12 · 17 · 21 s; etiquetas, sello y titulares según el manual; transiciones con la diagonal de 13°.</div></div>')
-gen.write('Storyboard.dc.html', page('Storyboard del reel', 2400, 990, body))
+gen.write('Storyboard.dc.html', page('Storyboard del reel', 2400, 1056, body))
 import sign  # noqa: E402
 sign.P = OUT
 print('storyboard h =', sign.sign('Storyboard.dc.html'))
