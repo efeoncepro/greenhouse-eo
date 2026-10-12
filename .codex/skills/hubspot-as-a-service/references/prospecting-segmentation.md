@@ -4,7 +4,42 @@ Use for researching, enriching and segmenting approved prospects in an independe
 portal. This is CRM preparation. It does not authorize outreach, publishing, workflow activation or changes to
 subscriptions, marketing-contact status or permissions.
 
-## Current rule (2026-10-11): research date, not dated cohorts
+## Current rule (2026-10-12): industry is a Company attribute; segments group by attributes
+
+Operator finding: the bank segment did not show up inside the finance segment. Cause: 188 listed 14 Company IDs,
+while Contact segment 153 read the hand-filled Contact property `industria`; 19 of 28 bank contacts had it empty
+and six banks had no Company `industry`. Two segments that should nest used unrelated keys.
+
+- Sector is classified once, on Company `industry`. Contact sector segments **151–155** read the Primary
+  Company: `ASSOCIATION(object = '0-2', association = 1) { industry IN (...) }`, with the same value sets as
+  Company segments 144–148 (Technology uses the four-value set of 150). Contact `industria` is no longer read
+  by 151–155; keep existing values, do not require it on new intakes and do not copy Company industry into it.
+- Every intake leaves Company `industry` and `country` populated with exact catalog values and evidence. A
+  Company without industry silently excludes all its contacts from every sector segment.
+- 188 is attribute-driven: research date known AND `individual_email` AND email known AND Primary Company
+  `industry IN ('BANKING') AND country = 'Chile'`. A new Chilean bank enters without editing the filter.
+- Never bound a universe with record IDs in a filter. A sub-segment uses the same key as its parent and must be
+  verified as a subset of it. If an approved universe is narrower than the attribute, an attribute is missing:
+  propose it instead of listing IDs.
+- HubSpot enrichment mislabels industry (a university as consumer services, a marketplace as e-learning). When
+  a contact would leave a segment under the Company rule, inspect the Company first; correct only what is
+  evident and authorized, and report the rest. Do not change a true value to make a record qualify: a group
+  whose record is an insurer stays `INSURANCE` even when it was approved as a bank account, and is reported.
+- 151–155 are global: they include historical CRM contacts of those companies, not only researched ones.
+  Report the researched subset separately. Historical cohort segments 166–170 still read `industria` and are
+  frozen; do not migrate them.
+- Before changing a filter: save definition and members, simulate who enters and leaves, apply, read back, then
+  enumerate members and compare with the simulation (zero missing, zero extra). `segments update-filters
+  --dry-run` returns no digest and does not validate the expression; only the real call and readback do.
+- Membership reader that works with user OAuth in Agent CLI 0.15.1: `hubspot objects search --type contacts
+  --filter "hs_crm_search.ilsListIds=<id>"`, paginated with `--after`. `segments members-list` still requires
+  a service key. In the MCP SQL reader, do not combine `hs_crm_search.ilsListIds` with cross-object columns
+  (`COMPANY.industry`): the list filter is dropped without error and the whole object is returned.
+
+[Verified definitions and counts](../../../../docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
+[decision delta](../../../../docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-12--la-industria-vive-en-la-empresa).
+
+## Rule since 2026-10-11: research date, not dated cohorts
 
 Operator decision: a new enum option per working day does not scale. Every intake or re-research now writes
 `efeonce_prospecting_researched_on` (date, `YYYY-MM-DD`) on BOTH Company and Contact; one does not populate the
@@ -157,9 +192,10 @@ for a correctly property-driven ACTIVE segment.
   official web domain and generate an empty company. After create, read Company associations and Primary on
   Contact and Deal; correct within the approved intake only after resolving the intended entity. Do not delete
   or merge the generated record solely because it is nameless or has a similar domain.
-- `industry` (Company) and `industria` (Contact) have separate enums. Chemicals is supported on Company but not
-  in this Contact enum. Keep the evidence-backed supported classification/gap; do not force Retail to make a
-  sector filter match. Company segment 177 does not automatically define a Contact recipient sector.
+- `industry` (Company) and `industria` (Contact) have separate enums. Since 2026-10-12 the Contact sector
+  segments read Company `industry` through the Primary association, so the Contact enum no longer limits which
+  sectors a contact can be grouped by. Keep the evidence-backed classification; do not force Retail to make a
+  sector filter match.
 - Unknown job title stays unknown. Do not manufacture a title for 171 or a service-interest value for 172/173.
   The current catalog has no dedicated SEO/AEO/GEO or open-tender segment; notes retain those specific signals
   until an authorized compatible property/consumer is defined.
@@ -172,18 +208,18 @@ for a correctly property-driven ACTIVE segment.
 
 ## Account-based continuous segments
 
-For an explicitly approved bank/account universe, use the verified Primary Company association when contact
-industry is incomplete or email domains differ from the intended entity. `associatedcompanyid` is the Contact
-property shown as **Empresa principal asociada** in the native filter editor. An approved set of Company IDs
-is an account boundary, not a static Contact-ID roster. Do not widen it to all financial services or banks in
-other countries; new accounts require an authorized definition update and complete-set verification.
+Select an account universe through attributes of the Primary Company, never through a list of Company IDs.
+The Primary association decides the entity even when the email domain differs. `associatedcompanyid`
+(**Empresa principal asociada**) stays useful for reading and reconciling, not for defining a segment.
 
-ACTIVE **188**, `Efeonce | Prospección continua | Bancos Chile | Personas con email`, was verified on 2026-10-11:
-research date known AND `individual_email` AND email known AND Primary Company in the 14 selected Chile banks.
-The complete independent `ilsListIds=188` read returned 28/28 expected contacts, zero missing and zero extra.
-Reuse it instead of creating a duplicate. New qualifying contacts in those accounts enter automatically;
-contacts without email, retail accounts and companies outside the selected set do not qualify.
-[Exact definition and dated aggregates](../../../../docs/operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json) ·
+ACTIVE **188**, `Efeonce | Prospección continua | Bancos Chile | Personas con email`, reads since 2026-10-12:
+research date known AND `individual_email` AND email known AND Primary Company `industry IN ('BANKING') AND
+country = 'Chile'`. The complete `ilsListIds=188` read returned 26/26 expected contacts across 13 banks, zero
+missing and zero extra, all contained in 153. Consorcio (2 contacts) left 188 because its Company record is the
+insurance group (`INSURANCE`); it remains in 153 and counting it as a bank is an operator decision on that one
+field. The 2026-10-11 definition (14 Company IDs, 28 contacts) is superseded; do not restore it.
+[Current definitions and counts](../../../../docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
+[superseded snapshot](../../../../docs/operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json) ·
 [case, provenance and remaining gaps](../../../../docs/commercial/prospects/bancos-chile-2026-10/README.md).
 
 When reporting each contact's properties, distinguish live field values from proposed services in notes.

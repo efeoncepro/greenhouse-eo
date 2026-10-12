@@ -18,8 +18,9 @@ resuelve al leer CRM (reutilizar o crear), dicho en una línea.
    portal, transporte pedido y diccionario real. El portal Efeonce/Kortex no autoriza otro cliente.
 2. Resolver Company, dominio/grupo y posibles Contact/Lead/Deal existentes; documentar IDs. Dedupe por email
    no resuelve un cambio de empleador. Una Company creada vía API puede no deduplicar por dominio.
-3. Preparar changeset con valores, asociaciones, notas/fecha de investigación y evidencia. Las cohortes
-   fechadas son históricas, sin nuevas asignaciones. Sólo nuevos contactos elegibles;
+3. Preparar changeset con valores, asociaciones, notas/fecha de investigación y evidencia. La Company queda
+   con industria y país: de ella heredan su segmento los contactos ([segmentos por atributo](segments-by-attribute.md)).
+   Las cohortes fechadas son históricas, sin nuevas asignaciones. Sólo nuevos contactos elegibles;
    objetivo sin correo queda en investigación o nota de Company autorizada. Registrar adyacentes no les atribuye
    la demanda del objetivo. Clasificación local no crea propiedades HubSpot por sí sola.
    Incluir plan por objeto/fase: campos pertinentes conocidos a completar, valores a conservar,

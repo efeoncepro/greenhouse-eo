@@ -28,6 +28,9 @@ externos y el comprador de sus propias declaraciones. Resuelve contradicciones s
 - **No crees un Contact/Lead de prospección sin correo corporativo individual verificado y atribuible a esa
   persona.** Si falta, conserva la señal en investigación o nota de Company y busca personas adyacentes.
   No inventes direcciones, uses un buzón general como correo individual ni rellenes una cuota con desconocidos.
+- **La industria y el país se registran en la empresa, en cada alta.** Los segmentos agrupan por atributos
+  comunes y los contactos heredan la industria de su empresa principal: una empresa sin industria deja fuera a
+  todos sus contactos. No delimites un segmento con una lista de IDs ni con un campo llenado a mano por persona.
 - Relación se mide por persona y con quién; demanda por oportunidad. Un adyacente no hereda intención ni
   calidez del objetivo. Una apertura, cargo, Lead o intent score no prueba necesidad o compra.
 - El buying group se mapea por necesidad/decisión, aunque no exista Deal. Una cuenta puede tener varios;
@@ -54,6 +57,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Preparar discovery, criterios o prueba por oferta/función | [discovery-and-proof](references/discovery-and-proof.md) + Commercial/práctica |
 | Dimensionar cartera, preventa y seguimiento | [capacity-and-economics](references/capacity-and-economics.md) + Pricing/Finance |
 | Proponer o ejecutar un registro autorizado | [crm-and-commercial-handoff](references/crm-and-commercial-handoff.md) + HubSpot |
+| Agrupar cuentas o personas en segmentos, o revisar por qué uno sale incompleto | [segments-by-attribute](references/segments-by-attribute.md) + HubSpot |
 | Representar cuentas objetivo y roles en HubSpot | [adapter account-based](../hubspot-as-a-service/references/account-based-prospecting.md) |
 | Elegir campos de Contact/Company/Lead/Deal por fase | [diccionario y captura HubSpot](../hubspot-as-a-service/references/property-inventory.md) |
 | Convertir una señal en validación y siguiente acción | [signal-to-action](references/signal-to-action.md) |

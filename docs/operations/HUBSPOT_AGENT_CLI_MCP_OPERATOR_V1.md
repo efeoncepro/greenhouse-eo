@@ -98,9 +98,28 @@ Para operar, cargar [adapter account-based](../../.codex/skills/hubspot-as-a-ser
 y preparar changeset/readback. Roles globales no sustituyen contexto por iniciativa; help/auth por comando
 prevalece sobre anuncio genérico de CLI. Metadata no demuestra CRUD del gráfico; refrescar el corte antes de actuar.
 
+## Segmentos por industria de la empresa — corte 2026-10-12
+
+El operador observó que Bancos no aparecía dentro de Finanzas. 188 enumeraba 14 Company IDs y 153 leía
+`industria` de Contact, llenada a mano: llaves sin relación. Desde este corte 151–155 leen `industry` de la
+empresa principal con `ASSOCIATION(object = '0-2', association = 1) { ... }` y 188 usa banca en Chile.
+
+- `objects update --type companies` por JSONL: preview con digest y `--confirm '13'`; 13/13 escritos y leídos.
+- `segments update-filters --dry-run` devolvió `executed:false` sin digest y sin validar la expresión. La
+  escritura real respondió `ok` y `segments get` confirmó tipo ACTIVE y expresión en los seis IDs.
+- Lector de membresía con OAuth de usuario: `objects search --filter "hs_crm_search.ilsListIds=<id>"`, paginado.
+  `segments members-list` respondió 403 (exige service key). Los seis conjuntos coincidieron con el esperado.
+- En el lector SQL del MCP, `hs_crm_search.ilsListIds` combinado con columnas `COMPANY.*` ignoró el filtro de
+  lista y devolvió el objeto completo, sin error. `search_crm_objects` del MCP rechaza ese nombre de propiedad.
+- 188 quedó en 26 contactos de 13 bancos, todos contenidos en 153 (147). Consorcio salió por ser `INSURANCE`.
+
+[Decisión](../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-12--la-industria-vive-en-la-empresa) ·
+[snapshot con valores previos](HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
+[manual](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#9-agrupar-por-industria-de-la-empresa--vigente-desde-el-12102026).
+
 ## Procedimiento por operación
 
-Aplicación bancaria verificada el 2026-10-11: ACTIVE **188**, 28 Contact de 14 cuentas Primary. Dos creates CLI
+Corte anterior, sustituido el 12/10 — aplicación bancaria verificada el 2026-10-11: ACTIVE **188**, 28 Contact de 14 cuentas Primary. Dos creates CLI
 devolvieron 502; se verificó ausencia antes de reintentar y luego se usó UI autenticada en el mismo portal.
 Readback CLI confirmó ACTIVE/expresión; MCP `ilsListIds=188` enumeró el conjunto completo sin faltantes/extras.
 No generalizar el fallo a todas las escrituras CLI. [Procedimiento y recuperación](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#8-seleccionar-bancos-por-empresa-principal).

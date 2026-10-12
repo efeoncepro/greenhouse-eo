@@ -38,13 +38,38 @@ la investigación. Los tipos históricos sin correo siguen existiendo, sin habil
 [Decisión del operador y límites](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-11--contactos-accionables-y-cobertura-de-la-cuenta-b2b).
 No cambia segmentos ni autoriza créditos fuera del alcance aprobado, envíos o Deals.
 
-## Bancos de Chile: selección continua por empresa principal
+## Vigente desde el 12/10/2026: la industria es de la empresa
 
-El [segmento activo 188](https://app.hubspot.com/contacts/48713323/objectLists/188/filters) selecciona contactos
-investigados con correo y empresa principal en los 14 bancos aprobados. La asociación define el banco incluso
-si el email usa otro dominio, como BTG Pactual o Tanner; no depende de que Contact tenga `industria=Finanzas`.
-Los nuevos contactos que cumplan esas propiedades entran automáticamente. Un banco distinto requiere ampliar
-el filtro de empresas; no es una selección de todos los bancos del mundo ni de toda la industria financiera.
+Los segmentos agrupan por atributos comunes. La industria se clasifica una sola vez, en la empresa, y los
+contactos la heredan por su empresa principal. Por eso un contacto aparece en «Contactos · Finanzas» cuando su
+empresa es de finanzas, aunque nadie haya llenado la industria en su ficha.
+
+| Segmento | Regla | Miembros | De la prospección vigente |
+| --- | --- | --- | --- |
+| 151 Contactos · Tecnología | Empresa principal en software, TI, internet o seguridad informática | 380 | 17 |
+| 152 Contactos · Retail | Empresa principal en retail y consumo | 223 | 19 |
+| 153 Contactos · Finanzas | Empresa principal en banca, servicios financieros, inversión o seguros | 147 | 35 |
+| 154 Contactos · Educación | Empresa principal en educación | 52 | 8 |
+| 155 Contactos · Gobierno | Empresa principal en administración pública | 63 | 14 |
+| 188 Bancos Chile · Personas con email | Investigado, con email, y empresa principal de banca en Chile | 26 | 26 |
+
+Bancos es un valor de industria dentro de Finanzas: los 26 contactos de 188 están todos en 153. Un banco
+chileno nuevo entra solo, sin editar el filtro. Los segmentos 151–155 son globales, así que incluyen contactos
+históricos del CRM; la columna de la derecha dice cuántos vienen de la prospección actual.
+
+Para que un prospecto caiga en su segmento, su **empresa** debe tener industria y país. Sin industria en la
+empresa, ninguno de sus contactos aparece. La industria del contacto ya no alimenta estos segmentos.
+
+Consorcio quedó fuera de Bancos con sus dos contactos: su empresa en HubSpot es el grupo asegurador y está
+clasificada como seguros. Sigue en Finanzas. Si se quiere contar como banco, se cambia ese único campo.
+[Definiciones y conteos sin PII](../../operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
+[decisión](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-12--la-industria-vive-en-la-empresa).
+
+## Bancos de Chile: corte del 11/10/2026 (sustituido)
+
+Hasta el 11/10 el [segmento activo 188](https://app.hubspot.com/contacts/48713323/objectLists/188/filters)
+enumeraba 14 empresas por ID. Era una lista manual con forma de segmento activo y no quedaba contenido en
+Finanzas; la regla vigente está en la sección anterior. Lo que sigue describe ese corte.
 
 Corte verificado 11/10/2026: **28 contactos**, sin faltantes ni adicionales respecto del manifiesto autorizado.
 Excluye Cencosud y los dos contactos bancarios aún sin email. Presencia de correo no garantiza entregabilidad:
@@ -76,7 +101,7 @@ retirar al registro del segmento correspondiente; el recálculo es asíncrono.
 | Contact | `efeonce_prospecting_contact_kind` | Nuevas altas: `individual_email` con correo corporativo individual verificado. Los otros valores clasifican registros históricos y no autorizan altas sin correo |
 | Contact | `efeonce_prospecting_service_fit` | `creative`, `hubspot_crm` o ambas cuando haya evidencia; conservar valores compatibles previos |
 | Company | `industry`, `country`, `hs_employee_range` | Industria y datos de cuenta respaldados, usando las opciones exactas existentes |
-| Contact | `industria`, `jobtitle`, `email` | Clasificación y datos personales respaldados; no inferir cargo ni inventar email |
+| Contact | `jobtitle`, `email` | Datos personales respaldados; no inferir cargo ni inventar email. `industria` ya no alimenta segmentos desde el 12/10: el sector se toma de la empresa |
 | Contact y Company/Deal asociados | Nota CRM | Señal exacta, fuente, fecha, estado del proceso, servicio pertinente e incertidumbres |
 
 La cohorte de empresa no se copia automáticamente al contacto. Tampoco `industry` e `industria` son el mismo

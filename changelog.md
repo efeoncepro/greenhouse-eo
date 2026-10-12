@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — HubSpot: los segmentos de industria leen la empresa, y Bancos queda dentro de Finanzas
+
+- El operador vio que los contactos del segmento de bancos casi no aparecían en el de finanzas. El de bancos
+  (188) enumeraba 14 empresas por ID y el de finanzas (153) leía una industria llenada a mano en cada contacto:
+  sólo 9 de 28 coincidían. Ahora los segmentos de contactos 151–155 leen la industria de la empresa principal
+  y 188 se define como banca en Chile. Trece empresas corregidas; membresía real igual a la simulada en los
+  seis segmentos. 188 pasa de 28 a 26: Consorcio sale por estar clasificada como seguros, pendiente de decisión.
+- La skill de prospección suma el módulo `segments-by-attribute` y el escenario P50; el adaptador de HubSpot,
+  la regla vigente y el lector de membresía que funciona con OAuth de usuario.
+  [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ·
+  [snapshot](docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json).
+
 ## 2026-10-12 — Cotizador V3: la CLI lee y escribe a través de un puerto de almacenamiento
 
 - `TASK-2024` (fase 1 de `EPIC-053`): fuentes, puntero y artefactos de `pnpm pricing:v3` pasan por
@@ -474,7 +486,3 @@ PR15 integra producción modular SKY e identidad Git; PR16/17 integran el Lab pr
 Colección candidata de 101 familias / 1.919 variantes nativas y 303 originales, selección exacta por kind/tamaño y página `/iconos/` enlazada desde Recursos. Código/docs Workbench en commit local `af6f5e2`; skills Codex/Claude y manuales/continuidad sincronizados. [Cierre y evidencia](docs/audits/creative-workbench/2026-10-01-sky-icons-documentation-closure.md). Sin push/deploy ni admisión nueva a jobs; CLIs Greenhouse intactas.
 
 Corrección SKY local: contenido 1.5.0/destino 1.2.0, los 76 badges tarifarios LEFT, pie legal por función y relaciones de destino/promoción revisadas. Export v6 de 24 adaptaciones y 394 pruebas PASS; docs y ocho referencias de la skill sincronizadas con subagentes. [Cierre documental](docs/audits/creative-workbench/2026-10-01-sky-layout-feedback-closure.md). Aceptación visual pendiente; sin push/deploy ni cambios de motores Greenhouse.
-
-## 2026-09-30 — Efeonce: demostración contextual como diferenciador comercial
-
-El operador reconoce «hacer que el cliente experimente nuestra capacidad antes de comprarla» como diferenciador. [Metodología](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta Berel, SKY y Pichincha; canon de marca y estrategia, skills Agency/Brand/SEO con espejos y referencias actualizados. Intensidad, presupuestos y métricas siguen propuestas; no se promete conversión ni se cambia el pipeline.

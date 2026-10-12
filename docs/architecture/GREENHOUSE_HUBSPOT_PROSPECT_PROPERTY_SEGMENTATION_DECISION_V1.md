@@ -173,6 +173,51 @@ ya exista; una autorización individual no se extiende a otros contactos. Invest
 envíos, secuencias ni Deals. Después de escribir, verificar correo, propiedades, empresa Primary, notas y
 membresía por lectura independiente según el contrato vigente.
 
+### Delta 2026-10-12 — la industria vive en la empresa
+
+El operador observó que los contactos del segmento de bancos casi no aparecían en el de finanzas. Causa: los
+dos segmentos usaban llaves sin relación. 188 enumeraba 14 Company IDs; 153 leía `industria`, una propiedad del
+Contact que se llena a mano. De los 28 contactos de bancos, 19 la tenían vacía, y seis bancos no tenían
+`industry` en la empresa. Un segmento activo cuya regla es una lista de IDs no agrupa por atributo.
+
+Decisión, que **sustituye el punto 4 del contrato** y la «Aplicación por cuentas bancarias» del 11/10:
+
+1. El sector se clasifica una vez, en `industry` de Company. Los segmentos sectoriales de Contact 151–155 leen
+   la empresa principal: `ASSOCIATION(object = '0-2', association = 1) { industry IN (...) }`, con los mismos
+   conjuntos de valores que 144–148. `industria` de Contact deja de alimentar segmentos; no se borra, no se
+   exige en altas nuevas y no se copia desde la empresa.
+2. Cada alta deja `industry` y `country` en la empresa. Sin industria, todos sus contactos quedan fuera.
+3. 188 pasa a atributos: fecha conocida AND `individual_email` AND email conocido AND empresa principal con
+   `industry IN ('BANKING') AND country = 'Chile'`. Un banco chileno nuevo entra sin editar el filtro.
+4. Ningún filtro delimita un universo con IDs de registros. Un subsegmento usa la llave de su padre y se
+   verifica contenido en él. Si el universo aprobado es más estrecho que el atributo, falta un atributo.
+5. No se cambia un dato verdadero para que un registro calce; el caso se reporta.
+
+Aplicado y verificado el 12/10 con Agent CLI 0.15.1. Trece empresas corregidas: `BANKING` en los seis bancos
+sin industria (cinco también sin país) y en BCI y Santander, que figuraban como servicios financieros; más
+cinco clasificaciones erróneas del enriquecimiento detectadas en la simulación. Membresía leída completa por
+`ilsListIds` y comparada con el conjunto esperado, sin faltantes ni sobrantes en los seis segmentos:
+
+| Segmento | Antes | Después | De la prospección vigente |
+| --- | --- | --- | --- |
+| 151 Tecnología | 17 | 380 | 17 |
+| 152 Retail | 17 | 223 | 19 |
+| 153 Finanzas | 14 | 147 | 35 |
+| 154 Educación | 9 | 52 | 8 |
+| 155 Gobierno | 14 | 63 | 14 |
+| 188 Bancos Chile | 28 | 26 | 26 |
+
+El salto de 151–155 es el alcance global que su nombre ya declaraba: ahora incluyen los contactos históricos
+de esas empresas, no sólo los que alguien etiquetó. Los 26 de 188 están todos en 153. Consorcio salió de 188
+con dos contactos porque su empresa es el grupo asegurador (`INSURANCE`); sigue en 153 y contarlo como banco
+es decisión del operador sobre ese campo. Dos contactos investigados cambiaron de sector al seguir a su empresa.
+
+Consecuencias: los segmentos globales crecen; ninguna automatización se dispara por entrar a una lista (la
+automatización del Prospecting Agent «cuando se agregue un contacto a cualquier lista» está desactivada,
+lectura del 08/10). Los segmentos históricos 166–170 siguen leyendo `industria` y no se migran. Recuperación:
+restaurar las seis expresiones y los valores previos de las trece empresas desde el
+[snapshot](../operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json), que guarda ambos.
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

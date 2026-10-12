@@ -134,6 +134,9 @@ carriles no pedidos. Se incorporan:
   ausente fuera de Codex. El punto 8 se precisa: la harness `deep-research` se comprueba por sesión; faltó en
   el preflight de Codex del 2026-10-11 y aparecía listada en Claude el 2026-10-12.
 - Evals versión 7: 49 escenarios y una comprobación de proporcionalidad; la extensión no es mérito.
+- Evals versión 8 (2026-10-12): escenario P50 y módulo `segments-by-attribute`, tras encontrar en HubSpot un
+  subsegmento definido con una lista de IDs que no quedaba contenido en su segmento padre. No se corrió una
+  ronda ciega sobre P50.
 
 Tras corregir, la skill mantuvo 20 de 20 aprobadas sin fallos críticos, bajó el ruido de 1,55 a 0,60 y quedó
 8 % por debajo del brazo sin skill en extensión. Es extensión del método aprobado, sin runtime, schema,

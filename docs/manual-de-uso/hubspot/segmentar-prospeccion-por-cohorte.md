@@ -10,6 +10,10 @@ Contrato: [runbook CLI/MCP](../../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.m
 > lo que incorpora el registro a los segmentos de «Prospección continua» **180–187**. La propiedad
 > `efeonce_prospecting_cohorts` queda como histórico de las rondas del 06 al 10 de octubre: no añadirle opciones
 > ni asignarla a registros nuevos. Detalle en la sección 7; lo anterior describe las rondas históricas.
+>
+> **Vigente desde el 12/10/2026:** la industria se registra en la **empresa** y los segmentos de contactos
+> 151–155 y 188 la leen de la empresa principal. Ya no se llena `industria` en el contacto para segmentar ni se
+> escriben IDs en un filtro. Detalle en la sección 9.
 
 ## Arranque rápido para cualquier agente
 
@@ -336,7 +340,56 @@ Estado verificado el 11/10: 97 contactos y 92 empresas con fecha; 180 = **97**, 
 183 = **31**, 184 = **10**, 185 + 186 = **9**, 187 = **92**. Son conteos del lector MCP, no una enumeración de
 miembros. Evidencia local (prestate, backfill, definiciones antes y después) fuera del repositorio; no copiar PII.
 
-## 8. Seleccionar bancos por empresa principal
+## 9. Agrupar por industria de la empresa — vigente desde el 12/10/2026
+
+**Para qué sirve.** Que un contacto aparezca en el segmento de su sector porque su empresa pertenece a ese
+sector, sin llenar nada en la ficha de la persona, y que un subsegmento (Bancos) quede dentro de su padre
+(Finanzas).
+
+**Antes de empezar.** Portal 48713323, `hubspot whoami` vigente y autorización para escribir en empresas o
+filtros. Leer la [decisión](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md#delta-2026-10-12--la-industria-vive-en-la-empresa).
+
+**En cada alta.**
+
+1. Dejar `industry` y `country` en la empresa, con el valor exacto del catálogo y evidencia. Es lo que decide
+   los segmentos 151–155 y 188 para todos sus contactos.
+2. Confirmar que la empresa correcta es la principal del contacto. El dominio del correo no la define.
+3. No llenar `industria` en el contacto para provocar membresía: ya no la lee ningún segmento vigente.
+4. Leer de vuelta la membresía. Lector que funciona con OAuth de usuario:
+
+```bash
+hubspot objects search --type contacts --filter "hs_crm_search.ilsListIds=153" --properties associatedcompanyid --format json
+```
+
+Paginar con `--after` hasta que no haya cursor. `segments members-list` sigue exigiendo service key.
+
+**Si un contacto no aparece en su segmento.** Revisar en este orden: empresa principal asociada, `industry` de
+esa empresa, `country` (sólo 188). Casi siempre falta la industria en la empresa o el enriquecimiento automático
+la clasificó mal. Corregir la empresa; no editar al contacto ni el filtro.
+
+**Antes de cambiar un filtro.** Guardar definición y miembros, simular quién entra y quién sale, aplicar con
+`segments update-filters`, leer de vuelta y comparar miembros reales con lo simulado. El `--dry-run` de ese
+comando no valida la expresión ni entrega digest: la única prueba es la escritura real y su lectura.
+
+**Qué no hacer.** No escribir IDs de empresas o contactos en un filtro. No reclasificar una empresa con un
+valor falso para que calce: Consorcio es grupo asegurador y por eso no está en Bancos. No migrar 166–170, que
+son históricos. No usar el crecimiento de un segmento como permiso de envío o inscripción.
+
+**Problemas comunes.**
+
+| Síntoma | Causa | Qué hacer |
+| --- | --- | --- |
+| El segmento de contactos tiene menos gente que su industria en empresas | Empresas sin `industry` | Completar la empresa |
+| Un contacto cambió de sector tras el 12/10 | Su empresa tiene otra industria que la que decía su ficha | Revisar la empresa; si está bien, el cambio es correcto |
+| Un subsegmento no está contenido en su padre | Usa otra llave | Redefinirlo con la llave del padre |
+| La consulta SQL del MCP devuelve todo el CRM | Se combinó `ilsListIds` con columnas de empresa | Leer la lista sola y cruzar aparte |
+
+[Definiciones, conteos y valores previos](../../operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json).
+
+## 8. Seleccionar bancos por empresa principal (corte del 11/10, sustituido)
+
+> Desde el 12/10 el segmento 188 se define por atributos de la empresa principal (banca en Chile), no por
+> una lista de IDs: ver la sección 9. Lo siguiente describe el corte anterior y sirve como historial.
 
 Para el universo aprobado de bancos chilenos, reutilizar ACTIVE **188**. La definición y los 14 Company IDs
 viven en el [snapshot fechado](../../operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json); los contactos y sus

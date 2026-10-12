@@ -1,0 +1,277 @@
+{
+  "as_of": "2026-10-12",
+  "portal_id": 48713323,
+  "cliVersion": "0.15.1",
+  "rule": "Sector is a Company attribute. Contact sector segments read the Primary Company industry through ASSOCIATION(object 0-2, association 1). No record IDs in filters.",
+  "supersedes": [
+    "docs/operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json"
+  ],
+  "segments": [
+    {
+      "listId": 151,
+      "name": "Efeonce | Activo | Contactos | Tecnología",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "ASSOCIATION(object = '0-2', association = 1) { industry IN ('COMPUTER_SOFTWARE', 'INFORMATION_TECHNOLOGY_AND_SERVICES', 'INTERNET', 'COMPUTER_NETWORK_SECURITY') }",
+      "previousFilterExpression": "industria IN ('Tecnología')",
+      "verifiedMemberCount": 380,
+      "expected": 380,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 17,
+      "researchedMembers": 17,
+      "companiesInValueSet": 199,
+      "membersThatLeft": 1
+    },
+    {
+      "listId": 152,
+      "name": "Efeonce | Activo | Contactos | Retail",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "ASSOCIATION(object = '0-2', association = 1) { industry IN ('APPAREL_FASHION', 'RETAIL', 'CONSUMER_ELECTRONICS', 'FURNITURE', 'CONSUMER_GOODS', 'SPORTING_GOODS') }",
+      "previousFilterExpression": "industria IN ('Retail')",
+      "verifiedMemberCount": 223,
+      "expected": 223,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 17,
+      "researchedMembers": 19,
+      "companiesInValueSet": 114,
+      "membersThatLeft": 0
+    },
+    {
+      "listId": 153,
+      "name": "Efeonce | Activo | Contactos | Finanzas",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "ASSOCIATION(object = '0-2', association = 1) { industry IN ('BANKING', 'FINANCIAL_SERVICES', 'INVESTMENT_MANAGEMENT', 'INSURANCE') }",
+      "previousFilterExpression": "industria IN ('Finanzas')",
+      "verifiedMemberCount": 147,
+      "expected": 147,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 14,
+      "researchedMembers": 35,
+      "companiesInValueSet": 57,
+      "membersThatLeft": 0
+    },
+    {
+      "listId": 154,
+      "name": "Efeonce | Activo | Contactos | Educación",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "ASSOCIATION(object = '0-2', association = 1) { industry IN ('EDUCATION_MANAGEMENT', 'HIGHER_EDUCATION', 'E_LEARNING', 'PROFESSIONAL_TRAINING_COACHING', 'PRIMARY_SECONDARY_EDUCATION') }",
+      "previousFilterExpression": "industria IN ('Educación')",
+      "verifiedMemberCount": 52,
+      "expected": 52,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 9,
+      "researchedMembers": 8,
+      "companiesInValueSet": 40,
+      "membersThatLeft": 1
+    },
+    {
+      "listId": 155,
+      "name": "Efeonce | Activo | Contactos | Gobierno",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "ASSOCIATION(object = '0-2', association = 1) { industry IN ('GOVERNMENT_ADMINISTRATION', 'GOVERNMENT_RELATIONS', 'PUBLIC_POLICY') }",
+      "previousFilterExpression": "industria IN ('Gobierno')",
+      "verifiedMemberCount": 63,
+      "expected": 63,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 14,
+      "researchedMembers": 14,
+      "companiesInValueSet": 79,
+      "membersThatLeft": 0
+    },
+    {
+      "listId": 188,
+      "name": "Efeonce | Prospección continua | Bancos Chile | Personas con email",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "efeonce_prospecting_researched_on IS NOT NULL AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND ASSOCIATION(object = '0-2', association = 1) { industry IN ('BANKING') AND country = 'Chile' }",
+      "previousFilterExpression": "efeonce_prospecting_researched_on IS NOT NULL AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND associatedcompanyid IN ('27772171820', '27779788940', '59139325088', '27770039389', '50679454111', '40240771202', '27778976271', '27776076691', '59142731319', '54834597003', '53949834349', '48485493897', '59114382409', '27779618095')",
+      "verifiedMemberCount": 26,
+      "expected": 26,
+      "missing_count": 0,
+      "extra_count": 0,
+      "previousMemberCount": 28,
+      "membersByCompany": {
+        "Tenpo": 2,
+        "Tanner Banco Digital": 2,
+        "BTG Pactual Chile": 2,
+        "Banco Internacional": 2,
+        "Banco Ripley": 2,
+        "Banco Falabella": 1,
+        "Banco Scotiabank": 2,
+        "BancoEstado": 2,
+        "Banco de Chile": 2,
+        "Bice": 5,
+        "Banco Bci": 2,
+        "Itaú Chile": 1,
+        "Santander": 1
+      },
+      "subsetOf153": true
+    }
+  ],
+  "companyCorrections": [
+    {
+      "company_id": 27776076691,
+      "name": "Banco de Chile",
+      "before": {
+        "industry": null,
+        "country": null
+      },
+      "after": {
+        "industry": "BANKING",
+        "country": "Chile"
+      }
+    },
+    {
+      "company_id": 27770039389,
+      "name": "BancoEstado",
+      "before": {
+        "industry": null,
+        "country": null
+      },
+      "after": {
+        "industry": "BANKING",
+        "country": "Chile"
+      }
+    },
+    {
+      "company_id": 27778976271,
+      "name": "Banco Scotiabank",
+      "before": {
+        "industry": null,
+        "country": null
+      },
+      "after": {
+        "industry": "BANKING",
+        "country": "Chile"
+      }
+    },
+    {
+      "company_id": 27772171820,
+      "name": "Itaú Chile",
+      "before": {
+        "industry": null,
+        "country": null
+      },
+      "after": {
+        "industry": "BANKING",
+        "country": "Chile"
+      }
+    },
+    {
+      "company_id": 27779788940,
+      "name": "Banco Falabella",
+      "before": {
+        "industry": null,
+        "country": null
+      },
+      "after": {
+        "industry": "BANKING",
+        "country": "Chile"
+      }
+    },
+    {
+      "company_id": 40240771202,
+      "name": "Banco Ripley",
+      "before": {
+        "industry": null
+      },
+      "after": {
+        "industry": "BANKING"
+      }
+    },
+    {
+      "company_id": 48485493897,
+      "name": "Banco Bci",
+      "before": {
+        "industry": "FINANCIAL_SERVICES"
+      },
+      "after": {
+        "industry": "BANKING"
+      }
+    },
+    {
+      "company_id": 50679454111,
+      "name": "Santander",
+      "before": {
+        "industry": "FINANCIAL_SERVICES"
+      },
+      "after": {
+        "industry": "BANKING"
+      }
+    },
+    {
+      "company_id": 59077943949,
+      "name": "Bsale",
+      "before": {
+        "industry": "ELECTRICAL_ELECTRONIC_MANUFACTURING"
+      },
+      "after": {
+        "industry": "COMPUTER_SOFTWARE"
+      }
+    },
+    {
+      "company_id": 53951848799,
+      "name": "Mercado Libre",
+      "before": {
+        "industry": "E_LEARNING"
+      },
+      "after": {
+        "industry": "RETAIL"
+      }
+    },
+    {
+      "company_id": 59085575939,
+      "name": "Universidad de La Frontera",
+      "before": {
+        "industry": "CONSUMER_SERVICES"
+      },
+      "after": {
+        "industry": "HIGHER_EDUCATION"
+      }
+    },
+    {
+      "company_id": 59084494354,
+      "name": null,
+      "before": {
+        "industry": null
+      },
+      "after": {
+        "industry": "CONSUMER_ELECTRONICS"
+      }
+    },
+    {
+      "company_id": 59090226971,
+      "name": "DGMN",
+      "before": {
+        "industry": "DEFENSE_SPACE"
+      },
+      "after": {
+        "industry": "GOVERNMENT_ADMINISTRATION"
+      }
+    }
+  ],
+  "verification": {
+    "membership_reader": "Agent CLI objects search, hs_crm_search.ilsListIds EQ <id>, paginated to exhaustion",
+    "expected_set": "contacts whose associatedcompanyid is a Company with industry in the value set (188: BANKING AND country Chile AND research date AND individual_email AND email)",
+    "definition_reader": "Agent CLI segments get <id> --format json",
+    "countsAreDatedObservations": true
+  },
+  "limitations": [
+    "Dated snapshot; HubSpot is the live source.",
+    "No Contact IDs or email addresses are stored here.",
+    "151-155 are global: counts include historical CRM contacts; researchedMembers is the prospecting subset.",
+    "Consorcio (Company 27779618095, INSURANCE) left 188 with 2 contacts and remains in 153; reclassifying it is an operator decision.",
+    "Two researched contacts changed sector with the Company rule: one left Tecnologia (Company without industry) and one moved from Educacion to Tecnologia (Company is IT services).",
+    "Historical cohort segments 166-170 still read Contact industria and were not changed.",
+    "Segment membership does not authorize sending, enrollment or workflows."
+  ]
+}
