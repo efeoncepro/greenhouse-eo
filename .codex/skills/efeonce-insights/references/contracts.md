@@ -558,11 +558,11 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
 ### Glifos, isotipos y tableros por plataforma (TASK-1990/1996 — code complete en develop 2026-10-04)
 
 - **Plataformas:** `INSIGHT_CHANNEL_IDS` = las de `AXIS_PLATFORM_ASSETS` (test de deriva contra el paquete instalado): 22
-  desde `axis-brand-assets` 0.4.25 (las 19 originales más `facebook`, `threads` y `x`, alineadas el 2026-10-12; ningún
-  adapter las emite todavía y Think no tiene sus isotipos);
+  desde `axis-brand-assets` 0.4.25 (las 19 originales más `facebook`, `threads` y `x`, alineadas el 2026-10-12);
   `channelForDomain(domain)` traduce un dominio citado (youtube.com, reddit.com, *.wikipedia.org, linkedin.com,
-  instagram.com, tiktok.com, facebook.com → meta; con `facebook` ya en el vocabulario, pasarlo a `facebook` es decisión
-  del operador). Los isotipos están copiados en `catalogs/insights-*/assets/channels/`
+  instagram.com, tiktok.com; desde el 2026-10-12 facebook.com → `facebook`, threads.net/threads.com → `threads` y
+  x.com/twitter.com → `x`; `meta` ya no sale de un dominio: es la empresa y su pauta). Los isotipos están copiados en
+  `catalogs/insights-*/assets/channels/`
   (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`).
 - **`metricIcon`:** glifo Trazo de la métrica (`presentation/metric-glyphs.ts`, `metricGlyphOf`), resuelto por
   `statItemView` y aditivo en el modelo web 1.4. Nunca junto a `channel`. Catálogo: campo `metricIcon` con resolver

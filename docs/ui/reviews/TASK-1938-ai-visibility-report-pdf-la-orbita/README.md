@@ -56,3 +56,13 @@ Validación final de repositorio y limitaciones: ver `verification.md`.
 Revisión independiente de las correcciones (03/10, exports 17:13): chip centrado y sin cortes en ES/EN/PT-BR; metodología sin identificadores técnicos; diez PDFs sin texto ni enlaces fuera de hoja. Pie aprobado conservado.
 
 Build final previo al commit (03/10): PASS sobre las correcciones de anotaciones, dist `.next-local/build-20261003223513-37388`. La nota anterior de build previo queda sustituida por esta comprobación.
+
+## Nota 2026-10-12 — lockups re-sellados después de esta revisión
+
+Este dossier describe la revisión del 2026-10-03 y su `manifest.json` conserva los hashes de ese día. El 2026-10-12 se
+re-sellaron los cuatro lockups del informe (`ai-visibility-report-lockup-*` y `aeo-lockup-*`) contra
+`@efeoncepro/axis-brand-assets` 0.4.25, que trae la terminación concéntrica del anillo aprobada para toda la familia de
+submarcas (AXIS `2651192`). Cambian sólo los extremos del anillo junto a la esfera; dimensiones, posición y el resto de los
+47 recursos quedan iguales. Por eso el hash de `public/branding/pdf/ai-visibility-assets.manifest.json` registrado acá ya
+no coincide con el archivo actual: es evidencia histórica, no una deriva. Verificación de ese día: el export real
+(`report-pdf-export.qa.test.ts`, 10 exports) pasa con los recursos nuevos.

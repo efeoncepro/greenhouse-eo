@@ -1,5 +1,16 @@
 # TASK-2014 — Adoptar los paquetes AXIS publicados y retirar la copia generada del informe AI Visibility
 
+## Delta 2026-10-12 — los dependientes del pin 0.4.25 ya están regenerados
+
+- El pin actual (`axis-brand-assets` 0.4.25) quedó sin deriva: tokens de Manzanitas, vocabulario de canales de Insights
+  (22 plataformas) y los cuatro lockups del PDF del AI Visibility Report, re-sellados con la terminación concéntrica.
+  Esta task parte de un árbol verde, no de tres tests rojos.
+- Al subir a 0.4.29, la pasada de regresión incluye las tres regeneraciones propias de `axis-brand-assets`:
+  `pnpm manzanitas:tokens`, `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` y los tests de deriva
+  de canales (`contracts/channels.test.ts`, `src/config/insights-channel-isotypes.test.ts`). Un lockup re-sellado es un
+  cambio visible en un PDF en producción: se mira el antes y el después. — por trabajo de deriva del pin AXIS
+  (commit `7877dfe89`)
+
 ## Delta 2026-10-09 — `axis-brand-assets` 0.4.28 (Wave, Reach y Globe, ruta H3)
 
 - La adopción suma `@efeoncepro/axis-brand-assets` **0.4.28** (AXIS `7c96680` + `5346761`; tag `v0.4.28` publicado), que lleva a Wave, Reach y Globe a la

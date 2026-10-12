@@ -1,5 +1,16 @@
 # TASK-1990 — Efeonce Insights: contrato de la tarjeta de cifra con canal (plataformas, glifo por métrica y tablero de un canal)
 
+## Delta 2026-10-12 — el vocabulario pasa de 19 a 22 plataformas
+
+- `INSIGHT_CHANNEL_IDS` suma `facebook`, `threads` y `x`, que AXIS publicó en `axis-brand-assets` 0.4.19 y 0.4.21 y que
+  Greenhouse instaló al subir el pin a 0.4.25 (`596bfab90`) sin alinear la lista. Nombre visible en `GH_INSIGHTS.channels`,
+  isotipo en color en los dos catálogos y en Think (commit local en `efeonce-think`).
+- `channelForDomain`: facebook.com → `facebook` (antes `meta`), threads.net/threads.com → `threads`, x.com/twitter.com →
+  `x`. `meta` ya no sale de un dominio. Una fuente citada de Facebook mostrará el isotipo de Facebook en las ediciones
+  que se rendericen después del próximo release.
+- Ningún adapter sella todavía esos tres canales por su cuenta; sólo llegan por dominio citado. — por trabajo de deriva
+  del pin AXIS (commit `7877dfe89` y siguiente)
+
 ## Delta 2026-10-04 — metricIcon, tableros por motor y por asistente (decisiones del operador)
 
 - `metricIcon` resuelto por `statItemView` (`presentation/metric-glyphs.ts`, una tabla para PDF, deck y web; aditivo en el

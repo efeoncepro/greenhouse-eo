@@ -4,6 +4,17 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-12 — AXIS: dependientes del pin `axis-brand-assets` 0.4.25 regenerados
+
+`596bfab90` subió el pin de 0.4.15 a 0.4.25 sin regenerar y dejó tres tests rojos en `pnpm test`. Corregido en
+`7877dfe89` y el commit siguiente: tokens de Manzanitas, `INSIGHT_CHANNEL_IDS` de 19 a 22 (Facebook, Threads, X, con
+isotipo en los dos catálogos) y los cuatro lockups del PDF del AI Visibility Report re-sellados (terminación
+concéntrica del anillo: **cambio visible en un PDF en producción**, sale con el próximo release). `channelForDomain`
+lleva facebook.com a `facebook` y suma los dominios de Threads y X. Think tiene los tres isotipos en un commit local
+de `efeonce-think` sin push: publicarlo antes del release de Greenhouse. Verificado: suites de Insights, Composer,
+config y PDF; gate visual de Insights 37 frames a 0 px; export real del PDF (10); lint y typecheck. No se corrió
+`pnpm test` completo ni `pnpm build`. Lección y comandos en las skills `axis-design-system` y `efeonce-insights`.
+
 ## 2026-10-12 — SEO/AEO: categoría y representación de marca
 
 [Método aceptado](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md): aspirar a referencia
