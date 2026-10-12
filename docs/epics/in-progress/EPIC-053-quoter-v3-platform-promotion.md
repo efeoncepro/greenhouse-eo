@@ -263,7 +263,7 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 | Costo de puesta en marcha de un servicio gestionado | **Abierta.** No bloquea |
 | Excepción del diseñador por dedicación | **Abierta.** No bloquea |
 | Quién puede emitir una cotización | Resuelta 2026-10-12: los agentes, dentro de política, y administración, cuentas y finanzas |
-| Prefijo y arranque del número de cotización | Resuelta 2026-10-12: `EO-QTE-`, la serie real empieza en 15; se asigna en la primera emisión |
+| Prefijo y arranque del número de cotización | Resuelta 2026-10-12: `EO-QTE-`, la primera cotización real es `EO-QTE-15001` y sigue correlativa; se asigna en la primera emisión |
 | Si V3 publica cotizaciones en HubSpot | **Abierta.** La contención detiene la salida actual; el destino se decide en la unidad U2 |
 | Cómo se vincula una propuesta de licitación mientras dure la contención | Resuelta 2026-10-12: ese flujo no se usa; no bloquea `TASK-2023` |
 | Ejemplos de cotización en la base compartida | Resuelta 2026-10-12: sintéticos, con numeración aparte |

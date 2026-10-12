@@ -1000,7 +1000,7 @@ Resueltas por el CEO el 2026-10-12 (ya no abiertas):
   para emitir.
 - **Bearer delegado como persona.** Aceptado: mientras no haya interfaz, la persona inicia sesión desde la CLI.
 - **Roles con capacidad de emitir** y **prefijo del número.** `efeonce_admin`, `efeonce_account` y `finance_admin`,
-  además de los agentes dentro de política; `EO-QTE-`, la serie real empieza en 15.
+  además de los agentes dentro de política; `EO-QTE-`, la primera cotización real es `EO-QTE-15001`.
 - **Cotizaciones de prueba.** Sintéticas, con numeración aparte.
 - **Propuestas de licitación.** El flujo que exige una cotización del cotizador actual no se usa: no bloquea.
 

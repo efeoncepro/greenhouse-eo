@@ -43,7 +43,7 @@ API → MCP → interfaz**, y con una regla que manda sobre las demás: **la CLI
    se registra una cotización calculada.
 5. **Historial de sólo agregar**, con guardas en la base. Corregir es crear una versión que reemplaza a la anterior. El
    número público sale de una secuencia, se asigna en la primera emisión, lleva el prefijo `EO-QTE-` y la serie real
-   empieza en 15 (`EO-QTE-15`). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.
+   empieza en 15001: la primera cotización real es `EO-QTE-15001` y sigue correlativa (`EO-QTE-15002`…). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.
 6. **El catálogo cambia de autoridad en dos pasos**: primero la base refleja el repo por huella (el repo manda);
    después los cambios se hacen por la API con las mismas huellas de confirmación y el repo recibe una copia. Aplicar
    nunca activa: mover el puntero es un acto aparte.
@@ -151,6 +151,8 @@ antes y el después.
 - **Dueña y emisora.** Efeonce siempre. Emite a organizaciones que son clientes o potenciales clientes.
 - **Quién puede emitir, además de los agentes.** Administración, cuentas y finanzas.
 - **Cotizaciones de prueba.** Sintéticas, con numeración aparte.
-- **Número.** Prefijo `EO-QTE-`; la serie real empieza en 15.
+- **Número.** Prefijo `EO-QTE-`; la primera cotización real de V3 es `EO-QTE-15001` y sigue correlativa. (Corregido
+  el mismo día: la primera lectura, «empieza en 15», era un error de interpretación; el CEO aclaró que 15 es el
+  comienzo del número.)
 - **Propuestas de licitación.** El flujo que exige una cotización del cotizador actual no se usa: la contención no
   tiene ese bloqueo.
