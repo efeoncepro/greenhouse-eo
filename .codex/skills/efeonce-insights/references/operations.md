@@ -401,3 +401,38 @@ revoked. Never record the one-time link token.
 - TASK-1962 necesita una edición nueva y lectura productiva de los campos de contenido; TASK-1957 necesita además el gate y la decisión AEO/copy. Crear/revisar/emitir/enviar no se ejecutó para arreglar documentación.
 - Cloud Run no se revalidó: gcloud exige reautenticación interactiva. No declarar salud o flags actuales del worker desde el Handoff. Ver auditoría y tareas para siguientes pasos.
 - Correcciones `8e4fbac7b`, `c782449f0` y `03e19f3ee` posteriores al release quedan pendientes de promoción/verificación; no son un release faltante del contrato de TASK-1962.
+
+## Alcance de contenido (TASK-2033 — tabla aplicada y Berel v1 fijado el 2026-10-12; código sin release)
+
+**Sin flag.** Se activa por dato: una organización con una versión de alcance con reglas. Ninguna otra organización
+lo tiene.
+
+**Ver y fijar** (proxy Cloud SQL arriba; dry-run por defecto, sin `--apply` no escribe):
+
+```bash
+pnpm seo:content-scope --org=<organization_id> --label="Artículos y tutoriales" \
+  --prefix=/articulos --prefix=/tutoriales --exact=/guia-en-la-raiz
+```
+
+El dry-run muestra el alcance vigente, lo que el nuevo mediría frente al sitio completo en el último mes completo
+(`--from` / `--to` para otra ventana) y las 15 páginas con más clics que quedarían fuera. Con `--apply` exige
+`--reason="…"`. La tabla es append-only: no hay forma de borrar una versión, tampoco una de prueba.
+
+**Volver al sitio completo:** `pnpm seo:content-scope --org=<organization_id> --clear --reason="…" --apply`. Rige para
+la siguiente edición, sin deploy.
+
+**Orden de despliegue:** la tabla antes que el código (ya aplicada). El release debe incluir Vercel **y** el
+`ops-worker`: el tick de schedules arma ediciones con el adapter del worker, y un worker sin el cambio generaría la
+ocurrencia mensual con la propiedad completa. Verificar en una edición nueva que sus fuentes SEO traen `contentScope`.
+
+**Mantenimiento del alcance de Berel:** `/articulos`, `/tutoriales`, `/inspiracion` (prefijos) y las guías
+`/pintura-y-barniz-para-madera-como-elegir` e `/impermeabilizante-para-azotea-como-elegir` (exactas). Una guía nueva
+publicada en la raíz no entra sola: hay que fijar una versión nueva que la incluya.
+
+**Vista previa real con alcance:** la de siempre (`scripts/insights/preview-edition.ts --editorial-v2`), con
+`GROWTH_SEO_WORK_QUEUE_ENABLED=true` y, para GA4, `GROWTH_GA4_ENABLED=true` más `GOOGLE_GA4_OAUTH_CLIENT_ID` y
+`GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` del entorno de staging. Sin GA4 el informe sale con el límite «Google
+Analytics 4: sin datos suficientes» y cuatro páginas menos.
+
+**Pruebas en vivo (sólo lectura):** `pnpm test:live src/lib/growth/seo/content-scope`. Leer `passed`: sin credenciales
+se saltan en silencio.

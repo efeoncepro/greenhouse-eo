@@ -583,3 +583,52 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
   iguales; si varían, barras por canal). `chapter.stats` puede traer varios tableros.
 - **Color por rol:** partes sin rol actual → anterior → paso (→ gris medio en waffle); coral sólo con rol declarado.
 
+## Alcance de contenido (TASK-2033 — develop local 2026-10-12; verificado contra código y PostgreSQL real)
+
+**Regla.** `{ kind: 'prefix' | 'exact', path }`. La ruta empieza por `/`, no termina en `/`, no lleva query, fragmento
+ni espacios, y no es `/` (el sitio completo se declara con cero reglas). Máximo 50 reglas, 200 caracteres por ruta,
+etiqueta de hasta 60 caracteres y sin cifras (se imprime en una línea que no admite números).
+
+**Pertenencia.** Una página pertenece si su ruta es igual a una regla `exact`, igual a una regla `prefix` o empieza
+por `prefix + '/'`. `/articulos-viejos` no pertenece a `/articulos`. La ruta se compara sin esquema, host, query,
+fragmento ni barras finales; por bytes, distingue mayúsculas. Aplica a todos los hosts de la propiedad.
+
+**Versiones.** El alcance vigente es la versión de mayor número. Fijar las mismas reglas y etiqueta no escribe
+(`changed: false`). Cero reglas = sitio completo. Nunca se edita ni se borra una versión.
+
+**Qué cambia en la evidencia con alcance vigente:**
+
+| Hecho | Con alcance | Sin alcance |
+| --- | --- | --- |
+| `clicks`, `impressions`, `ctr`, `position`, `clicks_week.*` | páginas del alcance | propiedad completa |
+| `driver.query.*`, `driver.page.*` | páginas del alcance (las consultas son las que llevaron a ellas) | propiedad completa |
+| `site.organic_*` (GA4) | sesiones cuya página de entrada pertenece al alcance | sitio completo |
+| `keywords_tracked`, `page_one_keywords` | keywords cuyo último punto de la ventana posiciona con URL del alcance | todas |
+| `opportunity.*` | ítems de la cola con `target_url` en el alcance | toda la cola |
+| `organic_etv` | no se emite; rechazo `outside_content_scope` | como siempre |
+| `site_total.clicks`, `site_total.impressions` | propiedad completa, `role: 'reference'` | no se emiten |
+
+**Sellado.** Con alcance, toda fuente SEO del snapshot lleva `contentScope: { version, label, rules }` (las de la
+ventana de comparación también) y los `evidenceRef` terminan en `:scope_v<n>`. Ausente = sitio completo. El plan lee
+el alcance de las fuentes (`contentScopeOf`), no de la configuración.
+
+**Plan.** `scopeLines` de búsqueda: «Visibilidad orgánica de {etiqueta en minúscula inicial}: sus clics, impresiones y
+posiciones en Google, sin el resto del sitio.» Entrada del capítulo: «Cómo encuentra Google el contenido que
+trabajamos y cuántas visitas le trae.» Última afirmación del capítulo, rol `finding`, id
+`claim.seo.content_scope_context`: «Los clics de este contenido variaron {Δ} frente al período anterior; los de todo
+el sitio, {Δ}.» Cita el hecho `clicks` y la referencia `site_total.clicks`; sólo existe si ambos tienen período
+anterior distinto de cero. Límite del ETV: «Tráfico orgánico estimado: se estima para todo el sitio, no para el
+contenido que mide esta edición.»
+
+**Contrato de contenido.** `site_total.` responde `outcome` (como `measurement` rompía el gate: SEO no tiene productor
+de metas).
+
+**Nombre de una página (`pageLabelOf`).** Hasta 40 caracteres. Una ruta más larga se nombra por su último tramo
+(`…/tramo`); si tampoco cabe, por el comienzo y los últimos 12 caracteres del tramo con la elipsis a la vista
+(`…/como-elegir-la-pintura-co…clima-humedo`). `uniquePageLabels` distingue dos nombres abreviados iguales (` ·2`).
+
+**Textos de GA4.** «Visitas orgánicas» (antes «Visitas orgánicas al sitio»), «Visitas desde buscadores» y «Visitas
+orgánicas, con y sin interacción»: valen con y sin alcance. Cambian para toda organización.
+
+**Fallo cerrado.** Si `readSeoContentScope` lanza, el adapter lanza y el orquestador registra el módulo SEO como
+límite. Nunca se mide el sitio completo por defecto.

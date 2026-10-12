@@ -1,5 +1,25 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-12 · TASK-2033 · Recortar la medición destapó tres fallas que sólo se ven con datos reales.** Síntoma:
+  con el alcance de contenido de Berel, (1) el render falló cerrado: las páginas que más cambian pasaron a ser
+  artículos con slugs de 65 caracteres y `pageLabelOf` sólo abreviaba hasta el último tramo, sin tope; (2) la lectura
+  de la figura decía «La página que más cambió fue subió de 14 a 82 clics»: la variante sin nombre reutilizaba una
+  frase terminada en «fue», y antes nunca se usaba porque la página que más cambiaba era la de inicio; (3) el
+  predicado de alcance por fila tardaba 5 s por consulta sobre un mes real (204 mil filas), cerca de 50 s por edición.
+  Regla: cambiar la POBLACIÓN de un informe cambia qué filas ganan cada ranking, y eso ejercita ramas que los datos
+  de siempre nunca tocaron; la vista previa real con la población nueva es parte del cambio, no un cierre opcional.
+  Sobre `seo_gsc_daily`, clasificar una vez por página distinta (`gscPagesInContentScopeSql`), nunca por fila.
+- **2026-10-12 · TASK-2033 · El primer registro del ID en el registry coincidía con «Siguiente ID libre».** Síntoma:
+  la guarda `! grep -q "TASK-2033"` antes de registrar dio verdadero porque la nota «Siguiente ID libre TASK-2033»
+  ya contenía el texto, y el script de registro no corrió sin avisar. Regla: buscar la FILA (`^| \`TASK-####\``),
+  no el texto del ID.
+- **2026-10-12 · TASK-2033 · GA4 y Search Console no cuentan lo mismo sobre el mismo contenido.** Síntoma: para las
+  páginas del alcance de Berel, Search Console da 799 clics en septiembre y GA4, 3.994 sesiones orgánicas; y mientras
+  los clics suben 20,9 %, las sesiones caen 51,9 %. No es un defecto del filtro: `seo_gsc_daily` guarda sólo
+  consultas con texto (las anónimas no entran), GA4 cuenta todos los buscadores, y agosto tuvo un pico de dos semanas
+  en el contenido. Regla: antes de leer dos fuentes como contradictorias, mirar la serie semanal de cada una; y
+  avisar al operador cuando un mes de comparación trae un pico, porque el informe lo imprime como caída.
+
 - **2026-10-12 · Afirmé que un canal «llega a Think» sin leer el modelo web.** Síntoma: tras llevar facebook.com a
   `facebook`, el Handoff, el changelog, la task y el mensaje al operador decían que había que publicar Think antes que
   Greenhouse para que la web no mostrara la fuente sin isotipo. Era falso: `channelForDomain` sólo lo llama `rowMarkOf`

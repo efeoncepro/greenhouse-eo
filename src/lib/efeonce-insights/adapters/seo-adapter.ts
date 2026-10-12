@@ -321,6 +321,8 @@ const MOVERS_LIMIT = 5
  * página; la URL completa queda en el `evidenceRef` del snapshot.
  */
 const PAGE_LABEL_MAX = 40
+/** Cuánto del final del último tramo se conserva cuando ni siquiera ese tramo cabe. */
+const PAGE_LABEL_TAIL = 12
 
 export const pageLabelOf = (url: string): string => {
   try {
@@ -329,10 +331,38 @@ export const pageLabelOf = (url: string): string => {
     if (path === '') return GH_INSIGHTS.reading.homePage
     if (path.length <= PAGE_LABEL_MAX) return path
 
-    return `…/${path.split('/').filter(Boolean).at(-1)}`
+    const last = `…/${path.split('/').filter(Boolean).at(-1)}`
+
+    if (last.length <= PAGE_LABEL_MAX) return last
+
+    // TASK-2033 — un artículo suele tener un slug más largo que la columna («…/como-elegir-la-pintura-correcta-para-
+    // exteriores-en-clima-humedo», 65 caracteres: el render fallaba cerrado en la figura y en la tabla; Berel con alcance
+    // de contenido, septiembre de 2026). Se nombra por el comienzo y el final del slug, con la elipsis a la vista: el
+    // comienzo dice de qué trata y el final distingue dos slugs que empiezan igual. Es un nombre abreviado de la página,
+    // no una cifra ni una afirmación recortada.
+    const head = PAGE_LABEL_MAX - PAGE_LABEL_TAIL - 1
+
+    return `${last.slice(0, head)}…${last.slice(-PAGE_LABEL_TAIL)}`
   } catch {
     return url
   }
+}
+
+/**
+ * Nombres visibles de un grupo de páginas, uno por página y todos distintos: si dos rutas abreviadas coinciden, la
+ * segunda lleva su orden («… ·2»). Dos barras con el mismo nombre no se podrían distinguir en la figura ni en la tabla.
+ */
+export const uniquePageLabels = (urls: readonly string[]): string[] => {
+  const seen = new Map<string, number>()
+
+  return urls.map(url => {
+    const label = pageLabelOf(url)
+    const count = (seen.get(label) ?? 0) + 1
+
+    seen.set(label, count)
+
+    return count === 1 ? label : `${label} ·${count}`
+  })
 }
 
 /**
@@ -452,9 +482,11 @@ const moverFacts = async (
       channelId: SEO_SEARCH_CHANNEL
     }
 
+    const pageLabels = dimension === 'page' ? uniquePageLabels(result.movers.map(mover => mover.key)) : []
+
     result.movers.forEach((mover, index) => {
       const rank = String(index + 1)
-      const label = dimension === 'page' ? pageLabelOf(mover.key) : mover.key
+      const label = dimension === 'page' ? pageLabels[index]! : mover.key
       const dims = { [dimension]: label, rank }
       const previousId = factId('seo', metricId, previous, rank)
 

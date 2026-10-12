@@ -8420,6 +8420,17 @@ export interface GreenhouseGrowthSeoCompetitors {
   seo_target_id: string;
 }
 
+export interface GreenhouseGrowthSeoContentScopeVersions {
+  created_at: Generated<Timestamp>;
+  created_by_actor_kind: string;
+  created_by_user_id: string | null;
+  label: string;
+  organization_id: string;
+  reason: string;
+  rules_json: Json;
+  version: number;
+}
+
 export interface GreenhouseGrowthSeoDomainOverviewSnapshots {
   capture_date: Timestamp;
   captured_at: Generated<Timestamp>;
@@ -14478,6 +14489,7 @@ export interface DB {
   "greenhouse_growth.seo_competitor_coverage_runs": GreenhouseGrowthSeoCompetitorCoverageRuns;
   "greenhouse_growth.seo_competitor_keyword_coverage": GreenhouseGrowthSeoCompetitorKeywordCoverage;
   "greenhouse_growth.seo_competitors": GreenhouseGrowthSeoCompetitors;
+  "greenhouse_growth.seo_content_scope_versions": GreenhouseGrowthSeoContentScopeVersions;
   "greenhouse_growth.seo_domain_overview_snapshots": GreenhouseGrowthSeoDomainOverviewSnapshots;
   "greenhouse_growth.seo_gsc_daily": GreenhouseGrowthSeoGscDaily;
   "greenhouse_growth.seo_keyword_discovery_actions": GreenhouseGrowthSeoKeywordDiscoveryActions;

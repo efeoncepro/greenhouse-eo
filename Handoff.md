@@ -6,16 +6,20 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 
 ## 2026-10-12 — Insights: alcance de contenido por organización (TASK-2033, en curso)
 
-El informe SEO de Berel medía la propiedad completa de Search Console; lo que Efeonce trabaja es el 4,3 % de sus
+El informe SEO de Berel medía la propiedad completa de Search Console; lo que Efeonce trabaja es el 5,6 % de sus
 clics. [`TASK-2033`](docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md) agrega un alcance
 de contenido por organización (reglas de ruta, append-only) en `src/lib/growth/seo/content-scope/`; los readers dueños
-lo aplican y el adapter de Insights lo sella en cada fuente. Slices 1–4 en `develop` local, **sin push**.
-**No empujar todavía:** la migración `20261012145214417_task-2033-growth-seo-content-scope.sql` está escrita y sin
-aplicar (espera autorización del operador), y el adapter falla cerrado si no puede leer el alcance: desplegar el código
-antes de la tabla dejaría sin capítulo SEO a toda edición. Quien corra `pnpm migrate:up` desde este árbol la aplica.
-Pendiente: aplicar la migración, fijar el alcance de Berel con `pnpm seo:content-scope`, vista previa real (PDF y
-deck), filtro de GA4 contra la propiedad real, tool MCP de lectura, documentación y skill. Verificado: 1.338 pruebas
-de Insights, SEO y GA4; `test:live` del alcance 9/9 contra PostgreSQL real; `pnpm typecheck`.
+lo aplican y el adapter de Insights lo sella en cada fuente. Slices 1–5 en `develop` local, **sin push ni release**.
+**Aplicado en la base compartida** con autorización del operador: la migración
+`20261012145214417_task-2033-growth-seo-content-scope.sql` y el alcance v1 de Berel (`pnpm seo:content-scope`).
+Producción sigue midiendo el sitio completo: el código desplegado no lee el alcance. El release debe incluir Vercel y
+el `ops-worker` (el tick de schedules arma ediciones allí).
+Vista previa real de septiembre de 2026 con alcance: A4 27 páginas, deck 21 láminas, 0 violaciones; clics del contenido
+661 → 799 (+20,9 %) con el sitio en −13,6 %. **Para quien revise esa edición:** las visitas orgánicas de GA4 al
+contenido caen 51,9 % por un pico de dos semanas en agosto; el informe lo imprime.
+Pendiente: tool MCP de lectura (Slice 6), `pnpm build`, release, decisión del operador sobre revisar la edición de
+septiembre. Verificado: `pnpm test` completo (20.284 pruebas, 0
+fallas), `test:live` del alcance 9/9 contra PostgreSQL real, gate visual de Insights 37 frames a 0 píxeles, typecheck.
 
 ## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
 

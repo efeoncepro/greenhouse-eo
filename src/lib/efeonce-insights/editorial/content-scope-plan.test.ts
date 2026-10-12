@@ -145,6 +145,35 @@ describe('TASK-2033 — el plan declara el alcance de contenido', () => {
     expect(validateEditorialPlan(built, snapshot)).toEqual([])
   })
 
+  it('cuando el nombre de la página no cabe en la lectura de su figura, la frase sin nombre sigue bien construida', () => {
+    const snapshot = scopedSnapshot()
+
+    const page = (rank: string, label: string, window: typeof CURRENT, value: number): EvidenceFactV1 => ({
+      ...seo('driver.page.clicks', window, value, 'count'),
+      factId: `seo.driver.page.clicks.${window.start}_${window.endExclusive}.${rank}`,
+      label,
+      comparisonFactId: window === CURRENT ? `seo.driver.page.clicks.${PREVIOUS.start}_${PREVIOUS.endExclusive}.${rank}` : null,
+      dimension: { page: label, rank }
+    })
+
+    // Caso real de Berel (septiembre de 2026): la guía de la raíz, cuyo nombre no cabe en la conclusión de la figura.
+    snapshot.facts.push(
+      page('1', '…/pintura-y-barniz-para-madera-como-elegir', CURRENT, 82),
+      page('1', '…/pintura-y-barniz-para-madera-como-elegir', PREVIOUS, 14),
+      page('2', '/articulos/como-pintar-una-pared', CURRENT, 60),
+      page('2', '/articulos/como-pintar-una-pared', PREVIOUS, 40)
+    )
+
+    const built = plan(snapshot)
+    const reading = built.chapters[0]!.readings!.find(item => item.chartId === 'chart.seo.drivers.page')!
+
+    expect(reading.conclusion!.text).toBe('La página que más cambió subió de 14 a 82 clics (+485,7 %).')
+    expect(reading.conclusion!.text).not.toContain('fue subió')
+    // El hallazgo del capítulo, que no tiene ese tope, la nombra completa.
+    expect(built.chapters[0]!.claims.some(item => item.text.startsWith('La página que más cambió fue «…/pintura-y-barniz-para-madera-como-elegir»'))).toBe(true)
+    expect(validateEditorialPlan(built, snapshot)).toEqual([])
+  })
+
   it('con contrato v1 (sin editorial v2) el alcance no cambia la forma del plan', () => {
     const built = buildDeterministicPlan(scopedSnapshot(), { modules: ['seo'], locale: 'es-CL' })
 

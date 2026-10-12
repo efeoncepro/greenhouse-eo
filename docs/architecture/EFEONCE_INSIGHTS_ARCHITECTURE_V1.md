@@ -154,6 +154,32 @@ compatible explícita, nunca usar el dato actual como histórico. Datos incomple
 bloquean la emisión por defecto. Una política explícita `allow_partial` puede emitir omisiones visibles,
 pero nunca salta los gates de seguridad, validez del instrumento o auditoría técnica.
 
+### 5.1 Alcance de contenido por organización (TASK-2033 — develop local 2026-10-12, sin release)
+
+Un informe mide lo que Efeonce trabaja, no todo lo que la fuente trae. Search Console entrega la propiedad completa
+de la organización; cuando Efeonce trabaja una parte del sitio (el contenido editorial), el resto decide la cifra y
+el informe deja de hablar del trabajo. El alcance de contenido resuelve eso sin cambiar las fuentes.
+
+- **Dueño:** el dominio SEO (`src/lib/growth/seo/content-scope/**`,
+  `greenhouse_growth.seo_content_scope_versions`). Se ancla a la organización, igual que la propiedad de Search
+  Console. Reglas de ruta `prefix` y `exact`, versiones append-only; la vigente es la de mayor número; cero reglas es
+  el sitio completo. Acceso sólo por `readSeoContentScope` y `setSeoContentScope`.
+- **Quién recorta:** los readers dueños (`readSeoOverviewKpisForWindow`, `readSeoWindowMovers`, `readSeoWorkQueue`,
+  `readGa4Analytics`), que reciben el alcance como parámetro opcional. El adapter de Insights lo resuelve una vez por
+  edición y lo pasa en la ventana actual y en la de comparación; no filtra filas ni lee tablas del dominio SEO.
+- **Qué se sella:** cada fuente SEO del snapshot lleva `contentScope` (versión, etiqueta, reglas). El plan lo lee de
+  ahí. Cambiar el alcance de la organización después no cambia lo que dice una edición sellada.
+- **Qué no se puede recortar:** el ETV es una estimación del dominio; con alcance no se emite y queda como límite
+  (`outside_content_scope`). La propiedad completa entra sólo como hechos de referencia (`site_total.*`), que una
+  afirmación de contexto cita.
+- **Fallo cerrado:** si el alcance no se puede leer, el adapter falla y el módulo queda como límite. Medir el sitio
+  completo por defecto sería el error que esta pieza existe para evitar.
+- **Fuera:** el capítulo AEO (la marca no se mide por URL), el alcance por servicio contratado (`TASK-1960`) y la
+  escritura del alcance por API o MCP.
+
+Contrato completo en la skill `efeonce-insights` (`references/contracts.md` § Alcance de contenido); estado y
+evidencia en su `program-ledger.md` § TASK-2033.
+
 ## 6. Plan editorial, gráficos y salidas
 
 El plan contiene resumen ejecutivo, capítulos de módulos, hallazgos con evidencia, acciones con owner sólo

@@ -381,6 +381,28 @@ describe('SEO adapter', () => {
       expect(result.rejections).toContainEqual(expect.objectContaining({ metricId: 'rank', reason: 'no_data' }))
     })
 
+    it('un artículo con un slug más largo que la columna se nombra por su comienzo y su final, y dos nombres nunca coinciden', async () => {
+      const { pageLabelOf, uniquePageLabels } = await import('./seo-adapter')
+      const long = 'https://x.cl/articulos/como-elegir-la-pintura-correcta-para-exteriores-en-clima-humedo'
+
+      // Caso real de Berel con alcance (septiembre de 2026): 65 caracteres no cabían en la figura (44) ni en la tabla (48).
+      expect(pageLabelOf(long)).toBe('…/como-elegir-la-pintura-co…clima-humedo')
+      expect(pageLabelOf(long).length).toBeLessThanOrEqual(40)
+      // Lo que ya cabía no cambia.
+      expect(pageLabelOf('https://x.cl/articulos/como-pintar')).toBe('/articulos/como-pintar')
+      expect(pageLabelOf('https://x.cl/sites/default/files/2025-06/FT_PINTURA%20AUTOENFRIANTE.pdf')).toBe('…/FT_PINTURA AUTOENFRIANTE.pdf')
+
+      // Dos slugs que se abrevian igual quedan distinguibles.
+      const twins = uniquePageLabels([
+        'https://x.cl/articulos/como-elegir-la-pintura-correcta-para-interiores-en-clima-humedo',
+        'https://x.cl/articulos/como-elegir-la-pintura-correcta-para-exteriores-en-clima-humedo',
+        'https://x.cl/articulos/otro'
+      ])
+
+      expect(new Set(twins).size).toBe(3)
+      expect(twins[1]).toBe(`${twins[0]} ·2`)
+    })
+
     it('si el alcance no se puede leer, el adapter falla: nunca mide el sitio completo en silencio', async () => {
       seoMocks.readSeoContentScope.mockRejectedValue(new Error('relation does not exist'))
       scopedGsc()

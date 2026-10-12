@@ -116,6 +116,17 @@ it without repeating what already cost a day*. It grows with every task: see the
   release `36a73e7b7e19` (2026-10-03). Gateway `efeonce-mcp` 1.7.0 federated the 7 tools
   (58 total): share create/revoke require `efeonce.mcp.insights.write` (no client carries it ⇒ fail-closed), the 5
   reads use the base scope; sending email and scheduling do not exist over MCP.
+- **Content scope (TASK-2033): with a declared scope, the SEO chapter measures only that content.** An organization
+  can declare which part of its site Efeonce works on (`greenhouse_growth.seo_content_scope_versions`, path rules
+  `prefix`/`exact`, append-only versions; command `setSeoContentScope`, reader `readSeoContentScope`, CLI
+  `pnpm seo:content-scope`). The adapter resolves it ONCE and passes it to the owner readers for the current and the
+  comparison window; it never filters rows itself. Every SEO source seals it (`EvidenceSourceV1.contentScope`) and the
+  plan reads it from the snapshot, never from live config. The whole site enters only as `site_total.*` reference
+  facts; the domain ETV is not emitted (`outside_content_scope`). If the scope cannot be read the adapter throws —
+  NEVER fall back to the whole site. On `seo_gsc_daily` use `gscPagesInContentScopeSql` (one classification per
+  distinct page), never the per-row predicate (5 s vs 0.4 s on a real month). An organization without a scope gets the
+  report it got before. The AEO chapter is not scoped. Live for Berel since 2026-10-12 (v1); see `contracts.md`
+  § Alcance de contenido and `operations.md` § Alcance de contenido.
 - **Figures are never invented, never "0" when absent.** `no_data`, `unsupported_window`,
   `insufficient_data` are rejections recorded in the snapshot and shown as limits in the plan. The AI
   author only rewrites validated text; if a figure changes, the deterministic plan wins.

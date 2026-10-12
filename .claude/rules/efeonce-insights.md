@@ -66,6 +66,12 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   **NUNCA** se reenvía: se reconcilia contra `email_deliveries`. Un schedule **NUNCA** emite ni envía (CHECK
   `draft_for_review`). Flags `INSIGHTS_SHARING_ENABLED` (Vercel), `INSIGHTS_DELIVERY_ENABLED` y
   `INSIGHTS_SCHEDULES_ENABLED` (Vercel + `ops-worker`); los EmailTypes nacen apagados en `email_type_config`.
+- **Alcance de contenido (TASK-2033)**: con un alcance declarado (`greenhouse_growth.seo_content_scope_versions`,
+  dominio SEO) el capítulo de búsqueda mide SÓLO ese contenido. El adapter lo resuelve una vez, lo pasa a los readers
+  dueños en las dos ventanas y lo sella en cada fuente (`contentScope`); **NUNCA** filtra filas por su cuenta ni cae al
+  sitio completo si no puede leerlo (lanza). El sitio completo entra sólo como referencia `site_total.*`; el ETV del
+  dominio no se emite (`outside_content_scope`). El plan lee el alcance del snapshot, nunca de la configuración viva.
+  Todo hecho nuevo por URL o por página debe recibir el alcance. AEO no se recorta.
 - **Eventos** `insights.*` sólo por `events.ts` en la misma transacción del write; **señales** de reliability
   `insights.editions.*` leen la tabla, no el evento. Observabilidad: `captureWithDomain(err, 'insights', …)`.
 - **Tool MCP nueva** ⇒ entrada en `src/mcp/greenhouse/tool-manifest.ts` (`writes` correcto) + `pnpm mcp:manifest:generate`

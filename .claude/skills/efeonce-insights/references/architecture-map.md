@@ -49,6 +49,19 @@ Architecture `EFEONCE_INSIGHTS_ARCHITECTURE_V1.md`, ADR `EFEONCE_INSIGHTS_PLATFO
 runbook `docs/manual-de-uso/insights/operar-efeonce-insights-api-mcp.md`, EPIC-045 + master UI flow
 `docs/ui/flows/EPIC-045-efeonce-insights-UI-FLOW.md`, Think decision `docs/think/README.md`, flag ledger rows.
 
+## TASK-2033 — alcance de contenido (in-progress 2026-10-12; develop local)
+
+- `src/lib/growth/seo/content-scope/contracts.ts` — `SeoContentScopeV1`, validación de reglas (rechaza, no corrige), `isPathInContentScope`, `contentScopeKey`. Puro, sin I/O.
+- `src/lib/growth/seo/content-scope/sql.ts` — `contentScopeSqlClause` (predicado por fila; conjuntos chicos) y `gscPagesInContentScopeSql` (el que se usa sobre `seo_gsc_daily`).
+- `src/lib/growth/seo/content-scope/store.ts` — `readSeoContentScope`, `setSeoContentScope`; único acceso a la tabla.
+- `greenhouse_growth.seo_content_scope_versions` — `(organization_id, version)`, etiqueta, reglas JSON, motivo y actor; trigger de no-update y no-delete.
+- `scripts/seo/set-content-scope.ts` (`pnpm seo:content-scope`) — CLI del operador, dry-run por defecto.
+- `adapters/seo-adapter.ts` — `ActiveScope`, `sealedScopeOf`, `uniquePageLabels`; `adapters/ga4-site-facts.ts` recibe `landingMatch`.
+- `contracts/evidence.ts` — `EvidenceContentScopeV1`, `EvidenceSourceV1.contentScope`, razón `outside_content_scope`.
+- `editorial/editorial-v2.ts` — `contentScopeOf`, `scopeLinesFor(modules, contentScope)`, `openingFor(module, contentScope)`, `contentScopeContextClaim`.
+- `src/lib/copy/insights.ts` — `GH_INSIGHTS.contentScope`, `readerLimits.outsideContentScope`, `metrics['site_total.*']`.
+- Pruebas: `content-scope/contracts.test.ts`, `content-scope.live.test.ts`, `scoped-readers.live.test.ts`, `editorial/content-scope-plan.test.ts`, casos nuevos en `adapters/adapters.test.ts`.
+
 ## TASK-1846 — durable rendering (2026-09-16)
 
 | Piece | Where | Responsibility |

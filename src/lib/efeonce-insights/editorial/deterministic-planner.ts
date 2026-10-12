@@ -667,8 +667,8 @@ const askFor = (rejections: readonly EvidenceRejectionV1[], modules: InsightModu
 }
 
 const DRIVER_DIMENSIONS = [
-  { dimension: 'query', lead: GH_INSIGHTS.reading.driverQueryLead, title: GH_INSIGHTS.figures.driversQueryTitle },
-  { dimension: 'page', lead: GH_INSIGHTS.reading.driverPageLead, title: GH_INSIGHTS.figures.driversPageTitle }
+  { dimension: 'query', lead: GH_INSIGHTS.reading.driverQueryLead, unnamedLead: GH_INSIGHTS.reading.driverQueryLeadUnnamed, title: GH_INSIGHTS.figures.driversQueryTitle },
+  { dimension: 'page', lead: GH_INSIGHTS.reading.driverPageLead, unnamedLead: GH_INSIGHTS.reading.driverPageLeadUnnamed, title: GH_INSIGHTS.figures.driversPageTitle }
 ] as const
 
 const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>, locale: string, totalClicks?: EvidenceFactV1) => {
@@ -679,7 +679,7 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
   const previousOf = (fact: EvidenceFactV1) => (fact.comparisonFactId ? byId.get(fact.comparisonFactId) : undefined)
   const fmtCount = (value: number | null) => formatFactValue(value, 'count', locale)
 
-  for (const { dimension, lead, title } of DRIVER_DIMENSIONS) {
+  for (const { dimension, lead, unnamedLead, title } of DRIVER_DIMENSIONS) {
     const movers = facts
       .filter(fact => fact.metricId === `driver.${dimension}.clicks` && fact.value !== null && previousOf(fact)?.value != null)
       .sort((a, b) => Number(a.dimension?.rank ?? 0) - Number(b.dimension?.rank ?? 0))
@@ -773,7 +773,7 @@ const driverSectionFor = (moduleKey: InsightModule, facts: EvidenceFactV1[], byI
       // La lectura de la figura dice lo MISMO que el hallazgo: «más cambió» es más clics movidos. La lectura genérica de
       // barras elige el mayor cambio relativo y nombraba otra página (/colores, -20,7 %) que el hallazgo (la portada).
       // Si la frase con el nombre no cabe en el molde, va sin el nombre: la figura ya lo muestra; nunca se recorta.
-      const conclusion = [named, `${lead} ${change}.`].find(text => text.length <= PLAN_TEXT_LIMITS.conclusion)!
+      const conclusion = [named, `${unnamedLead} ${change}.`].find(text => text.length <= PLAN_TEXT_LIMITS.conclusion)!
 
       readings.push({
         chartId,

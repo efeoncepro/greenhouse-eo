@@ -285,3 +285,7 @@ Todos permanecen abiertos: la infraestructura reutilizada no prueba la especiali
 
 - Mapping del contrato/backend TASK-1992 Slice 6 al plan/catálogos: fijar en Discovery; no hay código nuevo en este ajuste.
 - Techo por grupo y paginación: fijar según catálogo y QA, con omisiones explícitas.
+
+## Delta 2026-10-12 — alcance de contenido (TASK-2033)
+
+- `TASK-2033` agregó el alcance de contenido por organización. Los hallazgos de auditoría por página de esta task deben declarar si respetan el alcance vigente (sólo páginas del contenido que Efeonce trabaja) o si se informan sobre el sitio completo; no asumir uno sin decirlo en la edición.

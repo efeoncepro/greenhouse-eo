@@ -1,9 +1,9 @@
 # Operar Efeonce Insights por API y MCP
 
 > **Tipo de documento:** Manual de uso / runbook
-> **Version:** 1.20
+> **Version:** 1.21
 > **Creado:** 2026-09-15 por Claude (TASK-1845)
-> **Ultima actualizacion:** 2026-10-04 por Codex (1.20: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
+> **Ultima actualizacion:** 2026-10-12 por Claude (1.21: fijar el alcance de contenido de una organización. Historia: 1.20 por Codex, 2026-10-04: reconciliación del estado actual, flags y modelo 1.4; cierre pendiente con evidencia. Historia: 1.19: el criterio y las figuras nuevas están en producción desde el 2026-10-03 (release `36a73e7b7e19`). 1.18: el estado de «Revisar los gráficos de una edición antes de emitirla» se actualiza: el criterio quedó implementado en local por TASK-1974/1975, rollout pendiente; la revisión de las figuras nuevas vive en el manual nuevo «Revisar una edición antes de compartirla». 1.17: nueva sección «Revisar los gráficos de una edición antes de emitirla» con el criterio de selección de gráficos aprobado el 2026-10-03; lo que depende de su implementación (task de EPIC-045 aún sin número) queda marcado. 1.16: la página del Lab de AXIS quedó publicada el 2026-09-28 (AXIS main `3dfbf0e`). 1.15: la página del Lab seguía pendiente de publicar (publicada el mismo día, 1.16); qué muestra hoy un enlace real (modelo 1.0) frente a la muestra; causas de 502; «Cómo se midió»; impresión sólo como respaldo. 1.14: sección «Cómo se ve el informe» con la página del Lab. Antes, TASK-1875: enlace compartido encendido en producción, página de Think y muestra pública)
 > **Documentacion tecnica:** [EFEONCE_INSIGHTS_ARCHITECTURE_V1.md](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md) §14
 
 > **Estado verificado 04/10:** los ocho flags Insights de Vercel Production están ON. El contrato publicado sirve el modelo web 1.4 a ediciones nuevas; las ya selladas conservan su versión. Esto no cierra TASK-1848/1957/1962/1975: faltan canaries y revisiones. Cloud Run no se revalidó por requerir reautenticación. [Evidencia y pendientes](../../audits/insights/2026-10-04-epic-045-closure-review.md). Los bloques fechados anteriores describen su momento histórico.
@@ -699,6 +699,59 @@ figuras y su lectura, y el PDF de la sección anterior), o el enlace web si la e
 documentación funcional
 [«Cómo elige el informe sus gráficos»](../../documentation/insights/efeonce-insights-dominio-ediciones.md); familias con
 página en el PDF en `src/lib/efeonce-insights/render/figure-slots.ts`.
+
+## Fijar qué parte del sitio mide el informe (alcance de contenido)
+
+> `TASK-2033`, 2026-10-12. La herramienta y la tabla existen; el informe la usa a partir del próximo release.
+
+**Para qué sirve.** Que el capítulo de búsqueda de una organización mida sólo las páginas que Efeonce trabaja.
+
+**Antes de empezar.** Proxy de Cloud SQL arriba (`pnpm pg:connect`). Tener claro qué secciones del sitio son trabajo
+nuestro y, si hay páginas sueltas fuera de esas secciones, sus rutas exactas.
+
+**Paso a paso.**
+
+1. Corre la vista previa. No escribe nada:
+
+   ```bash
+   pnpm seo:content-scope --org=<organization_id> --label="Artículos y tutoriales" \
+     --prefix=/articulos --prefix=/tutoriales --exact=/guia-en-la-raiz
+   ```
+
+2. Lee el resultado: qué alcance está vigente, cuántos clics e impresiones tendría el nuevo frente al sitio completo
+   y las 15 páginas con más clics que quedarían fuera. Si alguna de esas páginas es trabajo nuestro, agrégala.
+3. Cuando esté bien, repite el comando con `--reason="por qué cambia"` y `--apply`.
+4. Genera o revisa una edición nueva y confirma que «Qué mide este informe» nombra el contenido.
+
+**Cómo se escriben las reglas.** `--prefix=/articulos` incluye `/articulos` y todo lo que cuelga de ahí, pero no
+`/articulos-viejos`. `--exact=/guia` incluye sólo esa página. Las rutas van sin dominio, sin barra final y sin
+parámetros. La etiqueta admite hasta 60 caracteres y no lleva cifras: se imprime en la portada.
+
+**Qué significan los resultados.**
+
+| Mensaje | Qué pasó |
+| --- | --- |
+| `DRY-RUN` | No se escribió nada |
+| `Alcance fijado: vN` | Quedó una versión nueva; rige para las ediciones nuevas |
+| `Sin cambios` | El alcance vigente ya era ese |
+| `Alcance inválido` | Alguna regla está mal escrita; el mensaje dice cuál |
+
+**Volver a medir el sitio completo.** `pnpm seo:content-scope --org=<organization_id> --clear --reason="…" --apply`.
+
+**Qué no hacer.**
+
+- No fijar un alcance «de prueba» en una organización real: las versiones no se pueden borrar.
+- No esperar que cambie una edición ya creada: hay que crear una versión nueva de ese informe.
+- No usar el alcance para esconder un resultado: el sitio completo sigue apareciendo como contexto.
+
+**Problemas comunes.**
+
+| Síntoma | Causa probable | Qué hacer |
+| --- | --- | --- |
+| El informe sigue midiendo todo el sitio | El código con alcance no está desplegado, o la edición es anterior | Confirmar el release y generar una edición nueva |
+| Falta una página en el informe | No pertenece a ninguna regla | Agregarla con una versión nueva |
+| No aparece el tráfico estimado | Con alcance no se emite | Es lo esperado; está en los límites del informe |
+| Las visitas de Analytics caen y los clics suben | Las fuentes cuentan distinto, o el mes anterior tuvo un pico | Mirar la serie semanal antes de emitir |
 
 ## Qué significan los estados
 

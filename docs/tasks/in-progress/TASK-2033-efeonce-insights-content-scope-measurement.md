@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–4 code complete en develop local (sin push); migración sin aplicar y alcance de Berel sin fijar, a la espera de autorización del operador; Slices 5 y 6 pendientes`
+- Status real: `Slices 1–5 en develop local (sin push ni release); migración aplicada y alcance v1 de Berel fijado el 2026-10-12; producción sigue midiendo el sitio completo hasta el release; Slice 6 (lectura por MCP) pendiente`
 - Rank: `TBD`
 - Domain: `insights|growth`
 - Blocked by: `none`
@@ -414,8 +414,8 @@ efecto en la siguiente edición, sin deploy.
 
 ## Acceptance Criteria
 
-- [ ] Existe `greenhouse_growth.seo_content_scope_versions`, append-only, y su migración aborta si la tabla no quedó creada.
-- [ ] `setSeoContentScope` crea una versión nueva sólo cuando cambian las reglas o la etiqueta, y rechaza reglas inválidas con error tipado. (Escrito; sin ejercitar contra PostgreSQL real porque la tabla aún no existe.)
+- [x] Existe `greenhouse_growth.seo_content_scope_versions`, append-only, y su migración aborta si la tabla no quedó creada. (Aplicada el 2026-10-12; `to_regclass` y `pgmigrations` verificados.)
+- [x] `setSeoContentScope` crea una versión nueva sólo cuando cambian las reglas o la etiqueta, y rechaza reglas inválidas con error tipado. (Ejercitado contra PostgreSQL real con el alcance de Berel: v1 creada, segunda corrida «sin cambios», regla inválida rechazada sin escribir.)
 - [x] `readSeoOverviewKpisForWindow` con el alcance de Berel devuelve 522 clics en agosto de 2026 y 605 en septiembre para `/articulos` + `/tutoriales`, leídos de PostgreSQL real. (Medido 2026-10-12 con el SQL del reader; con el alcance completo acordado: 661 y 799.)
 - [x] La suma de clics por página de `readSeoWindowMovers` con alcance coincide con el total de clics del alcance. (`scoped-readers.live.test.ts`, suma independiente por página en TS, las dos ventanas.)
 - [x] El matcher TS y el fragmento SQL clasifican igual las URLs de una muestra real que incluye `/articulos-x`, query strings, barra final y `www`. (`content-scope.live.test.ts`: casos de borde y todas las páginas reales de la organización con más serie.)
@@ -424,11 +424,11 @@ efecto en la siguiente edición, sin deploy.
 - [x] Con alcance, `organic_etv` no aparece como hecho y sí como límite con la razón `outside_content_scope`. (Pruebas de adapter y de plan.)
 - [x] Con alcance, «Qué mide este informe» nombra la etiqueta sellada y no contiene cifras. (`content-scope-plan.test.ts`.)
 - [x] La lectura de contexto cita los hechos de referencia `site_total.*` y pasa `plan-validation`. (`content-scope-plan.test.ts`, con las cifras reales de Berel.)
-- [ ] La vista previa real de Berel para septiembre de 2026 se abrió en PDF y deck, página por página.
-- [x] `pnpm vitest run src/lib/efeonce-insights src/lib/growth/seo src/lib/growth/analytics-ga4` queda verde. (2026-10-12: 1.338 pruebas; `test:live` del alcance: 9 pasadas, ninguna saltada.)
+- [x] La vista previa real de Berel para septiembre de 2026 se abrió en PDF y deck, página por página. (A4 27 páginas y deck 21 láminas con GA4 conectado, 0 violaciones; revisados el A4 completo del capítulo de búsqueda, límites y contraportada, y las 11 primeras láminas del deck.)
+- [x] `pnpm vitest run src/lib/efeonce-insights src/lib/growth/seo src/lib/growth/analytics-ga4` queda verde. (2026-10-12: `pnpm test` completo, 2.053 archivos y 20.284 pruebas, 0 fallas; `test:live` del alcance 9 pasadas, ninguna saltada; gate visual de Insights 37 frames a 0 píxeles.)
 - [ ] La tool MCP `get_seo_content_scope` existe, está en el manifiesto y federada en el gateway.
-- [ ] La consulta real de GA4 de Berel filtrada por página de entrada coincide con la suma por página hecha en TS.
-- [ ] La skill `efeonce-insights` y sus espejos reflejan el alcance (ledger, mapa, contratos, operación, lecciones).
+- [ ] La consulta real de GA4 de Berel filtrada por página de entrada coincide con la suma por página hecha en TS. (Casi: 50.730 por el filtro de la API frente a 50.727 sumando por página, semana del 8 al 14 de septiembre, todos los canales. Diferencia de 3 sesiones sin causa determinada; no se tilda.)
+- [x] La skill `efeonce-insights` y sus espejos reflejan el alcance (ledger, mapa, contratos, operación, lecciones).
 
 ## Verification
 
@@ -448,9 +448,9 @@ efecto en la siguiente edición, sin deploy.
 - [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
 - [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `.claude/skills/efeonce-insights/` actualizada y espejada a `.codex/` (`pnpm skills:mirrors`)
-- [ ] `berel-content-production` indica que una guía nueva en la raíz requiere una versión nueva del alcance
-- [ ] `TASK-1992`, `TASK-1960` y `TASK-1672` recibieron su delta
+- [x] `.claude/skills/efeonce-insights/` actualizada y espejada a `.codex/` (`pnpm skills:mirrors`)
+- [x] `berel-content-production` indica que una guía nueva en la raíz requiere una versión nueva del alcance
+- [x] `TASK-1992`, `TASK-1960` y `TASK-1672` recibieron su delta
 
 ## Follow-ups
 
@@ -473,3 +473,11 @@ efecto en la siguiente edición, sin deploy.
 - `site_total.*` responde la pregunta `outcome` del contrato de contenido; como `measurement` rompía el gate (SEO no tiene productor de metas).
 - La lectura de contexto es la última afirmación del capítulo, con rol `finding`: «Los clics de este contenido variaron +20,9 % frente al período anterior; los de todo el sitio, -13,6 %.» (cifras reales de Berel, septiembre de 2026).
 - Sin verificar todavía: el filtro de GA4 contra la propiedad real (la consulta ad hoc devolvió `query_failed`, sin diagnosticar), el store contra PostgreSQL real, y el PDF y el deck reales con alcance.
+
+## Delta 2026-10-12 (tarde)
+
+- Con autorización del operador: migración aplicada y alcance v1 de Berel fijado por CLI (`/articulos`, `/tutoriales`, `/inspiracion`, y las guías `/pintura-y-barniz-para-madera-como-elegir` e `/impermeabilizante-para-azotea-como-elegir`).
+- La vista previa real encontró y se corrigieron: el render fallaba cerrado con slugs de artículo de 65 caracteres (`pageLabelOf` abrevia por comienzo y final; `uniquePageLabels` evita nombres repetidos); la lectura sin nombre decía «La página que más cambió fue subió…»; tres textos de GA4 decían «al sitio» y ahora valen con y sin alcance (cambian para toda organización).
+- Dato que el operador debe conocer antes de emitir una edición de septiembre de Berel con alcance: las visitas orgánicas de GA4 al contenido caen 51,9 % (8.296 → 3.994) por un pico de dos semanas en agosto (1.863 y 4.657 sesiones contra 700–1.000 habituales), mientras los clics de Search Console del mismo contenido suben 20,9 %. El informe imprime las dos cosas.
+- El deck no tiene zona «Qué mide este informe» en su portada; el alcance aparece en la entrada del capítulo.
+- Sin hacer: Slice 6, `pnpm build`, release de Vercel y `ops-worker`.

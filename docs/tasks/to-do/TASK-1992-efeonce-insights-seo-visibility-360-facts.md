@@ -408,3 +408,7 @@ Nombres finales de hechos y de reglas se fijan en Discovery; el criterio es la r
 
 - ¿Se muestran los competidores al cliente? La política vigente dice que no; sólo el operador puede cambiarla.
 - ¿Qué glifo lleva la salud técnica: `checklist` o `web`? Propuesta: `checklist`.
+
+## Delta 2026-10-12 — alcance de contenido (TASK-2033)
+
+- `TASK-2033` agregó el alcance de contenido por organización (`src/lib/growth/seo/content-scope/`). El adapter SEO ya lo resuelve y lo sella en cada fuente. Todo hecho nuevo de esta task que salga por URL o por página (`url_visibility.*`, `site_health.*`, movimiento de keywords por página) debe recibir el alcance o declararse fuera de él con un límite; con alcance vigente el ETV del dominio no se emite, y `paid_etv`, `backlinks.*` y los hechos de dominio completo necesitan la misma decisión.

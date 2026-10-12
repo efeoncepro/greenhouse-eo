@@ -7,6 +7,22 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — Insights: el informe SEO puede medir sólo el contenido que Efeonce trabaja
+
+- Nuevo en `greenhouse_growth`: `seo_content_scope_versions`, el alcance de contenido de una organización (reglas de
+  ruta, versiones append-only). Aplicada a la base compartida. Berel tiene su alcance v1: `/articulos`, `/tutoriales`,
+  `/inspiracion` y dos guías de la raíz.
+- Comando nuevo `pnpm seo:content-scope`: muestra lo que un alcance mediría y las páginas que deja fuera; con
+  `--apply` lo fija.
+- Con alcance, el capítulo de búsqueda de Efeonce Insights mide sólo esas páginas, lo dice en la portada, deja el
+  sitio completo como contexto y saca el tráfico estimado del dominio a los límites. Sin alcance, el informe no cambia.
+- Cambian para toda organización tres textos de Analytics: «Visitas orgánicas» (antes «Visitas orgánicas al sitio»),
+  «Visitas desde buscadores» y «Visitas orgánicas, con y sin interacción».
+- Una página con un nombre más largo que la columna del informe ya no hace fallar el render: se abrevia por el
+  comienzo y el final de su ruta.
+- **Sin release:** el código vive en `develop` local. Producción sigue midiendo el sitio completo de Berel hasta
+  que se despliegue en Vercel y en el `ops-worker` (`TASK-2033`).
+
 ## 2026-10-12 — Cotizador V3: el registro de cotizaciones existe en la base
 
 - Nuevo en `greenhouse_commercial`: las tablas `quoter_*` (catálogo por huella, puntero de versiones vigentes,
@@ -501,7 +517,3 @@ El operador aceptó siete decisiones (aros de Nexa dorados, destacado «Agents»
 ## 2026-10-02 — El registro cine se opera sin consultor (TASK-1926, delta b)
 
 Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco campos propios (`llave`, `primerPlano`, `fondo`, `fenomeno`, `alcance`) que `foto:prompt` compila y avisa cuando faltan; `pnpm foto:cine:nueva` parte de una de las diez fotos aprobadas (`scripts/foto/cine-recetas.json`) y `foto:generar` no gasta con la escena de la receta; `pnpm foto:validar:cine` mide sombra y reserva vertical (calibrado: stickers, relleno y azul rey bajo luz azul no se separan en píxeles y los revisa el agente `cine-reviewer`); casebook, manual y punteros en canon, regla y skills. Los demás registros no cambian: `scripts/foto/regresion-prompt.mjs` compara todas las fichas en disco (0 no cine cambiadas). AXIS: sección «Registro cine» en el banco fotográfico (commit local).
-
-## 2026-10-02 — Traje biónico de Nexa: kit, catálogo y escena cine con Sparks (TASK-1940)
-
-El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde `NX5b` (aisladas, puestas en Nexa A, macro de la placa y lentes biónicos), entradas `traje-bionico-nexa` y `lentes-bionicos-nexa` en `foto:prompt` con la guarda `validarTrajeNexa` (sólo Nexa, sólo `"registro": "cine"`), marcas armadas en la referencia (isotipo incrustado en el pecho y logo completo serigrafiado en la espalda, con `foto:isotipo --marca logotipo`) y la escena aprobada `NX7d`, canonizada en el registro cine 1.7.

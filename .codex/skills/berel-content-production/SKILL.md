@@ -316,6 +316,17 @@ Plantillas ......................................................... templates/
   rotular versiones editoriales anteriores inequívocamente como `Histórico`. Nunca borrar evidencia, versiones
   ni historia para sanear la narrativa.
 
+## Alcance de medición del informe (Efeonce Insights)
+
+El informe mensual de Efeonce Insights de Berel mide sólo el contenido que trabajamos: `/articulos`, `/tutoriales`,
+`/inspiracion` y las guías publicadas en la raíz que están declaradas una por una
+(`/pintura-y-barniz-para-madera-como-elegir`, `/impermeabilizante-para-azotea-como-elegir`). Lo demás del sitio
+(inicio, productos, colores) queda fuera y sólo aparece como contexto.
+
+🔴 **Una pieza nueva publicada en la raíz del sitio no entra sola al informe.** Al publicarla, avisar para que se fije
+una versión nueva del alcance (`pnpm seo:content-scope`, ver la skill `efeonce-insights` → `operations.md`). Lo que se
+publica bajo `/articulos`, `/tutoriales` o `/inspiracion` entra sin hacer nada.
+
 ## Criterio de cierre
 
 Una ejecución no termina porque una API respondió `success`. Termina cuando una **segunda lectura
