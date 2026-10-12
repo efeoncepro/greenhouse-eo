@@ -1269,7 +1269,15 @@ Dilo cuando el negocio lo toca; no lo presentes como existente ni lo resuelvas d
 | Documento | `src/lib/finance/pricing-v3/resources/quote-document.ts`, `scripts/documents/render-cotizacion-a4.mjs` |
 | Rechazos (registro cerrado) | `src/lib/finance/pricing-v3/errors.ts` |
 | CLI, `--current`, `--out`, `runNotices` | `scripts/commercial/pricing-v3.ts`, `src/lib/finance/pricing-v3/adapters/` |
-| Pruebas y guardas (replay de todo artefacto congelado; el puntero nombra la versión más alta) | `src/lib/finance/pricing-v3/__tests__/`, `pnpm pricing:v3:test` |
+| Almacenamiento: cómo la CLI lee y escribe fuentes, puntero y artefactos | `src/lib/finance/pricing-v3/storage/`, `scripts/commercial/pricing-v3-storage-file.ts`, [contrato](../../../../docs/architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md) |
+| Pruebas y guardas (replay de todo artefacto congelado; el puntero nombra la versión más alta; línea base de lo que responde cada comando) | `src/lib/finance/pricing-v3/__tests__/`, `pnpm pricing:v3:test` |
+
+Lo que responde cada comando está fijado en una línea base (`pricing-v3-cli-golden.test.ts`): salida, error, código
+de salida y archivos escritos. Si cambias a propósito lo que un comando responde, incluido el texto de `help`, esa
+prueba queda en rojo: se vuelve a capturar con
+`PRICING_V3_CLI_GOLDEN=capture pnpm vitest run src/lib/finance/pricing-v3/__tests__/pricing-v3-cli-golden.test.ts`
+y se revisa el diff de los fixtures línea por línea. Si no buscabas cambiar una salida, el rojo es una regresión y no
+se captura.
 
 Las fuentes y los cambios locales no acreditan adopción en API, UI o MCP, sincronización remota, aprobación
 económica ni emisión. Si cambia un contrato, se actualiza su dueño en docs y después este procedimiento y sus
