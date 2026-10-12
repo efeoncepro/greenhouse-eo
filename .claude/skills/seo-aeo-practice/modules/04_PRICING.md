@@ -8,12 +8,17 @@ Para composición reproducible de demanda + tools/plataforma/créditos, cargar
 La CLI V3 agrega licencias base/específicas, capacidad declarada y packs por proveedor/mes con fuente/FX,
 congela inputs y produce explain/replay/readiness/preview. Costos históricos y `trial-*` siguen hipótesis;
 no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
-canónica. **Las propuestas40/35 de readiness no reemplazan el piso45% de la práctica** ni precio/condiciones
-aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas.
+canónica. **`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta** (ya no compara
+contra un 40/35 genérico) y no reemplaza precio/condiciones aprobados por cuenta. Servicio con roles internos sigue
+vendiendo fee/capacidad gobernada, no horas/piezas: la oferta se vende como `managed_service` por definición del
+catálogo, y una demanda que declara otra unidad no calcula.
 **Oferta V3 de esta práctica (catálogo v8, 2026-10-11):** un programa SEO/AEO gestionado se cotiza con
 `offerId: "seo-aeo-managed-service"` — objetivo 55% (extremo bajo del target 55-60% de abajo, confirmado por el CEO)
 y piso 45% (el del 2026-07-13). No usar `creative-managed-service` (objetivo = piso: saldría a 45%) ni la oferta de
-staffing; `--current` y fecha de cotización desde el 2026-10-11.
+staffing; `--current` y fecha de cotización desde el 2026-10-11. Un programa a un precio (tres meses, una
+licitación) declara ese precio como `agreed_total` —un neto por todo el plazo— y el documento lo imprime como
+«1 programa» con `combine`; un fee mensual continuo sigue siendo `agreed_net` por mes
+([procedimiento y ejemplo](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
 **Forma del compromiso (2026-10-11):** un encargo acotado (p. ej. la Fundación de la capa 1) declara
 `engagementForm: "on_demand"` en su propia cotización: +10% al precio sobre On-Going, mismo piso; es forma de
 compromiso, no otra oferta ni delivery model, y la Operación va On-Going (dos cotizaciones; no hay forma híbrida).

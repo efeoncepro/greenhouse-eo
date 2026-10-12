@@ -1,0 +1,98 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "Borrador · Redacción por dedicación",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Comprador de ejemplo",
+    "taxId": "Identificación del comprador por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Redacción",
+      "por dedicación."
+    ],
+    "subtitle": "Un redactor con 90 horas al mes para Comprador de ejemplo.",
+    "netLabel": "Valor neto de seis meses de servicio"
+  },
+  "service": {
+    "name": "Redacción por dedicación"
+  },
+  "scope": {
+    "title": [
+      "Una persona,",
+      "90 horas al mes."
+    ],
+    "intro": "Borrador de alcance. La cotización final debe especificar los tipos de pieza y los canales acordados.",
+    "rows": [
+      {
+        "title": "Redacción",
+        "text": "Textos para los canales acordados, dentro de las 90 horas mensuales de dedicación."
+      },
+      {
+        "title": "Coordinación",
+        "text": "Las solicitudes se reciben y priorizan con la contraparte del comprador."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario del servicio",
+    "phases": [
+      {
+        "label": "Mes 1",
+        "title": "Puesta en marcha y operación",
+        "text": "Accesos, lineamientos de marca y primeras entregas."
+      },
+      {
+        "label": "Meses 2 a 6",
+        "title": "Operación",
+        "text": "Entregas según las prioridades acordadas cada mes."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un valor mensual",
+      "por la dedicación."
+    ],
+    "intro": "Valores en pesos chilenos (CLP) para seis meses de servicio y su puesta en marcha.",
+    "summary": "Seis meses · Pesos chilenos · IVA no incluido en los valores netos",
+    "taxNote": "Los valores de cada línea son netos. El total incluye IVA y corresponde a seis meses de servicio."
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Facturación y pago",
+        "text": "El servicio se factura mensualmente. Las condiciones de pago se acuerdan antes de emitir la cotización final."
+      },
+      {
+        "title": "Dedicación",
+        "text": "Las horas no usadas en un mes no se acumulan. Una dedicación mayor se cotiza antes de ejecutarse."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia."
+      }
+    ]
+  },
+  "lines": {
+    "copy": {
+      "label": "Redactor",
+      "detail": "90 horas al mes"
+    },
+    "copy:setup": {
+      "label": "Puesta en marcha del servicio"
+    }
+  }
+}

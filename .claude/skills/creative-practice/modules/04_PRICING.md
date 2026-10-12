@@ -8,8 +8,13 @@ Para composición reproducible de demanda + tools/plataforma/créditos, cargar
 La CLI V3 agrega licencias base/específicas, capacidad declarada y packs por proveedor/mes con fuente/FX,
 congela inputs y produce explain/replay/readiness/preview. Costos históricos y `trial-*` siguen hipótesis;
 no homologar al loaded cost real de este módulo. La referenciaV2 de abajo conserva autoridad de cotización
-canónica. **Las propuestas40/35 de readiness no reemplazan el piso45% de la práctica** ni precio/condiciones
-aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas.
+canónica. **`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta** (aquí
+`creative-managed-service`: 45%/45%; ya no compara contra un 40/35 genérico) y no reemplaza precio/condiciones
+aprobados por cuenta. Servicio con roles internos sigue vendiendo fee/capacidad gobernada, no horas/piezas: la oferta
+se vende como `managed_service` por definición del catálogo, y una demanda que declara otra unidad no calcula.
+Un proyecto único de alcance cerrado se cotiza hoy con esta oferta, `on_demand` y a un precio (`agreed_total`, que
+el documento imprime como «1 proyecto»): no existe una oferta de proyectos
+([procedimiento, tabla por tipo de negocio](../../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#21-tabla-por-tipo-de-negocio)).
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
 nómina real del §3: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.

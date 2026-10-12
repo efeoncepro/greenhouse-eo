@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "pricing-v3-quote-document-brief/1",
+  "reference": "Borrador · Sitio web corporativo",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Equipo comercial",
+    "email": "comercial@example.com",
+    "phone": "+56 2 2000 0000"
+  },
+  "buyer": {
+    "name": "Comprador de ejemplo",
+    "taxId": "Identificación del comprador por confirmar",
+    "logo": null
+  },
+  "cover": {
+    "label": "Borrador · Sin validez comercial",
+    "title": [
+      "Sitio web",
+      "corporativo."
+    ],
+    "subtitle": "Diseño y desarrollo de un sitio web de alcance cerrado para Comprador de ejemplo, con un precio único por el proyecto.",
+    "netLabel": "Valor neto del proyecto"
+  },
+  "service": {
+    "name": "Sitio web corporativo"
+  },
+  "scope": {
+    "title": [
+      "Un alcance cerrado,",
+      "con un solo precio."
+    ],
+    "intro": "Borrador de alcance. La cotización final debe especificar las páginas, las integraciones y los criterios de aceptación.",
+    "rows": [
+      {
+        "title": "Diseño",
+        "text": "Estructura y diseño de las páginas acordadas, con una ronda de ajustes."
+      },
+      {
+        "title": "Desarrollo",
+        "text": "Construcción del sitio en WordPress y carga del contenido entregado por el comprador."
+      },
+      {
+        "title": "Entrega",
+        "text": "Revisión conjunta, correcciones y publicación."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Calendario del proyecto",
+    "phases": [
+      {
+        "label": "Etapa 1",
+        "title": "Diseño",
+        "text": "Estructura, diseño y aprobación."
+      },
+      {
+        "label": "Etapa 2",
+        "title": "Desarrollo",
+        "text": "Construcción y carga de contenido."
+      },
+      {
+        "label": "Etapa 3",
+        "title": "Entrega",
+        "text": "Revisión, correcciones y publicación."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un precio por",
+      "el proyecto completo."
+    ],
+    "intro": "Valores en pesos chilenos (CLP). El precio es por el proyecto completo.",
+    "summary": "Proyecto completo · Pesos chilenos · IVA no incluido en el valor neto",
+    "taxNote": "El valor del proyecto es neto. El total incluye IVA. Cada hito de pago se informa con su valor neto, su IVA y su total."
+  },
+  "conditions": {
+    "title": [
+      "Alcance, responsabilidades",
+      "y condiciones de cobro."
+    ],
+    "rows": [
+      {
+        "title": "Precio del proyecto",
+        "text": "Un precio único por el alcance descrito. Los cambios de alcance se cotizan antes de ejecutarse."
+      },
+      {
+        "title": "Lo que aporta el comprador",
+        "text": "El comprador contrata y paga el alojamiento y el dominio, y entrega los contenidos y los accesos."
+      },
+      {
+        "title": "Facturación y pago",
+        "text": "Cada hito del calendario de pagos se factura al cumplirse. Las condiciones de pago se acuerdan antes de emitir la cotización final."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Borrador sin validez comercial. La cotización final debe indicar su vigencia."
+      }
+    ]
+  },
+  "combine": [
+    {
+      "keys": [
+        "fee"
+      ],
+      "label": "Sitio web corporativo",
+      "detail": "Diseño, desarrollo y entrega",
+      "unit": "proyecto"
+    }
+  ],
+  "paymentMilestones": [
+    {
+      "id": "advance",
+      "label": "Anticipo",
+      "share": "0.5",
+      "when": "A la aceptación de la cotización"
+    },
+    {
+      "id": "closing",
+      "label": "Saldo",
+      "share": "0.5",
+      "when": "Contra la aprobación final"
+    }
+  ]
+}

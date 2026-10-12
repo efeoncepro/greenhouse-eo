@@ -386,7 +386,12 @@ FacturaNotion acredita importe/período facturado, no pago. Público/operador/hi
 `trial-*` son costos no medidos y no provisiones aprobadas. La puesta en marcha de una persona por dedicación ya es
 provisión estimada: onboarding USD 200 una vez por persona (por defecto) y reclutamiento USD 500 sólo si hay que
 contratar; la regla del Excel de «un mes del recurso» no se usa. Margen sobre venta y markup no son intercambiables;
-40/35 de readiness son propuestas, sin desplazar pisos específicos vigentes. `assess` nunca otorga aprobación.
+`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta (`margin.pricingPolicies[]`,
+`belowPolicyFloor`); ya no compara contra un 40/35 genérico, y nunca otorga aprobación. Un precio por el trabajo
+completo se declara como `agreed_total` (un neto por todo el plazo; con impuesto exclusivo, el impuesto de la
+cotización es el de la tasa sobre ese total) y `agreed_net` queda para un precio por periodo; la dedicación de cada
+línea lleva su evidencia y una estimada cuenta como costo estimado
+([procedimiento](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#39-el-precio-acordado)).
 Hay tres ofertas, todas del CEO: servicio gestionado creativo (`creative-managed-service`, objetivo 45%, piso 45%),
 servicio gestionado SEO/AEO (`seo-aeo-managed-service`, objetivo 55%, piso 45%, desde 2026-10-11) y una persona
 vendida por dedicación (staff augmentation, `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%, desde

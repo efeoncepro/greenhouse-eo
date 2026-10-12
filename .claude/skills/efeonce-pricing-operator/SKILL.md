@@ -17,7 +17,7 @@ ni Architecture; coordina sus decisiones y deja explícito qué está aprobado, 
 
 El presupuesto máximo del comprador no demuestra costo ni precio competitivo. Cuando el operador prioriza calidad al menor costo sostenible, separar costos fijos ya existentes, dedicación incremental, capacidad comprometida, costos externos y caja; no tratar el trabajo humano como gratuito por tener el equipo contratado. La ausencia de un costeo medido se registra, no se rellena con cero ni con un margen inventado.
 
-El precio aprobado y presentado gobierna la cotización; las recomendaciones anteriores quedan históricas. Mostrar neto, IVA y total del plazo completo. Una división por meses es referencia aritmética mientras las bases no confirmen cobro mensual. Para CRM, conciliar la unidad comercial con el importe total neto del programa; mantener presupuesto comprador e impuestos separados.
+El precio aprobado y presentado gobierna la cotización; las recomendaciones anteriores quedan históricas. Mostrar neto, IVA y total del plazo completo. Una división por meses es referencia aritmética mientras las bases no confirmen cobro mensual. Para CRM, conciliar la unidad comercial con el importe total neto del programa; mantener presupuesto comprador e impuestos separados. Si el precio del programa pasa por el Cotizador V3, se declara como `agreed_total` (un neto por todo el plazo) y el documento lo imprime como una línea «1 programa» con `combine`; el presupuesto máximo del comprador y su fórmula de puntaje no están modelados ahí ([procedimiento](references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
 
 Caso fechado: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El importe acordado no se convierte en rate card, mínimo sostenible comprobado ni margen validado.
 
@@ -142,88 +142,48 @@ emitidas. No importar al catálogo, tocar payroll ni publicar costos internos po
 
 ## Cotizador V3: flujo completo local para agentes
 
-Ante pedidos de cotizar roles o servicios sin UI, cargar
-[contrato operativo V3](references/cotizador-v3-agent-workflow.md) y
-[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).
-Cubre selección de variantes/países/tareas, catálogo monetario, licencias, cartera/capacidad declarada,
-créditos por proveedor/mes, provisiones, fuente/FX/vigencia, snapshots, explain/replay, readiness,
-preview redactado, documento A4 de cotización para el cliente y mantenimiento con preview/apply/digests/impacto.
-La referencia enlaza fuentes canónicas y comandos exactos; leerla antes de completar demanda o actualizar precios.
+Ante un pedido de cotizar un negocio sin UI (una persona por dedicación, un servicio gestionado, un programa, un
+proyecto, una oferta de licitación), cargar el
+[procedimiento V3](references/cotizador-v3-agent-workflow.md) y seguirlo en orden: decidir qué cotizar → componer la
+demanda → cotizar y leer → revisar → documento para el cliente. Trae la tabla de decisión por tipo de negocio, los
+diagnósticos con su arreglo, lo que no está modelado y un ejemplo que cotiza por cada tipo
+([`references/examples/`](references/examples/)). El
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md) lo acompaña con tablas y casos.
 
-El agente interpreta; el dominio calcula. `resources inspect` → `compose scaffold|plan` →
-`compose prepare|quote` → `explain|replay` → `compose assess|preview` → lecturas del artefacto
-(`compose split|schedule|cash|commitments`) → `compose document` cuando hay que entregar la cotización.
-Las versiones vigentes no se nombran a mano: las nombra el puntero `data/pricing/v3-operating/current.json` y los comandos las cargan con `--current`
-(`current show` lo muestra). Una versión nueva se emite con `catalog apply`/`resources apply` y después se
-mueve el puntero con `current set`; no sobrescribir artifacts. Se puede cotizar en CLP, USD, COP, MXN y PEN
-(`brief.outputCurrency`), cada moneda con su FX de cotización y su redondeo; no en EUR (España se cotiza en USD).
-El país entra por dos campos distintos de la demanda y rige con `quoteDate` 2026-10-11 o posterior:
-`brief.offerMarketCountry` (país del cliente) ajusta el precio de la parte humana y `brief.lines[].talentCountry`
-(país de cada persona) ajusta el costo; país no es moneda y los factores están cerrados por el CEO (valores de
-política confirmados desde 2026-10-12; no reabrirlos). Con cliente en Colombia o Perú el piso acompaña al factor de
-mercado: una cotización al precio de política no sale marcada aunque su margen real quede bajo el piso de su oferta,
-así que el margen que se informa es siempre `marginRateRoundedDown`.
-La forma del compromiso va en `brief.engagementForm`: `on_going` (razón 1) u `on_demand` (razón 1,10 sobre toda la
-fila; no mueve costo ni piso). Es una forma de compromiso, no una oferta ni un modelo de entrega; sin declararla
-cotiza como On-Going y no avisa, e Híbrido son dos cotizaciones. Tres lecturas de un artefacto congelado, que no
-cambian nada: `compose schedule` (calendario de pagos, no factura), `compose cash` (caja; no es margen ni decide
-precio) y `compose commitments` (compromisos con proveedores; informa y decide el operador).
-**«La cotización» para el cliente** es una cuarta lectura, `compose document`, que emite los datos (versión 2) de la
-[plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md): `compose document --input artefacto.json`
-imprime el andamio del brief (exit 2) → llenar el brief **sólo con textos** → `compose document --input artefacto.json
---brief brief.json --out data.json` (exit 3) → `node scripts/documents/render-cotizacion-a4.mjs --data data.json --out
-<carpeta nueva>` → leer las capturas de `qa/` y el PDF página por página. Monto, moneda, impuesto y fecha salen de la
-cotización congelada; el brief no tiene dónde ponerlos y se rechaza si los trae. **Nunca digitar ni editar una cifra
-en el brief ni en los datos emitidos: se cambia la cotización y se vuelve a correr.** El PDF se entrega como borrador
-mientras el precio no esté aprobado: no es `quotation_id`, precio aprobado ni cotización emitida. Claves de línea,
-plegado por meses, impuesto, rechazos y ejemplos:
-[referencia](references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre).
-El documento también imprime **servicios opcionales** (cada uno es su propia cotización, pasada con `--option`;
-fuera del neto y del total) y una **cortesía** (`courtesy: true` sobre una fila que la demanda bonifica): ni el precio
-de una opción ni un valor de referencia se digitan.
-Un opcional que amplía a personas que ya están en la cotización base (más dedicación, más consumo) no se lee en una
-cotización propia, que vuelve a cobrar lo que se cobra una vez por línea y subestima su margen: se cotiza **la base
-con el opcional adentro**, `compose increment --input con-opcional.artifact.json --base base.artifact.json` da su
-precio, costo y margen como diferencia (lectura interna) y el documento lo imprime con
-`--increment <clave>=<con-opcional.artifact.json>`:
-[referencia](references/cotizador-v3-agent-workflow.md#opcional-que-amplía-la-base-incremento-delta-2026-10-11-cierre).
-La fecha de inicio del servicio y la duración del contrato no son insumos del cotizador, por decisión del CEO
-(2026-10-11: una cotización no es un contrato): no se piden para cotizar, no se listan como pendiente y el documento
-no dice lo obvio (por ejemplo, quién define la fecha de inicio).
-Puesta en marcha por
-persona (onboarding por defecto, reclutamiento sólo por `choices`) y Adobe como se factura (CLP con IVA, una
-licencia = 1/3 del paquete, `fx:CLP:USD` en `fxRecordIds`): pasos y límites en la referencia.
-Los asientos nominativos se declaran **como se compran** —varios planes en un periodo, `idleSeats` con motivo,
-`seatSharing` con motivo; nunca se le quita una tarea a una persona para que la cuenta cuadre— y los meses idénticos
-van una vez con `periodIds`:
-[referencia](references/cotizador-v3-agent-workflow.md#asientos-como-se-compran-y-periodos-declarados-una-vez-delta-2026-10-11-primer-caso-real).
-Contrato 1.4.0: una compra a un tercero para un trabajo va en `brief.thirdPartyCosts[]` (`reinvoiced` = fila propia
-con la regla de su categoría; `client_direct` = nota fuera de todo total) con monto, moneda, `periodIds` y
-`evidence`: categoría, nunca una tasa. Un servicio gestionado `on_demand` recibe sola la reserva de contingencia
-(12 % del costo de persona, como costo); sólo sale con `brief.contingency` `waived` y su motivo, y queda marcada. Con
-terceros, contra el piso de la oferta se lee `ownWork.marginRateRoundedDown`, no el margen mezclado. Detalle:
-[referencia](references/cotizador-v3-agent-workflow.md#costos-de-terceros-y-reserva-de-contingencia-delta-2026-10-11-noche).
-Exit0=técnico,2=faltante,3=revisión,1=rechazo.
-`compose prepare|quote` imprimen un resumen derivado (bloqueos, señales de revisión, líneas bajo el piso);
-el resultado completo existe sólo en el artefacto de `--out`, así que quote siempre lleva `--out`; una corrida que
-no calcula no escribe nada ahí y la corregida usa el mismo `--out`. Un rechazo
-deja stdout vacío y trae en stderr `error.code` de un registro cerrado, con `option`/`issues` para ubicar el
-arreglo; `ADAPTER_FAILURE` es una falla sin clasificar de la herramienta, no del pedido.
-El resumen trae además `runNotices` (avisos de la corrida: nunca bloquean y se informan al operador junto al
-resultado) y `estimateExposure` (qué dato estimado confirmar primero; es sensibilidad, no validación).
-Los costos de persona son el costo objetivo que fijó el CEO, no la nómina: no proponer conectar la nómina ni
-llamarlos «lo que Efeonce paga»; el margen real de hoy sobre personas es mayor que el mostrado.
-Notion/M365 son base; tools e IA según necesidad y evidencia. Una simulación calculada no es costo
-validado, asignación live, aprobación de precio ni quote emitida. Los40/35 propuestos por readiness
-no sustituyen pisos de práctica aprobados. Hay tres ofertas, todas del CEO: servicio gestionado de la práctica
-creativa (`creative-managed-service`, objetivo 45 %, piso 45 %), servicio gestionado de la práctica SEO/AEO
-(`seo-aeo-managed-service`, objetivo 55 %, piso 45 %, desde 2026-10-11) y una persona vendida por dedicación, staff
-augmentation (`talent-assurance-staffing`, objetivo 30/35/40 % por tier, piso 25 %, desde 2026-10-11). Se elige por
-práctica y unidad vendida, nunca por el margen que deja pasar; sobre el piso el objetivo sube con una versión nueva
-del catálogo, y una excepción bajo un piso es del CEO y nunca referencia para otro cliente.
-El precio que se acuerda se declara directo en la demanda como
-neto acordado (`agreed_net` en `brief.adjustments`, por periodo, con motivo), sin calcular tasas a mano, y se
-vuelve a correr: el margen real y el veredicto del piso salen del motor. El catálogo vigente redondea cada
-precio hacia arriba al múltiplo de su moneda, así que una línea al piso ya no sale marcada: una línea bajo el
-piso de su mercado es un incumplimiento real y la excepción la decide el operador (CEO), nunca el agente. Mantener la frontera de
-[promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
+Lo que hay que saber antes de abrirlo:
+
+1. **El agente interpreta; el dominio calcula.** `pnpm --silent pricing:v3`, siempre con `--current` (las versiones
+   vigentes las nombra `data/pricing/v3-operating/current.json`; `current show` las muestra). Cadena: `resources
+   inspect` → `compose scaffold` → `compose quote --out` → `compose assess` → `compose document` → generador de la
+   [plantilla A4](../../../docs/commercial/templates/cotizacion-a4/README.md). Exit `3` es una cotización calculada
+   en revisión, `2` falta un insumo, `1` rechazo, `0` operación técnica. Una simulación calculada no es costo
+   validado, precio aprobado ni cotización emitida, y no cruza la frontera de la
+   [promoción canónica](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md).
+2. **Qué se cotiza sale del negocio, no de una preferencia.** Tres ofertas, cada una con su objetivo y su piso
+   (decisiones del CEO): `creative-managed-service` (45 % / 45 %), `seo-aeo-managed-service` (55 % / 45 %) y
+   `talent-assurance-staffing` (30–40 % por tier / 25 %). La **unidad comercial es un hecho del catálogo** (las dos
+   gestionadas se venden como `managed_service`, un fee; staffing como `role_capacity`, línea por línea) y una
+   demanda que la contradice no calcula. La forma (`engagementForm`) se declara siempre: `on_demand` para un
+   trabajo con alcance, inicio, término y aceptación (+10 % y, en un servicio gestionado, la reserva de
+   contingencia); `on_going` para un servicio mensual continuo. No existe una oferta para proyectos únicos: hoy van
+   con la oferta gestionada de su práctica, On-Demand y a un precio.
+3. **El precio acordado se declara y se vuelve a cotizar; nunca se calcula una tasa a mano.** Un precio por el
+   trabajo completo (programa, proyecto, todo incluido) es `agreed_total`: un neto por todo el plazo, que el
+   documento imprime como «1 programa» o «1 proyecto» con `combine`. Un precio por mes es `agreed_net` (por periodo
+   y por clase de cobro). El piso se juzga por fila y contra el de la propia oferta (`compose assess` →
+   `margin.pricingPolicies[]`, `belowPolicyFloor`): una fila bajo su piso es un incumplimiento real y la excepción
+   es del CEO, nunca del agente ni referencia para otro cliente.
+4. **Lo que se informa junto al precio:** el margen real (`marginRateRoundedDown`; con terceros refacturados,
+   también `ownWork.marginRateRoundedDown`, que es el que se compara con el piso), las filas marcadas con
+   `netShortOfFloor`, qué parte del costo es estimada (`estimateExposure`; una dedicación sin evidencia o estimada
+   nunca se lee como confirmada), los supuestos tomados y `runNotices`. Los costos de persona son el costo objetivo
+   que fijó el CEO, no la nómina: no proponer conectarla.
+
+**«La cotización» para el cliente** es el PDF de la plantilla A4 (versión 2), cuyos datos emite `compose document`
+desde la cotización congelada. El agente escribe sólo textos: **nunca digitar ni editar una cifra** en el brief ni
+en los datos emitidos; si un número debe cambiar, se cambia la demanda y se vuelve a correr. Una cotización no es un
+contrato (decisión del CEO): la fecha de inicio y la duración del contrato no se piden ni se listan como pendiente,
+y el documento no dice lo obvio; `buyer.unit` y `schedule.note` son opcionales y se omiten cuando no dicen nada. El
+PDF se entrega como borrador mientras el operador no apruebe el precio: no es `quotation_id`, precio aprobado ni
+cotización emitida. Opciones, incrementos, cortesías, hitos con su impuesto y lo que queda como texto de
+condiciones: [sección 6 del procedimiento](references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente).

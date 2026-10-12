@@ -577,8 +577,8 @@ piso) y los perfiles de contenido llevan Adobe Express, no Creative Cloud Pro: d
 Desde el contrato 1.4.0 (2026-10-11) ese encargo On-Demand lleva una reserva de contingencia de 12% del costo de
 personas y puede llevar terceros refacturados como filas propias (con ellos el piso se lee sobre el margen del trabajo
 propio, no sobre el mezclado); el buffer de un On-Going de licitación con multas sigue sin modelar.
-Readiness40/35 son propuestas genéricas, **no
-reemplazan piso45% ni excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
+`compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta (55%/45%; ya no compara contra un
+40/35 genérico) y **no reemplaza excepciones aprobadas por cuenta**. Assessment/preview siguen revisión y SOW/impuestos propios.
 El costo de personas de V3 es el nivel salarial objetivo del Excel de pricing, no la nómina actual (decisión del
 CEO, 2026-10-11): el margen real en personas hoy es mayor que el que muestra V3. Una excepción bajo el piso la decide
 sólo el CEO y ninguna sirve de referencia para otra cuenta. Moneda, FX de cotización y redondeo: `modules/04_PRICING.md`.

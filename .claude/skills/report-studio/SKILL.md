@@ -110,7 +110,7 @@ internos. Report Studio no completa faltantes económicos ni cambia estado por m
 neto/impuestos/plazo, fuente/snapshot y la marca de simulación hasta aprobación y emisión por el canal aplicable.
 El documento de cotización que recibe el cliente no se maqueta a mano desde el preview: `compose document` emite los
 datos (versión 2) de la plantilla A4 desde la cotización congelada y su generador compone el PDF
-([pasos](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#documento-de-cotización-para-el-cliente-delta-2026-10-11-cierre)).
+([pasos](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente)).
 Nunca digitar ni editar una cifra en su brief o en los datos emitidos: se cambia la cotización y se vuelve a correr.
 Ese documento es un borrador: no otorga aprobación ni quoteId, emisión, factura, sincronización o envío. La versión 2
 pagina su sección de inversión (cuatro páginas o más) y nunca reduce la tipografía; si no cabe, se acorta el texto.
@@ -118,5 +118,8 @@ Al revisar sus páginas, tres cosas son correctas y no un defecto: una línea «
 (una cortesía; no suma al subtotal ni al total), un bloque final «Opcional · Fuera de esta cotización» (servicios
 opcionales con su valor neto y su unidad; no entran en ningún total) y una nota tributaria que abre la página
 siguiente junto al bloque que le sigue, mientras los totales quedan bajo su tabla (una nota sola en una página sí es
-un defecto). Comprobar que el total no incluye las opciones.
+un defecto). También son correctos una línea «1 programa» o «1 proyecto» sin valor unitario (un precio por el trabajo
+completo, `combine`), un calendario de pagos con neto, impuesto y total por hito, y un encabezado interior sin unidad
+del cliente o un calendario sin nota (son textos opcionales: no pedir que se rellenen). Comprobar que el total no
+incluye las opciones.
 Verificar pixels de todas las páginas del documento que se entregue.
