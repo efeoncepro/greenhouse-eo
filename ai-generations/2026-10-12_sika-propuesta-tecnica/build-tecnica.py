@@ -296,21 +296,21 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 
 # ── 09 · Plazo ─────────────────────────────────────────────────────────────────────────────────────────────────
 def s_plazo():
-    LW, DW = 210, 35  # columna de etiquetas y ancho de un día hábil (20 días)
-    bars = [('Inmersión', 1, 2, None), ('Pieza madre', 3, 7, 7), ('Adaptación', 8, 14, None), ('Revisión y ajustes', 15, 18, 18), ('Entrega', 19, 20, None)]
+    LW, DW = 210, 70  # columna de etiquetas y ancho de un día hábil (10 días)
+    bars = [('Inmersión', 1, 1, None), ('Pieza madre', 2, 4, 4), ('Adaptación', 5, 7, None), ('Revisión y ajustes', 8, 9, 9), ('Entrega', 10, 10, None)]
     weeks = ''.join(f'<div style="position: absolute; left: {LW + w * 5 * DW}px; top: 0; width: {5 * DW}px; box-sizing: border-box; border-left: 1px solid {RULE}; height: 476px; padding-left: 12px">{label("Semana " + str(w + 1), INK)}'
-                    f'<div style="font-size: 13px; font-weight: 300; color: {SOFT}; margin-top: 4px">Días {w * 5 + 1} a {w * 5 + 5}</div></div>' for w in range(4))
+                    f'<div style="font-size: 13px; font-weight: 300; color: {SOFT}; margin-top: 4px">Días {w * 5 + 1} a {w * 5 + 5}</div></div>' for w in range(2))
     rws = ''
     for i, (t, a, b, m) in enumerate(bars):
         y = 84 + i * 80
-        rws += f'<div style="position: absolute; left: 0; top: {y - 2}px; width: {LW - 16}px"><div style="font-size: 19px; font-weight: 500">{t}</div><div style="font-size: 14px; font-weight: 300; color: {SOFT}; margin-top: 2px">Días {a} a {b}</div></div>'
+        rws += f'<div style="position: absolute; left: 0; top: {y - 2}px; width: {LW - 16}px"><div style="font-size: 19px; font-weight: 500">{t}</div><div style="font-size: 14px; font-weight: 300; color: {SOFT}; margin-top: 2px">{"Día " + str(a) if a == b else f"Días {a} a {b}"}</div></div>'
         rws += f'<div style="position: absolute; left: {LW + (a - 1) * DW + 4}px; top: {y}px; width: {(b - a + 1) * DW - 8}px; height: 42px; border-radius: 11px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6)"></div>'
         if m:
             rws += f'<div style="position: absolute; left: {LW + m * DW - 15}px; top: {y + 6}px; width: 30px; height: 30px; border-radius: 50%; background: {ACC}; box-shadow: 0 0 0 5px {BG}, 0 0 26px rgba(255, 101, 0, 0.7)"></div>'
     legend = (f'<div style="position: absolute; left: {LW}px; top: 498px; display: flex; align-items: center; gap: 10px; font-size: 15px; color: {SOFT}"><span style="width: 16px; height: 16px; border-radius: 50%; background: {ACC}"></span>Aprobación de Sika</div>')
     gantt = obj(f'<div style="position: relative; height: 524px">{weeks}{rws}{legend}</div>', 820, 200, 960, True, '; padding: 30px 26px 26px 30px')
     return page('Sika · Plazo', halo(1300, 470, None) + gantt +
-                left('La producción · Plazo', ['De 15 a 20', 'días hábiles', 'por', 'lanzamiento'], 'El plazo corre desde que Sika entrega el brief, la ficha técnica y los renders del producto. Son días de producción de Efeonce: el tiempo de revisión de Sika se agrega al calendario.') +
+                left('La producción · Plazo', ['Diez días', 'hábiles por', 'lanzamiento'], 'El plazo corre desde que Sika entrega el brief, la ficha técnica y los renders del producto. La pieza madre llega a su aprobación el cuarto día. El tiempo de revisión de Sika se agrega al calendario.') +
                 means('El calendario definitivo se acuerda en la reunión de inicio, según el número de lanzamientos y sus fechas.',
                       'Plazo propuesto por Efeonce para un lanzamiento tipo, con hasta dos rondas de ajustes. Se confirma al inicio.'), section=2)
 

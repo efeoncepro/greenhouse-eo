@@ -14,7 +14,7 @@ Secuencia: portada · resumen (tres documentos) · punto de partida · el sistem
 
 ## Por confirmar antes de enviar
 
-1. Plazo de 15 a 20 días hábiles y hasta dos rondas: propuesta propia, falta el visto bueno de operaciones.
+1. Plazo de diez días hábiles por lanzamiento y hasta dos rondas (el operador rechazó 15 a 20 el 12/10): propuesta propia, falta el visto bueno de operaciones.
 2. Equipo con nombre y cargo (roster): el operador pidió tomarlo del repo el 12/10; revierte el criterio «sin capacidad nominada» del borrador descartado.
 3. Caso SKY creativo (cifras de entrega de 12 meses): autorización de SKY para citarlo en una licitación, sin verificar.
 4. Uso del logo y del material de Sika en el deck (TASK-1937).

@@ -30,14 +30,14 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 | Lámina | Dato | Fuente |
 |---|---|---|
 | 5, 8 | Tres muestras, un solo producto, storyboard admitido; alcance base del lanzamiento tipo | Respuestas de Sika en Wherex del 02, 05 y 06/10 (`docs/commercial/tenders/sika-mexico-campana-creativa-1164/research/2026-10-07-propuesta-tecnica-INTERNO.md`) |
-| 9 | 15 a 20 días hábiles, hasta dos rondas | **Propuesta propia, sin validar por operaciones** |
+| 9 | Diez días hábiles, hasta dos rondas (el operador rechazó 15 a 20 el 12/10: «demasiado tiempo para un cliente de este tipo») | **Propuesta propia, sin validar por operaciones** |
 | 10 | Rondas, aprobación, IA, derechos | Modelo operativo de servicios creativos y brochure «Agencia Creativa» aprobado, pasados a usted |
 | 11 | Nombres y cargos | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; fotos reales del catálogo del compositor |
 | 12 | +2.000 piezas, 39 campañas, 88 %, 0,12, 5 mercados | Caso SKY creativo, 12 meses (`.claude/skills/creative-practice/efeonce/ESTADO_ACTUAL.md`); autorización para citarlo fuera, sin verificar |
 
 ## Por confirmar antes de enviar
 
-1. Plazo y rondas (lámina 9): visto bueno de operaciones.
+1. Plazo de diez días hábiles y rondas (lámina 9): visto bueno de operaciones.
 2. Equipo con nombre (lámina 11): revierte el criterio del borrador anterior («sin capacidad nominada»); lo pidió el operador el 12/10.
 3. Caso SKY (lámina 12): autorización de SKY para citar las cifras en una licitación.
 4. Logo de Sika en la portada y miniaturas del material de Sika (lámina 3): uso de marca de terceros (TASK-1937).
