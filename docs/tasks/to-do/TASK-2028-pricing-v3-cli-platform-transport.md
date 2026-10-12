@@ -6,7 +6,8 @@
   `registry issue` exige `--valid-until YYYY-MM-DD` (cada emisión fija su vigencia); comandos nuevos
   `registry accept`, `registry reject` y `registry reopen` (filas 18, 19 y 20 de `TASK-2027`), con token de
   consumidor y sin persona; `registry show` y `registry list` muestran `effectiveState` (`expired` se deriva en la
-  base, la CLI no lo calcula) y `validUntil`. Aceptar una cotización vencida se rechaza con el código de la API.
+  base, la CLI no lo calcula) y `validUntil`. Aceptar una cotización vencida se permite (CEO, 2026-10-12): la CLI
+  muestra lo que devuelve la API, `acceptance.afterValidity` y `acceptance.daysAfterValidity`, sin calcularlo.
 
 - `TASK-2024` cerró: deja de bloquear. La CLI ya es asíncrona (`run()` en `scripts/commercial/pricing-v3.ts`) y todo
   su acceso a disco pasa por `createFileStorage` más dos funciones para argumentos y salidas; el transporte de
@@ -424,7 +425,7 @@ y un `## Delta` en la task dueña de la ruta.
 | `registry document-texts` (nuevo) | sólo plataforma | `TASK-2027` (fila 5) | Guarda los textos del documento de una versión. |
 | `registry list`, `show`, `version`, `replay`, `preview`, `document`, `history` (nuevos) | sólo plataforma | `TASK-2027` (filas 10 a 16) | Lecturas del registro. |
 | `registry issue`, `withdraw` (nuevos) | sólo plataforma; agente o persona | `TASK-2027` (filas 8 y 9) | Emiten y retiran con el token de consumidor, sin aprobación de una persona. `issue` exige `--valid-until YYYY-MM-DD`. La API rechaza una versión bajo el piso sin su excepción aprobada. |
-| `registry accept`, `reject`, `reopen` (nuevos) | sólo plataforma; agente o persona | `TASK-2027` (filas 18, 19 y 20) | Registran la respuesta del cliente sobre la última versión emitida, o reabren la cotización. Sin aprobación de una persona. Aceptar una vencida se rechaza: se reabre y se emite de nuevo con vigencia nueva. |
+| `registry accept`, `reject`, `reopen` (nuevos) | sólo plataforma; agente o persona | `TASK-2027` (filas 18, 19 y 20) | Registran la respuesta del cliente sobre la última versión emitida, o reabren la cotización. Sin aprobación de una persona. Aceptar una vencida se permite y la respuesta dice que fue fuera de vigencia. |
 | `registry approve-exception` (nuevo) | sólo plataforma, sólo persona | `TASK-2027` (fila 7) | Acto humano: inicio de sesión de persona y confirmación en terminal. |
 
 Las diecinueve operaciones con ruta son las de la tabla de operaciones de `TASK-2026`; si esa tabla cambia, manda ella.
@@ -706,8 +707,9 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
       una persona: un agente emite una cotización sintética que está dentro de política y recibe su número; una
       versión bajo el piso sin excepción aprobada se rechaza con el código de la API.
 - [ ] `registry issue` sin `--valid-until` se rechaza antes de llamar a la API; `registry accept`, `reject` y `reopen`
-      corren con el token de consumidor, sin persona; aceptar una cotización vencida devuelve el código de la API y
-      `registry show` muestra `effectiveState: expired` sin calcularlo en la CLI.
+      corren con el token de consumidor, sin persona; aceptar una cotización vencida pasa y muestra
+      `acceptance.afterValidity: true` con sus días; `registry show` muestra `effectiveState: expired` sin calcularlo
+      en la CLI.
 - [ ] `registry approve-exception` exige inicio de sesión de persona y confirmación en terminal; con token de
       consumidor o sin terminal interactiva se rechaza con `TRANSPORT_HUMAN_SESSION_REQUIRED`.
 - [ ] La cabecera de bypass de Vercel se envía sólo a orígenes de staging (probado con un origen de producción y uno de

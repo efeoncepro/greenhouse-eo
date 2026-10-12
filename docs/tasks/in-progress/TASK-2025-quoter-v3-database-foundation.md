@@ -68,6 +68,22 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
   frozen-artifact.ts`) reproduce un artefacto de cualquier carril y dice, sobre el resultado **recalculado**, si
   calculó y si alguna fila está bajo el piso. El almacén guarda eso; `artifact-index.ts` ya no lo lee del texto.
 - **Una aprobación se revoca sólo mientras su versión no se haya emitido**; después, el acto es retirar.
+- **Aceptar una cotización vencida se permite (CEO, 2026-10-12).** La regla que lo impedía no protegía (bastaba
+  re-emitir y aceptar en dos pasos) y borraba el dato de que se aceptó tarde. Se quitó del disparador y del almacén;
+  que una aceptación fue fuera de vigencia, y por cuántos días, se lee derivado en `quoter_quote_current`
+  (`accepted_after_validity`, `accepted_days_after_validity`). Un tope de antigüedad («pasados N días hay que
+  cotizar de nuevo») sería una regla de catálogo decidida por el CEO; hoy no existe.
+- **Un documento fuente se guarda como se recibió**, igual que un artefacto y un puntero. La batería lo exigió: una
+  cotización calculada con un documento lo lleva dentro, y con `stableJson(documento)` el artefacto calculado en la
+  plataforma no salía byte a byte igual al de la CLI (caso 8). Dos huellas: `document_text_digest` (del texto, la
+  comprueba la base) y `document_digest` (de identidad, la que nombra el puntero).
+- **Lectura independiente del SQL (revisor de la sesión consultora, ~120 sondas en PostgreSQL 16).** Las quince
+  correcciones aguantaron. Hallazgos nuevos, ya incorporados: `greenhouse_migrator` recibe `ALL` por defecto en el
+  esquema y podía darle un número a un borrador (se le revoca todo y queda con `SELECT`); las reglas de «leer lo
+  vigente y escribir» sólo valen bajo `READ COMMITTED` (otro aislamiento se rechaza,
+  `quoter_requires_read_committed`); un miembro vacío (`''`) pasaba por identificado; la hora de cada fila la fija el
+  reloj de la base; la bajada de una migración aborta si hay una cotización real; `search_path` de la función
+  `SECURITY DEFINER` con `pg_temp` explícito; una transacción escribe una sola cotización.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -90,7 +106,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Slices 1 a 4 escritos y verdes en PostgreSQL 16 local (2026-10-12), con el ciclo de vida ampliado; tres migraciones pendientes, ninguna aplicada; faltan Slices 5 y 6`
+- Status real: `Slices 1 a 5 escritos y verdes en PostgreSQL 16 local (2026-10-12): 109 pruebas, batería de conformidad incluida; tres migraciones pendientes, ninguna aplicada; el catálogo del repo no está empujado y el importador lo exige; falta el Slice 6 (visto bueno, aplicar, importar)`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -340,8 +356,11 @@ Reglas obligatorias:
   - Una cotización emitida, aceptada, rechazada o retirada no recibe versiones (se abre antes una revisión); un
     documento se escribe en `draft` o en `revising`.
   - Toda emisión declara hasta qué día vale y no nace vencida. Aceptar y rechazar nombran lo último que se emitió.
-    «Vencida» se deriva en un solo lugar y una cotización vencida no se acepta: se emite de nuevo, con el mismo
-    número. Sólo `withdrawn` es terminal.
+    «Vencida» se deriva en un solo lugar. Aceptar una vencida se permite y queda legible que fue fuera de vigencia.
+    Sólo `withdrawn` es terminal.
+  - Estas tablas sólo se escriben bajo `READ COMMITTED`; una transacción escribe una sola cotización.
+  - Ningún rol distinto del dueño escribe números, contador ni matriz; el rol de migraciones no escribe ninguna
+    fila del cotizador.
   - Si una versión calculó y si está bajo el piso lo dice el motor sobre el resultado recalculado, en una sola
     función; nadie más reimplementa ese criterio.
   - La hora de un cambio de estado es la del reloj de la base; quien llama no puede declarar otra.
@@ -578,15 +597,19 @@ Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las 
 Regla (decidida el 2026-10-12 con la batería de conformidad de `TASK-2024`): **lo que se guarda es el texto que se
 recibió, tal cual; nadie lo reserializa, lo ordena ni lo normaliza.** Cada objeto lleva dos huellas con funciones
 distintas: la **huella del texto** (sha256 de los bytes guardados; la comprueba la base) y la **huella de identidad**
-(la que define el motor; la verifica el adaptador al escribir y al leer). En los documentos fuente y en los datos
-del documento el texto guardado es `stableJson(valor validado)`, así que las dos coinciden y basta una columna.
+(la que define el motor; la calcula el almacén al escribir). Sólo en los datos del documento del cliente el texto
+guardado es `stableJson(valor)`, así que ahí las dos coinciden y basta una columna.
 
 | Objeto | Texto guardado | Huella del texto (la comprueba la base) | Huella de identidad (la verifica el adaptador) |
 | --- | --- | --- | --- |
-| Documento de catálogo, política o créditos | `stableJson(documento validado por su rol)` | `document_digest` = sha256 del texto | la misma: `catalogDigest(documento)`, la que lleva el puntero |
+| Documento de catálogo, política o créditos | el documento **como se recibió**, con su sangría y su orden de claves | `document_text_digest` = sha256 del texto | `document_digest` = `catalogDigest(documento validado)`, la que lleva el puntero |
 | Puntero | el texto del puntero **como se escribió** (opaco) | `pointer_text_digest` = sha256 del texto | `pointer_digest` = `currentVersionsDigest(puntero)` |
 | Artefacto congelado | el texto del artefacto **como se emitió**, con su sangría y su orden de claves | `artifact_digest` = sha256 del texto | `replay_digest`, el que el artefacto declara y la reproducción recalcula |
 | Datos del documento del cliente | `stableJson(datos)` | `document_digest` = sha256 del texto | la misma |
+
+Por qué un documento fuente tampoco: una cotización calculada con él lo lleva dentro. Con el texto canónico el
+artefacto calculado en la plataforma tenía la misma huella de reproducción pero otros bytes que el de la CLI, y la
+paridad de archivo entre transportes (`TASK-2028`) se rompía. Lo destapó el caso 8 de la batería contra PostgreSQL.
 
 Por qué el artefacto y el puntero no se guardan como `stableJson`: la batería de `TASK-2024` exige que un artefacto se
 lea byte a byte como se escribió y que el puntero viaje como texto opaco; `stableJson` reordena las claves y ese
@@ -599,8 +622,8 @@ objetos que lo usan; reutiliza `stableJson` del motor. No transforma un artefact
 
 - `role text NOT NULL CHECK (role IN ('catalog','policy','credits'))`
 - `version text NOT NULL`
-- `document_digest text NOT NULL CHECK (document_digest ~ '^[0-9a-f]{64}$')`
-- `canonical_text text NOT NULL`
+- `document_digest text NOT NULL CHECK (document_digest ~ '^[0-9a-f]{64}$')` — huella de identidad
+- `document_text text NOT NULL` — como se recibió — y `document_text_digest text NOT NULL`, huella del texto
 - `schema_version text` (índice: el `schemaVersion` que declara el documento)
 - `parent_digest text` (el documento al que sucede, cuando lo declara)
 - `origin text NOT NULL CHECK (origin IN ('repo_import','artifact_embedded','platform_apply'))`
@@ -614,7 +637,7 @@ objetos que lo usan; reutiliza `stableJson` del motor. No transforma un artefact
   `request_hash text CHECK (request_hash ~ '^[0-9a-f]{64}$')`
 - `stored_at timestamptz NOT NULL DEFAULT now()`
 - Llave primaria `(role, document_digest)`; única `(role, version)`: una versión ya usada no cambia de contenido.
-- Comprobación de huella sobre `canonical_text` por disparador `BEFORE INSERT` (resultado del Slice 1).
+- Comprobación de `document_text_digest` sobre `document_text` por disparador `BEFORE INSERT` (resultado del Slice 1).
 - Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`. Vale para todas las tablas de sólo agregar de esta
   task: sin el rechazo de `UPDATE` la huella se podría saltar reescribiendo el texto.
 - **Lectura.** El lector comprueba el sha256 del texto y nada más: no vuelve a pasar el documento por el validador
@@ -851,9 +874,12 @@ exige cada acto lo resuelve la puerta única, no la matriz.
 - «Vencida» no se guarda. `quoter_quote_current` expone `valid_until` de la última emisión y `effective_state`, que
   vale `expired` cuando el estado guardado es `issued` o `revising` y esa fecha pasó. El último día de la vigencia
   todavía cuenta. Es el único lugar que aplica la regla: el almacén lee `effective_state` y no la repite.
-- Una cotización vencida no se acepta (`quoter_quote_expired`), la acepte quien la acepte; rechazarla sí se puede.
-  Para aceptarla se emite de nuevo con vigencia nueva (`issued → revising → issued` con la última versión emitida).
-  Esa regla vive aislada en un solo `IF` del disparador y en una sola comprobación del almacén.
+- **Aceptar o rechazar una cotización vencida se permite** (CEO, 2026-10-12). Que una aceptación fue fuera de
+  vigencia queda legible sin columna nueva: la vista expone, mientras el estado es `accepted`, `accepted_at`,
+  `accepted_valid_until` (la vigencia de la emisión respondida), `accepted_after_validity` y
+  `accepted_days_after_validity`, calculados con el día de Santiago de la aceptación contra esa vigencia. El último
+  día de la vigencia cuenta como dentro. Es lectura derivada, no verdad guardada. Un tope de antigüedad sería una
+  regla de catálogo decidida por el CEO; hoy no existe.
 - **Aceptar y rechazar** nombran lo último que se emitió —versión, huella, documento y huella— por las mismas
   llaves foráneas compuestas que la emisión (`…_responds_to_last_issued`). El motivo va en `reason`. Sin tablas
   nuevas. Capacidad: `commercial.quoter.quote:update`.
@@ -864,7 +890,18 @@ exige cada acto lo resuelve la puerta única, no la matriz.
 - `actor_kind` lleva una restricción con nombre (`quoter_state_transitions_actor_kind`) para ampliar su dominio a un
   tercero (`client`, cuando el cliente acepte por el enlace público) cambiando esa restricción. No se implementa
   ahora.
-- `occurred_at` lo fija el disparador con el reloj de la base.
+- `occurred_at` lo fija el disparador con el reloj de la base. Lo mismo vale para la hora de toda fila del
+  cotizador (`created_at`, `registered_at`, `stored_at`, `assigned_at`, `decided_at`, `activated_at`): quien inserta
+  no declara otra.
+- **Aislamiento.** `quoter_lock_quote()` y el disparador del puntero llaman a `quoter_assert_read_committed()`: bajo
+  `REPEATABLE READ` o `SERIALIZABLE` lo que se lee después del bloqueo es una foto anterior y las reglas dejarían
+  pasar lo que deben rechazar. Se rechaza con `quoter_requires_read_committed`.
+- **Una cotización por transacción.** Una transacción que tocara dos podría cruzarse con otra en orden inverso
+  (bloqueo por cotización y fila del contador) y PostgreSQL abortaría una (40P01). Un lote futuro ordena los
+  identificadores antes de bloquear.
+- **Permisos de `greenhouse_migrator`.** El esquema le da `ALL` por defecto. Se le revoca todo en las tablas del
+  cotizador y queda con `SELECT`; el bloque de verificación lo comprueba para él y para `greenhouse_app`.
+- **Bajada.** Las tres migraciones abortan su bajada si existe una cotización con `data_origin = 'real'`.
 
 Ningún par exige compuerta humana (decisión 7, enmendada por el CEO el 2026-10-12): un agente emite una versión que
 está dentro de política, retira lo que puede emitir y registra lo que respondió el cliente. Que un agente no pueda
@@ -1053,8 +1090,16 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
     rechazar nombran la última emisión; una respuesta sobre una versión que no es la última emitida falla, por el
     almacén y por SQL directo; ninguna respuesta es un callejón sin salida y el número se conserva en cada
     re-emisión; con «hoy» movido en la base desechable, una cotización pasa a `expired` el día siguiente a su
-    vigencia (no el mismo día), no se acepta, sí se rechaza, y se acepta tras re-emitirla; «hoy» es el día de
-    Santiago con cualquier zona de sesión; la hora de un cambio es la del reloj de la base.
+    vigencia (no el mismo día); una vencida se acepta y se rechaza, y la aceptación queda marcada fuera de vigencia
+    con sus días de atraso (en plazo y en el último día, no); «hoy» es el día de Santiago con cualquier zona de
+    sesión; la hora de toda fila es la del reloj de la base.
+19. **Lo que la base sostiene sola.** Bajo `REPEATABLE READ` o `SERIALIZABLE` la escritura se rechaza; un miembro
+    vacío no pasa por identificado; el rol de migraciones no puede insertar un número, mover el contador, agregar un
+    par ni escribir una cotización; con una cotización real la bajada aborta y con sólo sintéticas corre entera.
+20. **Batería de conformidad e importador.** `runStorageConformance` pasa contra el adaptador PostgreSQL con sus dos
+    diferencias declaradas (sólo artefactos calculados; puntero sólo sobre documentos guardados); el importador en
+    simulación no escribe, la segunda corrida no escribe, un conflicto de versión detiene todo antes de escribir, y
+    el reflejo del puntero nombra su commit y se hace una vez.
 18. **Un agente aplica todos los estados.** El sujeto máquina de un binding interno pasa la puerta y registra, sin
     persona: crear, asignar destinataria, guardar documento, emitir, rechazar, reabrir, re-emitir, aceptar, agregar
     versión, emitir, aceptar, reabrir y retirar. Ningún par de la matriz tiene compuerta. Lo único que no pasa:
@@ -1062,9 +1107,10 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
     misma prueba por HTTP es de `TASK-2027`.)
 16. **Falsificación.** Antes de dar una regla por probada se quita (en el SQL pendiente o en el almacén) y se
     confirma que la suite se pone roja; se restaura y vuelve a verde. Hecho el 2026-10-12 para el bloqueo del
-    disparador de estados, la regla del piso, la regla del documento, el bloqueo del almacén, la aceptación de una
-    vencida, la respuesta sobre la última emisión, el borde del último día de vigencia, la revocación después de
-    emitir y la emisión que nace vencida.
+    disparador de estados, la regla del piso, la regla del documento, el bloqueo del almacén, la respuesta sobre la
+    última emisión, el borde del último día de vigencia, la revocación después de emitir, la emisión que nace
+    vencida, el rechazo de otro aislamiento, la marca y los días de una aceptación tardía, la guarda de la bajada,
+    la hora declarada por quien inserta, el miembro vacío y los permisos del rol de migraciones.
 
 Las pruebas 1 a 8, 11, 12, 14, 15 y el lector de la dueña de la 10 corren contra el clúster PostgreSQL local. Una prueba omitida por
 falta de clúster no cuenta como verde: el cierre exige una corrida con el clúster arriba.
@@ -1113,6 +1159,9 @@ visto bueno y la importación del catálogo.
 
 ### Production verification sequence
 
+0. Dos lecturas contra la base compartida, antes de migrar: que `EO-ORG-0007` sea la entidad operativa activa (si
+   no, toda cotización falla cerrada) y qué privilegios reales tiene `greenhouse_migrator` en el esquema. La
+   migración 3 (capacidades) se aplica cuando el código que las declara ya está en producción: código primero.
 1. Clúster local (PostgreSQL 16): aplicar las tres migraciones, correr las pruebas obligatorias y la batería de
    conformidad; bajar y volver a subir las migraciones para comprobar que la bajada deja la base como estaba.
 2. Operador: visto bueno explícito para aplicar a la base compartida. Sin él, la task queda en
@@ -1202,11 +1251,16 @@ visto bueno y la importación del catálogo.
 - [ ] Prueba 2: con el índice de lectura corrompido, el lector devuelve lo que dice el artefacto y el índice se
       reconstruye; la prueba estática confirma que nada en `src/lib/commercial/quoter/` construye un resultado desde
       filas.
-- [ ] `runStorageConformance` pasa contra el adaptador PostgreSQL en el clúster local.
+- [x] `runStorageConformance` pasa contra el adaptador PostgreSQL en el clúster local.
+      Evidencia 2026-10-12: `storage-postgres-conformance.local-postgres.test.ts`, once casos, con las dos
+      diferencias declaradas del registro; los adaptadores de archivos y de memoria siguen en verde.
 - [ ] Las pruebas con base de datos corrieron con el clúster local arriba (evidencia de corrida, no omitidas).
 - [x] Después de emitir: `accepted` y `rejected` como estados, vigencia fijada por cada emisión, `expired` derivado
-      en un solo lugar, una vencida no se acepta, y sólo `withdrawn` es terminal (pruebas 17 y 18).
-      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, 85 pruebas verdes.
+      en un solo lugar, una vencida se puede aceptar y queda marcada fuera de vigencia, y sólo `withdrawn` es
+      terminal (pruebas 17 y 18).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, 109 pruebas verdes.
+- [x] Los hallazgos de la lectura independiente del SQL están dentro y probados (prueba 19).
+      Evidencia 2026-10-12: la misma corrida; siete reglas nuevas falsificadas.
 - [x] Un agente (sujeto máquina de un binding interno) aplica todos los estados sin persona; lo único que no puede
       es decidir una excepción bajo el piso y activar el catálogo (prueba 18 y `authz.test.ts`).
       Evidencia 2026-10-12: la misma corrida.
@@ -1297,6 +1351,8 @@ Resuelta por el operador el 2026-10-12: **versión de PostgreSQL del clúster lo
 
 Abierta, del operador: **empujar el catálogo vigente antes de importar.** El importador rechaza archivos sin
 commitear o sin empujar; la primera importación con escritura exige que el catálogo vigente esté en el remoto.
+Medido el 2026-10-12 con `pnpm quoter:import plan`: 24 documentos (12 catálogos, 11 políticas, 1 de créditos),
+ninguno con cambios sin commitear y **ninguno empujado**, tampoco el puntero.
 
 Resueltas por el CEO el 2026-10-12 (ya no abiertas):
 
