@@ -52,4 +52,6 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 8. Logo de Sika en la portada y miniaturas de su material (lámina 4): uso de marca de terceros (TASK-1937).
 9. Lámina 14: qué quiso decir Sika con «no AI/PSD» en su respuesta del 06/10. Hoy la lámina no promete archivos editables.
 10. Berel no se menciona: conflicto de interés sin decidir.
-11. Dos preguntas siguen sin respuesta en Wherex (manual de marca, moneda y facturación, zona horaria del cierre, historias por red, versión TikTok).
+11. Sika respondió nuestra pregunta el 09/10 (registro en el research INTERNO): sin manual en esta etapa, cierre 16/10 a las 16:00 de Ciudad de México (19:00 de Santiago), historias en Instagram y Facebook, reel con adaptación para TikTok. Moneda y facturación siguen sin respuesta.
+12. El reel: la ficha pide «1 video tipo reel no mayor a 30 seg» y el anexo lleva storyboard (admitido por Sika el 06/10). Existe un animatic MP4 de 25 s sin audio; decidir si se termina con locución y música y se adjunta.
+13. Propuesta económica desglosada: sin empezar.

@@ -75,3 +75,18 @@ Plan de recetas válido sin avisos; compositor completo con 21 páginas; revisi�
 El operador rechazó la propuesta y ordenó eliminarla. Se movieron a la Papelera los seis archivos externos propios (Word/Markdown v0.1, PDF v0.2/v0.3 y ZIP de fuentes), el plan `deck-plan.json` y sus salidas, capturas y scripts temporales. Se retiraron sus referencias activas de oferta/README/registros/Handoff y sourcePlans de Proposal Studio. No se prepara un reemplazo en esta operación.
 
 Se preservan fuentes, investigación factual, renders y el anexo POSIBLE. Readback: cero archivos con el prefijo técnico en la carpeta Sika de OneDrive; plan ausente; sha256 POSIBLE intacto `e79c508c5d19a09b38aa7e058a74a721505742d90431df837052f152dc5af064`. La Papelera permite recuperar la propuesta descartada. Sin envío, commit ni push.
+
+## Respuesta de Sika a la pregunta de Efeonce · 09/10/2026 16:45 (leída el 12/10)
+
+Captura de Wherex entregada por el operador el 12/10/2026. Respuesta del comprador a la pregunta del 06/10 18:07:
+
+1. **Manual de identidad:** no se comparte en esta etapa. El ejercicio evalúa la capacidad de desarrollar y evolucionar el concepto del brief; piden trabajar con los elementos visuales de los materiales proporcionados.
+2. **Moneda y facturación:** sin respuesta («lo reviso para no darles una respuesta errónea»). Sigue pendiente.
+3. **Cierre:** recepción de ofertas el 16/10/2026 a las **16:00** (hora de Ciudad de México). La ficha muestra 19:00 porque Wherex la presenta en la hora local del usuario (Santiago, UTC−3; Ciudad de México, UTC−6).
+4. **Historias:** sólo en las plataformas donde el formato es habitual; para la propuesta, Instagram y Facebook. Tres historias por red son seis.
+5. **TikTok:** sí. El reel debe contemplar su posible adaptación para TikTok.
+6. **Formatos y volumetrías:** las definiciones finales de formatos, plataformas y cantidades pueden ajustarse; la información del ejercicio es una base común para comparar propuestas.
+
+La ficha («Comentarios generales») pide, textual: metodología de trabajo; propuesta de cómo abordarían el desarrollo y la evolución gráfica de la campaña tomando como base los materiales proporcionados, con 1 imagen para Facebook, 1 imagen para Instagram y 1 video tipo reel no mayor a 30 seg; tiempos de entrega; propuesta económica desglosada. Tipo: licitación de **una ronda** de servicios.
+
+Efecto en el deck técnico (12/10): la lámina de cumplimiento usa las palabras de la ficha; el lanzamiento tipo pasa a 6 historias (3 Instagram, 3 Facebook) y reel con adaptación para TikTok; la adaptación para TikTok entra en el reel base y sale de la producción adicional.

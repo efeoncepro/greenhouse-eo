@@ -210,19 +210,19 @@ add('resumen', 'Resumen', s_resumen)
 
 # ── Cumplimiento ───────────────────────────────────────────────────────────────────────────────────────────────
 def s_matriz():
-    rows = [('Metodología', 'Cinco etapas de trabajo, con dos aprobaciones de Sika.', f'Láminas {ref("metodo")} y {ref("control")}'),
-            ('Abordaje', 'Un sistema de campaña: firma, fórmula de titular y pieza madre, con ajustes por audiencia.', f'Láminas {ref("partida")} a {ref("alcance")}'),
-            ('Muestra', 'Publicación para Facebook, publicación para Instagram y storyboard del reel, para SikaSeal®-170.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17'),
-            ('Tiempos', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
-            ('Propuesta económica', 'Valor del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
-            ('Además', 'Equipo con nombre y función, forma de trabajo con México y experiencia.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
-    tpl = 'display: grid; grid-template-columns: 210px minmax(0, 1fr) 250px; column-gap: 28px'
+    rows = [('Metodología de trabajo', 'Cinco etapas de trabajo, con dos aprobaciones de Sika.', f'Láminas {ref("metodo")} y {ref("control")}'),
+            ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre los materiales de Sika: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
+            ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel dura 25 segundos y va en storyboard con locución.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17'),
+            ('Tiempos de entrega', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
+            ('Propuesta económica desglosada', 'Valor por pieza del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
+            ('Además', 'Equipo con nombre y función, y un caso de éxito.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
+    tpl = 'display: grid; grid-template-columns: 290px minmax(0, 1fr) 220px; column-gap: 26px'
     head = f'<div style="{tpl}; padding-bottom: 14px">{label("Lo que pide la ficha")}{label("Nuestra respuesta")}{label("Dónde está")}</div>'
-    body_rows = ''.join(f'<div style="{tpl}; align-items: start; padding: 18px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1">{a}</div>'
-                        f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 17px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
+    body_rows = ''.join(f'<div style="{tpl}; align-items: start; padding: 16px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 21px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.14">{a}</div>'
+                        f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 16px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
     return page('Sika · Cumplimiento', halo(1300, 470, None) + obj(head + body_rows, 820, 196, 960, True, '; padding: 30px 32px 22px') +
-                left('Cumplimiento', ['Cada punto', 'de la ficha', 'tiene su', 'respuesta'], 'La ficha de la licitación pide cinco contenidos. Esta tabla indica dónde está cada uno, en este documento o en los que lo acompañan.') +
-                means('El comité puede ir directamente al punto que evalúa.', 'Ficha de la licitación N.º 1164 en Wherex, consultada el 7 de octubre de 2026.'))
+                left('Cumplimiento', ['Cada punto', 'de la ficha', 'tiene su', 'respuesta'], 'La ficha de la licitación pide cinco contenidos. Esta tabla los toma con sus mismas palabras e indica dónde está cada uno.') +
+                means('El comité puede ir directamente al punto que evalúa.', 'Ficha de la licitación N.º 1164 en Wherex, apartado «Comentarios generales».'))
 
 
 add('matriz', 'Cumplimiento', s_matriz)
@@ -293,7 +293,7 @@ def s_muestras():
                 frame('story.jpg', 'Storyboard del reel en siete cuadros', 820, 560, 960, 232) +
                 left('La propuesta · Muestras del concurso', ['Las tres', 'muestras ya', 'aplican el', 'sistema'], 'Las bases piden tres muestras. Las desarrollamos para SikaSeal®-170 Sanisil, uno de los dos productos que Sika indicó, y las tres salen de la misma pieza madre.') +
                 means('El comité puede revisar las tres piezas a tamaño completo en el anexo gráfico. Aquí van en miniatura.',
-                      'Respuestas de Sika en Wherex del 2, 5 y 6 de octubre de 2026: tres muestras, un solo producto admitido y storyboard con locución admitido.'), section=1)
+                      'Respuestas de Sika en Wherex del 2, 5, 6 y 9 de octubre de 2026: un solo producto admitido, storyboard con locución admitido y trabajo sobre los elementos visuales de sus materiales.'), section=1)
 
 
 add('muestras', 'Muestras del concurso', s_muestras)
@@ -340,12 +340,12 @@ def s_entregables():
         return ''.join(f'<div style="display: grid; grid-template-columns: 58px minmax(0, 1fr); column-gap: 10px; align-items: center; padding: 14px 0; border-top: 1px solid {RULE}">{fig(n, 44)}'
                        f'<div style="font-size: 17px; font-weight: 400; line-height: 1.3">{t}</div></div>' for n, t in xs)
     hero = obj(okicker('Pieza madre') + fig('1', 190, '; margin-top: 22px') + otitle('Master Graphic', 34, '; margin-top: 18px') + otext('La pieza que fija firma, titular, producto y sello del lanzamiento. Todas las demás se derivan de ella.'), 820, 220, 300, True, '; height: 540px')
-    dig = obj(okicker('Adaptaciones digitales') + f'<div style="margin-top: 16px">{rows([("5", "publicaciones para redes sociales"), ("1", "reel para Instagram"), ("3", "historias por red social")])}</div>', 1150, 280, 300, False, '; height: 420px')
+    dig = obj(okicker('Adaptaciones digitales') + f'<div style="margin-top: 16px">{rows([("5", "publicaciones para redes sociales"), ("1", "reel para Instagram, con adaptación para TikTok"), ("6", "historias: 3 para Instagram y 3 para Facebook")])}</div>', 1150, 280, 300, False, '; height: 420px')
     pdv = obj(okicker('Punto de venta e impresos') + f'<div style="margin-top: 16px">{rows([("1", "cartel tamaño tabloide"), ("1", "cenefa de anaquel"), ("1", "colgante"), ("1", "anuncio tamaño carta")])}</div>', 1480, 280, 300, False, '; height: 420px')
     return page('Sika · Lanzamiento tipo', halo(1300, 480, 800, 560, 46) + hero + dig + pdv +
                 left('La producción · Lanzamiento tipo', ['Una pieza', 'madre y sus', 'adaptaciones'], 'El alcance base de un lanzamiento es el que Sika definió en la ronda de preguntas: un Master Graphic y sus adaptaciones para redes sociales y para el punto de venta.') +
                 means('La oferta económica valora este lanzamiento tipo. Las piezas adicionales se valoran por separado.',
-                      'Respuestas de Sika en Wherex del 5 y 6 de octubre de 2026. Las redes y las medidas finales se confirman al inicio.'), section=2)
+                      'Respuestas de Sika en Wherex del 5, 6 y 9 de octubre de 2026. Formatos y cantidades finales se ajustan con Sika al inicio.'), section=2)
 
 
 add('entregables', 'Lanzamiento tipo', s_entregables)
@@ -353,12 +353,12 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 
 # ── Reel ───────────────────────────────────────────────────────────────────────────────────────────────────────
 def s_reel():
-    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con aprobación de Sika", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram"])}</div>', 820, 462, 465, True, '; height: 334px')
-    extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva", "Versiones del reel para otras redes"], False)}</div>', 1315, 462, 465, False, '; height: 334px')
+    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con aprobación de Sika", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram y adaptación para TikTok"])}</div>', 820, 456, 465, True, '; height: 364px')
+    extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva"], False)}</div>', 1315, 456, 465, False, '; height: 364px')
     return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
                 left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Sika confirmó que el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.') +
                 means('Sika sabe qué incluye el reel base y qué se decide como producción adicional.',
-                      'Respuestas de Sika en Wherex del 5 y 6 de octubre de 2026. Storyboard completo en el anexo gráfico, página 17.'), section=2)
+                      'Respuestas de Sika en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
 
 
 add('reel', 'Reel', s_reel)
@@ -366,7 +366,7 @@ add('reel', 'Reel', s_reel)
 
 # ── Piezas adicionales ─────────────────────────────────────────────────────────────────────────────────────────
 def s_adicionales():
-    a = obj(okicker('Piezas adicionales') + otitle('Se piden por pieza', 30) + f'<div style="margin-top: 16px">{bullets(["Carruseles", "Stopper y otros materiales de punto de venta", "Banners y formatos para medios", "Versiones del reel para otras redes"])}</div>', 820, 236, 300, True, '; height: 480px')
+    a = obj(okicker('Piezas adicionales') + otitle('Se piden por pieza', 30) + f'<div style="margin-top: 16px">{bullets(["Carruseles", "Stopper y otros materiales de punto de venta", "Banners y formatos para medios", "Historias y videos para otras redes"])}</div>', 820, 236, 300, True, '; height: 480px')
     b = obj(okicker('Impresos') + otitle('Artes finales listos para imprenta', 26) + otext('En las medidas que Sika indique. Las muestras del concurso usan medidas estándar.'), 1150, 300, 300, False, '; height: 350px')
     c = obj(okicker('Fuera del servicio') + f'<div style="margin-top: 14px">{bullets(["Impresión, producción e instalación de materiales", "Pauta y compra de medios"], False)}</div>', 1480, 300, 300, False, '; height: 350px')
     return page('Sika · Piezas adicionales', halo(1300, 480, 760, 560, 46) + a + b + c +

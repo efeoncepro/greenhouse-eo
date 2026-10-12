@@ -22,6 +22,10 @@ Secuencia: portada · resumen (tres documentos) · matriz de cumplimiento · pun
 6. Berel no se menciona: conflicto de interés sin decidir.
 7. Propuestas propias de las láminas nuevas: qué incluye el reel base, qué queda fuera del servicio (impresión, instalación, pauta), «personas en Chile y en México» (lo indicó el operador el 12/10; el repo no dice quiénes están en México) y la frase sobre lo que queda a disposición de Sika. Lista completa en el LEEME.
 
+## Contra la ficha de Wherex (12/10)
+
+Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Facebook, imagen para Instagram y tiempos de entrega. A medias: el «video tipo reel no mayor a 30 seg» va como storyboard de 25 s con locución (admitido por Sika el 06/10); hay un animatic MP4 sin audio por terminar. Falta: la propuesta económica desglosada. Cierre: 16/10/2026 a las 16:00 de Ciudad de México (19:00 de Santiago); licitación de una sola ronda.
+
 ## Historial
 
 La propuesta que hizo Codex se descartó y se eliminó por instrucción del operador el 07/10/2026 (Word/Markdown v0.1, decks PDF v0.2/v0.3 y ZIP de fuentes, a la Papelera). No usar esas versiones como base ni como evidencia de entrega.
