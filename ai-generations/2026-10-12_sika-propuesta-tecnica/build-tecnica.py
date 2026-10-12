@@ -220,7 +220,7 @@ add('idea', 'La idea', s_idea)
 def s_matriz():
     rows = [('Metodología de trabajo', 'Cinco etapas de trabajo, con dos aprobaciones de Sika.', f'Láminas {ref("metodo")} y {ref("control")}'),
             ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre los materiales de Sika: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
-            ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel dura 25 segundos y va en storyboard con locución.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17'),
+            ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel se entrega como video de 25 segundos, con locución y música.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17 · Archivo de video'),
             ('Tiempos de entrega', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
             ('Propuesta económica desglosada', 'Valor por pieza del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
             ('Además', 'Equipo con nombre y función, y un caso de éxito.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
@@ -329,7 +329,7 @@ add('audiencias', 'Audiencias', s_audiencias)
 
 # ── 05 · Muestras del concurso ─────────────────────────────────────────────────────────────────────────────────
 def s_muestras():
-    items = [('01', 'Publicación para Facebook', 'Formato 1:1 · anexo, página 15'), ('02', 'Publicación para Instagram', 'Formato 4:5 · anexo, página 16'), ('03', 'Reel de Instagram', 'Storyboard de siete cuadros con locución · anexo, página 17')]
+    items = [('01', 'Publicación para Facebook', 'Formato 1:1 · anexo, página 15'), ('02', 'Publicación para Instagram', 'Formato 4:5 · anexo, página 16'), ('03', 'Reel de Instagram', 'Video de 25 segundos con locución y música · storyboard en el anexo, página 17')]
     lst = ''.join(f'<div style="display: grid; grid-template-columns: 46px minmax(0, 1fr); column-gap: 12px; padding: 14px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 26px; font-weight: 760; letter-spacing: -0.03em">{n}</div>'
                   f'<div><div style="font-size: 18px; font-weight: 500; line-height: 1.3">{t}</div><div style="font-size: 15px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 4px">{x}</div></div></div>' for n, t, x in items)
     return page('Sika · Muestras', halo(1300, 430, None) +
@@ -402,7 +402,7 @@ def s_reel():
     base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con aprobación de Sika", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram y adaptación para TikTok"])}</div>', 820, 456, 465, True, '; height: 364px')
     extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva"], False)}</div>', 1315, 456, 465, False, '; height: 364px')
     return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
-                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Sika confirmó que el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.') +
+                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Sika confirmó que el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.', extra=callout('El reel de muestra se entrega como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
                 means('Sika sabe qué incluye el reel base y qué se decide como producción adicional.',
                       'Respuestas de Sika en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
 
