@@ -1,0 +1,17 @@
+{
+  "args": [
+    "frobnicate"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 227,
+    "sha256": "7c71eacd52d3b32d9679c228858efe34323574a34a68dae9de2c55b71865c650",
+    "text": "{\n  \"error\": {\n    \"code\": \"UNKNOWN_COMMAND\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

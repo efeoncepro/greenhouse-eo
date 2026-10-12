@@ -1,0 +1,40 @@
+{
+  "args": [
+    "current",
+    "set",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v10.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v10.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--reason",
+    "Golden baseline: replace the pointer.",
+    "--confirm",
+    "9f9d4426646fc4c4f26c93472e9c35cfb965ce7d854aefa70cd2244b14600bb9",
+    "--out",
+    "<tmp>/pointer.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 997,
+    "sha256": "9ab8fab8e67af65d9913af33867deeff9f93410d4dd4ebdc3c03fdb6325bdcff",
+    "text": "{\n  \"updated\": true,\n  \"binding\": false,\n  \"replaced\": \"9f9d4426646fc4c4f26c93472e9c35cfb965ce7d854aefa70cd2244b14600bb9\",\n  \"pointerDigest\": \"<pointerDigest>\",\n  \"pointer\": {\n    \"schemaVersion\": \"pricing-v3-current/1\",\n    \"updatedAt\": \"<updatedAt>\",\n    \"reason\": \"Golden baseline: replace the pointer.\",\n    \"catalog\": {\n      \"path\": \"data/pricing/v3-operating/catalog.review-v10.json\",\n      \"version\": \"operating-review-2026-10-11-v10\",\n      \"digest\": \"9a3bbf4eea14e1e0b7782b829b1a7dbde3effba28c1ced9f0b8f07029d2d3f91\"\n    },\n    \"policy\": {\n      \"path\": \"data/pricing/v3-operating/resources.review-v10.json\",\n      \"version\": \"operating-review-2026-10-11-v10\",\n      \"digest\": \"8ff145bf0c154c553815d6670ccb69aca8f2c17655dd190411d3df243822d8d1\"\n    },\n    \"credits\": {\n      \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n      \"version\": \"operator-screenshots-2026-10-09-v1\",\n      \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n    }\n  }\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "pointer.json",
+      "mode": "644",
+      "content": {
+        "bytes": 783,
+        "sha256": "faa58b7bb8f69c263814c695d0e0542b0e21cdb89572102384de1731e6c886ed",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-current/1\",\n  \"updatedAt\": \"<updatedAt>\",\n  \"reason\": \"Golden baseline: replace the pointer.\",\n  \"catalog\": {\n    \"path\": \"data/pricing/v3-operating/catalog.review-v10.json\",\n    \"version\": \"operating-review-2026-10-11-v10\",\n    \"digest\": \"9a3bbf4eea14e1e0b7782b829b1a7dbde3effba28c1ced9f0b8f07029d2d3f91\"\n  },\n  \"policy\": {\n    \"path\": \"data/pricing/v3-operating/resources.review-v10.json\",\n    \"version\": \"operating-review-2026-10-11-v10\",\n    \"digest\": \"8ff145bf0c154c553815d6670ccb69aca8f2c17655dd190411d3df243822d8d1\"\n  },\n  \"credits\": {\n    \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n    \"version\": \"operator-screenshots-2026-10-09-v1\",\n    \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n  }\n}\n"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "args": [
+    "compose",
+    "plan",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v11.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--input",
+    "data/pricing/v3-operating/designer.plan.json",
+    "--out",
+    "<tmp>/demand.json"
+  ],
+  "status": 2,
+  "stdout": {
+    "bytes": 62547,
+    "sha256": "59ed547036bb84865a44e34bb6ffc7dc66c872d00004f8a0b0a31f89ced7f89b"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "demand.json",
+      "mode": "600",
+      "content": {
+        "bytes": 3277,
+        "sha256": "b1f026a89a1b31c352227d3b792e53dd13586b54e6718ad63ee1a2c4d88a3683",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-composition-demand/1\",\n  \"commercialUnit\": \"role_capacity\",\n  \"brief\": {\n    \"schemaVersion\": \"pricing-v3-brief/1\",\n    \"mode\": \"simulation\",\n    \"quoteDate\": \"2026-10-09\",\n    \"offerId\": \"talent-assurance-staffing\",\n    \"engagementCode\": \"monthly\",\n    \"accountId\": \"design-simulation\",\n    \"offerMarketCountry\": \"CL\",\n    \"outputCurrency\": \"USD\",\n    \"periods\": 1,\n    \"lines\": [\n      {\n        \"lineId\": \"design\",\n        \"profile\": \"ECG-002\",\n        \"talentCountry\": \"CO\",\n        \"headcount\": 1,\n        \"dedication\": {\n          \"unit\": \"fte\",\n          \"value\": \"0.5\"\n        },\n        \"allocationMode\": \"shared\",\n        \"allocationPolicyId\": \"allocation:shared\",\n        \"allowUnlocalizedCost\": true,\n        \"choices\": []\n      }\n    ],\n    \"adjustments\": [],\n    \"taxTreatment\": {\n      \"kind\": \"not_resolved\"\n    }\n  },\n  \"work\": [\n    {\n      \"lineId\": \"design\",\n      \"assigneeIds\": [\n        \"design-slot\"\n      ],\n      \"tasks\": [],\n      \"aiToolIds\": [\n        \"higgsfield\",\n        \"magnific\"\n      ],\n      \"aiSelectionReason\": \"Image production and upscaling demand declared for simulation.\",\n      \"creditDemand\": [\n        {\n          \"periodId\": 1,\n          \"toolId\": \"higgsfield\",\n          \"credits\": 1000\n        },\n        {\n          \"periodId\": 1,\n          \"toolId\": \"magnific\",\n          \"credits\": 12000\n        }\n      ]\n    }\n  ],\n  \"serviceToolIds\": [],\n  \"allocations\": [\n    {\n      \"periodId\": 1,\n      \"toolId\": \"notion\",\n      \"priceId\": \"current\",\n      \"quantity\": \"1\",\n      \"serviceShare\": \"1\",\n      \"driver\": {\n        \"unit\": \"assigned-user-seat\",\n        \"totalUnits\": \"1\",\n        \"allocatedUnits\": \"1\"\n      },\n      \"reason\": \"Simulation of one licensed Business user at invoiced24USD; not a confirmed user assignment.\"\n    },\n    {\n      \"periodId\": 1,\n      \"toolId\": \"microsoft-365\",\n      \"priceId\": \"public-standard-teams-monthly\",\n      \"quantity\": \"1\",\n      \"serviceShare\": \"1\",\n      \"driver\": {\n        \"unit\": \"assigned-user-seat\",\n        \"totalUnits\": \"1\",\n        \"allocatedUnits\": \"1\"\n      },\n      \"reason\": \"Explicit publicUS plan simulation, not actualEfeonce billing.\"\n    },\n    {\n      \"periodId\": 1,\n      \"toolId\": \"adobe\",\n      \"priceId\": \"current\",\n      \"quantity\": \"1\",\n      \"seatCapacity\": 3,\n      \"serviceShare\": \"0.25\",\n      \"driver\": {\n        \"unit\": \"declared-capacity-hours\",\n        \"totalUnits\": \"160\",\n        \"allocatedUnits\": \"40\"\n      },\n      \"reason\": \"Portfolio example-capacity-v1 (simulation): Hypothetical capacity for reproducible demo; not actual staffing or license access.\"\n    }\n  ],\n  \"creditBudgets\": [\n    {\n      \"periodId\": 1,\n      \"toolId\": \"higgsfield\",\n      \"purchaseDate\": \"2026-10-09\",\n      \"useBy\": \"2026-10-31\",\n      \"subscriptionCreditsAllocated\": 400,\n      \"subscriptionCreditsAvailable\": 400,\n      \"activeSubscription\": true,\n      \"allowRepeatedPacks\": false\n    },\n    {\n      \"periodId\": 1,\n      \"toolId\": \"magnific\",\n      \"purchaseDate\": \"2026-10-09\",\n      \"useBy\": \"2026-10-31\",\n      \"subscriptionCreditsAllocated\": 2000,\n      \"subscriptionCreditsAvailable\": 2000,\n      \"activeSubscription\": true,\n      \"allowRepeatedPacks\": false\n    }\n  ],\n  \"fxRecordIds\": [\n    \"fx:EUR:USD:ECB:2026-10-09\"\n  ]\n}\n"
+      }
+    }
+  ]
+}

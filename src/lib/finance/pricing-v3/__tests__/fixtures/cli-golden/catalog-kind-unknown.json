@@ -1,0 +1,20 @@
+{
+  "args": [
+    "catalog",
+    "search",
+    "--kind",
+    "nope"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 553,
+    "sha256": "12d5726349c9ed2a20b3c430b793cb6d5a87331405957027b54cf918fed67ffc",
+    "text": "{\n  \"error\": {\n    \"code\": \"INVALID_ARGUMENT\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"kind\",\n    \"allowed\": [\n      \"profile\",\n      \"cost\",\n      \"resource\",\n      \"kit\",\n      \"allocation\",\n      \"pricing\",\n      \"talent_factor\",\n      \"market_factor\",\n      \"fx\",\n      \"price_rounding\",\n      \"engagement_factor\",\n      \"third_party_policy\",\n      \"contingency_reserve\",\n      \"offer\"\n    ]\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

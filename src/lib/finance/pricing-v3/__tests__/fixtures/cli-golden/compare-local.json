@@ -1,0 +1,21 @@
+{
+  "args": [
+    "compare",
+    "--left",
+    "data/pricing/v3-pilot/economics/colombia-chile-artifact.json",
+    "--right",
+    "data/pricing/v3-pilot/economics/colombia-chile-artifact.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 3023,
+    "sha256": "070ce4c5e614bb93fe7a1de31b3dcb4a7d1afacc7300af99d810930cf6b13f6a",
+    "text": "{\n  \"binding\": false,\n  \"differences\": null,\n  \"calculations\": [\n    \"local-fb397f774df79f17689d3d24\",\n    \"local-fb397f774df79f17689d3d24\"\n  ],\n  \"comparability\": {\n    \"currencyMatches\": true,\n    \"scopeMatches\": true,\n    \"snapshotMatches\": true,\n    \"complete\": false\n  },\n  \"before\": {\n    \"totals\": null,\n    \"diagnostics\": [\n      {\n        \"code\": \"MISSING_FX\",\n        \"fieldPath\": \"snapshot.fx.output\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_FX\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_MARKET_POLICY\",\n        \"fieldPath\": \"snapshot.marketFactors\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_MARKET_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_COST\",\n        \"fieldPath\": \"snapshot.profiles.ECG-002.cost\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_COST\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_POLICY\",\n        \"fieldPath\": \"request.lines.0\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      }\n    ],\n    \"lines\": []\n  },\n  \"after\": {\n    \"totals\": null,\n    \"diagnostics\": [\n      {\n        \"code\": \"MISSING_FX\",\n        \"fieldPath\": \"snapshot.fx.output\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_FX\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_MARKET_POLICY\",\n        \"fieldPath\": \"snapshot.marketFactors\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_MARKET_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_COST\",\n        \"fieldPath\": \"snapshot.profiles.ECG-002.cost\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_COST\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_POLICY\",\n        \"fieldPath\": \"request.lines.0\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      }\n    ],\n    \"lines\": []\n  }\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

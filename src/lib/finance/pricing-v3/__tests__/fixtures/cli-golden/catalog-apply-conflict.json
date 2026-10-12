@@ -1,0 +1,24 @@
+{
+  "args": [
+    "catalog",
+    "apply",
+    "--input",
+    "data/pricing/v3-catalog/examples/illustrative-increase.json",
+    "--confirm",
+    "0000000000000000000000000000000000000000000000000000000000000000",
+    "--out",
+    "<tmp>/catalog.next.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 236,
+    "sha256": "6c2b3a70ff37eacfdc8046ef27f9a186091097a6a0befadefad7d02a75cf830f",
+    "text": "{\n  \"error\": {\n    \"code\": \"CATALOG_PREVIEW_CONFLICT\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

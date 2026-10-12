@@ -1,0 +1,30 @@
+{
+  "args": [
+    "catalog",
+    "validate",
+    "--catalog",
+    "<tmp>/empty.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 1328,
+    "sha256": "8f459ebac053270439ac1883d6b49a261afa958b173896c12f64577b4137b95d",
+    "text": "{\n  \"error\": {\n    \"code\": \"SCHEMA_INVALID\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"issues\": [\n      {\n        \"path\": \"schemaVersion\",\n        \"rule\": \"invalid_literal\"\n      },\n      {\n        \"path\": \"catalogId\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"string\"\n      },\n      {\n        \"path\": \"version\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"string\"\n      },\n      {\n        \"path\": \"mode\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"'synthetic' | 'historical' | 'commercial_draft'\"\n      },\n      {\n        \"path\": \"calculationCurrency\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"string\"\n      },\n      {\n        \"path\": \"countries\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"array\"\n      },\n      {\n        \"path\": \"currencies\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"array\"\n      },\n      {\n        \"path\": \"records\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"array\"\n      },\n      {\n        \"path\": \"evidence\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"array\"\n      },\n      {\n        \"path\": \"audit\",\n        \"rule\": \"invalid_type\",\n        \"expected\": \"array\"\n      }\n    ]\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "empty.json",
+      "mode": "644",
+      "content": {
+        "bytes": 3,
+        "sha256": "ca3d163bab055381827226140568f3bef7eaac187cebd76878e0b63e9e442356",
+        "text": "{}\n"
+      }
+    }
+  ]
+}

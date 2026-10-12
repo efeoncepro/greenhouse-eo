@@ -1,0 +1,36 @@
+{
+  "args": [
+    "compose",
+    "scaffold",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v11.json",
+    "--input",
+    "data/pricing/v3-operating/writer.brief.json",
+    "--out",
+    "<tmp>/demand.json"
+  ],
+  "status": 2,
+  "stdout": {
+    "bytes": 4181,
+    "sha256": "6d4f91c8c46d190b8de2fa44fa26cfca1234a2a7a8a393d23229c296d4306f0e",
+    "text": "{\n  \"status\": \"needs_input\",\n  \"binding\": false,\n  \"demand\": {\n    \"schemaVersion\": \"pricing-v3-composition-demand/1\",\n    \"commercialUnit\": \"role_capacity\",\n    \"brief\": {\n      \"schemaVersion\": \"pricing-v3-brief/1\",\n      \"mode\": \"simulation\",\n      \"quoteDate\": \"2026-10-09\",\n      \"offerId\": \"talent-assurance-staffing\",\n      \"engagementCode\": \"monthly\",\n      \"accountId\": \"example-account\",\n      \"offerMarketCountry\": \"CL\",\n      \"outputCurrency\": \"USD\",\n      \"periods\": 1,\n      \"lines\": [\n        {\n          \"lineId\": \"writer\",\n          \"profile\": \"ECG-011\",\n          \"talentCountry\": \"CO\",\n          \"headcount\": 1,\n          \"dedication\": {\n            \"unit\": \"fte\",\n            \"value\": \"0.5\"\n          },\n          \"allocationMode\": \"shared\",\n          \"allocationPolicyId\": \"allocation:shared\",\n          \"allowUnlocalizedCost\": true,\n          \"choices\": []\n        }\n      ],\n      \"adjustments\": [],\n      \"taxTreatment\": {\n        \"kind\": \"not_resolved\"\n      }\n    },\n    \"work\": [\n      {\n        \"lineId\": \"writer\",\n        \"assigneeIds\": [\n          \"planned-writer-1\"\n        ],\n        \"tasks\": [],\n        \"aiToolIds\": [],\n        \"creditDemand\": []\n      }\n    ],\n    \"serviceToolIds\": [],\n    \"allocations\": [],\n    \"creditBudgets\": [],\n    \"fxRecordIds\": []\n  },\n  \"questions\": [\n    {\n      \"code\": \"WORK_TASKS_AND_USERS_REQUIRED\",\n      \"path\": \"writer\",\n      \"prompt\": \"The recipe of the profile (profileTasks) is applied to this line without being written in the demand. Add to tasks only the tasks of this engagement beyond the recipe, and leave it empty when there are none; to leave a task of the recipe out, declare it in excludedProfileTasks with its reason. Each assigneeId is a planning slot (planned-…): keep it while nobody is assigned, which the assessment then reports, and replace it with a stable anonymous id only when a specific person is assigned. Select AI tools only if justified.\",\n      \"profileTasks\": []\n    },\n    {\n      \"code\": \"TOOL_PLAN_AND_ALLOCATION_REQUIRED\",\n      \"path\": \"notion\",\n      \"prompt\": \"Select priceId, quantity, named access/capacity and declared allocation for every active period. `candidates` are the prices an allocation can name on the quote date; a price under `unavailablePrices` blocks the quote with the diagnostic listed there. Declare identical periods once with periodIds. A named tool priced per seat accounts for every paid seat: used, shared (seatSharing) or idle (idleSeats with idleReason). Declare in `evidence` where the allocation comes from; without confirmed evidence in force the assessment reports it.\",\n      \"candidates\": [\n        \"historical\"\n      ],\n      \"unavailablePrices\": [\n        {\n          \"priceId\": \"current\",\n          \"blocksWith\": \"RESOURCE_PRICE_NOT_EFFECTIVE\",\n          \"reason\": \"The value the policy states for the price is not in force on the date.\"\n        }\n      ]\n    },\n    {\n      \"code\": \"TOOL_PLAN_AND_ALLOCATION_REQUIRED\",\n      \"path\": \"microsoft-365\",\n      \"prompt\": \"Select priceId, quantity, named access/capacity and declared allocation for every active period. `candidates` are the prices an allocation can name on the quote date; a price under `unavailablePrices` blocks the quote with the diagnostic listed there. Declare identical periods once with periodIds. A named tool priced per seat accounts for every paid seat: used, shared (seatSharing) or idle (idleSeats with idleReason). Declare in `evidence` where the allocation comes from; without confirmed evidence in force the assessment reports it.\",\n      \"candidates\": [\n        \"historical\",\n        \"public-standard-teams-monthly\",\n        \"public-standard-teams-annual\",\n        \"public-standard-no-teams-monthly\"\n      ],\n      \"unavailablePrices\": [\n        {\n          \"priceId\": \"current\",\n          \"blocksWith\": \"RESOURCE_PRICE_NOT_EFFECTIVE\",\n          \"reason\": \"The value the policy states for the price is not in force on the date.\"\n        }\n      ]\n    }\n  ],\n  \"note\": \"Planning slots are not existing users or purchased seats. commercialUnit is the one the catalog states for this offer; confirm the service scope: there is no implicit service recipe.\"\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "demand.json",
+      "mode": "600",
+      "content": {
+        "bytes": 1137,
+        "sha256": "58f7ccfe30d5a4793f508d5f8130fa56b5e1dcac397d066e212d7ca615996374",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-composition-demand/1\",\n  \"commercialUnit\": \"role_capacity\",\n  \"brief\": {\n    \"schemaVersion\": \"pricing-v3-brief/1\",\n    \"mode\": \"simulation\",\n    \"quoteDate\": \"2026-10-09\",\n    \"offerId\": \"talent-assurance-staffing\",\n    \"engagementCode\": \"monthly\",\n    \"accountId\": \"example-account\",\n    \"offerMarketCountry\": \"CL\",\n    \"outputCurrency\": \"USD\",\n    \"periods\": 1,\n    \"lines\": [\n      {\n        \"lineId\": \"writer\",\n        \"profile\": \"ECG-011\",\n        \"talentCountry\": \"CO\",\n        \"headcount\": 1,\n        \"dedication\": {\n          \"unit\": \"fte\",\n          \"value\": \"0.5\"\n        },\n        \"allocationMode\": \"shared\",\n        \"allocationPolicyId\": \"allocation:shared\",\n        \"allowUnlocalizedCost\": true,\n        \"choices\": []\n      }\n    ],\n    \"adjustments\": [],\n    \"taxTreatment\": {\n      \"kind\": \"not_resolved\"\n    }\n  },\n  \"work\": [\n    {\n      \"lineId\": \"writer\",\n      \"assigneeIds\": [\n        \"planned-writer-1\"\n      ],\n      \"tasks\": [],\n      \"aiToolIds\": [],\n      \"creditDemand\": []\n    }\n  ],\n  \"serviceToolIds\": [],\n  \"allocations\": [],\n  \"creditBudgets\": [],\n  \"fxRecordIds\": []\n}\n"
+      }
+    }
+  ]
+}

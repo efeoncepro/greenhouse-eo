@@ -1,0 +1,36 @@
+{
+  "args": [
+    "resources",
+    "preview",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v5.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v5.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--input",
+    "data/pricing/v3-operating/stable-unit-prices.change.json",
+    "--out",
+    "<tmp>/preview.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 33678,
+    "sha256": "2f08b46b743c2cdd524090a4ba1df98afa24c17e22f876bd5840ea1d44bdf8fb"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "preview.json",
+      "mode": "600",
+      "content": {
+        "bytes": 33678,
+        "sha256": "2f08b46b743c2cdd524090a4ba1df98afa24c17e22f876bd5840ea1d44bdf8fb"
+      }
+    }
+  ]
+}

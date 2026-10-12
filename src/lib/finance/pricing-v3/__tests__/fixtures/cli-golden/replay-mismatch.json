@@ -1,0 +1,28 @@
+{
+  "args": [
+    "replay",
+    "--input",
+    "<tmp>/tampered.artifact.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 227,
+    "sha256": "0daf0a4f7a6bd1a735f02f4f6263079d3a80f5fd213b7bb3374910870abd6c2f",
+    "text": "{\n  \"error\": {\n    \"code\": \"REPLAY_MISMATCH\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "tampered.artifact.json",
+      "mode": "644",
+      "content": {
+        "bytes": 287682,
+        "sha256": "2e68000fc75a96f5ee662490d1bbeb6526a7e2b5b9363c7026e6037312bc581e"
+      }
+    }
+  ]
+}

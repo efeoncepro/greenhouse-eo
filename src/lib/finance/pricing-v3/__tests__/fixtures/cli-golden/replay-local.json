@@ -1,0 +1,19 @@
+{
+  "args": [
+    "replay",
+    "--input",
+    "data/pricing/v3-pilot/economics/colombia-chile-artifact.json"
+  ],
+  "status": 2,
+  "stdout": {
+    "bytes": 1771,
+    "sha256": "bfb09b4f388c1dc19a8bdf473cbfddc2ef050d01d53866d9af77a90f9780e78e",
+    "text": "{\n  \"verified\": true,\n  \"calculationId\": \"local-fb397f774df79f17689d3d24\",\n  \"result\": {\n    \"engineVersion\": \"pricing-v3-local/1.0.0\",\n    \"binding\": false,\n    \"calculationStatus\": \"needs_input\",\n    \"reviewStatus\": \"not_evaluated\",\n    \"dataMode\": \"commercial_draft\",\n    \"calculationCurrency\": \"USD\",\n    \"outputCurrency\": \"CLP\",\n    \"diagnostics\": [\n      {\n        \"code\": \"MISSING_FX\",\n        \"fieldPath\": \"snapshot.fx.output\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_FX\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_MARKET_POLICY\",\n        \"fieldPath\": \"snapshot.marketFactors\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_MARKET_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_COST\",\n        \"fieldPath\": \"snapshot.profiles.ECG-002.cost\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_COST\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      },\n      {\n        \"code\": \"MISSING_POLICY\",\n        \"fieldPath\": \"request.lines.0\",\n        \"lineId\": \"design\",\n        \"severity\": \"missing\",\n        \"message\": \"Pricing input requires attention: MISSING_POLICY\",\n        \"resolution\": \"Supply or correct the explicitly referenced record; no implicit fallback is applied.\"\n      }\n    ],\n    \"lines\": [],\n    \"totals\": null,\n    \"precisionPolicy\": \"decimal-80-half-up-final-line-largest-remainder-v1\"\n  }\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

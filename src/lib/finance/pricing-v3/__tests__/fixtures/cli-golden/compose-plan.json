@@ -1,0 +1,25 @@
+{
+  "args": [
+    "compose",
+    "plan",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--policy",
+    "data/pricing/v3-operating/resources.review-v11.json",
+    "--credits",
+    "data/pricing/v3-resources/ai-credits.review-v1.json",
+    "--input",
+    "data/pricing/v3-operating/designer.plan.json"
+  ],
+  "status": 2,
+  "stdout": {
+    "bytes": 62547,
+    "sha256": "59ed547036bb84865a44e34bb6ffc7dc66c872d00004f8a0b0a31f89ced7f89b"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

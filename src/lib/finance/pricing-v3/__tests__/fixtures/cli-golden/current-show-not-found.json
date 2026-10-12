@@ -1,0 +1,20 @@
+{
+  "args": [
+    "current",
+    "show",
+    "--input",
+    "<tmp>/missing.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 250,
+    "sha256": "1066d93233d1d0a8de03963e9a0b1ce6cb8c62291480b7502374ec1bfe6f103a",
+    "text": "{\n  \"error\": {\n    \"code\": \"INPUT_NOT_FOUND\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"input\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

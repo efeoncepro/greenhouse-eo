@@ -1,0 +1,18 @@
+{
+  "args": [
+    "catalog",
+    "validate"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 179,
+    "sha256": "08f36cbe6dcb30ca129e86241c3f008dcbed771f2c51ca37210b0b65c9c47a4a",
+    "text": "{\n  \"valid\": true,\n  \"digest\": \"b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02\",\n  \"version\": \"review-2026-10-09-v1\",\n  \"records\": 178,\n  \"mode\": \"historical\"\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

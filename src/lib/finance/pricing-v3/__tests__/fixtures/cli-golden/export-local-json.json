@@ -1,0 +1,41 @@
+{
+  "args": [
+    "export",
+    "--input",
+    "<tmp>/quote.artifact.json",
+    "--out",
+    "<tmp>/draft.json",
+    "--format",
+    "json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 132,
+    "sha256": "f94382e6ece86c54a9840c686fbefefb7a6864543d3f43006754ad3e3090b839",
+    "text": "{\n  \"documentType\": \"draft_estimate\",\n  \"binding\": false,\n  \"calculationId\": \"local-d9dfb365f2287cccab9637da\",\n  \"exported\": true\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "draft.json",
+      "mode": "600",
+      "content": {
+        "bytes": 1758,
+        "sha256": "bc0aee32ddc50035a59b1ada6c6ac97a1e582d0dffb0b1404ef4bfbbad3ec1fd",
+        "text": "{\n  \"documentType\": \"draft_estimate\",\n  \"binding\": false,\n  \"calculationId\": \"local-d9dfb365f2287cccab9637da\",\n  \"dataMode\": \"synthetic\",\n  \"quoteDate\": \"2026-10-09\",\n  \"currency\": \"USD\",\n  \"offerId\": \"talent-assurance-staffing\",\n  \"duration\": {\n    \"unit\": \"month\",\n    \"periods\": 3\n  },\n  \"scope\": [\n    {\n      \"lineId\": \"design\",\n      \"profileId\": \"TEST-DESIGN\",\n      \"profile\": \"Diseñador senior (prueba sintética)\",\n      \"seniority\": \"senior\",\n      \"headcount\": 1,\n      \"dedication\": {\n        \"unit\": \"fte\",\n        \"value\": \"0.5\"\n      },\n      \"allocationMode\": \"shared\",\n      \"included\": [\n        \"Suite de diseño de prueba\",\n        \"Plataforma de contratación de prueba\",\n        \"Talent Assurance de prueba\",\n        \"Operación de prueba\",\n        \"Onboarding de prueba\"\n      ],\n      \"exclusions\": []\n    }\n  ],\n  \"schedule\": [\n    {\n      \"lineId\": \"design:1:monthly\",\n      \"periodId\": 1,\n      \"kind\": \"monthly\",\n      \"label\": \"Diseñador senior (prueba sintética)\",\n      \"net\": \"918.00\"\n    },\n    {\n      \"lineId\": \"design:1:setup\",\n      \"periodId\": 1,\n      \"kind\": \"setup\",\n      \"label\": \"Diseñador senior (prueba sintética)\",\n      \"net\": \"135.00\"\n    },\n    {\n      \"lineId\": \"design:2:monthly\",\n      \"periodId\": 2,\n      \"kind\": \"monthly\",\n      \"label\": \"Diseñador senior (prueba sintética)\",\n      \"net\": \"918.00\"\n    },\n    {\n      \"lineId\": \"design:3:monthly\",\n      \"periodId\": 3,\n      \"kind\": \"monthly\",\n      \"label\": \"Diseñador senior (prueba sintética)\",\n      \"net\": \"918.00\"\n    }\n  ],\n  \"net\": \"2889.00\",\n  \"tax\": null,\n  \"grandTotal\": null,\n  \"uniformMonthlyNet\": \"918.00\",\n  \"taxStatus\": \"not_resolved\",\n  \"condition\": \"Synthetic demonstration; not an operational rate or approved proposal.\"\n}\n"
+      }
+    },
+    {
+      "name": "quote.artifact.json",
+      "mode": "600",
+      "content": {
+        "bytes": 24161,
+        "sha256": "1527a953d9db0b7af5420e974878d5f13209c592b8bafe341ed91a3511e62e20"
+      }
+    }
+  ]
+}

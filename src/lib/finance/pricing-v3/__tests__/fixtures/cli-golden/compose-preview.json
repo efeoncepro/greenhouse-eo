@@ -1,0 +1,20 @@
+{
+  "args": [
+    "compose",
+    "preview",
+    "--input",
+    "data/pricing/v3-operating/designer.artifact.json"
+  ],
+  "status": 3,
+  "stdout": {
+    "bytes": 685,
+    "sha256": "4cba1d5c2cad44e1287a2b9842f8a1b0be846b45e86be0f7d98442c13a420096",
+    "text": "{\n  \"schemaVersion\": \"pricing-v3-composition-preview/1\",\n  \"status\": \"Simulación interna pendiente de revisión\",\n  \"binding\": false,\n  \"commercialUnit\": \"role_capacity\",\n  \"currency\": \"USD\",\n  \"periods\": [\n    {\n      \"periodId\": 1,\n      \"currency\": \"USD\",\n      \"items\": [\n        {\n          \"label\": \"Senior Visual Designer\",\n          \"net\": \"1174.33\"\n        },\n        {\n          \"label\": \"Implementación inicial\",\n          \"net\": \"130.00\"\n        }\n      ],\n      \"net\": \"1304.33\"\n    }\n  ],\n  \"net\": \"1304.33\",\n  \"tax\": null,\n  \"grandTotal\": null,\n  \"note\": \"No es una oferta emitida. Validar alcance, recursos, precio, impuestos y condiciones antes de presentación.\"\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

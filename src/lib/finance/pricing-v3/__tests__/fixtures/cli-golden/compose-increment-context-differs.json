@@ -1,0 +1,22 @@
+{
+  "args": [
+    "compose",
+    "increment",
+    "--input",
+    "data/pricing/v3-operating/managed-addon-increment.artifact.json",
+    "--base",
+    "data/pricing/v3-operating/designer.artifact.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 1011,
+    "sha256": "42e5911e10a047313d84bddc1bef750c244719a74c3aaae6ee3fa45354c0b99e",
+    "text": "{\n  \"error\": {\n    \"code\": \"QUOTE_INCREMENT_CONTEXT_DIFFERS\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"input\",\n    \"issues\": [\n      {\n        \"path\": \"brief.outputCurrency\",\n        \"rule\": \"currency_differs\"\n      },\n      {\n        \"path\": \"brief.offerId\",\n        \"rule\": \"offer_differs\"\n      },\n      {\n        \"path\": \"brief.accountId\",\n        \"rule\": \"account_differs\"\n      },\n      {\n        \"path\": \"brief.taxTreatment\",\n        \"rule\": \"tax_treatment_differs\"\n      },\n      {\n        \"path\": \"brief.engagementForm\",\n        \"rule\": \"engagement_form_differs\"\n      },\n      {\n        \"path\": \"brief.quoteDate\",\n        \"rule\": \"quote_date_differs\"\n      },\n      {\n        \"path\": \"commercialUnit\",\n        \"rule\": \"commercial_unit_differs\"\n      },\n      {\n        \"path\": \"totals.currency\",\n        \"rule\": \"currency_differs\"\n      }\n    ]\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": []
+}

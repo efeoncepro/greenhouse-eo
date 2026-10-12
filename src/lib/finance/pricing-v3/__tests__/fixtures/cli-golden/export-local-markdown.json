@@ -1,0 +1,39 @@
+{
+  "args": [
+    "export",
+    "--input",
+    "<tmp>/quote.artifact.json",
+    "--out",
+    "<tmp>/draft.md"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 132,
+    "sha256": "f94382e6ece86c54a9840c686fbefefb7a6864543d3f43006754ad3e3090b839",
+    "text": "{\n  \"documentType\": \"draft_estimate\",\n  \"binding\": false,\n  \"calculationId\": \"local-d9dfb365f2287cccab9637da\",\n  \"exported\": true\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "draft.md",
+      "mode": "600",
+      "content": {
+        "bytes": 662,
+        "sha256": "707c4a6360bfd15df94b2c38663cd615ec6763b182353a0e4e85a59c5a49b470",
+        "text": "# Estimación — borrador\n\nSynthetic demonstration; not an operational rate or approved proposal.\n\nMoneda: USD. Periodos: 3 meses.\n\n- Diseñador senior \\(prueba sintética\\) (senior): 1 persona(s), 0.5 fte, shared.\n\n| Periodo | Concepto | Neto |\n| --- | --- | --- |\n| 1 | Diseñador senior \\(prueba sintética\\) / monthly | 918.00 |\n| 1 | Diseñador senior \\(prueba sintética\\) / setup | 135.00 |\n| 2 | Diseñador senior \\(prueba sintética\\) / monthly | 918.00 |\n| 3 | Diseñador senior \\(prueba sintética\\) / monthly | 918.00 |\n\nNeto: 2889.00 USD.\nImpuestos pendientes; total con impuestos no determinado.\n\nNo constituye aprobación ni cotización emitida.\n"
+      }
+    },
+    {
+      "name": "quote.artifact.json",
+      "mode": "600",
+      "content": {
+        "bytes": 24161,
+        "sha256": "1527a953d9db0b7af5420e974878d5f13209c592b8bafe341ed91a3511e62e20"
+      }
+    }
+  ]
+}

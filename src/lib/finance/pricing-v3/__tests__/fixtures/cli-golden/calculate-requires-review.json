@@ -1,0 +1,18 @@
+{
+  "args": [
+    "calculate",
+    "--input",
+    "data/pricing/v3-pilot/scenarios/colombia-chile-design-historical-hypothesis.json"
+  ],
+  "status": 3,
+  "stdout": {
+    "bytes": 24687,
+    "sha256": "892bcfaa7096ea6c7e69e8d6e092f0207c37821357bb9e6929a55083e4194fab"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

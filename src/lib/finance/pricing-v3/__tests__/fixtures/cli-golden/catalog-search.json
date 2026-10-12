@@ -1,0 +1,20 @@
+{
+  "args": [
+    "catalog",
+    "search",
+    "--query",
+    "designer"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 3121,
+    "sha256": "91f4b839865f9f0c8d4a2ab3c83c0cbc5fccab5906a052a71bcd19830d03003b",
+    "text": "{\n  \"binding\": false,\n  \"mode\": \"historical\",\n  \"version\": \"review-2026-10-09-v1\",\n  \"digest\": \"b6f42e53203341e87472ef9ededea463d3be972f7f13c1f32231b35247e2ed02\",\n  \"resolution\": \"ambiguous\",\n  \"candidates\": [\n    {\n      \"recordId\": \"profile:ECG-002\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"pricing-history:seed-csv\",\n        \"effectiveFrom\": \"2026-10-09\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"estimated\"\n      },\n      \"note\": \"Historical profile; seniority only from title; tier labels are references, not operational approval.\",\n      \"kind\": \"profile\",\n      \"value\": {\n        \"profileId\": \"ECG-002\",\n        \"label\": \"Senior Visual Designer\",\n        \"seniorityCode\": \"senior\",\n        \"tierCode\": \"historical-tier-2\",\n        \"requiredCoverages\": [\n          \"human_salary\"\n        ],\n        \"aliases\": [\n          \"diseñador senior\",\n          \"senior designer\"\n        ],\n        \"defaultKitId\": \"visual-core\"\n      }\n    },\n    {\n      \"recordId\": \"profile:ECG-003\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"pricing-history:seed-csv\",\n        \"effectiveFrom\": \"2026-10-09\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"estimated\"\n      },\n      \"note\": \"Historical profile; seniority only from title; tier labels are references, not operational approval.\",\n      \"kind\": \"profile\",\n      \"value\": {\n        \"profileId\": \"ECG-003\",\n        \"label\": \"Creative Designer\",\n        \"seniorityCode\": \"not_specified\",\n        \"tierCode\": \"historical-tier-1\",\n        \"requiredCoverages\": [\n          \"human_salary\"\n        ],\n        \"aliases\": [],\n        \"defaultKitId\": \"generic-core\"\n      }\n    },\n    {\n      \"recordId\": \"profile:ECG-017\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"pricing-history:seed-csv\",\n        \"effectiveFrom\": \"2026-10-09\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"estimated\"\n      },\n      \"note\": \"Historical profile; seniority only from title; tier labels are references, not operational approval.\",\n      \"kind\": \"profile\",\n      \"value\": {\n        \"profileId\": \"ECG-017\",\n        \"label\": \"UX/UI Designer\",\n        \"seniorityCode\": \"not_specified\",\n        \"tierCode\": \"historical-tier-2\",\n        \"requiredCoverages\": [\n          \"human_salary\"\n        ],\n        \"aliases\": [],\n        \"defaultKitId\": \"generic-core\"\n      }\n    },\n    {\n      \"recordId\": \"profile:ECG-018\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"pricing-history:seed-csv\",\n        \"effectiveFrom\": \"2026-10-09\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"estimated\"\n      },\n      \"note\": \"Historical profile; seniority only from title; tier labels are references, not operational approval.\",\n      \"kind\": \"profile\",\n      \"value\": {\n        \"profileId\": \"ECG-018\",\n        \"label\": \"Video Editor/Motion Graphics Designer\",\n        \"seniorityCode\": \"not_specified\",\n        \"tierCode\": \"historical-tier-1\",\n        \"requiredCoverages\": [\n          \"human_salary\"\n        ],\n        \"aliases\": [],\n        \"defaultKitId\": \"generic-core\"\n      }\n    }\n  ]\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

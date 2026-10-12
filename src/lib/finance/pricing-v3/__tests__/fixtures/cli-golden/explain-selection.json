@@ -1,0 +1,18 @@
+{
+  "args": [
+    "explain",
+    "--input",
+    "data/pricing/v3-catalog/examples/designer.quote.artifact.json"
+  ],
+  "status": 3,
+  "stdout": {
+    "bytes": 117652,
+    "sha256": "44ec4cba06cf98bda2fe380b1b1e5a2dd5a1e90ce611ecf521c7c0efc51304f1"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

@@ -1,0 +1,21 @@
+{
+  "args": [
+    "catalog",
+    "preview",
+    "--input",
+    "data/pricing/v3-catalog/examples/illustrative-increase.json",
+    "--impact",
+    "data/pricing/v3-catalog/examples/update-impact-briefs.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 627574,
+    "sha256": "18e6da85816c6ed6f1d5c73a97fda39d03d5df7a93fb6f63f279b5ec56a70107"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

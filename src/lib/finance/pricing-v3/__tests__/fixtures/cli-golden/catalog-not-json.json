@@ -1,0 +1,30 @@
+{
+  "args": [
+    "catalog",
+    "validate",
+    "--catalog",
+    "<tmp>/broken.json"
+  ],
+  "status": 1,
+  "stdout": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "stderr": {
+    "bytes": 251,
+    "sha256": "fa1ec669bac49a81ef7d066e3ab747edc971c91a1ef82cda62f6a73f23453b93",
+    "text": "{\n  \"error\": {\n    \"code\": \"INPUT_NOT_JSON\",\n    \"message\": \"Operation failed. `code` names the cause; `option` and `issues`, when present, name where to fix it, and `allowed` what the option takes.\",\n    \"option\": \"catalog\"\n  },\n  \"binding\": false\n}\n"
+  },
+  "files": [
+    {
+      "name": "broken.json",
+      "mode": "644",
+      "content": {
+        "bytes": 1,
+        "sha256": "245843abef9e72e7efac30138a994bf6301e7e1d7d7042a33d42e863d2638811",
+        "text": "["
+      }
+    }
+  ]
+}

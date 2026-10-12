@@ -1,0 +1,24 @@
+{
+  "args": [
+    "catalog",
+    "show",
+    "--catalog",
+    "data/pricing/v3-operating/catalog.review-v11.json",
+    "--kind",
+    "offer",
+    "--query",
+    "offer:creative-managed-service"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 962,
+    "sha256": "4e21abbe55a2f166ac893295581cf5b5258bc2bcba1a48b19f6f46158c4d456f",
+    "text": "{\n  \"binding\": false,\n  \"mode\": \"historical\",\n  \"version\": \"operating-review-2026-10-11-v11\",\n  \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\",\n  \"resolution\": \"candidate\",\n  \"candidates\": [\n    {\n      \"recordId\": \"offer:creative-managed-service\",\n      \"revision\": 1,\n      \"source\": {\n        \"reference\": \"policy:offer-commercial-unit-2026-10-11\",\n        \"effectiveFrom\": \"2026-10-10\",\n        \"effectiveUntil\": \"9999-12-31\",\n        \"status\": \"confirmed\"\n      },\n      \"note\": \"Sold as one managed-service fee: the client sees the service and its price, never its team, hours or roles. Decided with the offer; declared in the catalog on 2026-10-11 after a managed-service quote was scaffolded as role capacity.\",\n      \"kind\": \"offer\",\n      \"value\": {\n        \"offerId\": \"creative-managed-service\",\n        \"label\": \"Managed service of the Creative practice\",\n        \"commercialUnit\": \"managed_service\"\n      }\n    }\n  ]\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}

@@ -1,0 +1,30 @@
+{
+  "args": [
+    "current",
+    "show",
+    "--input",
+    "<tmp>/pointer.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 1851,
+    "sha256": "3a5cd81dcbfc5e0b9ffd740a80cc453759f793f328a22af89c95b459a8363d35",
+    "text": "{\n  \"binding\": false,\n  \"pointerDigest\": \"9f9d4426646fc4c4f26c93472e9c35cfb965ce7d854aefa70cd2244b14600bb9\",\n  \"consistent\": true,\n  \"sources\": {\n    \"catalog\": {\n      \"path\": \"data/pricing/v3-operating/catalog.review-v11.json\",\n      \"status\": \"match\",\n      \"found\": {\n        \"version\": \"operating-review-2026-10-11-v11\",\n        \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\"\n      }\n    },\n    \"policy\": {\n      \"path\": \"data/pricing/v3-operating/resources.review-v11.json\",\n      \"status\": \"match\",\n      \"found\": {\n        \"version\": \"operating-review-2026-10-11-v11\",\n        \"digest\": \"7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406\"\n      }\n    },\n    \"credits\": {\n      \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n      \"status\": \"match\",\n      \"found\": {\n        \"version\": \"operator-screenshots-2026-10-09-v1\",\n        \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n      }\n    }\n  },\n  \"pointer\": {\n    \"schemaVersion\": \"pricing-v3-current/1\",\n    \"updatedAt\": \"2026-10-11\",\n    \"reason\": \"Golden baseline: a pointer that names immutable versions.\",\n    \"catalog\": {\n      \"path\": \"data/pricing/v3-operating/catalog.review-v11.json\",\n      \"version\": \"operating-review-2026-10-11-v11\",\n      \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\"\n    },\n    \"policy\": {\n      \"path\": \"data/pricing/v3-operating/resources.review-v11.json\",\n      \"version\": \"operating-review-2026-10-11-v11\",\n      \"digest\": \"7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406\"\n    },\n    \"credits\": {\n      \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n      \"version\": \"operator-screenshots-2026-10-09-v1\",\n      \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n    }\n  }\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "pointer.json",
+      "mode": "644",
+      "content": {
+        "bytes": 802,
+        "sha256": "2a3dd661a106807551d8f55e070ac0b64fdbf7ce80481fbfd69a3177e17be401",
+        "text": "{\n  \"schemaVersion\": \"pricing-v3-current/1\",\n  \"updatedAt\": \"2026-10-11\",\n  \"reason\": \"Golden baseline: a pointer that names immutable versions.\",\n  \"catalog\": {\n    \"path\": \"data/pricing/v3-operating/catalog.review-v11.json\",\n    \"version\": \"operating-review-2026-10-11-v11\",\n    \"digest\": \"238a60d6eb514f6e15f8c4b7582b7a075222ce4bd02a55ac10e09d7abec3a702\"\n  },\n  \"policy\": {\n    \"path\": \"data/pricing/v3-operating/resources.review-v11.json\",\n    \"version\": \"operating-review-2026-10-11-v11\",\n    \"digest\": \"7ed8b92752fa4818fb2de53655e1a5275ce72bc556df9f41f1129d98ae810406\"\n  },\n  \"credits\": {\n    \"path\": \"data/pricing/v3-resources/ai-credits.review-v1.json\",\n    \"version\": \"operator-screenshots-2026-10-09-v1\",\n    \"digest\": \"6886757643bada2b11cc41df2fa9f62a0edc3587ee00da48cbe2443d05f0cc2d\"\n  }\n}\n"
+      }
+    }
+  ]
+}

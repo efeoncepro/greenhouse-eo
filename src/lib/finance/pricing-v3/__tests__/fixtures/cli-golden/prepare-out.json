@@ -1,0 +1,29 @@
+{
+  "args": [
+    "prepare",
+    "--input",
+    "data/pricing/v3-catalog/examples/designer-co-cl.json",
+    "--out",
+    "<tmp>/selection.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 52871,
+    "sha256": "6a1b266fe3d6c0b5ae2115943631be06952e53e153ac6052cd3c41e4cce90011"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": [
+    {
+      "name": "selection.json",
+      "mode": "600",
+      "content": {
+        "bytes": 52871,
+        "sha256": "6a1b266fe3d6c0b5ae2115943631be06952e53e153ac6052cd3c41e4cce90011"
+      }
+    }
+  ]
+}

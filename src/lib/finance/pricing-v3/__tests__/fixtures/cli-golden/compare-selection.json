@@ -1,0 +1,21 @@
+{
+  "args": [
+    "compare",
+    "--left",
+    "data/pricing/v3-catalog/examples/designer.quote.artifact.json",
+    "--right",
+    "data/pricing/v3-catalog/examples/designer.quote.artifact.json"
+  ],
+  "status": 0,
+  "stdout": {
+    "bytes": 1090,
+    "sha256": "6b4763b7aa882cd8604b8b2d440a73bc7a3f802ed711bbb58b41131f50975828",
+    "text": "{\n  \"binding\": false,\n  \"calculations\": [\n    \"selection-34d01a41a1229925d06fd658\",\n    \"selection-34d01a41a1229925d06fd658\"\n  ],\n  \"before\": {\n    \"cost\": \"3334.00\",\n    \"undiscountedPrice\": \"4334.20\",\n    \"discount\": \"0.00\",\n    \"net\": \"4334.20\",\n    \"marginAmount\": \"1000.20\",\n    \"marginRate\": \"0.23076923076923076923076923076923076923076923076923076923076923076923076923076923\",\n    \"tax\": null,\n    \"grandTotal\": null,\n    \"cashCommitment\": \"3334.00\",\n    \"averageMonthlyNet\": \"1444.73\",\n    \"currency\": \"USD\"\n  },\n  \"after\": {\n    \"cost\": \"3334.00\",\n    \"undiscountedPrice\": \"4334.20\",\n    \"discount\": \"0.00\",\n    \"net\": \"4334.20\",\n    \"marginAmount\": \"1000.20\",\n    \"marginRate\": \"0.23076923076923076923076923076923076923076923076923076923076923076923076923076923\",\n    \"tax\": null,\n    \"grandTotal\": null,\n    \"cashCommitment\": \"3334.00\",\n    \"averageMonthlyNet\": \"1444.73\",\n    \"currency\": \"USD\"\n  },\n  \"comparability\": {\n    \"currencyMatches\": true,\n    \"scopeMatches\": true,\n    \"complete\": true\n  },\n  \"catalogs\": [\n    \"review-2026-10-09-v1\",\n    \"review-2026-10-09-v1\"\n  ]\n}\n"
+  },
+  "stderr": {
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "text": ""
+  },
+  "files": []
+}
