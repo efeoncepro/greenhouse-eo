@@ -1,5 +1,18 @@
 # TASK-2027 — Quoter V3 registry API: quotes, versions, lifecycle and numbering
 
+## Delta 2026-10-12
+
+Diseño de esquema cerrado en el Discovery de `TASK-2025` con la sesión consultora, ya incorporado al cuerpo de esta
+task:
+
+- **Destinataria en tabla propia** (`quoter_quote_recipients`, sólo agregar). Se asigna al crear o después, se puede
+  reasignar mientras la cotización esté en `draft` y queda congelada desde la primera emisión. Operación nueva: 16.
+- **El mismo cálculo dos veces.** La huella no es llave única del registro, pero un cálculo vive en una sola
+  cotización no retirada: registrarlo de nuevo con otra clave responde 409 `artifact_already_registered`.
+- **Sin `dealReference`.** El vínculo con el negocio queda fuera (ver `## Out of Scope`).
+- **Una sola puerta de escritura.** Todo comando escribe por las funciones de `quote-store.ts` de `TASK-2025`, que
+  exigen `command_execution_id`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -270,14 +283,14 @@ Reglas obligatorias:
   - una versión que el kernel marca bajo el piso se emite únicamente si existe su fila en
     `quoter_exception_approvals` para esa versión y esa huella, la emita una persona o un agente;
   - una identidad ligada a una organización sólo ve la proyección apta para cliente de la versión emitida de
-    cotizaciones cuyo `client_organization_id` es el suyo.
+    cotizaciones cuya destinataria vigente (`quoter_quote_recipients`) es la suya.
 - Write-target allowlist: si TASK-2025 dejó un boundary test del dominio, cada tabla que esta task escribe queda
   declarada allí en el mismo PR con su justificación; `quotations*` nunca aparece.
 - Tenant/space boundary: `owner_organization_id` es siempre la organización canónica de Efeonce, resuelta por el
   servidor por referencia estable y nunca tomada del pedido; el alcance de autorización es la identidad interna con
-  su capacidad. `client_organization_id` es contenido validado de la cotización —cliente o potencial cliente—,
-  anulable en un borrador y obligatorio para emitir, y no concede nada a quien lo escribe ni a la organización
-  nombrada (ver «Organización»). Un recurso fuera del alcance responde 404.
+  su capacidad. La destinataria es contenido validado de la cotización —cliente o potencial cliente—, vive en
+  `quoter_quote_recipients`, es opcional en un borrador y obligatoria para emitir, y no concede nada a quien la
+  escribe ni a la organización nombrada (ver «Organización»). Un recurso fuera del alcance responde 404.
 - Idempotency/concurrency: header `Idempotency-Key` obligatorio en todo comando; reclamo en
   `greenhouse_core.api_platform_command_executions` y `request_hash` en las filas del agregado; reclamo, cambio y
   respuesta en una transacción con `executeAtomicApiPlatformCommand`. Concurrencia optimista con `expectedVersion` y,
@@ -425,6 +438,9 @@ Reglas obligatorias:
 
 - Escribir en `greenhouse_commercial.quotations*`, leerlas para calcular, o migrar sus filas.
 - Envío a HubSpot, a Nubox o a cualquier CRM; sincronización de negocio, de líneas o de producto.
+- Vincular una cotización con un negocio (`dealReference`): la identidad no admite cambios, la cotización suele nacer
+  antes que el negocio y la mayoría de los negocios de HubSpot no están en `greenhouse_commercial.deals`. Se diseña
+  con la salida a HubSpot, como asignación de sólo agregar.
 - Render de PDF o HTML en producción, consumidor del `artifact-worker`, catálogo del compositor. El PDF se sigue
   generando en local con `scripts/documents/render-cotizacion-a4.mjs`.
 - Interfaz, pantallas, vistas, herramientas de Nexa y herramientas MCP.
@@ -465,12 +481,13 @@ lector. «Persona» significa compuerta humana: sólo la fila 7 la lleva. Capaci
 | 13 | Reproducir versión | L | `GET /quotes/{quoteId}/versions/{n}/replay` | app, ecosystem | igual que 12 | `verified`, `calculationId`, huella y resumen, como `replay` de la CLI |
 | 14 | Vista previa apta para cliente | L | `GET /quotes/{quoteId}/versions/{n}/preview` | app, ecosystem | `commercial.quoter.quote:read` | `projectCompositionPreview` del artefacto guardado |
 | 15 | Datos del documento | L | `GET /quotes/{quoteId}/versions/{n}/document` | app, ecosystem | `commercial.quoter.quote:read` | documento guardado + hechos del registro |
+| 16 | Asignar destinataria | C | `POST /quotes/{quoteId}/recipient` | app, ecosystem | `commercial.quoter.quote:update` | agrega una fila a `quoter_quote_recipients`; sólo en `draft`; rige la última |
 | 16 | Historial | L | `GET /quotes/{quoteId}/history` | app, ecosystem | igual que 12 | cambios de estado y aprobaciones de excepción, con actor y motivo |
 
 ### Reglas por comando
 
 **Crear y agregar versión (1, 2).** Cuerpo: `input` (la demanda `pricing-v3-composition-demand/1`), `versions`
-opcional con la misma semántica de TASK-2026, `clientOrganizationId` y `dealReference` opcionales (sólo en 1; ver
+opcional con la misma semántica de TASK-2026, `clientOrganizationId` opcional (sólo en 1; ver
 «Organización»), `expectedVersion` obligatorio en 2. El servidor resuelve las fuentes, ejecuta la misma función que
 la operación 9 de TASK-2026 y:
 
@@ -489,8 +506,8 @@ la operación 9 de TASK-2026 y:
   documento de `compose quote` sin `runNotices.output`. No hay número en la respuesta: un borrador no lo tiene.
 
 **Registrar local (3, 4).** Cuerpo: `artifactText` (el artefacto congelado como texto, exactamente los bytes del
-archivo local; el servidor lo guarda tal cual y lo lee de ahí, nunca lo reserializa), `clientOrganizationId` y `dealReference`
-opcionales (sólo en 3), `expectedVersion` en 4. Orden fijo de comprobaciones, la primera que falla corta:
+archivo local; el servidor lo guarda tal cual y lo lee de ahí, nunca lo reserializa), `clientOrganizationId`
+opcional (sólo en 3), `expectedVersion` en 4. Orden fijo de comprobaciones, la primera que falla corta:
 
 1. forma y familia: sólo `pricing-v3-resource-composition/1`; otra familia → 422 `artifact_family_not_accepted`
    (la columna de TASK-2025 admite las tres familias; este comando admite una);
@@ -503,8 +520,12 @@ opcionales (sólo en 3), `expectedVersion` en 4. Orden fijo de comprobaciones, l
 6. se guarda el texto canónico con `origin = 'local'`; el `calculation_id` es el del artefacto y quién registró queda
    en las columnas `registered_by_*`.
 
-Un artefacto registrado dos veces con la misma clave de idempotencia devuelve la misma versión; con otra clave crea
-otra cotización: la huella no es una llave única del registro, porque dos negocios pueden compartir un cálculo.
+Un artefacto registrado dos veces con la misma clave de idempotencia devuelve la misma versión. Con otra clave, si
+ese cálculo todavía vive en una cotización no retirada, responde 409 con el detalle `artifact_already_registered` y la
+referencia a la cotización y la versión existentes; si la única cotización que lo tenía está retirada, crea una nueva.
+La huella no es una llave única del registro (una restricción dejaría sin salida a quien retira un borrador y vuelve
+a registrar): la regla la hace cumplir la función de escritura de TASK-2025, bajo bloqueo. `OUTPUT_EXISTS` nunca
+llega al cliente.
 
 **Guardar documento (5).** Cuerpo: `brief` (`pricing-v3-quote-document-brief/1`), `options` como lista ordenada de
 `{ flag: "option" | "increment", key, quoteId, version }` (máximo 8, por referencia a versiones guardadas de la
@@ -537,7 +558,7 @@ transacción:
 
 - identidad con `commercial.quoter.issue:approve`: una persona con uno de los tres roles o un agente (ver «Autoridad
   para emitir y retirar»). No exige persona;
-- la cotización tiene organización destinataria (`client_organization_id`); si no, 422
+- la cotización tiene organización destinataria (asignada en `quoter_quote_recipients`); si no, 422
   `recipient_organization_required`;
 - estado `draft` o `revising`, y `version` es la última de la cotización;
 - la huella guardada coincide con `artifactDigest` y con la recalculada del texto;
@@ -635,16 +656,17 @@ espera a ninguna persona, y quien puede emitir puede retirar.
   operativa activa; el UUID no se escribe en código. Ninguna ruta acepta `organizationId`, `ownerOrganizationId` ni
   un estado. Con esto queda resuelto el bloqueo del Slice 2: un binding `internal` no trae organización y no la
   necesita. Si la fila no existe o no es la entidad operativa, el comando responde 500 con captura y no escribe.
-- **Destinataria** (`client_organization_id`): contenido de la cotización. Las operaciones 1 y 3 la reciben como
+- **Destinataria** (`quoter_quote_recipients`): contenido de la cotización. Las operaciones 1, 3 y 16 la reciben como
   `clientOrganizationId`; el servidor comprueba que exista en `greenhouse_core.organizations`, que esté activa, que
   no sea la entidad operativa y que su etapa sea `prospect`, `opportunity` o `active_client`; si no, 422
   `recipient_organization_invalid`. No concede ni amplía acceso a quien la escribe ni a la organización nombrada.
-  **Opcional en un borrador, obligatoria para emitir** (operación 8). La identidad de la cotización es inmutable, así
-  que se declara al crear: un borrador sin destinataria no se emite, y para emitir se crea la cotización con ella. Un
-  prospecto que todavía no es una organización se crea antes por la puerta canónica de organizaciones.
+  **Opcional en un borrador, obligatoria para emitir** (operación 8). Se puede asignar al crear o después, y
+  reasignar mientras la cotización esté en `draft` (operación 16): rige la última asignación. Desde la primera emisión
+  queda congelada; asignar entonces responde 409 `recipient_locked`. Un prospecto que todavía no es una organización
+  se crea antes por la puerta canónica de organizaciones.
 - Alcance de lectura: identidad interna con `commercial.quoter.quote:read` (persona o sujeto máquina) → todas las
   cotizaciones, porque la dueña es siempre Efeonce. Identidad ligada a una organización (sesión cliente o binding de
-  organización) → sólo las operaciones 10, 11, 14 y 15, sólo cotizaciones cuyo `client_organization_id` es el suyo y
+  organización) → sólo las operaciones 10, 11, 14 y 15, sólo cotizaciones cuya destinataria vigente es la suya y
   sólo la versión emitida vigente; en 10 y 11 recibe número, versión emitida, fecha de emisión, moneda y estado, sin
   versiones internas, huellas ni origen.
 - Fuera de alcance, inexistente, o no visible para la audiencia: el mismo 404 `not_found`, con el mismo cuerpo.
@@ -691,6 +713,8 @@ evento de solicitud ni de rechazo de excepción porque esos actos no existen. Es
 | Emisión sin documento guardado | 422 | `bad_request` | `document_required` |
 | Emisión de una cotización sin organización destinataria | 422 | `bad_request` | `recipient_organization_required` |
 | Organización destinataria inexistente, inactiva, que es la entidad operativa o que no es cliente ni potencial cliente | 422 | `bad_request` | `recipient_organization_invalid` |
+| El mismo cálculo ya vive en una cotización no retirada | 409 | `quoter_artifact_already_registered` | `artifact_already_registered`, con la cotización y la versión existentes |
+| Asignar destinataria a una cotización que ya fue emitida | 409 | `quoter_invalid_transition` | `recipient_locked` |
 | La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict` |
 | El estado no admite el acto | 409 | `quoter_invalid_transition` | `invalid_transition`, `exception_not_needed` o `exception_already_approved` |
 | Fila bajo el piso y no existe aprobación para esa versión y esa huella | 409 | `quoter_exception_approval_required` | `exception_approval_required` |
@@ -886,7 +910,7 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
       inexistente responden el mismo 404; y ningún rol de cliente recibió una capacidad del cotizador en esta task.
 - [ ] La organización dueña de toda cotización es la canónica de Efeonce, resuelta en una sola función por
       referencia estable, la cree una persona o un agente; ninguna ruta la lee del pedido.
-      `clientOrganizationId` se acepta sólo en las operaciones 1 y 3, se valida contra `greenhouse_core.organizations`
+      `clientOrganizationId` se acepta sólo en las operaciones 1, 3 y 16, se valida contra `greenhouse_core.organizations`
       y no cambia lo que puede ver quien la envía.
 - [ ] Ningún `INSERT`, `UPDATE`, `DELETE` ni `SELECT` del agregado toca `greenhouse_commercial.quotations*`.
 - [ ] Ningún archivo de esta task agrega una llamada a HubSpot, un render de PDF, una pantalla, una tarea en segundo
@@ -967,8 +991,6 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
   destinataria. El esquema guarda el resultado (`data_origin`), no la regla. Es lo único abierto de ese frente.
 - **Excepción sin aprobar.** No hay registro de una solicitud ni de un rechazo. Confirmar que basta con que la
   necesidad se lea del artefacto y con que no aprobar no deje huella.
-- **Asignar la destinataria después de crear.** Hoy sólo se declara al crear (misma pregunta en TASK-2025). No
-  bloquea.
 
 Resueltas por el CEO el 2026-10-12 (ya no abiertas):
 
