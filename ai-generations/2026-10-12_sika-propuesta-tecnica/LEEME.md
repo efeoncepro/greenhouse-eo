@@ -102,3 +102,5 @@ el agua como antagonista. Todo vive en `reel/v2/`:
 Pendiente: llevar cuadros del reel nuevo a la lámina 13 del deck y al storyboard del anexo (página 17), que siguen con el guion anterior.
 
 **v2.1 (12/10), tras la revisión del operador:** la gota se regeneró (`s1b-gota`) para que caiga a velocidad real y la cámara lenta empiece en el impacto (estirar el plano la hacía caer «extrañamente lenta»); la música va en un solo tramo continuo de 25 s (17,45–42,45 de la pista de 43 s), porque los empalmes de la reedición se notaban.
+
+**v2.2 (12/10), línea gráfica:** la capa de motion se genera con `reel/v2/build-overlay.py` (escribe `overlay.html`). Etiquetas de lugar en caja amarilla con texto negro y corte a 13°, «UNO solo.» como campo amarillo con cortes negros, el sello de lanzamiento aprobado (`gen.sello_lanz` del manual, no redibujado) y los titulares sobre panel amarillo. No se usó el triángulo rojo suelto: el manual lo reserva para la firma y el logo.
