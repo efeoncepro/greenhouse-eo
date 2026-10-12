@@ -1,9 +1,9 @@
 # Sika Mexicana · Wherex N.º 1164 · Propuesta técnica (deck 16:9)
 
-**Estado al 12/10/2026:** borrador v2 (19 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
+**Estado al 12/10/2026:** borrador v3 (22 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
 **separado** del anexo gráfico «POSIBLE» (decisión del operador: no se presentan como una sola propuesta).
 
-- 19 láminas, línea Brand (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
+- 22 láminas, línea Brand (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
 - Títulos directos, sin pregunta y respuesta (instrucción del operador del 07/10). Registro formal, de usted.
 - Lienzo (privado): https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5 → página «3 · Propuesta técnica (documento aparte)».
 - PDF: OneDrive `Alineación/4. Comercial/Licitaciones/Sika/2. Campaña Creativa/Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf`.
@@ -25,6 +25,26 @@ python3 build-tecnica.py dc out/canvas/project                                  
 (`src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`) y los recortes del anexo gráfico
 (`pdftoppm -r 192` sobre `Efeonce-Propuesta-Sika-POSIBLE.pdf`; páginas 2, 3, 4, 13, 15–20). El logo de Sika es el archivo
 oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `render.mjs` avisa si un bloque se desborda.
+
+## Orden vigente (v3, 12/10)
+
+1 portada · 2 la idea (Master Graphic a página completa) · 3 cumplimiento · 4 punto de partida · 5 evolución (qué se conserva y
+qué se ordena) · 6 el sistema · 7 el brief, punto por punto · 8 audiencias · 9 muestras · 10 alcance · 11 método ·
+12 lanzamiento tipo · 13 reel · 14 piezas adicionales · 15 plazo · 16 control · 17 equipo · 18 trabajo con México ·
+19 caso Sky · 20 continuidad · 21 inicio · 22 cierre. **Las tablas de abajo conservan la numeración de la v2 (19 láminas).**
+
+Cambios de la v3, pedidos por el operador tras revisar la narrativa contra la ficha: salió el resumen de «tres
+documentos»; el deck abre con el trabajo; la lámina 4 dejó el tono de diagnóstico; se sumaron evolución, el cruce con el
+brief (factores diferenciadores, mensajes clave y tono, secciones 2 y 6 del brief) y continuidad (el brief fija la campaña
+hasta diciembre de 2027).
+
+## El reel como video
+
+`reel/animatic-sin-audio.mp4` es el animatic de 25 s del 06/10 (activo `6e04eb5d…` del lienzo). `reel/mezcla.sh` le monta
+la locución (`vo-1.mp3`, voz «Marco», español de México, ElevenLabs multilingual v2, una toma cortada por sus silencios)
+y la música (`musica.mp3`, ElevenLabs Music v2.5, instrumental) y escribe `reel-sikaseal-170.mp4`. Los dos servidores
+MCP locales de ElevenLabs tienen mal la clave (usan el id de la clave, no la `sk_`): la generación salió por el conector
+de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo `music`).
 
 ## De dónde sale cada dato
 
