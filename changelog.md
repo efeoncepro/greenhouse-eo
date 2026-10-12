@@ -7,6 +7,15 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — Cotizador V3: la CLI lee y escribe a través de un puerto de almacenamiento
+
+- `TASK-2024` (fase 1 de `EPIC-053`): fuentes, puntero y artefactos de `pnpm pricing:v3` pasan por
+  `PricingV3Storage`, con un adaptador de archivos (el modo local de siempre) y uno en memoria. Ninguna salida,
+  código de salida, error ni archivo de la CLI cambió: lo prueba una línea base de 107 comandos capturada antes
+  del cambio. Quien cambie a propósito lo que un comando responde debe volver a capturarla y revisar el diff.
+  `pnpm pricing:v3:test` suma esa línea base, una batería de conformidad sobre los 48 artefactos congelados y una
+  guarda de imports del motor. [Contrato](docs/architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).
+
 ## 2026-10-12 — Prospección B2B: respuesta proporcional tras un diferencial ciego bajo Claude
 
 - Diez escenarios con y sin la skill, calificados a ciegas: la skill evita el alta de contactos sin correo,
@@ -469,9 +478,3 @@ Corrección SKY local: contenido 1.5.0/destino 1.2.0, los 76 badges tarifarios L
 ## 2026-09-30 — Efeonce: demostración contextual como diferenciador comercial
 
 El operador reconoce «hacer que el cliente experimente nuestra capacidad antes de comprarla» como diferenciador. [Metodología](docs/commercial/EFEONCE_VENTA_CON_DEMOSTRACION_CONTEXTUAL_V1.md) documenta Berel, SKY y Pichincha; canon de marca y estrategia, skills Agency/Brand/SEO con espejos y referencias actualizados. Intensidad, presupuestos y métricas siguen propuestas; no se promete conversión ni se cambia el pipeline.
-
-## 2026-09-30 — AEO X-Ray: demo multipieza aceptada, publicada y documentada
-
-- Think conserva y extiende el X-Ray original: landing y artículo por manifiesto, cuatro etapas, radiografía acoplada, oportunidad evidenciada, banners y derivados sociales/video, marcas oficiales, footer, iconografía, transiciones nativas, selector y telón de 1400 ms. Fix productivo de unidades CSS optimizadas `s`/`ms`; 44 checks de apertura pasaron también en producción.
-- Think `be8d484`, deployment `dpl_7AEWYHEiiWWUyCiwrcTj1US1e3vB` READY con alias; entrega comercial autónoma `sample_` aceptada. Foundation Greenhouse/contrato AXIS preparados y probados; migración/grant/runtime compartido pendientes, sin promoción Greenhouse. [Dossier](docs/think/aeo-xray-implementation-dossier-2026-09-30.md), triple documentación, kit multicliente y skills espejo actualizados.
-- HubSpot: deal 65352884246 → Presentación de soluciones por instrucción y readback; brochure alojado en HubSpot, correo previo a reunión redactado con enlaces X-Ray e Insights. Envío del correo no verificado.

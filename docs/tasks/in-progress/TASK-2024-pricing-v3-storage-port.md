@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-053`
-- Status real: `Discovery y plan (2026-10-12); sin código todavía`
+- Status real: `Código y documentación completos (5 slices, 2026-10-12); falta el gate de cierre: pnpm test completo y pnpm build, que requieren autorización del operador`
 - Rank: `EPIC-053-01 (fase 1 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -248,12 +248,12 @@ Reglas obligatorias:
 
 ### Acceptance criteria additions
 
-- [ ] Source of truth, contract surface and consumers are named with real paths or objects.
-- [ ] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
-- [ ] Esta task no crea tablas; no hay allowlist de destinos de escritura que actualizar.
-- [ ] Migration/backfill/rollback posture is explicit and proportional to risk.
-- [ ] Runtime or DB evidence is listed for any change beyond docs/tooling.
-- [ ] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
+- [x] Source of truth, contract surface and consumers are named with real paths or objects.
+- [x] Data invariants, tenant/access boundary and idempotency/concurrency posture are explicit.
+- [x] Esta task no crea tablas; no hay allowlist de destinos de escritura que actualizar.
+- [x] Migration/backfill/rollback posture is explicit and proportional to risk.
+- [x] Runtime or DB evidence is listed for any change beyond docs/tooling.
+- [x] Sensitive domains have canonical errors, audit/signal posture and no raw data leaks.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 2 — PLAN MODE
@@ -467,26 +467,38 @@ Repo-only change. Avisar en `Handoff.md` que la CLI cambió por dentro y cómo s
 
 ## Acceptance Criteria
 
-- [ ] `git diff` de la task no toca `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` ni `errors.ts`, ni ningún
+- [x] `git diff` de la task no toca `src/lib/finance/pricing-v3/calculate.ts`, `schemas.ts` ni `errors.ts`, ni ningún
       archivo bajo `data/pricing/**` o `docs/commercial/**/pricing/`.
-- [ ] Los fixtures dorados de la CLI se capturaron y commitearon antes del primer cambio a
+      Evidencia: `git diff --stat 6b80ac782..HEAD` sobre esas rutas, vacío.
+- [x] Los fixtures dorados de la CLI se capturaron y commitearon antes del primer cambio a
       `scripts/commercial/pricing-v3.ts`, y pasan después del refactor sin haberse regenerado.
-- [ ] La matriz dorada cubre cada familia de comando listada en el Slice 1, los cuatro códigos de salida y los cuatro
+      Evidencia: línea base en `8f87ae6b2`, primer cambio a la CLI en `8e5c2d66b`; 122 de 122 tests del dorado en verde sin regenerar; `git status` de `fixtures/cli-golden` limpio.
+- [x] La matriz dorada cubre cada familia de comando listada en el Slice 1, los cuatro códigos de salida y los cuatro
       rechazos de disco.
-- [ ] `scripts/commercial/pricing-v3.ts` ya no llama a `readFileSync`, `writeFileSync` ni `renameSync` para documentos
+      Evidencia: test «the matrix covers every command family, every exit code and every disk rejection» (107 casos).
+- [x] `scripts/commercial/pricing-v3.ts` ya no llama a `readFileSync`, `writeFileSync` ni `renameSync` para documentos
       de catálogo, política y créditos, puntero y artefactos.
-- [ ] Ningún archivo no-test bajo `src/lib/finance/pricing-v3/**` importa algo distinto de módulos relativos,
+      Evidencia: `grep node:fs scripts/commercial/pricing-v3.ts` sólo encuentra un comentario; todo el acceso a disco está en `pricing-v3-storage-file.ts`.
+- [x] Ningún archivo no-test bajo `src/lib/finance/pricing-v3/**` importa algo distinto de módulos relativos,
       `decimal.js`, `zod` y `node:crypto`, y un test lo hace cumplir.
-- [ ] Ningún archivo bajo `src/` importa `scripts/commercial/pricing-v3-storage-file.ts`.
-- [ ] La batería de conformidad corre contra los tres adaptadores (archivos sobre el repo, archivos sobre temporal,
+      Evidencia: `pricing-v3-purity.test.ts`, 4 tests.
+- [x] Ningún archivo bajo `src/` importa `scripts/commercial/pricing-v3-storage-file.ts`.
+      Evidencia: mismo test, por `git grep`. Se lee como «ningún módulo que no sea un test»: la batería de conformidad vive en `__tests__` y debe correr contra el adaptador (acordado con la sesión consultora).
+- [x] La batería de conformidad corre contra los tres adaptadores (archivos sobre el repo, archivos sobre temporal,
       memoria) y pasa los nueve casos; el caso 1 cubre todos los `*.artifact.json` de `data/pricing/**` y
       `docs/commercial/**`.
-- [ ] El caso 8 calcula ejemplos del repo sobre el adaptador en memoria, sin `node:fs` en el camino bajo prueba, y
+      Evidencia: `pricing-v3-storage-conformance.test.ts`, 33 tests (11 por adaptador); el caso 1 recorre los 48 artefactos.
+- [x] El caso 8 calcula ejemplos del repo sobre el adaptador en memoria, sin `node:fs` en el camino bajo prueba, y
       obtiene la huella del artefacto versionado.
-- [ ] `runStorageConformance` está exportada y documentada como requisito de todo adaptador nuevo.
-- [ ] `pnpm pricing:v3:test` verde, incluida `pricing-v3-frozen-artifacts.test.ts`.
-- [ ] No existe `src/lib/commercial/quoter/` como resultado de esta task.
-- [ ] Documento de arquitectura del puerto, delta funcional y delta del manual publicados.
+      Evidencia: caso 8 sobre memoria; todos los pares demanda/artefacto reproducen el archivo commiteado byte a byte (`DEMANDS_THAT_NO_LONGER_GIVE_THEIR_ARTIFACT` vacío).
+- [x] `runStorageConformance` está exportada y documentada como requisito de todo adaptador nuevo.
+      Evidencia: exportada desde `__tests__/storage-conformance.ts` (módulo auxiliar, no `.test.ts`, para poder importarla sin arrastrar tests) y documentada en `GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md`.
+- [x] `pnpm pricing:v3:test` verde, incluida `pricing-v3-frozen-artifacts.test.ts`.
+      Evidencia: 36 archivos, 1.799 tests en verde (2026-10-12).
+- [x] No existe `src/lib/commercial/quoter/` como resultado de esta task.
+      Evidencia: `ls src/lib/commercial/quoter` no existe.
+- [x] Documento de arquitectura del puerto, delta funcional y delta del manual publicados.
+      Evidencia: `GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md`, delta en `cotizador-v3-superficie-implementada.md` y en `cotizar-v3-por-cli.md`.
 
 ## Verification
 
@@ -520,7 +532,17 @@ Repo-only change. Avisar en `Handoff.md` que la CLI cambió por dentro y cómo s
 
 ## Open Questions
 
-- Operaciones síncronas o asíncronas en el contrato. La CLI es síncrona hoy; el adaptador de servidor será asíncrono.
-  Se decide en Discovery con los fixtures dorados como juez.
-- Si la matriz dorada debe vivir dentro de `pnpm pricing:v3:test` (más lenta, siempre presente) o en un script propio
-  que la suite invoque. Por defecto: dentro, porque la decisión exige esa suite en verde en cada entrega.
+Resueltas en Discovery (2026-10-12), con la sesión consultora:
+
+- **Síncrono o asíncrono:** asíncrono, una sola forma. El adaptador PostgreSQL y el transporte HTTP lo son de todos
+  modos, y la resolución de fuentes debe servir igual a la CLI y al servidor. La CLI pasó de un `try` de nivel
+  superior a una función asíncrona con las cargas en el mismo orden; los fixtures dorados fueron el juez.
+- **Dónde vive la matriz dorada:** dentro de `pnpm pricing:v3:test`. Cada comando tarda entre 0,1 y 0,2 s; el archivo
+  completo, unos 19 s.
+
+Ajustes de firma respecto de la propuesta (las invariantes no cambiaron): `findDocument` como lectura tolerante;
+`readPointer` devuelve `null` si no hay puntero y acepta dirección; `confirmDigest` admite `null`; una identidad
+pedida que no coincide es `INPUT_NOT_FOUND`; una segunda escritura rechaza siempre, también con el mismo contenido.
+
+No cubierto por la línea base: `CURRENT_VERSIONS_MISMATCH` de `--current`, porque el puntero que sigue `--current` es
+siempre el del repositorio y provocarlo exigiría alterarlo. Lo cubre el caso 7b de la batería sobre el puerto.

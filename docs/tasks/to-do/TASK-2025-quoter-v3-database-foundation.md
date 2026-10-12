@@ -1,5 +1,39 @@
 # TASK-2025 — Cotizador V3: base de datos del catálogo por huella y del registro de cotizaciones
 
+## Delta 2026-10-12
+
+`TASK-2024` entregó el contrato `PricingV3Storage` y la batería `runStorageConformance`. Documento vigente:
+[`GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md`](../../architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md). Lo que
+difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar la batería:
+
+- **Operaciones asíncronas**, todas. Además de las previstas hay `findDocument` (lectura tolerante, sin verificar,
+  para los veredictos sobre el puntero) y `readPointer` devuelve `null` cuando no hay puntero.
+- **Identidad de un documento** = rol + versión + huella del documento **ya validado por su rol**
+  (`identifyDocument`). `readDocument` con identidad entrega ese documento o `INPUT_NOT_FOUND`: en PostgreSQL es una
+  búsqueda por `(role, version, document_digest)` que encuentra o no encuentra. El texto canónico de un documento
+  fuente es `stableJson(documento validado)`; la batería sólo exige identidad para documentos, no bytes, así que
+  guardar ese canónico la pasa.
+- **Un artefacto se devuelve byte a byte como se escribió** (casos 1 y 2 de la batería). El texto que recibe
+  `writeArtifact` es el que la CLI escribe, con sangría y con el orden de claves de la corrida; `stableJson` ordena
+  las claves y ese orden no se recupera. Guardar `stableJson(artefacto)`, como dice hoy la tabla de `## Detailed
+  Spec`, **no pasa la batería** y rompería la paridad byte a byte entre transportes de `TASK-2028`. Recomendación:
+  guardar el texto recibido tal cual, con `artifact_digest` = sha256 de ese texto (comprobable por la base) y
+  `replay_digest` como identidad. Decidir con la sesión consultora antes de fijar el esquema.
+- **El puntero viaja como texto opaco** (caso 7): `readPointer` devuelve el texto que se escribió. `pointer_digest`
+  = `currentVersionsDigest(puntero)` no es el sha256 de ese texto, así que la comprobación en la base necesita una
+  huella del texto aparte, o guardar el puntero tal cual y verificar `pointer_digest` en el adaptador.
+- **Nada se reemplaza, tampoco con el mismo contenido**: una segunda escritura sobre la misma identidad es siempre
+  `OUTPUT_EXISTS`. Ese código no debe llegar a un cliente HTTP: el importador y los comandos del registro preguntan
+  antes (`findDocument`) y resuelven la idempotencia por encima del puerto.
+- **`replacePointer({ text, confirmDigest })`**: `confirmDigest` es la huella del puntero que se reemplaza o `null`
+  si no se espera ninguno; la comprobación y el reemplazo son un solo acto dentro del adaptador (control optimista).
+- **La batería se importa, no se copia**: `runStorageConformance({ name, empty })` desde
+  `src/lib/finance/pricing-v3/__tests__/storage-conformance.ts`. `empty()` entrega un almacén vacío por llamada y
+  `locator(path)` la dirección que el adaptador da a lo que el repositorio tiene en esa ruta (`undefined` si no usa
+  ninguna). El caso 8 escribe varias versiones de fuentes y mueve el puntero varias veces sobre el mismo almacén.
+- El adaptador de archivos vive en `scripts/commercial/pricing-v3-storage-file.ts`; ningún módulo de `src/` que no
+  sea un test puede importarlo (`pricing-v3-purity.test.ts`).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"

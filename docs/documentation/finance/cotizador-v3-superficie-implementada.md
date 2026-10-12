@@ -1455,6 +1455,30 @@ congelado lleva sus tres fuentes dentro y nunca lo sigue; por eso las versiones 
 El presupuesto IA separado posee su propio formato: no es una quote válida para replay.
 [Mantenimiento completo](cotizador-v3-mantenimiento-catalogo.md).
 
+### Por dentro, la CLI lee y escribe a través de un puerto (2026-10-12)
+
+Desde el 2026-10-12 (`TASK-2024`, primera fase de llevar V3 a la plataforma) la CLI ya no abre archivos por su cuenta.
+Lo que lee y escribe de forma duradera —catálogo, policy y catálogo de créditos, el puntero de versiones vigentes y
+los artefactos congelados— pasa por un contrato de almacenamiento con un adaptador de archivos debajo. La razón es la
+plataforma: una API no puede leer los JSON del repositorio, así que tendrá su propio adaptador sobre la base de datos,
+y el código que resuelve «lo vigente» será el mismo en los dos casos.
+
+**Qué no cambió.** Nada de lo que ve quien cotiza: los mismos comandos y flags, la misma salida, los mismos códigos de
+salida (`0`, `1`, `2`, `3`), los mismos errores, y los mismos archivos con el mismo contenido y los mismos permisos
+(lo que la CLI congela es privado; el puntero no). `--out` sigue sin sobrescribir nunca. El modo local sobre archivos
+no es transitorio: es el modo de la CLI y se conserva cuando exista la plataforma.
+
+**Cómo se sabe.** Antes de tocar la CLI se fijó su comportamiento en una línea base de 107 comandos: qué imprime, qué
+código de salida da y qué archivo escribe cada uno. Después del cambio esa línea base pasa sin haberse regenerado.
+Aparte, una batería comprueba que los 48 artefactos congelados del repositorio se leen byte a byte y se reproducen con
+la misma huella a través del contrato, también sobre un almacén en memoria que no toca el disco. Ambas corren dentro
+de `pnpm pricing:v3:test`.
+
+**Qué significa si esa línea base se pone roja.** Que algo cambió en lo que la CLI responde. Si el cambio era
+buscado (un comando nuevo, un texto de ayuda), la línea base se vuelve a capturar y se revisa el diff; si no lo era,
+es una regresión. Detalle técnico y comando en el
+[documento del puerto](../../architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).
+
 ## Evaluación, salidas y límites
 
 `compose assess` separa completitud matemática de evidencia: salario localizado, provisiones medidas,

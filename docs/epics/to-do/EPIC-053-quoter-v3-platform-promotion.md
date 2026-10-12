@@ -230,6 +230,11 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
       nada sale hacia HubSpot.
 - [ ] **Fase 1 (`TASK-2024`).** Suite de V3 en verde; todos los artefactos del repo se recalculan idénticos a través
       del puerto; ninguna salida de la CLI cambió respecto de la línea base.
+      Evidencia del 2026-10-12, con la task todavía sin cerrar: `pnpm pricing:v3:test` 36 archivos y 1.799 tests en
+      verde; los 48 artefactos se leen byte a byte y se reproducen con su huella por los tres adaptadores
+      (archivos sobre el repo, archivos sobre una carpeta llenada por el puerto, memoria); la línea base de 107
+      comandos, capturada antes de tocar la CLI, pasa sin regenerar un fixture. Falta el gate de cierre de la task
+      (`pnpm test` completo), que requiere autorización del operador; la casilla se marca al cerrarla.
 - [ ] **Fase 2 (`TASK-2025`).** Catálogo vigente importado; huellas en la base iguales a las del repo; un artefacto
       guardado se lee con la misma huella.
 - [ ] **Fase 3 (`TASK-2026`).** Paridad en staging: cada ejemplo del repo da la misma huella por la API.
