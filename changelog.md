@@ -15,6 +15,20 @@
   en las guías del operador. [ADR](docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md)
   y [canary real](docs/audits/creative-studio/BYTEPLUS_DIRECT_CONNECTION_2026-10-12.md). Sin promoción de Globe,
   deploy ni compra/clonación de voces.
+- [Precios API Seedance 2.5](docs/audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md):
+  30 s 1080p, BytePlus US$17,06 frente a Fal/Higgsfield base US$34,12; descuento final HF sin confirmar.
+- [Nexa cine, Pro directo vs Sunburst max](docs/audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md):
+  una salida nativa por motor, mismos brief/referencias; Pro útil para variantes, Sunburst más fiel a la acción.
+  Espera HTTP de imágenes BytePlus 600 s, sin retry; primer timeout con consumo sin confirmar. Sin publicación.
+- [Cuatro iconos Flare max/Pro standard](docs/audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
+  ocho PNG nativos 2048², mismos prompts; Flare conserva mejor mate/detalle, Pro US$0,081 por icono con
+  material a revisar. Comparación interna, fondo opaco; sin adopción de glifos ni cambio de UI.
+  Segunda tanda clay 3D: ambos mantienen mate, Pro modelado más artesanal y Flare formas más regulares;
+  ocho originales nuevos, prompts/recibos/costos guardados sin sustituir los anteriores.
+- [Iconos nuevos Efeonce mate uniforme](docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md):
+  binoculares, metrónomo, sello e imán, bases planas aprobadas; prueba Flare/Pro con originales y alfa derivado.
+  Ajuste adicional Pro y avisos geométricos documentados. Operador seleccionó Flare para esta ronda;
+  comparación preservada, sin publicación del catálogo ni cambio del default global.
 
 ## 2026-10-12 — Medios: composición integral y operación programática acompañada
 

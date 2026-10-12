@@ -1,0 +1,28 @@
+{
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--image",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/binoculares.png",
+    "--prompt-file",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/surface-finish.txt",
+    "--input-file",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-input.json",
+    "--out",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/binoculares.png",
+    "--out-dir",
+    "ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/receipts-smooth/binoculares",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "elapsedSeconds": 134.67244005203247,
+  "exitCode": 0,
+  "parent": "seedream/binoculares.png",
+  "delta": "material microtexture only"
+}

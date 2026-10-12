@@ -1,5 +1,8 @@
 # El criterio de la órbita: cuándo, cómo, con qué y por qué
 
+> Delta mate uniforme verificado contra: petición y aprobación de cuatro bases planas por el operador,
+> AXIS `de34866` y catálogo live de 134 entradas — 2026-10-12. Prueba de nuevos volúmenes, sin alta/publicación.
+
 > Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` + `5346761` (paquete 0.4.28, tag `v0.4.28`) — 2026-10-09; corrige el endoso «by efeonce» de §6.
 
 > Delta Rooms verificado contra: decisión explícita del operador y fuentes de axis-design-system@f4dd2fe — 2026-10-07; revisión documental, sin implementación ni release Rooms. Los sellos anteriores conservan su ámbito histórico.
@@ -488,6 +491,10 @@ sexta: es no usar órbita.
     operador dice «los clay» se refiere a Plastilina; el nombre canónico es **Plastilina** (en inglés, «Plasticine»), y
     el volumen es una capa suya, no una voz nueva. Las librerías «Clay 3D» del equipo en OneDrive son otra cosa
     (ilustración genérica para propuestas) y no se mezclan con Plastilina en una pieza.
+  - **Mate uniforme, prueba 2026-10-12:** el operador pidió superficie lisa y homogénea, sin grano, poros, huellas
+    ni marcas de modelado, en iconos nuevos de Efeonce. Se conserva volumen blando, paleta y esfera de Brand;
+    se añade esa instrucción al prompt canónico, sin reescribirlo. Las bases planas se aprobaron antes del 3D.
+    No cambia los PNG existentes ni canoniza los nuevos volúmenes. [Prueba y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md).
   - **Errores típicos:** generarlo de nuevo dentro de una pieza en vez de usar el PNG aprobado · dos objetos en volumen
     en la misma pieza · el volumen como viñeta o en una fila de servicios · un objeto nuevo inventado directo en 3D ·
     extruir el vector (sale plano, una «galleta»: rechazado por el operador).

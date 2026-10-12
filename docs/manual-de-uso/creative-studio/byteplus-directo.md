@@ -38,6 +38,12 @@ no implican preservación de todos los píxeles ni un PSD con texto/vector edita
 La caché incluye proveedor, modelo, digest de entrada, resolución y prompt. Una corrida recibida sin documento
 completo no se vuelve a cobrar automáticamente; se conserva un recibo y exige revisión o `--force` explícito.
 
+Las solicitudes de imagen esperan hasta 600 s: Pro standard con varias referencias tardó 227 s en una
+prueba real. Un timeout no prueba que BytePlus haya cancelado o dejado de cobrar. No hay retry automático;
+volver a ejecutar es otra solicitud. [Nexa cine: Pro máximo frente a Sunburst max](../../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md).
+[Cuatro iconos frente a Flare max](../../audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
+ocho PNG nativos 2048² verificados, sin alfa en esa prueba de fondo opaco; Pro US$0,081 por icono.
+
 Tarifas observadas 2026-10-12, estimadas, no settlement: Flash US$0,018 por salida/capa; Pro US$0,0405/0,081
 por imagen y US$0,02025/0,0405 por capa según área ≤/>2,61 millones de píxeles. Se incluye la base; cada capa
 se calcula por su tamaño real. El número de capas varía: la cota usa 17 salidas al tier mayor. Lite US$0,0315,
@@ -66,6 +72,13 @@ Las salidas se guardan localmente antes de que venza la URL. Los recibos no guar
 Las tarifas estimadas salen del catálogo de la cuenta. Con video de entrada hay mínimos de tokens variables:
 no se inventa una cota. `--max-usd` sólo opera sobre una estimación conocida y no es un límite impuesto a BytePlus.
 `usage.completion_tokens` de la respuesta es la evidencia de consumo; estimación y factura son hechos distintos.
+
+## Comparación de costos de Seedance 2.5
+
+Para 30 s, 16:9, sin video de entrada: **720p US$6,93** y **1080p US$17,06** por BytePlus con la tarifa
+de cuenta; Fal y la tarifa base de Higgsfield API dan US$13,87 / US$34,12. Descuento final de Higgsfield no
+confirmado; el conector por créditos no forma parte de esta comparación.
+[Fuente, fórmula y límites del estimador local](../../audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md).
 
 ## Audio, voz y ASR
 

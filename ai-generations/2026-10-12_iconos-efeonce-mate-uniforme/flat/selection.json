@@ -1,0 +1,42 @@
+[
+  {
+    "variant": "binoculares-v2",
+    "key": "binoculares",
+    "label": "Binoculares",
+    "use": "exploración, perspectiva y descubrimiento",
+    "dot": [
+      15.96,
+      31.56
+    ]
+  },
+  {
+    "variant": "metronomo-v1",
+    "key": "metronomo",
+    "label": "Metrónomo",
+    "use": "ritmo y continuidad editorial",
+    "dot": [
+      29.5,
+      13.7
+    ]
+  },
+  {
+    "variant": "sello-aprobacion-v1",
+    "key": "sello-aprobacion",
+    "label": "Sello de aprobación",
+    "use": "revisión y aprobación creativa",
+    "dot": [
+      20.5,
+      34
+    ]
+  },
+  {
+    "variant": "iman-v1",
+    "key": "iman",
+    "label": "Imán",
+    "use": "atracción y afinidad",
+    "dot": [
+      26,
+      18
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+{
+  "lane": "seedream",
+  "icon": "metronomo",
+  "elapsedSeconds": 56.847869873046875,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/metronomo.txt",
+    "--input-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-input.json",
+    "--image",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/metronomo.png",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/metronomo.png",
+    "--out-dir",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/receipts/metronomo",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/metronomo.png"
+}

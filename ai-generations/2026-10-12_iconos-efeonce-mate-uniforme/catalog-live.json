@@ -1,0 +1,3667 @@
+{
+  "schema": "axis.efeonce-iconography.v1",
+  "title": "Iconografía de La órbita — Trazo y Plastilina",
+  "status": "canonical",
+  "page": "/references/iconography/",
+  "guide": "docs/agent-composition/iconography.md",
+  "package": {
+    "name": "@efeoncepro/axis-graphic-line",
+    "subpath": "@efeoncepro/axis-graphic-line/icons",
+    "since": "0.4.0",
+    "current": "0.17.0",
+    "versionSource": "workspace",
+    "publication": "Verify the installed package or registry before consumption."
+  },
+  "tokens": {
+    "path": "efeonceGraphicLine.icons",
+    "package": "@efeoncepro/axis-tokens",
+    "values": {
+      "status": "canonical",
+      "background": "#001a33",
+      "paper": "#f7f8f6",
+      "ink": {
+        "onDark": "#ffffff",
+        "onLight": "#023c70"
+      },
+      "voiceByLine": {
+        "growth": "stroke",
+        "brand": "plastilina",
+        "engine": "stroke",
+        "voice": null,
+        "revenue-hubspot": "stroke",
+        "revenue-salesforce": "stroke"
+      },
+      "stroke": {
+        "grid": 24,
+        "margin": 2,
+        "guides": {
+          "circleRadius": 10,
+          "square": 18,
+          "rectangle": [
+            20,
+            16
+          ]
+        },
+        "width": 1.5,
+        "smallWidth": 1.75,
+        "smallMaxPx": 20,
+        "capFromPx": 64,
+        "maxScreenPx": 4,
+        "sphereRadius": 1.75,
+        "sphereClearance": 0.5,
+        "responseMinPx": 20,
+        "qaSizesPx": [
+          64,
+          32,
+          24,
+          20
+        ]
+      },
+      "plastilina": {
+        "grid": 48,
+        "targetArea": 560,
+        "maxRadius": 22.5,
+        "sphereRadius": 3.4,
+        "knockRadius": 4.5,
+        "gestureWidth": 2.8,
+        "gestureStrokes": [
+          2,
+          5
+        ],
+        "contentWidth": 2.6,
+        "minPx": 32,
+        "qaSizesPx": [
+          160,
+          64,
+          32
+        ],
+        "generation": {
+          "model": "gpt-image-2",
+          "size": "1024x1024",
+          "grid": "3x3",
+          "colors": "solo fondo liso y blanco puro; sin naranja ni puntos",
+          "vectorize": {
+            "upscale": 3,
+            "whiteThreshold": 150,
+            "connectivity": 4,
+            "minComponentPx": 60,
+            "maxOrangeRatio": 0.5,
+            "potrace": [
+              "-s",
+              "--flat",
+              "-t",
+              "40",
+              "-a",
+              "1.15",
+              "-O",
+              "0.6"
+            ]
+          }
+        }
+      },
+      "skewedOrbit": {
+        "tiltDeg": -16,
+        "heightRatio": 0.3333333333333333,
+        "knockPx": 12,
+        "ringOpacity": 0.22,
+        "ringPx": 2.4,
+        "arcPx": 3.8,
+        "arcFromDeg": 118,
+        "arcToDeg": 52,
+        "sphereRadiusPx": 8.3,
+        "sphereKnockRadiusPx": 12.5,
+        "baseWidthPx": 1080,
+        "minObjectPx": 320,
+        "perPiece": 1
+      },
+      "volume": {
+        "status": "canonical",
+        "line": "brand",
+        "state": "response",
+        "sizePx": 1024,
+        "minPx": 160,
+        "perPiece": 1,
+        "generation": {
+          "model": "gpt-image-2.5-sunburst",
+          "quality": "high",
+          "referencePx": 760,
+          "background": "#001a33"
+        },
+        "key": {
+          "from": 28,
+          "to": 95,
+          "frameSamplePx": 24
+        },
+        "qa": {
+          "minIoU": 0.75,
+          "sameHoles": true,
+          "sameParts": true
+        }
+      }
+    }
+  },
+  "lines": [
+    {
+      "key": "growth",
+      "name": "Efeonce",
+      "accentOnDark": "#36c8bf",
+      "accentOnLight": "#0e8c82",
+      "voice": "stroke"
+    },
+    {
+      "key": "brand",
+      "name": "Servicios creativos",
+      "accentOnDark": "#ff6500",
+      "accentOnLight": "#bb1954",
+      "voice": "plastilina"
+    },
+    {
+      "key": "engine",
+      "name": "Web, infraestructura, SEO y medición",
+      "accentOnDark": "#0375db",
+      "accentOnLight": "#0375db",
+      "voice": "stroke"
+    },
+    {
+      "key": "voice",
+      "name": "Medios y distribución",
+      "accentOnDark": "#f83902",
+      "accentOnLight": "#f83902",
+      "voice": null
+    },
+    {
+      "key": "revenue-hubspot",
+      "name": "RevOps y CRM · HubSpot",
+      "accentOnDark": "#e86bd0",
+      "accentOnLight": "#8e1b82",
+      "voice": "stroke"
+    },
+    {
+      "key": "revenue-salesforce",
+      "name": "RevOps y CRM · Salesforce",
+      "accentOnDark": "#2fb8ff",
+      "accentOnLight": "#00739e",
+      "voice": "stroke"
+    }
+  ],
+  "api": {
+    "catalogRouting": "Each catalog entry declares package and renderer. Use that renderer with its key; candidates are not accepted by the canonical resolveIcon API.",
+    "resolveSeoIcon": "From @efeoncepro/axis-graphic-line/icons/seo: resolveSeoIcon({ glyph, state?, size?, line?, surface?, label? }) → { svg, status, warnings, … }; includes authority candidates.",
+    "resolveIcon": "resolveIcon({ glyph, state?: \"rest\"|\"response\", size?: px, line?, surface?: \"dark\"|\"light\", gesture?, label? }) → { svg, state, warnings, … }",
+    "iconSvg": "iconSvg(request) → string (sólo el SVG)",
+    "auditIconGroup": "auditIconGroup(items, { pieceHasSphere? }) → { ok, issues[{ code, message }] }",
+    "skewedOrbitHeroSvg": "skewedOrbitHeroSvg({ glyph, line, width, height, object: { x, y, size }, gesture? }) → string",
+    "iconVoiceForLine": "iconVoiceForLine(line) → \"stroke\" | \"plastilina\" | null",
+    "strokeSphereClearance": "strokeSphereClearance({ response, dot }, width?) → aire en unidades de la grilla 24"
+  },
+  "commands": {
+    "export": "pnpm icons:export -- --out <dir> [--line <línea>] [--surface dark|light] [--size <px>]",
+    "check": "pnpm icons:check -- --glyph <glifo.json> --out <dir>",
+    "vectorize": "pnpm icons:vectorize -- --sheet <hoja.png> --names a,b,c,... --out <dir>"
+  },
+  "generation": {
+    "styleReference": "/media/iconography/plastilina-style-reference.webp",
+    "styleReferenceSource": "docs/agent-composition/iconography/plastilina-style-reference.png",
+    "prompt": "/media/iconography/plastilina-prompt.txt"
+  },
+  "volume": {
+    "status": "canonical",
+    "tokens": "efeonceGraphicLine.icons.volume",
+    "package": {
+      "name": "@efeoncepro/axis-brand-assets",
+      "api": "volumeIconUrl(glyph) · findVolumeIcon(glyph) · AXIS_VOLUME_ICONS",
+      "since": "0.3.2"
+    },
+    "prompt": "/media/iconography/volume-prompt.txt",
+    "promptSource": "docs/agent-composition/iconography/volume-prompt.txt",
+    "commands": "pnpm icons:volume -- refs|key|check|publish",
+    "use": [
+      {
+        "use": "Sí",
+        "where": "Momentos protagonistas: portada, key visual, pieza social con un solo objeto, escenario, merch y el objeto en escena."
+      },
+      {
+        "use": "Sí",
+        "where": "Sobre cualquier fondo: el PNG trae alfa, con los calados abiertos."
+      },
+      {
+        "use": "No",
+        "where": "Listas, tablas, navegación, contenido de deck, dashboards ni UI: ahí van el plano o el Trazo."
+      },
+      {
+        "use": "No",
+        "where": "Mezclado con Plastilina plana o con el Trazo en el mismo grupo; una pieza lleva un solo volumen."
+      },
+      {
+        "use": "No",
+        "where": "Más chico que el mínimo: bajo ese tamaño se lee mejor el plano."
+      },
+      {
+        "use": "No",
+        "where": "Una forma nueva generada directo en 3D: primero entra al set plano; el volumen se genera desde ese vector."
+      }
+    ],
+    "method": [
+      {
+        "title": "Referencia desde el vector",
+        "body": "pnpm icons:volume -- refs pinta el ícono plano aprobado en respuesta (con su gesto si lo tiene) a 760 px sobre el fondo navy, centrado en 1024."
+      },
+      {
+        "title": "Genera con el prompt canónico",
+        "body": "Edición de imagen con la referencia y docs/agent-composition/iconography/volume-prompt.txt, sin cambiarlo: el modelo pone volumen y arcilla mate, nunca otra forma. Hoy, GPT Image 2.5 Sunburst en high, 1024 × 1024 (la familia 2.5 no acepta input_fidelity: la fidelidad la da el prompt). Si un detalle falla, agrega UNA línea que lo nombre (el laptop necesitó «la pantalla es sólida, sus ranuras atraviesan»)."
+      },
+      {
+        "title": "Recorta por color",
+        "body": "pnpm icons:volume -- key saca el alfa contra el fondo liso. Nunca un recorte con IA: rellena los calados y deja semitransparente una esfera suelta."
+      },
+      {
+        "title": "Revisa contra el plano",
+        "body": "pnpm icons:volume -- check mide la silueta, los calados y las piezas. Un aviso no es un rechazo: se mira al 100 %. Se rechaza si la forma se reinventó, si un calado se volvió relieve o si figura y fondo se invirtieron."
+      },
+      {
+        "title": "Publica sellado",
+        "body": "pnpm icons:volume -- publish comprime, copia a @efeoncepro/axis-brand-assets (volume/<glifo>.png) y al Lab, y sella el hash. La prueba del paquete falla si un PNG cambia sin sellar."
+      }
+    ],
+    "review": [
+      {
+        "glyph": "laptop",
+        "note": "Tercera pasada: pantalla sólida con ranuras pasantes. Queda algo menos inclinado que el plano (silueta 0,44)."
+      },
+      {
+        "glyph": "escritorio",
+        "note": "La perspectiva y el grosor bajan la silueta (0,64); la forma es la misma."
+      },
+      {
+        "glyph": "telefono",
+        "note": "Igual que escritorio (0,73)."
+      },
+      {
+        "glyph": "pluma",
+        "note": "La barra superior se une a la plumilla."
+      },
+      {
+        "glyph": "tijeras",
+        "note": "Las hojas se unen en el pivote, como en unas tijeras reales."
+      },
+      {
+        "glyph": "megafono",
+        "note": "El anillo de la esfera queda como un hueco dentro de la campana."
+      },
+      {
+        "glyph": "audifonos",
+        "note": "Los auriculares se unen al arco."
+      },
+      {
+        "glyph": "lampara",
+        "note": "Oficio (D25). Segunda pasada: la primera dejó un anillo inclinado alrededor de la esfera, como un planeta; se agregó una línea que lo nombra."
+      },
+      {
+        "glyph": "trofeo",
+        "note": "Oficio (D25). La esfera se apoya en la copa: su anillo calado desaparece y queda una pieza menos."
+      },
+      {
+        "glyph": "lapiz",
+        "note": "Oficio (D25). La virola suma una ranura; la forma es la misma."
+      },
+      {
+        "glyph": "varita",
+        "note": "Oficio (D25). El anillo de la esfera queda como hueco en la estrella."
+      },
+      {
+        "glyph": "chispa",
+        "note": "IA y social (D26). El destello chico con su esfera cambia la proporción (silueta 0,60); se lee como chispa."
+      },
+      {
+        "glyph": "gorra",
+        "note": "IA y social (D26). Las costuras del plano se funden en el volumen."
+      },
+      {
+        "glyph": "aro-de-luz",
+        "note": "IA y social (D26). El aro y el soporte se juntan; el teléfono queda al centro."
+      },
+      {
+        "glyph": "mano",
+        "note": "Desliza (D29). La esfera se funde con la punta del dedo: piezas 3 → 2; la flecha queda entera."
+      }
+    ],
+    "assets": [
+      {
+        "glyph": "rayo",
+        "label": "Rayo",
+        "gesture": true,
+        "size": 1024,
+        "png": "volume/rayo.png",
+        "sha256": "536d7ca2061eee6b9616e417d0e359407bc8ba1bb368c0e5abf54b640e18a0b7",
+        "url": "/media/iconography/volume/rayo.png"
+      },
+      {
+        "glyph": "paleta",
+        "label": "Paleta",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/paleta.png",
+        "sha256": "558c39b4f3fcb1aa7ed5bd7b1a35857b45067d9e225e080a0733186f60224492",
+        "url": "/media/iconography/volume/paleta.png"
+      },
+      {
+        "glyph": "pincel",
+        "label": "Pincel",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/pincel.png",
+        "sha256": "f2c04af46914c74d111c89c78c5717f645ba4c27e2697b3c8c39d832003219fb",
+        "url": "/media/iconography/volume/pincel.png"
+      },
+      {
+        "glyph": "cuentagotas",
+        "label": "Cuentagotas",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/cuentagotas.png",
+        "sha256": "4e76c4c226ed73544d9ac645ffbfd303ec7cb9f119f88061db9127e1915c89cd",
+        "url": "/media/iconography/volume/cuentagotas.png"
+      },
+      {
+        "glyph": "bombillo",
+        "label": "Bombillo",
+        "gesture": true,
+        "size": 1024,
+        "png": "volume/bombillo.png",
+        "sha256": "f5ca284ac86d617ceb592aebf2197f8ac7b8cf1b1168b4195532c28b33356622",
+        "url": "/media/iconography/volume/bombillo.png"
+      },
+      {
+        "glyph": "tablet",
+        "label": "Tablet",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/tablet.png",
+        "sha256": "b6ff41cfb0eeae02b96a07005a1aa9ab5c31a1b580fe2065cb83f4e6ae34c109",
+        "url": "/media/iconography/volume/tablet.png"
+      },
+      {
+        "glyph": "laptop",
+        "label": "Laptop",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/laptop.png",
+        "sha256": "48613937b2ae42b3fd359a6a3d3f43f36edec6200c00cc5c7387d767fa0f0f7a",
+        "url": "/media/iconography/volume/laptop.png"
+      },
+      {
+        "glyph": "escritorio",
+        "label": "Mac de escritorio",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/escritorio.png",
+        "sha256": "b80af54ebd5316564a756140ccb68293a5b315de3091da43c150d3736d31ff30",
+        "url": "/media/iconography/volume/escritorio.png"
+      },
+      {
+        "glyph": "telefono",
+        "label": "Teléfono",
+        "gesture": true,
+        "size": 1024,
+        "png": "volume/telefono.png",
+        "sha256": "4264a54ac070f9aa09563ce9ceaca037725db589e98388fe9d49541dd9e4868e",
+        "url": "/media/iconography/volume/telefono.png"
+      },
+      {
+        "glyph": "camara",
+        "label": "Cámara",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/camara.png",
+        "sha256": "08e6cfba65ad79dd41f11760f82f65809dccd452bc15a088d92692ca12bc9f7b",
+        "url": "/media/iconography/volume/camara.png"
+      },
+      {
+        "glyph": "claqueta",
+        "label": "Claqueta",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/claqueta.png",
+        "sha256": "f97cf75f731324c860bb0851158cd0dde12370bd550eae143a869a727f36f013",
+        "url": "/media/iconography/volume/claqueta.png"
+      },
+      {
+        "glyph": "microfono",
+        "label": "Micrófono",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/microfono.png",
+        "sha256": "cf1a43d89efe53a6feeab980312d714ef59f372ca3dfc4e3ef18f4d361d7d5d5",
+        "url": "/media/iconography/volume/microfono.png"
+      },
+      {
+        "glyph": "pluma",
+        "label": "Pluma vectorial",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/pluma.png",
+        "sha256": "eede4dc8544eb46cfe8aa686b0571b7366e95231cb442dd4314e9047493d7d1b",
+        "url": "/media/iconography/volume/pluma.png"
+      },
+      {
+        "glyph": "cursor",
+        "label": "Cursor",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/cursor.png",
+        "sha256": "1814398c14ea083bccf452b7fb637a50a9a3416b922b4535bc774b811ea73354",
+        "url": "/media/iconography/volume/cursor.png"
+      },
+      {
+        "glyph": "tijeras",
+        "label": "Tijeras",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/tijeras.png",
+        "sha256": "ea41d181b430c7786216dd0d89a0148f6d21903a5f5a8e4dfdfbb97039e82791",
+        "url": "/media/iconography/volume/tijeras.png"
+      },
+      {
+        "glyph": "megafono",
+        "label": "Megáfono",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/megafono.png",
+        "sha256": "d7091a4f1f7895a36176c6e61b209c8c84b2bb6806a32c8f44f26ac223cca14e",
+        "url": "/media/iconography/volume/megafono.png"
+      },
+      {
+        "glyph": "audifonos",
+        "label": "Audífonos",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/audifonos.png",
+        "sha256": "43b79c093734b67cf6485c17845277e38f90538d857cf4531fb33960ba37fdb8",
+        "url": "/media/iconography/volume/audifonos.png"
+      },
+      {
+        "glyph": "corazon",
+        "label": "Corazón",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/corazon.png",
+        "sha256": "c9140fef9d71a7ad8ecff96610a07c50a4d0b656b4faeff36b0040b0fc171333",
+        "url": "/media/iconography/volume/corazon.png"
+      },
+      {
+        "glyph": "lapiz",
+        "label": "Lápiz",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/lapiz.png",
+        "sha256": "4b3e5ad0cc6f3a7f02293c5939986895a274f8ce9b03577e968bef8a71a172ae",
+        "url": "/media/iconography/volume/lapiz.png"
+      },
+      {
+        "glyph": "rodillo",
+        "label": "Rodillo",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/rodillo.png",
+        "sha256": "348fa1cf7148f33fd8ccac6c141350a4120f88124bef9abb3fd285b0be6e6acf",
+        "url": "/media/iconography/volume/rodillo.png"
+      },
+      {
+        "glyph": "aerosol",
+        "label": "Aerosol",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/aerosol.png",
+        "sha256": "caa8a124c067fa68a6fcc0f8c1f2ed284423ce1812d515ed6d433a388a3fd736",
+        "url": "/media/iconography/volume/aerosol.png"
+      },
+      {
+        "glyph": "escuadra",
+        "label": "Escuadra",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/escuadra.png",
+        "sha256": "7bacb759aad38a5a740c4d761a2f4c35d1eb1c1a39ed57f27626b8a08269012c",
+        "url": "/media/iconography/volume/escuadra.png"
+      },
+      {
+        "glyph": "postit",
+        "label": "Post-it",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/postit.png",
+        "sha256": "2d4344d11e447d059bf0c5a894e3ed8a1bb24764f01f5a126f31e544ef9ec94d",
+        "url": "/media/iconography/volume/postit.png"
+      },
+      {
+        "glyph": "encuadre",
+        "label": "Encuadre",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/encuadre.png",
+        "sha256": "5283540e1d1c04d81c000821c21a3b3765595b2c686e349b3f773ca59fd7dece",
+        "url": "/media/iconography/volume/encuadre.png"
+      },
+      {
+        "glyph": "pelicula",
+        "label": "Película",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/pelicula.png",
+        "sha256": "d124111ea536dc90aacba8b0ab8794e1a3256295e7d74479216208aadb4c6fa5",
+        "url": "/media/iconography/volume/pelicula.png"
+      },
+      {
+        "glyph": "vinilo",
+        "label": "Vinilo",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/vinilo.png",
+        "sha256": "c15b9185861e8176b7a7dfeaab98e1760343e783efc9588acc4315c7119c8c95",
+        "url": "/media/iconography/volume/vinilo.png"
+      },
+      {
+        "glyph": "guitarra",
+        "label": "Guitarra",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/guitarra.png",
+        "sha256": "f696e8fb95186416b16c9de1db9481b493f5307d7e19d137ae066baea8931abb",
+        "url": "/media/iconography/volume/guitarra.png"
+      },
+      {
+        "glyph": "reproducir",
+        "label": "Reproducir",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/reproducir.png",
+        "sha256": "b57c45f54688af34aa755bb9299cf702c28deffddac5f83acc017dd163598d60",
+        "url": "/media/iconography/volume/reproducir.png"
+      },
+      {
+        "glyph": "varita",
+        "label": "Varita mágica",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/varita.png",
+        "sha256": "5661daae9b01338415b984924e7efd3e2283b6f6ebf79924ab359e9ff0427eda",
+        "url": "/media/iconography/volume/varita.png"
+      },
+      {
+        "glyph": "taza",
+        "label": "Taza de café",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/taza.png",
+        "sha256": "e375fdf15e519cb9f9f73265d67a33fd321e96f55d28e2b63a37b911fc9b3cad",
+        "url": "/media/iconography/volume/taza.png"
+      },
+      {
+        "glyph": "lampara",
+        "label": "Lámpara de escritorio",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/lampara.png",
+        "sha256": "9509e9b37ca6f5202e2e39532ced6ac147e13837a6ab3080061a5f9ba5845e45",
+        "url": "/media/iconography/volume/lampara.png"
+      },
+      {
+        "glyph": "trofeo",
+        "label": "Trofeo",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/trofeo.png",
+        "sha256": "94f5550bad99e550ff36aa1c885005b1aca578c3d14913ec84d4d2eb19e31906",
+        "url": "/media/iconography/volume/trofeo.png"
+      },
+      {
+        "glyph": "estrella",
+        "label": "Estrella",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/estrella.png",
+        "sha256": "3ed598ae76b995814bf0c1ae946e2e01be37ab595d748d5a97157c746b962137",
+        "url": "/media/iconography/volume/estrella.png"
+      },
+      {
+        "glyph": "chispa",
+        "label": "Chispa",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/chispa.png",
+        "sha256": "98cc1de22aa86fe557998b8499789fbf5fac4d496d1449ad6ec423f2c0dcfbba",
+        "url": "/media/iconography/volume/chispa.png"
+      },
+      {
+        "glyph": "prompt",
+        "label": "Prompt",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/prompt.png",
+        "sha256": "c1c99b382e099a4dee191b3bd0372a067a8e24e8c4b711ce71fd6fed10905822",
+        "url": "/media/iconography/volume/prompt.png"
+      },
+      {
+        "glyph": "barra-busqueda",
+        "label": "Barra de búsqueda",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/barra-busqueda.png",
+        "sha256": "f32859c2f2abd70827fbb61d64971859bcc71a9bc3c952c4739f0ded53c9df49",
+        "url": "/media/iconography/volume/barra-busqueda.png"
+      },
+      {
+        "glyph": "aro-de-luz",
+        "label": "Aro de luz",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/aro-de-luz.png",
+        "sha256": "315be219a642827c96d4c926070811d8bc50be4fc5e7ff8b0aa0a87530142886",
+        "url": "/media/iconography/volume/aro-de-luz.png"
+      },
+      {
+        "glyph": "television",
+        "label": "Televisión",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/television.png",
+        "sha256": "f9051d8e4ba9b9d8efa992a367396509ffbd14eef651b9fee80c8348aeba1b13",
+        "url": "/media/iconography/volume/television.png"
+      },
+      {
+        "glyph": "like",
+        "label": "Me gusta",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/like.png",
+        "sha256": "5acb691e727890bc19b0a729ba65b8153c00dca29cfc0c66eefd063af0d2f5fc",
+        "url": "/media/iconography/volume/like.png"
+      },
+      {
+        "glyph": "galeria",
+        "label": "Galería",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/galeria.png",
+        "sha256": "2bf4cf1acff3a1076014e4aec50a738684571a0dd2280ca87684b876654119c9",
+        "url": "/media/iconography/volume/galeria.png"
+      },
+      {
+        "glyph": "biblioteca",
+        "label": "Biblioteca de assets",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/biblioteca.png",
+        "sha256": "79eb859c986a28054cd779210d6836535a3e2c3f5c6dd33281aa47e85da5ed43",
+        "url": "/media/iconography/volume/biblioteca.png"
+      },
+      {
+        "glyph": "hoodie",
+        "label": "Hoodie Efeonce",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/hoodie.png",
+        "sha256": "ed37f24411a46dd21f761b255bc2229b686f2564e1c94dcf2ac28d367fa3a41f",
+        "url": "/media/iconography/volume/hoodie.png"
+      },
+      {
+        "glyph": "gorra",
+        "label": "Gorra Efeonce",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/gorra.png",
+        "sha256": "ea67289900615c14880f566ac8abb88788ca8e03eab1d36baf2ba5489c7f7d27",
+        "url": "/media/iconography/volume/gorra.png"
+      },
+      {
+        "glyph": "guardar",
+        "label": "Guardar",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/guardar.png",
+        "sha256": "b12bde24a0b2e20b8ae62393cd25aca158def7d9d21a591c07aa781e299b8e3b",
+        "url": "/media/iconography/volume/guardar.png"
+      },
+      {
+        "glyph": "compartir",
+        "label": "Compartir",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/compartir.png",
+        "sha256": "3d2c54710bcb78641e5d1d28438f848ead53010c5f5a5187cde1c94539c94e5e",
+        "url": "/media/iconography/volume/compartir.png"
+      },
+      {
+        "glyph": "recomendar",
+        "label": "Recomendar",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/recomendar.png",
+        "sha256": "4e521b70c65de93c7b3ee8c74103fe00795cf4e50af7cb320023761e2dd3967b",
+        "url": "/media/iconography/volume/recomendar.png"
+      },
+      {
+        "glyph": "comentar",
+        "label": "Comentar",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/comentar.png",
+        "sha256": "1b4e2a92599db33fcd7fce8241527254cd011d764ed9a5b444b048b31ab2a09b",
+        "url": "/media/iconography/volume/comentar.png"
+      },
+      {
+        "glyph": "deslizar",
+        "label": "Deslizar",
+        "gesture": true,
+        "size": 1024,
+        "png": "volume/deslizar.png",
+        "sha256": "6ebd2c87761ec6acac5018fefa350451cf74ae435cb57f558a18e2d5d76fd174",
+        "url": "/media/iconography/volume/deslizar.png"
+      },
+      {
+        "glyph": "mano",
+        "label": "Mano",
+        "gesture": false,
+        "size": 1024,
+        "png": "volume/mano.png",
+        "sha256": "34dd3f212d93af039c50c3d1099775f25272265a49c1c7ac75f553dc66166e93",
+        "url": "/media/iconography/volume/mano.png"
+      }
+    ]
+  },
+  "why": {
+    "note": "Criterio de diseño a partir de la personalidad de marca de Efeonce (Greenhouse docs/context/05_voz-tono-estilo.md); no es un dato medido.",
+    "items": [
+      {
+        "key": "voces",
+        "title": "Dos voces, una familia",
+        "trait": "Creencia: la creatividad que no se mide no se defiende",
+        "why": "Efeonce hace dos trabajos que la industria suele separar: medir y crear. Por eso hay dos voces. Y por eso comparten el fondo, la tinta y la esfera: son el mismo sistema visto desde dos lados, no dos agencias con dos estilos.",
+        "shows": "Una voz por línea de servicio; nunca mezcladas en un mismo grupo.",
+        "avoids": "Un set que parece hecho por dos equipos que no se hablan."
+      },
+      {
+        "key": "trazo",
+        "title": "El Trazo ordena",
+        "trait": "Rasgo: obsesión por la prueba",
+        "why": "Lo que se mide tiene que leerse rápido y sin interpretar. El Trazo es sobrio a propósito: un solo grosor, una grilla, remates redondos y nada que no cumpla una función. No busca lucirse; ordena para que el dato sea el protagonista, y se lee igual a 20 px que en un muro.",
+        "shows": "Grilla 24, trazo 1,5, esfera sólo cuando responde.",
+        "avoids": "El ícono decorativo que le compite al número."
+      },
+      {
+        "key": "plastilina",
+        "title": "Plastilina se hace con las manos",
+        "trait": "Rasgo: arquitecto con las manos sucias",
+        "why": "Lo que se crea se hace con las manos. Plastilina muestra el objeto moldeado, blando, inclinado y tomado en uso: no el símbolo de una cámara, sino una cámara que alguien está usando. Es donde la marca pone el carácter, porque el oficio creativo se reconoce por cómo se hace.",
+        "shows": "Masa blanda con giro, calados redondos y la esfera donde está la acción.",
+        "avoids": "El pictograma de stock, de frente y simétrico."
+      },
+      {
+        "key": "esfera",
+        "title": "La esfera: responde uno",
+        "trait": "Rasgo: profundidad accesible",
+        "why": "La esfera no es parte del dibujo: aparece cuando algo responde, y en un grupo responde uno solo. Es la forma de decir qué importa en la primera lectura; una pieza que marca todo como importante no prioriza nada. Viene de La órbita, donde la esfera es la respuesta que cierra la pregunta.",
+        "shows": "Reposo por defecto, una esfera por grupo, nunca como viñeta.",
+        "avoids": "La fila de íconos donde todo brilla igual."
+      },
+      {
+        "key": "volumen",
+        "title": "El volumen se puede tocar",
+        "trait": "Rasgo: honestidad incómoda, nunca un parche bonito",
+        "why": "Cuando el objeto es el protagonista, el volumen lo vuelve casi tangible: el oficio deja de ser un símbolo y pasa a ser material. No es un 3D de moda aplicado encima: sale del vector aprobado, así que es la misma forma con cuerpo. Por eso va poco y en grande: un énfasis que aparece en todas partes deja de ser énfasis.",
+        "shows": "Arcilla mate sin brillo, uno por pieza, desde 160 px.",
+        "avoids": "El clay 3D genérico que puede usar cualquier marca."
+      }
+    ]
+  },
+  "voices": [
+    {
+      "key": "stroke",
+      "name": "Trazo",
+      "role": "Lo que se mide",
+      "lines": "Growth, Engine y Revenue (HubSpot y Salesforce)",
+      "uses": "Decks, informes, dashboards, listas de servicios, firmas, navegación, tablas y todo lo que ordena o mide.",
+      "summary": "Trazo limpio en reposo; la esfera aparece cuando el ícono responde. Grilla 24, trazo 1,5, remates redondos."
+    },
+    {
+      "key": "plastilina",
+      "name": "Plastilina",
+      "role": "Lo que se crea",
+      "lines": "Brand (servicios creativos)",
+      "uses": "Piezas sociales, portadas, stickers y momentos del oficio creativo donde el objeto es protagonista.",
+      "summary": "Masa blanda con giro, calados redondos y actitud; la esfera es la acción del objeto. Grilla 48, desde 32 px."
+    }
+  ],
+  "states": [
+    {
+      "situation": "El ícono es la pieza (protagonista, sin otra esfera)",
+      "state": "Respuesta",
+      "why": "Su esfera es la única de la pieza."
+    },
+    {
+      "situation": "Una fila o grupo de íconos",
+      "state": "Responde uno solo",
+      "why": "El activo: la sección donde vamos, el servicio que se vende."
+    },
+    {
+      "situation": "La pieza ya tiene esfera (órbita o voz con esfera)",
+      "state": "Reposo",
+      "why": "El canon ya cierra con esa esfera; el ícono no suma otra."
+    },
+    {
+      "situation": "Dentro de una órbita (firma de equipo, pieza con órbita sesgada)",
+      "state": "Reposo",
+      "why": "La órbita responde por él."
+    },
+    {
+      "situation": "Listas, tablas, contacto, navegación, satélites",
+      "state": "Reposo",
+      "why": "La esfera nunca es viñeta."
+    },
+    {
+      "situation": "Trazo a menos de 20 px",
+      "state": "Reposo",
+      "why": "La esfera no se lee. Plastilina no baja de 32 px: usa el Trazo."
+    }
+  ],
+  "donts": [
+    {
+      "voice": "Las dos",
+      "rule": "Trazo y Plastilina en un mismo grupo o fila.",
+      "instead": "Una voz por grupo. Si conviven, Plastilina manda en grande y el Trazo apoya en chico."
+    },
+    {
+      "voice": "Las dos",
+      "rule": "Todos los íconos respondiendo.",
+      "instead": "Responde uno solo, el que importa."
+    },
+    {
+      "voice": "Las dos",
+      "rule": "Responder junto a otra esfera (órbita o voz).",
+      "instead": "El ícono descansa."
+    },
+    {
+      "voice": "Las dos",
+      "rule": "Volumen, brillo, sombras, degradés o esferas de vidrio.",
+      "instead": "Plano y a la vista: fondo, tinta y un acento."
+    },
+    {
+      "voice": "Las dos",
+      "rule": "El acento en el cuerpo del ícono, en el gesto o en el trazo.",
+      "instead": "El acento vive sólo en la esfera."
+    },
+    {
+      "voice": "Las dos",
+      "rule": "El acento de un objeto: «el pincel va en naranja».",
+      "instead": "El acento es de la línea de la pieza, no del objeto."
+    },
+    {
+      "voice": "Trazo",
+      "rule": "La esfera más grande, hueca, en tinta o suelta lejos del glifo.",
+      "instead": "Radio 1,75, rellena, en el acento, con 0,5 de aire."
+    },
+    {
+      "voice": "Trazo",
+      "rule": "El teal claro #36c8bf sobre papel (1,94:1).",
+      "instead": "Sobre papel, tinta navy y el acento claro de la línea."
+    },
+    {
+      "voice": "Trazo",
+      "rule": "Dibujar un glifo a mano dentro de una pieza.",
+      "instead": "Primero entra al set con icons:check y aprobación; después se usa."
+    },
+    {
+      "voice": "Plastilina",
+      "rule": "Gesto y esfera en todos los íconos.",
+      "instead": "El gesto es del protagonista, uno por pieza."
+    },
+    {
+      "voice": "Plastilina",
+      "rule": "Un objeto sin carácter: de frente, simétrico, con esquinas vivas.",
+      "instead": "Inclinado, tomado en uso, con masa blanda."
+    },
+    {
+      "voice": "Plastilina",
+      "rule": "La órbita sesgada midiendo un dato.",
+      "instead": "La sesgada es gesto. Lo que mide va en la órbita circular."
+    },
+    {
+      "voice": "Plastilina",
+      "rule": "La órbita cruzando el texto.",
+      "instead": "Rodea sólo al objeto; la voz vive fuera, en el tercio inferior."
+    },
+    {
+      "voice": "Plastilina",
+      "rule": "Usarla a menos de 32 px.",
+      "instead": "A ese tamaño va el Trazo."
+    }
+  ],
+  "newGlyph": {
+    "stroke": [
+      {
+        "title": "Dibuja en la grilla 24",
+        "body": "Margen 2 medido en el eje del trazo (el borde puede llegar a 1,25), trazo 1,5, remates y uniones redondos. El cuerpo llena su guía: círculo de radio 10 (redondos), cuadrado de 18 (compactos) o rectángulo de 20 × 16 (apaisados); los apéndices pueden salir de la guía, nunca del margen. Un punto se dibuja como M x yh.01."
+      },
+      {
+        "title": "Prevé la esfera desde el dibujo",
+        "body": "Elige el modo. Reemplaza: una pieza del glifo se vuelve la esfera (la punta de la flecha, un punto). Completa: la esfera aparece donde la acción se resuelve (el foco de la lupa). Déjale su lugar."
+      },
+      {
+        "title": "Escribe el glifo en JSON",
+        "body": "Claves key, label, use («Línea · temas»), mode, rest, response y dot (centro de la esfera). En reemplaza, response es rest sin la pieza que ocupa la esfera; en completa, es igual. Ejemplo: docs/examples/iconography/stroke-glyph-keynote.json."
+      },
+      {
+        "title": "Verifica",
+        "body": "pnpm icons:check falla si el aire de la esfera es menor que 0,5, si algo sale del margen, si faltan label o use o si mode no coincide con los trazos. Deja hojas de control a 160, 64, 32, 24 y 20 px sobre #001a33 y papel."
+      },
+      {
+        "title": "Pide el alta",
+        "body": "Con las hojas de control, el operador aprueba. Recién entonces el glifo se agrega a STROKE_GLYPHS (icons-stroke-data.ts) con su prueba, y se usa en piezas."
+      }
+    ],
+    "plastilina": [
+      {
+        "title": "Genera la forma, nunca el color",
+        "body": "Con la referencia de estilo y el prompt modelo de AXIS: rejilla 3 × 3, sólo fondo liso y blanco, sin naranja ni puntos. Para un solo objeto, pide nueve variantes. Hoy, gpt-image-2 a 1024 × 1024 con la referencia como imagen."
+      },
+      {
+        "title": "Vectoriza y normaliza",
+        "body": "pnpm icons:vectorize separa los objetos por componentes conexos (nunca por celda fija), los traza con potrace, los normaliza por área (k = min(√(560 / área), 22,5 / radio)) y lista sus calados con la esfera propuesta en el más grande. Elige la variante inclinada, gorda y dentro del peso del set (394–559 u²)."
+      },
+      {
+        "title": "Pon la esfera donde está la acción",
+        "body": "La gota, la luz, la punta, la boca de la guitarra (usa el centro del calado que da vectorize). Radio 3,4 con su anillo calado de 4,5: si el calado es más chico, el anillo la separa. Completa label y use."
+      },
+      {
+        "title": "Dibuja el gesto si será protagonista",
+        "body": "2 a 5 trazos rectos en TINTA (2,8), de 2,4 a 5,6 de largo, desde la acción hacia afuera, con al menos 0,5 de aire contra la silueta y dentro de la grilla 48."
+      },
+      {
+        "title": "Verifica y pide el alta",
+        "body": "pnpm icons:check mide el peso contra el set, los calados y el gesto, y deja hojas a 160, 64 y 32 px. A ojo: que se lea como familia. Con la aprobación del operador, entra a PLASTILINA_GLYPHS."
+      }
+    ],
+    "volume": [
+      {
+        "title": "Referencia desde el vector",
+        "body": "pnpm icons:volume -- refs pinta el ícono plano aprobado en respuesta (con su gesto si lo tiene) a 760 px sobre el fondo navy, centrado en 1024."
+      },
+      {
+        "title": "Genera con el prompt canónico",
+        "body": "Edición de imagen con la referencia y docs/agent-composition/iconography/volume-prompt.txt, sin cambiarlo: el modelo pone volumen y arcilla mate, nunca otra forma. Hoy, GPT Image 2.5 Sunburst en high, 1024 × 1024 (la familia 2.5 no acepta input_fidelity: la fidelidad la da el prompt). Si un detalle falla, agrega UNA línea que lo nombre (el laptop necesitó «la pantalla es sólida, sus ranuras atraviesan»)."
+      },
+      {
+        "title": "Recorta por color",
+        "body": "pnpm icons:volume -- key saca el alfa contra el fondo liso. Nunca un recorte con IA: rellena los calados y deja semitransparente una esfera suelta."
+      },
+      {
+        "title": "Revisa contra el plano",
+        "body": "pnpm icons:volume -- check mide la silueta, los calados y las piezas. Un aviso no es un rechazo: se mira al 100 %. Se rechaza si la forma se reinventó, si un calado se volvió relieve o si figura y fondo se invirtieron."
+      },
+      {
+        "title": "Publica sellado",
+        "body": "pnpm icons:volume -- publish comprime, copia a @efeoncepro/axis-brand-assets (volume/<glifo>.png) y al Lab, y sella el hash. La prueba del paquete falla si un PNG cambia sin sellar."
+      }
+    ]
+  },
+  "pending": [
+    {
+      "topic": "Voz de la línea Voice (Reach)",
+      "current": "Sin voz fija: elegir con criterio y declararlo en la pieza."
+    },
+    {
+      "topic": "Aire de la esfera del Trazo a 20 px",
+      "current": "A 20 px el trazo sube a 1,75 y el aire baja a ~0,4. Rige «respuesta desde 20 px»; se evalúa subir a 24 px."
+    },
+    {
+      "topic": "Opacidad del anillo de la órbita sesgada",
+      "current": "22 %. En teléfono casi desaparece; se prueba 30 %."
+    },
+    {
+      "topic": "En piezas con las dos voces, ¿la esfera en la voz o en el ícono?",
+      "current": "En la voz (canon de la línea gráfica); el ícono descansa."
+    },
+    {
+      "topic": "Automatización en respuesta se puede leer como un indicador de carga",
+      "current": "Se mantiene el glifo aprobado; revisar si el círculo abierto con la esfera choca con «la órbita nunca se llena como un loader»."
+    }
+  ],
+  "agentPrompt": "Vas a usar la iconografía de La órbita de Efeonce (marca propia; nunca trabajo de clientes ni UI de producto).\nFuente de verdad: AXIS. Valores en efeonceGraphicLine.icons (@efeoncepro/axis-tokens); geometría y reglas en\n@efeoncepro/axis-graphic-line/icons; guía en docs/agent-composition/iconography.md y en /references/iconography/.\n\n1. Elige la voz por la línea de servicio de la pieza: iconVoiceForLine(line). Trazo = lo que se mide; Plastilina = lo que se crea.\n2. Busca el glifo en /references/iconography.json: reúne ICON_CATALOG y las colecciones AEO, SEO y Autoridad. Cada entrada declara status, collections, package y renderer. Estar visible no cambia su aprobación. Si no existe, NO lo dibujes dentro de la pieza: sigue el método de alta de la guía.\n3. Importa el renderer desde el package de la entrada. Los canónicos usan resolveIcon; los candidatos de SEO y Autoridad usan resolveSeoIcon y conservan sus warnings. Nunca transcribas HEX ni px ni pases un candidato a resolveIcon.\n4. Reposo por defecto. Responde uno solo, el que importa, y sólo si la pieza no tiene otra esfera.\n5. Antes de entregar, pasa el grupo por auditIconGroup(items, { pieceHasSphere }) y resuelve cada issue.\n6. Plastilina protagonista en una pieza: skewedOrbitHeroSvg (el objeto en reposo, la órbita pone la esfera).\n7. Un objeto protagonista en volumen: usa el PNG de @efeoncepro/axis-brand-assets (volumeIconUrl(glyph)); nunca lo generes de nuevo ni lo uses en listas o UI.\n8. Reporta los avisos (warnings) del renderer y lo que quedó pendiente. Para candidatos, conserva la revisión pendiente; auditIconGroup sólo valida glifos canónicos.",
+  "collections": [
+    {
+      "key": "aeo",
+      "label": "AEO",
+      "count": 19
+    },
+    {
+      "key": "seo",
+      "label": "SEO",
+      "count": 37
+    },
+    {
+      "key": "authority",
+      "label": "Autoridad",
+      "count": 13
+    }
+  ],
+  "catalog": [
+    {
+      "key": "busqueda",
+      "voice": "stroke",
+      "label": "Búsqueda",
+      "use": "Búsqueda de información.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Búsqueda",
+        "Engine · SEO, AEO, búsqueda",
+        "Búsqueda de información.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-busqueda"
+    },
+    {
+      "key": "medicion",
+      "voice": "stroke",
+      "label": "Medición",
+      "use": "Medición y evolución.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Medición",
+        "Growth · datos, analítica",
+        "Medición y evolución.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-medicion"
+    },
+    {
+      "key": "contenido",
+      "voice": "stroke",
+      "label": "Contenido",
+      "use": "Producción y optimización de contenido.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo",
+        "seo"
+      ],
+      "keywords": [
+        "Contenido",
+        "Brand · contenido, redacción",
+        "Producción y optimización de contenido.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-contenido"
+    },
+    {
+      "key": "medios",
+      "voice": "stroke",
+      "label": "Medios",
+      "use": "Voice · medios, distribución",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Medios",
+        "Voice · medios, distribución"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-medios"
+    },
+    {
+      "key": "revenue",
+      "voice": "stroke",
+      "label": "Revenue",
+      "use": "RevOps · crecimiento de ingresos",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Revenue",
+        "RevOps · crecimiento de ingresos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-revenue"
+    },
+    {
+      "key": "web",
+      "voice": "stroke",
+      "label": "Web",
+      "use": "Engine · web, sitios",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Web",
+        "Engine · web, sitios"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-web"
+    },
+    {
+      "key": "talent",
+      "voice": "stroke",
+      "label": "Talent",
+      "use": "Área · personas, equipo",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Talent",
+        "Área · personas, equipo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-talent"
+    },
+    {
+      "key": "finanzas",
+      "voice": "stroke",
+      "label": "Finance",
+      "use": "Área · finanzas",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Finance",
+        "Área · finanzas"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-finanzas"
+    },
+    {
+      "key": "embudo",
+      "voice": "stroke",
+      "label": "Embudo",
+      "use": "Revenue · funnel, conversión",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Embudo",
+        "Revenue · funnel, conversión"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-embudo"
+    },
+    {
+      "key": "crm",
+      "voice": "stroke",
+      "label": "CRM",
+      "use": "Revenue · CRM, contactos",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "CRM",
+        "Revenue · CRM, contactos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-crm"
+    },
+    {
+      "key": "automatizacion",
+      "voice": "stroke",
+      "label": "Automatización",
+      "use": "Revenue · RevOps, flujos",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Automatización",
+        "Revenue · RevOps, flujos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-automatizacion"
+    },
+    {
+      "key": "informe",
+      "voice": "stroke",
+      "label": "Informe",
+      "use": "Diagnóstico o reporte de SEO.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo",
+        "seo"
+      ],
+      "keywords": [
+        "Informe",
+        "Growth · reportes, informes",
+        "Diagnóstico y reporte.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO",
+        "Diagnóstico o reporte de SEO.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-informe"
+    },
+    {
+      "key": "correo",
+      "voice": "stroke",
+      "label": "Correo",
+      "use": "Revenue · email marketing, correo",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Correo",
+        "Revenue · email marketing, correo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-correo"
+    },
+    {
+      "key": "llamada",
+      "voice": "stroke",
+      "label": "Llamada",
+      "use": "Área · llamadas, contacto",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Llamada",
+        "Área · llamadas, contacto"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-llamada"
+    },
+    {
+      "key": "calendario",
+      "voice": "stroke",
+      "label": "Calendario",
+      "use": "Growth · agenda, fechas",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Calendario",
+        "Growth · agenda, fechas"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-calendario"
+    },
+    {
+      "key": "reunion",
+      "voice": "stroke",
+      "label": "Reunión",
+      "use": "Área · reuniones, conversación",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Reunión",
+        "Área · reuniones, conversación"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-reunion"
+    },
+    {
+      "key": "objetivo",
+      "voice": "stroke",
+      "label": "Objetivo",
+      "use": "Growth · objetivos, metas, KPI",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Objetivo",
+        "Growth · objetivos, metas, KPI"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-objetivo"
+    },
+    {
+      "key": "presentacion",
+      "voice": "stroke",
+      "label": "Presentación",
+      "use": "Growth · presentaciones, workshops",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Presentación",
+        "Growth · presentaciones, workshops"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-presentacion"
+    },
+    {
+      "key": "contrato",
+      "voice": "stroke",
+      "label": "Contrato",
+      "use": "Área · contratos, acuerdos",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Contrato",
+        "Área · contratos, acuerdos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-contrato"
+    },
+    {
+      "key": "checklist",
+      "voice": "stroke",
+      "label": "Checklist",
+      "use": "Área · tareas, entregables",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Checklist",
+        "Área · tareas, entregables"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-checklist"
+    },
+    {
+      "key": "codigo",
+      "voice": "stroke",
+      "label": "Código",
+      "use": "Engine · desarrollo, código",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Código",
+        "Engine · desarrollo, código"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-codigo"
+    },
+    {
+      "key": "base-de-datos",
+      "voice": "stroke",
+      "label": "Base de datos",
+      "use": "Engine · datos, bases de datos",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Base de datos",
+        "Engine · datos, bases de datos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-base-de-datos"
+    },
+    {
+      "key": "nube",
+      "voice": "stroke",
+      "label": "Nube",
+      "use": "Engine · nube, hosting",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Nube",
+        "Engine · nube, hosting"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-nube"
+    },
+    {
+      "key": "integracion",
+      "voice": "stroke",
+      "label": "Integración",
+      "use": "Revenue · integraciones, conectores",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Integración",
+        "Revenue · integraciones, conectores"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-integracion"
+    },
+    {
+      "key": "seguridad",
+      "voice": "stroke",
+      "label": "Seguridad",
+      "use": "Engine · seguridad, privacidad",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Seguridad",
+        "Engine · seguridad, privacidad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-seguridad"
+    },
+    {
+      "key": "ubicacion",
+      "voice": "stroke",
+      "label": "Ubicación",
+      "use": "Lugar o área atendida; contexto de SEO local.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Ubicación",
+        "Área · ubicación, oficinas",
+        "Lugar o área atendida; contexto de SEO local.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-ubicacion"
+    },
+    {
+      "key": "reloj",
+      "voice": "stroke",
+      "label": "Reloj",
+      "use": "Área · plazos, tiempo",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Reloj",
+        "Área · plazos, tiempo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-reloj"
+    },
+    {
+      "key": "ia",
+      "voice": "stroke",
+      "label": "IA",
+      "use": "Engine · inteligencia artificial, agentes",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "IA",
+        "Engine · inteligencia artificial, agentes"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-ia"
+    },
+    {
+      "key": "composer",
+      "voice": "stroke",
+      "label": "Prompt",
+      "use": "Consulta escrita en el composer.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Composer",
+        "Engine · asistentes de IA, prompts, AEO",
+        "Prompt",
+        "Consulta escrita en el composer.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-composer"
+    },
+    {
+      "key": "buscador",
+      "voice": "stroke",
+      "label": "Búsqueda",
+      "use": "Búsqueda de información.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Buscador",
+        "Engine · buscadores, SEO, búsqueda en IA",
+        "Búsqueda",
+        "Búsqueda de información.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-buscador"
+    },
+    {
+      "key": "influencer",
+      "voice": "stroke",
+      "label": "Influencer",
+      "use": "Voice · creadores de contenido, influencers",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Influencer",
+        "Voice · creadores de contenido, influencers"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-influencer"
+    },
+    {
+      "key": "prensa",
+      "voice": "stroke",
+      "label": "Prensa",
+      "use": "Voice · prensa, medios ganados, PR",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Prensa",
+        "Voice · prensa, medios ganados, PR"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-prensa"
+    },
+    {
+      "key": "social",
+      "voice": "stroke",
+      "label": "Social",
+      "use": "Voice · redes sociales, comunidad",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Social",
+        "Voice · redes sociales, comunidad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-social"
+    },
+    {
+      "key": "multimedia",
+      "voice": "stroke",
+      "label": "Multimedia",
+      "use": "Brand · medios mixtos, foto y video",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Multimedia",
+        "Brand · medios mixtos, foto y video"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-multimedia"
+    },
+    {
+      "key": "assets",
+      "voice": "stroke",
+      "label": "Assets",
+      "use": "Brand · biblioteca de assets, archivos creativos",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Assets",
+        "Brand · biblioteca de assets, archivos creativos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-assets"
+    },
+    {
+      "key": "staff-gorra",
+      "voice": "stroke",
+      "label": "Staff",
+      "use": "Área · staff augmentation, equipo en terreno",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Staff",
+        "Área · staff augmentation, equipo en terreno"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-staff-gorra"
+    },
+    {
+      "key": "swipe",
+      "voice": "stroke",
+      "label": "Desliza",
+      "use": "Voice · carruseles y stories, pasar a la siguiente",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Desliza",
+        "Voice · carruseles y stories, pasar a la siguiente"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-swipe"
+    },
+    {
+      "key": "republicar",
+      "voice": "stroke",
+      "label": "Republicar",
+      "use": "Social · republicar, compartir en el feed",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Republicar",
+        "Social · republicar, compartir en el feed"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-republicar"
+    },
+    {
+      "key": "enviar",
+      "voice": "stroke",
+      "label": "Enviar",
+      "use": "Social · enviar por mensaje directo",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Enviar",
+        "Social · enviar por mensaje directo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-enviar"
+    },
+    {
+      "key": "competencia",
+      "voice": "stroke",
+      "label": "Competencia",
+      "use": "Comparación con otros sitios o marcas.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo",
+        "seo"
+      ],
+      "keywords": [
+        "Competencia",
+        "Engine · competidores, marca contra marca",
+        "Comparación entre marcas.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO",
+        "Comparación con otros sitios o marcas.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-competencia"
+    },
+    {
+      "key": "keyword",
+      "voice": "stroke",
+      "label": "Keyword",
+      "use": "Término de búsqueda analizado.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Keyword",
+        "Engine · keywords, términos de búsqueda",
+        "Término de búsqueda analizado.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-keyword"
+    },
+    {
+      "key": "enlace",
+      "voice": "stroke",
+      "label": "Enlace",
+      "use": "Enlaces y backlinks.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo",
+        "seo"
+      ],
+      "keywords": [
+        "Enlace",
+        "Engine · enlaces, backlinks, autoridad",
+        "Enlaces y referencias.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO",
+        "Enlaces y backlinks.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-enlace"
+    },
+    {
+      "key": "velocidad",
+      "voice": "stroke",
+      "label": "Velocidad",
+      "use": "Growth · velocidad, ritmo, throughput",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Velocidad",
+        "Growth · velocidad, ritmo, throughput"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-velocidad"
+    },
+    {
+      "key": "pausa",
+      "voice": "stroke",
+      "label": "Pausa",
+      "use": "Growth · trabado, en espera, bloqueos",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Pausa",
+        "Growth · trabado, en espera, bloqueos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-pausa"
+    },
+    {
+      "key": "clic",
+      "voice": "stroke",
+      "label": "Clic",
+      "use": "Clic registrado en un resultado.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Clic",
+        "Engine · clics, interacción",
+        "Clic registrado en un resultado.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-clic"
+    },
+    {
+      "key": "impresion",
+      "voice": "stroke",
+      "label": "Impresión",
+      "use": "Exposición registrada en resultados.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Impresión",
+        "Engine · impresiones, alcance, vistas",
+        "Exposición registrada en resultados.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-impresion"
+    },
+    {
+      "key": "ctr",
+      "voice": "stroke",
+      "label": "CTR",
+      "use": "Proporción de clics respecto de impresiones.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "CTR",
+        "Engine · tasa de clics, proporción",
+        "Proporción de clics respecto de impresiones.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-ctr"
+    },
+    {
+      "key": "posicion",
+      "voice": "stroke",
+      "label": "Posición",
+      "use": "Posición observada en resultados de búsqueda.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Posición",
+        "Engine · posición, ranking, primera página",
+        "Posición observada en resultados de búsqueda.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-posicion"
+    },
+    {
+      "key": "visita",
+      "voice": "stroke",
+      "label": "Visita",
+      "use": "Visitas o sesiones atribuidas al canal declarado.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Visita",
+        "Growth · visitas, sesiones, tráfico",
+        "Visitas o sesiones atribuidas al canal declarado.",
+        "Herramientas y métricas",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-visita"
+    },
+    {
+      "key": "cita",
+      "voice": "stroke",
+      "label": "Cita",
+      "use": "Referencia a una fuente dentro de la respuesta.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Cita",
+        "Engine · citas, referencias a fuentes en respuestas",
+        "Referencia a una fuente dentro de la respuesta.",
+        "Herramientas compartidas",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-cita"
+    },
+    {
+      "key": "respuesta-ia",
+      "voice": "stroke",
+      "label": "Respuesta de IA",
+      "use": "Respuesta entregada por el motor.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Respuesta de IA",
+        "Engine · AEO, Respuesta entregada por el motor.",
+        "Respuesta entregada por el motor.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-respuesta-ia"
+    },
+    {
+      "key": "mencion-marca",
+      "voice": "stroke",
+      "label": "Mención de marca",
+      "use": "La marca aparece nombrada en la respuesta.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Mención de marca",
+        "Engine · AEO, La marca aparece nombrada en la respuesta.",
+        "La marca aparece nombrada en la respuesta.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-mencion-marca"
+    },
+    {
+      "key": "fuente",
+      "voice": "stroke",
+      "label": "Fuente",
+      "use": "Página o documento que respalda información.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Fuente",
+        "Engine · AEO, Página o documento que respalda información.",
+        "Página o documento que respalda información.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-fuente"
+    },
+    {
+      "key": "entidad",
+      "voice": "stroke",
+      "label": "Entidad",
+      "use": "Marca, persona o producto con identidad y relaciones.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Entidad",
+        "Engine · AEO, Marca, persona o producto con identidad y relaciones.",
+        "Marca, persona o producto con identidad y relaciones.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-entidad"
+    },
+    {
+      "key": "atribucion",
+      "voice": "stroke",
+      "label": "Atribución",
+      "use": "A quién se reconoce como autor de una idea o información.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Atribución",
+        "Engine · AEO, A quién se reconoce como autor de una idea o información.",
+        "A quién se reconoce como autor de una idea o información.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-atribucion"
+    },
+    {
+      "key": "recomendacion-ia",
+      "voice": "stroke",
+      "label": "Recomendación",
+      "use": "Una opción elegida o recomendada dentro de la respuesta.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Recomendación",
+        "Engine · AEO, Una opción elegida o recomendada dentro de la respuesta.",
+        "Una opción elegida o recomendada dentro de la respuesta.",
+        "Presencia y evidencia",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-recomendacion-ia"
+    },
+    {
+      "key": "consultas-relacionadas",
+      "voice": "stroke",
+      "label": "Consultas relacionadas",
+      "use": "Una consulta se ramifica en búsquedas relacionadas.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Consultas relacionadas",
+        "Engine · AEO, Una consulta se ramifica en búsquedas relacionadas.",
+        "Una consulta se ramifica en búsquedas relacionadas.",
+        "Investigación y cobertura",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-consultas-relacionadas"
+    },
+    {
+      "key": "recuperacion",
+      "voice": "stroke",
+      "label": "Recuperación de información",
+      "use": "Se localiza un pasaje relevante en una fuente.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Recuperación de información",
+        "Engine · AEO, Se localiza un pasaje relevante en una fuente.",
+        "Se localiza un pasaje relevante en una fuente.",
+        "Investigación y cobertura",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-recuperacion"
+    },
+    {
+      "key": "cobertura-preguntas",
+      "voice": "stroke",
+      "label": "Cobertura de preguntas",
+      "use": "Presencia observada dentro de un conjunto definido de preguntas.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Cobertura de preguntas",
+        "Engine · AEO, Presencia observada dentro de un conjunto definido de preguntas.",
+        "Presencia observada dentro de un conjunto definido de preguntas.",
+        "Investigación y cobertura",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-cobertura-preguntas"
+    },
+    {
+      "key": "cobertura-motores",
+      "voice": "stroke",
+      "label": "Cobertura de motores",
+      "use": "Presencia observada en motores o superficies identificados.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [
+        "aeo"
+      ],
+      "keywords": [
+        "Cobertura de motores",
+        "Engine · AEO, Presencia observada en motores o superficies identificados.",
+        "Presencia observada en motores o superficies identificados.",
+        "Investigación y cobertura",
+        "aeo",
+        "AEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-stroke-cobertura-motores"
+    },
+    {
+      "key": "rayo",
+      "voice": "plastilina",
+      "label": "Rayo",
+      "use": "energía, velocidad, impulso",
+      "mode": "action",
+      "gesture": true,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Rayo",
+        "energía, velocidad, impulso"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-rayo"
+    },
+    {
+      "key": "paleta",
+      "voice": "plastilina",
+      "label": "Paleta",
+      "use": "color, dirección de arte",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Paleta",
+        "color, dirección de arte"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-paleta"
+    },
+    {
+      "key": "pincel",
+      "voice": "plastilina",
+      "label": "Pincel",
+      "use": "diseño, ilustración",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Pincel",
+        "diseño, ilustración"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-pincel"
+    },
+    {
+      "key": "cuentagotas",
+      "voice": "plastilina",
+      "label": "Cuentagotas",
+      "use": "color exacto, sistema de marca",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Cuentagotas",
+        "color exacto, sistema de marca"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-cuentagotas"
+    },
+    {
+      "key": "bombillo",
+      "voice": "plastilina",
+      "label": "Bombillo",
+      "use": "idea, concepto creativo",
+      "mode": "action",
+      "gesture": true,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Bombillo",
+        "idea, concepto creativo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-bombillo"
+    },
+    {
+      "key": "tablet",
+      "voice": "plastilina",
+      "label": "Tablet",
+      "use": "diseño digital, piezas en pantalla",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Tablet",
+        "diseño digital, piezas en pantalla"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-tablet"
+    },
+    {
+      "key": "laptop",
+      "voice": "plastilina",
+      "label": "Laptop",
+      "use": "producción digital, web",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Laptop",
+        "producción digital, web"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-laptop"
+    },
+    {
+      "key": "escritorio",
+      "voice": "plastilina",
+      "label": "Mac de escritorio",
+      "use": "estudio, producción",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Mac de escritorio",
+        "estudio, producción"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-escritorio"
+    },
+    {
+      "key": "telefono",
+      "voice": "plastilina",
+      "label": "Teléfono",
+      "use": "social, móvil, contenido vertical",
+      "mode": "action",
+      "gesture": true,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Teléfono",
+        "social, móvil, contenido vertical"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-telefono"
+    },
+    {
+      "key": "camara",
+      "voice": "plastilina",
+      "label": "Cámara",
+      "use": "fotografía",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Cámara",
+        "fotografía"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-camara"
+    },
+    {
+      "key": "claqueta",
+      "voice": "plastilina",
+      "label": "Claqueta",
+      "use": "video, producción audiovisual",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Claqueta",
+        "video, producción audiovisual"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-claqueta"
+    },
+    {
+      "key": "microfono",
+      "voice": "plastilina",
+      "label": "Micrófono",
+      "use": "podcast, audio, voz",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Micrófono",
+        "podcast, audio, voz"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-microfono"
+    },
+    {
+      "key": "pluma",
+      "voice": "plastilina",
+      "label": "Pluma vectorial",
+      "use": "vector, identidad, logotipo",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Pluma vectorial",
+        "vector, identidad, logotipo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-pluma"
+    },
+    {
+      "key": "cursor",
+      "voice": "plastilina",
+      "label": "Cursor",
+      "use": "experiencia digital, UI",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Cursor",
+        "experiencia digital, UI"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-cursor"
+    },
+    {
+      "key": "tijeras",
+      "voice": "plastilina",
+      "label": "Tijeras",
+      "use": "edición, recorte, adaptación",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Tijeras",
+        "edición, recorte, adaptación"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-tijeras"
+    },
+    {
+      "key": "megafono",
+      "voice": "plastilina",
+      "label": "Megáfono",
+      "use": "anuncio, campaña, difusión",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Megáfono",
+        "anuncio, campaña, difusión"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-megafono"
+    },
+    {
+      "key": "audifonos",
+      "voice": "plastilina",
+      "label": "Audífonos",
+      "use": "audio, música, sonido",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Audífonos",
+        "audio, música, sonido"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-audifonos"
+    },
+    {
+      "key": "corazon",
+      "voice": "plastilina",
+      "label": "Corazón",
+      "use": "comunidad, engagement",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Corazón",
+        "comunidad, engagement"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-corazon"
+    },
+    {
+      "key": "lapiz",
+      "voice": "plastilina",
+      "label": "Lápiz",
+      "use": "boceto, escritura, idea en papel",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Lápiz",
+        "boceto, escritura, idea en papel"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-lapiz"
+    },
+    {
+      "key": "rodillo",
+      "voice": "plastilina",
+      "label": "Rodillo",
+      "use": "pintura, cobertura, gran formato",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Rodillo",
+        "pintura, cobertura, gran formato"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-rodillo"
+    },
+    {
+      "key": "aerosol",
+      "voice": "plastilina",
+      "label": "Aerosol",
+      "use": "arte urbano, grafiti, intervención",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Aerosol",
+        "arte urbano, grafiti, intervención"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-aerosol"
+    },
+    {
+      "key": "escuadra",
+      "voice": "plastilina",
+      "label": "Escuadra",
+      "use": "diseño técnico, grilla, precisión",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Escuadra",
+        "diseño técnico, grilla, precisión"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-escuadra"
+    },
+    {
+      "key": "postit",
+      "voice": "plastilina",
+      "label": "Post-it",
+      "use": "ideación, taller, notas",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Post-it",
+        "ideación, taller, notas"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-postit"
+    },
+    {
+      "key": "encuadre",
+      "voice": "plastilina",
+      "label": "Encuadre",
+      "use": "encuadre, composición, formatos",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Encuadre",
+        "encuadre, composición, formatos"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-encuadre"
+    },
+    {
+      "key": "pelicula",
+      "voice": "plastilina",
+      "label": "Película",
+      "use": "cine, fotografía analógica, rodaje",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Película",
+        "cine, fotografía analógica, rodaje"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-pelicula"
+    },
+    {
+      "key": "vinilo",
+      "voice": "plastilina",
+      "label": "Vinilo",
+      "use": "música, discografía, playlist",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Vinilo",
+        "música, discografía, playlist"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-vinilo"
+    },
+    {
+      "key": "guitarra",
+      "voice": "plastilina",
+      "label": "Guitarra",
+      "use": "música en vivo, composición, jingle",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Guitarra",
+        "música en vivo, composición, jingle"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-guitarra"
+    },
+    {
+      "key": "reproducir",
+      "voice": "plastilina",
+      "label": "Reproducir",
+      "use": "video, estreno, reproducción",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Reproducir",
+        "video, estreno, reproducción"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-reproducir"
+    },
+    {
+      "key": "varita",
+      "voice": "plastilina",
+      "label": "Varita mágica",
+      "use": "magia, efectos, transformación",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Varita mágica",
+        "magia, efectos, transformación"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-varita"
+    },
+    {
+      "key": "taza",
+      "voice": "plastilina",
+      "label": "Taza de café",
+      "use": "pausa, conversación, equipo",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Taza de café",
+        "pausa, conversación, equipo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-taza"
+    },
+    {
+      "key": "lampara",
+      "voice": "plastilina",
+      "label": "Lámpara de escritorio",
+      "use": "foco, estudio, trabajo creativo",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Lámpara de escritorio",
+        "foco, estudio, trabajo creativo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-lampara"
+    },
+    {
+      "key": "trofeo",
+      "voice": "plastilina",
+      "label": "Trofeo",
+      "use": "premios, logros, reconocimiento",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Trofeo",
+        "premios, logros, reconocimiento"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-trofeo"
+    },
+    {
+      "key": "estrella",
+      "voice": "plastilina",
+      "label": "Estrella",
+      "use": "destacado, favorito, calidad",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Estrella",
+        "destacado, favorito, calidad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-estrella"
+    },
+    {
+      "key": "chispa",
+      "voice": "plastilina",
+      "label": "Chispa",
+      "use": "inteligencia artificial, IA generativa, ideas",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Chispa",
+        "inteligencia artificial, IA generativa, ideas"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-chispa"
+    },
+    {
+      "key": "prompt",
+      "voice": "plastilina",
+      "label": "Prompt",
+      "use": "prompt, composer, conversación con IA",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Prompt",
+        "prompt, composer, conversación con IA"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-prompt"
+    },
+    {
+      "key": "barra-busqueda",
+      "voice": "plastilina",
+      "label": "Barra de búsqueda",
+      "use": "búsqueda, buscadores, respuestas de IA",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Barra de búsqueda",
+        "búsqueda, buscadores, respuestas de IA"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-barra-busqueda"
+    },
+    {
+      "key": "aro-de-luz",
+      "voice": "plastilina",
+      "label": "Aro de luz",
+      "use": "influencers, creadores, contenido en vivo",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Aro de luz",
+        "influencers, creadores, contenido en vivo"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-aro-de-luz"
+    },
+    {
+      "key": "television",
+      "voice": "plastilina",
+      "label": "Televisión",
+      "use": "medios, prensa, noticias",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Televisión",
+        "medios, prensa, noticias"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-television"
+    },
+    {
+      "key": "like",
+      "voice": "plastilina",
+      "label": "Me gusta",
+      "use": "redes sociales, reacciones, comunidad",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Me gusta",
+        "redes sociales, reacciones, comunidad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-like"
+    },
+    {
+      "key": "galeria",
+      "voice": "plastilina",
+      "label": "Galería",
+      "use": "multimedia, fotos y video, contenido",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Galería",
+        "multimedia, fotos y video, contenido"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-galeria"
+    },
+    {
+      "key": "biblioteca",
+      "voice": "plastilina",
+      "label": "Biblioteca de assets",
+      "use": "assets creativos, archivo, entregables",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Biblioteca de assets",
+        "assets creativos, archivo, entregables"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-biblioteca"
+    },
+    {
+      "key": "hoodie",
+      "voice": "plastilina",
+      "label": "Hoodie Efeonce",
+      "use": "staff augmentation, talento, equipo en terreno",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Hoodie Efeonce",
+        "staff augmentation, talento, equipo en terreno"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-hoodie"
+    },
+    {
+      "key": "gorra",
+      "voice": "plastilina",
+      "label": "Gorra Efeonce",
+      "use": "staff augmentation, equipo en terreno, merch",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Gorra Efeonce",
+        "staff augmentation, equipo en terreno, merch"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-gorra"
+    },
+    {
+      "key": "guardar",
+      "voice": "plastilina",
+      "label": "Guardar",
+      "use": "Glitch · redes: guardar la pieza",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Guardar",
+        "Glitch · redes: guardar la pieza"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-guardar"
+    },
+    {
+      "key": "compartir",
+      "voice": "plastilina",
+      "label": "Compartir",
+      "use": "Glitch · redes: enviar la pieza",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Compartir",
+        "Glitch · redes: enviar la pieza"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-compartir"
+    },
+    {
+      "key": "recomendar",
+      "voice": "plastilina",
+      "label": "Recomendar",
+      "use": "Glitch · redes: repost",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Recomendar",
+        "Glitch · redes: repost"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-recomendar"
+    },
+    {
+      "key": "comentar",
+      "voice": "plastilina",
+      "label": "Comentar",
+      "use": "Glitch · redes: comentarios",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Comentar",
+        "Glitch · redes: comentarios"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-comentar"
+    },
+    {
+      "key": "deslizar",
+      "voice": "plastilina",
+      "label": "Deslizar",
+      "use": "Glitch · redes: desliza al siguiente",
+      "mode": "action",
+      "gesture": true,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Deslizar",
+        "Glitch · redes: desliza al siguiente"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-deslizar"
+    },
+    {
+      "key": "mano",
+      "voice": "plastilina",
+      "label": "Mano",
+      "use": "carruseles y stories, desliza a la siguiente",
+      "mode": "action",
+      "gesture": false,
+      "status": "canonical",
+      "collections": [],
+      "keywords": [
+        "Mano",
+        "carruseles y stories, desliza a la siguiente"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons",
+      "renderer": "resolveIcon",
+      "href": "/references/iconography/#icon-plastilina-mano"
+    },
+    {
+      "key": "autoridad-marca",
+      "voice": "stroke",
+      "label": "Brand Authority",
+      "use": "Reconocimiento y credibilidad de una marca dentro de su categoría.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "aeo",
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Brand Authority",
+        "Reconocimiento y credibilidad de una marca dentro de su categoría.",
+        "Autoridad",
+        "aeo",
+        "AEO",
+        "seo",
+        "SEO",
+        "authority"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-autoridad-marca"
+    },
+    {
+      "key": "autoridad-dominio",
+      "voice": "stroke",
+      "label": "Autoridad de dominio",
+      "use": "Fortaleza estimada del dominio según una metodología declarada.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Autoridad de dominio",
+        "Fortaleza estimada del dominio según una metodología declarada.",
+        "Autoridad",
+        "seo",
+        "SEO",
+        "authority"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-autoridad-dominio"
+    },
+    {
+      "key": "autoridad-pagina",
+      "voice": "stroke",
+      "label": "Autoridad de página",
+      "use": "Fortaleza estimada de una URL individual.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Autoridad de página",
+        "Fortaleza estimada de una URL individual.",
+        "Autoridad",
+        "seo",
+        "SEO",
+        "authority"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-autoridad-pagina"
+    },
+    {
+      "key": "backlink",
+      "voice": "stroke",
+      "label": "Backlink",
+      "use": "Enlace que llega desde otro sitio hacia una página.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Backlink",
+        "Enlace que llega desde otro sitio hacia una página.",
+        "Perfil de enlaces",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-backlink"
+    },
+    {
+      "key": "dominios-referentes",
+      "voice": "stroke",
+      "label": "Dominios referentes",
+      "use": "Dominios únicos que enlazan al sitio o URL analizada.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Dominios referentes",
+        "Dominios únicos que enlazan al sitio o URL analizada.",
+        "Perfil de enlaces",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-dominios-referentes"
+    },
+    {
+      "key": "perfil-enlaces",
+      "voice": "stroke",
+      "label": "Perfil de enlaces",
+      "use": "Conjunto y distribución de los enlaces observados.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Perfil de enlaces",
+        "Conjunto y distribución de los enlaces observados.",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-perfil-enlaces"
+    },
+    {
+      "key": "anchor-text",
+      "voice": "stroke",
+      "label": "Anchor text",
+      "use": "Texto visible que sirve de ancla a un enlace.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Anchor text",
+        "Texto visible que sirve de ancla a un enlace.",
+        "Perfil de enlaces",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-anchor-text"
+    },
+    {
+      "key": "enlaces-nuevos",
+      "voice": "stroke",
+      "label": "Enlaces nuevos",
+      "use": "Enlaces detectados por primera vez dentro del periodo observado.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Enlaces nuevos",
+        "Enlaces detectados por primera vez dentro del periodo observado.",
+        "Evolución y diagnóstico",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-enlaces-nuevos"
+    },
+    {
+      "key": "enlaces-perdidos",
+      "voice": "stroke",
+      "label": "Enlaces perdidos",
+      "use": "Enlaces que el proveedor dejó de observar en el periodo.",
+      "mode": "complete",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Enlaces perdidos",
+        "Enlaces que el proveedor dejó de observar en el periodo.",
+        "Evolución y diagnóstico",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-enlaces-perdidos"
+    },
+    {
+      "key": "enlaces-rotos",
+      "voice": "stroke",
+      "label": "Enlaces rotos",
+      "use": "Enlaces cuyo destino falla o no entrega el contenido esperado.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Enlaces rotos",
+        "Enlaces cuyo destino falla o no entrega el contenido esperado.",
+        "Evolución y diagnóstico",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-enlaces-rotos"
+    },
+    {
+      "key": "brecha-backlinks",
+      "voice": "stroke",
+      "label": "Brecha de backlinks",
+      "use": "Fuentes que enlazan a competidores y faltan en el perfil analizado.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Brecha de backlinks",
+        "Fuentes que enlazan a competidores y faltan en el perfil analizado.",
+        "Evolución y diagnóstico",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-brecha-backlinks"
+    },
+    {
+      "key": "relevancia-tematica",
+      "voice": "stroke",
+      "label": "Relevancia temática",
+      "use": "Afinidad entre el tema de una fuente y el contenido al que enlaza.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Relevancia temática",
+        "Afinidad entre el tema de una fuente y el contenido al que enlaza.",
+        "Perfil de enlaces",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-relevancia-tematica"
+    },
+    {
+      "key": "riesgo-enlaces",
+      "voice": "stroke",
+      "label": "Riesgo del perfil",
+      "use": "Señales que requieren revisión del perfil de enlaces.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo",
+        "authority"
+      ],
+      "keywords": [
+        "Riesgo del perfil",
+        "Señales que requieren revisión del perfil de enlaces.",
+        "Evolución y diagnóstico",
+        "seo",
+        "SEO",
+        "authority",
+        "Autoridad"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-riesgo-enlaces"
+    },
+    {
+      "key": "rastreo",
+      "voice": "stroke",
+      "label": "Rastreo",
+      "use": "Recorrido del crawler por las páginas.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Rastreo",
+        "Recorrido del crawler por las páginas.",
+        "Acceso y descubrimiento",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-rastreo"
+    },
+    {
+      "key": "indexacion",
+      "voice": "stroke",
+      "label": "Indexación",
+      "use": "Incorporación de una página al índice.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Indexación",
+        "Incorporación de una página al índice.",
+        "Acceso y descubrimiento",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-indexacion"
+    },
+    {
+      "key": "sitemap",
+      "voice": "stroke",
+      "label": "Sitemap",
+      "use": "Inventario de URLs para facilitar su descubrimiento.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Sitemap",
+        "Inventario de URLs para facilitar su descubrimiento.",
+        "Acceso y descubrimiento",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-sitemap"
+    },
+    {
+      "key": "canonical",
+      "voice": "stroke",
+      "label": "Canonical",
+      "use": "URL representativa entre páginas duplicadas o similares.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Canonical",
+        "URL representativa entre páginas duplicadas o similares.",
+        "Estructura del sitio",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-canonical"
+    },
+    {
+      "key": "redireccion",
+      "voice": "stroke",
+      "label": "Redirección",
+      "use": "Cambio de destino de una URL.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Redirección",
+        "Cambio de destino de una URL.",
+        "Estructura del sitio",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-redireccion"
+    },
+    {
+      "key": "datos-estructurados",
+      "voice": "stroke",
+      "label": "Datos estructurados",
+      "use": "Propiedades del contenido expresadas en un formato legible por máquinas.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Datos estructurados",
+        "Propiedades del contenido expresadas en un formato legible por máquinas.",
+        "Interpretación del contenido",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-datos-estructurados"
+    },
+    {
+      "key": "renderizado",
+      "voice": "stroke",
+      "label": "Renderizado",
+      "use": "Código convertido en contenido visible en la página.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Renderizado",
+        "Código convertido en contenido visible en la página.",
+        "Interpretación del contenido",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-renderizado"
+    },
+    {
+      "key": "enlazado-interno",
+      "voice": "stroke",
+      "label": "Enlazado interno",
+      "use": "Conexiones entre páginas de un mismo sitio.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Enlazado interno",
+        "Conexiones entre páginas de un mismo sitio.",
+        "Estructura del sitio",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-enlazado-interno"
+    },
+    {
+      "key": "intencion-busqueda",
+      "voice": "stroke",
+      "label": "Intención de búsqueda",
+      "use": "Necesidad que la persona busca resolver con una consulta.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Intención de búsqueda",
+        "Necesidad que la persona busca resolver con una consulta.",
+        "Estrategia de contenido",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-intencion-busqueda"
+    },
+    {
+      "key": "cluster-tematico",
+      "voice": "stroke",
+      "label": "Cluster temático",
+      "use": "Tema central y contenidos relacionados.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Cluster temático",
+        "Tema central y contenidos relacionados.",
+        "Estrategia de contenido",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-cluster-tematico"
+    },
+    {
+      "key": "canibalizacion",
+      "voice": "stroke",
+      "label": "Canibalización",
+      "use": "URLs que compiten por la misma intención de búsqueda.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Canibalización",
+        "URLs que compiten por la misma intención de búsqueda.",
+        "Estrategia de contenido",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-canibalizacion"
+    },
+    {
+      "key": "hreflang",
+      "voice": "stroke",
+      "label": "Hreflang",
+      "use": "Alternativas de una página por idioma y región.",
+      "mode": "replace",
+      "gesture": false,
+      "status": "candidate",
+      "collections": [
+        "seo"
+      ],
+      "keywords": [
+        "Hreflang",
+        "Alternativas de una página por idioma y región.",
+        "SEO internacional",
+        "seo",
+        "SEO"
+      ],
+      "package": "@efeoncepro/axis-graphic-line/icons/seo",
+      "renderer": "resolveSeoIcon",
+      "href": "/references/iconography/#icon-stroke-hreflang"
+    }
+  ]
+}

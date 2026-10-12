@@ -34,6 +34,24 @@ Para Seedream, Layerize, Seedance y Seed Speech del contrato Johor, usa `pnpm ai
 Los slugs, precios y mediciones de Fal/Higgsfield conservados abajo pertenecen a esos proveedores, que siguen
 como alternativas explícitas o para capacidades sin equivalencia directa. Esta elección local no habilita Globe.
 
+**Prueba propia 2026-10-12:** [Nexa cine, Seedream 5 Pro standard directo y Sunburst max](../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md).
+Pro conserva rostro, traje y atmósfera a menor costo; Sunburst sigue mejor acción/geografía en esa pareja.
+Una salida por motor, tamaños nativos distintos; sin ranking universal ni cambio de anclas/default OpenAI.
+[Seedance 2.5: costo API 720p/1080p](../audits/creative-studio/BYTEPLUS_DIRECT_PRICING_COMPARISON_2026-10-12.md)
+separa tarifa BytePlus de cuenta, Fal e Higgsfield API antes de descuento; excluye el conector por créditos.
+
+[Cuatro iconos 3D, Flare max vs Pro standard directo](../audits/ai-tooling/2026-10-12-iconos-flare-vs-seedream5-pro.md):
+mismos prompts, ambos PNG 2048²; Flare conserva mejor acabado mate y detalle fino, Pro resuelve los conceptos
+pero deriva a porcelana brillante. Cuatro salidas: US$1,72 / US$0,324 estimados. Fondo opaco controlado;
+no prueba alfa ni adopta nuevos glifos de Efeonce/AXIS.
+La segunda tanda del mismo informe, **clay 3D**, mantiene mate en ambos motores: Pro aporta marcas de
+modelado creíbles y Flare formas más infladas/regulares. Pro viable para clay genérico a US$0,081 por icono;
+revisar silueta/color y detalles añadidos, sin trasladar el juicio de vidrio/porcelana a todos los materiales.
+[Mate uniforme Efeonce](../audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md): cuatro formas nuevas,
+referencias planas aprobadas. Flare max más liso y regular en una pasada (US$1,751348/4); Pro standard conserva
+grano inicial (US$0,324/4), mejora con edición de superficie (otras US$0,324/4). Diferenciar primera pasada
+controlada y proceso final de dos pasadas; alfa derivado por color-key, avisos de geometría y sin adopción del catálogo. El operador seleccionó Flare para esta ronda; la evidencia Pro se conserva.
+
 ## 0. Cómo usar esta guía
 
 Sigue siempre este orden. No saltes al comando sin pasar por el árbol.

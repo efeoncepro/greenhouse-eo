@@ -29,7 +29,8 @@ Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_D
 
 TeamBot: `pnpm teams:announce` sólo para grupos con menciones explícitas; 1:1 manual requiere dispatcher/audit, Entra e idempotencia. Performance Reports verifica mención publicada, no infiere sobrecarga por volumen. [Manual](docs/operations/manual-teams-announcements.md).
 
-AXIS: packages privados y Lab. [Composición](docs/manual-de-uso/creative/descubrir-y-componer-con-axis.md); [distribución y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md). Video 0.6.5; Think registry. CI proporcional, Select obligatorio y QA por host; WordPress sin activar. Primitives/Growth CTA aprobados; Growth Forms opt-in local.
+AXIS privado/Lab: [composición](docs/manual-de-uso/creative/descubrir-y-componer-con-axis.md), [operación y QA](docs/operations/AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
+Iconos: [prueba mate](docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md).
 
 Globe (`../efeonce-globe`): Tailwind v4; hibernación/encendido en [estado](docs/operations/creative-studio/GLOBE_RUNTIME_HANDOFF.md)
 y [runbook](docs/operations/creative-studio/GLOBE_DEEP_HIBERNATION_RUNBOOK_V1.md); caller pausado hasta SQL/API y tenancy fresca.

@@ -1,5 +1,8 @@
 # Iconografía de la línea: Trazo y Plastilina
 
+> Delta de prueba mate uniforme verificado contra: AXIS `de34866`, catálogo live (134 entradas) y aprobación
+> de las bases por el operador — 2026-10-12. Sin promoción/publicación de esos candidatos.
+
 > Actualización de este corte verificada contra: axis-design-system@aee99d2 — 2026-10-04. El historial anterior conserva sus fuentes por fecha.
 
 > Verificado contra: AXIS `main@5b8ab20` (tokens `0.3.6`, `@efeoncepro/axis-graphic-line` `0.4.0`, publicados con el
@@ -321,6 +324,16 @@ La voz sigue siempre el canon de la línea (pregunta Poppins 300 con aro, respue
 ver `criteria.md`).
 
 ## 12. Plastilina en volumen (canónica desde D24, 2026-09-27)
+
+**Prueba nueva 2026-10-12:** binoculares, metrónomo, sello de aprobación e imán no figuraban entre las 134
+entradas live. Se crearon con la referencia y prompt de Plastilina plana, vectorización y `icons:check`;
+el operador aprobó sus bases antes del 3D. Para comparar Flare y Pro directo se usa el prompt canónico de
+volumen más una línea que exige mate perfectamente liso, sin microtextura/huellas, conforme a su pedido.
+Los helpers de color-key y QA mantienen su lógica canónica en un adapter local de candidatos; publicación
+inhabilitada. Flare logró mayor uniformidad en una pasada; Pro recibió una segunda edición de superficie,
+con costo y posible deriva adicionales. Los PNG sin fondo son derivados, no alfa nativo.
+Después de la entrega, el operador eligió Flare para esta ronda; Seedream queda como evidencia comparativa.
+La selección de ronda no publica los glifos ni cambia el default global; los avisos de QA siguen registrados. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md).
 
 > **Estado:** canónica en AXIS `main@c18e3d3` y en el Lab (operador, 2026-09-27: «Bien, ese estilo me gusta,
 > canonízalo y mándalo también a la web y a todos los espacios que corresponda»). Los paquetes que la traen

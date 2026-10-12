@@ -1,0 +1,20 @@
+[
+  {
+    "id": "sunburst-max",
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "logo": 6.28
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  },
+  {
+    "id": "seedream5-pro-standard",
+    "ratioDominanteEntrada": null,
+    "contraste": {
+      "logo": 4.04
+    },
+    "gapsTinta": [],
+    "seleccion": null
+  }
+]

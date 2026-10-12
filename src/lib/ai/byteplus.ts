@@ -70,7 +70,8 @@ export const bytePlusRequest = async <T>(lane: BytePlusLane, path: string, optio
 }
 
 export const generateBytePlusImages = (input: Record<string, unknown>) =>
-  bytePlusRequest<BytePlusImageResponse>('ark', '/images/generations', { method: 'POST', body: input })
+  // Standard Pro + múltiples referencias puede tardar más de tres minutos. Sin reintento automático.
+  bytePlusRequest<BytePlusImageResponse>('ark', '/images/generations', { method: 'POST', body: input, timeoutMs: 600_000 })
 export interface BytePlusVideoTask {
   id: string
   status: 'queued' | 'running' | 'succeeded' | 'failed' | 'cancelled' | 'expired'

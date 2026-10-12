@@ -1,0 +1,28 @@
+{
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--image",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/metronomo.png",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/surface-finish.txt",
+    "--input-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-input.json",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-smooth/metronomo.png",
+    "--out-dir",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/receipts-smooth/metronomo",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "elapsedSeconds": 123.8203809261322,
+  "exitCode": 0,
+  "parent": "seedream/metronomo.png",
+  "delta": "material microtexture only (requested, not a pixel preservation guarantee)"
+}

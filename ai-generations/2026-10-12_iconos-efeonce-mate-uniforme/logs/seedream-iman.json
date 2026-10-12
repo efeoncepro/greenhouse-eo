@@ -1,0 +1,29 @@
+{
+  "lane": "seedream",
+  "icon": "iman",
+  "elapsedSeconds": 53.97331213951111,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:byteplus",
+    "--model",
+    "seedream5-pro",
+    "--size",
+    "2048x2048",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/prompts/iman.txt",
+    "--input-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream-input.json",
+    "--image",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/references/iman.png",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/iman.png",
+    "--out-dir",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/receipts/iman",
+    "--max-usd",
+    "0.09",
+    "--yes"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-efeonce-mate-uniforme/seedream/iman.png"
+}

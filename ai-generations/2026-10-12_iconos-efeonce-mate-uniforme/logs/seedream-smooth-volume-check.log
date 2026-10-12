@@ -1,0 +1,6 @@
+  ✓ binoculares  silueta 0.995 · calados 2→2 · piezas 2→2
+  ⚠ metronomo    silueta 0.214 · calados 1→2 · piezas 2→1 — revisar al 100 %: silueta 0.214 < 0.75; calados 1 → 2; piezas 2 → 1
+  ⚠ sello-aprobacion silueta 0.231 · calados 1→1 · piezas 3→1 — revisar al 100 %: silueta 0.231 < 0.75; piezas 3 → 1
+  ⚠ iman         silueta 0.916 · calados 0→0 · piezas 4→2 — revisar al 100 %: piezas 4 → 2
+
+3 con avisos. Un aviso no es un rechazo: mira cada uno al 100 % contra el plano (el volumen junta piezas que se tocan y la perspectiva baja la silueta). Rechaza si la forma se reinventó, si un calado se volvió relieve o si figura y fondo se invirtieron.

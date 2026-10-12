@@ -40,6 +40,9 @@ Cada generación conserva identidad de modelo, proveedor, request/task ID, uso y
 Una tarifa estimada no prueba ahorro realizado. El número de capas se conoce sólo tras la respuesta; se incluye
 la base y se calcula por el tamaño efectivo de cada capa en BytePlus. No se reintenta un POST de generación.
 Video registra el task ID antes de polling para poder recuperar el resultado sin encolar de nuevo.
+Imágenes esperan hasta 600 s sin retry automático: Pro standard con ocho referencias terminó a los 227 s
+en la [prueba Nexa](../../audits/ai-tooling/2026-10-12-nexa-seedream5-pro-vs-sunburst.md). El timeout inicial
+de 180 s no prueba cancelación ni cobro cero; un nuevo POST es un intento separado.
 
 ## Runtime Contract
 

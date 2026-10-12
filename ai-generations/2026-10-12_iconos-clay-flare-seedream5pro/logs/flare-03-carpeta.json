@@ -1,0 +1,28 @@
+{
+  "lane": "flare",
+  "icon": "03-carpeta",
+  "elapsedSeconds": 52.8140127658844,
+  "exitCode": 0,
+  "command": [
+    "pnpm",
+    "-s",
+    "ai:image",
+    "--model",
+    "gpt-image-2.5-flare",
+    "--quality",
+    "max",
+    "--size",
+    "2048x2048",
+    "--background",
+    "opaque",
+    "--format",
+    "png",
+    "--prompt-file",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/prompts/03-carpeta.txt",
+    "--out",
+    "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/03-carpeta.png",
+    "--timeout",
+    "600000"
+  ],
+  "output": "/Users/jreye/Documents/greenhouse-eo/ai-generations/2026-10-12_iconos-clay-flare-seedream5pro/flare/03-carpeta.png"
+}

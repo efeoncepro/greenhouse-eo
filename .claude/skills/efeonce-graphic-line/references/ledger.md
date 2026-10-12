@@ -1,5 +1,8 @@
 # Registro de decisiones y versiones
 
+> Delta mate uniforme verificado contra: petición y aprobación del operador, AXIS `de34866` y catálogo live
+> de 134 entradas — 2026-10-12; comparación local, sin publicación de paquetes ni incorporación al catálogo.
+
 > Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
@@ -27,6 +30,7 @@
 
 | Fecha | Decisión |
 |---|---|
+| 2026-10-12 | Prueba de **Plastilina en volumen mate uniforme**: superficie lisa, sin huellas/grano, en cuatro iconos ausentes del catálogo actual. Bases de binoculares, metrónomo, sello de aprobación e imán aprobadas («Sí, continuar con las cuatro») para comparar Flare max y Seedream 5 Pro standard desde sus vectores. Posteriormente el operador seleccionó las cuatro versiones Flare para esta ronda («quedemonos para esta ronda con los de flare»); la comparación se conserva. Selección de ronda sin publicación del catálogo ni default global. [Evidencia y estado](../../../../docs/audits/ai-tooling/2026-10-12-efeonce-iconos-mate-uniforme.md). |
 | 2026-10-10 | Deck **Marketing de Contenidos** aprobado (brochure de 57 láminas, línea Brand, ruta corta de 21; «Me encantó todo, queda aprobado»). Deja cuatro cosas en el canon: el patrón **franjas de foto** en seis y tres franjas, con tres excepciones sólo para él (una esfera por franja, foto de cine recortada, degradado bajo el título); la lámina a mano **«Producción con IA»** con la foto `CT24` en el índice de cine; **«Día a día»** con una interfaz de Marketing Studio **construida, no capturada**, como uso de `content-day-tools`; y la lámina de equipo **«Expertos multidisciplinarios»** con «+85 expertos más en Latam» («Personas reales» deja de ser el titular preferido). No se envía a un prospecto hasta cerrar sus pendientes (compromisos de servicio, «+85» sin fuente, logos de terceros). Norma: `EFEONCE_SURFACE_COMPOSITION_V1.md` §4.6 y deltas 2026-10-10 (a–e); catálogo: `deck-recipes/README.md`. |
 | 2026-10-09 | Deck **Servicios web y digitales** aprobado (brochure de 29 láminas, línea Engine; «este deck está listo»). Fija que una pieza de línea lleva el **fondo Efeonce `#001A33`** y sólo el acento de la línea (`#091951` es de piezas de producto), una variante de `decision-case` sin foto del caso y la lámina «Dónde construimos». Pendientes antes de enviarlo: cifras de los casos Aguas Andinas (marcadores) y Berel. Norma: §4.6, «Deck Servicios web». |
 | 2026-10-09 | Portada general del brochure: «¿Qué gano con Efeonce? **Crecimiento.**» reemplaza a «¿Qué hace Efeonce? Crecer.» («Efeonce GENERA crecimiento para nuestros clientes»; confirmado en el canvas «Brochure Efeonce»). Vale para la portada general y la lámina que abre servicios. Los plates no llevan texto: el par nuevo va en el intent y no se regenera ninguna foto (las imágenes de referencia del catálogo todavía muestran «Crecer.»). La pregunta va en voz del cliente: el operador eligió cumplir la regla 3 del delta 2026-10-06 sobre «¿Qué genera Efeonce?». |
