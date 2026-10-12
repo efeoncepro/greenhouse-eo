@@ -248,7 +248,7 @@ Reglas obligatorias:
 ### Runtime evidence
 
 - Local checks: `pnpm pricing:v3:test` (incluye la paridad sin red y la caracterización del modo local), `pnpm local:check`.
-- DB/runtime checks: lectura de la cotización registrada por la API después de `registry register` (número, versión, huella).
+- DB/runtime checks: lectura de la cotización registrada por la API después de `registry register` (identificador, versión, huella).
 - Integration checks: `pnpm pricing:v3 doctor` y `pnpm pricing:v3:parity` contra staging y contra producción.
 - Reliability signals/logs: `requestId` por llamada; las señales del registro son de `TASK-2027`.
 - Production verification sequence: la de «Rollout Plan & Risk Matrix».
@@ -314,8 +314,9 @@ Reglas obligatorias:
 
 ### Slice 5 — Registro y actos humanos
 
-- Grupo `registry`: registrar un artefacto local, leer cotizaciones y versiones, pedir los datos del documento con
-  número y versión, y los actos humanos del ciclo de vida de `TASK-2027`.
+- Grupo `registry`: crear una cotización o una versión desde una demanda, registrar un artefacto local, guardar los
+  textos del documento, las lecturas del registro y, si la decisión de la sección 7 lo permite, los actos humanos de
+  `TASK-2027`.
 - Clave de idempotencia impresa antes del pedido; sin reintentos; manejo de resultado dudoso.
 
 ### Slice 6 — Paridad permanente
@@ -398,9 +399,11 @@ y un `## Delta` en la task dueña de la ruta.
 | `current set` | no | `TASK-2029` | Mover el puntero será un acto humano por la API. |
 | `doctor` (nuevo) | sólo plataforma | `TASK-2026` | Diagnóstico de conexión. |
 | `parity` (nuevo) | los dos a la vez | `TASK-2026` | Compara los dos transportes. |
-| `registry register` (nuevo) | sólo plataforma | `TASK-2027` | Registra un artefacto local como cotización nueva o como versión nueva. |
-| `registry list`, `show`, `versions`, `document` (nuevos) | sólo plataforma | `TASK-2027` | Lecturas del registro. |
-| `registry` + acto humano (nuevos) | sólo plataforma, sólo persona | `TASK-2027` | Aprobar una excepción bajo el piso y emitir. Los nombres salen del contrato de `TASK-2027`. |
+| `registry create`, `add-version` (nuevos) | sólo plataforma | `TASK-2027` (filas 1 y 2) | La API recalcula la demanda y guarda la versión. |
+| `registry register` (nuevo) | sólo plataforma | `TASK-2027` (filas 3 y 4) | Registra un artefacto local como cotización nueva o, con `--quote`, como versión nueva. |
+| `registry document-texts` (nuevo) | sólo plataforma | `TASK-2027` (fila 5) | Guarda los textos del documento de una versión. |
+| `registry list`, `show`, `version`, `replay`, `preview`, `document`, `history` (nuevos) | sólo plataforma | `TASK-2027` (filas 9 a 15) | Lecturas del registro. |
+| `registry approve-exception`, `issue`, `withdraw` (nuevos) | sólo plataforma, sólo persona | `TASK-2027` (filas 6 a 8) | Actos humanos. Condicionados a la decisión de la sección 7. |
 
 Las diecinueve operaciones con ruta son las de la tabla de operaciones de `TASK-2026`; si esa tabla cambia, manda ella.
 Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta por la API, entra como `## Delta` de
@@ -460,8 +463,8 @@ Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta po
 - Sin `--quote` crea la cotización con su primera versión; con `--quote` agrega una versión que reemplaza a la anterior.
 - Calcular por la API **no registra**: registrar es siempre un paso aparte y explícito, una mutación por comando.
 - Hay una sola base para staging y producción: registrar contra staging escribe en las mismas tablas que producción.
-  Las pruebas de registro en staging usan el marcador de origen sintético que defina `TASK-2025`/`TASK-2027`; sin ese
-  marcador no se hacen registros de prueba.
+  Las pruebas de registro en staging usan `data_origin = 'synthetic'` (`TASK-2025`), que tiene secuencia de número
+  propia; sin ese marcador no se hacen registros de prueba.
 
 ### 7. Autenticación
 
@@ -483,6 +486,14 @@ Persona (carril de aplicación):
 - Inicio de sesión por PKCE en loopback, como `scripts/globe-credit-funding.ts`: navegador, escucha en
   `127.0.0.1:<puerto aleatorio>`, intercambio del código, token en memoria durante la ejecución, nada en disco.
 - Obligatorio para todo acto humano; opcional (`--sign-in`) para quien quiera cotizar o registrar como persona.
+- **Dependencia abierta.** Ese inicio de sesión produce un bearer `sister_platform_oauth`, y `TASK-2027`, tal como está
+  escrita, lo rechaza como acto humano (`human_gate_required`): su compuerta acepta sólo `cookie_session` o
+  `first_party_app`, y deja «admitir un bearer delegado de una persona verificada» como decisión del dueño. Mientras
+  esa decisión no exista, los tres comandos de acto humano no se construyen y la task lo declara; el resto del Slice 5
+  no depende de ello. La alternativa de sesión de primera parte (`POST /api/platform/app/sessions`, correo y
+  contraseña) no se adopta por defecto: los usuarios internos entran por SSO y poner una contraseña en una terminal
+  operada por agentes es lo que la política prohíbe. Sin interfaz hasta la fase 8, esta decisión define si alguien
+  puede aprobar una excepción o emitir antes de esa fase.
 - Un acto humano pide además confirmación en la terminal mostrando qué se va a hacer. Sin terminal interactiva termina
   con `TRANSPORT_HUMAN_SESSION_REQUIRED`.
 - Una sesión de `/api/auth/agent-session` no se usa para actos humanos: la API la rechaza y en producción ese endpoint
@@ -543,9 +554,10 @@ Ya previstos por `TASK-2026` y que esta task consume tal cual: claves del cuerpo
 Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible a la task dueña:
 
 - Una lectura de las versiones del registro de motores que sirve el despliegue (`doctor` la compara con las locales).
-- Que el carril de aplicación acepte el bearer delegado de una persona para los actos humanos de `TASK-2027`, no sólo la
-  cookie de sesión.
-- Un marcador de origen sintético en el registro, para las pruebas de `registry register` en staging.
+- Que el carril de aplicación acepte el bearer delegado de una persona para los actos humanos: hoy `TASK-2027` lo
+  rechaza a propósito (ver sección 7). Es una decisión del operador, no un hueco técnico.
+- Cómo marca quien llama una cotización como sintética (`data_origin = 'synthetic'` de `TASK-2025`, con su secuencia
+  propia) para las pruebas de registro en staging.
 - El límite de tamaño del cuerpo: el artefacto más grande del repo mide cerca de 2,5 MB. Un `413` se traduce a un error
   tipado propio, nunca a `TRANSPORT_UNREACHABLE`.
 
@@ -566,7 +578,7 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 | El refactor altera la salida del modo local | CLI | medium | Caracterización del Slice 1 como puerta de cada commit; guarda de artefactos congelados | `pnpm pricing:v3:test` en rojo |
 | La API calcula distinto que la CLI | motor / API | low | Mismo código; paridad sin red y en vivo; verificación local antes de `--out` | `TRANSPORT_PARITY_MISMATCH`, `REPLAY_MISMATCH` |
 | Una caída de red deja al operador sin herramienta | CLI | medium | Modo local intacto y siempre seleccionable; error claro en vez de respaldo | `TRANSPORT_UNREACHABLE` |
-| Una cotización parece registrada y no lo está | registro | low | Sin respaldo silencioso; registrar es un comando aparte que devuelve número y versión | salida de `registry register` sin número |
+| Una cotización parece registrada y no lo está | registro | low | Sin respaldo silencioso; registrar es un comando aparte que devuelve identificador, versión y huella | salida de `registry register` sin identificador |
 | Doble registro por reintento | registro | low | Clave derivada del contenido, impresa antes; sin reintentos; resultado dudoso tipado | `TRANSPORT_AMBIGUOUS_OUTCOME` |
 | Fuga de un token o del secreto de bypass | identidad | low | Una sola fuente, en memoria, redacción, rechazo de archivos dentro del repo, prueba de que ninguna salida lo contiene | prueba de redacción en rojo |
 | Un agente ejecuta un acto humano | registro | low | Carril de aplicación con persona; confirmación en terminal; la API rechaza sesión de agente | `TRANSPORT_HUMAN_SESSION_REQUIRED` |
@@ -645,8 +657,8 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
       huella alterada no se escribe y termina con `REPLAY_MISMATCH`.
 - [ ] Una fuente pasada por archivo viaja como versión y huella; una prueba demuestra que el contenido del archivo no
       está en el cuerpo del pedido.
-- [ ] `registry register` registra un artefacto local calculado y devuelve número y versión; repetir el comando devuelve
-      el mismo registro; un artefacto bloqueado, uno con huella alterada y uno con una versión no reflejada se rechazan
+- [ ] `registry register` registra un artefacto local calculado y devuelve identificador, versión y huella (el número
+      público se asigna al emitir); repetir el comando devuelve el mismo registro; un artefacto bloqueado, uno con huella alterada y uno con una versión no reflejada se rechazan
       con su código.
 - [ ] Calcular por la API no crea filas en el registro (comprobado leyendo el registro antes y después).
 - [ ] Toda mutación imprime su clave de idempotencia en stderr antes del pedido y ninguna se reintenta sola; un corte
@@ -655,8 +667,9 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
       un archivo con otros permisos o un archivo dentro del repo se rechazan.
 - [ ] Una prueba recorre stdout, stderr y los archivos escritos de todas las rutas de error y confirma que ni el token
       ni el secreto de bypass aparecen.
-- [ ] Un acto humano exige inicio de sesión de persona y confirmación en terminal; con token de consumidor o sin
-      terminal interactiva se rechaza.
+- [ ] Actos humanos: o bien la decisión de admitir el bearer delegado de una persona está tomada y los tres comandos
+      exigen inicio de sesión de persona y confirmación en terminal (con token de consumidor o sin terminal interactiva
+      se rechazan); o bien quedan sin construir, con la decisión pendiente registrada en esta task y en `EPIC-053`.
 - [ ] La cabecera de bypass de Vercel se envía sólo a orígenes de staging (probado con un origen de producción y uno de
       terceros).
 - [ ] `pnpm pricing:v3 doctor` reporta cada comprobación de la sección 9 y falla cuando el puntero reflejado difiere del
@@ -724,4 +737,6 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 - ¿Qué perfil rige cuando el modo por defecto pasa a `platform`: `production` implícito o perfil siempre explícito? La
   propuesta es exigirlo por `PRICING_V3_PROFILE`, sin perfil implícito.
 - ¿Quién opera el alta del consumidor y dónde vive su secreto (nombre y proyecto)?
+- ¿Se admite el bearer delegado de una persona verificada como acto humano del cotizador? Sin eso no hay forma de
+  aprobar una excepción ni de emitir desde la CLI, y la interfaz llega recién en la fase 8.
 - ¿Un agente puede pedir datos de documento con número antes de la emisión, o sólo el borrador?

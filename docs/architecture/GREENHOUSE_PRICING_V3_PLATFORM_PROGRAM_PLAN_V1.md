@@ -147,7 +147,7 @@ una persona o un agente.
 | 6 | Catálogo en la plataforma | Revisar, aplicar y mover el puntero por la API; exportación al repo | Mantenimiento de catálogo también por la API | Un cambio real de precio hecho por la API, con su copia en el repo |
 | 7 | MCP | Herramientas de lectura, simulación y registro; las de aprobar y emitir no se exponen | Sin cambios | Canario del gateway en verde; herramientas actuales de V2 siguen respondiendo |
 | 8 | Interfaz y documento en producción | Decisión portal o Rooms; pantallas de lista, detalle, aprobación y emisión; enlace público; render del PDF en producción | Sin cambios | Se define al abrir la fase |
-| 9 | Retiro del cotizador actual | Cierre de sus puertas de escritura; herramientas de Nexa y MCP apuntando a V3; vínculo de propuestas de licitación; salida a HubSpot | Sin cambios | Decisión propia, con su plan de reversa |
+| 9 | Retiro del cotizador actual | (El cierre de sus puertas de escritura se adelantó: `TASK-2023`.) Herramientas de Nexa y MCP apuntando a V3; vínculo de propuestas de licitación; salida a HubSpot | Sin cambios | Decisión propia, con su plan de reversa |
 
 Orden pedido por el CEO: API (fases 1–4), CLI (5), MCP (7), interfaz (8). La fase 6 es parte de la API y se hace con
 la CLI ya conectada, porque el mantenimiento del catálogo se opera con ella.
