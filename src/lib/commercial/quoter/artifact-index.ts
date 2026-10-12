@@ -1,8 +1,8 @@
 import 'server-only'
 
 import { identifyCurrentSource } from '@/lib/finance/pricing-v3/adapters/current-versions'
-import type { ARTIFACT_VERSIONS} from '@/lib/finance/pricing-v3/storage';
 import { identifyArtifact } from '@/lib/finance/pricing-v3/storage'
+import type { ARTIFACT_VERSIONS } from '@/lib/finance/pricing-v3/storage'
 import type { CurrentSourceRole } from '@/lib/finance/pricing-v3/adapters/current-versions'
 
 /**
@@ -30,6 +30,11 @@ export type ArtifactIndex = {
   /** Every input contract its periods were written under. */
   contractVersions: string[]
   currency: string | null
+  /**
+   * The verdict of the engine: some row of some period is under its floor (`MARGIN_BELOW_FLOOR`). Frozen with the
+   * version, because issuing a version below the floor needs the approval of a person and the database checks it.
+   */
+  belowFloor: boolean
   /** The sources the artifact carries inside, by the identity a pointer would name them with. */
   sources: Partial<Record<CurrentSourceRole, ArtifactSourceIndex>>
 }
@@ -43,9 +48,16 @@ const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 const text = (value: unknown): string | null => (typeof value === 'string' && value ? value : null)
 const distinct = (values: (string | null)[]) => [...new Set(values.filter((value): value is string => value !== null))].sort()
 
+const BELOW_FLOOR = 'MARGIN_BELOW_FLOOR'
+
+const flagsBelowFloor = (holder: Json | undefined) =>
+  list(holder?.diagnostics).some(diagnostic => object(diagnostic)?.code === BELOW_FLOOR)
+
 // The quote of a period-based lane: its status and totals, the engine of each period and the contract of each input.
 const quoteFacts = (quote: Json | undefined) => ({
   calculationStatus: text(quote?.calculationStatus),
+  belowFloor:
+    flagsBelowFloor(quote) || list(quote?.periods).some(period => flagsBelowFloor(object(object(period)?.result))),
   engineVersions: distinct(list(quote?.periods).map(period => text(object(object(period)?.result)?.engineVersion))),
   contractVersions: distinct(
     list(object(quote?.resolution)?.inputs).map(input =>
@@ -84,6 +96,7 @@ export const readArtifactIndex = (value: unknown): ArtifactIndex => {
       ...identity,
       artifactVersion: lane,
       calculationStatus: text(result?.calculationStatus),
+      belowFloor: flagsBelowFloor(result),
       engineVersions: distinct([text(semantic?.engineVersion)]),
       contractVersions: distinct([text(request?.schemaVersion)]),
       currency: text(request?.outputCurrency),

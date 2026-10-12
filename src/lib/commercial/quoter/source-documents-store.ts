@@ -3,8 +3,8 @@ import 'server-only'
 import type { CurrentSourceRole } from '@/lib/finance/pricing-v3/adapters/current-versions'
 
 import { canonicalSourceDocument, textDigest } from './canonical-text'
-import { UNIQUE_VIOLATION, runQuoterQuery, sqlStateOf, toIso } from './db'
-import { QuoterError } from './errors'
+import { runQuoterQuery, toIso } from './db'
+import { QuoterError, withQuoterRejections } from './errors'
 import { publishQuoterSourceDocumentStored } from './events'
 import { memberIdOf } from './types'
 import type { QuoterDbClient } from './db'
@@ -31,6 +31,8 @@ export type StoredSourceDocument = {
   parentDigest: string | null
   origin: SourceDocumentOrigin
   sourcePath: string | null
+  /** The commit of the repository the file was read at. `null` only for a document applied on the platform. */
+  sourceCommitSha: string | null
   storedAt: string
 }
 
@@ -44,13 +46,18 @@ type Row = {
   parent_digest: string | null
   origin: SourceDocumentOrigin
   source_path: string | null
+  source_commit_sha: string | null
   stored_at: Date
 }
 
-const COLUMNS = `role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path, stored_at`
+const COLUMNS = `role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path,
+  source_commit_sha, stored_at`
 
-// What is read is believed only after its digest is recomputed: a row whose text no longer gives its digest is a
-// corrupt registry, never a document to hand over.
+// What is read is believed only after the sha256 of its text is recomputed: a row whose text no longer gives its
+// digest is a corrupt registry, never a document to hand over. The text is NOT run through the validator of its
+// role again: that validator is today's, and a document stored under an older contract must stay readable for as
+// long as an artifact names it. Identity is matched by the columns (role, version, digest), which were derived from
+// the validated value when the row was written.
 const verified = (row: Row): StoredSourceDocument => {
   if (textDigest(row.canonical_text) !== row.document_digest)
     throw new QuoterError('stored_digest_mismatch', { object: 'source_document', role: row.role, version: row.version })
@@ -64,6 +71,7 @@ const verified = (row: Row): StoredSourceDocument => {
     parentDigest: row.parent_digest,
     origin: row.origin,
     sourcePath: row.source_path,
+    sourceCommitSha: row.source_commit_sha,
     storedAt: toIso(row.stored_at)
   }
 }
@@ -96,7 +104,8 @@ export const findSourceDocument = async (
 export const listSourceDocuments = async (client: QuoterDbClient | undefined) => {
   const rows = await runQuoterQuery<Omit<Row, 'canonical_text'>>(
     client,
-    `SELECT role, version, document_digest, schema_version, parent_digest, origin, source_path, stored_at
+    `SELECT role, version, document_digest, schema_version, parent_digest, origin, source_path, source_commit_sha,
+            stored_at
        FROM greenhouse_commercial.quoter_source_documents
       ORDER BY role COLLATE "C", stored_at DESC, version COLLATE "C"`
   )
@@ -109,6 +118,7 @@ export const listSourceDocuments = async (client: QuoterDbClient | undefined) =>
     parentDigest: row.parent_digest,
     origin: row.origin,
     sourcePath: row.source_path,
+    sourceCommitSha: row.source_commit_sha,
     storedAt: toIso(row.stored_at)
   }))
 }
@@ -118,7 +128,9 @@ export type StoreSourceDocumentInput = {
   /** The document as received. It is validated by the contract of its role and stored as its canonical text. */
   document: unknown
   origin: SourceDocumentOrigin
+  /** Where the file lives in the repository, and the commit it was read at. Required unless `platform_apply`. */
   sourcePath?: string | null
+  sourceCommitSha?: string | null
   parentDigest?: string | null
   actor: QuoterActor
   reason: string
@@ -135,38 +147,39 @@ export const storeSourceDocument = async (
 ): Promise<StoredSourceDocument> => {
   const canonical = canonicalSourceDocument(input.role, input.document)
 
-  let rows: Row[]
+  if (input.origin !== 'platform_apply' && !(input.sourcePath && input.sourceCommitSha))
+    throw new QuoterError('source_commit_required', { role: input.role, version: canonical.version, origin: input.origin })
 
-  try {
-    rows = await runQuoterQuery<Row>(
-      client,
-      `INSERT INTO greenhouse_commercial.quoter_source_documents
-         (role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path,
-          stored_by_actor_kind, stored_by_member_id, reason, command_execution_id, request_hash)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-       RETURNING ${COLUMNS}`,
-      [
-        input.role,
-        canonical.version,
-        canonical.digest,
-        canonical.text,
-        canonical.schemaVersion,
-        input.parentDigest ?? null,
-        input.origin,
-        input.sourcePath ?? null,
-        input.actor.kind,
-        memberIdOf(input.actor),
-        input.reason,
-        input.command?.commandExecutionId ?? null,
-        input.command?.requestHash ?? null
-      ]
-    )
-  } catch (error) {
-    if (sqlStateOf(error) === UNIQUE_VIOLATION)
-      throw new QuoterError('source_document_exists', { role: input.role, version: canonical.version })
-
-    throw error
-  }
+  const rows = await withQuoterRejections(
+    () =>
+      runQuoterQuery<Row>(
+        client,
+        `INSERT INTO greenhouse_commercial.quoter_source_documents
+           (role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path,
+            source_commit_sha, stored_by_actor_kind, stored_by_member_id, stored_by_principal_id, reason,
+            command_execution_id, request_hash)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+         RETURNING ${COLUMNS}`,
+        [
+          input.role,
+          canonical.version,
+          canonical.digest,
+          canonical.text,
+          canonical.schemaVersion,
+          input.parentDigest ?? null,
+          input.origin,
+          input.sourcePath ?? null,
+          input.sourceCommitSha ?? null,
+          input.actor.kind,
+          memberIdOf(input.actor),
+          input.actor.principalId,
+          input.reason,
+          input.command?.commandExecutionId ?? null,
+          input.command?.requestHash ?? null
+        ]
+      ),
+    { role: input.role, version: canonical.version }
+  )
 
   const stored = verified(rows[0])
 

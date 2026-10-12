@@ -16,10 +16,11 @@ import { isQuoterError } from '../errors'
 import { activatePointer, readCurrentPointer } from '../pointer-store'
 import { findSourceDocument, listSourceDocuments, storeSourceDocument } from '../source-documents-store'
 
-import { createLocalDatabase, inTransaction, localPgEnabled, rejectionOf } from './local-pg'
+import { FIXTURE_COMMIT, createLocalDatabase, inTransaction, localPgEnabled, rejectionOf } from './local-pg'
 import type { LocalDatabase } from './local-pg'
 
-const MEMBER = { kind: 'member', memberId: 'member-local-fixture' } as const
+const MEMBER = { kind: 'member', memberId: 'member-local-fixture', principalId: 'user-local-fixture' } as const
+const JOB = { kind: 'service', principalId: 'quoter-import' } as const
 const REASON = 'Local fixture: quoter store test.'
 
 const quoterCode = async (operation: Promise<unknown>) => {
@@ -47,7 +48,8 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
         document: JSON.parse(text),
         origin: 'repo_import',
         sourcePath: document(role).path,
-        actor: MEMBER,
+        sourceCommitSha: FIXTURE_COMMIT,
+        actor: JOB,
         reason: REASON
       })
     )
@@ -58,7 +60,8 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
         text: `${JSON.stringify(pointer, null, 2)}\n`,
         confirmDigest,
         origin: 'repo_mirror',
-        activatedByMemberId: MEMBER.memberId,
+        actor: JOB,
+        sourceCommitSha: FIXTURE_COMMIT,
         reason: REASON
       })
     )
@@ -78,7 +81,8 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
       role: 'catalog',
       version: corpus.pointer.catalog.version,
       digest: corpus.pointer.catalog.digest,
-      origin: 'repo_import'
+      origin: 'repo_import',
+      sourceCommitSha: FIXTURE_COMMIT
     })
     expect(textDigest(stored.text)).toBe(corpus.pointer.catalog.digest)
 
@@ -137,13 +141,45 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     const insert = (client: Client) =>
       client.query(
         `INSERT INTO greenhouse_commercial.quoter_source_documents
-           (role, version, document_digest, canonical_text, origin, source_path, stored_by_actor_kind, reason)
-         VALUES ('policy', 'forged-v1', $1, '{"forged":true}', 'repo_import', 'x.json', 'service', 'forged digest')`,
-        ['0'.repeat(64)]
+           (role, version, document_digest, canonical_text, origin, source_path, source_commit_sha,
+            stored_by_actor_kind, stored_by_principal_id, reason)
+         VALUES ('policy', 'forged-v1', $1, '{"forged":true}', 'repo_import', 'x.json', $2, 'service', 'forger',
+                 'forged digest')`,
+        ['0'.repeat(64), FIXTURE_COMMIT]
       )
 
-    expect((await rejectionOf(insert(runtime)))?.code).toBe('23514')
-    expect((await rejectionOf(insert(ops)))?.code).toBe('23514')
+    for (const client of [runtime, ops])
+      expect(await rejectionOf(insert(client))).toMatchObject({ code: '23514', constraint: 'quoter_source_documents_text_digest' })
+  })
+
+  it('a document read from the repository names its file and its commit; every row names who stored it', async () => {
+    const withoutCommit = inTransaction(runtime, () =>
+      storeSourceDocument(runtime, {
+        role: 'policy',
+        document: JSON.parse(document('policy').text),
+        origin: 'repo_import',
+        sourcePath: document('policy').path,
+        actor: JOB,
+        reason: REASON
+      })
+    )
+
+    expect(await quoterCode(withoutCommit)).toBe('source_commit_required')
+
+    // And the table says the same to whoever skips the store.
+    const raw = (columns: string, values: string) =>
+      runtime.query(
+        `INSERT INTO greenhouse_commercial.quoter_source_documents
+           (role, version, document_digest, canonical_text, origin, stored_by_actor_kind, reason${columns})
+         VALUES ('policy', 'raw-v1', greenhouse_commercial.quoter_text_digest('{}'), '{}', 'repo_import', 'service',
+                 'raw insert'${values})`
+      )
+
+    expect(await rejectionOf(raw(', stored_by_principal_id', `, 'job'`))).toMatchObject({
+      code: '23514',
+      constraint: 'quoter_source_documents_origin_names_its_source'
+    })
+    expect((await rejectionOf(raw(', source_path, source_commit_sha', `, 'x.json', '${FIXTURE_COMMIT}'`)))?.code).toBe('23502')
   })
 
   it('append only: UPDATE, DELETE and TRUNCATE fail for the runtime and for the owner', async () => {
@@ -159,9 +195,15 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     const owned = 'greenhouse_commercial.quoter_source_documents'
 
     for (const statement of [`UPDATE ${owned} SET reason = 'changed'`, `DELETE FROM ${owned}`, `TRUNCATE ${owned} CASCADE`])
-      expect((await rejectionOf(ops.query(statement)))?.code, `${statement} as owner`).toBe('23514')
+      expect(await rejectionOf(ops.query(statement)), `${statement} as owner`).toMatchObject({
+        code: '23514',
+        constraint: 'quoter_append_only'
+      })
 
-    expect((await rejectionOf(ops.query(`TRUNCATE greenhouse_commercial.quoter_pointer_history`)))?.code).toBe('23514')
+    expect(await rejectionOf(ops.query(`TRUNCATE greenhouse_commercial.quoter_pointer_history`))).toMatchObject({
+      code: '23514',
+      constraint: 'quoter_append_only'
+    })
   })
 
   it('storing documents never activates: the pointer is still absent', async () => {
@@ -216,7 +258,7 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     expect((await readCurrentPointer(runtime))?.seq).toBe(inForce.seq + 1)
   })
 
-  it('a pointer cannot name a document the registry does not hold, and moving it takes an identified person', async () => {
+  it('a pointer cannot name a document the registry does not hold; activating takes a person, mirroring takes a commit', async () => {
     const inForce = (await readCurrentPointer(runtime))!
 
     const unknown = buildCurrentVersions({
@@ -233,31 +275,66 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
 
     expect(await quoterCode(activate(unknown, inForce.digest))).toBe('pointer_names_unknown_document')
 
-    expect(
-      await quoterCode(
+    const pointerText = `${JSON.stringify(corpus.pointer, null, 2)}\n`
+
+    const activateAs = (overrides: Partial<Parameters<typeof activatePointer>[1]>) =>
+      quoterCode(
         inTransaction(runtime, () =>
           activatePointer(runtime, {
-            text: `${JSON.stringify(corpus.pointer, null, 2)}\n`,
+            text: pointerText,
             confirmDigest: inForce.digest,
             origin: 'platform_activation',
-            activatedByMemberId: '  ',
-            reason: REASON
+            actor: MEMBER,
+            reason: REASON,
+            ...overrides
           })
         )
       )
-    ).toBe('human_actor_required')
 
-    // And the table itself has no way to record a move without a person.
-    const withoutPerson = runtime.query(
-      `INSERT INTO greenhouse_commercial.quoter_pointer_history
-         (pointer_seq, pointer_digest, pointer_text, pointer_text_digest, previous_pointer_digest,
-          catalog_digest, policy_digest, credits_digest, origin, activated_by_member_id, reason)
-       VALUES (0, $1, 'x', greenhouse_commercial.quoter_text_digest('x'), $2, $3, $4, $5, 'repo_mirror', NULL, 'no person')`,
-      ['1'.repeat(64), inForce.digest, corpus.pointer.catalog.digest, corpus.pointer.policy.digest, corpus.pointer.credits.digest]
+    // Activating on the platform is the act of a person; mirroring the repository names the commit instead.
+    expect(await activateAs({ actor: { kind: 'agent', principalId: 'agent-local-fixture' } })).toBe('human_actor_required')
+    expect(await activateAs({ actor: JOB })).toBe('human_actor_required')
+    expect(await activateAs({ origin: 'repo_mirror', actor: JOB })).toBe('source_commit_required')
+
+    // And the table itself says the same to whoever skips the store.
+    const raw = (origin: string, member: string | null, commit: string | null) =>
+      runtime.query(
+        `INSERT INTO greenhouse_commercial.quoter_pointer_history
+           (pointer_seq, pointer_digest, pointer_text, pointer_text_digest, previous_pointer_digest, catalog_digest,
+            policy_digest, credits_digest, origin, activated_by_member_id, activated_by_principal_id,
+            source_commit_sha, reason)
+         VALUES (0, $1, 'x', greenhouse_commercial.quoter_text_digest('x'), $2, $3, $4, $5, $6, $7, 'raw', $8, 'raw insert')`,
+        ['1'.repeat(64), inForce.digest, corpus.pointer.catalog.digest, corpus.pointer.policy.digest, corpus.pointer.credits.digest, origin, member, commit]
+      )
+
+    expect(await rejectionOf(raw('platform_activation', null, null))).toMatchObject({
+      code: '23514',
+      constraint: 'quoter_pointer_history_activation_needs_person'
+    })
+    expect(await rejectionOf(raw('repo_mirror', null, null))).toMatchObject({
+      code: '23514',
+      constraint: 'quoter_pointer_history_mirror_names_its_commit'
+    })
+    expect((await readCurrentPointer(runtime))?.seq).toBe(inForce.seq)
+
+    // A person activates on the platform, over the pointer the mirror left; the row names both.
+    const activated = await inTransaction(runtime, () =>
+      activatePointer(runtime, {
+        text: pointerText,
+        confirmDigest: inForce.digest,
+        origin: 'platform_activation',
+        actor: MEMBER,
+        reason: REASON
+      })
     )
 
-    expect((await rejectionOf(withoutPerson))?.code).toBe('23502')
-    expect((await readCurrentPointer(runtime))?.seq).toBe(inForce.seq)
+    expect(activated).toMatchObject({
+      seq: inForce.seq + 1,
+      origin: 'platform_activation',
+      activatedByMemberId: MEMBER.memberId,
+      activatedByPrincipalId: MEMBER.principalId,
+      sourceCommitSha: null
+    })
   })
 
   it('every activation published its event, with digests and no text', async () => {
@@ -292,6 +369,7 @@ describe('what is read from the registry is believed only after its digests are 
             parent_digest: null,
             origin: 'repo_import',
             source_path: 'x.json',
+            source_commit_sha: null,
             stored_at: new Date()
           }
         ]
@@ -317,7 +395,9 @@ describe('what is read from the registry is believed only after its digests are 
             policy_digest: corpus.pointer.policy.digest,
             credits_digest: corpus.pointer.credits.digest,
             origin: 'repo_mirror',
-            activated_by_member_id: 'm',
+            activated_by_member_id: null,
+            activated_by_principal_id: 'job',
+            source_commit_sha: null,
             reason: 'fixture',
             activated_at: new Date(),
             ...overrides

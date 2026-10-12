@@ -105,18 +105,26 @@ export const createLocalDatabase = async (): Promise<LocalDatabase> => {
   }
 }
 
-/** The rejection of a statement that must fail: its SQLSTATE and message, or `null` when it did not fail. */
-export const rejectionOf = async (operation: Promise<unknown>): Promise<{ code: string; message: string } | null> => {
+/**
+ * The rejection of a statement that must fail: its SQLSTATE, the constraint it names and its message, or `null`
+ * when it did not fail. Assert on the SQLSTATE and the constraint, never on the message.
+ */
+export const rejectionOf = async (
+  operation: Promise<unknown>
+): Promise<{ code: string; constraint: string | null; message: string } | null> => {
   try {
     await operation
   } catch (error) {
-    const failure = error as { code?: string; message?: string }
+    const failure = error as { code?: string; constraint?: string; message?: string }
 
-    return { code: failure.code ?? 'unknown', message: failure.message ?? '' }
+    return { code: failure.code ?? 'unknown', constraint: failure.constraint ?? null, message: failure.message ?? '' }
   }
 
   return null
 }
+
+/** A git commit SHA for fixtures: forty hex characters that name no commit. */
+export const FIXTURE_COMMIT = 'c0ffee'.padEnd(40, '0')
 
 /** Runs `work` in a transaction of `client`, as a governed command does: committed if it returns, rolled back if not. */
 export const inTransaction = async <T>(client: Client, work: () => Promise<T>): Promise<T> => {

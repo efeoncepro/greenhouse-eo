@@ -16,6 +16,14 @@ CREATE SCHEMA greenhouse_core AUTHORIZATION greenhouse_ops;
 CREATE SCHEMA greenhouse_sync AUTHORIZATION greenhouse_ops;
 CREATE SCHEMA greenhouse_commercial AUTHORIZATION greenhouse_ops;
 
+-- Los privilegios por defecto del esquema en producción (migrations/…task-345…sql): toda tabla nueva de
+-- greenhouse_ops nace con SELECT, INSERT, UPDATE y DELETE para el runtime. Copiados aquí para que una migración que
+-- olvide quitarlos falle en local donde fallaría en producción.
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_commercial
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_commercial
+  GRANT SELECT ON TABLES TO greenhouse_app;
+
 SET ROLE greenhouse_ops;
 
 CREATE TABLE greenhouse_core.organizations (
