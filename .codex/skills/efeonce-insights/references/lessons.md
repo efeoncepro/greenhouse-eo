@@ -1,5 +1,11 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-12 · TASK-2033 · Cargar el logo para fondo oscuro cambió la portada y borró la línea del alcance.**
+  Síntoma: al cargar la variante `on_dark` del logo de Berel, la regla `auto` pasó la portada de blanca a navy, y la
+  portada navy no tiene la zona «Qué mide este informe»: el PDF dejó de decir en la portada qué contenido mide.
+  Regla: cargar un logo `on_dark` es también una decisión de portada; revisar la portada resultante en la vista previa
+  (`--cover=light|dark`) y, si la organización tiene alcance de contenido, fijar la portada en blanca o aceptar que el
+  alcance no salga en la portada.
 - **2026-10-12 · TASK-2033 · Recortar la medición destapó tres fallas que sólo se ven con datos reales.** Síntoma:
   con el alcance de contenido de Berel, (1) el render falló cerrado: las páginas que más cambian pasaron a ser
   artículos con slugs de 65 caracteres y `pageLabelOf` sólo abreviaba hasta el último tramo, sin tope; (2) la lectura

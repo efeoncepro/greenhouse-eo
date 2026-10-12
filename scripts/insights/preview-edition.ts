@@ -20,7 +20,7 @@
  *   GREENHOUSE_POSTGRES_HOST=127.0.0.1 GREENHOUSE_POSTGRES_PORT=15432 GREENHOUSE_POSTGRES_SSL=false \
  *   pnpm exec tsx --require ./scripts/lib/server-only-shim.cjs scripts/insights/preview-edition.ts \
  *     --edition=insed-... --org=org-... [--output=report_pdf|deck_pdf|both] [--editorial-v2] [--plan-only] [--ai-authoring]
- *     [--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD]
+ *     [--start=YYYY-MM-DD --end-exclusive=YYYY-MM-DD] [--cover=light|dark]
  *
  * TASK-1888 — `--editorial-v2` recorre el contrato editorial v2 como lo haría la generación con
  * `INSIGHTS_EDITORIAL_V2_ENABLED=true`: evidencia v2 (FTR y metas ICO), portada resuelta con la preferencia y los
@@ -117,7 +117,12 @@ const main = async () => {
     editorialV2
   })
 
-  const cover = editorialV2 ? await resolveInsightCoverForEdition({ organizationId, requested: request.brand.coverTheme ?? null }) : null
+  // `--cover=light|dark`: ver la otra portada sin tocar la preferencia de la organización (sólo la vista previa).
+  const coverOverride = arg('cover')
+
+  if (coverOverride && !['light', 'dark'].includes(coverOverride)) throw new Error('--cover debe ser light o dark')
+
+  const cover = editorialV2 ? await resolveInsightCoverForEdition({ organizationId, requested: (coverOverride as 'light' | 'dark' | undefined) ?? request.brand.coverTheme ?? null }) : null
   const deterministic = buildDeterministicPlan(content, { modules: request.modules, locale: request.locale, editorialV2, cover })
   let plan = deterministic
 

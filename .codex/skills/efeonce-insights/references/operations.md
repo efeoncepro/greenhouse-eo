@@ -429,6 +429,11 @@ ocurrencia mensual con la propiedad completa. Verificar en una edición nueva qu
 `/pintura-y-barniz-para-madera-como-elegir` e `/impermeabilizante-para-azotea-como-elegir` (exactas). Una guía nueva
 publicada en la raíz no entra sola: hay que fijar una versión nueva que la incluya.
 
+**Portada y alcance:** la línea del alcance sólo aparece en la portada BLANCA del A4; la navy y el deck no tienen esa
+zona. Una organización con alcance y logo `on_dark` sale en navy por la regla `auto`: fijar su portada en blanca
+(`POST /api/platform/app/insights/cover-preference`, `coverTheme: light`) si el alcance debe verse en la portada.
+Berel está en blanca desde el 2026-10-12.
+
 **Vista previa real con alcance:** la de siempre (`scripts/insights/preview-edition.ts --editorial-v2`), con
 `GROWTH_SEO_WORK_QUEUE_ENABLED=true` y, para GA4, `GROWTH_GA4_ENABLED=true` más `GOOGLE_GA4_OAUTH_CLIENT_ID` y
 `GOOGLE_GA4_OAUTH_CLIENT_SECRET_SECRET_REF` del entorno de staging. Sin GA4 el informe sale con el límite «Google

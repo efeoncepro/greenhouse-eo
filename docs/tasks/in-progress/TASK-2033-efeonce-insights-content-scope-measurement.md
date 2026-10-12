@@ -481,3 +481,11 @@ efecto en la siguiente edición, sin deploy.
 - Dato que el operador debe conocer antes de emitir una edición de septiembre de Berel con alcance: las visitas orgánicas de GA4 al contenido caen 51,9 % (8.296 → 3.994) por un pico de dos semanas en agosto (1.863 y 4.657 sesiones contra 700–1.000 habituales), mientras los clics de Search Console del mismo contenido suben 20,9 %. El informe imprime las dos cosas.
 - El deck no tiene zona «Qué mide este informe» en su portada; el alcance aparece en la entrada del capítulo.
 - Sin hacer: Slice 6, `pnpm build`, release de Vercel y `ops-worker`.
+
+## Delta 2026-10-12 (noche) — logo y portada de Berel
+
+- El logo de Grupo Berel en Greenhouse era una imagen generada con IA. Con autorización del operador se cargaron los oficiales del OneDrive del squad por `attachOrganizationLogoAsset`: `Logo Principal.png` como `default` (`asset-8745032e…`) y `Logo 1 Tinta Blanco.png` como `on_dark` (`asset-9d7ad7a5…`). Quedaron en el bucket `…-private-assets-dev`; el anterior estaba en `-staging`. Los tres buckets tienen los mismos permisos y la regla de borrado sólo toca `quotation-pdfs/`; falta ver un render desde producción con estos archivos.
+- Con variante oscura, la regla `auto` pasa la portada a navy, y la portada navy NO tiene la zona «Qué mide este informe»: el alcance desaparecía de la portada del A4. El operador fijó la portada de Berel en blanca (`POST /api/platform/app/insights/cover-preference`, `coverTheme: light`, 2026-10-12). Un plan nuevo resuelve `theme: light`, `source: organization`, logo `default`.
+- Pendiente de diseño, no de esta task: la portada navy no dice qué mide el informe. Cualquier organización con alcance y portada navy pierde esa línea en el PDF (el deck tampoco la tiene).
+- `scripts/insights/preview-edition.ts` acepta `--cover=light|dark` para ver la otra portada sin tocar la preferencia.
+- En prueba, sin commit y a la espera del operador: la línea semanal dibuja sólo semanas completas y la lectura nombra el bloque que queda fuera.
