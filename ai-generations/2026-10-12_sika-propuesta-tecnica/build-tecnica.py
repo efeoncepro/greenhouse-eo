@@ -456,7 +456,7 @@ def s_mexico():
              card('reunion', 'Un solo interlocutor', 'El Responsable de Cuenta atiende a Sika y coordina al equipo. Los comentarios llegan por un solo canal.', 820, 488) +
              card('integracion', 'Herramientas a la vista', 'Reuniones por Microsoft Teams, seguimiento del proyecto en Notion y revisión de las piezas en Frame.io.', 1315, 488))
     return page('Sika · Trabajo con México', halo(1300, 480, None) + cards +
-                left('El equipo · Trabajo con México', ['Un equipo', 'en Chile y', 'en México'], 'Efeonce atiende a Sika Mexicana con personas en Chile y en México, que trabajan sobre la misma campaña con un solo responsable. La moneda y la facturación se tratan en la oferta económica.') +
+                left('El equipo · Trabajo con México', ['Un equipo', 'en Chile y', 'en México'], 'Efeonce atiende a Sika Mexicana con personas en Chile y en México, que trabajan sobre la misma campaña con un solo responsable.') +
                 means('Sika trabaja con un equipo cercano: personas en su país y una sola persona responsable.',
                       'Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú.'), section=3)
 
