@@ -449,7 +449,9 @@ Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta po
 
 ### 5. `--out` y verificación cruzada
 
-- En modo plataforma, `--out` de `quote`, `compose prepare|quote` escribe el artefacto congelado que devuelve la API.
+- En modo plataforma, `--out` de `quote`, `compose prepare|quote` escribe el artefacto congelado que devuelve la API,
+  **tomado de `data.artifactText` y escrito tal cual**, sin volver a serializarlo; antes comprueba que su sha256 es
+  `data.artifactDigest`. Así el archivo es idéntico byte a byte al del modo local.
   Antes de escribir, la CLI lo recalcula con las funciones puras de replay del motor; si la huella no coincide no
   escribe nada y termina con `REPLAY_MISMATCH`.
 - Un artefacto escrito así se verifica después con `pnpm --silent pricing:v3 replay --input <archivo> --transport

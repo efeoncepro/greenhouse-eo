@@ -37,8 +37,10 @@ API → MCP → interfaz**, y con una regla que manda sobre las demás: **la CLI
    importan el mismo código. Ningún consumidor lleva fórmulas.
 2. **Registro propio.** Agregado nuevo en `greenhouse_commercial`, con prefijo propio. No escribe en `quotations*`.
 3. **El almacenamiento es un puerto** con dos adaptadores: archivos (el modo local de hoy) y PostgreSQL.
-4. **Una versión es el artefacto congelado tal cual**: se guarda su texto canónico y su huella, verificada al escribir
-   y al leer. Las columnas adicionales son índices de lectura. Sólo se registra una cotización calculada.
+4. **Una versión es el artefacto congelado tal cual**: se guarda el texto del artefacto como se emitió, byte a byte,
+   sin reserializarlo ni ordenarlo. Lleva dos huellas: la del texto, que comprueba la base, y la de identidad
+   (reproducción), que verifica el motor al escribir y al leer. Las columnas adicionales son índices de lectura. Sólo
+   se registra una cotización calculada.
 5. **Historial de sólo agregar**, con guardas en la base. Corregir es crear una versión que reemplaza a la anterior. El
    número público sale de una secuencia, se asigna en la primera emisión, lleva el prefijo `EO-QTE-` y la serie real
    empieza en 15 (`EO-QTE-15`). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.

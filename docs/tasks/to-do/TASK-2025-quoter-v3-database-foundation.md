@@ -18,10 +18,11 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
   las claves y ese orden no se recupera. Guardar `stableJson(artefacto)`, como dice hoy la tabla de `## Detailed
   Spec`, **no pasa la batería** y rompería la paridad byte a byte entre transportes de `TASK-2028`. Recomendación:
   guardar el texto recibido tal cual, con `artifact_digest` = sha256 de ese texto (comprobable por la base) y
-  `replay_digest` como identidad. Decidir con la sesión consultora antes de fijar el esquema.
+  `replay_digest` como identidad. **Decidido 2026-10-12: así queda**, ya incorporado en «Texto guardado y huellas».
 - **El puntero viaja como texto opaco** (caso 7): `readPointer` devuelve el texto que se escribió. `pointer_digest`
   = `currentVersionsDigest(puntero)` no es el sha256 de ese texto, así que la comprobación en la base necesita una
-  huella del texto aparte, o guardar el puntero tal cual y verificar `pointer_digest` en el adaptador.
+  huella del texto aparte. **Decidido 2026-10-12:** se guarda el texto tal cual, con `pointer_text_digest` para la
+  base y `pointer_digest` verificado por el adaptador.
 - **Nada se reemplaza, tampoco con el mismo contenido**: una segunda escritura sobre la misma identidad es siempre
   `OUTPUT_EXISTS`. Ese código no debe llegar a un cliente HTTP: el importador y los comandos del registro preguntan
   antes (`findDocument`) y resuelven la idempotencia por encima del puerto.
@@ -137,7 +138,7 @@ Reglas obligatorias:
   `DO $$ … RAISE EXCEPTION` de verificación y deja bajo `-- Down Migration` sólo sentencias de deshacer.
 - Nada se actualiza ni se borra en las tablas de historia: versiones, cambios de estado, historial del puntero,
   documentos por huella y datos de documento son de sólo agregar, con disparadores que lo hacen cumplir.
-- El texto canónico vive en una columna `text`. Ninguna columna `jsonb` es la verdad de un documento o de un
+- El texto guardado vive en una columna `text`. Ninguna columna `jsonb` es la verdad de un documento o de un
   artefacto.
 - Las columnas adicionales son índices de lectura. Ningún lector reconstruye un resultado desde ellas.
 - Sólo se registra una cotización calculada. Los avisos de la corrida y las lecturas derivadas no se guardan como
@@ -270,8 +271,9 @@ Reglas obligatorias:
   `quoter_state_transitions`, `quoter_exception_approvals`, `quoter_version_documents`; vistas
   `quoter_current_pointer` y `quoter_quote_current`; secuencias y funciones de número público.
 - Invariantes que no se pueden romper:
-  - La huella guardada de un documento o de un artefacto es el sha256 de su texto canónico, comprobado por la base al
-    escribir y por el adaptador al leer.
+  - La huella del texto de un documento, un puntero o un artefacto es el sha256 de los bytes guardados, comprobada
+    por la base al escribir; su huella de identidad la verifica el adaptador al escribir y al leer.
+  - Un artefacto y un puntero se guardan y se devuelven byte a byte como se recibieron.
   - Una fila de historia no se actualiza ni se borra, tampoco con el usuario de runtime.
   - Guardar un documento no agrega una fila al historial del puntero.
   - Una fila del puntero sólo entra si declara la huella del puntero que reemplaza y esa huella es la vigente.
@@ -371,13 +373,14 @@ Reglas obligatorias:
 ### Slice 1 — Prueba de ida y vuelta de huellas (antes de escribir el esquema definitivo)
 
 - Contra el clúster PostgreSQL local: para cada uno de los 48 artefactos y para cada documento de catálogo, política
-  y créditos del repo, guardar `stableJson(valor)` en una columna `text`, leerlo, y comprobar que (a) el texto leído
+  y créditos del repo, guardar su texto (el artefacto como está en el repo; el documento fuente como
+  `stableJson(validado)`) en una columna `text`, leerlo, y comprobar que (a) el texto leído
   es idéntico, (b) `encode(sha256(convert_to(texto, 'UTF8')), 'hex')` calculado por PostgreSQL es igual al sha256
   calculado en Node sobre el mismo texto, y (c) la reproducción del artefacto leído verifica con su huella.
 - Confirmar en PostgreSQL 16 la volatilidad de `sha256(bytea)` y `convert_to(text, name)`: si ambas son inmutables,
   la comprobación de huella va como `CHECK`; si alguna no lo es, va como disparador `BEFORE INSERT`.
 - El resultado decide el mecanismo y queda escrito en el documento de modelo de datos. Si alguna huella difiere, la
-  task se detiene y se reporta: el diseño de «texto canónico en `text`» no se cambia por un atajo.
+  task se detiene y se reporta: el diseño de «texto en `text`, sin reserializar» no se cambia por un atajo.
 
 ### Slice 2 — Catálogo por huella y puntero
 
@@ -450,17 +453,27 @@ Reglas obligatorias:
 
 Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las invariantes ni el prefijo.
 
-### Texto canónico y huellas
+### Texto guardado y huellas
 
-| Objeto | Texto canónico | Huella guardada | Otras huellas |
+Regla (decidida el 2026-10-12 con la batería de conformidad de `TASK-2024`): **lo que se guarda es el texto que se
+recibió, tal cual; nadie lo reserializa, lo ordena ni lo normaliza.** Cada objeto lleva dos huellas con funciones
+distintas: la **huella del texto** (sha256 de los bytes guardados; la comprueba la base) y la **huella de identidad**
+(la que define el motor; la verifica el adaptador al escribir y al leer). En los documentos fuente y en los datos
+del documento el texto guardado es `stableJson(valor validado)`, así que las dos coinciden y basta una columna.
+
+| Objeto | Texto guardado | Huella del texto (la comprueba la base) | Huella de identidad (la verifica el adaptador) |
 | --- | --- | --- | --- |
-| Documento de catálogo, política o créditos | `stableJson(documento)` | `document_digest` = sha256 del texto = `catalogDigest(documento)`, la misma que lleva el puntero del repo | — |
-| Puntero | `stableJson(puntero)` | `pointer_digest` = `currentVersionsDigest(puntero)` | — |
-| Artefacto congelado | `stableJson(artefacto)` | `artifact_digest` = sha256 del texto | `replay_digest`, el que el propio artefacto declara y la reproducción recalcula |
-| Datos del documento del cliente | `stableJson(datos)` | `document_digest` = sha256 del texto | — |
+| Documento de catálogo, política o créditos | `stableJson(documento validado por su rol)` | `document_digest` = sha256 del texto | la misma: `catalogDigest(documento)`, la que lleva el puntero |
+| Puntero | el texto del puntero **como se escribió** (opaco) | `pointer_text_digest` = sha256 del texto | `pointer_digest` = `currentVersionsDigest(puntero)` |
+| Artefacto congelado | el texto del artefacto **como se emitió**, con su sangría y su orden de claves | `artifact_digest` = sha256 del texto | `replay_digest`, el que el artefacto declara y la reproducción recalcula |
+| Datos del documento del cliente | `stableJson(datos)` | `document_digest` = sha256 del texto | la misma |
 
-`canonical-text.ts` es el único lugar que produce texto canónico y calcula su huella en el servidor; reutiliza
-`stableJson` del motor.
+Por qué el artefacto y el puntero no se guardan como `stableJson`: la batería de `TASK-2024` exige que un artefacto se
+lea byte a byte como se escribió y que el puntero viaje como texto opaco; `stableJson` reordena las claves y ese
+orden no se recupera. Sin esos bytes no hay paridad de archivo entre transportes (`TASK-2028`).
+
+`canonical-text.ts` es el único lugar del servidor que calcula huellas de texto y que produce `stableJson` para los
+objetos que lo usan; reutiliza `stableJson` del motor. No transforma un artefacto ni un puntero.
 
 ### `quoter_source_documents` (sólo agregar)
 
@@ -483,7 +496,8 @@ Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las 
 ### `quoter_pointer_history` (sólo agregar)
 
 - `pointer_seq bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY`
-- `pointer_digest text NOT NULL UNIQUE`, `pointer_text text NOT NULL`, comprobación de huella
+- `pointer_digest text NOT NULL UNIQUE` (identidad), `pointer_text text NOT NULL` (como se escribió),
+  `pointer_text_digest text NOT NULL` con comprobación de huella del texto
 - `previous_pointer_digest text` — obligatorio salvo en la primera fila
 - `catalog_digest`, `policy_digest`, `credits_digest`: cada una con llave foránea a
   `quoter_source_documents (role, document_digest)` con el rol fijo correspondiente
@@ -563,7 +577,8 @@ potencial cliente.
 
 - `quote_id` (llave foránea), `version_number integer NOT NULL CHECK (version_number >= 1)`, llave primaria
   `(quote_id, version_number)`; `owner_organization_id` repetido y comprobado contra el padre
-- `artifact_text text NOT NULL`, `artifact_digest text NOT NULL` con comprobación de huella
+- `artifact_text text NOT NULL` (como se emitió, sin reserializar), `artifact_digest text NOT NULL` con comprobación
+  de huella del texto
 - `replay_digest text NOT NULL CHECK (replay_digest ~ '^[0-9a-f]{64}$')`, `calculation_id text NOT NULL`
 - `artifact_version text NOT NULL CHECK (artifact_version IN ('pricing-v3-local-artifact/1',
   'pricing-v3-selection-quote/1','pricing-v3-resource-composition/1'))`

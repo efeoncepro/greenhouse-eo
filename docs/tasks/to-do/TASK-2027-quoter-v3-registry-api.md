@@ -488,7 +488,8 @@ la operación 9 de TASK-2026 y:
 - Respuesta 201: `{ quoteId, version, artifactDigest, calculationId, state, summary }`, donde `summary` es el
   documento de `compose quote` sin `runNotices.output`. No hay número en la respuesta: un borrador no lo tiene.
 
-**Registrar local (3, 4).** Cuerpo: `artifact` (el artefacto congelado), `clientOrganizationId` y `dealReference`
+**Registrar local (3, 4).** Cuerpo: `artifactText` (el artefacto congelado como texto, exactamente los bytes del
+archivo local; el servidor lo guarda tal cual y lo lee de ahí, nunca lo reserializa), `clientOrganizationId` y `dealReference`
 opcionales (sólo en 3), `expectedVersion` en 4. Orden fijo de comprobaciones, la primera que falla corta:
 
 1. forma y familia: sólo `pricing-v3-resource-composition/1`; otra familia → 422 `artifact_family_not_accepted`

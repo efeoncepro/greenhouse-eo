@@ -413,7 +413,11 @@ Cuerpo de una operación `POST` (las claves que no aplican se rechazan como `UNK
   versiones gobernadas.
 - Respuesta 200: `data = { result, artifact }` y `meta = { exitCode, versionsUsed, audience }`.
   - `result` es el documento de stdout de la CLI para esa operación, sin envolver ni reordenar.
-  - `artifact` es `null` salvo en las operaciones marcadas en la tabla.
+  - `artifact` es `null` salvo en las operaciones marcadas en la tabla. Cuando existe viaja además como **texto**:
+    `data.artifactText` es la cadena exacta que la CLI local habría escrito con `--out` (misma sangría, mismo orden de
+    claves, salto final) y `data.artifactDigest` es su sha256. Es lo que da paridad de archivo byte a byte entre
+    transportes: un objeto JSON no garantiza el orden de claves al cruzar HTTP. El servidor produce ese texto con el
+    mismo formateador de la CLI, movido al motor en el Slice 1; nunca lo reconstruye desde `artifact`.
   - `meta.exitCode` es `0`, `2` o `3`. **Los tres son HTTP 200**: bloqueado o falta de datos (`2`) y calculado bajo
     revisión (`3`) son resultados con documento completo, no fallos; un envelope de error no puede transportar ese
     documento. El rechazo (`1` en la CLI) es el único que usa el envelope de error.
