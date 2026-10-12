@@ -394,38 +394,48 @@ operas es prometer el trabajo de otro.
 
 ## PARTE B — Share of Voice en LLMs (medición AEO)
 
-El KPI central de AEO: **¿con qué frecuencia aparece/se cita tu marca en las
-respuestas de los motores IA, vs. competidores?**
+El norte de AEO incluye descubrimiento y representación fiel ante necesidades pertinentes. Frecuencia
+de aparición es una dimensión; no sustituye a pertinencia, consideración ni negocio. Canon:
+`docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §§2–5.
 
-### Definiciones
-- **Presence / Visibility:** % de respuestas IA (sobre tu panel de prompts) donde
-  la marca es mencionada.
-- **Citation share:** % de respuestas donde tu *sitio* es citado como fuente.
-- **Share of Voice IA:** tu presencia/citas vs. la de competidores en el mismo
-  set de prompts.
-- **Sentiment:** cómo se habla de la marca cuando aparece.
-- **Position:** orden/prominencia dentro de la respuesta.
+### Definiciones y denominadores
 
-### Método propio (sin herramienta de pago) — reproducible con WebSearch
-1. **Define el panel de prompts** (20–50): las preguntas reales de tu ICP sobre
-   la categoría (ver prompt research, `04_AEO_GEO.md`). Versiona el set.
-2. **Corre cada prompt en cada motor** (ChatGPT, Perplexity, Gemini, AI
-   Overviews) — manualmente o con WebSearch para aproximar.
-3. **Registra** por prompt × motor: ¿aparece la marca? ¿se cita el sitio? ¿qué
-   competidores aparecen? ¿qué fuentes gana el competidor? sentimiento.
-4. **Calcula** presence %, citation share %, SoV vs. competidores.
-5. **Repite con cadencia fija** (mensual) con el mismo panel → tendencia. La
-   consistencia del panel es lo que hace comparable la serie.
-- Tablero sugerido: `templates/checklists` (incluye un esqueleto de tracking).
+- **Presencia:** respuestas válidas con mención / respuestas válidas medidas del mismo corte del panel.
+- **Citación:** respuestas válidas con URL del sitio como fuente / respuestas válidas del mismo corte.
+  Conservar la marca explícita por separado: sitio citado no significa marca mencionada.
+- **Fidelidad:** descripción contrastada con fuentes vigentes de categoría, capacidades, público y límites;
+  registrar errores, atribución y criterios antes de calcular tasas.
+- **Recomendación pertinente:** inclusión como proveedor para la necesidad del prompt, con razón y contexto.
+  Selección del sistema no demuestra preferencia del comprador.
+- **Prominencia:** papel y ubicación en la respuesta; no equiparar a posición orgánica de Google.
+- **Share competitivo:** declarar fórmula y población. Participación sobre total de menciones y porcentaje
+  de respuestas con presencia son métricas diferentes; varias marcas pueden aparecer en una respuesta.
 
-📐 **Cómo lo formaliza un tercero** (fórmulas de terceros, **no validadas con nuestros datos**):
-score `0,6 × mention_share + 0,4 × citation_share` con denominador = prompts unbranded × modelos −
-celdas no medidas; umbral de significancia `eps = max(3,0 · 100/denom)` para no pintar ruido como
-tendencia; e higiene del denominador (`not_measured` ≠ ausente tras 3 reintentos; >20% de celdas
-fallidas degrada el run a *low-confidence*) →
-`../references/competitor-methodologies-2026-09.md` §1.
-🔴 Sus **curvas de CTR** contradicen las dos medidas de este módulo por un factor ~6 en la
-posición 5: gobierna lo medido (§9.1 de esa referencia).
+### Método de panel comparable
+
+1. Delimitar categoría, comprador/situación, mercado/idioma y superficie. Diseñar un corpus pertinente
+   desde preguntas observadas o hipótesis explícitas; no equiparar prompts diseñados con demanda medida.
+2. Versionar un núcleo comparable; clasificar intención y branded/non-brand por separado. Mantener
+   consultas branded de representación separadas del panel non-brand de descubrimiento.
+3. Medir en la plataforma/modo definidos y conservar fecha, sesión/configuración conocida, repeticiones,
+   respuesta y fuentes completas. WebSearch puede ayudar a investigar, pero no simula ni certifica una
+   respuesta de ChatGPT, Claude, Gemini, Perplexity o la UI de AI Mode.
+4. Registrar presencia, cita, fidelidad, prominencia, recomendaciones, competidores y estado por intento.
+   Fallo de adquisición no es ausencia. Publicar cobertura, fallos y denominadores junto a las tasas.
+5. Repetir con condiciones comparables; si el corpus cambia, comparar sobre el corte común y declarar
+   nueva versión. Un run no demuestra comportamiento universal ni permanencia de una recomendación.
+6. Conectar tres planos distintos: descubrimiento/representación, comportamiento/consideración y negocio.
+   Conservar tráfico branded/non-brand absoluto y proporciones; su composición puede cambiar por pérdida
+   de tráfico genérico. Datos nativos, referencias y CRM tienen fuentes/definiciones propias.
+
+**Límite central:** 60% de presencia en un panel no significa 60% de mercado, usuarios o búsquedas reales.
+No ponderar por demanda inexistente ni sumar poblaciones de motores. Mención/cita no prueba exposición
+real a compradores, recuerdo ni ventas. Referencias/conversiones observadas y autodeclaración de origen
+pueden aportar evidencia de recorrido, sin demostrar incrementalidad causal de una cita.
+
+Fórmulas de terceros y sus límites: `../references/competitor-methodologies-2026-09.md` §1. No adoptar
+ponderaciones o umbrales como KPI propio sin validación; no mezclar scoring SEO/AEO ni cambiar fórmulas
+runtime por una decisión documental.
 
 ### Herramientas dedicadas (cuando el presupuesto lo permite) — as-of 2026-06
 - **Profound** — enterprise; G2 AEO Leader; $96M Serie C / valuación $1B.

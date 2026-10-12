@@ -1,0 +1,26 @@
+  $ costo estimado ≈ USD 0.330 (8 × 1372 tokens de salida × USD 30/1M; la entrada suma aparte)
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-barista-pregunta.png …
+  ✓ 2225KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 144 (img 0 · txt 144) · out 1372 · total 1516
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-barista-molienda.png …
+  ✓ 2110KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 112 (img 0 · txt 112) · out 1372 · total 1484
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-barista-hielo.png …
+  ✓ 2213KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 113 (img 0 · txt 113) · out 1372 · total 1485
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-origen-cerezas.png …
+  ✓ 2242KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 84 (img 0 · txt 84) · out 1372 · total 1456
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-origen-secado.png …
+  ✓ 3561KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 78 (img 0 · txt 78) · out 1372 · total 1450
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-origen-tueste.png …
+  ✓ 2209KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 85 (img 0 · txt 85) · out 1372 · total 1457
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-sabado-feria.png …
+  ✓ 2675KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 115 (img 0 · txt 115) · out 1372 · total 1487
+→ ./ai-generations/2026-10-09_deck-contenidos/ads/series/serie-sabado-playa.png …
+  ✓ 2142KB · gpt-image-2 · 1024x1536 · medium
+    usage: in 116 (img 0 · txt 116) · out 1372 · total 1488
+done

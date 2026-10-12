@@ -5,24 +5,17 @@
 > **motor de enlaces** y regla dura del **claim de producto** as-of 2026-08-25;
 > **capilaridad editorial** y **unbrand test que falla legítimamente** as-of 2026-08-25.
 
-## Cambio de paradigma 2026: de "links" a "presencia"
+## Reconocimiento externo y presencia distribuida
 
-El off-page clásico era *construir backlinks*. En 2026 sigue importando para SEO,
-pero el centro de gravedad se movió a **presencia de marca distribuida**:
+Aplicar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §4.5. La distribución de
+pruebas útiles llega a compradores y permite contrastar claims con referencias independientes. Los
+backlinks y las menciones son señales diferentes; no existe una equivalencia universal ni una regla
+causal de «menciones → recomendación IA». Investigar fuentes usadas por cada superficie y muestra.
 
-> **Las menciones de marca correlacionan ~3× más fuerte con visibilidad IA que
-> los backlinks.** (Data 2026.)
-
-Por qué: los motores IA aprenden de dónde y cómo se *habla* de tu marca en la
-web, no solo de quién te enlaza. Una mención sin enlace en una conversación
-relevante de Reddit puede pesar más para AEO que un backlink mediocre.
-
-**Doble objetivo del off-page moderno:**
-1. **Autoridad de enlace** (SEO clásico): backlinks de calidad pasan PageRank y
-   confianza.
-2. **Señales de entidad + co-ocurrencia** (AEO + Knowledge Graph): menciones,
-   contexto, comunidades → enseñan a los modelos qué es tu marca y a qué espacio
-   pertenece.
+Seleccionar medios, especialistas, partners y comunidades por pertinencia, audiencia y capacidad real.
+Una página accesible puede ser candidata a recuperación; no demuestra uso por un motor. No atribuir
+aprendizaje/entrenamiento a una publicación ni fabricar consenso. Medir enlaces, contexto, fidelidad y
+recomendaciones observadas con sus denominadores, conservando evidencia de negocio por separado.
 
 ## Backlinks: calidad sobre cantidad (sigue vigente)
 
@@ -71,9 +64,8 @@ Decisión Efeonce 2026-09-11: **no construimos un generador automático de disav
 ## Digital PR (el motor de links + menciones de calidad)
 
 La forma legítima y escalable de ganar autoridad en 2026:
-- **Data-driven PR:** publica *original research*/datos propios → la prensa y los
-  blogs citan datos. Es el activo de mayor leverage (también para AEO: los datos
-  propios son lo más citado por IA).
+- **Investigación propia:** publicar datos verificables, método y límites que terceros puedan usar;
+  estudiar citas recibidas sin garantizar enlaces ni declarar preferencia universal de las IA.
 - **Expert commentary** (HARO/Connectively y similares): responder a periodistas
   con quotes expertos → menciones + links en medios de autoridad + construye
   entidad de autor.
@@ -101,9 +93,8 @@ marca lo vacía: **el gate falla por construcción**, y no hay nada que arreglar
 
 La lectura correcta no es «arréglalo», y tampoco marcarlo verde para que cuadre. Es que **la
 pieza es construcción de entidad, no utilidad neutra** y, por lo tanto, **se mide por menciones
-y citas del léxico, no por backlinks al objeto** — que es exactamente el **principio #3** de
-esta skill: las menciones de marca correlacionan **~3× más** que los backlinks con visibilidad
-IA. Medir esa pieza por backlinks la declara fracasada mientras cumple su función.
+y citas del léxico, no por backlinks al objeto**; mantener backlinks como evidencia distinta cuando existan.
+No trasladar correlaciones de una muestra externa a una regla causal de visibilidad IA. Medir esa pieza por backlinks la declara fracasada mientras cumple su función.
 
 ✅ **Declarar el gate fallado y explicar por qué es más honesto y más útil que forzar el
 verde.** El objeto no cambia; cambia la métrica de éxito, y eso se escribe en el brief.

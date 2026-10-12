@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "44ce153cbf79dfca1cea7f9a08e67afe7f0f061adf5b4b792b5a16c7d494dd01",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-markets",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:MK2-mercados",
+      "path": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/MK2-mercados.png",
+      "sha256": "10fdddfffbc90647dc8f4045d45dfdf034f6db027d698a9d6140ef7f02a74750"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

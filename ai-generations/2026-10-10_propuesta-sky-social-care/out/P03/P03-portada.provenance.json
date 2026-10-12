@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "d4161a521368b9be1aa0a66b3e9d0a6477ca27bb0cf068d165988fd634a2f7c8",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-proposal",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:sky-on-dark",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/clients/sky-on-dark.svg",
+      "sha256": "b016f4158dcf6a4235f9a8f3b0433f224bf3f74d6298fe168569aaf732f99231"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

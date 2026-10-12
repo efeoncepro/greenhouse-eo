@@ -1,0 +1,1365 @@
+#!/usr/bin/env python3
+"""Propuesta SKY · sistema visual v2: tipografía grande, contraste, diagramas, fotos y aperturas de capítulo.
+
+Uso: python3 tools/gen_v2.py canvas/project   (después: python3 tools/gen_insights.py canvas/project)
+"""
+import json
+import math
+import runpy
+import sys
+from pathlib import Path
+
+OUT = Path(sys.argv[1])
+P = "font-family: 'Poppins', system-ui, sans-serif"
+B = "font-family: 'Bricolage Grotesque', system-ui, sans-serif"
+ACC, SOFT, HALO, GROUND, NAVY = "#ff6500", "#cfe4fa", "#72ded8", "#001a33", "#023c70"
+RULE, RULE_S = "rgba(114, 222, 216, 0.2)", "rgba(114, 222, 216, 0.34)"
+GLASS = ("box-sizing: border-box; border-radius: 26px; border: 1px solid rgba(114, 222, 216, 0.32); "
+         "background: linear-gradient(155deg, rgba(3, 117, 219, 0.26) 0%, rgba(2, 60, 112, 0.52) 62%)")
+LINE = "box-sizing: border-box; border-radius: 26px; border: 1px solid rgba(114, 222, 216, 0.3)"
+WHITE = "box-sizing: border-box; border-radius: 26px; background: #ffffff; color: #001a33"
+BLOB = lambda i: f"/_blob/{i}"
+URL = f'<img src="{BLOB("a7bde70c6e07b8783a9401be4139c49c")}" alt="efeoncepro.com" style="position: absolute; left: 135px; top: 994px; width: 162px; height: auto">'
+ICO = {
+    "comentario": "857479f09a2f93dc464ef7622baf669b", "lapiz": "446e253ad8cd7d7b9c57ab6ebf6b8de9", "cursor": "df8b8d138dad35c412262ec44f066a13",
+    "corazon": "acca95370f359c1227c5c0986dc77152", "carpeta": "a25241b8ddd3f226dab8030adf457ce4", "rayo": "acd0ddeb3d5baa47590ff6502de5d8d3",
+    "trofeo": "09487c5abd4946d931c07a0decfb0a06", "conversacion": "6731acbc32bc0b802f329cd0aa8c5184", "audifonos": "c91e7ad4e68550af23ce720fbe3a25b0",
+    "megafono": "e9547c547b375d09dace5e9b2dc2d975", "busqueda": "174bad56a37c6c2c88e3038a674b99a7", "telefono": "69856ec99e80ac79aa49f6b7bc76a973",
+    "idea": "fd60f44822d879a2d1ea1becdc005370", "estrella": "09b92728c6aa9bb9a5baf6eac5089a89",
+}
+SKY = BLOB("0a55139651dbb9d1b8fcf43fcd89f7a8")
+RING = ('<svg aria-hidden="true" viewBox="0 0 62 62" width="0.62em" height="0.62em" style="margin-right: 0.42em; flex-shrink: 0">'
+        f'<circle cx="31" cy="31" r="26" fill="none" stroke="{ACC}" stroke-width="10"></circle></svg>')
+SPHERE = f'<svg aria-hidden="true" viewBox="0 0 10 10" width="0.2em" height="0.2em" style="margin-left: 0.03em"><circle cx="5" cy="5" r="5" fill="{ACC}"></circle></svg>'
+ARROW = (f'<svg aria-hidden="true" viewBox="0 0 40 16" width="40" height="16" style="flex-shrink: 0"><path d="M1 8h36M30 2l7 6-7 6" fill="none" stroke="{HALO}" '
+         'stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>')
+GLOW = ('<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: radial-gradient(ellipse 900px 620px at 1300px 520px, '
+        'rgba(3, 117, 219, 0.36), rgba(3, 117, 219, 0.1) 52%, rgba(0, 26, 51, 0) 78%)"></div>')
+
+
+def ico(name, size, dark=False):
+    flt = "; filter: brightness(0) saturate(100%) invert(11%) sepia(60%) saturate(2400%) hue-rotate(196deg) brightness(90%)" if dark else ""
+    return f'<img src="{BLOB(ICO[name])}" alt="" style="width: {size}px; height: {size}px; flex-shrink: 0{flt}">'
+
+
+def page(title, body, bg_layer=GLOW):
+    return (
+        '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+        f'<title>{title}</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n'
+        '<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800'
+        '&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet">\n'
+        '<style>\nbody{margin:0;background:#001a33}\n</style>\n</helmet>\n'
+        '<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #001a33; color: #ffffff">\n'
+        f'{bg_layer}\n{body}\n{URL}\n</div>\n</x-dc>\n'
+        '<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":1920,"height":1080}}\'>\n'
+        'class Component extends DCLogic { renderVals() { return {}; } }\n</script>\n</body>\n</html>\n'
+    )
+
+
+def voice(eyebrow, question, answer, lead, size=104, width=600, extras=None, lead_w=540):
+    ex = ""
+    if extras:
+        rows = "".join(
+            f'<div style="padding: 13px 0; border-top: 1px solid {RULE}; display: flex; align-items: center; gap: 14px">'
+            f'<span style="width: 9px; height: 9px; border-radius: 50%; background: #ffffff; flex-shrink: 0"></span>{e}</div>' for e in extras)
+        ex = f'<div style="margin-top: 34px; max-width: {lead_w}px; border-bottom: 1px solid {RULE}; {P}; font-size: 19px; font-weight: 400; line-height: 1.35; color: #ffffff">{rows}</div>'
+    return (
+        f'<div style="position: absolute; left: 140px; top: 120px; width: {width}px; display: flex; flex-direction: column">'
+        f'<div style="{P}; font-size: 16px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #e2e2e2">{eyebrow}</div>'
+        f'<div style="margin-top: 44px; display: flex; align-items: center; {P}; font-size: 38px; font-weight: 300; line-height: 1.2; color: #e2e2e2">{RING}{question}</div>'
+        f'<div style="margin-top: 20px; {B}; font-size: {size}px; font-weight: 760; letter-spacing: -0.045em; line-height: 0.9; color: #ffffff">{"<br>".join(answer)}{SPHERE}</div>'
+        f'<div style="margin-top: 38px; {P}; font-size: 24px; font-weight: 300; line-height: 1.45; color: #ffffff; max-width: {lead_w}px">{lead}</div>{ex}</div>')
+
+
+def zone(inner, top=100, left=790, width=1010, height=860, gap=20):
+    return (f'<div style="position: absolute; left: {left}px; top: {top}px; width: {width}px; height: {height}px; display: flex; flex-direction: column; gap: {gap}px">{inner}</div>')
+
+
+def kick(text, color=SOFT, size=14):
+    return f'<div style="{P}; font-size: {size}px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: {color}">{text}</div>'
+
+
+def head(k, title, color="#ffffff", kcolor=SOFT, size=38):
+    return f'<div>{kick(k, kcolor)}<div style="margin-top: 8px; {B}; font-size: {size}px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: {color}">{title}</div></div>'
+
+
+def note(text, top=1008, left=790, width=1010):
+    return f'<div style="position: absolute; left: {left}px; top: {top}px; width: {width}px; {P}; font-size: 15px; font-weight: 300; line-height: 1.4; color: {SOFT}">{text}</div>'
+
+
+def chip(text, filled=False, dark=False):
+    if filled:
+        st = "background: #ffffff; color: #001a33; border: 1px solid #ffffff"
+    elif dark:
+        st = "background: #001a33; color: #ffffff; border: 1px solid #001a33"
+    else:
+        st = "color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.6)"
+    return (f'<span style="{P}; flex-shrink: 0; white-space: nowrap; font-size: 14px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; '
+            f'padding: 8px 16px; border-radius: 999px; {st}">{text}</span>')
+
+
+def ifthen(k, title, col_a, col_b, rows, left_w=380, a_fs=25, b_fs=20):
+    body = "".join(
+        f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE}">'
+        f'<div style="width: {left_w}px; flex-shrink: 0; {B}; font-size: {a_fs}px; font-weight: 700; letter-spacing: -0.015em; line-height: 1.15; color: #ffffff">{a}</div>'
+        f'{ARROW}<div style="flex: 1; {P}; font-size: {b_fs}px; font-weight: 300; line-height: 1.36; color: {SOFT}">{b}</div></div>' for a, b in rows)
+    return (f'<div style="{GLASS}; flex: 1; padding: 30px 38px 12px; display: flex; flex-direction: column">'
+            f'<div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px">{head(k, title)}'
+            f'<div style="display: flex; gap: 16px; align-items: center">{kick(col_a)}{ARROW}{kick(col_b)}</div></div>{body}</div>')
+
+
+def tiles(items, cols=2, title_fs=29, body_fs=19.5, numbered=False, icons=None, featured=None):
+    cells = []
+    for i, (t, d) in enumerate(items):
+        white = featured == i
+        fg, sub = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+        top = ""
+        if numbered:
+            top = f'<div style="{B}; font-size: 42px; font-weight: 300; line-height: 1; color: {ACC}">{i + 1:02d}</div>'
+        if icons:
+            top = ico(icons[i], 60)
+        cells.append(
+            f'<div style="{WHITE if white else GLASS}; padding: 26px 30px; display: flex; flex-direction: column; gap: 12px">{top}'
+            f'<div style="{B}; font-size: {title_fs}px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1; color: {fg}">{t}</div>'
+            f'<div style="{P}; font-size: {body_fs}px; font-weight: {400 if white else 300}; line-height: 1.42; color: {sub}">{d}</div></div>')
+    return f'<div style="flex: 1; display: grid; grid-template-columns: repeat({cols}, 1fr); grid-auto-rows: 1fr; gap: 18px">{"".join(cells)}</div>'
+
+
+def checks(items, color, mark="check", fs=23, weight=400, rule=RULE):
+    if mark == "check":
+        glyph = f'<svg aria-hidden="true" viewBox="0 0 28 28" width="28" height="28" style="flex-shrink: 0"><circle cx="14" cy="14" r="13" fill="{color}"></circle><path d="M8 14.5l4 4 8-9" fill="none" stroke="{{bg}}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+    else:
+        glyph = f'<svg aria-hidden="true" viewBox="0 0 28 28" width="28" height="28" style="flex-shrink: 0"><circle cx="14" cy="14" r="12.2" fill="none" stroke="{color}" stroke-width="1.6"></circle><path d="M9.5 9.5l9 9M18.5 9.5l-9 9" fill="none" stroke="{color}" stroke-width="1.8" stroke-linecap="round"></path></svg>'
+    return glyph, "".join(
+        f'<div style="flex: 1; display: flex; align-items: center; gap: 16px; border-top: 1px solid {rule}; {P}; font-size: {fs}px; font-weight: {weight}; line-height: 1.3">__G__<span>{t}</span></div>' for t in items)
+
+
+S = {}
+
+# =============================================================== aperturas de capítulo
+CHAPTERS = [
+    ("00a-cap-encargo", ["El", "encargo"], "Qué pidió SKY, qué queda sin atención en 2027 y qué dejó el piloto.", ["Lo que queda sin dueño", "Lo que dejó el piloto"]),
+    ("00b-cap-propuesta", ["La", "propuesta"], "Respuesta pública en las 13 cuentas, con reglas escritas antes de partir.", ["Hasta dónde llegamos", "Reglas de respuesta", "La conversación completa"]),
+    ("00c-cap-operacion", ["La", "operación"], "Cómo se trabaja cada comentario: agentes, equipo, contingencias y traspasos.", ["El recorrido de un comentario", "La autoridad y la ficha de cada agente", "Base de conocimiento y equipo", "Contingencias", "Traspaso de reclamos"]),
+    ("00d-cap-resguardos", ["Los", "resguardos"], "Lo que protege a la marca cuando algo sale mal.", ["Herramientas", "Seguridad y datos", "Continuidad operativa"]),
+    ("00e-cap-medicion", ["La", "medición"], "Qué se mide, contra qué se compara y cómo llega a SKY.", ["27 indicadores y sus objetivos", "Encuesta de esfuerzo en los traspasos", "Cinco informes en Efeonce Insights", "También por MCP y por API"]),
+    ("00f-cap-acuerdo", ["El", "acuerdo"], "Quién hace qué, qué se ve en los primeros 90 días y cómo se sale.", ["Quién hace qué", "Los primeros 90 días", "Salida y transición", "Preguntas frecuentes"]),
+]
+
+
+def divider(n, title, lead, items):
+    tsize = 168 if len(title[-1]) <= 9 else 142
+    cx, cy, r = 1400, 540, 340
+    ang = math.radians(n / 6 * 360)
+    ex, ey = cx + r * math.sin(ang), cy - r * math.cos(ang)
+    large = 1 if n / 6 > 0.5 else 0
+    arc = (f'<path d="M{cx} {cy - r} A{r} {r} 0 {large} 1 {ex:.1f} {ey:.1f}" fill="none" stroke="{ACC}" stroke-width="7" stroke-linecap="round"></path>'
+           if n < 6 else f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{ACC}" stroke-width="7"></circle>')
+    orbit = (f'<svg aria-hidden="true" viewBox="0 0 1920 1080" width="1920" height="1080" style="position: absolute; left: 0; top: 0">'
+             f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{HALO}" stroke-opacity="0.3" stroke-width="2"></circle>{arc}'
+             f'<circle cx="{ex:.1f}" cy="{ey:.1f}" r="17" fill="{ACC}"></circle><circle cx="{ex:.1f}" cy="{ey:.1f}" r="34" fill="{ACC}" fill-opacity="0.18"></circle></svg>')
+    lst = "".join(f'<div style="padding: 14px 0; border-top: 1px solid {RULE}; display: flex; gap: 18px; {P}; font-size: 22px; font-weight: 400; color: #ffffff">'
+                  f'<span style="width: 34px; {B}; font-weight: 300; color: {SOFT}">{i + 1:02d}</span>{t}</div>' for i, t in enumerate(items))
+    bg = ('<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: radial-gradient(circle 620px at 1400px 540px, '
+          'rgba(3, 117, 219, 0.42), rgba(3, 117, 219, 0.1) 60%, rgba(0, 26, 51, 0) 100%)"></div>')
+    body = (
+        orbit
+        + f'<div style="position: absolute; left: {cx - 300}px; top: {cy - 190}px; width: 600px; text-align: center; {B}; font-size: 330px; font-weight: 760; letter-spacing: -0.05em; line-height: 1.15; color: #ffffff">{n:02d}</div>'
+        + f'<div style="position: absolute; left: 140px; top: 120px; width: 780px; display: flex; flex-direction: column">'
+          f'<div style="{P}; font-size: 16px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: #e2e2e2">Capítulo {n:02d} de 06</div>'
+          f'<div style="margin-top: 60px; {B}; font-size: {tsize}px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.86; color: #ffffff">{title[0]}<br><span style="white-space: nowrap">{title[1]}{SPHERE}</span></div>'
+          f'<div style="margin-top: 44px; {P}; font-size: 28px; font-weight: 300; line-height: 1.42; color: #ffffff; max-width: 640px">{lead}</div>'
+          f'<div style="margin-top: 44px; width: 600px; border-bottom: 1px solid {RULE}">{lst}</div></div>')
+    return page("Capítulo: " + " ".join(title), body, bg)
+
+
+for i, (fname, title, lead, items) in enumerate(CHAPTERS):
+    S[fname + ".dc.html"] = divider(i + 1, title, lead, items)
+
+# =============================================================== 03 sin dueño
+# Rehecha el 10/10/2026 («está confusa»): ahora es una tabla de quién responde cada tipo de comentario en 2027.
+rows03 = [
+    ("megafono", "Engagement", "Campañas, concursos y dinámicas de marca: más del 80&nbsp;% del total.", "El CM de la agencia de SKY", "Ya tiene dueño", False),
+    ("busqueda", "Precio y destinos", "Tarifas, rutas y promociones. Fue el foco del piloto.", "Nadie", "Esta propuesta", True),
+    ("conversacion", "Consultas generales", "Dudas y críticas sobre el servicio.", "Nadie", "Esta propuesta", True),
+    ("audifonos", "Reclamos", "Lo que SKY llama quiebres: problemas con el vuelo o el servicio.", "Nadie", "Esta propuesta", True),
+]
+
+
+def _row03(ic, t, d, who, tag, ours):
+    return (f'<div style="{GLASS if ours else LINE}; flex: 1; padding: 0 30px; display: flex; align-items: center; gap: 26px{"" if ours else "; opacity: 0.72"}">{ico(ic, 62)}'
+            f'<div style="flex: 1"><div style="{B}; font-size: 36px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: #ffffff">{t}</div>'
+            f'<div style="margin-top: 7px; {P}; font-size: 18.5px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div>'
+            f'<div style="width: 250px; flex-shrink: 0; padding-left: 26px; border-left: 1px solid {RULE}">{kick("Quién responde", SOFT, 12)}'
+            f'<div style="margin-top: 6px; {B}; font-size: {40 if ours else 23}px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1; color: {ACC if ours else "#ffffff"}">{who}</div></div>'
+            f'<div style="width: 190px; flex-shrink: 0; display: flex; justify-content: flex-end">{chip(tag, ours)}</div></div>')
+
+
+S["03-sin-dueno.dc.html"] = page("Lo que queda sin dueño", voice(
+    "El punto de partida", "¿Quién responde qué en 2027?", ["Tres tipos", "sin dueño"],
+    "El engagement ya tiene quién lo responda. Las consultas de precio, las dudas generales y los reclamos, no: ésos son <span style=\"font-weight: 600\">esta propuesta</span>.", size=108)
+    + zone("".join(_row03(*r) for r in rows03), top=110, height=830, gap=16)
+    + note("Fuente: tipología y datos de SKY, 9 de octubre de 2026."))
+
+# =============================================================== 05b alcance
+g, inside = checks(["Clasificar todos los comentarios públicos de las 13 cuentas", "Responder precio y destinos, consultas generales y reclamos", "Derivar los reclamos a DM, con registro de cada traspaso",
+                    "Detectar y escalar riesgos: seguridad, prensa, suplantaciones", "Ocultar o reportar cuentas falsas, según la política de SKY", "Informes y lectura de fricciones por ruta y promoción"], "#001a33", fs=22, weight=500, rule="#dbe3ee")
+inside = inside.replace("__G__", g.replace("{bg}", "#ffffff"))
+g2, outside = checks(["Engagement de campañas, concursos y dinámicas", "Resolver el caso del pasajero: lo hace el equipo de SKY", "Atender mensajes directos",
+                      "Vocería, decisiones legales o de compensación", "Acceder a reservas, datos de pasajeros o sistemas de SKY"], SOFT, mark="x", fs=22, weight=300)
+outside = outside.replace("__G__", g2)
+S["05b-alcance.dc.html"] = page("Alcance: lo que entra y lo que no", voice(
+    "Alcance", "¿Hasta dónde llegamos?", ["Límites", "claros"], "Lo que entra, lo que no, y dónde termina nuestro trabajo y empieza el de SKY. Escrito antes de partir.")
+    + f'<div style="position: absolute; left: 790px; top: 100px; width: 1010px; height: 860px; display: grid; grid-template-columns: 1.08fr 0.92fr; gap: 20px">'
+      f'<div style="{WHITE}; padding: 36px 38px 14px; display: flex; flex-direction: column"><div>{kick("Dentro", "#52647c")}<div style="margin-top: 8px; display: flex; align-items: center; gap: 14px; {B}; font-size: 42px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: #001a33"><span>Lo que hace</span><img src="{BLOB("ad9b07614674548d6a8179314a25daca")}" alt="Efeonce" style="height: 34px; width: auto; margin-top: 4px"></div></div><div style="margin-top: 22px; flex: 1; display: flex; flex-direction: column; color: #001a33">{inside}</div></div>'
+      f'<div style="{GLASS}; padding: 36px 38px 14px; display: flex; flex-direction: column">{head("Fuera", "Lo que no hace", size=42)}<div style="margin-top: 22px; flex: 1; display: flex; flex-direction: column; color: #ffffff">{outside}</div></div></div>')
+
+# =============================================================== 06c decisión
+S["06c-decision.dc.html"] = page("Reglas de respuesta", voice(
+    "Reglas de respuesta", "¿Y si preguntan otra cosa?", ["Hay una", "regla"], "Cada situación tiene una conducta escrita y aprobada por SKY antes de partir. Nadie improvisa en público.")
+    + zone(ifthen("Matriz de decisión", "Qué se hace en cada caso", "Si el comentario", "Entonces", [
+        ("Pregunta un precio que está en la base", "Tarifa «desde», su condición y el enlace del mercado."),
+        ("Pregunta por una ruta que no está", "Enlace al calendario de precios; se pide la entrada a SKY."),
+        ("Reclama que la promoción no coincide", "Se explica la condición, sin discutir. Un solo seguimiento."),
+        ("Consulta algo que la base no cubre", "No se improvisa: canal oficial y entrada nueva en la base."),
+        ("Describe un problema con su viaje", "Contención, invitación a DM y traspaso registrado."),
+        ("Publica su reserva o su documento", "Se oculta, se invita a DM y queda registrado."),
+        ("Habla de seguridad, amenaza o autoridad", "No se responde. Aviso inmediato a SKY."),
+        ("Insiste después de un seguimiento", "Pasa a DM. No se abre un debate en público."),
+    ], left_w=400, a_fs=24, b_fs=19.5)))
+
+# =============================================================== 06d proceso
+steps = [
+    ("Entra y se clasifica", "Tipo, mercado, idioma, ruta, tono y prioridad de todo lo que llega.", "Agente", False),
+    ("Se enruta", "Lo nuestro a nuestra cola; el engagement a la suya; lo crítico dispara una alerta.", "Regla", False),
+    ("Se lee el contexto", "El hilo completo, el historial de la persona y la entrada vigente de la base.", "Agente", False),
+    ("Se propone la respuesta", "Un borrador con la fuente citada. En el servicio base, el agente no envía.", "Agente", False),
+    ("Se aprueba y se envía", "Una persona revisa, ajusta y publica la respuesta.", "Persona", True),
+    ("Se deriva o se sigue", "Los reclamos pasan a DM; el hilo se vigila 72 horas.", "Persona", True),
+    ("Se cierra y se aprende", "Estado y tiempos registrados; revisión de calidad; la base se corrige.", "Persona", True),
+]
+srows = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 28px; position: relative">'
+    f'<div style="width: 64px; height: 64px; flex-shrink: 0; border-radius: 50%; display: flex; align-items: center; justify-content: center; {B}; font-size: 28px; font-weight: 700; '
+    + (f'background: #ffffff; color: #001a33' if person else f'background: #001a33; color: #ffffff; border: 2px solid {HALO}; box-sizing: border-box')
+    + f'">{i + 1}</div>'
+    f'<div style="flex: 1; align-self: stretch; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid {RULE}"><div style="flex: 1">'
+    f'<div style="{B}; font-size: 32px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05; color: #ffffff">{t}</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 20px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div>{chip(c, person)}</div></div>'
+    for i, (t, d, c, person) in enumerate(steps))
+S["06d-proceso.dc.html"] = page("El recorrido de un comentario", voice(
+    "Operación", "¿Cómo se trabaja cada comentario?", ["Siete", "pasos"], "El mismo recorrido para las 13 cuentas, con responsable en cada paso y registro de principio a fin.",
+    extras=["Círculo blanco: lo hace una persona", "Círculo con borde: agente o regla"])
+    + f'<div style="position: absolute; left: 821px; top: 150px; width: 2px; height: 760px; background: linear-gradient({HALO}, rgba(114, 222, 216, 0.15))"></div>'
+    + zone(srows, gap=0))
+
+# =============================================================== 07b equipo híbrido (versión para enviar)
+# Dos parejas: cada agente tiene una persona que responde por él. Sin caras: las personas aún no están asignadas.
+def _hy_person(icon, name, d):
+    return (f'<div style="{WHITE}; padding: 26px 30px; display: flex; gap: 22px; align-items: center">{ico(icon, 68, True)}'
+            f'<div>{kick("Persona", "#52647c", 13)}<div style="margin-top: 6px; {B}; font-size: 32px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05; color: #001a33">{name}</div>'
+            f'<div style="margin-top: 8px; {P}; font-size: 18.5px; font-weight: 400; line-height: 1.36; color: #33475f">{d}</div></div></div>')
+
+
+def _hy_agent(blob, alt, name, d, can, cannot):
+    rows = "".join(
+        f'<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid {RULE}">{kick(k, SOFT, 12)}'
+        f'<div style="margin-top: 6px; {P}; font-size: 18.5px; font-weight: 300; line-height: 1.34; color: #ffffff">{v}</div></div>' for k, v in (("Puede", can), ("No puede", cannot)))
+    return (f'<div style="{GLASS}; flex: 1; padding: 22px 30px 8px; display: flex; flex-direction: column">'
+            f'<div style="display: flex; gap: 20px; align-items: center; padding-bottom: 16px">'
+            f'<img src="{BLOB(blob)}" alt="{alt}" style="width: 128px; height: 128px; flex-shrink: 0; filter: drop-shadow(0 16px 22px rgba(0, 0, 0, 0.4))">'
+            f'<div>{kick("Agente de IA", SOFT, 13)}<div style="margin-top: 6px; {B}; font-size: 32px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05; color: #ffffff">{name}</div>'
+            f'<div style="margin-top: 8px; {P}; font-size: 18.5px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div></div>{rows}</div>')
+
+
+_hy_link = (f'<div style="display: flex; align-items: center; justify-content: center; gap: 12px; {P}; font-size: 15px; font-weight: 500; letter-spacing: 0.02em; color: #ffffff">'
+            f'<svg aria-hidden="true" viewBox="0 0 16 34" width="16" height="34"><path d="M8 1v30M2 25l6 7 6-7" fill="none" stroke="{HALO}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+            'responde por</div>')
+
+
+def _hy_pair(person, agent):
+    return f'<div style="display: flex; flex-direction: column; gap: 12px">{person}{_hy_link}{agent}</div>'
+
+
+S["07b-equipo-hibrido.dc.html"] = page("Equipo híbrido", voice(
+    "El equipo", "¿Quién hace el trabajo?", ["Equipo", "híbrido"],
+    "Dos personas y dos agentes de IA, cada uno con su tarea. Los agentes leen y proponen; las personas <span style=\"font-weight: 600\">deciden y responden</span>.", size=120,
+    extras=["Cada agente tiene una persona que responde por él", "En las campañas grandes se suma una persona entrenada"])
+    + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 20px">'
+           + _hy_pair(_hy_person("audifonos", "Especialista dedicado", "Aprueba y envía cada respuesta, deriva los reclamos y mantiene la base al día."),
+                      _hy_agent("9c504f3a6656923e74648dbfa53a1dc9", "Spark de servicio: un robot esférico blanco de Efeonce que saluda y sostiene una burbuja de conversación.", "Redactor",
+                                "Lee el hilo, busca la entrada vigente y propone la respuesta con su fuente.",
+                                "Proponer un borrador, con la fuente citada.", "Enviar, dar un precio fuera de la base ni pedir datos personales."))
+           + _hy_pair(_hy_person("estrella", "Líder de servicio", "Revisa la calidad, toma los casos sensibles y reemplaza al especialista en sus ausencias."),
+                      _hy_agent("d4e8828cd04c6ffb7f9fb4f348889be7", "Spark de investigación: un robot esférico blanco de Efeonce que examina con una lupa.", "Clasificador",
+                                "Lee todo lo que entra y lo etiqueta por tipo, mercado, idioma y prioridad.",
+                                "Leer, etiquetar y avisar lo crítico.", "Ocultar, borrar ni responder."))
+           + '</div>'
+           f'<div style="{LINE}; padding: 20px 30px; display: flex; align-items: center; gap: 18px">{ico("carpeta", 34)}'
+           f'<div style="{P}; font-size: 19px; font-weight: 300; line-height: 1.38; color: #ffffff">Detrás del equipo: responsable de cuenta, operación de agentes y base de conocimiento, y medición en Efeonce Insights.</div></div>', top=110, height=840, gap=18)
+    + note("Los Sparks son los personajes con que Efeonce representa a sus agentes."))
+
+# =============================================================== 10g herramientas (anexo)
+# Seis tarjetas con su ícono o su marca. La bandeja va destacada en blanco, con el logo oficial de Sprout Social.
+_LOCK = (f'<svg aria-hidden="true" viewBox="0 0 64 64" width="62" height="62"><rect x="12" y="28" width="40" height="28" rx="7" fill="#ffffff"></rect>'
+         '<path d="M21 28v-8a11 11 0 0 1 22 0v8" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round"></path><circle cx="32" cy="42" r="4.5" fill="#001a33"></circle></svg>')
+
+
+def _tool(mark, k, title, d, chips, white=False):
+    fg, soft, rule = ("#001a33", "#33475f", "#dbe3ee") if white else ("#ffffff", SOFT, RULE)
+    tags = "".join(f'<span style="{P}; font-size: 14px; font-weight: 600; padding: 6px 13px; border-radius: 999px; white-space: nowrap; '
+                   + ("background: #eaf1f9; color: #001a33" if white else "border: 1px solid rgba(114, 222, 216, 0.45); color: #ffffff") + f'">{c}</span>' for c in chips)
+    return (f'<div style="{WHITE if white else GLASS}; padding: 26px 28px 24px; display: flex; flex-direction: column">'
+            f'<div style="height: 96px; display: flex; align-items: center; gap: 12px">{mark}</div>'
+            f'<div style="margin-top: 14px">{kick(k, "#52647c" if white else SOFT, 13)}</div>'
+            f'<div style="margin-top: 6px; {B}; font-size: 30px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.06; color: {fg}">{title}</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 18px; font-weight: {400 if white else 300}; line-height: 1.38; color: {soft}">{d}</div>'
+            f'<div style="margin-top: auto; padding-top: 16px; display: flex; flex-wrap: wrap; gap: 8px">{tags}</div></div>')
+
+
+_spk = lambda b, alt: f'<img src="{BLOB(b)}" alt="{alt}" style="width: 96px; height: 96px; filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.4))">'
+S["10g-herramientas.dc.html"] = page("Herramientas", voice(
+    "Herramientas", "¿Con qué se opera?", ["El", "stack"], "Seis piezas, cada una con su función. Las que tratan datos de SKY se informan y se aprueban <span style=\"font-weight: 600\">antes de partir</span>.", size=128,
+    extras=["SKY no instala ni contrata nada", "Un cambio de herramienta se informa antes de hacerlo"])
+    + zone('<div style="flex: 1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 18px">'
+           + _tool(f'<img src="{BLOB("53ccc81e0d50f2b7d56710291bfea5b9")}" alt="Sprout Social" style="height: 96px; width: auto">', "Bandeja", "Sprout Social",
+                   "Las 13 cuentas en una sola vista, con etiquetas y tiempos de respuesta.", ["13 cuentas", "5 mercados"], white=True)
+           + _tool(_spk("d4e8828cd04c6ffb7f9fb4f348889be7", "Spark de investigación de Efeonce") + _spk("9c504f3a6656923e74648dbfa53a1dc9", "Spark de servicio de Efeonce"), "Agentes de IA", "Clasificador y Redactor",
+                   "Sobre modelos de lenguaje con contrato empresarial.", ["Sin entrenar con los datos"])
+           + _tool(ico("carpeta", 66), "Base de conocimiento", "Una sola fuente",
+                   "Precios, rutas, promociones y respuestas aprobadas por SKY.", ["Con fecha de vencimiento"])
+           + _tool(f'<img src="{BLOB("e049b1b50443f77efc55c5b616513462")}" alt="Efeonce Insights" style="width: 70px; height: 70px">', "Medición", "Efeonce Insights",
+                   "Los 27 indicadores del servicio, con las mismas cifras en todos los formatos.", ["Web", "PDF", "MCP", "API"])
+           + _tool(ico("rayo", 66), "Alertas", "Aviso automático",
+                   "Lo crítico llega a SKY y al líder de servicio, también fuera de horario.", ["En 30 minutos"])
+           + _tool(_LOCK, "Accesos", "Usuarios con nombre",
+                   "Rol de socio en las cuentas sociales, sin contraseñas compartidas.", ["Doble factor", "Baja en 24 horas"])
+           + '</div>', top=100, height=870, gap=18))
+
+# =============================================================== 07c fichas de agentes
+def role_card(icon_name, name, sub, fields, white=False):
+    fg, soft, rule = ("#001a33", "#52647c", "#dbe3ee") if white else ("#ffffff", SOFT, RULE)
+    body = "".join(
+        f'<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid {rule}">{kick(k, soft, 13)}'
+        f'<div style="margin-top: 8px; {P}; font-size: 23px; font-weight: {400 if white else 300}; line-height: 1.34; color: {fg}">{v}</div></div>' for k, v in fields)
+    return (f'<div style="position: relative; {WHITE if white else GLASS}; padding: 32px 34px 10px; display: flex; flex-direction: column">'
+            f'<img src="{BLOB(icon_name[0])}" alt="{icon_name[1]}" style="position: absolute; right: 14px; top: -178px; width: 236px; height: 236px; filter: drop-shadow(0 24px 30px rgba(0, 0, 0, 0.45))">'
+            f'<div style="margin-bottom: 22px">{kick(sub, soft)}'
+            f'<div style="margin-top: 6px; {B}; font-size: 54px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: {fg}">{name}</div></div>{body}</div>')
+
+S["07c-agentes-ficha.dc.html"] = page("Ficha de rol de cada agente", voice(
+    "Agentes de IA", "¿Qué hace cada agente?", ["Dos roles", "acotados"], "Cada agente tiene una ficha: qué hace, qué no puede hacer, quién responde por él y cuándo se retira.")
+    + f'<div style="position: absolute; left: 790px; top: 196px; width: 1010px; height: 764px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px">'
+    + role_card(("d4e8828cd04c6ffb7f9fb4f348889be7", "Spark de investigación: un robot esférico blanco de Efeonce que examina con una lupa."), "Clasificador", "Agente 1 · lee y etiqueta", [
+        ("Tarea", "Etiqueta tipo, mercado, idioma, ruta, tono y prioridad de todo lo que entra."),
+        ("Puede", "Leer y etiquetar. Avisar lo crítico a SKY y al líder de servicio."),
+        ("No puede", "Ocultar, borrar ni responder."),
+        ("Responde por él", "El líder de servicio."),
+        ("Se retira si", "Pierde una alerta crítica o baja del umbral dos semanas seguidas."),
+    ])
+    + role_card(("9c504f3a6656923e74648dbfa53a1dc9", "Spark de servicio: un robot esférico blanco de Efeonce que saluda y sostiene una burbuja de conversación."), "Redactor", "Agente 2 · propone", [
+        ("Tarea", "Lee el hilo, busca la entrada vigente y propone la respuesta con su fuente."),
+        ("Puede", "Proponer un borrador. Nunca envía."),
+        ("No puede", "Dar un precio fuera de la base, pedir datos personales ni ofrecer compensación."),
+        ("Responde por él", "El especialista que aprueba."),
+        ("Se retira si", "Un error de precio publicado nace de su borrador."),
+    ]) + "</div>"
+    + note("Los Sparks son los personajes con que Efeonce representa a sus agentes. Antes de producción: prueba con casos reales, operación en sombra y comparación con la línea base."))
+
+# =============================================================== 08b base de conocimiento
+base_rows = [
+    ("Precios y rutas", "Tarifa por ruta, mercado y moneda, con enlace medible", "Marketing digital", "Cada semana; a diario en campaña"),
+    ("Promociones", "Condiciones, vigencia y legales por mercado", "Marketing", "Antes de cada promoción"),
+    ("Servicio", "Equipaje, check-in, cambios y canales oficiales", "Experiencia de clientes", "Cuando cambia una política"),
+    ("Reclamos", "Respuestas de contención y ruta de derivación", "Experiencia de clientes", "Cada trimestre"),
+    ("Tono", "Voz de SKY por mercado, en español y portugués", "Marca", "Cada semestre"),
+    ("Contingencia", "Mensajes de espera ya aprobados", "Comunicaciones", "Antes de partir y tras cada evento"),
+]
+brows = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE}">'
+    f'<div style="flex: 1"><div style="{B}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{a}</div><div style="margin-top: 4px; {P}; font-size: 18.5px; font-weight: 300; line-height: 1.35; color: {SOFT}">{b}</div></div>'
+    f'<div style="width: 250px; flex-shrink: 0">{chip(c)}</div><div style="width: 220px; flex-shrink: 0; {P}; font-size: 19px; font-weight: 400; line-height: 1.32; color: #ffffff">{d}</div></div>'
+    for a, b, c, d in base_rows)
+S["08b-base.dc.html"] = page("Base de conocimiento", voice(
+    "El método · Base de conocimiento", "¿Y si SKY cambia una tarifa?", ["Una sola", "fuente"],
+    "Las tarifas, las rutas y las promociones de SKY cambian seguido. Por eso nada se responde de memoria: cada respuesta sale de una base que SKY aprueba, con dueño y <span style=\"font-weight: 600\">fecha de vencimiento</span>.",
+    extras=["Una entrada vencida no se puede usar", "Cada cambio queda registrado, con quién lo aprobó", "El piloto dejó la primera versión de precios y rutas"])
+    + zone(f'<div style="{GLASS}; flex: 1; padding: 30px 38px 10px; display: flex; flex-direction: column"><div style="display: flex; align-items: flex-end; gap: 24px; margin-bottom: 18px">'
+           f'<div style="flex: 1">{head("Seis módulos", "Qué contiene y quién lo mantiene")}</div><div style="width: 250px">{kick("Dueño propuesto en SKY")}</div><div style="width: 220px">{kick("Se actualiza")}</div></div>{brows}</div>'))
+
+# =============================================================== 08c equipo
+front = "".join(
+    f'<div style="{WHITE}; padding: 28px 32px; display: flex; gap: 22px; align-items: center">{ico("audifonos", 74, True)}<div><div style="{B}; font-size: 34px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05; color: #001a33">{t}</div>'
+    f'<div style="margin-top: 8px; {P}; font-size: 19.5px; font-weight: 400; line-height: 1.38; color: #33475f">{d}</div></div></div>'
+    for t, d in (("Especialista dedicado", "Aprueba y envía, deriva y mantiene la base al día."), ("Líder de servicio y calidad", "Calidad y casos sensibles. Reemplaza al especialista en sus ausencias.")))
+back = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE}"><div style="width: 360px; flex-shrink: 0; {B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{a}</div>'
+    f'<div style="{P}; font-size: 20px; font-weight: 300; color: {SOFT}">{b}</div></div>'
+    for a, b in (("Responsable de cuenta", "El interlocutor de SKY: alcance, riesgos y revisiones."),
+                 ("Operación de agentes y base", "Fichas, pruebas e incidentes de los agentes."), ("Medición", "Efeonce Insights calcula los indicadores directo de los datos."), ("Refuerzo de campaña", "Una persona entrenada más en cada campaña grande.")))
+guar = "".join(
+    f'<div style="{LINE}; padding: 18px 24px"><div style="{B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{t}</div><div style="margin-top: 4px; {P}; font-size: 17px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>'
+    for t, d in (("Respaldo entrenado", "El líder cubre vacaciones, licencias y días de alto volumen."), ("Certificación", "50 respuestas de práctica antes de responder solo."), ("Portugués", "Lo redacta el agente; lo revisa quien domina el idioma.")))
+S["08c-equipo.dc.html"] = page("El equipo detrás del servicio", voice(
+    "Equipo", "¿Quién está detrás?", ["Equipo", "dedicado"], "Un especialista dedicado responde, con un líder que lo respalda. Detrás hay cuenta, agentes y medición, y un refuerzo listo para las campañas.")
+    + zone(f'{kick("En la primera línea")}<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px">{front}</div>'
+           f'<div style="{GLASS}; flex: 1; padding: 22px 34px 6px; display: flex; flex-direction: column">{kick("Detrás")}<div style="margin-top: 12px; flex: 1; display: flex; flex-direction: column">{back}</div></div>'
+           f'<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px">{guar}</div>', gap=16))
+
+# =============================================================== 09 cobertura y tiempos (reloj de 24 horas)
+def arc(cx, cy, r, h0, h1, stroke, width, dash=""):
+    a0, a1 = math.radians(h0 / 24 * 360), math.radians(h1 / 24 * 360)
+    x0, y0, x1, y1 = cx + r * math.sin(a0), cy - r * math.cos(a0), cx + r * math.sin(a1), cy - r * math.cos(a1)
+    large = 1 if ((h1 - h0) % 24) > 12 else 0
+    return f'<path d="M{x0:.1f} {y0:.1f} A{r} {r} 0 {large} 1 {x1:.1f} {y1:.1f}" fill="none" stroke="{stroke}" stroke-width="{width}" stroke-linecap="round"{dash}></path>'
+
+cxd, cyd, rd = 230, 230, 176
+hours = "".join(
+    f'<text x="{cxd + (rd + 36) * math.sin(math.radians(h / 24 * 360)):.1f}" y="{cyd - (rd + 36) * math.cos(math.radians(h / 24 * 360)) + 7:.1f}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="18" font-weight="500" fill="{SOFT}">{h:02d}</text>'
+    for h in (0, 6, 12, 18))
+dial = (f'<svg viewBox="0 0 460 460" width="460" height="460" role="img" aria-label="Cobertura en las 24 horas de un día hábil">'
+        f'<circle cx="{cxd}" cy="{cyd}" r="{rd}" fill="none" stroke="{HALO}" stroke-opacity="0.22" stroke-width="2"></circle>'
+        + arc(cxd, cyd, rd, 9.25, 17.75, "#ffffff", 26) + arc(cxd, cyd, rd, 18.45, 8.55, "#8fb8e8", 26) + hours
+        + f'<text x="{cxd}" y="{cyd - 16}" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-size="46" font-weight="760" fill="#ffffff">9 horas</text>'
+          f'<text x="{cxd}" y="{cyd + 16}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="17" fill="{SOFT}">de atención humana,</text><text x="{cxd}" y="{cyd + 40}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="17" fill="{SOFT}">de lunes a viernes</text></svg>')
+win = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 20px; border-top: 1px solid {RULE}"><span style="width: 44px; height: 14px; border-radius: 7px; flex-shrink: 0; {sw}"></span>'
+    f'<div style="flex: 1"><div style="display: flex; align-items: baseline; gap: 14px"><span style="{B}; font-size: 32px; font-weight: 760; letter-spacing: -0.02em; color: #ffffff; white-space: nowrap">{n}</span><span style="{P}; font-size: 17px; color: {SOFT}">{w}</span></div>'
+    f'<div style="margin-top: 4px; {P}; font-size: 20px; font-weight: 300; line-height: 1.35; color: #ffffff">{d}</div></div></div>'
+    for sw, n, w, d in (("background: #ffffff", "Hábil", "Lun–vie · 09:00 a 18:00", "Respuesta en 2 a 4 horas, según la prioridad. Una persona aprueba cada respuesta."),
+                        ("background: #8fb8e8", "Extendida", "Opcional · noches, fines de semana y feriados", "Agentes autónomos responden precio y consultas generales; los reclamos esperan al bloque hábil."),
+                        (f"border: 2px dashed {HALO}; box-sizing: border-box", "Fuera de horario", "Sin la opción extendida", "Primer bloque hábil siguiente. Una alerta automática avisa lo crítico a SKY en 30 minutos.")))
+NETS = (f'<div style="display: flex; align-items: center; gap: 9px; margin: 2px 0 12px"><img src="{BLOB("db931e069d8b0aceb52ffe157278916d")}" alt="Instagram" style="width: 28px; height: 28px">'
+        f'<img src="{BLOB("556555665fe4ec5df51fffe38cba039b")}" alt="Facebook" style="width: 28px; height: 28px">'
+        f'<span style="width: 1px; height: 20px; margin: 0 3px; background: {RULE_S}"></span>'
+        + "".join(f'<img src="{BLOB(b)}" alt="{n}" style="width: 22px; height: 22px; opacity: 0.75">' for b, n in (("e263d9f4ba54b0e506a4e86bf09d8d20", "TikTok"), ("029e746d5bc40ded16a44702c566c265", "LinkedIn"), ("9f0c81e4cfdc5ed01979b017af5d7c5f", "X")))
+        + "</div>")
+def _sun(cx, cy, r, fill="#fcd116"):
+    rays = "".join(f'<line x1="{cx + (r + 1.2) * math.cos(math.radians(k * 45)):.2f}" y1="{cy + (r + 1.2) * math.sin(math.radians(k * 45)):.2f}" x2="{cx + (r + 4) * math.cos(math.radians(k * 45)):.2f}" '
+                   f'y2="{cy + (r + 4) * math.sin(math.radians(k * 45)):.2f}" stroke="{fill}" stroke-width="1.4" stroke-linecap="round"></line>' for k in range(8))
+    return rays + f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{fill}" stroke="#b8860b" stroke-width="0.4"></circle>'
+
+_star = "M10.5 4.2 L12 8.6 L16.6 8.6 L12.9 11.4 L14.3 15.8 L10.5 13.1 L6.7 15.8 L8.1 11.4 L4.4 8.6 L9 8.6 Z"
+FLAG_ART = {
+    "Chile": '<rect width="60" height="42" fill="#ffffff"></rect><rect y="21" width="60" height="21" fill="#d52b1e"></rect><rect width="21" height="21" fill="#0039a6"></rect>' + f'<path d="{_star}" fill="#ffffff"></path>',
+    "Perú": '<rect width="60" height="42" fill="#ffffff"></rect><rect width="20" height="42" fill="#d91023"></rect><rect x="40" width="20" height="42" fill="#d91023"></rect>',
+    "Argentina": '<rect width="60" height="42" fill="#ffffff"></rect><rect width="60" height="14" fill="#74acdf"></rect><rect y="28" width="60" height="14" fill="#74acdf"></rect>' + _sun(30, 21, 3.6, "#f6b40e"),
+    "Brasil": ('<rect width="60" height="42" fill="#009c3b"></rect><path d="M30 5 L55 21 L30 37 L5 21 Z" fill="#ffdf00"></path><circle cx="30" cy="21" r="9.6" fill="#002776"></circle>'
+               '<path d="M20.9 18.6 Q30.5 16.4 39.4 23.2" fill="none" stroke="#ffffff" stroke-width="1.9"></path>'),
+    "Uruguay": ('<rect width="60" height="42" fill="#ffffff"></rect>' + "".join(f'<rect x="0" y="{i * 42 / 9:.2f}" width="60" height="{42 / 9:.2f}" fill="#0038a8"></rect>' for i in (1, 3, 5, 7))
+                + '<rect width="23.33" height="23.33" fill="#ffffff"></rect>' + _sun(11.67, 11.67, 4.7)),
+}
+
+
+def flag(country, w=63):
+    h = w * 42 / 60
+    return (f'<span style="display: inline-block; width: {w}px; height: {h:.0f}px; border-radius: {w * 0.13:.0f}px; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35); flex-shrink: 0">'
+            f'<svg viewBox="0 0 60 42" width="{w}" height="{h:.0f}" role="img" aria-label="Bandera de {country}" preserveAspectRatio="none">{FLAG_ART[country]}</svg></span>')
+
+def flag_round(country, d=30):
+    x0 = 0 if country in ("Chile", "Uruguay") else 9
+    return (f'<span style="display: inline-block; width: {d}px; height: {d}px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.5); flex-shrink: 0">'
+            f'<svg viewBox="{x0} 0 42 42" width="{d}" height="{d}" role="img" aria-label="Bandera de {country}">{FLAG_ART[country]}</svg></span>')
+
+FLAGS = f'<div style="display: flex; gap: 9px; margin: 2px 0 12px">{flag("Brasil", 40)}{flag("Uruguay", 40)}</div>'
+facts = "".join(
+    f'<div style="{GLASS}; padding: 20px 26px">{kick(k, SOFT, 13)}<div style="margin-top: 8px; {B}; font-size: 28px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08; color: #ffffff">{t}</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 17px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>'
+    for k, t, d in (("Las 13 cuentas entran", NETS + "El volumen está en Instagram y Facebook", "TikTok, LinkedIn y X se atienden igual, con muy pocos comentarios. Chile concentra el mayor volumen; después Perú y Argentina."), ("Brasil y Uruguay", FLAGS + "100 a 200 al mes", "Comentarios al mes. El portugués se responde desde la base aprobada, sin equipo dedicado."), ("Cobertura base", "Hábil", "La extendida es opcional y se activa cuando SKY lo decida.")))
+S["09-tiempos.dc.html"] = page("Cobertura y tiempos", voice(
+    "Nivel de servicio", "¿En cuánto responden?", ["Con", "tiempos", "pactados"],
+    "El tiempo de primera respuesta se acuerda por ventana y por prioridad, se mide en cada conversación y se informa <span style=\"font-weight: 600\">cada semana</span>.", size=112)
+    + zone(f'<div style="flex: 1; display: flex; align-items: center; gap: 30px"><div style="flex-shrink: 0">{dial}</div><div style="flex: 1; align-self: stretch; display: flex; flex-direction: column; border-bottom: 1px solid {RULE}">{win}</div></div>'
+           f'<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px">{facts}</div>', top=110, height=840)
+    + note("Tiempos propuestos: se confirman tras medir las primeras cuatro semanas. Volúmenes por red y por mercado: datos de SKY, 9 de octubre de 2026. Horas de Chile."))
+
+# =============================================================== 10b contingencias
+def mode_card(n, title, when, items, white=False):
+    fg, soft, rule = ("#001a33", "#33475f", "#dbe3ee") if white else ("#ffffff", SOFT, RULE)
+    lst = "".join(f'<div style="flex: 1; display: flex; align-items: center; border-top: 1px solid {rule}; {P}; font-size: 20px; font-weight: {500 if white else 300}; line-height: 1.32; color: {fg}">{t}</div>' for t in items)
+    return (f'<div style="{WHITE if white else GLASS}; padding: 30px 30px 10px; display: flex; flex-direction: column"><div style="{B}; font-size: 44px; font-weight: 300; line-height: 1; color: {ACC}">{n}</div>'
+            f'<div style="margin-top: 12px; {B}; font-size: 44px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: {fg}">{title}</div>'
+            f'<div style="margin-top: 10px; margin-bottom: 18px; min-height: 78px; {P}; font-size: 18.5px; font-weight: 400; line-height: 1.38; color: {soft}">{when}</div>{lst}</div>')
+
+S["10b-contingencia.dc.html"] = page("Contingencias", voice(
+    "Contingencias", "¿Y si el volumen se dispara?", ["Modo", "contingencia"],
+    "Para este servicio, una campaña grande ya es una contingencia: el volumen se multiplica en pocos días. La diferencia con una cancelación masiva es que <span style=\"font-weight: 600\">tiene fecha</span>. Las dos corren con el mismo protocolo.", size=96,
+    extras=["Sin aviso, lo activa SKY o un alza de volumen o de tono", "Seguridad y fraude: nada se responde sin SKY"])
+    + zone(f'<div style="flex: 1; display: flex; gap: 18px">'
+           f'<div style="flex: 1; display: flex; flex-direction: column"><div style="height: 46px; display: flex; align-items: center">{kick("Todo el año")}</div><div style="flex: 1; display: grid">'
+           + mode_card("01", "Normal", "La operación de todos los días.", ["Ventanas y tiempos pactados", "Especialista y respaldo", "Informe semanal"])
+           + f'</div></div><div style="flex: 2; display: flex; flex-direction: column"><div style="height: 46px; display: flex; align-items: center; gap: 16px">{kick("Modo contingencia", "#ffffff")}'
+             f'<span style="flex: 1; height: 1px; background: {RULE_S}"></span>{kick("Mismo protocolo, dos entradas")}</div><div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 18px">'
+           + mode_card("02", "Con fecha", "Campañas grandes: Travel Sale, Cyber SKY, Black Friday y lanzamientos de ruta.", ["Se prepara dos semanas antes", "Dos personas conectadas y tiempos más cortos", "Respuestas y legales aprobados por promoción", "Parte diario e informe al cierre"], white=True)
+           + mode_card("03", "Sin aviso", "Cancelaciones masivas, clima, paro o incidente.", ["Se activa en horas", "Mensaje de espera aprobado por SKY", "Reclamos por una sola ruta a DM; lo comercial, en pausa", "Parte diario mientras dure"], white=True)
+           + f'</div></div></div><div style="{LINE}; padding: 22px 34px; {P}; font-size: 21px; font-weight: 300; line-height: 1.4; color: #ffffff"><span style="font-weight: 600">Se acuerda antes de partir:</span> el calendario de campañas, los contactos de crisis de SKY, los mensajes de espera y quién declara y cierra una contingencia.</div>'))
+
+# =============================================================== 10c calidad y resguardos (foto)
+res = [("Precio", "Sólo tarifas vigentes de la base. Lo vencido no se usa."), ("Reclamos", "Siempre una persona. No se discute ni se ofrece compensación."),
+       ("Datos personales", "Nunca se piden en público. Si aparecen, se ocultan y se deriva."), ("Calidad", "El primer mes se revisan todas las respuestas a reclamos."),
+       ("Error público", "Se corrige, se responde de nuevo y se avisa a SKY."), ("Continuidad", "Un respaldo entrenado cubre las ausencias. Si falla el agente, se opera a mano.")]
+res_cells = "".join(f'<div style="padding: 13px 0; border-top: 1px solid {RULE}"><div style="{B}; font-size: 24px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{t}</div>'
+                    f'<div style="margin-top: 3px; {P}; font-size: 17px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div>' for t, d in res)
+photo_bg = (f'<img src="{BLOB("4e6c979a9d08213a960bd200f548c5d8")}" alt="Una estratega de Efeonce con hoodie azul sostiene con la mano una campana de vidrio que guarda una chispa naranja sobre un aro de luz." '
+            'style="position: absolute; object-fit: cover; left: 0; top: 0; width: 1920px; height: 1080px">'
+            '<div style="position: absolute; left: 0; top: 0; width: 1100px; height: 1080px; background: linear-gradient(90deg, rgba(0, 26, 51, 0.86) 0%, rgba(0, 26, 51, 0.6) 62%, rgba(0, 26, 51, 0) 100%)"></div>')
+S["10c-resguardos.dc.html"] = page("Calidad y resguardos", voice(
+    "Calidad y resguardos", "¿Y si la IA se equivoca?", ["No responde", "sola"],
+    "El agente propone y una persona aprueba. Darle más autonomía es una decisión <span style=\"font-weight: 600\">de SKY</span>, por tipo de consulta y con evidencia.", size=104, width=760, lead_w=600)
+    + f'<div style="position: absolute; left: 140px; top: 640px; width: 760px; display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px">{res_cells}</div>', photo_bg)
+
+# =============================================================== 10d traspasos
+def node(icon_name, k, t, d, white=False):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; flex: 1; align-self: stretch; padding: 28px 28px">{ico(icon_name, 70, white)}<div style="margin-top: 16px">{kick(k, "#52647c" if white else SOFT, 13)}</div>'
+            f'<div style="margin-top: 6px; {B}; font-size: 44px; font-weight: 760; letter-spacing: -0.03em; line-height: 1.05; color: {fg}">{t}</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 21px; font-weight: {400 if white else 300}; line-height: 1.38; color: {soft}">{d}</div></div>')
+
+carry = "".join(f'<div style="display: flex; align-items: center; gap: 14px; padding: 13px 0; border-top: 1px solid {RULE}; {P}; font-size: 21px; color: #ffffff"><span style="width: 9px; height: 9px; border-radius: 50%; background: #ffffff"></span>{t}</div>'
+                for t in ("El comentario original y su enlace", "Usuario, mercado e idioma", "Tema y nivel de urgencia", "Lo que ya se le dijo en público"))
+recon = "".join(f'<div style="padding: 13px 0; border-top: 1px solid {RULE}"><span style="{B}; font-size: 27px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{t}</span>'
+                f'<span style="margin-left: 14px; {P}; font-size: 18px; font-weight: 300; color: {SOFT}">{d}</span></div>'
+                for t, d in (("Derivados", "cuántos pasaron a DM, y por qué tema"), ("Tomados", "cuántos tomó el equipo de SKY"), ("Reabiertos", "cuántos volvieron a los comentarios")))
+S["10d-traspasos.dc.html"] = page("Traspaso de reclamos", voice(
+    "Traspasos", "¿Y el reclamo derivado?", ["Llega", "completo"], "Cada reclamo llega al equipo de SKY con lo necesario para tomarlo sin volver a preguntar, y cada semana se revisa qué pasó con él.")
+    + zone(f'<div style="flex: 1; display: flex; align-items: center; gap: 14px">' + node("comentario", "En público", "Contiene", "Responde con empatía, sin discutir ni prometer.") + ARROW
+           + node("telefono", "A mensaje directo", "Deriva", "Invita a DM y registra el traspaso.") + ARROW + node("audifonos", "El equipo de SKY", "Resuelve", "El equipo de SKY toma el caso y lo gestiona.", white=True) + "</div>"
+           f'<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px"><div style="{GLASS}; padding: 28px 32px 14px">{head("En cada traspaso", "Qué recibe SKY", size=34)}<div style="margin-top: 16px">{carry}</div></div>'
+           f'<div style="{GLASS}; padding: 28px 32px 14px">{head("Cada semana", "Conciliación", size=34)}<div style="margin-top: 16px">{recon}</div></div></div>'
+           f'<div style="{LINE}; padding: 20px 32px; {P}; font-size: 20.5px; font-weight: 300; line-height: 1.4; color: #ffffff"><span style="font-weight: 600">Para partir se acuerda:</span> quién recibe, por qué canal, en qué horario y en cuánto tiempo toma el caso.</div>'))
+
+# =============================================================== 10e seguridad
+_SPARK = ('<svg viewBox="0 0 32 32" width="22" height="22" aria-label="Inteligencia artificial"><path d="M13 3 L15.6 11.4 L24 14 L15.6 16.6 L13 25 L10.4 16.6 L2 14 L10.4 11.4 Z" fill="#ffffff"></path>'
+          '<path d="M24.5 19 L25.8 22.7 L29.5 24 L25.8 25.3 L24.5 29 L23.2 25.3 L19.5 24 L23.2 22.7 Z" fill="#ffffff"></path></svg>')
+
+
+def _role(k, t, d, bg="#023c70"):
+    return (f'<div style="flex: 1; align-self: stretch; box-sizing: border-box; border-radius: 18px; padding: 20px 22px; background: {bg}; color: #ffffff">'
+            f'<div style="height: 24px; display: flex; align-items: center; gap: 9px">{k}</div>'
+            f'<div style="margin-top: 12px; {B}; font-size: 32px; font-weight: 760; letter-spacing: -0.025em; line-height: 1.05">{t}</div>'
+            f'<div style="margin-top: 6px; {P}; font-size: 16.5px; font-weight: 400; line-height: 1.36; opacity: 0.85">{d}</div></div>')
+
+_arrow_dark = ARROW.replace(HALO, "#001a33")
+_laws = "".join(
+    f'<div style="flex: 1; padding: 0 18px; border-left: 1px solid {RULE_S}"><div style="display: flex; align-items: center; gap: 8px; {B}; font-size: 24px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{flag_round(c, 20)}{c}</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 17px; font-weight: 400; color: #ffffff">{l}</div><div style="{P}; font-size: 14px; font-weight: 300; color: {SOFT}">{n}</div></div>'
+    for c, l, n in (("Chile", "Ley 21.719", "rige desde el 1 dic 2026"), ("Perú", "Ley 29733", "y su reglamento de 2025"), ("Brasil", "LGPD", "Lei 13.709"), ("Argentina", "Ley 25.326", "&nbsp;"), ("Uruguay", "Ley 18.331", "&nbsp;")))
+S["10e-seguridad.dc.html"] = page("Seguridad y datos", voice(
+    "Seguridad y datos", "¿Y nuestros datos?", ["Bajo", "control"],
+    "SKY es responsable de los datos de sus pasajeros. Efeonce los trata <span style=\"font-weight: 600\">por encargo de SKY</span> y sólo según sus instrucciones, bajo un contrato de encargo que se firma antes de partir.",
+    extras=["Cumplimos la ley de datos personales de los cinco países donde SKY atiende", "Sin acceso a reservas ni a sistemas internos de SKY"])
+    + zone(f'<div style="{WHITE}; padding: 26px 28px 26px">{kick("Contrato de encargo de tratamiento", "#52647c")}<div style="margin-top: 14px; display: flex; align-items: center; gap: 12px">'
+           + _role(f'<img src="{SKY}" alt="SKY" style="height: 19px; width: auto">', "Responsable", "Decide para qué y cómo se tratan los datos.") + _arrow_dark
+           + _role(f'<img src="{BLOB("503823171b96284f634ef670092872d3")}" alt="Efeonce" style="height: 19px; width: auto">', "Encargado", "Los trata por cuenta de SKY, según sus instrucciones.", "#001a33") + _arrow_dark
+           + _role(f'{ico("comentario", 22)}{_SPARK}<span style="{P}; font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.8">Bandeja e IA</span>', "Subencargados", "Declarados y aprobados por SKY.", "#0b3158") + "</div></div>"
+           f'<div style="{GLASS}; padding: 20px 14px 20px 16px"><div style="padding: 0 18px; margin-bottom: 14px"><div style="{B}; font-size: 28px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">Operamos bajo la ley de datos de cada país</div>'
+           f'<div style="margin-top: 4px; {P}; font-size: 16.5px; font-weight: 300; color: {SOFT}">Todas regulan a quien trata datos por cuenta de una marca: de ahí el contrato de encargo.</div></div><div style="display: flex">{_laws}</div></div>'
+           + tiles([
+               ("Uso acotado", "Los datos se usan para atender los comentarios, por instrucción de SKY, y para nada más."),
+               ("El mínimo dato", "No se piden datos en público. Si aparecen, se ocultan y se deriva."),
+               ("Accesos con nombre", "Doble factor, baja en 24 horas y registro de quién aprobó cada respuesta."),
+               ("Reglas para la IA", "El proveedor no entrena con datos de SKY y figura como subencargado."),
+               ("Brechas y derechos", "Aviso a SKY en el plazo del contrato. Las solicitudes de los titulares se derivan a SKY."),
+               ("Al terminar", "Devolución o eliminación de los datos, con constancia."),
+           ], cols=3, title_fs=24, body_fs=17), top=92, height=896, gap=16)
+    + note("Orientación, no asesoría legal: el contrato de encargo y el marco de cada país los validan los equipos legales de SKY y de Efeonce.", top=1012))
+
+# =============================================================== 10f continuidad
+S["10f-continuidad.dc.html"] = page("Continuidad operativa", voice(
+    "Continuidad", "¿Y si algo falla?", ["Hay", "respaldo"], "Cada falla previsible tiene un procedimiento escrito y ensayado. El servicio sigue aunque falte una persona o una herramienta.")
+    + zone(ifthen("Seis escenarios", "Qué pasa en cada falla", "Si", "Entonces", [
+        ("Falta una persona", "El líder de servicio cubre el turno. Refuerzo si dura más de tres días."),
+        ("Cae la bandeja", "Respuesta directa en las plataformas, con registro manual."),
+        ("Cae el agente o su proveedor", "Operación manual con el mismo equipo, y aviso a SKY."),
+        ("Se pierde un acceso", "Cuenta de respaldo con rol equivalente y solicitud a SKY."),
+        ("Llega un pico no previsto", "Refuerzo y prioridad a lo sensible. Si triplica, modo contingencia."),
+        ("Sale un especialista", "El líder asume mientras se selecciona y se entrena el reemplazo."),
+    ], left_w=360, a_fs=28, b_fs=21), height=880)
+    + note("Los procedimientos manuales se ensayan antes de partir y una vez por semestre."))
+
+# =============================================================== 11b indicadores
+groups = [("4", "Volumen", "Clasificados, atendidos, respuestas por conversación y no contestables."), ("5", "Oportunidad", "Primera respuesta, cumplimiento, réplicas, pendientes y aviso de lo crítico."),
+          ("5", "Calidad", "Nota de calidad, errores públicos y de precio, cobertura y vigencia de la base."), ("4", "Derivación", "Traspasos, tomados por SKY, reaperturas y esfuerzo de quien reclamó (CES)."),
+          ("2", "Negocio", "Clics en enlaces medibles; ventas con el seguimiento que acordemos."), ("3", "Conversación", "Temas, tono y fricciones recurrentes, con recomendación."),
+          ("3", "Agentes", "Acierto de clasificación, alertas perdidas y borradores sin cambios."), ("1", "Operación", "Tiempo de persona por conversación.")]
+gt = "".join(
+    f'<div style="{GLASS}; padding: 20px 28px; display: flex; align-items: center; gap: 26px"><div style="width: 78px; flex-shrink: 0; text-align: center; {B}; font-size: 112px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.9; color: #ffffff">{n}</div>'
+    f'<div><div style="{B}; font-size: 32px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{t}</div><div style="margin-top: 6px; {P}; font-size: 18px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div></div>'
+    for n, t, d in groups)
+S["11b-indicadores.dc.html"] = page("Catálogo de indicadores", voice(
+    "Indicadores", "¿Qué se mide?", ["27", "indicadores"], "Ocho grupos, cada indicador con su fórmula, su fuente y su dueño. Toda cifra lleva período y denominador.", size=98)
+    + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 16px">{gt}</div>', height=880)
+    + note("El catálogo completo, con fórmula y fuente de cada indicador, se entrega en la puesta en marcha."))
+
+# =============================================================== 11l esfuerzo (CES)
+# Sólo CES (decisión del operador, 10/10/2026): el servicio responde en público y no atiende mensajes directos, así que una
+# encuesta de satisfacción con la atención no tiene dónde ocurrir; lo que sí depende del servicio es el traspaso del reclamo.
+def _sb(t, mine=False):
+    side, rad = ("flex-end", "18px 18px 4px 18px") if mine else ("flex-start", "4px 18px 18px 18px")
+    bg, fg = ("rgba(207, 228, 250, 0.13)", "#ffffff") if mine else ("#ffffff", "#001a33")
+    return (f'<div style="align-self: {side}; max-width: 86%; padding: 11px 16px; border-radius: {rad}; background: {bg}; color: {fg}; {P}; font-size: 17.5px; font-weight: 500; line-height: 1.4">{t}</div>')
+
+
+def _dot(i):
+    look = (f"background: {ACC}; color: #ffffff; box-shadow: 0 0 0 5px rgba(255, 101, 0, 0.22)" if i == 5 else "border: 1px solid rgba(207, 228, 250, 0.4); color: #ffffff")
+    return (f'<span style="width: 46px; height: 46px; box-sizing: border-box; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; {P}; font-size: 18px; font-weight: 600; {look}">{i}</span>')
+
+
+def _lab(t):
+    return (f'<div style="margin-top: 2px; display: flex; align-items: center; gap: 12px; {P}; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT}">'
+            f'<span style="flex: 1; height: 1px; background: rgba(207, 228, 250, 0.2)"></span>{t}<span style="flex: 1; height: 1px; background: rgba(207, 228, 250, 0.2)"></span></div>')
+
+
+_survey = (
+    f'<div style="{GLASS}; flex: 0 0 400px; padding: 0; overflow: hidden; display: flex; flex-direction: column">'
+    f'<div style="padding: 18px 22px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(207, 228, 250, 0.14)">'
+    f'<span style="height: 34px; padding: 0 11px; border-radius: 10px; background: rgba(255, 255, 255, 0.07); border: 1px solid rgba(207, 228, 250, 0.14); display: inline-flex; align-items: center"><img src="{SKY}" alt="SKY" style="height: 14px; width: auto"></span>'
+    f'<span style="display: flex; flex-direction: column"><span style="{P}; font-size: 15px; font-weight: 600; color: #ffffff">SKY Airline</span><span style="{P}; font-size: 12.5px; color: {SOFT}">Instagram</span></span></div>'
+    f'<div style="flex: 1; padding: 22px 22px 24px; display: flex; flex-direction: column; gap: 14px">'
+    + _lab("En los comentarios")
+    + _sb("Me cobraron dos veces el equipaje.", mine=True)
+    + _sb("Lamentamos lo ocurrido. Escríbenos por mensaje directo para revisarlo.")
+    + _lab("Después del traspaso")
+    + f'<div style="margin-top: 2px; padding: 18px 18px 16px; border-radius: 20px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(207, 228, 250, 0.2)">'
+      f'<div style="{P}; font-size: 17px; font-weight: 600; line-height: 1.35; color: #ffffff">¿Fue fácil llegar al canal correcto?</div>'
+      f'<div style="margin-top: 16px; display: flex; justify-content: space-between">{"".join(_dot(i) for i in range(1, 6))}</div>'
+      f'<div style="margin-top: 8px; display: flex; justify-content: space-between; {P}; font-size: 12.5px; color: {SOFT}"><span>Muy difícil</span><span>Muy fácil</span></div></div>'
+    + _sb("Gracias por responder.")
+    + f'<div style="margin-top: auto; align-self: center; {P}; font-size: 12.5px; color: {SOFT}">Un toque. Respuesta registrada.</div>'
+    + '</div></div>')
+
+
+def _measure(code, name, q, rows, featured=False, flex=1):
+    fg, soft, line = ("#001a33", "#33475f", "rgba(0, 26, 51, 0.14)") if featured else ("#ffffff", SOFT, RULE)
+    w = 400 if featured else 300
+    head = (f'<span style="{B}; font-size: 44px; font-weight: 760; letter-spacing: -0.04em; line-height: 1; color: {fg}">{code}</span>' if code else "")
+    body = "".join(
+        f'<div style="display: flex; gap: 16px; padding: 11px 0; border-top: 1px solid {line}; {P}; font-size: 18px; line-height: 1.36; color: {fg}">'
+        f'<span style="width: 124px; flex-shrink: 0; font-size: 12.5px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {soft}; padding-top: 4px">{k}</span><span style="font-weight: {w}">{v}</span></div>'
+        for k, v in rows)
+    return (f'<div style="{WHITE if featured else GLASS}; flex: {flex}; padding: 22px 28px 12px; display: flex; flex-direction: column">'
+            f'<div style="display: flex; align-items: baseline; gap: 14px">{head}'
+            f'<span style="{P}; font-size: 15px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {soft}">{name}</span></div>'
+            f'<div style="margin-top: 10px; margin-bottom: auto; padding-bottom: 12px; {B}; font-size: 32px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; color: {fg}">{q}</div>'
+            + body + "</div>")
+
+
+srules = "".join(f'<div style="flex: 1; padding: 0 22px; border-left: 1px solid {RULE}; {P}; font-size: 18px; font-weight: 300; line-height: 1.4; color: #ffffff">{t}</div>'
+                 for t in ("Un solo mensaje directo por traspaso, coordinado con el equipo de SKY.", "Cada cifra con su tasa de respuesta y su número de respuestas.", "Primer trimestre: línea base. La meta se fija con datos."))
+S["11l-satisfaccion.dc.html"] = page("Encuesta de esfuerzo (CES)", voice(
+    "Esfuerzo", "¿Y fue fácil para quien reclamó?", ["Se lo", "preguntamos"],
+    "Después de derivar un reclamo, una pregunta de un toque: si fue fácil llegar al canal correcto. Es la parte del reclamo que depende de nosotros.", size=94,
+    extras=["Las respuestas entran a Efeonce Insights, por mercado, red y tema", "Si SKY ya mide esfuerzo en su centro de contacto, usamos la misma escala"])
+    + zone(f'<div style="flex: 1; min-height: 0; display: flex; gap: 20px">{_survey}'
+           f'<div style="flex: 1; display: flex; flex-direction: column; gap: 20px">'
+           + _measure("CES", "Esfuerzo", "¿Fue fácil llegar al canal correcto?", [
+               ("Cuándo", "Después del traspaso de un reclamo, coordinado con el equipo de SKY que atiende los mensajes."),
+               ("Se informa", "Porcentaje que respondió fácil o muy fácil."),
+               ("Sirve para", "Detectar los traspasos que hacen rebotar a la persona.")], featured=True, flex=1.25)
+           + _measure("", "Por qué sólo esfuerzo", "Lo demás se mide con hechos", [
+               ("Precio y dudas", "Se responden en público: tiempo, calidad, clics y reaperturas."),
+               ("El caso", "Lo resuelve SKY, y su satisfacción la mide SKY.")])
+           + f'</div></div><div style="{LINE}; padding: 22px 12px; display: flex">{srules}</div>', gap=20)
+    + note("Conversación de ejemplo. La encuesta se envía donde la red lo permite y dentro de sus reglas de mensajería; escala y redacción se cierran con SKY en la preparación."))
+
+# =============================================================== 11c objetivos
+def stat(fig, unit, label, white=False, size=104):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; padding: 26px 30px; display: flex; flex-direction: column; justify-content: space-between">'
+            f'<div style="{B}; font-size: {size}px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.95; color: {fg}; white-space: nowrap">{fig}<div style="margin-top: 6px; min-height: 30px; {P}; font-size: 24px; font-weight: 500; letter-spacing: 0; line-height: 1.2">{unit}</div></div>'
+            f'<div style="{P}; font-size: 20px; font-weight: {500 if white else 400}; line-height: 1.32; color: {soft}">{label}</div></div>')
+
+rules = "".join(f'<div style="flex: 1; padding: 0 22px; border-left: 1px solid {RULE}; {P}; font-size: 18px; font-weight: 300; line-height: 1.4; color: #ffffff">{t}</div>'
+                for t in ("Mediana y percentil 90, nunca un promedio solo.", "Lo que no se pudo medir se informa «sin dato», nunca como cero.", "El reloj corre dentro de la ventana con personas."))
+S["11c-objetivos.dc.html"] = page("Objetivos iniciales", voice(
+    "Objetivos", "¿Contra qué se compara?", ["Metas", "escritas"], "Partimos con objetivos propuestos. Después de cuatro semanas medidas, se ajustan con datos reales y pasan a ser compromiso.")
+    + zone(f'<div style="flex: 1.15; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px">' + stat("90 %", "o más", "Respuestas dentro del tiempo acordado", white=True) + stat("90 %", "o más", "Nota de calidad sobre la muestra") + stat("95 %", "o más", "Consultas con entrada vigente en la base") + "</div>"
+           f'<div style="flex: 1; display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 16px">' + stat("&lt; 0,5 %", "", "Respuestas corregidas o eliminadas", size=70) + stat("0", "", "Errores de precio", size=104) + stat("0", "", "Alertas críticas perdidas", size=104) + stat("0", "", "Pendientes al cierre, o justificados", size=104) + "</div>"
+           f'<div style="{LINE}; padding: 22px 12px; display: flex">{rules}</div>', gap=16))
+
+# =============================================================== 11d reportería
+reports = [
+    ("Cada día", "Parte de contingencia", "Sólo en campañas grandes e imprevistos: volumen, tiempos, temas del día y casos sensibles.", "Mensaje", False),
+    ("Cada semana", "Informe operativo", "Edición breve: volumen, tiempos, traspasos y vacíos de la base.", "Insights", True),
+    ("Cada mes", "Edición mensual", "Edición completa: todos los indicadores, las fricciones y una recomendación.", "Insights", True),
+    ("Cada campaña", "Informe de campaña", "Tres días después: lo ocurrido contra lo esperado y qué cambiar.", "Insights", True),
+    ("Cada trimestre", "Revisión trimestral", "Tiempos, calidad, alcance y autonomía de los agentes.", "Insights", True),
+]
+rrows = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 28px; border-top: 1px solid {RULE_S}"><div style="width: 250px; flex-shrink: 0; {B}; font-size: 38px; font-weight: 300; letter-spacing: -0.03em; line-height: 1; color: {ACC}">{w}</div>'
+    f'<div style="flex: 1"><div style="{B}; font-size: 32px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05; color: #ffffff">{t}</div><div style="margin-top: 6px; {P}; font-size: 20px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div>{chip(c, f)}</div>'
+    for w, t, d, c, f in reports)
+S["11d-reporteria.dc.html"] = page("Reportería", voice(
+    "Reportería", "¿Cómo me entero?", ["Cinco", "informes"], "Cuatro son ediciones de Efeonce Insights, sobre los mismos datos. En contingencia se suma un parte diario por mensaje. No hay que pedirlos.")
+    + zone(f'<div style="flex: 1; display: flex; flex-direction: column; border-bottom: 1px solid {RULE_S}">{rrows}</div>', top=120, height=820))
+
+# =============================================================== 11e insights
+trae = "".join(f'<div style="display: flex; align-items: center; gap: 14px; border-top: 1px solid {RULE}"><span style="width: 9px; height: 9px; border-radius: 50%; background: #ffffff; flex-shrink: 0"></span>{t}</div>'
+               for t in ("Tres a cinco hallazgos del mes", "Volumen por tipo, mercado y canal", "Tiempos contra objetivo", "Calidad y errores", "Traspasos, reaperturas y esfuerzo", "Fricciones con recomendación", "Desempeño de los agentes", "Límites y datos faltantes"))
+llega = "".join(f'<div style="{LINE}; padding: 20px 24px"><div style="{B}; font-size: 27px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08; color: #ffffff">{t}</div><div style="margin-top: 6px; {P}; font-size: 17.5px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>'
+                for t, d in (("Versión web", "Con un enlace privado que vence."), ("Informe y presentación", "Los dos en PDF, con las mismas cifras."), ("Edición sellada", "Una corrección es una versión nueva."), ("Revisión humana", "La emite una persona de Efeonce.")))
+S["11e-insights.dc.html"] = page("Todo se reporta en Efeonce Insights", voice(
+    "Reportería · la plataforma", "¿Dónde veo los resultados?", ["En Efeonce", "Insights"], "Efeonce Insights es nuestro producto de informes para clientes. Ahí se reporta todo lo que medimos de este servicio: las mismas cifras en versión web, informe y presentación. Lo que falta se declara; no se inventa.", size=98)
+    + zone(f'<div style="{GLASS}; flex: 1; padding: 30px 38px 14px; display: flex; flex-direction: column">{head("Cada edición", "Qué trae")}<div style="margin-top: 18px; flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; column-gap: 40px; {P}; font-size: 24px; color: #ffffff">{trae}</div></div>'
+           f'<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px">{llega}</div>'
+           f'<div style="{WHITE}; padding: 22px 34px; {P}; font-size: 21px; font-weight: 400; line-height: 1.42; color: #001a33"><span style="font-weight: 700">Efeonce Insights está en producción.</span> Este servicio se reporta ahí desde el primer día de operación, junto a SEO, respuestas de IA y entrega creativa.</div>'))
+
+# =============================================================== láminas con el prototipo de Insights
+INS = runpy.run_path(str(Path(__file__).with_name("gen_insights.py")), run_name="ins")
+PAPER_BG, TEAL = "#f7f8f6", "#36c8bf"
+PROTO = "Prototipo con cifras de ejemplo."
+LOCKUP = BLOB("ea442590e8eb589de204ec7288963c31")
+GLOW_SHADOW = "box-shadow: 0 60px 150px rgba(3, 117, 219, 0.5), 0 24px 70px rgba(0, 0, 0, 0.65)"
+EDGE = "linear-gradient(135deg, rgba(114, 222, 216, 0.95) 0%, rgba(3, 117, 219, 0.55) 45%, rgba(114, 222, 216, 0.2) 100%)"
+
+
+BLOBS_UI = ('<div style="position: absolute; left: 1180px; top: -160px; width: 760px; height: 760px; border-radius: 50%; background: rgba(54, 200, 191, 0.34); filter: blur(120px)"></div>'
+            '<div style="position: absolute; left: 760px; top: 560px; width: 820px; height: 620px; border-radius: 50%; background: rgba(3, 117, 219, 0.42); filter: blur(130px)"></div>')
+
+
+def stage_glow(cx, cy, rx=980, ry=640):
+    return (f'<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: radial-gradient(ellipse {rx}px {ry}px at {cx}px {cy}px, '
+            f'rgba(54, 200, 191, 0.3) 0%, rgba(3, 117, 219, 0.22) 42%, rgba(0, 26, 51, 0) 76%)"></div>')
+
+
+def scaled(inner, w, h, s, bg, crop_h=None):
+    hh = crop_h if crop_h else h * s
+    return (f'<div style="position: relative; width: {w * s:.0f}px; height: {hh:.0f}px; overflow: hidden">'
+            f'<div style="position: relative; width: {w}px; height: {h}px; overflow: hidden; background: {bg}; transform: scale({s}); transform-origin: 0 0">{inner}</div></div>')
+
+
+def frame(inner, left, top, radius=22, chrome=None):
+    """Ventana con borde de luz y resplandor; `chrome` agrega la barra del navegador."""
+    bar = ""
+    if chrome:
+        dots = "".join('<span style="width: 11px; height: 11px; border-radius: 50%; background: rgba(207, 228, 250, 0.45)"></span>' for _ in range(3))
+        bar = (f'<div style="height: 42px; padding: 0 18px; display: flex; align-items: center; gap: 8px; background: #0b2440">{dots}'
+               f'<span style="margin-left: 16px; padding: 5px 16px; border-radius: 999px; background: rgba(207, 228, 250, 0.1); {P}; font-size: 13px; color: {SOFT}">{chrome}</span></div>')
+    return (f'<div style="position: absolute; left: {left}px; top: {top}px; padding: 2px; border-radius: {radius}px; background: {EDGE}; {GLOW_SHADOW}">'
+            f'<div style="border-radius: {radius - 2}px; overflow: hidden">{bar}{inner}</div></div>')
+
+
+def floating(inner, left, top, white=False, width=None, pad="16px 22px", radius=18):
+    w = f"width: {width}px; " if width else ""
+    bg = "background: #ffffff; color: #001a33" if white else f"background: rgba(0, 26, 51, 0.92); color: #ffffff; border: 1px solid rgba(114, 222, 216, 0.5)"
+    return (f'<div style="position: absolute; left: {left}px; top: {top}px; {w}box-sizing: border-box; border-radius: {radius}px; padding: {pad}; {bg}; '
+            f'box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6), 0 0 50px rgba(3, 117, 219, 0.3)">{inner}</div>')
+
+
+# --- 11f · informe web: navegador grande que se sale del margen + versión en teléfono
+phone = (f'<div style="position: absolute; left: 1650px; top: 600px; transform: scale(0.84); transform-origin: 0 0; width: 268px; height: 548px; box-sizing: border-box; border-radius: 44px; padding: 9px; background: linear-gradient(160deg, #3a4f6b, #0b1b33); '
+         f'box-shadow: 0 40px 90px rgba(0, 0, 0, 0.7), 0 0 60px rgba(3, 117, 219, 0.35)">'
+         f'<div style="position: relative; width: 100%; height: 100%; box-sizing: border-box; border-radius: 36px; overflow: hidden; background: {GROUND}; padding: 30px 20px 0">'
+         f'<div style="position: absolute; left: 50%; top: 9px; width: 74px; height: 20px; margin-left: -37px; border-radius: 12px; background: #000000"></div>'
+         f'<div style="position: absolute; right: -90px; top: 70px; width: 260px; height: 260px; border-radius: 50%; border: 1.5px solid rgba(114, 222, 216, 0.25)"></div>'
+         f'<img src="{LOCKUP}" alt="Efeonce Insights" style="margin-top: 22px; height: 15px; width: auto">'
+         f'<div style="margin-top: 44px; {P}; font-size: 8px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {SOFT}">Atención en comentarios · mayo de 2027</div>'
+         f'<div style="margin-top: 10px; {B}; font-size: 29px; letter-spacing: -0.04em; line-height: 1.02; color: #ffffff"><span style="font-weight: 740">Nueve de cada diez respuestas llegaron a tiempo.</span> <span style="font-weight: 340; color: {SOFT}">La fricción está en una promoción.</span></div>'
+         f'<div style="margin-top: 14px; {P}; font-size: 11px; line-height: 1.5; color: {SOFT}">1.284 conversaciones en las 13 cuentas; la primera respuesta bajó de 52 a 38 minutos.</div>'
+         f'<div style="position: absolute; left: 12px; right: 12px; bottom: 14px; display: flex; gap: 8px"><span style="flex: 1; text-align: center; padding: 10px 0; border-radius: 999px; border: 1px solid rgba(207, 228, 250, 0.35); {P}; font-size: 11px; font-weight: 600; color: #ffffff">Copiar enlace</span>'
+         f'<span style="flex: 1; text-align: center; padding: 10px 0; border-radius: 999px; background: #ffffff; {P}; font-size: 11px; font-weight: 600; color: {GROUND}">Descargar</span></div></div></div>')
+S["11f-insights-web.dc.html"] = page("Insights: el informe web", BLOBS_UI
+    + voice("Efeonce Insights · informe web", "¿Cómo veo los resultados?", ["Un informe", "vivo"], "Tiempos, calidad, traspasos y clics llegan a una página privada para SKY. Abre con el hallazgo del mes; el resto se recorre o se presenta en la reunión.",
+            extras=["El enlace vence y se puede revocar", "Se lee igual en el teléfono"], lead_w=500)
+    + frame(scaled(INS["hero"], 1440, 960, 0.78, GROUND), 800, 104, chrome="Efeonce Insights · enlace privado para SKY")
+    + phone
+    + floating(f'<div style="display: flex; align-items: center; gap: 12px; {P}; font-size: 17px; font-weight: 600"><span style="width: 34px; height: 34px; border-radius: 50%; background: #001a33; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 13px">▶</span>Presentar en la reunión</div>', 880, 866, white=True, pad="10px 22px 10px 10px", radius=999)
+    + floating(f'<div style="{P}; font-size: 17px; font-weight: 600">Descargar informe y presentación</div>', 1200, 866, pad="15px 24px", radius=999)
+    + note(PROTO, top=1024, left=800, width=1000), "")
+
+# --- 11g · lo esencial: la pantalla grande, cortada por el borde, con la decisión flotando
+decision = (f'<div style="{P}; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT}">Para decidir en la reunión</div>'
+            f'<div style="margin-top: 10px; {B}; font-size: 42px; font-weight: 680; letter-spacing: -0.035em; line-height: 1.04; color: #ffffff">Aclarar la promoción en la pieza</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 17px; line-height: 1.45; color: {SOFT}">Tres acciones para bajar las dudas repetidas y cerrar los reclamos que rebotan.</div>'
+            f'<div style="margin-top: 18px"><span style="display: inline-flex; padding: 11px 20px; border-radius: 999px; background: #ffffff; color: {GROUND}; {P}; font-size: 15px; font-weight: 600">Plan de acción →</span></div>')
+S["11g-insights-esencial.dc.html"] = page("Insights: lo esencial del mes", BLOBS_UI
+    + voice("Efeonce Insights · lo esencial", "¿Qué leo primero?", ["Lo", "esencial"], "Cinco hallazgos, cada uno con su evidencia y su fuente, y al final una decisión para la reunión. Social care es un módulo más, junto a SEO, respuestas de IA y entrega creativa.", lead_w=500,
+            extras=["Cada hallazgo se abre para ver su evidencia", "Medido o estimado: siempre se indica", "Cierra con el plan de acción"])
+    + frame(scaled(INS["esencial"], 1440, 1500, 0.8, GROUND, crop_h=876), 810, 96)
+    + note(PROTO, top=1000, left=330, width=460), "")
+
+# --- 11h · capítulo: la página clara, grande, con una cifra ampliada encima
+_cap = INS["capitulo"]
+_a = _cap.index('<div><div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px">')
+_b = _cap.index('<div style="display: flex; gap: 72px; align-items: center">')
+_detail = f'<div style="position: absolute; left: 40px; top: 40px; width: 1280px; display: flex; flex-direction: column; gap: 36px">{_cap[_a:_b]}</div>'
+_zoom = INS["stat_cell"](INS["STATS"][1], 92, 22, 18, "0", "")
+S["11h-insights-capitulo.dc.html"] = page("Insights: capítulo Social care", BLOBS_UI
+    + voice("Efeonce Insights · el capítulo", "¿Y el detalle?", ["Capítulo", "propio"], "Seis cifras con su comparación contra el mes anterior, el resultado contra el objetivo y, en cada figura, lo que significa y el próximo paso.", lead_w=500)
+    + frame(scaled(_detail, 1360, 1250, 0.84, PAPER_BG, crop_h=1010), 820, 92)
+    + floating(_zoom, 448, 660, white=True, width=392, pad="30px 34px 28px", radius=26)
+    + note(PROTO, top=1000, left=330, width=460), "")
+
+S["11i-insights-mapa.dc.html"] = page("Insights: qué reporta cada sección", voice(
+    "Efeonce Insights · contenido", "¿Está todo?", ["Los 27"], "Cada indicador tiene su lugar en la edición. Lo que no se pudo medir aparece como límite, nunca como cero.", size=120)
+    + zone(ifthen("En cada edición", "Dónde va cada indicador", "Sección", "Qué reporta", [
+        ("Lo esencial del mes", "Tres a cinco hallazgos con su evidencia, y la decisión del mes."),
+        ("Cifras del período", "Conversaciones, primera respuesta, cumplimiento, esfuerzo, traspasos y clics."),
+        ("Volumen", "Clasificados, atendidos, respuestas por conversación y no contestables; por tipo, mercado y canal."),
+        ("Tiempos y objetivos", "Primera respuesta, réplicas, pendientes y aviso de lo crítico, contra el objetivo."),
+        ("Calidad", "Nota de calidad, errores públicos y de precio, cobertura y vigencia de la base."),
+        ("Traspasos", "Derivados, tomados por SKY, reabiertos y esfuerzo de quien reclamó (CES)."),
+        ("Conversación", "Temas, tono y fricciones por ruta, promoción y mercado."),
+        ("Agentes y operación", "Acierto, alertas perdidas, borradores sin cambios y tiempo por conversación."),
+        ("Plan y límites", "Acciones con responsable; qué no se midió y por qué."),
+    ], left_w=300, a_fs=26, b_fs=19), height=880))
+
+# --- 11j · modo presentación: el escenario grande, con la tira de láminas
+_labels = ["Portada", "Hallazgo 1", "Hallazgo 2", "Hallazgo 3", "Hallazgo 4", "Hallazgo 5", "Decisión", "Plan", "Cierre"]
+_strip = "".join(
+    f'<div style="flex: 1; height: 66px; box-sizing: border-box; border-radius: 12px; padding: 9px 12px; display: flex; flex-direction: column; justify-content: space-between; '
+    + (f"background: #0b2f55; border: 2px solid {TEAL}; box-shadow: 0 0 30px rgba(54, 200, 191, 0.45)" if i == 3 else "background: #0b2440; border: 1px solid rgba(207, 228, 250, 0.2)")
+    + f'"><span style="{P}; font-size: 11px; font-weight: 600; color: {"#ffffff" if i == 3 else SOFT}">{i + 1}</span><span style="{P}; font-size: 13px; font-weight: {600 if i == 3 else 400}; color: {"#ffffff" if i == 3 else SOFT}">{t}</span></div>'
+    for i, t in enumerate(_labels))
+_stage = (
+    f'<div style="position: relative; width: 1010px; height: 568px; overflow: hidden; background: #001a33">'
+    f'<div style="position: absolute; left: 0; top: 0; width: 1010px; height: 568px; background: radial-gradient(circle 460px at 230px 310px, rgba(54, 200, 191, 0.2), rgba(0, 26, 51, 0) 70%)"></div>'
+    f'<img src="{LOCKUP}" alt="Efeonce Insights" style="position: absolute; left: 36px; top: 28px; height: 20px; width: auto">'
+    f'<div style="position: absolute; right: 36px; top: 28px; {P}; font-size: 15px; color: {SOFT}"><span style="font-weight: 600; color: #ffffff">4</span> de 9</div>'
+    f'<div style="position: absolute; left: 36px; top: 110px"><span style="display: inline-flex; padding: 5px 13px; border-radius: 999px; border: 1px solid rgba(207, 228, 250, 0.3); {P}; font-size: 13px; font-weight: 600; color: {SOFT}">Social care</span></div>'
+    f'<div style="position: absolute; left: 30px; top: 156px; {B}; font-size: 200px; font-weight: 760; letter-spacing: -0.055em; line-height: 1; color: {TEAL}; white-space: nowrap">41 %</div>'
+    f'<div style="position: absolute; left: 500px; top: 108px; width: 470px"><div style="{B}; font-size: 35px; font-weight: 640; letter-spacing: -0.028em; line-height: 1.14; color: #ffffff">Cuatro de cada diez dudas de precio preguntan por la misma promoción.</div>'
+    f'<div style="margin-top: 26px; padding-top: 16px; border-top: 1px solid rgba(207, 228, 250, 0.2)"><div style="{P}; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: {SOFT}">Lo que significa</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 18px; line-height: 1.42; color: #ffffff">La respuesta existe en la base; lo que falta es que la pieza diga las fechas de vuelo.</div></div>'
+    f'<div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(207, 228, 250, 0.2)"><div style="{P}; font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: {SOFT}">Próximo paso</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 18px; line-height: 1.42; color: #ffffff">Agregar las fechas a la pieza y a la primera línea de la publicación.</div></div></div>'
+    f'<div style="position: absolute; left: 36px; right: 36px; top: 506px; height: 3px; border-radius: 2px; background: rgba(207, 228, 250, 0.2)"><div style="width: 44.4%; height: 3px; border-radius: 2px; background: {TEAL}"></div></div>'
+    f'<div style="position: absolute; left: 36px; right: 36px; top: 524px; display: flex; justify-content: space-between; {P}; font-size: 13px; color: {SOFT}"><span>← → para avanzar · Esc para salir</span><span>Medido · etiquetas revisadas por muestra</span></div></div>')
+_call = "".join(f'<div style="{WHITE if w else LINE}; padding: 18px 24px"><div style="{B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; color: {"#001a33" if w else "#ffffff"}">{t}</div>'
+                f'<div style="margin-top: 4px; {P}; font-size: 17.5px; font-weight: {400 if w else 300}; line-height: 1.38; color: {"#33475f" if w else SOFT}">{d}</div></div>'
+                for t, d, w in (("Desde el mismo enlace", "No hay que armar un deck aparte para el comité.", True), ("Una lámina por hallazgo", "Con su cifra, lo que significa y el próximo paso.", False), ("También en PDF", "Informe A4 y presentación, para quien quiera archivo.", False)))
+S["11j-insights-pdf.dc.html"] = page("Insights: modo presentación", BLOBS_UI
+    + voice("Efeonce Insights · modo presentación", "¿Y para el comité?", ["Modo", "presentación"],
+            "En la reunión, el informe se presenta desde el mismo enlace: la portada, una lámina por hallazgo, la decisión y el plan. Sin armar un deck aparte.", size=94, lead_w=520)
+    + frame(scaled(_stage, 1010, 568, 1.1, GROUND), 786, 86, radius=24)
+    + f'<div style="position: absolute; left: 790px; top: 746px; width: 1010px; display: flex; gap: 10px">{_strip}</div>'
+    + f'<div style="position: absolute; left: 790px; top: 834px; width: 1010px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px">{_call}</div>'
+    + note(PROTO, top=1024), "")
+
+
+# =============================================================== 02b las 13 cuentas
+NET = {"Instagram": "db931e069d8b0aceb52ffe157278916d", "Facebook": "556555665fe4ec5df51fffe38cba039b", "TikTok": "e263d9f4ba54b0e506a4e86bf09d8d20", "LinkedIn": "029e746d5bc40ded16a44702c566c265", "X": "9f0c81e4cfdc5ed01979b017af5d7c5f"}
+MARKETS = [("Chile", "El mayor volumen"), ("Perú", "Volumen medio"), ("Argentina", "Volumen medio"), ("Brasil", "100 a 200 al mes"), ("Uruguay", "100 a 200 al mes")]
+OCX, OCY, ORAD = 1295, 520, 330
+_DARKEN = "filter: brightness(0) saturate(100%) invert(11%) sepia(60%) saturate(2400%) hue-rotate(196deg) brightness(90%)"
+
+
+def _market(country, vol, deg, featured=False):
+    x, y = OCX + ORAD * math.cos(math.radians(deg)), OCY + ORAD * math.sin(math.radians(deg))
+    w, h = (260, 172) if featured else (224, 150)
+    if featured:
+        skin, fg, soft = "background: #ffffff; box-shadow: 0 30px 70px rgba(0, 0, 0, 0.55), 0 0 70px rgba(54, 200, 191, 0.45)", "#001a33", "#52647c"
+    else:
+        skin, fg, soft = "background: linear-gradient(160deg, #0a3566, #052447); border: 1px solid rgba(114, 222, 216, 0.5); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 44px rgba(3, 117, 219, 0.4)", "#ffffff", SOFT
+    ig = f'<img src="{BLOB(NET["Instagram"])}" alt="Instagram" style="width: 32px; height: 32px{"; " + _DARKEN if featured else ""}">'
+    fb = f'<img src="{BLOB(NET["Facebook"])}" alt="Facebook" style="width: 32px; height: 32px">'
+    return (f'<div style="position: absolute; left: {x - w / 2:.0f}px; top: {y - h / 2:.0f}px; width: {w}px; height: {h}px; box-sizing: border-box; border-radius: 26px; {skin}; '
+            f'display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px">'
+            f'<div style="display: flex; align-items: center; gap: 11px">{flag_round(country, 32 if featured else 28)}<span style="{B}; font-size: {36 if featured else 30}px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: {fg}">{country}</span></div>'
+            f'<div style="display: flex; align-items: center; gap: 10px">{ig}{fb}</div>'
+            f'<div style="{P}; font-size: 14px; font-weight: 500; letter-spacing: 0.02em; color: {soft}">{vol}</div></div>')
+
+_spokes = "".join(
+    f'<line x1="{OCX + 178 * math.cos(math.radians(d)):.1f}" y1="{OCY + 178 * math.sin(math.radians(d)):.1f}" x2="{OCX + ORAD * math.cos(math.radians(d)):.1f}" y2="{OCY + ORAD * math.sin(math.radians(d)):.1f}" '
+    f'stroke="{HALO}" stroke-opacity="0.55" stroke-width="1.6" stroke-dasharray="2 8" stroke-linecap="round"></line>' for d in (-90, -18, 54, 126, 198))
+_orbit13 = (f'<svg aria-hidden="true" viewBox="0 0 1920 1080" width="1920" height="1080" style="position: absolute; left: 0; top: 0">'
+            f'<circle cx="{OCX}" cy="{OCY}" r="{ORAD}" fill="none" stroke="{HALO}" stroke-opacity="0.42" stroke-width="2"></circle>{_spokes}</svg>')
+_core = (f'<div style="position: absolute; left: {OCX - 180}px; top: {OCY - 180}px; width: 360px; height: 360px; border-radius: 50%; '
+         f'background: radial-gradient(circle, rgba(3, 117, 219, 0.7) 0%, rgba(2, 60, 112, 0.5) 55%, rgba(0, 26, 51, 0) 72%); display: flex; flex-direction: column; align-items: center; justify-content: center">'
+         f'<img src="{SKY}" alt="SKY" style="height: 56px; width: auto">'
+         f'<div style="margin-top: 20px; width: 150px; height: 1px; background: rgba(207, 228, 250, 0.4)"></div>'
+         f'<div style="margin-top: 18px; display: flex; align-items: center; gap: 16px">'
+         + "".join(f'<img src="{BLOB(NET[n])}" alt="{n}" style="width: 38px; height: 38px">' for n in ("TikTok", "LinkedIn", "X"))
+         + f'</div><div style="margin-top: 12px; {P}; font-size: 14px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #ffffff">3 regionales</div></div>')
+_glow13 = (f'<div style="position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; background: radial-gradient(circle 640px at {OCX}px {OCY}px, rgba(3, 117, 219, 0.5) 0%, rgba(54, 200, 191, 0.14) 48%, rgba(0, 26, 51, 0) 78%)"></div>')
+S["02b-cuentas.dc.html"] = page("Las 13 cuentas y sus mercados", _glow13 + voice(
+    "El alcance que definió SKY", "¿Qué cuentas atendemos?", ["Las 13"],
+    "Las que nos indicó SKY: Instagram y Facebook en sus cinco mercados y tres cuentas regionales. Todas entran a una sola bandeja.", size=150, lead_w=500,
+    extras=["5 mercados × 2 redes = 10 cuentas", "TikTok, LinkedIn y X: 3 cuentas regionales", "En español y en portugués"])
+    + _orbit13 + _core
+    + _market("Chile", "El mayor volumen", -90, featured=True) + _market("Perú", "Volumen medio", -18) + _market("Argentina", "Volumen medio", 54)
+    + _market("Brasil", "100 a 200 al mes", 126) + _market("Uruguay", "100 a 200 al mes", 198)
+    + note("Fuente: listado de cuentas y volúmenes entregado por SKY, 9 de octubre de 2026. X figura en el listado; hoy está fuera del conteo que entregó SKY.", top=1010), "")
+
+# =============================================================== 11k Insights por MCP y por API
+BLOBS = ('<div style="position: absolute; left: 1180px; top: -160px; width: 760px; height: 760px; border-radius: 50%; background: rgba(54, 200, 191, 0.34); filter: blur(120px)"></div>'
+         '<div style="position: absolute; left: 760px; top: 560px; width: 820px; height: 620px; border-radius: 50%; background: rgba(3, 117, 219, 0.42); filter: blur(130px)"></div>')
+INS_ISO = BLOB("e049b1b50443f77efc55c5b616513462")  # isotipo oficial de Insights, versión para fondo oscuro
+HAIR = "rgba(207, 228, 250, 0.14)"
+_u = lambda t: (f'<div style="align-self: flex-end; max-width: 84%; padding: 10px 16px; border-radius: 16px 16px 4px 16px; background: rgba(207, 228, 250, 0.13); '
+                f'color: #ffffff; {P}; font-size: 15.5px; font-weight: 500; line-height: 1.4">{t}</div>')
+_tile = lambda inner, pad="0": (f'<span style="height: 26px; min-width: 26px; box-sizing: border-box; flex: none; padding: {pad}; border-radius: 8px; background: rgba(255, 255, 255, 0.07); '
+                                f'border: 1px solid {HAIR}; display: inline-flex; align-items: center; justify-content: center">{inner}</span>')
+_src_ins = _tile(f'<img src="{INS_ISO}" alt="Efeonce Insights" style="height: 16px; width: auto">')
+_src_sky = _tile(f'<img src="{SKY}" alt="SKY" style="height: 11px; width: auto">', pad="0 7px")
+_check = (f'<svg aria-hidden="true" viewBox="0 0 16 16" width="15" height="15" style="margin-left: auto; flex: none"><path d="M3.6 8.4l2.9 2.9 5.9-6.4" fill="none" stroke="{TEAL}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>')
+# Consulta a un conector, en una sola línea sin caja: quién responde (con su logo) y qué se le pidió.
+_call = lambda logos, name, what: (
+    f'<div style="display: flex; align-items: center; gap: 9px">{logos}'
+    f'<span style="margin-left: 2px; {P}; font-size: 13.5px; font-weight: 600; color: #ffffff; white-space: nowrap">{name}</span>'
+    f'<span style="{P}; font-size: 13px; color: {SOFT}; opacity: 0.8; white-space: nowrap">{what}</span>{_check}</div>')
+_ans = lambda t, foot="": f'<div style="{P}; font-size: 16px; line-height: 1.55; color: rgba(255, 255, 255, 0.94)">{t}{foot}</div>'
+_cite = (f'<div style="margin-top: 8px; display: flex; align-items: center; gap: 8px; {P}; font-size: 12.5px; color: {SOFT}; opacity: 0.85">'
+         f'<span style="width: 6px; height: 6px; border-radius: 50%; background: {TEAL}"></span>Efeonce Insights, mayo de 2027 · dato medido</div>')
+_chat = (
+    f'<div style="width: 492px; height: 572px; box-sizing: border-box; background: linear-gradient(180deg, #0a2342 0%, #071a31 100%); display: flex; flex-direction: column">'
+    f'<div style="padding: 18px 24px 17px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid {HAIR}">'
+    f'<span style="{B}; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; color: #ffffff">El asistente de IA de SKY</span><div style="display: flex; align-items: center; gap: 14px">'
+    + "".join(f'<img src="{BLOB(b)}" alt="{n}" style="width: 18px; height: 18px; filter: brightness(0) invert(1) opacity(0.6)">'
+              for n, b in (("ChatGPT", "8b93bc5ae9eaaf4505bb1282c221b555"), ("Claude", "2836b667c49049cb7897ceaa1d4bca6d"), ("Gemini", "df0dadae560ee15325eceb0b17ac47b2"), ("Microsoft Copilot", "6426e902e1cd4e6b6afd45b6e56279c4")))
+    + "</div>"
+    + f'</div><div style="flex: 1; min-height: 0; padding: 24px 24px 0; display: flex; flex-direction: column; gap: 17px">'
+    + _u("¿Qué promoción generó más dudas en mayo?")
+    + _call(_src_ins, "Efeonce Insights", "· social care, mayo de 2027")
+    + _ans('La promoción de mayo: <span style="font-weight: 700; color: #ffffff">269 de 655</span> consultas de precio, el 41 %. Chile concentra la mayoría. La duda que más se repite es qué fechas de vuelo aplican.', _cite)
+    + _u("Crúzalo con las ventas de esa ruta.")
+    + _call(_src_ins + _src_sky, "Insights + datos de SKY", "· por semana")
+    + _ans('Suben juntas hasta la semana 3. Después las dudas bajan y las ventas siguen: una pista, no una causa.')
+    + f'</div><div style="margin: 0 24px 22px; padding: 9px 9px 9px 18px; border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(207, 228, 250, 0.22); display: flex; align-items: center; gap: 12px">'
+      f'<span style="{P}; font-size: 14.5px; color: {SOFT}; opacity: 0.7">Pregunta lo que necesites…</span>'
+      f'<span style="margin-left: auto; display: inline-flex; align-items: center; gap: 7px; {P}; font-size: 12px; color: {SOFT}"><span style="width: 6px; height: 6px; border-radius: 50%; background: {TEAL}"></span>Insights conectado</span>'
+      f'<span style="width: 30px; height: 30px; flex: none; border-radius: 50%; background: #ffffff; display: inline-flex; align-items: center; justify-content: center">'
+      f'<svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14"><path d="M8 12.6V3.6M4.2 7.2L8 3.4l3.8 3.8" fill="none" stroke="#001a33" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></div></div>')
+_bx = (62, 166, 270, 374)
+_bars = "".join(f'<rect x="{x - 23}" y="{254 - v * 0.9:.0f}" width="46" height="{v * 0.9:.0f}" rx="7" fill="{"#023c70" if i == 2 else "#cbd9ea"}"></rect>'
+                f'<text x="{x}" y="280" text-anchor="middle" font-family="Poppins, sans-serif" font-size="12.5" fill="#7a8799">Sem {i + 1}</text>' for i, (x, v) in enumerate(zip(_bx, (120, 140, 235, 160))))
+_ly = (176, 160, 104, 54)
+_dash = (
+    f'<div style="width: 492px; height: 572px; box-sizing: border-box; background: #f6f7f5; padding: 0 28px; display: flex; flex-direction: column">'
+    f'<div style="padding: 18px 0 17px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #dde2ea"><span style="{B}; font-size: 19px; font-weight: 700; letter-spacing: -0.01em; color: #001a33">El tablero de negocio de SKY</span>'
+    f'<span style="{P}; font-size: 11.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #52647c">Datos por API</span></div>'
+    f'<div style="margin-top: 24px; {P}; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; color: #001a33">Dudas de precio y ventas de la ruta</div>'
+    f'<div style="margin-top: 4px; {P}; font-size: 13px; color: #52647c">Por semana · mayo de 2027</div>'
+    f'<svg viewBox="0 0 436 290" width="436" height="290" style="margin-top: 14px" role="img" aria-label="Ejemplo: dudas de precio por semana cruzadas con las ventas de la ruta"><line x1="12" y1="254.5" x2="424" y2="254.5" stroke="#dde2ea"></line>{_bars}'
+    f'<polyline points="{" ".join(f"{x},{y}" for x, y in zip(_bx, _ly))}" fill="none" stroke="#ff6500" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></polyline>'
+    + "".join(f'<circle cx="{x}" cy="{y}" r="4.6" fill="#ffffff" stroke="#ff6500" stroke-width="2.4"></circle>' for x, y in zip(_bx, _ly)) + "</svg>"
+    f'<div style="margin-top: 6px; display: flex; gap: 22px; {P}; font-size: 12.5px; color: #33475f"><span style="display: inline-flex; align-items: center; gap: 7px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #023c70"></span>Dudas de precio · Insights</span>'
+    f'<span style="display: inline-flex; align-items: center; gap: 7px"><span style="width: 16px; height: 2.6px; border-radius: 2px; background: #ff6500"></span>Ventas · datos de SKY</span></div>'
+    f'<div style="margin-top: auto; padding: 16px 0 22px; border-top: 1px solid #dde2ea">'
+    f'<div style="{P}; font-size: 11.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #7a8799">Cada dato llega con</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 14px; color: #33475f">período · mercado · red · tema · indicador · valor · fuente</div></div></div>')
+_hub = (f'<svg aria-hidden="true" viewBox="0 0 1920 1080" width="1920" height="1080" style="position: absolute; left: 0; top: 0">'
+        f'<path d="M1295 168 C1295 214, 1190 200, 1190 250" fill="none" stroke="{HALO}" stroke-opacity="0.6" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"></path>'
+        f'<path d="M1295 168 C1295 210, 1554 196, 1554 250" fill="none" stroke="{HALO}" stroke-opacity="0.6" stroke-width="1.6" stroke-dasharray="2 7" stroke-linecap="round"></path></svg>')
+_tag = lambda t, x: (f'<div style="position: absolute; left: {x}px; top: 198px; padding: 5px 15px; border-radius: 999px; background: #001a33; border: 1px solid rgba(114, 222, 216, 0.65); '
+                     f'{P}; font-size: 13px; font-weight: 600; letter-spacing: 0.16em; color: #ffffff">{t}</div>')
+S["11k-insights-mcp-api.dc.html"] = page("Insights por MCP y por API", BLOBS
+    + voice("Efeonce Insights · MCP y API", "¿Y con mis datos?", ["Se", "cruzan"],
+            "Ése es el valor de abrir los datos por MCP y por API: que SKY pueda <span style=\"font-weight: 600\">correlacionar</span> lo que la gente pregunta en los comentarios con lo que pasa en su negocio: ventas por ruta, resultado de una promoción, reclamos.", size=128, lead_w=540,
+            extras=["Por MCP: desde Copilot, ChatGPT, Claude, Gemini o el que elijan", "Por API: a sus tableros y a su bodega de datos"])
+    + _hub
+    + f'<div style="position: absolute; left: 1148px; top: 96px; padding: 20px 34px; border-radius: 999px; background: #001a33; border: 1.5px solid rgba(114, 222, 216, 0.8); box-shadow: 0 20px 60px rgba(3, 117, 219, 0.55)">'
+      f'<img src="{LOCKUP}" alt="Efeonce Insights" style="display: block; height: 30px; width: auto"></div>'
+    + _tag("MCP", 1160) + _tag("API", 1528)
+    + frame(_chat, 790, 250, radius=24) + frame(_dash, 1308, 250, radius=24)
+    # Mascotas de partners sobre el borde de la ventana del asistente. Tres juntas por pedido explícito del operador
+    # (comentario del canvas, 10/10/2026); poses oficiales del kit, sin alterar; pieza privada, no pautada.
+    + "".join(f'<img src="{BLOB(b)}" alt="{alt}" style="position: absolute; left: {x}px; top: {256 - h}px; height: {h}px; width: auto; filter: drop-shadow(0 10px 12px rgba(0, 0, 0, 0.55))">'
+              for b, alt, x, h in (("4284342dc6ba10089960a3c528b87930", "Codex, la mascota de OpenAI, saludando", 806, 70),
+                                   ("39a5c56c082173eef7e2b78d317b4774", "Clawd, la mascota de Claude", 876, 66),
+                                   ("1b0af1c192ef6fe4b85fa06a4861be7c", "Gigi, la mascota de Gemini, saludando", 980, 70)))
+    + f'<div style="position: absolute; left: 790px; top: 858px; width: 1014px; box-sizing: border-box; padding: 24px 0; border-top: 1px solid rgba(207, 228, 250, 0.22); border-bottom: 1px solid rgba(207, 228, 250, 0.22); '
+      f'display: flex; align-items: center; justify-content: center; gap: 28px; {B}; font-size: 34px; font-weight: 700; letter-spacing: -0.025em; color: #ffffff">'
+      f'<span>Lo que la gente pregunta</span><svg viewBox="0 0 64 24" width="60" height="22" aria-hidden="true"><path d="M3 12h58M10 5L3 12l7 7M54 5l7 7-7 7" fill="none" stroke="#ff6500" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+      f'<span>lo que pasa en el negocio</span></div>'
+    + note("Efeonce Insights ya entrega sus ediciones por MCP y por API; las de social care se suman con la operación. Ejemplos ilustrativos. Acceso de lectura, con los permisos que SKY defina; la conexión se configura con su equipo de tecnología.", top=1010, left=790, width=1010), "")
+
+# =============================================================== 12 quién hace qué
+def gov(k, t, d, white=False):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; padding: 32px 34px; display: flex; flex-direction: column; justify-content: center">{kick(k, "#52647c" if white else SOFT)}'
+            f'<div style="margin-top: 12px; {B}; font-size: 44px; font-weight: 760; letter-spacing: -0.03em; line-height: 1.02; color: {fg}">{t}</div>'
+            f'<div style="margin-top: 14px; {P}; font-size: 20px; font-weight: {400 if white else 300}; line-height: 1.42; color: {soft}">{d}</div></div>')
+
+_g, _ops = checks(["Lee y clasifica todo lo que entra", "Responde en las 13 cuentas", "Deriva los reclamos, con registro", "Mantiene la base de conocimiento al día",
+                    "Prepara las campañas y las contingencias", "Mide y reporta en Efeonce Insights", "Entrena al equipo y a los agentes"], "#001a33", fs=22, weight=500, rule="#dbe3ee")
+_ops = _ops.replace("__G__", _g.replace("{bg}", "#ffffff"))
+_dec = "".join(
+    f'<div style="flex: 1; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid {RULE}">{kick(w, SOFT, 13)}'
+    f'<div style="margin-top: 6px; {B}; font-size: 31px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05; color: #ffffff">{t}</div>'
+    f'<div style="margin-top: 6px; {P}; font-size: 19px; font-weight: 300; line-height: 1.36; color: {SOFT}">{d}</div></div>'
+    for w, t, d in (("Al partir y con cada cambio", "Qué se dice", "Entrega las tarifas y promociones vigentes y aprueba las respuestas tipo."),
+                    ("Al partir", "Quién toma los reclamos", "Define el equipo que recibe los mensajes directos que derivamos."),
+                    ("Cuando ocurre", "Cuándo hay contingencia", "La declara y la cierra, y aprueba los mensajes de espera."),
+                    ("Cada trimestre", "Cuánta autonomía tiene la IA", "Por tipo de consulta, con la evidencia que le mostramos.")))
+S["12-quien-hace-que.dc.html"] = page("Quién hace qué", voice(
+    "Cómo trabajamos juntos", "¿Y qué le toca a SKY?", ["Decidir", "y aprobar"],
+    "Efeonce opera el servicio completo. SKY conserva las decisiones que son de la marca. Son cuatro, y para cada una llegamos con la propuesta lista.", size=110,
+    extras=["Un solo interlocutor en Efeonce", "Una reunión de 30 minutos a la semana"])
+    + f'<div style="position: absolute; left: 790px; top: 100px; width: 1010px; height: 760px; display: grid; grid-template-columns: 0.94fr 1.06fr; gap: 20px">'
+      f'<div style="{WHITE}; padding: 36px 38px 14px; display: flex; flex-direction: column"><div><img src="{BLOB("ad9b07614674548d6a8179314a25daca")}" alt="Efeonce" style="display: block; height: 34px; width: auto"><div style="margin-top: 16px; {B}; font-size: 42px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: #001a33">Opera el servicio</div></div><div style="margin-top: 20px; flex: 1; display: flex; flex-direction: column; color: #001a33">{_ops}</div></div>'
+      f'<div style="{GLASS}; padding: 36px 38px 10px; display: flex; flex-direction: column"><div><img src="{SKY}" alt="SKY" style="display: block; height: 34px; width: auto"><div style="margin-top: 16px; {B}; font-size: 42px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: #ffffff">Decide y aprueba</div></div><div style="margin-top: 20px; flex: 1; display: flex; flex-direction: column">{_dec}</div></div></div>'
+    + f'<div style="position: absolute; left: 790px; top: 880px; width: 1010px; {LINE}; padding: 22px 34px; {P}; font-size: 21px; font-weight: 300; line-height: 1.4; color: #ffffff">'
+      f'<span style="font-weight: 600">Lo que no cambia:</span> nada se responde fuera de lo aprobado, y lo legal o de prensa se escala a SKY antes de contestar.</div>')
+
+# =============================================================== 13b los primeros 90 días
+def milestone(day, t, d, white=False):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; flex: 1; padding: 0 36px; display: flex; align-items: center; gap: 34px">'
+            f'<div style="width: 250px; flex-shrink: 0; {B}; line-height: 0.9; color: {fg}"><span style="{P}; font-size: 20px; font-weight: 500; display: block; margin-bottom: 6px; color: {soft}">Día</span>'
+            f'<span style="font-size: 124px; font-weight: 760; letter-spacing: -0.055em">{day}</span></div>'
+            f'<div style="flex: 1"><div style="{B}; font-size: 38px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: {fg}">{t}</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 20px; font-weight: {400 if white else 300}; line-height: 1.4; color: {soft}">{d}</div></div></div>')
+
+S["13b-puerta.dc.html"] = page("Los primeros 90 días", voice(
+    "Los primeros 90 días", "¿Qué veo y cuándo?", ["Desde el", "día uno"],
+    "Desde el primer día hay respuesta en las 13 cuentas. Al mes, el primer informe completo y tiempos comprometidos con datos de SKY, no con supuestos.", size=110)
+    + zone(milestone("1", "Respuesta en las 13 cuentas", "Equipo y agentes operando. Todo se mide desde el primer comentario.")
+           + milestone("30", "Tiempos comprometidos", "Con cuatro semanas medidas, los objetivos pasan a ser compromiso. Llega la primera edición mensual de Insights.", white=True)
+           + milestone("60", "Operación afinada", "Base de conocimiento, turnos y respuestas ajustados con lo que mostró el primer mes.")
+           + milestone("90", "Primera revisión", "Revisamos juntos calidad, alcance y qué consultas puede responder la IA con más autonomía."), top=110, height=840, gap=16))
+
+# =============================================================== 14b salida
+exits = [("Base de conocimiento", "Se entrega completa, con su historial de cambios.", "Es de SKY", True), ("Taxonomía y respuestas tipo", "Se entregan en formato abierto.", "Es de SKY", True),
+         ("Historial de conversaciones", "Se exporta con etiquetas, tiempos y estados.", "Es de SKY", True), ("Accesos de Efeonce", "Se revocan al terminar, con constancia.", "Se revoca", False),
+         ("Bandeja", "Si la licencia es de SKY, la operación sigue sin migrar nada.", "Sigue", False), ("Agentes", "Se entrega su especificación: taxonomía, reglas y pruebas.", "Se documenta", False)]
+erows = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE_S}"><div style="width: 420px; flex-shrink: 0; {B}; font-size: 32px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.05; color: #ffffff">{a}</div>'
+    f'<div style="flex: 1; {P}; font-size: 21px; font-weight: 300; line-height: 1.36; color: {SOFT}">{b}</div>{chip(c, f)}</div>' for a, b, c, f in exits)
+S["14b-salida.dc.html"] = page("Salida y transición", voice(
+    "Salida y transición", "¿Quedamos amarrados?", ["Todo", "es de SKY"], "Lo que se construye para operar es de SKY. Si el servicio termina, se entrega completo y en formato abierto.")
+    + zone(f'<div style="flex: 1; display: flex; flex-direction: column; border-bottom: 1px solid {RULE_S}">{erows}</div>', top=130, height=800)
+    + note("Efeonce acompaña la transición durante el plazo de aviso que fije el contrato."))
+
+# =============================================================== 14c / 14d preguntas
+def faq(items):
+    cells = "".join(
+        f'<div style="{GLASS}; padding: 28px 30px; display: flex; flex-direction: column; gap: 14px">'
+        f'<div style="display: flex; gap: 14px; {B}; font-size: 29px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.12; color: #ffffff">'
+        f'<svg aria-hidden="true" viewBox="0 0 62 62" width="22" height="22" style="flex-shrink: 0; margin-top: 5px"><circle cx="31" cy="31" r="26" fill="none" stroke="{ACC}" stroke-width="10"></circle></svg><span>{q}</span></div>'
+        f'<div style="{P}; font-size: 19.5px; font-weight: 300; line-height: 1.44; color: {SOFT}">{a}</div></div>' for q, a in items)
+    return f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 18px">{cells}</div>'
+
+S["14c-preguntas-negocio.dc.html"] = page("Preguntas frecuentes: negocio y atención", voice(
+    "Preguntas frecuentes · 1 de 2", "¿Dudas de negocio?", ["Respondidas"], "Lo que suelen preguntar Marketing y Experiencia de clientes antes de aprobar un servicio como éste.", size=96)
+    + zone(faq([
+        ("¿No es caro para responder comentarios?", "No se paga por comentario: se paga cobertura, calidad y reporte. Para responder 1.300 hay que leer y clasificar todo lo que entra."),
+        ("¿Cómo sé que vende?", "Con clics en enlaces medibles desde el primer día. Las ventas se atribuyen con el seguimiento que acordemos; no prometemos una cifra."),
+        ("El volumen bajó a 818. ¿Cambia algo?", "Bajó el conteo: la plataforma nueva no incluye X ni anuncios. El fee cubre hasta 1.300 conversaciones al mes, así que hay holgura."),
+        ("¿Y si el volumen se dispara?", "Aviso al 80 % del tope mensual, refuerzo de campaña y revisión trimestral. Nada se absorbe ni se cobra en silencio."),
+        ("¿Nos van a llenar el DM?", "Sólo se deriva lo que es un caso. Cada semana informamos cuánto se derivó, por qué tema y cuánto se tomó."),
+        ("¿Van a prometer lo que no podemos cumplir?", "Las respuestas a reclamos son de contención y las aprueba SKY. Sin plazos, causas ni compensaciones."),
+    ]), height=880))
+S["14d-preguntas-riesgo.dc.html"] = page("Preguntas frecuentes: riesgo y contrato", voice(
+    "Preguntas frecuentes · 2 de 2", "¿Dudas de riesgo?", ["Respondidas"], "Lo que suelen preguntar Legal, Tecnología, Compras y la gerencia.", size=96)
+    + zone(faq([
+        ("¿Qué datos personales tratan?", "Los que el público escribe en los comentarios, por encargo de SKY y bajo contrato. No se piden; si aparecen, se ocultan y se deriva."),
+        ("¿La IA usa nuestros datos?", "El proveedor no entrena con ellos. Queda registro de qué propuso el agente y quién lo aprobó."),
+        ("¿Qué accesos necesitan?", "Rol de socio en las cuentas sociales y usuarios en la bandeja. Ningún sistema interno de SKY."),
+        ("¿Por qué no un call center?", "Un call center resuelve casos. Esto es respuesta pública de marca, con base de precios y lectura para Marketing."),
+        ("¿Qué pasa si no cumplen los tiempos?", "Se informan cada semana, con mediana y percentil 90. Tras cuatro semanas medidas pasan a compromiso; las consecuencias van al contrato."),
+        ("¿Y si hay una crisis?", "Modo contingencia acordado antes de partir: mensajes aprobados, una sola ruta de derivación y parte diario. La decisión es siempre de SKY."),
+    ]), height=880))
+
+# =============================================================== 14 inversión
+_price = (f'<div style="{WHITE}; padding: 30px 36px 26px; display: flex; flex-direction: column">{kick("Servicio base · fee mensual", "#52647c")}'
+          f'<div style="margin-top: 14px; display: flex; align-items: baseline; gap: 14px"><span style="{P}; font-size: 26px; font-weight: 500; color: #33475f">CLP</span>'
+          f'<span style="{B}; font-size: 108px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.95; color: #001a33">4.990.000</span></div>'
+          f'<div style="margin-top: 8px; {P}; font-size: 21px; font-weight: 500; color: #001a33">más IVA, al mes · todo incluido</div>'
+          f'<div style="margin-top: 16px; align-self: flex-start; padding: 9px 16px; border-radius: 12px; background: #eaf1f9; {P}; font-size: 19px; font-weight: 500; color: #001a33">12 meses de servicio: CLP 59.880.000 más IVA</div>'
+          f'<div style="margin-top: auto; padding-top: 16px; border-top: 1px solid #dbe3ee; {P}; font-size: 18px; font-weight: 400; line-height: 1.38; color: #33475f">'
+          'Hasta 1.300 conversaciones al mes. Lunes a viernes, de 09:00 a 18:00, y con el equipo reforzado en las campañas grandes.</div></div>')
+_setup = (f'<div style="{GLASS}; padding: 30px 30px 26px; display: flex; flex-direction: column">{kick("Puesta en marcha", SOFT)}'
+          f'<div style="margin-top: 14px; {B}; font-size: 60px; font-weight: 760; letter-spacing: -0.04em; line-height: 1; color: #ffffff">Bonificada</div>'
+          f'<div style="margin-top: 12px; {P}; font-size: 18px; font-weight: 300; line-height: 1.38; color: {SOFT}">Única vez: accesos, base de conocimiento, agentes y calibración.</div>'
+          f'<div style="margin-top: auto; padding-top: 16px; border-top: 1px solid {RULE}; {P}; font-size: 18px; font-weight: 400; color: #ffffff">Valor de referencia: CLP 990.000</div></div>')
+extra = "".join(
+    f'<div style="flex: 1; display: flex; align-items: center; gap: 24px; border-top: 1px solid {RULE}"><div style="flex: 1"><span style="{B}; font-size: 25px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{a}</span>'
+    f'<div style="margin-top: 2px; {P}; font-size: 17px; font-weight: 300; line-height: 1.34; color: {SOFT}">{b}</div></div><div style="text-align: right; white-space: nowrap"><div style="{B}; font-size: 27px; font-weight: 740; letter-spacing: -0.02em; color: #ffffff">{c}</div>'
+    f'<div style="{P}; font-size: 16px; font-weight: 400; color: {SOFT}">{u}</div></div></div>'
+    for a, b, c, u in (("Cobertura extendida con agentes autónomos", "Noches, fines de semana y feriados. Se activa cuando SKY lo decida, con la evidencia de los primeros meses.", "+ CLP 1.290.000", "más IVA, al mes"),
+                       ("Sobre 1.300 conversaciones", "Aviso al llegar al 80 % del tope. El exceso se atiende por bloques de 200 conversaciones.", "CLP 290.000", "más IVA, por bloque")))
+S["14-inversion.dc.html"] = page("Inversión", voice(
+    "Inversión", "¿Cuánto cuesta?", ["Un fee", "fijo"], "Un valor mensual, todo incluido, para las 13 cuentas. <span style=\"font-weight: 600\">No se cobra por comentario</span> ni por réplica.", size=120,
+    extras=["Especialista dedicado, con respaldo y supervisión", "Refuerzo incluido en Travel Sale, Cyber SKY y Black Friday", "Agentes de IA, base de conocimiento y plataforma", "27 indicadores en Efeonce Insights"])
+    + zone(f'<div style="flex: 0.86; display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px">{_price}{_setup}</div>'
+           f'<div style="{GLASS}; flex: 1; padding: 18px 34px 4px; display: flex; flex-direction: column">{kick("Opcionales y excesos")}<div style="margin-top: 10px; flex: 1; display: flex; flex-direction: column">{extra}</div></div>', gap=16)
+    + note("Valores netos, más IVA. El refuerzo de campaña cubre hasta cinco semanas al año. Vigencia: 2027, desde la fecha de inicio que defina SKY. Contrato a 12 meses."))
+
+# =============================================================== 15 próximos pasos
+nexts = "".join(
+    f'<div style="{GLASS}; padding: 26px 28px"><div style="{B}; font-size: 54px; font-weight: 300; line-height: 1; color: {ACC}">{n}</div><div style="margin-top: 12px; {B}; font-size: 28px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08; color: #ffffff">{t}</div>'
+    f'<div style="margin-top: 8px; {P}; font-size: 18px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>'
+    for n, t, d in (("01", "Revisamos esta propuesta con SKY", "Una llamada corta para resolver dudas de alcance."), ("02", "SKY la lleva a su presupuesto 2027", "Con el valor mensual y los opcionales de esta propuesta."), ("03", "Seis semanas de preparación", "Cuando SKY decida partir: accesos, base de conocimiento y agentes.")))
+def plain(items, color, weight, rule):
+    return "".join(f'<div style="flex: 1; display: flex; align-items: center; border-top: 1px solid {rule}; {P}; font-size: 20px; font-weight: {weight}; line-height: 1.3; color: {color}">{t}</div>' for t in items)
+S["15-siguiente.dc.html"] = page("Supuestos y próximos pasos", voice(
+    "Próximos pasos", "¿Qué sigue?", ["Tres", "pasos"], "Los valores de esta propuesta están cerrados. Lo que sigue depende de la decisión de SKY.", size=128)
+    + zone(f'<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px">{nexts}</div>'
+           f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 18px">'
+           f'<div style="{WHITE}; padding: 30px 34px 10px; display: flex; flex-direction: column">{head("Para partir", "Lo que necesitaremos de SKY", "#001a33", "#52647c", 34)}<div style="margin-top: 16px; flex: 1; display: flex; flex-direction: column">'
+           + plain(["Accesos a las 13 cuentas, por rol", "Fuente vigente de tarifas, rutas y promociones", "Calendario de campañas del año", "Equipo que recibe en DM los reclamos derivados", "Lineamientos de tono y temas que no se responden", "Reparto real entre precio, generales y reclamos"], "#001a33", 500, "#dbe3ee")
+           + f'</div></div><div style="{GLASS}; padding: 30px 34px 10px; display: flex; flex-direction: column">{head("Supuestos", "Sobre qué está armada", size=34)}<div style="margin-top: 16px; flex: 1; display: flex; flex-direction: column">'
+           + plain(["1.300 conversaciones al mes: cada comentario y su hilo", "El engagement y la atención por DM quedan fuera", "Los reclamos se derivan; el caso lo resuelve SKY", "X y los comentarios en anuncios entran, si hay accesos", "Atención en días hábiles, de 09:00 a 18:00", "Seis semanas de preparación; la fecha de inicio la define SKY"], "#ffffff", 300, RULE)
+           + "</div></div></div>"))
+
+
+# =============================================================== 04 piloto
+def proof(fig, t, d, white=False):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; flex: 1; padding: 0 40px; display: flex; align-items: center; gap: 36px">'
+            f'<div style="width: 330px; flex-shrink: 0; {B}; font-size: 150px; font-weight: 760; letter-spacing: -0.055em; line-height: 0.9; color: {fg}; white-space: nowrap">{fig}</div>'
+            f'<div style="flex: 1"><div style="{B}; font-size: 36px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.05; color: {fg}">{t}</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 20px; font-weight: {400 if white else 300}; line-height: 1.4; color: {soft}">{d}</div></div></div>')
+
+S["04-piloto.dc.html"] = page("Lo que dejó el piloto", voice(
+    "Piloto · mayo y junio de 2026", "¿Qué dejó el piloto?", ["Evidencia"],
+    "Ya respondimos los comentarios de precio de SKY durante un Cyber. Lo que aprendimos ahí es la <span style=\"font-weight: 600\">base</span> de esta propuesta.", size=118,
+    extras=["Temas clasificados y casos que no se contestan", "Respuestas tipo por ruta y por promoción", "Base de precios por mercado, con enlaces medibles"])
+    + zone(proof("96", "comentarios de precio, todos resueltos", "En seis días de Cyber SKY, del 29 de mayo al 3 de junio. La semana anterior habían sido 30.", white=True)
+           + proof("60 %", "del volumen llegó en dos días", "El 1 y el 2 de junio. Parte del volumen entró después de las 19:00.")
+           + proof("43 %", "fueron quejas por precio o promoción", "El tema número uno, por sobre la cotización (33 %): la promoción publicada no calzaba con lo que la persona veía al cotizar.")
+           + f'<div style="{LINE}; padding: 20px 40px; {P}; font-size: 21px; font-weight: 300; color: #ffffff"><span style="font-weight: 600">Lo que faltó medir:</span> el tiempo de primera respuesta. En 2027 se mide desde el primer día.</div>', top=110, height=830)
+    + note("Fuente: informes semanales de social care de SKY, mayo y junio de 2026."))
+
+# =============================================================== 06 tres caminos
+def path(n, t, goal, s1, s2, s3):
+    box = lambda x, white=False: (f'<div style="flex: 1; align-self: stretch; box-sizing: border-box; border-radius: 16px; padding: 16px 20px; display: flex; align-items: center; {P}; font-size: 20px; line-height: 1.3; '
+                                  + ("background: #ffffff; color: #001a33; font-weight: 600" if white else f"border: 1px solid {RULE_S}; color: #ffffff; font-weight: 300") + f'">{x}</div>')
+    return (f'<div style="{GLASS}; flex: 1; padding: 26px 34px 28px; display: flex; flex-direction: column; gap: 18px"><div style="display: flex; align-items: center; gap: 20px">'
+            f'<span style="{B}; font-size: 46px; font-weight: 300; line-height: 1; color: {ACC}">{n}</span><span style="flex: 1; {B}; font-size: 42px; font-weight: 760; letter-spacing: -0.03em; line-height: 1; color: #ffffff">{t}</span>{chip(goal)}</div>'
+            f'<div style="flex: 1; display: flex; align-items: center; gap: 14px">{box(s1)}{ARROW}{box(s2)}{ARROW}{box(s3, True)}</div></div>')
+
+S["06-tres-caminos.dc.html"] = page("Tres caminos", voice(
+    "Cómo se responde", "¿Qué pasa con cada comentario?", ["Tres", "caminos"],
+    "Cada comentario se clasifica al entrar. El tipo decide la respuesta y <span style=\"font-weight: 600\">dónde termina</span>.", size=120,
+    extras=["Un solo seguimiento por persona; si insiste, a DM", "Lo que no se contesta se registra y se informa"])
+    + zone(path("01", "Precio y destinos", "Capturar la venta", "Se identifica la ruta y el mercado", "Respuesta con la tarifa vigente y su enlace", "La persona cotiza en el sitio de SKY")
+           + path("02", "Consultas generales", "Resolver en público", "Se busca en la base de conocimiento", "Respuesta aprobada, con la voz de SKY", "La duda queda resuelta a la vista")
+           + path("03", "Reclamos", "Derivar a quien resuelve", "Respuesta pública de contención", "Invitación a seguir por mensaje directo", "El equipo de SKY resuelve el caso"), top=110, height=840))
+
+# =============================================================== 06b la conversación completa
+S["06b-conversacion.dc.html"] = page("La conversación completa", voice(
+    "Cómo se responde · La conversación", "¿Es sólo responder?", ["Es una", "conversación"],
+    "Un comentario no se cierra con una respuesta. Atendemos la conversación <span style=\"font-weight: 600\">completa</span>: lo que hay que saber antes y lo que pasa después.", size=92,
+    extras=["La unidad del servicio es la conversación, no cada réplica", "Se informan respuestas, traspasos y reaperturas"])
+    + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px">'
+           + mode_card("01", "Antes", "Lo que hay que saber para responder bien.", ["A qué publicación y promoción responde", "El hilo completo y lo que ya se dijo", "Si la persona ya escribió antes", "El dato vigente en la base"])
+           + mode_card("02", "Respuesta", "Lo que la persona ve.", ["El agente propone, con su fuente", "Una persona aprueba y envía", "Si es reclamo, queda registrado el traspaso a DM"], white=True)
+           + mode_card("03", "Después", "Lo que pasa en el hilo.", ["Replica: un seguimiento y, si insiste, a DM", "Otros se suman: una respuesta visible para todos", "Vuelve sin atención: se reabre y se deriva", "El hilo crece: alerta y cambio de prioridad"])
+           + f'</div><div style="{LINE}; padding: 22px 34px; {P}; font-size: 21px; font-weight: 300; line-height: 1.4; color: #ffffff"><span style="font-weight: 600">72 horas:</span> cada hilo se sigue ese tiempo después de la última respuesta. Es una propuesta: se ajusta con lo que se mida en la puesta en marcha.</div>'))
+
+
+# =============================================================== 07 personas y agentes (bandeja)
+UI_INK, UI_SUB, UI_LINE, UI_BLUE = "#0b1f3a", "#5a6b84", "#e3e8f0", "#0375db"
+
+
+def ui_chip(text, fg, bg, fs=11.5):
+    return f'<span style="display: inline-flex; align-items: center; white-space: nowrap; padding: 3px 9px; border-radius: 999px; background: {bg}; color: {fg}; {P}; font-size: {fs}px; font-weight: 600">{text}</span>'
+
+
+def ui_net(code):
+    bg = "linear-gradient(135deg, #f9a03f, #d6249f 55%, #5b51d8)" if code == "IG" else "#1877f2"
+    return f'<span style="display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 6px; background: {bg}; color: #ffffff; {P}; font-size: 9px; font-weight: 700">{code}</span>'
+
+
+def ui_item(ini, tint, name, net, market, ago, text, chip_html, active=False):
+    base = (f"background: #ffffff; box-shadow: 0 6px 18px rgba(11, 31, 58, 0.1); border: 1px solid #cfe0fb" if active else "border: 1px solid transparent")
+    bar = (f'<span style="position: absolute; left: -1px; top: 14px; bottom: 14px; width: 3px; border-radius: 2px; background: {UI_BLUE}"></span>' if active else "")
+    return (f'<div style="position: relative; box-sizing: border-box; border-radius: 12px; padding: 11px 12px; display: flex; gap: 10px; {base}">{bar}'
+            f'<span style="width: 34px; height: 34px; flex-shrink: 0; border-radius: 50%; background: {tint}; color: {UI_INK}; display: flex; align-items: center; justify-content: center; {P}; font-size: 12px; font-weight: 700">{ini}</span>'
+            f'<div style="flex: 1; min-width: 0"><div style="display: flex; align-items: center; gap: 6px"><span style="{P}; font-size: 13.5px; font-weight: 700; color: {UI_INK}">{name}</span>{ui_net(net)}'
+            f'<span style="margin-left: auto; {P}; font-size: 11px; color: {UI_SUB}">{ago}</span></div>'
+            f'<div style="margin-top: 3px; {P}; font-size: 12.5px; line-height: 1.35; color: {UI_SUB}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{text}</div>'
+            f'<div style="margin-top: 7px; display: flex; align-items: center; gap: 6px">{chip_html}<span style="{P}; font-size: 11px; color: {UI_SUB}; white-space: nowrap">{market}</span></div></div></div>')
+
+
+def ui_icon(d, active=False):
+    wrap = "background: rgba(255, 255, 255, 0.14)" if active else ""
+    return (f'<span style="width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; {wrap}">'
+            f'<svg viewBox="0 0 20 20" width="19" height="19" fill="none" stroke="{"#ffffff" if active else "#8fa6c4"}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">{d}</svg></span>')
+
+
+rail = (f'<div style="width: 58px; flex-shrink: 0; background: #001a33; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 0">'
+        f'<svg viewBox="0 0 62 62" width="24" height="24" style="margin-bottom: 10px"><circle cx="31" cy="31" r="24" fill="none" stroke="#ffffff" stroke-width="7"></circle><circle cx="50" cy="13" r="7" fill="{ACC}"></circle></svg>'
+        + ui_icon('<path d="M3 5.5h14v8.5H9l-3.5 3V14H3z"></path>', True) + ui_icon('<path d="M4 16V9M10 16V4M16 16v-5"></path>') + ui_icon('<path d="M4 4h9a3 3 0 013 3v9H7a3 3 0 01-3-3z"></path><path d="M8 8h5M8 11h5"></path>')
+        + ui_icon('<circle cx="10" cy="10" r="2.6"></circle><path d="M10 3v2M10 15v2M3 10h2M15 10h2M5 5l1.4 1.4M13.6 13.6L15 15M15 5l-1.4 1.4M6.4 13.6L5 15"></path>')
+        + f'<span style="margin-top: auto; width: 34px; height: 34px; border-radius: 50%; background: #ffd9b8; color: {UI_INK}; display: flex; align-items: center; justify-content: center; {P}; font-size: 12px; font-weight: 700">CM</span></div>')
+topbar = (f'<div style="height: 56px; flex-shrink: 0; padding: 0 18px; display: flex; align-items: center; gap: 12px; background: #ffffff; border-bottom: 1px solid {UI_LINE}">'
+          f'<span style="{B}; font-size: 19px; font-weight: 740; letter-spacing: -0.02em; color: {UI_INK}">Bandeja de social care</span>'
+          + ui_chip("SKY · 13 cuentas · 5 mercados", UI_INK, "#eef1f6")
+          + f'<span style="margin-left: auto; display: flex; align-items: center; gap: 8px">' + ui_chip("3 borradores listos", "#0a57a8", "#e3efff") + ui_chip("1 con una persona", "#8a5a00", "#fff1d6") + ui_chip("1 alerta", "#a3123f", "#ffe3ea") + "</span></div>")
+lista = (f'<div style="width: 262px; flex-shrink: 0; padding: 14px 12px; display: flex; flex-direction: column; gap: 6px; background: #f4f6fa; border-right: 1px solid {UI_LINE}">'
+         f'<div style="display: flex; justify-content: space-between; padding: 0 4px 4px; {P}; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {UI_SUB}"><span>Por atender</span><span>5</span></div>'
+         + ui_item("LM", "#d9e8ff", "Lucía M.", "IG", "Chile · precio", "4 min", "¿Cuánto sale Santiago–Lima en julio?", ui_chip("Borrador listo", "#0a57a8", "#e3efff"), True)
+         + ui_item("DR", "#e4dcff", "Diego R.", "FB", "Perú · precio", "9 min", "¿Hasta cuándo dura la promoción?", ui_chip("Borrador listo", "#0a57a8", "#e3efff"))
+         + ui_item("PT", "#ffe1d0", "Paula T.", "IG", "Chile · reclamo", "12 min", "Me cobraron dos veces el equipaje.", ui_chip("Con Camila", "#8a5a00", "#fff1d6"))
+         + ui_item("VN", "#d5f3e6", "Viajes Norte", "FB", "Chile · grupos", "18 min", "Somos 40, ¿hay tarifa de grupo?", ui_chip("Derivado a ventas", "#0d6b3f", "#dcf5e8"))
+         + ui_item("TP", "#ffd9e1", "Tomás P.", "IG", "Argentina", "21 min", "La promoción no existe, es un engaño.", ui_chip("Alerta P1", "#a3123f", "#ffe3ea")) + "</div>")
+sla = (f'<svg viewBox="0 0 36 36" width="34" height="34"><circle cx="18" cy="18" r="14" fill="none" stroke="{UI_LINE}" stroke-width="4"></circle>'
+       f'<path d="M18 4 A14 14 0 1 1 6.1 25.4" fill="none" stroke="{UI_BLUE}" stroke-width="4" stroke-linecap="round"></path></svg>')
+hilo = (f'<div style="flex: 1; min-width: 0; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; background: #fbfcfe">'
+        f'<div style="display: flex; align-items: center; gap: 12px"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: #d9e8ff; color: {UI_INK}; display: flex; align-items: center; justify-content: center; {P}; font-size: 14px; font-weight: 700">LM</span>'
+        f'<div><div style="{P}; font-size: 16px; font-weight: 700; color: {UI_INK}">Lucía M.</div><div style="{P}; font-size: 12px; color: {UI_SUB}; white-space: nowrap">Comentario público · Instagram</div></div>'
+        f'<div style="margin-left: auto; display: flex; align-items: center; gap: 9px">{sla}<div><div style="{P}; font-size: 13px; font-weight: 700; color: {UI_INK}; white-space: nowrap">1 h 42 min</div><div style="{P}; font-size: 11px; color: {UI_SUB}; white-space: nowrap">para responder · P3</div></div></div></div>'
+        f'<div style="display: flex; align-items: center; gap: 6px"><span style="{P}; font-size: 11px; color: {UI_SUB}; white-space: nowrap">El agente clasificó</span>'
+        + ui_chip("Precio y destinos", UI_INK, "#eef1f6") + ui_chip("Santiago–Lima", UI_INK, "#eef1f6") + "</div>"
+        f'<div style="align-self: flex-start; padding: 12px 16px; white-space: nowrap; border-radius: 4px 16px 16px 16px; background: #eef1f6; {P}; font-size: 15px; color: {UI_INK}">Hola, ¿cuánto sale Santiago–Lima en julio?</div>'
+        f'<div style="margin-top: 2px; padding: 1.5px; border-radius: 18px; background: linear-gradient(135deg, #0375db, #36c8bf); box-shadow: 0 16px 40px rgba(3, 117, 219, 0.22)"><div style="border-radius: 16.5px; background: #ffffff; padding: 14px 16px 14px">'
+        f'<div style="display: flex; align-items: center; gap: 9px"><img src="{BLOB("9c504f3a6656923e74648dbfa53a1dc9")}" alt="" style="width: 42px; height: 42px"><span style="{P}; font-size: 13.5px; font-weight: 700; color: {UI_BLUE}; white-space: nowrap">Borrador del agente</span>'
+        f'<span style="margin-left: auto">{ui_chip("Coincidencia alta", "#0d6b3f", "#dcf5e8")}</span></div>'
+        f'<div style="margin-top: 9px; {P}; font-size: 15px; line-height: 1.5; color: {UI_INK}">Hola, Lucía. El valor cambia según la fecha y la disponibilidad. En este enlace ves el calendario de julio con las mejores tarifas.</div>'
+        f'<div style="margin-top: 10px; display: flex; align-items: center; gap: 8px">{ui_chip("Fuente · Precios y rutas", "#0a57a8", "#e3efff")}<span style="{P}; font-size: 11.5px; color: {UI_SUB}; white-space: nowrap">vigente hasta el 31 de julio</span></div>'
+        f'<div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid {UI_LINE}; display: flex; align-items: center; gap: 8px">'
+        f'<span style="padding: 10px 14px; border-radius: 10px; background: #001a33; color: #ffffff; {P}; font-size: 13.5px; font-weight: 600; white-space: nowrap">Aprobar y enviar</span>'
+        f'<span style="padding: 9px 13px; border-radius: 10px; border: 1px solid #c9d3e2; color: {UI_INK}; {P}; font-size: 13.5px; font-weight: 600">Editar</span>'
+        f'<span style="padding: 9px 8px; color: {UI_SUB}; {P}; font-size: 13px; font-weight: 600; white-space: nowrap">A una persona</span></div></div></div>'
+        f'<div style="margin-top: auto; display: flex; align-items: center; gap: 8px; {P}; font-size: 12px; color: {UI_SUB}"><span style="width: 8px; height: 8px; border-radius: 50%; background: #1f9e94"></span>Precio validado contra el tarifario vigente antes de enviar</div></div>')
+def kb_row(k, v):
+    return f'<div style="display: flex; justify-content: space-between; padding: 6px 0; border-top: 1px solid #d6e4fb; {P}; font-size: 12px"><span style="color: {UI_SUB}">{k}</span><span style="font-weight: 600; color: {UI_INK}">{v}</span></div>'
+def rule(t):
+    return (f'<div style="display: flex; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px solid {UI_LINE}; {P}; font-size: 12.5px; color: {UI_INK}">'
+            f'<svg viewBox="0 0 16 16" width="15" height="15" style="flex-shrink: 0"><circle cx="8" cy="8" r="8" fill="#0d6b3f"></circle><path d="M4.5 8.3l2.3 2.3 4.6-5" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>{t}</div>')
+kb = (f'<div style="width: 226px; flex-shrink: 0; padding: 16px 16px; display: flex; flex-direction: column; background: #ffffff; border-left: 1px solid {UI_LINE}">'
+      f'<div style="{B}; font-size: 17px; font-weight: 740; letter-spacing: -0.02em; color: {UI_INK}">Base de conocimiento</div><div style="margin-top: 2px; {P}; font-size: 12px; color: {UI_SUB}">Lo que el agente usó para responder</div>'
+      f'<div style="margin-top: 12px; border-radius: 14px; background: #eef5ff; border: 1px solid #cfe0fb; padding: 12px 14px 6px"><div style="display: flex; align-items: center; justify-content: space-between"><span style="{P}; font-size: 14px; font-weight: 700; color: {UI_INK}">Precios y rutas</span>{ui_chip("Vigente", "#0d6b3f", "#dcf5e8")}</div>'
+      f'<div style="margin: 6px 0 8px; {P}; font-size: 12.5px; line-height: 1.4; color: {UI_SUB}">Santiago–Lima: tarifa «desde» y enlace con seguimiento.</div>' + kb_row("Dueño", "Marketing digital") + kb_row("Vence", "31 de julio") + kb_row("Aprobó", "SKY") + "</div>"
+      f'<div style="margin-top: 16px; {P}; font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: {UI_SUB}; padding-bottom: 6px">Reglas activas</div>'
+      + rule("Sólo tarifas vigentes") + rule("Sin pedir datos en público") + rule("Reclamos: siempre una persona") + "</div>")
+window = (f'<div style="position: absolute; left: 0; top: 0; width: 1010px; height: 660px; border-radius: 20px; overflow: hidden; display: flex; background: #f4f6fa; box-shadow: 0 60px 150px rgba(3, 117, 219, 0.5), 0 24px 70px rgba(0, 0, 0, 0.65), 0 0 0 2px rgba(114, 222, 216, 0.55)">{rail}'
+          f'<div style="flex: 1; min-width: 0; display: flex; flex-direction: column">{topbar}<div style="flex: 1; min-height: 0; display: flex">{lista}{hilo}{kb}</div></div></div>')
+toast = (f'<div style="position: absolute; right: -44px; top: 508px; width: 300px; box-sizing: border-box; border-radius: 16px; padding: 14px 16px; background: #001a33; border: 1px solid rgba(114, 222, 216, 0.4); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.55)">'
+         f'<div style="display: flex; align-items: center; gap: 9px; {P}; font-size: 13.5px; font-weight: 700; color: #ffffff"><span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5a7a; box-shadow: 0 0 0 5px rgba(255, 90, 122, 0.22)"></span>Alerta P1 · aviso al líder</div>'
+         f'<div style="margin-top: 6px; {P}; font-size: 13px; line-height: 1.4; color: {SOFT}">«La promoción no existe, es un engaño». No se responde sin revisión.</div></div>')
+done = (f'<div style="position: absolute; left: -34px; top: 636px; display: flex; align-items: center; gap: 10px; border-radius: 999px; padding: 11px 18px 11px 12px; background: #ffffff; box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5)">'
+        f'<svg viewBox="0 0 16 16" width="22" height="22"><circle cx="8" cy="8" r="8" fill="#0d6b3f"></circle><path d="M4.5 8.3l2.3 2.3 4.6-5" fill="none" stroke="#ffffff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+        f'<span style="{P}; font-size: 14px; font-weight: 600; color: {UI_INK}">Aprobada por Camila · enviada en 38 min</span></div>')
+tri = "".join(
+    f'<div style="display: flex; gap: 16px; padding-top: 18px; border-top: 1px solid {RULE_S}"><span style="{B}; font-size: 44px; font-weight: 300; line-height: 1; color: {ACC}">{n}</span>'
+    f'<div><div style="{B}; font-size: 26px; font-weight: 740; letter-spacing: -0.02em; white-space: nowrap; color: #ffffff">{t}</div><div style="margin-top: 4px; {P}; font-size: 17px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div></div>'
+    for n, t, d in (("01", "Base de conocimiento", "Tarifas, rutas, promociones y respuestas aprobadas."), ("02", "Agentes de IA", "Clasifican cada comentario y proponen la respuesta."), ("03", "Personas", "Aprueban, responden lo sensible y derivan.")))
+S["07-personas-agentes.dc.html"] = page("Personas y agentes", voice(
+    "El método", "¿Persona o IA?", ["Las dos,", "con una", "sola voz"],
+    "Armamos la base de conocimiento con el equipo de SKY. Los agentes de IA clasifican y proponen; las personas responden lo que pide <span style=\"font-weight: 600\">criterio</span>.", size=104, width=640, lead_w=560,
+    extras=["Clasificación inmediata de cada comentario", "Una persona aprueba cada respuesta", "Cada respuesta mejora la base"])
+    + '<div style="position: absolute; left: 640px; top: 40px; width: 1280px; height: 760px; background: radial-gradient(ellipse 560px 360px at 660px 400px, rgba(54, 200, 191, 0.2), rgba(0, 26, 51, 0) 75%)"></div>'
+    + f'<div style="position: absolute; left: 800px; top: 104px; width: 1010px; height: 660px">{window}{toast}{done}</div>'
+    + f'<div style="position: absolute; left: 800px; top: 836px; width: 1010px; display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 28px">{tri}</div>'
+    + note("Interfaz ilustrativa con datos de ejemplo.", top=1024, left=800))
+
+
+# =============================================================== 00 resumen ejecutivo
+_sum = [("Qué", "Respuesta pública en las 13 cuentas", "Precio y destinos, consultas generales y reclamos."),
+        ("Cuánto", "1.300 conversaciones al mes", "La referencia de SKY: cada comentario y su hilo."),
+        ("Cómo", "Personas con agentes de IA", "El agente propone; una persona aprueba cada respuesta."),
+        ("Cobertura", "Días hábiles, de 09:00 a 18:00", "Con refuerzo incluido en las campañas grandes. Opcional: noches, fines de semana y feriados con agentes autónomos."),
+        ("Medición", "27 indicadores en Efeonce Insights", "Informe semanal, edición mensual y modo presentación."),
+        ("Cuándo", "En 2027, cuando SKY lo defina", "Seis semanas de preparación desde la fecha que elijan. En 2026 no se opera ni se cobra.")]
+_sum_cells = "".join(
+    f'<div style="{GLASS}; padding: 24px 28px; display: flex; flex-direction: column; justify-content: center">{kick(k)}'
+    f'<div style="margin-top: 8px; {B}; font-size: 31px; font-weight: 740; letter-spacing: -0.025em; line-height: 1.06; color: #ffffff">{t}</div>'
+    f'<div style="margin-top: 8px; {P}; font-size: 18px; font-weight: 300; line-height: 1.38; color: {SOFT}">{d}</div></div>' for k, t, d in _sum)
+S["00-resumen.dc.html"] = page("Resumen", voice(
+    "Resumen", "¿Cuál es la propuesta?", ["En una", "página"],
+    "Efeonce se hace cargo de los tres tipos de comentario que quedan sin atención en 2027, con un equipo propio, agentes de IA supervisados y reporte en Efeonce Insights.", size=116)
+    + zone(f'<div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; gap: 16px">{_sum_cells}</div>'
+           f'<div style="{WHITE}; padding: 24px 34px; display: flex; align-items: center; gap: 28px"><div style="flex: 1">{kick("Inversión", "#52647c")}'
+           f'<div style="margin-top: 6px; {B}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; color: #001a33">Fee mensual fijo, todo incluido</div></div>'
+           f'<div style="{B}; font-size: 30px; font-weight: 740; color: #001a33; white-space: nowrap">CLP 4.990.000 + IVA</div></div>', gap=16))
+
+# =============================================================== 03b el costo de no responder
+S["03b-sin-respuesta.dc.html"] = page("El costo de no responder", voice(
+    "El costo de no hacer nada", "¿Y si nadie responde?", ["15.600", "al año"],
+    "Al ritmo que indicó SKY, son 1.300 conversaciones al mes sin respuesta: consultas de precio, dudas y reclamos, a la vista de todos.", size=124)
+    + zone(proof("650", "consultas de precio sin responder al mes", "Hipótesis: la mitad de las 1.300. Cada una es una persona preguntando cuánto cuesta volar.", white=True)
+           + proof("43 %", "eran quejas por la promoción", "En el Cyber de junio, entre los comentarios de precio que atendimos. Sin respuesta, quedan bajo la pieza.")
+           + proof("60 %", "llegó en sólo dos días", "En el Cyber de junio, la mayoría de las consultas entró el 1 y el 2. Sin respuesta en esos días, la campaña pierde las preguntas de quienes están cotizando.")
+           + f'<div style="{LINE}; padding: 20px 40px; {P}; font-size: 21px; font-weight: 300; color: #ffffff"><span style="font-weight: 600">Lo que no se ve:</span> cada comentario sin respuesta lo leen también quienes no preguntaron.</div>', top=110, height=830)
+    + note("Fuentes: volúmenes y nuevo modelo de atención, SKY, 9 de octubre de 2026; piloto de social care, mayo y junio de 2026."))
+
+# =============================================================== 12b el caso de negocio
+# Un solo ejemplo, leído de izquierda a derecha: cuántos preguntan, qué reciben y cuántos compran. Después, qué pasa si
+# compran más o menos, y cuándo el servicio se paga solo. (Rehecha el 10/10/2026: la versión de tres escenarios no se entendía.)
+def _step(k, fig, label, icon, white=False):
+    fg, soft = ("#001a33", "#33475f") if white else ("#ffffff", SOFT)
+    return (f'<div style="{WHITE if white else GLASS}; flex: 1; padding: 26px 28px 28px; display: flex; flex-direction: column">{kick(k, "#52647c" if white else SOFT, 13)}'
+            f'<div style="margin-top: 22px">{ico(icon, 64, dark=white)}</div>'
+            f'<div style="margin-top: auto; {B}; font-size: 150px; font-weight: 760; letter-spacing: -0.06em; line-height: 0.9; color: {fg}">{fig}</div>'
+            f'<div style="margin-top: 14px; min-height: 84px; {P}; font-size: 21px; font-weight: {500 if white else 400}; line-height: 1.34; color: {fg}">{label}</div></div>')
+
+
+_next = (f'<svg aria-hidden="true" viewBox="0 0 34 24" width="34" height="24" style="flex: none; align-self: center"><path d="M2 12h28M21 4l9 8-9 8" fill="none" stroke="{ACC}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"></path></svg>')
+
+
+def _if(ratio, n, sales, mult, hot=False):
+    return (f'<div style="flex: 1; padding: 0 26px; border-left: 1px solid {RULE}; display: flex; flex-direction: column; gap: 7px">'
+            f'<div style="{P}; font-size: 18px; font-weight: 300; color: {SOFT}">Si compra <span style="font-weight: 600; color: #ffffff">{ratio}</span></div>'
+            f'<div style="display: flex; align-items: baseline; gap: 10px"><span style="{B}; font-size: 42px; font-weight: 760; letter-spacing: -0.04em; line-height: 1; white-space: nowrap; color: {ACC if hot else "#ffffff"}">{sales}</span>'
+            f'<span style="{P}; font-size: 17px; color: #ffffff; white-space: nowrap">al año</span></div>'
+            f'<div style="{P}; font-size: 16.5px; font-weight: 300; color: {SOFT}">{n} reservas al mes<br><span style="font-weight: 600; color: #ffffff">{mult} la inversión</span></div>'
+            f'<div style="height: 6px; border-radius: 3px; background: rgba(207, 228, 250, 0.16)"><div style="height: 6px; width: {n / 65 * 100:.0f}%; border-radius: 3px; background: {ACC if hot else "#ffffff"}"></div></div></div>')
+
+
+S["12b-caso.dc.html"] = page("El caso de negocio", voice(
+    "El caso de negocio", "¿Cuánto vende responder?", ["Lo que hoy", "se pierde"],
+    "Cada mes, unas 650 personas preguntan un precio en los comentarios de SKY. Si reciben la tarifa y el enlace, una parte compra: con 1 de cada 20, son <span style=\"font-weight: 600\">CLP 61 millones al año</span>. No prometemos esa cifra: la medimos.", size=96, lead_w=540,
+    extras=["Los clics se miden desde el primer día", "La venta, con el seguimiento que acordemos con SKY"])
+    + zone(f'<div style="flex: 1; min-height: 0; display: flex; gap: 14px">'
+           + _step("Cada mes", "650", "personas preguntan un precio en los comentarios", "comentario")
+           + _next + _step("Si compra 1 de cada 20", "32", "reservas al mes, con la tarifa vigente y el enlace", "cursor")
+           + _next + _step("En un año", "61", "millones de pesos en pasajes vendidos", "trofeo", white=True) + "</div>"
+           f'<div style="{LINE}; padding: 22px 6px 22px 0; display: flex">{_if("1 de cada 50", 13, "CLP 25 M", "0,4 veces")}{_if("1 de cada 20", 32, "CLP 61 M", "1 vez", hot=True)}{_if("1 de cada 10", 65, "CLP 125 M", "2,1 veces")}</div>'
+           f'<div style="{GLASS}; padding: 22px 32px; display: grid; grid-template-columns: 1.1fr 1fr; gap: 34px; align-items: center">'
+           f'<div>{kick("Retorno sobre la inversión")}<div style="margin-top: 8px; {B}; font-size: 29px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.12; color: #ffffff">Con 1 de cada 20, las ventas igualan la inversión del año</div></div>'
+           f'<div style="{P}; font-size: 18.5px; font-weight: 300; line-height: 1.42; color: {SOFT}">La inversión anual es de CLP 59,9 millones. Con 1 de cada 10, los pasajes vendidos la duplican. Y si cada reserva lleva dos pasajeros, el retorno se duplica otra vez.</div></div>', top=100, height=870, gap=18)
+    + note("Ejemplo ilustrativo, no un pronóstico. 650 es una hipótesis: la mitad de las 1.300 conversaciones. Reserva de ida y vuelta a la tarifa «desde» promedio de las 55 rutas desde Chile que entregó SKY (CLP 80.012 por tramo, mayo de 2026); sin equipaje, asientos ni acompañantes. No cuenta a quienes leen la respuesta sin preguntar.", top=1000))
+
+
+for name, html in S.items():
+    (OUT / name).write_text(html, encoding="utf-8")
+
+# =============================================================== canvas.json
+MAIN = [
+    ("Main.dc.html", "Portada (receta)"), ("00-resumen.dc.html", "Resumen"), ("02-encargo.dc.html", "El encargo"), ("02b-cuentas.dc.html", "Las 13 cuentas y sus mercados"),
+    ("03b-sin-respuesta.dc.html", "El costo de no responder"), ("05-propuesta.dc.html", "La propuesta"), ("06-tres-caminos.dc.html", "Tres caminos"), ("07-personas-agentes.dc.html", "Personas y agentes"), ("07b-equipo-hibrido.dc.html", "Equipo híbrido"),
+    ("09-tiempos.dc.html", "Cobertura y tiempos"), ("10-campanas.dc.html", "Campañas"), ("10c-resguardos.dc.html", "Calidad y resguardos"), ("11f-insights-web.dc.html", "Reportería en Efeonce Insights"), ("12b-caso.dc.html", "El caso de negocio"),
+    ("14-inversion.dc.html", "Inversión"), ("15-siguiente.dc.html", "Supuestos y próximos pasos"),
+]
+# La contraportada cierra el deck completo: va después del anexo, no entre la versión para enviar y el anexo.
+CLOSING = ("16-cierre.dc.html", "Contraportada (receta)")
+ANNEX = [
+    ("00a-cap-encargo.dc.html", "Capítulo 01 · El encargo"), ("03-sin-dueno.dc.html", "Lo que queda sin dueño"), ("04-piloto.dc.html", "Lo que dejó el piloto"),
+    ("00b-cap-propuesta.dc.html", "Capítulo 02 · La propuesta"), ("05b-alcance.dc.html", "Alcance: dentro y fuera"), ("06c-decision.dc.html", "Reglas de respuesta"), ("06b-conversacion.dc.html", "La conversación completa"),
+    ("00c-cap-operacion.dc.html", "Capítulo 03 · La operación"), ("06d-proceso.dc.html", "El recorrido de un comentario"), ("08-escalera.dc.html", "La autoridad del agente (receta)"),
+    ("07c-agentes-ficha.dc.html", "Ficha de rol de cada agente"), ("08b-base.dc.html", "Base de conocimiento"), ("08c-equipo.dc.html", "Equipo"),
+    ("10b-contingencia.dc.html", "Contingencias"), ("10d-traspasos.dc.html", "Traspaso de reclamos"),
+    ("00d-cap-resguardos.dc.html", "Capítulo 04 · Los resguardos"), ("10g-herramientas.dc.html", "Herramientas"), ("10e-seguridad.dc.html", "Seguridad y datos"), ("10f-continuidad.dc.html", "Continuidad"),
+    ("00e-cap-medicion.dc.html", "Capítulo 05 · La medición"), ("11-medicion.dc.html", "Medición"), ("11b-indicadores.dc.html", "Catálogo de indicadores"), ("11l-satisfaccion.dc.html", "Encuesta de esfuerzo (CES)"), ("11c-objetivos.dc.html", "Objetivos iniciales"),
+    ("11d-reporteria.dc.html", "Reportería"), ("11e-insights.dc.html", "Todo se reporta en Insights"), ("11g-insights-esencial.dc.html", "Insights · lo esencial del mes"),
+    ("11h-insights-capitulo.dc.html", "Insights · capítulo Social care"), ("11i-insights-mapa.dc.html", "Insights · qué reporta cada sección"), ("11j-insights-pdf.dc.html", "Insights · modo presentación"),
+    ("11k-insights-mcp-api.dc.html", "Insights · por MCP y por API"),
+    ("00f-cap-acuerdo.dc.html", "Capítulo 06 · El acuerdo"), ("12-quien-hace-que.dc.html", "Quién hace qué"), ("13b-puerta.dc.html", "Los primeros 90 días"), ("14b-salida.dc.html", "Salida y transición"), ("14c-preguntas-negocio.dc.html", "Preguntas: negocio y atención"),
+    ("14d-preguntas-riesgo.dc.html", "Preguntas: riesgo y contrato"),
+]
+canvas_path = OUT / "canvas.json"
+canvas = json.loads(canvas_path.read_text(encoding="utf-8"))
+missing = [f for f, _ in MAIN + ANNEX + [CLOSING] if not (OUT / f).exists()]
+if missing:
+    sys.exit(f"faltan archivos: {missing}")
+# Dos páginas: la propuesta (versión para enviar y anexo) y el prototipo de Insights, que escribe gen_insights.py.
+# En el anexo cada capítulo parte en una fila propia, con su lámina de apertura a la izquierda.
+# La versión para enviar va en dos filas completas: la contraportada cierra la segunda, nunca queda sola en una tercera.
+MAIN_ROW, ANNEX_ROW = (len(MAIN) + 1) // 2, 8
+pages = [pg for pg in canvas.get("pages", []) if pg.get("id") not in ("propuesta", "insights")]
+canvas["pages"] = [{"id": "propuesta", "name": "Propuesta"}, {"id": "insights", "name": "Prototipo de Insights"}] + pages
+boards = {}
+for i, (f, t) in enumerate(MAIN):
+    boards[f] = {"x": (i % MAIN_ROW) * 2000, "y": (i // MAIN_ROW) * 1200, "w": 1920, "h": 1080, "title": f"{i + 1:02d} · {t}"}
+annex_y = ((len(MAIN) - 1) // MAIN_ROW + 1) * 1200 + 600
+row, col = -1, ANNEX_ROW
+for i, (f, t) in enumerate(ANNEX):
+    if "-cap-" in f or col >= ANNEX_ROW:
+        row, col = row + 1, 0
+    boards[f] = {"x": col * 2000, "y": annex_y + row * 1200, "w": 1920, "h": 1080, "title": f"A{i + 1:02d} · {t}"}
+    col += 1
+if col >= ANNEX_ROW:
+    row, col = row + 1, 0
+boards[CLOSING[0]] = {"x": col * 2000, "y": annex_y + row * 1200, "w": 1920, "h": 1080, "title": f"Cierre · {CLOSING[1]}"}
+# Los tableros de otras páginas (la marca) no son de este generador: se conservan tal como están.
+boards.update({k: v for k, v in canvas["boards"].items() if v.get("page") == "marca"})
+canvas["boards"] = boards
+canvas["order"] = [f for f, _ in MAIN + ANNEX + [CLOSING]] + [f for f in canvas["order"] if f.startswith("marca-")]
+canvas["notes"]["titulo"] = {"x": 0, "y": -300, "text": f"Propuesta para SKY · {len(MAIN)} láminas · sigue el anexo", "kind": "title1", "maxW": MAIN_ROW * 2000 - 80}
+canvas["notes"]["anexo"] = {"x": 0, "y": annex_y - 300, "text": f"Anexo · detalle de la operación · {len(ANNEX)} láminas · la contraportada cierra el deck", "kind": "title1", "maxW": ANNEX_ROW * 2000 - 80}
+canvas_path.write_text(json.dumps(canvas, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print(len(S), "láminas generadas;", len(MAIN), "para enviar +", len(ANNEX), "de anexo")

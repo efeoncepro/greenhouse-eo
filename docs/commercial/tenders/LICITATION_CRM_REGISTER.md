@@ -1,5 +1,18 @@
 # Registro operativo CRM de licitaciones
 
+## INAPI y SERNATUR Arica — alta completa de radar 10/10/2026
+
+**Decisión posterior de Julio:** Arica1330-22-COT26 descartada. Lead595750420295 Disqualified/NO_INTEREST, nota118333867172 ampliada y tarea Cancelada, con readback. [Decisión y evidencia](../follow-up-agent/runs/2026-10-10-arica-no-bid.md).
+
+Alta autorizada por Julio, con readback propio HubSpot/Notion. **Alta inicial de dos Leads New; decisión posterior: Arica NO-BID / Disqualified y tarea Cancelada; INAPI sigue New por calificar**, empresas existentes reutilizadas, notas de investigación, documentos y tareas de Julio; sin Deals, forecast, contactos nuevos o GO. Arica queda fuera de seguimiento activo por decisión de Julio; INAPI mantiene las puertas de referencias y discrepancia de metas.
+
+| Caso / expediente | Lead / Company / nota | Cierre externo Chile | Tarea / meta interna |
+| --- | --- | --- | --- |
+| [INAPI — Campañas de marketing digital · 519302-9-LE26](inapi-marketing-digital-519302-9-le26/README.md) | [Lead 595750420294](https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=595750420294&utm_source=codex&utm_medium=ai_agent); Company 34939665568; nota 118339677186 | 02/11 16:00, oficial + LicitaLAB | [Julio · Alta · Sin empezar](https://app.notion.com/p/3f539c2fefe78108bd57fef0ab6e5002?pvs=204); 16/10 12:00 |
+| [SERNATUR Arica — Campaña medios online · 1330-22-COT26](sernatur-arica-medios-online-1330-22-cot26/README.md) | [Lead 595750420295](https://app.hubspot.com/contacts/48713323/objects/0-136/views/all/list?leadId=595750420295&utm_source=codex&utm_medium=ai_agent); Company 31640422315; nota 118333867172 | 12/10 18:00, LicitaLAB; oficial SPA no corroborado | [Julio · Cancelada · NO-BID](https://app.notion.com/p/3f539c2fefe781e6a035df7493f63a1e?pvs=204); control cancelado |
+
+[Seguimiento focal](../follow-up-agent/runs/2026-10-10-inapi-arica-intake.md). INAPI: tres DOCX originales, PDF RE381 pendiente por reCAPTCHA; Arica: original completo de 7 páginas. Ver matrices para requisitos, costos/pagos y dudas.
+
 ## Grupo Socopur — agencia digital 2027 — revisión completa 10-10-2026
 
 **Recuperación de ingreso tardío, HSP-0017.** [Expediente y cinco láminas](socopur-agencia-marketing-digital-2027/README.md): redes, pauta, audiovisual/diseño, SEO/web y analítica. Manifestación cerró 5/10; calendario prevé Q&A 8–13/10, preparación 14–30/10, presentaciones 2–6/11 y selección 9–13/11. Año 2026 contextual, sin hora/zona publicadas. **No hay reapertura ni ingreso tardío confirmados.** Nuevo detalle: equipo técnico/creativo exclusivo y discrepancia entre experiencia sectorial mínima (lámina) o preferida (post). Primer contacto: credencial/portafolio PDF; RFP completo pendiente.
@@ -458,3 +471,10 @@ El HTML del botón Ver conserva un `onclick` hacia [detalle público CRM](https:
 Guillermo Díaz, Analista de Compras: [Contact 253395802939](https://app.hubspot.com/contacts/48713323/record/0-1/253395802939?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), `guillermo.diaz@tvn.cl`; Mercedes Garnica, Ingeniero de Compras: [Contact 253353012041](https://app.hubspot.com/contacts/48713323/record/0-1/253353012041?utm_source=app_12360546_mcp&utm_medium=ai_agent&utm_campaign=fetch), `mercedes.garnica@tvn.cl`. LinkedIn leído en navegador y Apollo coinciden con cargo actual TVN. Ambos emails Apollo `Verified`, ZeroBounce `valid` (06/10/2026 08:04:25Z), no inferidos. Guillermo recomendado como primera entrada; no se confirma quién gestiona esta licitación ni autoridad de admisión. Mercedes mantiene entrada CorreosChile abril 2024 sin rango, conservada como ambigüedad frente al current de Apollo.
 
 Dos contactos creados y releídos en HubSpot y Apollo; asociados a Company `53943439754` y Deal `65757239717`. Nota `118115066177` contiene procedencia, intención institucional observada, próximo paso y borrador NO ENVIADO. Apollo request `-3949524283185478571`, 4 créditos consumidos y saldo 2375. Sin correo, llamada, mensaje, formulario ni invitación enviada/recibida. Siguiente paso: consultar admisión y ruta para recibir invitación/bases mediante Compras.
+
+
+## Corte documental de fuentes — 10-10-2026 (sin readback CRM nuevo)
+
+[Índice de 18 casos y expedientes](RADAR_CASES_2026-10-10.md). Estudios, no altas CRM ni decisión de participar. La fuente oficial reportada para [Aysén 1332-12-LP26](sernatur-aysen-1332-12-lp26/README.md) cierra **23-10-2026 15:00 America/Santiago (18:00 UTC)**; sustituye para planificación el 21-10 de las filas históricas. Resolución explicativa pendiente; CRM Deal 65832697782 no releído ni modificado aquí. La coordinación de actualización CRM se realiza por separado.
+
+Ñuble conserva Deal 65806359148. GORE conserva Lead 595417344321, Company 32146470729 y nota 118262917392 con revisión de bases del 08-10; no degradar ese contexto ni duplicar. Pierre Fabre conserva Deal 65843869022 y workspace previo, con formulario no revalidado en este corte. Las señales sin Deal no se añaden al registro comercial general. Ninguna de estas fichas certifica admisibilidad completa ni ausencia de adendas.

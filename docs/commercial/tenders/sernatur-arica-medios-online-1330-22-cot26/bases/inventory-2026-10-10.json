@@ -1,0 +1,13 @@
+{
+  "tender_id": "1330-22-COT26",
+  "observed_on": "2026-10-10",
+  "files": [
+    {
+      "file": "Solicitud-compra-agil-medios-online.pdf",
+      "size": 373206,
+      "sha256": "71b06ce60f2c5a943cacf294783574cf50c2683da2b5f57d6999abde4261a21f",
+      "status": "original_downloaded",
+      "source": "Firmador oficial SERNATUR"
+    }
+  ]
+}

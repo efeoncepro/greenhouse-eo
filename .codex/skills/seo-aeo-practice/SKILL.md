@@ -57,30 +57,24 @@ casos ficticios o autorizados. Claims comerciales, rankings, precios, casos de c
 de pago no son evidencia de seniority. La dueña del instrumento, su binding por opening, el snapshot inmutable y
 la calibración es `greenhouse-talent-people-operator`; la decisión sigue siendo humana y advisory.
 
-## 0. La tesis — en una categoría de humo, la honestidad es el producto
+## Norte de la práctica: referencia de categoría con representación fiel
 
-**Vender SEO no se parece a vender HubSpot. Se parece a lo contrario.**
+Cargar el [método operativo](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) para estrategia, propuestas y revisión comercial. El norte es ser
+descubiertos, comprendidos y considerados por compradores de una categoría/situación delimitada, con
+capacidad y evidencia reales. Liderazgo es aspiración, no garantía ni claim de superioridad sin pruebas.
+Visibilidad de marca ante preguntas non-brand amplía el descubrimiento; no elimina el tráfico genérico.
+Separar citas, menciones, fidelidad y recomendación de consideración/ventas observadas. Contratar trabajo
+controlable y capacidad; medir resultados sujetos a dependencias. Una correlación no garantiza clics,
+ahorro paid ni revenue. Módulos `03_OFERTA.md`, `08_PRUEBA.md` y `templates/propuesta-tipo.md` aplican esto.
 
-| | HubSpot | **SEO / AEO** |
-|---|---|---|
-| Qué vendes | El producto **de otro** | **El tuyo** |
-| El estado del comprador | *"¿me sirve a mí?"* — **duda de encaje** | 🔴 *"¿eres un estafador?"* — **duda de honestidad** |
-| Dónde se gana | Calificando bien | 🎯 **Ganándote el derecho a ser escuchado** |
+## 0. La tesis — evidencia, pertinencia y transparencia
 
-**El 100% de tus prospectos ya compró SEO y tiene una cicatriz.** Le prometieron primera página, le mostraron
-rankings de keywords que nadie busca, y el revenue no se movió. **No duda del servicio: duda de ti.**
-
-Eso invierte la venta. La secuencia que gana:
-
-```
-1. Le REGALAS el diagnóstico (el Grader)      ← evidencia antes que promesa
-2. Le dices para qué NO le sirve               ← descalificación honesta
-3. Le muestras el piso y el techo, con supuestos ← un precio con método, no un número
-4. Recién ahí, la oferta
-```
-
-🎯 **Es la misma mecánica del waiver de HubSpot: le entregas la evidencia antes de pedirle plata.**
-En una categoría con déficit de confianza, **eso no es un imán de leads: es el motor de venta entero.**
+Empezar en la necesidad del comprador, su evidencia y el estado de la cuenta. Investigar dudas de encaje,
+confianza, inversión y ejecución; no presumir que todos han sufrido una mala experiencia SEO.
+Diagnóstico y demostración contextual sirven cuando resuelven una incertidumbre pertinente. El Grader
+es una entrada posible, no un paso obligatorio para reiniciar oportunidades avanzadas.
+La propuesta conecta territorio, prueba, acciones, medición y alcance comercial; no vende un score ni
+un resultado algorítmico garantizado. Precio y capacidad siguen sus fuentes y aprobaciones.
 
 ---
 
@@ -106,22 +100,14 @@ que el mercado vende, USD 900+/mes.** ✅
 🎯 **"puedes ver lo que hacemos sin tener que confiar en nosotros"** *(que es otra cosa, y no se comoditiza:
 es **transparencia como producto**, y en una categoría con déficit de confianza, es el moat)*.
 
-**(c) 🔴 La atribución de AEO a revenue NO existe.** ✅ *verificado*: los estudios de conversión de tráfico LLM
-**van de +900% a −13% — se contradicen en el signo**, y el tráfico de IA es **el 1,08% del total**.
-**Quien te dé un ROI de AEO te lo está inventando.** 🎯 **Decirlo en voz alta es el activo.**
+**(c) La prueba se construye en tres planos.** Descubrimiento/representación, comportamiento del
+comprador y negocio. Referencias y conversiones observadas se pueden medir cuando hay datos; eso no
+prueba efecto causal de citación ni un ROI incremental. Estudios de CTR mantienen muestra/fecha/límites;
+no implican recuperación de clics o ahorro en paid para el prospecto.
 
-🎯 **Pero SÍ existe un puente honesto, y casi nadie lo usa:** las marcas **citadas** en AI Overviews reciben
-**+35% de clics orgánicos** y **+91% de clics pagados** ✅ — **y eso se mide en el GA4 y la cuenta de Ads DEL
-CLIENTE, no en un dashboard nuestro.**
-
-> ## La citación no es un canal nuevo. Es la condición para seguir existiendo en el viejo.
-> **El AEO no se vende como canal: se vende como eficiencia de medios.** *(Y eso hace entrar al CFO.)*
-> → `modules/01_MERCADO_2026.md` · `modules/08_PRUEBA.md`
-
-**(d) 🎯 Tenemos un activo que casi nadie tiene: el AI Visibility Grader, funcionando, en producción.**
-Y **ya se usa en la venta**. Pero por (b), **su valor tiene que migrar de dar un *score* a dar una
-*prescripción con delta esperado***. Un número no vende. *"Estás invisible en 4 de 7 motores, esto es lo que lo
-mueve, y este es el orden"* sí.
+**(d) El diagnóstico sirve al criterio.** Un Assessment puede orientar qué investigar o mejorar, con
+cobertura y límites visibles. La prescripción se sustenta en brechas, capacidad, dependencias y pruebas;
+no inventar un delta esperado de presencia/ventas porque exista un score.
 
 ---
 
@@ -152,7 +138,7 @@ mueve, y este es el orden"* sí.
 
 8. 🔴 **NUNCA prometas rankings.** Ni posiciones, ni "primera página". **Es la promesa que rompió la confianza
    de la categoría** — y la que va a hacer que te comparen con el que te precedió.
-9. 🔴 **NUNCA atribuyas revenue a citación en IA.** No existe el modelo. **Decirlo en voz alta es el activo.**
+9. **No inferir revenue incremental desde una cita.** Medir referencias y outcomes cuando existan datos; atribución observada no prueba causalidad.
 10. 🔴 **NUNCA prometas —ni muestres sin declarar— un techo de clics sobre un sitio que no tiene muestra
     para su propia curva de CTR.** El techo *("ganarías N clics si subieras a la posición 5")* es
     `impresiones × (CTR objetivo − CTR actual)`, y el CTR objetivo sale de **la curva del propio sitio**
@@ -212,7 +198,7 @@ mueve, y este es el orden"* sí.
 | 🎯 **La cuña: el Grader** — el motor de venta, y su migración de *score* a *prescripción* · 🎯 **el panel competitivo multi-marca** (el cliente + sus competidores con el mismo set de preguntas, el mismo día; caso SKY 2026-09-11) | **`modules/05_CUNA_GRADER.md`** |
 | 🔴 **Descalificación** — los 8 casos en que NO vendemos | **`modules/06_DESCALIFICACION.md`** |
 | **Displacement** — el freelancer · la herramienta · el in-house · la agencia titular · **no hacer nada** | **`modules/07_DISPLACEMENT.md`** |
-| 🎯 **Prueba sin mentir** — el puente de atribución que SÍ existe | **`modules/08_PRUEBA.md`** |
+| 🎯 **Prueba y medición** — compromisos controlables, resultados observados y causalidad | **`modules/08_PRUEBA.md`** |
 | **Canales** — outbound · cross-sell · 🎯 **PAID al Grader (la aritmética)** · licitaciones · inbound propio | **`modules/09_CANALES_OUTBOUND.md`** |
 | 🎯 **PROSPECCIÓN — el manual del vendedor** *(cómo se construye la lista, las señales de compra, el ritmo semanal, la matemática del pipeline)* | **`modules/13_PROSPECCION.md`** |
 | **La conversación** — discovery *(las 9 preguntas)*, propuesta, negociación, QBR | **`modules/10_CONVERSACION.md`** |

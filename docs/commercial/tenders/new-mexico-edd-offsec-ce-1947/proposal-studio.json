@@ -1,0 +1,20 @@
+{
+  "$schema": "../PROPOSAL_STUDIO_CLOSURE_SCHEMA.md",
+  "schemaVersion": 1,
+  "deal": "new-mexico-edd-offsec-ce-1947",
+  "workspacePath": "docs/commercial/tenders/new-mexico-edd-offsec-ce-1947",
+  "status": "workshop_only",
+  "proposalId": null,
+  "registration": null,
+  "composition": {
+    "sourcePlans": []
+  },
+  "renderJobs": [],
+  "deliverables": [],
+  "verification": null,
+  "notes": [
+    "Estudio documental de investigación; no implica que Julio decidió participar.",
+    "Sin Proposal registrada, oferta económica/técnica, deck, render ni entregables gobernados en este trabajo.",
+    "Fuentes recibidas con corte 2026-10-10; bloqueos y desconocidos conservados."
+  ]
+}

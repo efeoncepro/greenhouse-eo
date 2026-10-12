@@ -21,6 +21,15 @@ description: Estrategia, arquitectura, posicionamiento, identidad verbal, reputa
 
 Opera la marca como un sistema de crecimiento: posicionamiento relevante, diferencia defendible, memoria acumulada, experiencia demostrable, confianza verificable y decisiones gobernadas.
 
+## Referencia de categoría en búsqueda y respuestas IA
+
+Para liderar una categoría mediante descubrimiento y representación fiel, cargar el
+[método SEO/AEO](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) y `references/semantic-and-ai-brand.md`. Brand Studio fija categoría,
+posicionamiento, diferencias y claims con pruebas; SEO/AEO verifica presencia por superficie y Content
+convierte conocimiento en evidencia útil. Visibilidad ante consultas non-brand conserva la función de
+descubrimiento genérico. Liderazgo en respuestas y liderazgo entre compradores se observan por separado;
+una descripción favorable debe ser también fiel a las capacidades, mercados y límites reales.
+
 ## Alcance y fronteras
 
 Esta skill es dueña de:

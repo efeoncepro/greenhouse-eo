@@ -57,3 +57,20 @@ Datos individuales y auditoría detallada en CRM y en el expediente privado loca
 ## Verificación del registro de credenciales
 
 Lectura independiente del contacto, asociaciones y descripción/nota CRM: correcta. Company Primary `59076520008`, Deal `65843869022` y nota `118286393402` asociados al contacto `254011713292`. Un único registro por email; membresía efectiva ACTIVE182 verificada. El segmento expresa fit, no consentimiento ni envío. Comprobación documental acotada: cero advertencias. El registro CRM no equivale a postulación enviada.
+
+
+## Corte documental del radar — 10-10-2026
+
+Se conserva íntegra la revisión previa del 09-10 y el Deal 65843869022. El formulario no fue revalidado en este corte. Responsable de próxima revisión: Julio Reyes.
+
+**Prioridad provisional:** P2 — preparar credenciales. Preinscripción 30-10; encaje medios integral y ruta histórica, pero formulario/capacidad/conflictos deben revalidarse.
+
+Julio: revisar formulario actual y contactos existentes, seleccionar credenciales/casos y completar evaluación interna antes de decidir preinscripción.
+
+- [Fuentes y corte recibido](bases/FUENTES-2026-10-10.md).
+- [Matriz de admisibilidad interna](matriz-admisibilidad-INTERNO.md).
+- [Intake, continuidad y acción interna](research/INTAKE-2026-10-10-INTERNO.md).
+- [Estado documental Proposal Studio](proposal-studio.json): workshop_only; sin registro/render.
+- [Manifiesto de artefactos](artifact-manifest.json): vacío; no hay piezas vivas ejecutadas.
+
+Este complemento no crea ni verifica Proposal, CRM, contactos o envío. Las fechas sin hora/zona siguen siendo textuales; los rangos de inversión no son presupuesto del concurso. Rafael Figueroa consta como contacto previamente verificado en la ficha delegada; revisar vigencia/rol antes de usarlo. Conservar estudio, sin atribuir GO.

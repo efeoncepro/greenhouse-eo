@@ -1,0 +1,306 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "A2-hibrido-social-care",
+  "input": {
+    "artifactId": "A2-hibrido-social-care",
+    "slides": [
+      {
+        "slideId": "deck-method-hybrid-workforce",
+        "contentType": "deck.method-hybrid-workforce",
+        "slots": {
+          "frame": {
+            "line": "brand",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 290,
+            "answerPx": 150,
+            "bodyTop": 650,
+            "bodyPx": 27,
+            "bodyWidth": 600,
+            "ladderTitleLeft": "--gl-hw-title-left=1070px",
+            "ladderTitleTop": "--gl-hw-title-top=260px",
+            "ladderTitlePx": "--gl-hw-title-px=18px",
+            "ladderX": "--gl-hw-x=1070px",
+            "ladderBase": "--gl-hw-base=900px",
+            "barWidth": "--gl-hw-bar-width=170px",
+            "barGap": "--gl-hw-bar-gap=14px",
+            "barFrom": "--gl-hw-bar-from=150px",
+            "barStep": "--gl-hw-bar-step=110px",
+            "barRadius": "--gl-hw-bar-radius=14px",
+            "barPadTop": "--gl-hw-bar-pad-top=20px",
+            "barPadX": "--gl-hw-bar-pad-x=18px",
+            "glassFrom": "--gl-hw-glass-from=8%",
+            "glassStep": "--gl-hw-glass-step=7%",
+            "glassColor": "--gl-hw-glass-color=#72ded8",
+            "numberPx": "--gl-hw-number-px=44px",
+            "labelPx": "--gl-hw-label-px=20px",
+            "labelGap": "--gl-hw-label-gap=10px",
+            "baselineWidth": "--gl-hw-baseline-width=722px",
+            "baselineStroke": "--gl-hw-baseline-stroke=2px",
+            "pathLeft": "--gl-hw-path-left=1070px",
+            "pathTop": "--gl-hw-path-top=922px",
+            "pathPx": "--gl-hw-path-px=19px",
+            "pathWidth": "--gl-hw-path-width=760px"
+          },
+          "indicator": {
+            "src": "asset-ref:layer:gl-hw-progress-3-of-5-brand"
+          },
+          "voice": {
+            "question": "¿Quién responde, al final?",
+            "answer": "y agentes",
+            "eyebrow": "Social care · equipos híbridos",
+            "answerLead": "Personas"
+          },
+          "body": "En social care, personas y agentes de IA comparten la bandeja. El agente gana autoridad por tramos y una persona conserva la responsabilidad.",
+          "ladderTitle": "La autoridad del agente crece por tramos",
+          "ladder": [
+            {
+              "label": "Leer y clasificar"
+            },
+            {
+              "label": "Proponer respuesta"
+            },
+            {
+              "label": "Responder lo frecuente"
+            },
+            {
+              "label": "Actuar con aprobación"
+            }
+          ],
+          "path": "Base de conocimiento → agente que propone → agente que responde → operación híbrida",
+          "selection": {
+            "label": "Social care",
+            "anchor": "top-end",
+            "participantKind": "department",
+            "scale": 1.25,
+            "textPad": "per-line",
+            "also": [
+              {
+                "label": "Agente IA",
+                "anchor": "bottom-end",
+                "action": "resize",
+                "participantKind": "department"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-method-hybrid-workforce",
+      "contentType": "deck.method-hybrid-workforce",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 290,
+          "answerPx": 150,
+          "bodyTop": 650,
+          "bodyPx": 27,
+          "bodyWidth": 600,
+          "ladderTitleLeft": "--gl-hw-title-left=1070px",
+          "ladderTitleTop": "--gl-hw-title-top=260px",
+          "ladderTitlePx": "--gl-hw-title-px=18px",
+          "ladderX": "--gl-hw-x=1070px",
+          "ladderBase": "--gl-hw-base=900px",
+          "barWidth": "--gl-hw-bar-width=170px",
+          "barGap": "--gl-hw-bar-gap=14px",
+          "barFrom": "--gl-hw-bar-from=150px",
+          "barStep": "--gl-hw-bar-step=110px",
+          "barRadius": "--gl-hw-bar-radius=14px",
+          "barPadTop": "--gl-hw-bar-pad-top=20px",
+          "barPadX": "--gl-hw-bar-pad-x=18px",
+          "glassFrom": "--gl-hw-glass-from=8%",
+          "glassStep": "--gl-hw-glass-step=7%",
+          "glassColor": "--gl-hw-glass-color=#72ded8",
+          "numberPx": "--gl-hw-number-px=44px",
+          "labelPx": "--gl-hw-label-px=20px",
+          "labelGap": "--gl-hw-label-gap=10px",
+          "baselineWidth": "--gl-hw-baseline-width=722px",
+          "baselineStroke": "--gl-hw-baseline-stroke=2px",
+          "pathLeft": "--gl-hw-path-left=1070px",
+          "pathTop": "--gl-hw-path-top=922px",
+          "pathPx": "--gl-hw-path-px=19px",
+          "pathWidth": "--gl-hw-path-width=760px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-hw-progress-3-of-5-brand"
+        },
+        "voice": {
+          "question": "¿Quién responde, al final?",
+          "answer": "y agentes",
+          "eyebrow": "Social care · equipos híbridos",
+          "answerLead": "Personas"
+        },
+        "body": "En social care, personas y agentes de IA comparten la bandeja. El agente gana autoridad por tramos y una persona conserva la responsabilidad.",
+        "ladderTitle": "La autoridad del agente crece por tramos",
+        "ladder": [
+          {
+            "label": "Leer y clasificar"
+          },
+          {
+            "label": "Proponer respuesta"
+          },
+          {
+            "label": "Responder lo frecuente"
+          },
+          {
+            "label": "Actuar con aprobación"
+          }
+        ],
+        "path": "Base de conocimiento → agente que propone → agente que responde → operación híbrida",
+        "selection": {
+          "label": "Social care",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.25,
+          "textPad": "per-line",
+          "also": [
+            {
+              "label": "Agente IA",
+              "anchor": "bottom-end",
+              "action": "resize",
+              "participantKind": "department"
+            }
+          ]
+        }
+      },
+      "template": "MethodHybridWorkforce",
+      "contractHash": "9c7d70991efeb813d7561543757f7b125eb2a2f4c5ab850295e8df410d27b41b",
+      "templateHash": "003a3665ee5d51d9064d8c56f5f1d85335307d749b0e760c4550f365a630aace"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

@@ -101,9 +101,9 @@ La lectura correcta **no** es «arréglalo», y tampoco marcarlo verde para que 
 
 - La pieza es **construcción de entidad**, no utilidad neutra. Sigue siendo legítima.
 - **Cambia la MEDICIÓN, no el objeto:** se mide por **menciones y citas del léxico**, no por
-  **backlinks al objeto**. Coherente con `seo-aeo`: las menciones de marca correlacionan **~3×
-  más** que los backlinks con visibilidad IA. Medirla por backlinks la declara fracasada
-  mientras cumple su función.
+  **backlinks al objeto** como única medida. Conservar contexto, fidelidad y atribución del léxico;
+  una correlación externa no demuestra causalidad ni preferencia universal de los motores.
+  Canon: `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
 - **Declarar el gate fallado y explicar por qué** es más honesto y más útil que forzar el verde.
   Se escribe en el brief, junto a la métrica de éxito que sí aplica.
 

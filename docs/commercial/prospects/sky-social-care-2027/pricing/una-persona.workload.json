@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "pricing-v3-workload/1",
+  "version": "sky-social-care-una-persona-2026-10-10",
+  "mode": "simulation",
+  "capacity": {
+    "productiveHoursPerFteMonth": "125",
+    "scheduledHoursPerFteMonth": "180",
+    "source": {
+      "reference": "design:sky-social-care-operacion-v2:seccion-10",
+      "effectiveFrom": "2026-10-10",
+      "effectiveUntil": "2026-12-31",
+      "status": "estimated"
+    }
+  },
+  "drivers": [
+    {
+      "driverId": "conversations",
+      "label": "Conversaciones públicas a responder",
+      "unit": "conversation",
+      "unitsPerMonth": "1300",
+      "minutesPerUnit": "3",
+      "source": {
+        "reference": "request:sky-2026-10-09:1300-por-mes",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "fixedWork": [
+    {
+      "workId": "service-upkeep",
+      "label": "Base de conocimiento, traspasos y revisión de calidad (60 h: lo que cabe en una sola persona con 1.300 conversaciones)",
+      "hoursPerMonth": "60",
+      "source": {
+        "reference": "design:sky-social-care-operacion-v2:seccion-10",
+        "effectiveFrom": "2026-10-10",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
+    }
+  ],
+  "lines": [
+    {
+      "lineId": "titular",
+      "driverShares": [
+        {
+          "driverId": "conversations",
+          "share": "1"
+        }
+      ],
+      "fixedWorkShares": [
+        {
+          "workId": "service-upkeep",
+          "share": "1"
+        }
+      ],
+      "reason": "Una sola persona dedicada: atiende toda la cola en horario hábil y mantiene la base. Sin holgura a 1.300 conversaciones."
+    }
+  ],
+  "rounding": {
+    "fteStep": "0.05"
+  }
+}

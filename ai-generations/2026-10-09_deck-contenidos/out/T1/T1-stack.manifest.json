@@ -1,0 +1,596 @@
+{
+  "manifestVersion": 1,
+  "artifactId": "T1-stack",
+  "input": {
+    "artifactId": "T1-stack",
+    "slides": [
+      {
+        "slideId": "deck-content-stack",
+        "contentType": "deck.content-stack",
+        "slots": {
+          "frame": {
+            "line": "brand",
+            "margin": 140,
+            "eyebrowTop": 110,
+            "questionTop": 200,
+            "answerTop": 270,
+            "answerPx": 150,
+            "bodyTop": 610,
+            "bodyPx": 26,
+            "bodyWidth": 330,
+            "answerLeading": "--gl-stk-answer-leading=0.95",
+            "answerTracking": "--gl-stk-answer-tracking=-0.04em",
+            "tileSize": "--gl-stk-tile=70px",
+            "iconSize": "--gl-stk-icon=40px",
+            "tileRadius": "--gl-stk-tile-radius=19px",
+            "tileShadowY": "--gl-stk-tile-shadow-y=14px",
+            "tileShadowBlur": "--gl-stk-tile-shadow-blur=26px",
+            "tileShadowColor": "--gl-stk-tile-shadow-color=#000814",
+            "tileShadowOpacity": "--gl-stk-tile-shadow-opacity=55%",
+            "tileGlowBlur": "--gl-stk-tile-glow-blur=22px",
+            "tileGlowOpacity": "--gl-stk-tile-glow-opacity=18%",
+            "haloColor": "--gl-stk-halo-color=#72ded8",
+            "labelWidth": "--gl-stk-label-width=350px",
+            "labelPx": "--gl-stk-label-px=28px",
+            "labelNotePx": "--gl-stk-label-note-px=18px",
+            "baseLeft": "--gl-stk-base-left=455.16px",
+            "baseTop": "--gl-stk-base-top=588px",
+            "baseWidth": "--gl-stk-base-width=480px",
+            "baseLogo": "--gl-stk-base-logo=400px",
+            "baseLogoGap": "--gl-stk-base-logo-gap=10px",
+            "baseGlowBlur": "--gl-stk-base-glow-blur=24px",
+            "baseGlowOpacity": "--gl-stk-base-glow-opacity=35%",
+            "baseLeadPx": "--gl-stk-base-lead-px=20px",
+            "baseNotePx": "--gl-stk-base-note-px=18px"
+          },
+          "back": {
+            "src": "asset-ref:layer:content-stack-back-brand"
+          },
+          "front": {
+            "src": "asset-ref:layer:content-stack-front-brand"
+          },
+          "voice": {
+            "question": "¿Con qué trabajamos?",
+            "answer": "mejor",
+            "eyebrow": "Nuestro stack",
+            "answerLead": "Con lo"
+          },
+          "body": "<strong>12</strong> herramientas en tres capas, conectadas en Efeonce: así cada pieza sale con calidad y se mide.",
+          "tiles": [
+            {
+              "left": "--gl-stk-left=1267.37px",
+              "top": "--gl-stk-top=396.5px",
+              "z": "--gl-stk-z=13",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:metricool-on-black",
+              "alt": "Metricool"
+            },
+            {
+              "left": "--gl-stk-left=1362.63px",
+              "top": "--gl-stk-top=451.5px",
+              "z": "--gl-stk-z=15",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:sprout-social-isotype",
+              "alt": "Sprout Social"
+            },
+            {
+              "left": "--gl-stk-left=1457.89px",
+              "top": "--gl-stk-top=506.5px",
+              "z": "--gl-stk-z=17",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:favikon-isotype",
+              "alt": "Favikon"
+            },
+            {
+              "left": "--gl-stk-left=1267.37px",
+              "top": "--gl-stk-top=236.5px",
+              "z": "--gl-stk-z=33",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:notion-isotype",
+              "alt": "Notion"
+            },
+            {
+              "left": "--gl-stk-left=1362.63px",
+              "top": "--gl-stk-top=291.5px",
+              "z": "--gl-stk-z=35",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:teams-isotype",
+              "alt": "Teams"
+            },
+            {
+              "left": "--gl-stk-left=1457.89px",
+              "top": "--gl-stk-top=346.5px",
+              "z": "--gl-stk-z=37",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:frameio-isotype",
+              "alt": "Frame.io"
+            },
+            {
+              "left": "--gl-stk-left=1315px",
+              "top": "--gl-stk-top=49px",
+              "z": "--gl-stk-z=52",
+              "fillFrom": "--gl-stk-fill-from-color=#001e36",
+              "fillMid": "--gl-stk-fill-mid-color=#001e36",
+              "fillTo": "--gl-stk-fill-to-color=#000000",
+              "fillMidAt": "--gl-stk-fill-mid-at=70%",
+              "edgeOpacity": "--gl-stk-edge-opacity=22%",
+              "src": "asset-ref:file:adobe-photoshop-isotype",
+              "alt": "Photoshop"
+            },
+            {
+              "left": "--gl-stk-left=1410.26px",
+              "top": "--gl-stk-top=104px",
+              "z": "--gl-stk-z=54",
+              "fillFrom": "--gl-stk-fill-from-color=#00005b",
+              "fillMid": "--gl-stk-fill-mid-color=#00005b",
+              "fillTo": "--gl-stk-fill-to-color=#000000",
+              "fillMidAt": "--gl-stk-fill-mid-at=70%",
+              "edgeOpacity": "--gl-stk-edge-opacity=22%",
+              "src": "asset-ref:file:adobe-premiere-isotype",
+              "alt": "Premiere"
+            },
+            {
+              "left": "--gl-stk-left=1219.74px",
+              "top": "--gl-stk-top=104px",
+              "z": "--gl-stk-z=54",
+              "fillFrom": "--gl-stk-fill-from-color=#0a0a0a",
+              "fillMid": "--gl-stk-fill-mid-color=#0a0a0a",
+              "fillTo": "--gl-stk-fill-to-color=#000000",
+              "fillMidAt": "--gl-stk-fill-mid-at=70%",
+              "edgeOpacity": "--gl-stk-edge-opacity=22%",
+              "src": "asset-ref:file:higgsfield-isotype",
+              "alt": "Higgsfield"
+            },
+            {
+              "left": "--gl-stk-left=1505.53px",
+              "top": "--gl-stk-top=159px",
+              "z": "--gl-stk-z=56",
+              "fillFrom": "--gl-stk-fill-from-color=#00005b",
+              "fillMid": "--gl-stk-fill-mid-color=#00005b",
+              "fillTo": "--gl-stk-fill-to-color=#000000",
+              "fillMidAt": "--gl-stk-fill-mid-at=70%",
+              "edgeOpacity": "--gl-stk-edge-opacity=22%",
+              "src": "asset-ref:file:adobe-after-effects-isotype",
+              "alt": "After Effects"
+            },
+            {
+              "left": "--gl-stk-left=1315px",
+              "top": "--gl-stk-top=159px",
+              "z": "--gl-stk-z=56",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:magnific-isotype",
+              "alt": "Magnific"
+            },
+            {
+              "left": "--gl-stk-left=1600.79px",
+              "top": "--gl-stk-top=214px",
+              "z": "--gl-stk-z=58",
+              "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+              "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+              "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+              "fillMidAt": "--gl-stk-fill-mid-at=60%",
+              "edgeOpacity": "--gl-stk-edge-opacity=60%",
+              "src": "asset-ref:file:adobe-firefly-isotype",
+              "alt": "Firefly"
+            }
+          ],
+          "labels": [
+            {
+              "left": "--gl-stk-label-left=729.47px",
+              "top": "--gl-stk-label-top=474px",
+              "tone": "rest",
+              "name": "Gestionar",
+              "note": "3 herramientas · lo que se publica"
+            },
+            {
+              "left": "--gl-stk-label-left=729.47px",
+              "top": "--gl-stk-label-top=314px",
+              "tone": "lead",
+              "name": "Coordinar",
+              "note": "3 herramientas · lo que se aprueba"
+            },
+            {
+              "left": "--gl-stk-label-left=729.47px",
+              "top": "--gl-stk-label-top=154px",
+              "tone": "rest",
+              "name": "Crear",
+              "note": "6 herramientas · lo que se produce"
+            }
+          ],
+          "base": {
+            "lead": "Todo se conecta en",
+            "note": "donde cada pieza se mide"
+          }
+        }
+      }
+    ]
+  },
+  "catalog": {
+    "name": "graphic-line-deck",
+    "version": "0.1",
+    "registryHash": "e5c3d5c0879119c86a6e2ef5075ca02d429edfbcbd3fa799a707373f43a6142a",
+    "ownerOrgId": "efeonce"
+  },
+  "slides": [
+    {
+      "slideId": "deck-content-stack",
+      "contentType": "deck.content-stack",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 150,
+          "bodyTop": 610,
+          "bodyPx": 26,
+          "bodyWidth": 330,
+          "answerLeading": "--gl-stk-answer-leading=0.95",
+          "answerTracking": "--gl-stk-answer-tracking=-0.04em",
+          "tileSize": "--gl-stk-tile=70px",
+          "iconSize": "--gl-stk-icon=40px",
+          "tileRadius": "--gl-stk-tile-radius=19px",
+          "tileShadowY": "--gl-stk-tile-shadow-y=14px",
+          "tileShadowBlur": "--gl-stk-tile-shadow-blur=26px",
+          "tileShadowColor": "--gl-stk-tile-shadow-color=#000814",
+          "tileShadowOpacity": "--gl-stk-tile-shadow-opacity=55%",
+          "tileGlowBlur": "--gl-stk-tile-glow-blur=22px",
+          "tileGlowOpacity": "--gl-stk-tile-glow-opacity=18%",
+          "haloColor": "--gl-stk-halo-color=#72ded8",
+          "labelWidth": "--gl-stk-label-width=350px",
+          "labelPx": "--gl-stk-label-px=28px",
+          "labelNotePx": "--gl-stk-label-note-px=18px",
+          "baseLeft": "--gl-stk-base-left=455.16px",
+          "baseTop": "--gl-stk-base-top=588px",
+          "baseWidth": "--gl-stk-base-width=480px",
+          "baseLogo": "--gl-stk-base-logo=400px",
+          "baseLogoGap": "--gl-stk-base-logo-gap=10px",
+          "baseGlowBlur": "--gl-stk-base-glow-blur=24px",
+          "baseGlowOpacity": "--gl-stk-base-glow-opacity=35%",
+          "baseLeadPx": "--gl-stk-base-lead-px=20px",
+          "baseNotePx": "--gl-stk-base-note-px=18px"
+        },
+        "back": {
+          "src": "asset-ref:layer:content-stack-back-brand"
+        },
+        "front": {
+          "src": "asset-ref:layer:content-stack-front-brand"
+        },
+        "voice": {
+          "question": "¿Con qué trabajamos?",
+          "answer": "mejor",
+          "eyebrow": "Nuestro stack",
+          "answerLead": "Con lo"
+        },
+        "body": "<strong>12</strong> herramientas en tres capas, conectadas en Efeonce: así cada pieza sale con calidad y se mide.",
+        "tiles": [
+          {
+            "left": "--gl-stk-left=1267.37px",
+            "top": "--gl-stk-top=396.5px",
+            "z": "--gl-stk-z=13",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:metricool-on-black",
+            "alt": "Metricool"
+          },
+          {
+            "left": "--gl-stk-left=1362.63px",
+            "top": "--gl-stk-top=451.5px",
+            "z": "--gl-stk-z=15",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:sprout-social-isotype",
+            "alt": "Sprout Social"
+          },
+          {
+            "left": "--gl-stk-left=1457.89px",
+            "top": "--gl-stk-top=506.5px",
+            "z": "--gl-stk-z=17",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:favikon-isotype",
+            "alt": "Favikon"
+          },
+          {
+            "left": "--gl-stk-left=1267.37px",
+            "top": "--gl-stk-top=236.5px",
+            "z": "--gl-stk-z=33",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:notion-isotype",
+            "alt": "Notion"
+          },
+          {
+            "left": "--gl-stk-left=1362.63px",
+            "top": "--gl-stk-top=291.5px",
+            "z": "--gl-stk-z=35",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:teams-isotype",
+            "alt": "Teams"
+          },
+          {
+            "left": "--gl-stk-left=1457.89px",
+            "top": "--gl-stk-top=346.5px",
+            "z": "--gl-stk-z=37",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:frameio-isotype",
+            "alt": "Frame.io"
+          },
+          {
+            "left": "--gl-stk-left=1315px",
+            "top": "--gl-stk-top=49px",
+            "z": "--gl-stk-z=52",
+            "fillFrom": "--gl-stk-fill-from-color=#001e36",
+            "fillMid": "--gl-stk-fill-mid-color=#001e36",
+            "fillTo": "--gl-stk-fill-to-color=#000000",
+            "fillMidAt": "--gl-stk-fill-mid-at=70%",
+            "edgeOpacity": "--gl-stk-edge-opacity=22%",
+            "src": "asset-ref:file:adobe-photoshop-isotype",
+            "alt": "Photoshop"
+          },
+          {
+            "left": "--gl-stk-left=1410.26px",
+            "top": "--gl-stk-top=104px",
+            "z": "--gl-stk-z=54",
+            "fillFrom": "--gl-stk-fill-from-color=#00005b",
+            "fillMid": "--gl-stk-fill-mid-color=#00005b",
+            "fillTo": "--gl-stk-fill-to-color=#000000",
+            "fillMidAt": "--gl-stk-fill-mid-at=70%",
+            "edgeOpacity": "--gl-stk-edge-opacity=22%",
+            "src": "asset-ref:file:adobe-premiere-isotype",
+            "alt": "Premiere"
+          },
+          {
+            "left": "--gl-stk-left=1219.74px",
+            "top": "--gl-stk-top=104px",
+            "z": "--gl-stk-z=54",
+            "fillFrom": "--gl-stk-fill-from-color=#0a0a0a",
+            "fillMid": "--gl-stk-fill-mid-color=#0a0a0a",
+            "fillTo": "--gl-stk-fill-to-color=#000000",
+            "fillMidAt": "--gl-stk-fill-mid-at=70%",
+            "edgeOpacity": "--gl-stk-edge-opacity=22%",
+            "src": "asset-ref:file:higgsfield-isotype",
+            "alt": "Higgsfield"
+          },
+          {
+            "left": "--gl-stk-left=1505.53px",
+            "top": "--gl-stk-top=159px",
+            "z": "--gl-stk-z=56",
+            "fillFrom": "--gl-stk-fill-from-color=#00005b",
+            "fillMid": "--gl-stk-fill-mid-color=#00005b",
+            "fillTo": "--gl-stk-fill-to-color=#000000",
+            "fillMidAt": "--gl-stk-fill-mid-at=70%",
+            "edgeOpacity": "--gl-stk-edge-opacity=22%",
+            "src": "asset-ref:file:adobe-after-effects-isotype",
+            "alt": "After Effects"
+          },
+          {
+            "left": "--gl-stk-left=1315px",
+            "top": "--gl-stk-top=159px",
+            "z": "--gl-stk-z=56",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:magnific-isotype",
+            "alt": "Magnific"
+          },
+          {
+            "left": "--gl-stk-left=1600.79px",
+            "top": "--gl-stk-top=214px",
+            "z": "--gl-stk-z=58",
+            "fillFrom": "--gl-stk-fill-from-color=#ffffff",
+            "fillMid": "--gl-stk-fill-mid-color=#eef3f7",
+            "fillTo": "--gl-stk-fill-to-color=#d9e3ec",
+            "fillMidAt": "--gl-stk-fill-mid-at=60%",
+            "edgeOpacity": "--gl-stk-edge-opacity=60%",
+            "src": "asset-ref:file:adobe-firefly-isotype",
+            "alt": "Firefly"
+          }
+        ],
+        "labels": [
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=474px",
+            "tone": "rest",
+            "name": "Gestionar",
+            "note": "3 herramientas · lo que se publica"
+          },
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=314px",
+            "tone": "lead",
+            "name": "Coordinar",
+            "note": "3 herramientas · lo que se aprueba"
+          },
+          {
+            "left": "--gl-stk-label-left=729.47px",
+            "top": "--gl-stk-label-top=154px",
+            "tone": "rest",
+            "name": "Crear",
+            "note": "6 herramientas · lo que se produce"
+          }
+        ],
+        "base": {
+          "lead": "Todo se conecta en",
+          "note": "donde cada pieza se mide"
+        }
+      },
+      "template": "ContentStack",
+      "contractHash": "a3274db17ab6dc235b50dd02778b615955d49816355038f807b1a01556b8810e",
+      "templateHash": "57b8c42d413fb11a0fc378c220d7f55272e2961098b81460f8bf49c504f62b83"
+    }
+  ],
+  "brandPack": {
+    "name": "axis",
+    "hash": "d6a0cf66e84ef75d5d18e4417ae185f962445d2826afe3164ca63cd6ba577078"
+  },
+  "fonts": [
+    {
+      "family": "Geist",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Geist",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Geist",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Geist",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600 italic",
+      "checksum": "b4de1c6c4adfb29175cc846d6fc80bf317f8850aef72707f74601f8910b45436"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700 italic",
+      "checksum": "733b74494c0b5856045e34eea8b899f02458ca8e0b7ebd2a887a86b64d99b0d0"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800 italic",
+      "checksum": "8d85bdf1bf460f930b2845e482d6907aaa55ad704df94e6ca7971b9fdd6a8b60"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900 italic",
+      "checksum": "ba96639e42ae0f89b531e432f90e0618a23af72345e265c610ae1ea09741cbbe"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "da1b33b82f5fb047fc50970643e66a09c28787013b0c7f2b771e5465f9ee6b9e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "dae40ca7b35fe7501bda2e4140a6860b1db47330be5d3c8ab6971fd83a70e9a5"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1984efdda0fbe207d7ac20feac2ba7c2768c92a90094b02a206c9d58cc30ff2e"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "5e8a5c3c2a56c3bc1b135645ca9637b9b64dc3fed5fbf85cb5ed144e06bb6d48"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "3a05787fc423c4d73c2846beebb56378092f17ac6698ed54765b6ca11fabccc0"
+    },
+    {
+      "family": "Bricolage Grotesque",
+      "variant": "760",
+      "checksum": "413e7357809ddd12fd80a96a8a396de0e401638d4acd3cb3e37532f0472ac682"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "707fdc5c8bab57a90061c6a8ed7b70d5ffb82fc810e994e79f90bace890c255a"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "fcff04f4bec2b3636f05ed894dc1f9a752c4cb587ee49857ec7a82abaf6ca016"
+    },
+    {
+      "family": "Poppins",
+      "variant": "300",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "400",
+      "checksum": "ccce59465ae5c61930ada5453834f60500fbd95084d85db63e0e65fad0125455"
+    },
+    {
+      "family": "Poppins",
+      "variant": "500",
+      "checksum": "a8eefb873ba9c9020665f8a98302697ce1f3b79ab2deef6ee508c0ca6a82e876"
+    },
+    {
+      "family": "Poppins",
+      "variant": "600",
+      "checksum": "7171f481b121803d007f5c6c76cd9988c0d41cce4202db9a18dff9945505d36d"
+    },
+    {
+      "family": "Poppins",
+      "variant": "700",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "800",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    },
+    {
+      "family": "Poppins",
+      "variant": "900",
+      "checksum": "1a9874b3be0fc168692a3d2327bccb4d28835653d3b91537a755296a467a83e3"
+    }
+  ],
+  "validators": []
+}

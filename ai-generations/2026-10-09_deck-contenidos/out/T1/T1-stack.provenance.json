@@ -1,0 +1,75 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "1ba312b9bdc327bda2003e07db31acb88d43dbb693bd4532422a5ef2a500d12c",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-stack",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:metricool-on-black",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/metricool-on-black.svg",
+      "sha256": "28bd449b106e66b094dad4872219f6356756048549491cf052d2feaad361e2f3"
+    },
+    {
+      "ref": "asset-ref:file:sprout-social-isotype",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/sprout-social-isotype.svg",
+      "sha256": "5241ac2beb4e51cf528077422074257cc21b0dc6aba87d8b7d30ef25007a61de"
+    },
+    {
+      "ref": "asset-ref:file:favikon-isotype",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/favikon-isotype.png",
+      "sha256": "e03b698931c67bfbe881d8d7b7153039a1bbac3b64a91030bc73e7cb93d7beaa"
+    },
+    {
+      "ref": "asset-ref:file:notion-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "sha256": "73e1972c42eeb5b337bbeb2b4a02a9315ddb1921e690725e89f1fcec96203816"
+    },
+    {
+      "ref": "asset-ref:file:teams-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/teams-isotype.svg",
+      "sha256": "fb94647100f67df8a6faf8ed52bc900ad30fdbeb15690fbdbba613335ef098db"
+    },
+    {
+      "ref": "asset-ref:file:frameio-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "sha256": "a1ba5e2f7c3eda6dca595eae3ce49b90a94417fc46fdb5762eb5aa9bf989add8"
+    },
+    {
+      "ref": "asset-ref:file:adobe-photoshop-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-photoshop-isotype.svg",
+      "sha256": "9936d22030e0fefe91663595f3de4fe3d56808f5349bea31c96a12e0bfcabcbf"
+    },
+    {
+      "ref": "asset-ref:file:adobe-premiere-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-premiere-isotype.svg",
+      "sha256": "d9d05579c4e9e539177e90ba52466caada22856e534d4bea5c10048b38c5a087"
+    },
+    {
+      "ref": "asset-ref:file:higgsfield-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/higgsfield-isotype.svg",
+      "sha256": "c5224319e65d7d6b0732e6a093de980df709cb059bd6e7fbaef4bd34677b2ea3"
+    },
+    {
+      "ref": "asset-ref:file:adobe-after-effects-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-after-effects-isotype.svg",
+      "sha256": "ee55694d66c867c46e332775adaa00123a5966e53f72f82b3559489c6763e93e"
+    },
+    {
+      "ref": "asset-ref:file:magnific-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/magnific-isotype.svg",
+      "sha256": "b567181a2fb17d96bdc230960a94327d254490ad950037e929499c625cbb898b"
+    },
+    {
+      "ref": "asset-ref:file:adobe-firefly-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/adobe-firefly-isotype.svg",
+      "sha256": "9e44c9cfef8bf62b23e8c3acd77183e4dad17adb93c2d50427e30cfb2b84b0cc"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

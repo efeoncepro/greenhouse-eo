@@ -18,13 +18,16 @@
 ## Qué y para qué
 - **Título de trabajo:**
 - **Objetivo + etapa de funnel:**
-- **Métrica de éxito:** (→ `06`)
+- **Métrica de éxito:** (→ `06`; separar entrega, presencia/representación, consideración y negocio)
+- **Panel o fuente nativa / baseline / denominador:** (si aplica; panel ≠ cuota de mercado)
 - **Pillar/cluster:**
 
 ## Audiencia
 - **ICP/segmento + JTBD:**
 - **Nivel de consciencia:** (Schwartz — calibra ángulo)
 - **Ángulo / insight propietario:**
+- **Categoría / situación de compra / mercado:** (si busca referencia en búsqueda)
+- **Capacidad de marca a representar / prueba autorizada / límites:**
 
 ## Formato y producción
 - **Formato + longitud + canal destino:** (→ `03`)

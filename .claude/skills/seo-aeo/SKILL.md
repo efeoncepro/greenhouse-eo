@@ -66,6 +66,17 @@ description: >-
    explica los comandos y la [decisión técnica](../../../docs/architecture/GREENHOUSE_DATAFORSEO_OPERATOR_CLI_DECISION_V1.md)
    gobierna transporte, allowlist, costos y lifecycle.
 
+### Liderazgo de categoría y representación de marca
+
+Para estrategia de descubrimiento, visibilidad de marca, liderazgo de categoría o evaluación non-brand,
+cargar el [método operativo](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) y usar
+[plan de categoría](templates/category-leadership-plan.md). Norte: ser descubiertos, comprendidos y
+considerados como opción de referencia para categoría, comprador y situación delimitados. El liderazgo
+es aspiración; no garantía ni resultado probado por un ranking/panel. Visibilidad de marca puede surgir
+ante consultas non-brand: separar intención, presencia, cita, fidelidad y recomendación, luego conectar
+con consideración y negocio observados. Branded/non-brand, tráfico absoluto y métricas por superficie
+se conservan; nunca convertir un panel sintético en cuota real de mercado ni citas en ventas causales.
+
 ### AEO X-Ray / Radiografía AEO
 
 Para preparar, extender o revisar una muestra de trabajo, cargar
@@ -149,15 +160,10 @@ la tienda y convertir la ficha) · descubrimiento por IA (Ask Play, Gemini, Pers
 Collections, Siri/Spotlight). Para un cliente con app, la tienda es una superficie más del
 mismo trabajo, no otra disciplina → `modules/10_ASO_APP_DISCOVERY.md`.
 
-**Por qué importa ahora (data verificada 2026-06):**
-
-- AI Overviews aparecen en ~**48–50%** de las búsquedas en Google (Mar 2026).
-- **65%** de las búsquedas terminan sin click; **83%** cuando hay AI Overview.
-- Pero las marcas **citadas dentro** del AI Overview ganan ~**35% más** clicks
-  orgánicos que el #1 orgánico debajo de la respuesta. → El juego pasó de
-  "rankear #1" a "ser la fuente citada".
-- Solo **~11%** de los dominios citados se solapan entre ChatGPT y Perplexity
-  (sobre 680M citas). → No hay un único "AEO". Cada motor es un canal.
+**Evidencia y límites:** las respuestas de IA pueden asociarse con menos clics; los estudios de Pew y
+Ahrefs, con muestras/fechas y límites, están en el método de liderazgo §7. Eso no demuestra que el
+90–95% del tráfico B2B será branded ni que desaparece el descubrimiento genérico. Recuperación y
+medición se verifican por plataforma; no hay señal universal que garantice cita o recomendación.
 
 ---
 

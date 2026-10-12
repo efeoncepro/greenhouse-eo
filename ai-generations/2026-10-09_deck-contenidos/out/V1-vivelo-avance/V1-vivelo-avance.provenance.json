@@ -1,0 +1,36 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "e26bf69bf0edddc7fd98999007b9459c021adcc665cd87b834846399fbf53a86",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day.live-progress",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:pieza-video-creadora-review-340x425",
+      "path": "ai-generations/2026-10-09_deck-contenidos/ui/pieza-video-creadora.png",
+      "sha256": "a99d4cd2ae3bc6d43e33a231468bd2c4b734e842f6b56ddfa2303a61d0cefbdb"
+    }
+  ],
+  "files": [
+    {
+      "ref": "asset-ref:file:notion-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/notion-isotype.svg",
+      "sha256": "73e1972c42eeb5b337bbeb2b4a02a9315ddb1921e690725e89f1fcec96203816"
+    },
+    {
+      "ref": "asset-ref:file:frameio-isotype",
+      "path": "src/lib/artifact-composer/catalogs/deck-axis/assets/tools/frameio-isotype.svg",
+      "sha256": "a1ba5e2f7c3eda6dca595eae3ce49b90a94417fc46fdb5762eb5aa9bf989add8"
+    },
+    {
+      "ref": "asset-ref:file:efeonce-isotype-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/efeonce-isotype-negative.svg",
+      "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

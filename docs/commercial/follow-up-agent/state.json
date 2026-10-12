@@ -1004,6 +1004,57 @@
       "last_task_status_readback_at": "2026-10-09T19:09:39.197666+00:00",
       "last_followup_summary": "Clave: followup:65843869022:pierre-fabre. Armar credenciales, casos, certificaciones, estructura y cobertura. Revisión interna 23/10; meta de envío 28/10; cierre 30/10/2026 sin hora publicada. Formulario y destinatario verificados en el expediente y cuerpo de esta tarea. No es una postulación enviada ni un GO final.",
       "reused_existing_task": true
+    },
+    {
+      "key": "followup:lead:519302-9-LE26",
+      "lead_id": "595750420294",
+      "company_id": "34939665568",
+      "note_id": "118339677186",
+      "tender_id": "519302-9-LE26",
+      "title": "INAPI — Campañas de marketing digital — calificar viabilidad",
+      "internal_due": "2026-10-16T12:00:00-03:00",
+      "notion_task_id": "3f539c2f-efe7-8108-bd57-fef0ab6e5002",
+      "notion_url": "https://app.notion.com/p/3f539c2fefe78108bd57fef0ab6e5002?pvs=204",
+      "status": "todo",
+      "write_status": "verified",
+      "draft_location": null,
+      "external_deadline": "2026-11-02T19:00:00Z",
+      "deadline_source": "Mercado Público y LicitaLAB live 10/10",
+      "tender_source_status": "Publicada",
+      "notion_status": "Sin empezar",
+      "dossier": "docs/commercial/tenders/inapi-marketing-digital-519302-9-le26/README.md",
+      "last_followup_summary": "Alta de radar; sin GO. Referencias, metas contradictorias y caja pendientes.",
+      "last_task_status_readback_at": "2026-10-10T16:56:05Z"
+    },
+    {
+      "key": "followup:lead:1330-22-COT26",
+      "lead_id": "595750420295",
+      "company_id": "31640422315",
+      "note_id": "118333867172",
+      "tender_id": "1330-22-COT26",
+      "title": "SERNATUR Arica — Campaña medios online — calificar viabilidad",
+      "notion_task_id": "3f539c2f-efe7-81e6-a035-df7493f63a1e",
+      "notion_url": "https://app.notion.com/p/3f539c2fefe781e6a035df7493f63a1e?pvs=204",
+      "status": "cancelled",
+      "write_status": "verified",
+      "draft_location": null,
+      "external_deadline": "2026-10-12T21:00:00Z",
+      "deadline_source": "LicitaLAB live 10/10; oficial SPA sin fecha corroborada",
+      "tender_source_status": "Publicada",
+      "notion_status": "Cancelada",
+      "dossier": "docs/commercial/tenders/sernatur-arica-medios-online-1330-22-cot26/README.md",
+      "last_followup_summary": "NO-BID por instrucción explícita de Julio10Oct: «Descarta la de ARICa». Lead Disqualified/NO_INTEREST; tarea Cancelada. Sin nuevas alertas de preparación; fee total710k por20/10–15/12 como contexto, no motivo adicional declarado.",
+      "last_task_status_readback_at": "2026-10-10T17:36:20Z",
+      "decision": "NO-BID",
+      "closed_by": "Julio Reyes",
+      "closed_at": "2026-10-10T17:36:20Z",
+      "lead_stage": "unqualified-stage-id",
+      "lead_stage_label": "Disqualified",
+      "lead_is_open": false,
+      "lead_disqualification_reason": "NO_INTEREST",
+      "suppressed": true,
+      "no_reopen_without_explicit_instruction": true,
+      "internal_due_historical": "2026-10-12T09:00:00-03:00"
     }
   ],
   "outlook_drafts": {
@@ -2014,5 +2065,28 @@
     "lead_stage_pending": "595416937988",
     "notion_cancelled": 2,
     "readbacks_verified": true
+  },
+  "focal_deltas": [
+    {
+      "observed_at": "2026-10-10T16:56:05Z",
+      "scope": "519302-9-LE26 / 1330-22-COT26",
+      "report": "docs/commercial/follow-up-agent/runs/2026-10-10-inapi-arica-intake.md",
+      "new_leads": 2,
+      "new_notes": 2,
+      "new_notion_tasks": 2,
+      "global_coverage_refreshed": false
+    },
+    {
+      "observed_at": "2026-10-10T17:36:20Z",
+      "scope": "1330-22-COT26",
+      "decision": "NO-BID",
+      "lead_update": "verified Disqualified/NO_INTEREST, open=false",
+      "notion_update": "verified Cancelada",
+      "report": "docs/commercial/follow-up-agent/runs/2026-10-10-arica-no-bid.md",
+      "global_coverage_refreshed": false
+    }
+  ],
+  "protected_decisions": {
+    "sernatur_arica_1330_22_cot26": "NO-BID by Julio 2026-10-10. Lead595750420295 Disqualified/NO_INTEREST and Notion task Cancelada verified. Suppress preparation alerts and preserve dossier; reopen only on explicit operator instruction."
   }
 }

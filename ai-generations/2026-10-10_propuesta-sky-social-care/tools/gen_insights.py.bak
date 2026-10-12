@@ -1,0 +1,582 @@
+#!/usr/bin/env python3
+"""Prototipo: Efeonce Insights extendido con el módulo Social care (informe live + A4). Cifras de ejemplo."""
+import json
+import math
+import sys
+from pathlib import Path
+
+OUT = Path(sys.argv[1])
+
+# Tokens copiados de efeonce-think/src/lib/insights-tokens.ts (orbita, dataRoles, variation)
+GROUND, NAVY, PAPER, SURFACE = "#001a33", "#023c70", "#f7f8f6", "#ffffff"
+SOFT_DARK, SOFT_LIGHT, HALO = "#cfe4fa", "#6d6777", "#72ded8"
+ACC_DARK, ACC_LIGHT = "#36c8bf", "#0e8c82"
+D_CUR, D_PREV, D_THIRD, D_GAP = "#023c70", "#1f9e94", "#8da7bf", "#e0745c"
+INK = "#020061"
+RULE_P = "#dfe4ec"
+BETTER, NEUTRAL_BG = "#0d6b3f", "#e9edf3"
+TILE = "#10253f"
+
+P = "font-family: 'Poppins', system-ui, sans-serif"
+B = "font-family: 'Bricolage Grotesque', system-ui, sans-serif"
+
+LOCKUP_NEG = "/_blob/ea442590e8eb589de204ec7288963c31"
+LOGO_NEG = "/_blob/503823171b96284f634ef670092872d3"
+LOGO_POS = "/_blob/ad9b07614674548d6a8179314a25daca"
+URL_LIGHT = "/_blob/cbdda01a58239fbcb86b97a7fe3a1e35"
+SKY_ON_DARK = "/_blob/0a55139651dbb9d1b8fcf43fcd89f7a8"
+
+PERIOD, PRIOR = "mayo 2027", "abril 2027"
+
+
+def page(title, w, h, bg, body):
+    return (
+        '<!doctype html>\n<html lang="es">\n<head>\n<meta charset="utf-8">\n'
+        f'<title>{title}</title>\n<script src="./support.js"></script>\n</head>\n<body>\n<x-dc>\n<helmet>\n'
+        '<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800'
+        '&amp;family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&amp;display=swap" rel="stylesheet">\n'
+        f'<style>\nbody{{margin:0;background:{bg}}}\n</style>\n</helmet>\n'
+        f'<div style="position: relative; width: {w}px; height: {h}px; overflow: hidden; background: {bg}">\n'
+        f'{body}\n</div>\n</x-dc>\n'
+        '<script type="text/x-dc" data-dc-script data-props=\'{"$preview":{"width":' + str(w) + ',"height":' + str(h) + '}}\'>\n'
+        'class Component extends DCLogic { renderVals() { return {}; } }\n</script>\n</body>\n</html>\n'
+    )
+
+
+def tri(direction, color, size=9):
+    d = "M4.5 0.5 L8.5 7.5 H0.5 Z" if direction == "up" else "M4.5 7.5 L8.5 0.5 H0.5 Z"
+    return (f'<svg aria-hidden="true" viewBox="0 0 9 8" width="{size}" height="{size * 8 / 9:.1f}">'
+            f'<path d="{d}" fill="{color}" stroke="{color}" stroke-width="1.4" stroke-linejoin="round"></path></svg>')
+
+
+def pill(direction, text, tone, fs=13):
+    if tone == "better":
+        bg, fg = "rgba(13, 107, 63, 0.12)", BETTER
+    else:
+        bg, fg = NEUTRAL_BG, INK
+    return (f'<span style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; '
+            f'background: {bg}; color: {fg}; {P}; font-size: {fs}px; font-weight: 600">{tri(direction, fg)}{text}</span>')
+
+
+def fact_mark(kind, color, label_color, source, fs=13):
+    dash = ' stroke-dasharray="2.2 2.2"' if kind in ("Estimado", "") else ""
+    return (f'<span style="display: inline-flex; align-items: center; gap: 8px; {P}; font-size: {fs}px; color: {label_color}">'
+            f'<svg aria-hidden="true" viewBox="0 0 12 12" width="11" height="11"><circle cx="6" cy="6" r="4.2" fill="none" stroke="{color}" stroke-width="2"{dash}></circle></svg>'
+            f'<span style="font-weight: 600; color: {color}">{kind}</span><span>{source}</span></span>')
+
+
+ICONS = {
+    "chat": '<path d="M3 5.5h14v8.5H9l-3.5 3V14H3z"></path>',
+    "clock": '<circle cx="10" cy="10" r="7"></circle><path d="M10 6v4.2l2.8 1.8"></path>',
+    "target": '<circle cx="10" cy="10" r="7"></circle><circle cx="10" cy="10" r="3"></circle>',
+    "check": '<circle cx="10" cy="10" r="7"></circle><path d="M6.8 10.2l2.2 2.2 4.2-4.6"></path>',
+    "forward": '<path d="M3 10h13"></path><path d="M11.5 5.5L16 10l-4.5 4.5"></path>',
+    "cursor": '<path d="M5 3.5l10 5-4.2 1.4L9.4 14z"></path><path d="M11.4 11.4l3.4 3.4"></path>',
+}
+
+
+def icon(name, color, size=18):
+    return (f'<svg aria-hidden="true" viewBox="0 0 20 20" width="{size}" height="{size}" fill="none" stroke="{color}" '
+            f'stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0">{ICONS[name]}</svg>')
+
+
+# Cifras de ejemplo, coherentes entre sí (1.284 conversaciones = 655 precio + 311 generales + 318 reclamos)
+STATS = [
+    ("chat", "Conversaciones", "1.284", "", ("up", "9,2 %", "neutral"), "1.176", False),
+    ("clock", "Primera respuesta", "38", "min", ("down", "26,9 %", "better"), "52 min", True),
+    ("target", "Dentro del tiempo", "93,4", "%", ("up", "3,3 pp", "better"), "90,1 %", False),
+    ("check", "Nota de calidad", "94", "/ 100", ("up", "2 pts", "better"), "92", False),
+    ("forward", "Traspasos tomados", "81", "%", ("up", "5 pp", "better"), "76 %", False),
+    ("cursor", "Clics a tarifas", "2.140", "", ("up", "14,7 %", "better"), "1.865", False),
+]
+
+
+def stat_cell(s, big, name_fs, vs_fs, pad, border):
+    ico, name, val, unit, (d, txt, tone), prior, lower = s
+    unit_html = (f'<span style="font-size: {big * 0.36:.0f}px; font-weight: 600; margin-left: 6px">{unit}</span>' if unit else "")
+    lower_html = (f'<div style="margin-top: 8px; {P}; font-size: {max(vs_fs - 3, 9)}px; font-weight: 600; letter-spacing: 0.12em; '
+                  f'text-transform: uppercase; color: {SOFT_LIGHT}">↓ Menor es mejor</div>' if lower else "")
+    return (
+        f'<div style="padding: {pad}; {border}">'
+        f'<div style="display: flex; align-items: center; gap: 10px; {P}; font-size: {name_fs}px; font-weight: 600; color: {INK}">{icon(ico, INK, name_fs + 3)}{name}</div>'
+        f'<div style="margin-top: 6px; {P}; font-size: {big}px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; color: {NAVY}; font-variant-numeric: tabular-nums">{val}{unit_html}</div>'
+        f'<div style="margin-top: 10px">{pill(d, txt, tone, max(vs_fs - 1, 11))}</div>'
+        f'<div style="margin-top: 10px; {P}; font-size: {vs_fs}px; color: {INK}">vs <span style="font-weight: 600">{prior}</span> en {PRIOR}</div>'
+        f'{lower_html}</div>'
+    )
+
+
+def stat_grid(big, name_fs, vs_fs, pad):
+    cells = []
+    for i, s in enumerate(STATS):
+        b = []
+        if i % 3 != 2:
+            b.append(f"border-right: 1px solid {RULE_P}")
+        if i < 3:
+            b.append(f"border-bottom: 1px solid {RULE_P}")
+        cells.append(stat_cell(s, big, name_fs, vs_fs, pad, "; ".join(b)))
+    return '<div style="display: grid; grid-template-columns: 1fr 1fr 1fr">\n' + "\n".join(cells) + "\n</div>"
+
+
+TARGETS = [
+    ("target", "Dentro del tiempo", "porcentaje", "93,4 %", "meta 90 %", 93.4, 90.0, False),
+    ("check", "Nota de calidad", "puntos sobre 100", "94", "meta 90", 94.0, 90.0, False),
+    ("clock", "Alertas avisadas a tiempo", "porcentaje", "100 %", "meta 100 %", 100.0, 100.0, False),
+    ("chat", "Cobertura de la base", "porcentaje", "91,8 %", "meta 95 %", 91.8, 95.0, True),
+]
+
+
+def bullet_rows(name_w, name_fs, sub_fs, track_h, row_pad):
+    rows = []
+    for ico, name, unit, got, meta, v, m, gap in TARGETS:
+        ratio = v / m
+        width = min(ratio * 90, 100)
+        color = D_GAP if gap else D_CUR
+        pct = f"{round(ratio * 100)} %"
+        if gap:
+            badge = (f'<span style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; background: rgba(224, 116, 92, 0.16); '
+                     f'color: {INK}; {P}; font-size: {sub_fs + 1}px; font-weight: 600">{tri("down", D_GAP)}{pct}</span>')
+        elif ratio > 1:
+            badge = (f'<span style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; background: {NAVY}; '
+                     f'color: #ffffff; {P}; font-size: {sub_fs + 1}px; font-weight: 600">{tri("up", ACC_DARK)}{pct}</span>')
+        else:
+            badge = (f'<span style="display: inline-flex; align-items: center; gap: 7px; padding: 5px 12px; border-radius: 999px; background: {NEUTRAL_BG}; '
+                     f'color: {INK}; {P}; font-size: {sub_fs + 1}px; font-weight: 600">{pct}</span>')
+        rows.append(
+            f'<div style="display: flex; align-items: center; gap: 20px; padding: {row_pad}px 0; border-top: 1px solid {RULE_P}">'
+            f'<div style="width: {name_w}px; flex-shrink: 0"><div style="display: flex; align-items: center; gap: 9px; {P}; font-size: {name_fs}px; font-weight: 600; color: {INK}">{icon(ico, INK, name_fs + 3)}{name}</div>'
+            f'<div style="margin-top: 3px; margin-left: {name_fs + 12}px; {P}; font-size: {sub_fs}px; color: {NAVY}">{unit}</div></div>'
+            f'<div style="flex: 1"><div style="position: relative; height: {track_h}px; border-radius: {track_h / 2}px; background: {NEUTRAL_BG}">'
+            f'<div style="position: absolute; left: 0; top: 0; height: {track_h}px; width: {width:.1f}%; border-radius: {track_h / 2}px; background: {color}"></div>'
+            f'<div style="position: absolute; left: 90%; top: -{track_h * 0.6:.0f}px; width: 2px; height: {track_h * 2.2:.0f}px; background: {INK}"></div></div>'
+            f'<div style="margin-top: 8px; display: flex; justify-content: space-between; {P}; font-size: {sub_fs}px; color: {INK}"><span><span style="font-weight: 600">{got}</span> logrado</span><span style="margin-right: 4%">{meta}</span></div></div>'
+            f'<div style="width: 86px; flex-shrink: 0; text-align: right">{badge}</div></div>')
+    return "\n".join(rows)
+
+
+def legend(items, fs=12):
+    return ('<div style="display: flex; gap: 18px; flex-wrap: wrap">' + "".join(
+        f'<span style="display: inline-flex; align-items: center; gap: 7px; {P}; font-size: {fs}px; color: {INK}">'
+        f'<span style="width: 11px; height: 11px; border-radius: 3px; background: {c}"></span>{t}</span>' for c, t in items) + "</div>")
+
+
+WEEKS = [("Semana 1", 120, 72, 76), ("Semana 2", 140, 76, 75), ("Semana 3", 235, 85, 82), ("Semana 4", 160, 78, 85)]
+assert sum(w[1] for w in WEEKS) == 655 and sum(w[2] for w in WEEKS) == 311 and sum(w[3] for w in WEEKS) == 318
+
+
+def stacked_svg(w, h):
+    base, top, scale = h - 34, 26, (h - 34 - 26) / 420
+    bar_w, gap = 78, (w - 60 - 4 * 78) / 3
+    parts = [f'<line x1="40" y1="{base}" x2="{w}" y2="{base}" stroke="{RULE_P}" stroke-width="1"></line>']
+    for tick in (100, 200, 300, 400):
+        y = base - tick * scale
+        parts.append(f'<line x1="40" y1="{y:.1f}" x2="{w}" y2="{y:.1f}" stroke="{RULE_P}" stroke-width="1" stroke-dasharray="2 4"></line>')
+        parts.append(f'<text x="32" y="{y + 4:.1f}" text-anchor="end" font-family="Poppins, sans-serif" font-size="11" fill="{SOFT_LIGHT}">{tick}</text>')
+    for i, (label, a, b, c) in enumerate(WEEKS):
+        x = 60 + i * (bar_w + gap)
+        y = base
+        for value, color in ((a, D_CUR), (b, D_PREV), (c, D_THIRD)):
+            hh = value * scale
+            y -= hh
+            parts.append(f'<rect x="{x:.1f}" y="{y:.1f}" width="{bar_w}" height="{hh - 2:.1f}" rx="4" fill="{color}"></rect>')
+        parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{y - 8:.1f}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="14" font-weight="700" fill="{NAVY}">{a + b + c}</text>')
+        parts.append(f'<text x="{x + bar_w / 2:.1f}" y="{base + 22}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="12" fill="{INK}">{label}</text>')
+    return f'<svg viewBox="0 0 {w} {h}" width="{w}" height="{h}" role="img" aria-label="Conversaciones por semana y tipo">{"".join(parts)}</svg>'
+
+
+def donut_svg(size):
+    r, cx = size * 0.36, size / 2
+    circ = 2 * math.pi * r
+    parts, offset = [], 0.0
+    for value, color in ((258, D_CUR), (37, D_PREV), (23, D_THIRD)):
+        length = value / 318 * circ
+        parts.append(f'<circle cx="{cx}" cy="{cx}" r="{r:.1f}" fill="none" stroke="{color}" stroke-width="{size * 0.1:.1f}" '
+                     f'stroke-dasharray="{length - 3:.1f} {circ - length + 3:.1f}" stroke-dashoffset="{-offset:.1f}" transform="rotate(-90 {cx} {cx})"></circle>')
+        offset += length
+    parts.append(f'<text x="{cx}" y="{cx + 4}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="{size * 0.17:.0f}" font-weight="700" fill="{NAVY}">318</text>')
+    parts.append(f'<text x="{cx}" y="{cx + size * 0.1:.0f}" text-anchor="middle" font-family="Poppins, sans-serif" font-size="{size * 0.048:.0f}" fill="{SOFT_LIGHT}">reclamos derivados</text>')
+    return f'<svg viewBox="0 0 {size} {size}" width="{size}" height="{size}" role="img" aria-label="Reclamos derivados por estado">{"".join(parts)}</svg>'
+
+
+RANK = [
+    ("Promoción de mayo: qué fechas de vuelo aplican", 269),
+    ("Santiago–Lima: precio final con tasas", 96),
+    ("Qué equipaje incluye la tarifa", 88),
+    ("Medios de pago y cuotas", 61),
+    ("Santiago–Buenos Aires: disponibilidad", 54),
+    ("Otros temas", 87),
+]
+assert sum(v for _, v in RANK) == 655
+
+
+def rank_rows(fs, bar_h, pad, name_w):
+    rows = []
+    for i, (name, v) in enumerate(RANK):
+        color = D_CUR if i == 0 else (D_THIRD if name == "Otros temas" else D_PREV)
+        rows.append(
+            f'<div style="display: flex; align-items: center; gap: 16px; padding: {pad}px 0; border-top: 1px solid {RULE_P}">'
+            f'<div style="width: 22px; {P}; font-size: {fs - 2}px; font-weight: 600; color: {SOFT_LIGHT}">{i + 1:02d}</div>'
+            f'<div style="width: {name_w}px; flex-shrink: 0; {P}; font-size: {fs}px; font-weight: 500; line-height: 1.3; color: {INK}">{name}</div>'
+            f'<div style="flex: 1; height: {bar_h}px; border-radius: {bar_h / 2}px; background: {NEUTRAL_BG}"><div style="height: {bar_h}px; width: {v / 269 * 100:.1f}%; border-radius: {bar_h / 2}px; background: {color}"></div></div>'
+            f'<div style="width: 78px; text-align: right; {P}; font-size: {fs + 2}px; font-weight: 700; color: {NAVY}; font-variant-numeric: tabular-nums">{v}<span style="font-size: {fs - 3}px; font-weight: 500; color: {SOFT_LIGHT}"> · {round(v / 655 * 100)} %</span></div></div>')
+    return "\n".join(rows)
+
+
+def chip_dark(text, selected=False, new=False):
+    if selected:
+        st = "background: #ffffff; color: #001a33; border: 1px solid #ffffff"
+    else:
+        st = f"color: {SOFT_DARK}; border: 1px solid rgba(207, 228, 250, 0.22)"
+    tag = (f'<span style="margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: {ACC_LIGHT}; color: #ffffff; font-size: 10px; '
+           f'font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase">Nuevo</span>' if new else "")
+    return f'<span style="display: inline-flex; align-items: center; padding: 8px 16px; border-radius: 999px; {P}; font-size: 14px; font-weight: 500; {st}">{text}{tag}</span>'
+
+
+PROTO = "Prototipo · cifras de ejemplo"
+BOARDS = {}
+
+# ============================================================== LIVE 01 · hero
+cx, cy, r = 1150, 470, 330
+ang_end, ang_start = math.radians(336), math.radians(286)
+sx, sy = cx + r * math.sin(ang_start), cy - r * math.cos(ang_start)
+ex, ey = cx + r * math.sin(ang_end), cy - r * math.cos(ang_end)
+orbit = (
+    f'<svg aria-hidden="true" viewBox="0 0 1440 960" width="1440" height="960" style="position: absolute; left: 0; top: 0">'
+    f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="none" stroke="{HALO}" stroke-opacity="0.2" stroke-width="1.6"></circle>'
+    f'<line x1="{cx}" y1="{cy - r - 7}" x2="{cx}" y2="{cy - r + 7}" stroke="{HALO}" stroke-opacity="0.6" stroke-width="1.6"></line>'
+    f'<path d="M{sx:.1f} {sy:.1f} A{r} {r} 0 0 1 {ex:.1f} {ey:.1f}" fill="none" stroke="{ACC_DARK}" stroke-width="4" stroke-linecap="round"></path>'
+    f'<circle cx="{ex:.1f}" cy="{ey:.1f}" r="10" fill="{ACC_DARK}"></circle></svg>')
+hero = (
+    f'<div style="position: absolute; left: 0; top: 0; width: 1440px; height: 960px; background: radial-gradient(circle 560px at 1150px 470px, rgba(54, 200, 191, 0.2), rgba(0, 26, 51, 0) 70%)"></div>\n{orbit}\n'
+    f'<img src="{LOCKUP_NEG}" alt="Efeonce Insights" style="position: absolute; left: 80px; top: 32px; height: 32px; width: auto">\n'
+    f'<div style="position: absolute; right: 80px; top: 30px; display: flex; gap: 10px">'
+    f'<span style="display: inline-flex; align-items: center; gap: 9px; padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(207, 228, 250, 0.22); {P}; font-size: 14px; color: {SOFT_DARK}">'
+    f'<span style="width: 8px; height: 8px; border-radius: 50%; background: {ACC_DARK}"></span>{PROTO}</span></div>\n'
+    f'<div style="position: absolute; left: {cx - 240}px; top: {cy - 118}px; width: 480px; text-align: center">'
+    f'<div style="{B}; font-size: 136px; font-weight: 760; letter-spacing: -0.05em; line-height: 1; color: #ffffff">93,4<span style="font-size: 62px; margin-left: 8px">%</span></div>'
+    f'<div style="margin-top: 8px; {P}; font-size: 19px; font-weight: 500; color: #ffffff">de las conversaciones, a tiempo</div>'
+    f'<div style="margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(40, 199, 111, 0.6); {P}; font-size: 14px; font-weight: 600; color: #d0f3ff">'
+    f'<svg viewBox="0 0 9 8" width="10" height="9"><path d="M4.5 0.5 L8.5 7.5 H0.5 Z" fill="#28c76f" stroke="#28c76f" stroke-width="1.4" stroke-linejoin="round"></path></svg>3,3 pp sobre abril · objetivo 90 %</div></div>\n'
+    f'<div style="position: absolute; left: 80px; top: 208px; width: 690px; display: flex; flex-direction: column">'
+    f'<div style="{P}; font-size: 14px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: {SOFT_DARK}">Atención en comentarios&nbsp;&nbsp;·&nbsp;&nbsp;1 al 31 de mayo de 2027</div>'
+    f'<div style="margin-top: 22px; {B}; font-size: 62px; letter-spacing: -0.04em; line-height: 1.02; color: #ffffff"><span style="font-weight: 740">Nueve de cada diez respuestas llegaron a tiempo.</span> '
+    f'<span style="font-weight: 340; color: {SOFT_DARK}">La fricción está en una promoción.</span></div>'
+    f'<div style="margin-top: 30px; {P}; font-size: 20px; font-weight: 400; line-height: 1.6; color: {SOFT_DARK}; max-width: 640px">El equipo atendió 1.284 conversaciones en las 13 cuentas y bajó la primera respuesta de 52 a 38 minutos. '
+    f'Cuatro de cada diez dudas de precio preguntan por la misma promoción: la pieza no deja claras sus fechas.</div>'
+    f'<div style="margin-top: 36px; display: flex; align-items: center; gap: 16px"><span style="{P}; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_DARK}">Preparado para</span>'
+    f'<span style="display: inline-flex; align-items: center; padding: 12px 20px; border-radius: 12px; background: {NAVY}"><img src="{SKY_ON_DARK}" alt="SKY Airline" style="height: 26px; width: auto"></span></div>'
+    f'</div>\n'
+    f'<div style="position: absolute; left: 80px; top: 892px; display: flex; gap: 28px; {P}; font-size: 14px; color: {SOFT_DARK}"><span style="font-weight: 600; color: #ffffff">SKY Airline</span><span>Edición de mayo · prototipo, sin emitir</span><span>datos al 31 de mayo</span></div>\n'
+    f'<div style="position: absolute; right: 80px; top: 868px; width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(207, 228, 250, 0.3); display: flex; align-items: center; justify-content: center; color: #ffffff; {P}; font-size: 20px">↓</div>'
+)
+BOARDS["ins-live-01-hero.dc.html"] = ("Insights live · portada", 1440, 960, page("Insights live · portada (prototipo)", 1440, 960, GROUND, hero))
+
+# ============================================================== LIVE 02 · lo esencial
+def viz_bars(a, b, la, lb):
+    hmax = 96
+    ha, hb = hmax, hmax * b / a
+    return (f'<svg viewBox="0 0 190 130" width="190" height="130" aria-hidden="true"><rect x="22" y="{106 - ha:.0f}" width="58" height="{ha:.0f}" rx="8" fill="#8aa8d8" fill-opacity="0.55"></rect>'
+            f'<rect x="108" y="{106 - hb:.0f}" width="58" height="{hb:.0f}" rx="8" fill="{ACC_DARK}"></rect>'
+            f'<text x="51" y="126" text-anchor="middle" font-family="Poppins, sans-serif" font-size="13" fill="{SOFT_DARK}">{la}</text><text x="137" y="126" text-anchor="middle" font-family="Poppins, sans-serif" font-size="13" font-weight="600" fill="#ffffff">{lb}</text></svg>')
+
+
+def viz_share(n):
+    cells = "".join(f'<rect x="{(i % 5) * 37 + 3}" y="{(i // 5) * 37 + 12}" width="30" height="30" rx="8" fill="{ACC_DARK if i < n else "#8aa8d8"}" fill-opacity="{1 if i < n else 0.25}"></rect>' for i in range(10))
+    return (f'<svg viewBox="0 0 190 130" width="190" height="130" aria-hidden="true">{cells}<text x="3" y="112" font-family="Poppins, sans-serif" font-size="13" fill="{SOFT_DARK}">{n} de cada 10 dudas</text></svg>')
+
+
+def viz_ring(frac, color):
+    r, c = 44, 2 * math.pi * 44
+    return (f'<svg viewBox="0 0 190 130" width="190" height="130" aria-hidden="true"><circle cx="126" cy="62" r="{r}" fill="none" stroke="#8aa8d8" stroke-opacity="0.28" stroke-width="16"></circle>'
+            f'<circle cx="126" cy="62" r="{r}" fill="none" stroke="{color}" stroke-width="16" stroke-linecap="round" stroke-dasharray="{frac * c:.1f} {c:.1f}" transform="rotate(-90 126 62)"></circle>'
+            f'<text x="126" y="68" text-anchor="middle" font-family="Poppins, sans-serif" font-size="16" font-weight="700" fill="#ffffff">60 de 318</text></svg>')
+
+
+def viz_spark():
+    pts = [(8, 104), (92, 86), (176, 30)]
+    line = " ".join(f"{x},{y}" for x, y in pts)
+    return (f'<svg viewBox="0 0 190 130" width="190" height="130" aria-hidden="true"><polygon points="8,118 {line} 176,118" fill="{ACC_DARK}" fill-opacity="0.16"></polygon>'
+            f'<polyline points="{line}" fill="none" stroke="{ACC_DARK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline><circle cx="176" cy="30" r="7" fill="{ACC_DARK}"></circle>'
+            f'<text x="8" y="128" font-family="Poppins, sans-serif" font-size="12" fill="{SOFT_DARK}">marzo a mayo</text></svg>')
+
+
+def tile(chip_text, figure, text, mark, source, wide=False, viz=None):
+    plus = (f'<span style="position: absolute; right: 24px; top: 24px; width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(207, 228, 250, 0.3); '
+            f'display: flex; align-items: center; justify-content: center; color: #ffffff; {P}; font-size: 20px">+</span>')
+    chip = (f'<span style="display: inline-flex; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(207, 228, 250, 0.26); {P}; font-size: 12px; font-weight: 600; '
+            f'letter-spacing: 0.04em; color: {SOFT_DARK}">{chip_text}</span>')
+    base = f"position: relative; box-sizing: border-box; border-radius: 24px; background: {TILE}; border: 1px solid rgba(207, 228, 250, 0.14); padding: 24px"
+    if wide:
+        return (f'<div style="{base}; height: 320px; grid-column: 1 / span 2">{chip}{plus}'
+                f'<div style="position: absolute; left: 28px; bottom: 10px; {B}; font-size: 150px; font-weight: 760; letter-spacing: -0.05em; line-height: 1; color: {ACC_DARK}">{figure}</div>'
+                f'<div style="position: absolute; left: 692px; bottom: 32px; width: 540px"><div style="margin-bottom: 22px"><div style="position: relative; height: 14px; border-radius: 7px; background: rgba(138, 168, 216, 0.25)">'
+                f'<div style="position: absolute; left: 0; top: 0; height: 14px; width: 93.4%; border-radius: 7px; background: {ACC_DARK}"></div><div style="position: absolute; left: 90%; top: -7px; width: 2px; height: 28px; background: #ffffff"></div></div>'
+                f'<div style="margin-top: 8px; display: flex; justify-content: space-between; {P}; font-size: 13px; color: {SOFT_DARK}"><span>93,4 % logrado</span><span style="margin-right: 5%">objetivo 90 %</span></div></div>'
+                f'<div style="{P}; font-size: 24px; font-weight: 500; line-height: 1.35; color: #ffffff">{text}</div>'
+                f'<div style="margin-top: 14px">{fact_mark(mark, "#ffffff", SOFT_DARK, source)}</div></div></div>')
+    vz = f'<div style="position: absolute; right: 26px; bottom: 22px">{viz}</div>' if viz else ""
+    return (f'<div style="{base}; height: 252px">{chip}{plus}{vz}'
+            f'<div style="margin-top: 14px; {B}; font-size: 60px; font-weight: 760; letter-spacing: -0.04em; line-height: 1.05; color: #ffffff">{figure}</div>'
+            f'<div style="margin-top: 8px; {P}; font-size: 16px; line-height: 1.5; color: #ffffff; max-width: {360 if viz else 540}px">{text}</div>'
+            f'<div style="margin-top: 12px">{fact_mark(mark, "#ffffff", SOFT_DARK, source)}</div></div>')
+
+
+topbar = (
+    f'<div style="position: absolute; left: 0; top: 0; width: 1440px; height: 68px; box-sizing: border-box; padding: 0 80px; display: flex; align-items: center; justify-content: space-between; '
+    f'background: rgba(0, 26, 51, 0.94); border-bottom: 1px solid rgba(207, 228, 250, 0.14)">'
+    f'<div style="display: flex; align-items: center; gap: 10px">'
+    f'<svg aria-hidden="true" viewBox="0 0 28 28" width="26" height="26" style="margin-right: 8px"><circle cx="14" cy="14" r="10" fill="none" stroke="{HALO}" stroke-opacity="0.3" stroke-width="1.6"></circle>'
+    f'<path d="M14 4 A10 10 0 0 1 22.7 9" fill="none" stroke="{ACC_DARK}" stroke-width="2.4" stroke-linecap="round"></path><circle cx="22.7" cy="9" r="3" fill="{ACC_DARK}"></circle></svg>'
+    f'{chip_dark("Todo")}{chip_dark("SEO")}{chip_dark("Respuestas de IA")}{chip_dark("Entrega creativa")}{chip_dark("Social care", selected=True, new=True)}</div>'
+    f'<div style="display: flex; align-items: center; gap: 22px; {P}; font-size: 14px; font-weight: 500; color: {SOFT_DARK}"><span>Plan</span><span>Presentar</span><span>Copiar enlace</span>'
+    f'<span style="padding: 9px 18px; border-radius: 999px; background: #ffffff; color: {GROUND}; font-weight: 600">Descargar</span></div></div>')
+esencial = (
+    topbar
+    + f'\n<div style="position: absolute; left: 80px; top: 128px; width: 1280px; display: flex; flex-direction: column">'
+    f'<div style="display: flex; align-items: baseline; justify-content: space-between"><div style="{B}; font-size: 42px; font-weight: 720; letter-spacing: -0.03em; color: #ffffff">Lo esencial del mes</div>'
+    f'<div style="{P}; font-size: 15px; color: {SOFT_DARK}">Toca un hallazgo para ver su evidencia.</div></div>'
+    f'<div style="margin-top: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px">'
+    + tile("Social care", "93,4 %", "Nueve de cada diez conversaciones tuvieron su primera respuesta dentro del tiempo acordado; el objetivo era 90 %.", "Medido", "Bandeja de comentarios", wide=True)
+    + tile("Social care", "38 min", "La mediana de primera respuesta bajó de 52 a 38 minutos; en tardes y fines de semana sigue en 2 h 10.", "Medido", "Bandeja de comentarios", viz=viz_bars(52, 38, "abr · 52", "may · 38"))
+    + tile("Social care", "41 %", "Cuatro de cada diez dudas de precio preguntan por la misma promoción: la pieza no deja claras las fechas de vuelo.", "Medido", "Etiquetas revisadas por muestra", viz=viz_share(4))
+    + tile("Social care", "19 %", "Uno de cada cinco reclamos derivados no fue tomado en DM, y 23 personas volvieron a reclamar en los comentarios.", "Medido", "Conciliación de traspasos", viz=viz_ring(60 / 318, "#ff7063"))
+    + tile("Social care", "2.140", "Las respuestas de precio llevaron 2.140 clics al calendario de tarifas. La venta todavía no se puede atribuir.", "Medido", "Enlaces medibles", viz=viz_spark())
+    + '</div>'
+    f'<div style="margin-top: 56px; box-sizing: border-box; border-radius: 28px; background: {NAVY}; padding: 48px">'
+    f'<div style="{P}; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_DARK}">Para decidir en la reunión</div>'
+    f'<div style="margin-top: 14px; {B}; font-size: 52px; font-weight: 680; letter-spacing: -0.035em; line-height: 1.05; color: #ffffff">Aclarar la promoción en la pieza</div>'
+    f'<div style="margin-top: 14px; {P}; font-size: 19px; line-height: 1.5; color: {SOFT_DARK}; max-width: 680px">Tres acciones para bajar las dudas repetidas y cerrar los reclamos que rebotan. La primera puede salir esta semana.</div>'
+    f'<div style="margin-top: 26px"><span style="display: inline-flex; align-items: center; gap: 10px; padding: 12px 22px; border-radius: 999px; background: #ffffff; color: {GROUND}; {P}; font-size: 16px; font-weight: 600">Plan de acción →</span></div></div>'
+    '</div>'
+)
+BOARDS["ins-live-02-esencial.dc.html"] = ("Insights live · lo esencial", 1440, 1500, page("Insights live · lo esencial (prototipo)", 1440, 1500, GROUND, esencial))
+
+# ============================================================== LIVE 03 · capítulo
+def fig_card(title, inner, height, width=None, foot=None):
+    toggle = (f'<span style="display: inline-flex; padding: 3px; border-radius: 999px; border: 1px solid {RULE_P}; {P}; font-size: 12px">'
+              f'<span style="padding: 5px 12px; border-radius: 999px; background: {NAVY}; color: #ffffff; font-weight: 600">Gráfico</span><span style="padding: 5px 12px; color: {SOFT_LIGHT}">Tabla</span></span>')
+    wcss = f"width: {width}px; " if width else ""
+    foot_html = (f'<div style="margin-top: auto; padding-top: 14px; display: flex; gap: 22px; flex-wrap: wrap; align-items: center; {P}; font-size: 12px; color: {SOFT_LIGHT}">{foot}</div>' if foot else "")
+    return (f'<div style="{wcss}box-sizing: border-box; height: {height}px; border-radius: 24px; background: {SURFACE}; border: 1px solid {RULE_P}; padding: 26px 28px; display: flex; flex-direction: column">'
+            f'<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px"><div style="{P}; font-size: 15px; font-weight: 600; color: {INK}">{title}</div>{toggle}</div>'
+            f'{inner}{foot_html}</div>')
+
+
+def src_line(source):
+    return (f'<span><span style="font-weight: 600; color: {INK}">Fuente</span> {source}</span><span><span style="font-weight: 600; color: {INK}">Datos al</span> 31-05-2027</span>'
+            + fact_mark("Medido", INK, SOFT_LIGHT, "", 12))
+
+
+def beat_text(kicker, headline, body, width=520):
+    return (f'<div style="width: {width}px"><div style="{P}; font-size: 12px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_LIGHT}">{kicker}</div>'
+            f'<div style="margin-top: 14px; {B}; font-size: 38px; font-weight: 640; letter-spacing: -0.03em; line-height: 1.12; color: {NAVY}">{headline}</div>'
+            f'<div style="margin-top: 14px; {P}; font-size: 17px; line-height: 1.55; color: {SOFT_LIGHT}">{body}</div></div>')
+
+
+def meaning(kicker, text, bg):
+    return (f'<div style="box-sizing: border-box; border-radius: 20px; background: {bg}; padding: 24px 28px"><div style="{P}; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_DARK}">{kicker}</div>'
+            f'<div style="margin-top: 10px; {P}; font-size: 20px; font-weight: 500; line-height: 1.4; color: #ffffff">{text}</div></div>')
+
+
+stats_card = (
+    f'<div style="box-sizing: border-box; border-radius: 24px; background: {SURFACE}; border: 1px solid {RULE_P}; padding: 8px 12px">'
+    + stat_grid(54, 16, 14, "26px 30px 24px") + "</div>")
+donut_legend = "".join(
+    f'<div style="display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid {RULE_P}; {P}; font-size: 15px; color: {INK}">'
+    f'<span style="width: 12px; height: 12px; border-radius: 3px; background: {c}"></span><span style="flex: 1">{t}</span>'
+    f'<span style="font-weight: 700; color: {NAVY}">{v}</span><span style="width: 52px; text-align: right; color: {SOFT_LIGHT}">{p}</span></div>'
+    for c, t, v, p in ((D_CUR, "Tomados por SKY", "258", "81 %"), (D_PREV, "Pendientes de tomar", "37", "12 %"), (D_THIRD, "Volvieron a los comentarios", "23", "7 %")))
+capitulo = (
+    f'<div style="position: absolute; left: 80px; top: 72px; width: 1280px; height: 3420px; display: flex; flex-direction: column; gap: 84px">'
+    # apertura
+    f'<div><span style="display: inline-flex; padding: 6px 14px; border-radius: 999px; background: {SURFACE}; border: 1px solid {RULE_P}; {P}; font-size: 13px; font-weight: 600; color: {NAVY}">04 · Social care</span>'
+    f'<div style="margin-top: 18px; {B}; font-size: 92px; font-weight: 760; letter-spacing: -0.045em; line-height: 1; color: {NAVY}">Social care</div>'
+    f'<div style="margin-top: 20px; {P}; font-size: 22px; line-height: 1.5; color: {SOFT_LIGHT}; max-width: 760px">Mayo cerró con 1.284 conversaciones atendidas en las 13 cuentas: la respuesta llegó más rápido y una sola promoción concentró las dudas.</div></div>'
+    # cifras
+    f'<div><div style="display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 16px"><div style="{P}; font-size: 16px; font-weight: 600; color: {INK}">Bandeja de comentarios · {PERIOD} contra {PRIOR}</div>'
+    f'<div style="{P}; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_LIGHT}">6 cifras</div></div>{stats_card}</div>'
+    # figura principal
+    f'<div style="display: flex; gap: 56px; align-items: stretch">'
+    + fig_card("Resultado de mayo contra el objetivo", f'<div style="margin-bottom: 6px">{legend([(D_CUR, "Logrado"), (INK, "Objetivo"), (D_GAP, "Mayor brecha")])}</div>' + bullet_rows(250, 15, 12, 12, 17),
+               560, 700, src_line("Bandeja de comentarios y pauta de calidad"))
+    + f'<div style="flex: 1; display: flex; flex-direction: column; gap: 18px"><div><div style="{B}; font-size: 96px; font-weight: 760; letter-spacing: -0.045em; line-height: 1; color: {NAVY}">93,4 %</div>'
+      f'<div style="margin-top: 10px; {P}; font-size: 16px; line-height: 1.5; color: {SOFT_LIGHT}">de las conversaciones tuvo respuesta dentro del tiempo acordado; el objetivo es 90 %</div></div>'
+      f'<div style="{B}; font-size: 34px; font-weight: 640; letter-spacing: -0.03em; line-height: 1.12; color: {NAVY}">A tiempo y con calidad; la base de conocimiento quedó corta</div>'
+    + meaning("Lo que significa", "La operación cumple. Lo que falta es contenido: 8 de cada 100 consultas no tenían una respuesta aprobada.", NAVY)
+    + meaning("Próximo paso", "Sumar a la base las tasas por ruta y las condiciones de la promoción antes del día 10.", GROUND)
+    + '</div></div>'
+    # beat 1
+    f'<div style="display: flex; gap: 72px; align-items: center">'
+    + beat_text("Composición", "La tercera semana concentró el alza: 402 conversaciones, 235 de precio", "La promoción de mayo partió ese lunes. Consultas generales y reclamos se mantuvieron parejos todo el mes.")
+    + fig_card("Conversaciones por semana y por tipo", f'<div style="margin-bottom: 8px">{legend([(D_CUR, "Precio y destinos"), (D_PREV, "Consultas generales"), (D_THIRD, "Reclamos")])}</div>' + stacked_svg(630, 300),
+               470, 688, src_line("Bandeja de comentarios"))
+    + '</div>'
+    # beat 2
+    f'<div style="display: flex; gap: 72px; align-items: center">'
+    + fig_card("Qué se preguntó en precio y destinos · 655 conversaciones", rank_rows(15, 12, 13, 300), 510, 688, src_line("Etiquetas del agente, revisadas por muestra"))
+    + beat_text("Fricción", "Cuatro de cada diez dudas de precio son sobre la misma promoción", "269 personas preguntaron qué fechas de vuelo aplican. La respuesta existe en la base; lo que falta es que la pieza lo diga.")
+    + '</div>'
+    # beat 3
+    f'<div style="display: flex; gap: 72px; align-items: center">'
+    + beat_text("Derivación", "Ocho de cada diez reclamos derivados fueron tomados en DM", "De 318 reclamos, 37 seguían sin tomar al cierre y 23 personas volvieron a escribir en los comentarios. Casi todos entraron en fin de semana.")
+    + fig_card("Reclamos derivados a DM, por estado", f'<div style="display: flex; align-items: center; gap: 28px"><div style="flex-shrink: 0">{donut_svg(250)}</div><div style="flex: 1; border-bottom: 1px solid {RULE_P}">{donut_legend}</div></div>',
+               400, 688, src_line("Conciliación semanal de traspasos"))
+    + '</div>'
+    # límites
+    f'<div style="margin-top: auto; border-top: 1px solid {RULE_P}; padding-top: 22px"><div style="{P}; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_LIGHT}">Límites de este capítulo</div>'
+    f'<div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px; {P}; font-size: 15px; color: {NAVY}">'
+    f'<div style="display: flex; gap: 10px; align-items: center">{fact_mark("", NAVY, NAVY, "Las ventas no entran en esta edición: falta acordar el seguimiento con SKY.", 15)}</div>'
+    f'<div style="display: flex; gap: 10px; align-items: center">{fact_mark("", NAVY, NAVY, "X no entra: la cuenta todavía no está conectada a la bandeja.", 15)}</div>'
+    f'<div style="display: flex; gap: 10px; align-items: center">{fact_mark("", NAVY, NAVY, PROTO + ": ninguna cifra de esta página es una medición.", 15)}</div></div></div>'
+    '</div>'
+)
+BOARDS["ins-live-03-capitulo.dc.html"] = ("Insights live · capítulo Social care", 1440, 3560, page("Insights live · capítulo Social care (prototipo)", 1440, 3560, PAPER, capitulo))
+
+# ============================================================== A4
+def a4_header(right_a, right_b):
+    return (
+        f'<div style="position: absolute; left: 68px; top: 48px; width: 118px; height: 28px; box-sizing: border-box; border: 1px dashed #9aa6bd; border-radius: 3px; display: flex; align-items: center; justify-content: center; '
+        f'{P}; font-size: 7px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: {SOFT_LIGHT}">Logo del cliente</div>'
+        f'<div style="position: absolute; right: 68px; top: 56px; display: flex; align-items: center; gap: 10px; {P}; font-size: 10px; color: {INK}"><span style="font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase">{right_a}</span>'
+        f'<span style="width: 1px; height: 11px; background: #9aa6bd"></span><span style="letter-spacing: 0.04em">{right_b}</span></div>'
+        f'<div style="position: absolute; left: 68px; top: 90px; width: 658px; height: 1px; background: {RULE_P}"></div>'
+        f'<div style="position: absolute; right: 0; top: 139px; width: 24px; height: 76px; background: {NAVY}; display: flex; align-items: center; justify-content: center"><span style="{P}; font-size: 9px; font-weight: 700; color: #ffffff; transform: rotate(90deg)">04</span></div>')
+
+
+def a4_footer(folio):
+    return (
+        f'<div style="position: absolute; left: 68px; top: 1051px; width: 658px; height: 1px; background: {RULE_P}"></div><div style="position: absolute; left: 68px; top: 1050px; width: 32px; height: 2px; background: {NAVY}"></div>'
+        f'<img src="{LOGO_POS}" alt="Efeonce" style="position: absolute; left: 68px; top: 1064px; height: 11px; width: auto">'
+        f'<div style="position: absolute; left: 124px; top: 1064px; display: flex; align-items: center; gap: 9px; {P}; font-size: 7.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {INK}"><span style="width: 1px; height: 10px; background: #9aa6bd"></span>Insights · Informe de mayo 2027</div>'
+        f'<div style="position: absolute; left: 68px; top: 1082px; {P}; font-size: 7.5px; color: {SOFT_LIGHT}">{PROTO} · no es una edición emitida</div>'
+        f'<img src="{URL_LIGHT}" alt="efeoncepro.com" style="position: absolute; left: 566px; top: 1068px; width: 84px; height: auto">'
+        f'<div style="position: absolute; left: 664px; top: 1064px; width: 1px; height: 24px; background: {RULE_P}"></div>'
+        f'<div style="position: absolute; right: 68px; top: 1066px; {P}; font-size: 15px; font-weight: 700; color: {INK}">{folio} <span style="font-size: 8px; font-weight: 400; color: {SOFT_LIGHT}">/ 30</span></div>')
+
+
+def a4_eyebrow(text):
+    return f'<div style="{P}; font-size: 9.5px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: {INK}">{text}</div>'
+
+
+def a4_meta(cols):
+    return ('<div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px">' + "".join(
+        f'<div><div style="{P}; font-size: 7.5px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: {INK}">{k}</div>'
+        f'<div style="margin-top: 5px; {B}; font-size: 11px; line-height: 1.5; color: {INK}">{v}</div></div>' for k, v in cols) + "</div>")
+
+
+def a4_note(text):
+    return f'<div style="{B}; font-size: 12px; font-style: italic; color: {NAVY}">↖&nbsp;&nbsp;{text}</div>'
+
+
+# --- A4 01 apertura
+chap_list = "".join(
+    f'<div style="display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid rgba(207, 228, 250, 0.16); {B}; font-size: 13px; color: #ffffff"><span>{t}</span>'
+    f'<span style="{P}; font-weight: 600; color: {ACC_DARK}">{n}</span></div>'
+    for t, n in (("Cifras del período", 22), ("Resultado contra el objetivo", 23), ("Qué se preguntó en precio y destinos", 24), ("Reclamos derivados a DM", 25)))
+a4_open = (
+    f'<div style="position: absolute; left: 330px; top: 590px; {P}; font-size: 560px; font-weight: 700; line-height: 1; letter-spacing: -0.02em; color: transparent; -webkit-text-stroke: 1px rgba(54, 200, 191, 0.34); white-space: nowrap">04</div>'
+    f'<div style="position: absolute; left: 68px; top: 62px; {P}; font-size: 9.5px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: {ACC_DARK}">Capítulo 04</div>'
+    f'<div style="position: absolute; right: 68px; top: 62px; {P}; font-size: 9.5px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: {SOFT_DARK}">Informe de mayo 2027</div>'
+    f'<div style="position: absolute; left: 68px; top: 226px; width: 40px; height: 3px; background: {ACC_DARK}"></div>'
+    f'<div style="position: absolute; left: 68px; top: 250px; width: 560px"><div style="{P}; font-size: 44px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.1; color: #ffffff">La conversación pública</div>'
+    f'<div style="margin-top: 18px; {B}; font-size: 19px; line-height: 1.45; color: {SOFT_DARK}; max-width: 470px">Qué preguntó la gente en los comentarios de SKY, en cuánto tiempo se le respondió y qué pasó con sus reclamos.</div>'
+    f'<div style="margin-top: 56px; width: 430px"><div style="{P}; font-size: 8.5px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: {ACC_DARK}; margin-bottom: 12px">En este capítulo</div>'
+    f'{chap_list}<div style="border-top: 1px solid rgba(207, 228, 250, 0.16)"></div></div></div>'
+    f'<img src="{LOGO_NEG}" alt="Efeonce" style="position: absolute; left: 68px; top: 1052px; height: 12px; width: auto">'
+    f'<div style="position: absolute; left: 128px; top: 1052px; display: flex; align-items: center; gap: 10px; {P}; font-size: 8px; font-weight: 500; letter-spacing: 0.34em; text-transform: uppercase; color: {SOFT_DARK}"><span style="width: 1px; height: 11px; background: rgba(207, 228, 250, 0.4)"></span>Insights</div>'
+    f'<div style="position: absolute; left: 68px; top: 1076px; {P}; font-size: 7.5px; color: {SOFT_DARK}">{PROTO}</div>'
+    f'<div style="position: absolute; right: 68px; top: 1050px; {P}; font-size: 14px; font-weight: 700; color: #ffffff">21</div>'
+)
+BOARDS["ins-a4-01-apertura.dc.html"] = ("Insights A4 · apertura de capítulo", 794, 1123, page("Insights A4 · apertura de capítulo (prototipo)", 794, 1123, GROUND, a4_open))
+
+# --- A4 02 cifras
+a4_cifras = (
+    a4_header("04 · Social care", "Mayo 2027 · contra abril 2027") + a4_footer("22")
+    + f'<div style="position: absolute; left: 68px; top: 130px; width: 658px; display: flex; flex-direction: column">'
+    + a4_eyebrow("123&nbsp;&nbsp;Cifras del período")
+    + f'<div style="margin-top: 16px; {P}; font-size: 27px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: {INK}; max-width: 600px">La primera respuesta bajó de 52 a 38 minutos</div>'
+      f'<div style="margin-top: 12px; {B}; font-size: 15px; line-height: 1.5; color: {INK}; max-width: 610px">El equipo atendió 1.284 conversaciones, 108 más que en abril, y respondió a tiempo el 93,4 %. Los clics al calendario de tarifas subieron de 1.865 a 2.140.</div>'
+      f'<div style="margin-top: 30px; display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid #c9d1de"><div style="{P}; font-size: 12.5px; font-weight: 600; color: {INK}">Bandeja de comentarios · mayo contra abril</div>'
+      f'<div style="{P}; font-size: 7.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {SOFT_LIGHT}">6 cifras</div></div>'
+    + stat_grid(40, 12.5, 11.5, "22px 16px 20px 16px")
+    + f'<div style="border-top: 1px solid #c9d1de; padding-top: 18px">{a4_note("El tiempo de primera respuesta es la mediana, medida dentro de la ventana con personas.")}</div>'
+      f'<div style="margin-top: 22px">'
+    + a4_meta([("Unidad", "Cada cifra en su propia unidad; bajo cada una, la variación contra abril."), ("Fuente", "Bandeja de comentarios, pauta de calidad y enlaces medibles"), ("Cobertura", "13 cuentas; X fuera de esta edición")])
+    + '</div></div>'
+)
+BOARDS["ins-a4-02-cifras.dc.html"] = ("Insights A4 · cifras del período", 794, 1123, page("Insights A4 · cifras del período (prototipo)", 794, 1123, PAPER, a4_cifras))
+
+# --- A4 03 metas
+a4_metas = (
+    a4_header("04 · Social care", "Mayo 2027 · contra el objetivo") + a4_footer("23")
+    + f'<div style="position: absolute; left: 68px; top: 130px; width: 658px; display: flex; flex-direction: column">'
+    + a4_eyebrow("◎&nbsp;&nbsp;Objetivos del mes")
+    + f'<div style="margin-top: 14px; display: flex; gap: 40px"><div style="width: 284px; flex-shrink: 0"><div style="{P}; font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: {NAVY}">93,4 %</div>'
+      f'<div style="margin-top: 10px; {B}; font-size: 12.5px; line-height: 1.45; color: {INK}">de las conversaciones con respuesta a tiempo; tres de los cuatro objetivos se cumplieron</div></div>'
+      f'<div><div style="{P}; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.22; color: {INK}">Se cumplieron tiempo y calidad; la brecha está en la base de conocimiento</div>'
+      f'<div style="margin-top: 10px; {B}; font-size: 13px; line-height: 1.5; color: {INK}">Ocho de cada cien consultas no tenían una respuesta aprobada. Las cuatro alertas críticas del mes se avisaron a tiempo.</div></div></div>'
+      f'<div style="margin-top: 34px; {P}; font-size: 12.5px; font-weight: 600; color: {INK}">Resultado de mayo contra el objetivo de cada indicador</div>'
+      f'<div style="margin-top: 10px; margin-bottom: 12px">{legend([(D_CUR, "Logrado"), (INK, "Objetivo"), (D_GAP, "Mayor brecha")], 10.5)}</div>'
+    + bullet_rows(200, 12.5, 10, 10, 16)
+    + f'<div style="border-top: 1px solid {RULE_P}; padding-top: 16px">{a4_note("Cada fila usa su propia escala: la marca vertical es el objetivo y la barra, lo logrado.")}</div>'
+      f'<div style="margin-top: 20px">'
+    + a4_meta([("Unidad", "Cada indicador en su unidad; a la derecha, el porcentaje del objetivo."), ("Fuente", "Bandeja de comentarios, pauta de calidad y base de conocimiento"), ("Cobertura", "Objetivos acordados para mayo de 2027")])
+    + f'</div><div style="margin-top: 24px; border-radius: 14px; background: {NAVY}; padding: 24px 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px">'
+      f'<div><div style="{P}; font-size: 8.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {ACC_DARK}">Lo que significa</div>'
+      f'<div style="margin-top: 9px; {P}; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #ffffff">La operación cumple. Lo que falta es contenido aprobado para responder sin derivar al canal oficial.</div></div>'
+      f'<div><div style="{P}; font-size: 8.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {ACC_DARK}">→&nbsp;&nbsp;Próximo paso</div>'
+      f'<div style="margin-top: 9px; {P}; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #ffffff">Sumar a la base las tasas por ruta y las condiciones de la promoción (p. 24).</div>'
+      f'<div style="margin-top: 8px; {B}; font-size: 10px; color: {SOFT_DARK}">Recomendación de Efeonce</div></div></div>'
+    '</div>'
+)
+BOARDS["ins-a4-03-objetivos.dc.html"] = ("Insights A4 · resultado contra el objetivo", 794, 1123, page("Insights A4 · resultado contra el objetivo (prototipo)", 794, 1123, PAPER, a4_metas))
+
+# --- A4 04 tabla de respaldo
+a4_tabla = (
+    a4_header("04 · Social care", "Mayo 2027 · precio y destinos") + a4_footer("24")
+    + f'<div style="position: absolute; left: 68px; top: 130px; width: 658px; display: flex; flex-direction: column">'
+    + a4_eyebrow("≡&nbsp;&nbsp;Tabla de respaldo")
+    + f'<div style="margin-top: 14px; display: flex; gap: 40px"><div style="width: 224px; flex-shrink: 0"><div style="{P}; font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 1; color: {NAVY}">41 %</div>'
+      f'<div style="margin-top: 10px; {B}; font-size: 12.5px; line-height: 1.45; color: {INK}">de las dudas de precio pregunta por la misma promoción</div></div>'
+      f'<div><div style="{P}; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.22; color: {INK}">La promoción de mayo concentró 269 de las 655 consultas de precio</div>'
+      f'<div style="margin-top: 10px; {B}; font-size: 13px; line-height: 1.5; color: {INK}">La gente preguntó qué fechas de vuelo aplican. La respuesta está en la base; la pieza no lo dice.</div></div></div>'
+      f'<div style="margin-top: 34px; display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 12px"><div style="{P}; font-size: 12.5px; font-weight: 600; color: {INK}">Qué se preguntó en precio y destinos</div>'
+      f'<div style="{P}; font-size: 7.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {SOFT_LIGHT}">655 conversaciones</div></div>'
+    + rank_rows(12, 10, 13, 250)
+    + f'<div style="border-top: 1px solid {RULE_P}; padding-top: 16px">{a4_note("Las barras parten del dato mayor; a la derecha, la cantidad y su parte del total.")}</div>'
+      f'<div style="margin-top: 20px">'
+    + a4_meta([("Unidad", "Conversaciones: el comentario inicial y su hilo."), ("Fuente", "Etiquetas del agente clasificador, revisadas por muestra semanal"), ("Cobertura", "Facebook, Instagram, TikTok y LinkedIn; cinco mercados")])
+    + f'</div><div style="margin-top: 24px; border-radius: 14px; background: {NAVY}; padding: 24px 26px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px">'
+      f'<div><div style="{P}; font-size: 8.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {ACC_DARK}">Lo que significa</div>'
+      f'<div style="margin-top: 9px; {P}; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #ffffff">Responder 269 veces lo mismo es un problema de la pieza, no de la atención.</div></div>'
+      f'<div><div style="{P}; font-size: 8.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: {ACC_DARK}">→&nbsp;&nbsp;Próximo paso</div>'
+      f'<div style="margin-top: 9px; {P}; font-size: 12.5px; font-weight: 600; line-height: 1.5; color: #ffffff">Agregar las fechas de vuelo a la pieza y a la primera línea del texto de la publicación.</div>'
+      f'<div style="margin-top: 8px; {B}; font-size: 10px; color: {SOFT_DARK}">Recomendación de Efeonce</div></div></div>'
+    '</div>'
+)
+BOARDS["ins-a4-04-respaldo.dc.html"] = ("Insights A4 · tabla de respaldo", 794, 1123, page("Insights A4 · tabla de respaldo (prototipo)", 794, 1123, PAPER, a4_tabla))
+
+for name, (_, _, _, html) in BOARDS.items():
+    (OUT / name).write_text(html, encoding="utf-8")
+
+# ---------------------------------------------------------------- canvas.json
+canvas_path = OUT / "canvas.json"
+canvas = json.loads(canvas_path.read_text(encoding="utf-8"))
+for key in list(canvas["boards"]):
+    if key.startswith("ins-"):
+        del canvas["boards"][key]
+canvas["order"] = [f for f in canvas["order"] if not f.startswith("ins-")]
+# la fila del prototipo va siempre debajo de la última fila del deck, con aire para su título
+Y0 = max(b["y"] + b["h"] for b in canvas["boards"].values()) + 700
+x = 0
+for name, (title, w, h, _) in BOARDS.items():
+    canvas["boards"][name] = {"x": x, "y": Y0, "w": w, "h": h, "title": title}
+    canvas["order"].append(name)
+    x += w + 120
+canvas["notes"]["insights"] = {
+    "x": 0, "y": Y0 - 300,
+    "text": "Prototipo · Efeonce Insights con el módulo Social care · informe web y PDF A4 · cifras de ejemplo",
+    "kind": "title1", "maxW": x - 120,
+}
+canvas_path.write_text(json.dumps(canvas, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+print(json.dumps({f"project/{n}": f"project/{n}" for n in BOARDS}, ensure_ascii=False))

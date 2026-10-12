@@ -90,3 +90,8 @@ verificados sin convertir Markdown en una segunda base de datos comercial.
 - **Evidencia fechada:** auditorías, propuestas, Teams y SharePoint; pueden quedar stale y deben conservar fecha.
 
 No almacenes credenciales, tokens, cookies, datos personales innecesarios ni documentos sensibles en esta carpeta.
+
+
+## Casos documentales del radar — corte 10-10-2026
+
+- [18 casos investigados en cinco países](tenders/RADAR_CASES_2026-10-10.md): convocatorias, búsquedas privadas, RFI, planes y referencia excluida; métodos de postulación, documentos, próximos pasos y bloqueos. Estudios sin GO ni nuevas mutaciones CRM; Pierre Fabre reutilizado, cierre Aysén actualizado en fuente y GORE preservado.

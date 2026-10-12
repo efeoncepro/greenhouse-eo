@@ -1,0 +1,88 @@
+{
+  "tenderId": "A2-hibrido-social-care",
+  "slides": [
+    {
+      "slideId": "deck-method-hybrid-workforce",
+      "contentType": "deck.method-hybrid-workforce",
+      "slots": {
+        "frame": {
+          "line": "brand",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 290,
+          "answerPx": 150,
+          "bodyTop": 650,
+          "bodyPx": 27,
+          "bodyWidth": 600,
+          "ladderTitleLeft": "--gl-hw-title-left=1070px",
+          "ladderTitleTop": "--gl-hw-title-top=260px",
+          "ladderTitlePx": "--gl-hw-title-px=18px",
+          "ladderX": "--gl-hw-x=1070px",
+          "ladderBase": "--gl-hw-base=900px",
+          "barWidth": "--gl-hw-bar-width=170px",
+          "barGap": "--gl-hw-bar-gap=14px",
+          "barFrom": "--gl-hw-bar-from=150px",
+          "barStep": "--gl-hw-bar-step=110px",
+          "barRadius": "--gl-hw-bar-radius=14px",
+          "barPadTop": "--gl-hw-bar-pad-top=20px",
+          "barPadX": "--gl-hw-bar-pad-x=18px",
+          "glassFrom": "--gl-hw-glass-from=8%",
+          "glassStep": "--gl-hw-glass-step=7%",
+          "glassColor": "--gl-hw-glass-color=#72ded8",
+          "numberPx": "--gl-hw-number-px=44px",
+          "labelPx": "--gl-hw-label-px=20px",
+          "labelGap": "--gl-hw-label-gap=10px",
+          "baselineWidth": "--gl-hw-baseline-width=722px",
+          "baselineStroke": "--gl-hw-baseline-stroke=2px",
+          "pathLeft": "--gl-hw-path-left=1070px",
+          "pathTop": "--gl-hw-path-top=922px",
+          "pathPx": "--gl-hw-path-px=19px",
+          "pathWidth": "--gl-hw-path-width=760px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-hw-progress-3-of-5-brand"
+        },
+        "voice": {
+          "question": "¿Quién responde, al final?",
+          "answer": "y agentes",
+          "eyebrow": "Social care · equipos híbridos",
+          "answerLead": "Personas"
+        },
+        "body": "En social care, personas y agentes de IA comparten la bandeja. El agente gana autoridad por tramos y una persona conserva la responsabilidad.",
+        "ladderTitle": "La autoridad del agente crece por tramos",
+        "ladder": [
+          {
+            "label": "Leer y clasificar"
+          },
+          {
+            "label": "Proponer respuesta"
+          },
+          {
+            "label": "Responder lo frecuente"
+          },
+          {
+            "label": "Actuar con aprobación"
+          }
+        ],
+        "path": "Base de conocimiento → agente que propone → agente que responde → operación híbrida",
+        "selection": {
+          "label": "Social care",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.25,
+          "textPad": "per-line",
+          "also": [
+            {
+              "label": "Agente IA",
+              "anchor": "bottom-end",
+              "action": "resize",
+              "participantKind": "department"
+            }
+          ]
+        }
+      },
+      "template": "MethodHybridWorkforce"
+    }
+  ]
+}

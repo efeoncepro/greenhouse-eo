@@ -12,6 +12,9 @@
   ChatGPT Search / Claude Search / Perplexity Search / otra):
 - **Audiencia / ICP:**
 - **Objetivo de negocio** (tráfico / lead / venta / brand):
+- **Categoría / comprador / situación de compra / mercado:**
+- **Brand/non-brand** (separado de intención):
+- **Capacidad a representar / evidencia y límites / vínculo con la marca:**
 - **URL destino:**
 
 ## 2. Investigación
@@ -49,6 +52,9 @@
 - **Imagen/OG (1200×630), alt text:**
 
 ## 6. Medición
-- **KPI clásico:** posición objetivo / tráfico / conversión.
-- **KPI AEO:** ¿aparece en el panel de prompts de Share of Voice? (`07`).
-- **Fecha de revisión/refresh:** (frescura = factor IA; agenda el refresh).
+- **Compromiso controlable:** entregable, owner, aceptación y estado de publicación.
+- **Resultado clásico a observar:** posiciones, tráfico branded/non-brand absoluto y conversiones.
+- **Resultado AEO a observar:** fuente/cita, presencia, fidelidad y recomendación pertinentes (`07`).
+- **Corpus / superficie / condiciones / numerador-denominador / cobertura:**
+- **Consideración y negocio:** fuente y definición; no inferir ventas causales desde una cita.
+- **Fecha de revisión/refresh:** actualizar sólo ante cambios sustantivos.

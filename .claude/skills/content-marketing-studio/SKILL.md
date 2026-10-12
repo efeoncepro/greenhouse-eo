@@ -72,6 +72,15 @@ newsletter o átomo no es la unidad: estima cada operación generativa de media 
 curaduría, QA, publicación y distribución como capacidad/gobierno con 0 Studio Credits. No inventes bandas,
 precio por crédito ni equivalencias por pieza.
 
+## Evidencia para referencia de categoría
+
+Si el contenido busca liderazgo de categoría, presencia o recomendación en búsquedas, cargar el
+[método SEO/AEO](../../../docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md). Partir de categoría, comprador y situación; auditar cobertura/pruebas antes
+de producir. Convertir experiencia autorizada en objetos útiles, casos, criterios o investigación, con
+vínculo comprensible a capacidades de la marca y límites. El contenido puede servir de fuente sin generar
+reconocimiento: medir cita, mención, fidelidad y recomendación por separado con SEO/AEO. Brand Studio
+posee posicionamiento; el studio produce y distribuye evidencia, sin garantizar inclusión o ventas.
+
 ## Intake (correr SIEMPRE antes de recomendar)
 
 - **Objetivo**: ¿awareness, demanda/generación, autoridad/thought leadership, activación, retención? Cada uno cambia formato, tono y distribución.

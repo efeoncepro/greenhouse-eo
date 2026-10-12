@@ -1,5 +1,9 @@
 # Registro de seguimiento comercial
 
+**Decisión posterior 10/10 · SERNATUR Arica1330-22-COT26:** NO-BID por instrucción explícita de Julio. Lead Disqualified/NO_INTEREST y tarea Cancelada, verificados. Cancelado control12/10 09:00; no emitir nuevas alertas de preparación ni reabrir. [Decisión y evidencia](runs/2026-10-10-arica-no-bid.md).
+
+**Delta focalizado 10/10 · INAPI y SERNATUR Arica:** dos Leads New nuevos, dos notas asociadas a empresas reutilizadas y dos tareas de Julio verificadas, prioridad Alta / Sin empezar. Arica: **NO-BID posterior; revisión interna12/10 cancelada**, cierre **12/10 18:00 Chile** (LicitaLAB); fee ≤ CLP 710.000 sobre envolvente, pauta prefinanciada y presupuesto inconsistente. INAPI: revisión **16/10 12:00**, foro 19/10 15:00, cierre 02/11 16:00 Chile; referencias y discrepancia 20.000/25.000 sesiones. [Expedientes, tareas, IDs y evidencia](runs/2026-10-10-inapi-arica-intake.md). Sin GO, propuestas o envíos; no renueva la cobertura global 09/10.
+
 **Delta posterior al corte 16:00 · 09/10:** ProChile y SENADIS no se presentaron por falta de tiempo, confirmado por Julio. ProChile en Cierre perdido; SENADIS descartada con nota CRM, cambio de etapa del Lead pendiente por reautenticación. Ambas tareas Canceladas; sin nuevas alertas de preparación/conciliación. [Decisión y evidencia](runs/2026-10-09-prochile-senadis-no-presentadas.md).
 
 **Delta confirmado por Julio · 09/10:** SANNA y UNAP no se presentaron por falta de tiempo. Ambos Deals están en Cierre perdido y sus tareas Canceladas, con readback. Sus alertas de preparación/conciliación quedan resueltas. [Nota y evidencia](runs/2026-10-09-sanna-unap-no-presentadas.md).

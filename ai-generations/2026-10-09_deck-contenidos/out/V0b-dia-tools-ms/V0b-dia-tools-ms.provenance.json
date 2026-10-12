@@ -1,0 +1,45 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "b8114702cfaa355668c0f95049ac01b314192248db0029e56ac6330c8fda9713",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.content-day.tools",
+  "plates": [],
+  "files": [
+    {
+      "ref": "asset-ref:file:metricool-on-black",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/metricool-on-black.svg",
+      "sha256": "28bd449b106e66b094dad4872219f6356756048549491cf052d2feaad361e2f3"
+    },
+    {
+      "ref": "asset-ref:file:sprout-social-isotype",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/sprout-social-isotype.svg",
+      "sha256": "5241ac2beb4e51cf528077422074257cc21b0dc6aba87d8b7d30ef25007a61de"
+    },
+    {
+      "ref": "asset-ref:file:favikon-isotype",
+      "path": "ai-generations/2026-10-09_deck-contenidos/logos/favikon-isotype.png",
+      "sha256": "e03b698931c67bfbe881d8d7b7153039a1bbac3b64a91030bc73e7cb93d7beaa"
+    },
+    {
+      "ref": "asset-ref:file:efeonce-isotype-negative",
+      "path": "src/lib/artifact-composer/catalogs/graphic-line-deck/assets/efeonce-isotype-negative.svg",
+      "sha256": "e8864a76710f352d78537ee130658caf0617939f7bd5ff7b2d656bf85c01ae74"
+    },
+    {
+      "ref": "asset-ref:file:ms-social",
+      "path": "ai-generations/2026-10-09_deck-contenidos/ui/ms-social.png",
+      "sha256": "4a0ebe1d900350b39d806f2018019e9df36d96bb14171a9367866bed3dbd2418"
+    },
+    {
+      "ref": "asset-ref:file:marketing-studio-isotype-negative",
+      "path": "node_modules/@efeoncepro/axis-brand-assets/assets/marketing-studio-isotype-negative.svg",
+      "sha256": "83317bcc8b3177cdf0a79e7d2167751805fd5faf6304ba8e194ff6764ebee7dc"
+    }
+  ],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}
