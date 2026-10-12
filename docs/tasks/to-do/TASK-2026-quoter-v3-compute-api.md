@@ -413,6 +413,10 @@ Cuerpo de una operación `POST` (las claves que no aplican se rechazan como `UNK
   versiones gobernadas.
 - Respuesta 200: `data = { result, artifact }` y `meta = { exitCode, versionsUsed, audience }`.
   - `result` es el documento de stdout de la CLI para esa operación, sin envolver ni reordenar.
+    Excepción medida en el dorado de `TASK-2024`: `compose preview --format markdown` no imprime JSON. Para esa
+    variante la ruta acepta `format` y devuelve el texto en `data.resultText` (y `result: null`); la CLI lo imprime tal
+    cual. Las otras 106 salidas del dorado son JSON y sobreviven la ida y vuelta por objeto (prueba permanente en
+    `pricing-v3-cli-golden.test.ts`), así que viajan en `result`.
   - `artifact` es `null` salvo en las operaciones marcadas en la tabla. Cuando existe viaja además como **texto**:
     `data.artifactText` es la cadena exacta que la CLI local habría escrito con `--out` (misma sangría, mismo orden de
     claves, salto final) y `data.artifactDigest` es su sha256. Es lo que da paridad de archivo byte a byte entre
