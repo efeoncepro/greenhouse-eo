@@ -35,9 +35,29 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - El adaptador de archivos vive en `scripts/commercial/pricing-v3-storage-file.ts`; ningún módulo de `src/` que no
   sea un test puede importarlo (`pricing-v3-purity.test.ts`).
 - **Diseño cerrado en Discovery (2026-10-12), ya incorporado al cuerpo:** destinataria en tabla propia de sólo
-  agregar (diez tablas); huella de artefacto única por cotización y no en el registro; una sola puerta de escritura
+  agregar (hoy doce tablas); huella de artefacto única por cotización y no en el registro; una sola puerta de escritura
   con `command_execution_id` obligatorio; sin vínculo con el negocio; migraciones en `pending-migrations/` hasta el
   visto bueno; permisos por rol y `can()` con literales; SQL directo sobre cliente recibido; huella por disparador.
+- **Lectura final del diseño (sesión consultora, 2026-10-12), ya incorporada al cuerpo y al SQL pendiente.** Ninguna
+  migración estaba aplicada, así que se corrigió en el esquema y no con una migración hacia adelante:
+  1. El historial de estados tiene orden propio: `transition_seq` por cotización, asignado bajo bloqueo. El estado
+     vigente es el de la fila de mayor `transition_seq`, no el de la hora más reciente.
+  2. `data_origin` no tiene valor por defecto: quien crea lo declara, y lo decide la identidad, no el pedido.
+  3. Toda fila inmutable guarda `*_principal_id NOT NULL`: el registro de comandos caduca y `command_execution_id`
+     queda como referencia blanda.
+  4. Emitir nombra la última versión **o la última emitida** (volver a lo que el cliente tenía), y fija el documento
+     que se emitió (`document_seq` y `document_digest`). El documento se escribe en `draft` y en `revising`.
+  5. Emitir apunta a una versión real con su huella por llave foránea compuesta; una cotización emitida o retirada
+     no recibe versiones (primero `issued → revising`).
+  6. La regla del piso vive también en la base: la versión guarda `below_floor` y emitir una versión bajo el piso
+     exige una aprobación vigente. Las aprobaciones son decisiones `approved | revoked`; rige la última.
+  7. El número lo asigna la base en la primera emisión, desde un contador por serie (sin huecos). La serie real
+     empieza en **15001**: la primera cotización real es `EO-QTE-15001` (aclarado por el CEO; no `EO-QTE-15`).
+  8. Los índices de lectura de una versión viven en una tabla hermana reconstruible, no en la fila inmutable.
+  9. Cada rechazo de un disparador lleva `CONSTRAINT = '<nombre>'`; el código lee ese nombre, nunca el mensaje.
+  10. `REVOKE` explícito al runtime (el esquema concede `UPDATE` y `DELETE` por defecto) y verificación por nombre.
+  11. El puntero: sin único en `pointer_digest`; persona exigida sólo en `platform_activation`; un reflejo del repo
+      nombra su commit. Los documentos importados nombran su archivo y su commit.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -60,7 +80,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Discovery y plan (2026-10-12); sin código ni migraciones todavía`
+- Status real: `Slices 1 a 3 escritos y verdes en PostgreSQL 16 local (2026-10-12); migraciones pendientes, ninguna aplicada; faltan Slices 4 a 6`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -287,10 +307,11 @@ Reglas obligatorias:
 ### Data model and invariants
 
 - Entidades afectadas (todas nuevas, esquema `greenhouse_commercial`): `quoter_source_documents`,
-  `quoter_pointer_history`, `quoter_quotes`, `quoter_quote_recipients`, `quoter_quote_numbers`,
-  `quoter_quote_versions`, `quoter_state_matrix`,
+  `quoter_pointer_history`, `quoter_quotes`, `quoter_quote_recipients`, `quoter_quote_number_counters`,
+  `quoter_quote_numbers`, `quoter_quote_versions`, `quoter_quote_version_index`, `quoter_state_matrix`,
   `quoter_state_transitions`, `quoter_exception_approvals`, `quoter_version_documents`; vistas
-  `quoter_current_pointer` y `quoter_quote_current`; secuencias y funciones de número público.
+  `quoter_current_pointer` y `quoter_quote_current`; funciones de bloqueo, de estado vigente y de asignación de
+  número.
 - Invariantes que no se pueden romper:
   - La huella del texto de un documento, un puntero o un artefacto es el sha256 de los bytes guardados, comprobada
     por la base al escribir; su huella de identidad la verifica el adaptador al escribir y al leer.
@@ -301,6 +322,14 @@ Reglas obligatorias:
   - Un cambio de estado sólo entra si su par origen → destino existe en la matriz y su origen es el estado vigente de
     esa cotización; si la matriz exige compuerta humana, el actor es una persona identificada. Ningún par sembrado
     la exige: emitir y retirar los hace también un agente (decisión 7).
+  - El estado vigente, la destinataria vigente, el documento vigente y la decisión vigente sobre una excepción se
+    leen por un correlativo propio asignado bajo el bloqueo de la cotización, nunca por la hora.
+  - Emitir nombra una versión real con su huella (la última o la última emitida) y el documento que rige para ella
+    con su huella; exige destinataria y, si la versión está bajo el piso, una aprobación vigente. Lo comprueba la
+    base, no sólo el código.
+  - Una cotización emitida o retirada no recibe versiones; un documento se escribe en `draft` o en `revising`.
+  - Toda fila inmutable dice quién actuó (`*_principal_id`), sin depender del registro de comandos.
+  - Cada regla que la base hace cumplir tiene nombre, y el código responde por ese nombre.
   - La organización dueña de toda cotización es la canónica de Efeonce; la destinataria, cuando existe, es una
     organización cliente o potencial cliente y no confiere acceso. Se asigna en una tabla de sólo agregar: rige la
     última, se puede reasignar mientras la cotización esté en `draft` y queda congelada desde la primera emisión.
@@ -309,15 +338,17 @@ Reglas obligatorias:
     sola cotización no retirada lo hace cumplir la función de escritura, bajo bloqueo, no una restricción: una
     restricción global dejaría sin salida a quien retira un borrador y vuelve a registrar el mismo cálculo.
   - Ninguna versión ni cambio de estado entra sin `command_execution_id`.
-  - Una aprobación de excepción vale para una versión y una huella de artefacto, y sólo la registra una persona
-    identificada.
+  - Una decisión sobre una excepción (aprobar o revocar) vale para una versión y una huella de artefacto, sólo la
+    registra una persona identificada, y sólo existe para una versión que el motor marcó bajo el piso.
   - Una versión guarda sólo un artefacto con estado de cálculo `calculated`.
-  - El número público se asigna una sola vez por cotización, en su primera emisión, por una función con un solo
-    `nextval`, y no se recorta al crecer. La serie real empieza en 15 (`EO-QTE-15`).
+  - El número público lo asigna la base una sola vez por cotización, en la transacción de su primera emisión, desde
+    un contador por serie que sólo avanza de a uno: sin huecos y sin que nadie lo elija. La serie real empieza en
+    15001 (`EO-QTE-15001`), sin relleno.
   - El registro no escribe ni lee `greenhouse_commercial.quotations*`.
 - Write-target allowlist: el dominio comercial no tiene prueba de frontera; esta task la crea para el cotizador
-  (`src/lib/commercial/quoter/boundary-domain.test.ts`) con las diez tablas `quoter_*` más
-  `greenhouse_sync.outbox_events` como únicos destinos de escritura, cada uno con su justificación.
+  (`src/lib/commercial/quoter/boundary-domain.test.ts`) con las tablas `quoter_*` en que el runtime inserta (todas
+  menos la matriz, el contador y los números) más `greenhouse_sync.outbox_events` como únicos destinos de escritura,
+  cada uno con su justificación.
 - Tenant/space boundary: `quoter_quotes.owner_organization_id` es obligatorio, referencia
   `greenhouse_core.organizations` y es siempre la organización canónica de Efeonce, la cree una persona o un agente
   (CEO, 2026-10-12). La resuelve el servidor por referencia estable; nunca sale del pedido ni de un UUID escrito en
@@ -326,9 +357,11 @@ Reglas obligatorias:
   llama». La organización destinataria es contenido validado de la cotización, por llave foránea en
   `quoter_quote_recipients`, y no confiere acceso. Catálogo y puntero son de Efeonce y no llevan organización.
 - Idempotency/concurrency: la idempotencia de comandos usa la tabla única `api_platform_command_executions`; no se
-  crea una segunda. Cada fila escrita por un comando guarda `command_execution_id` y `request_hash`. Concurrencia:
-  control optimista por huella en el puntero; bloqueo transaccional por cotización al agregar versión o estado;
-  unicidad `(quote_id, version_number)`.
+  crea una segunda. Cada fila escrita por un comando guarda `command_execution_id` y `request_hash` como referencia
+  blanda (esa tabla se purga), y `*_principal_id` como huella permanente de quién actuó. Concurrencia: control
+  optimista por huella en el puntero; un bloqueo transaccional por cotización (`quoter_lock_quote`, de dos claves)
+  que toman el almacén y todos los disparadores que leen «lo vigente»; un bloqueo por cálculo, siempre antes que el
+  de la cotización; unicidad `(quote_id, version_number)`.
 - Audit/outbox/history: las propias tablas son el historial. Eventos en la misma transacción para documento guardado
   y puntero activado; los eventos de cotización nacen con los comandos de `TASK-2027`.
 
@@ -344,8 +377,9 @@ Reglas obligatorias:
   reflejo del repo, que se puede reimportar). Después de la primera cotización real, sin retorno por bajada: la
   corrección es una migración nueva hacia adelante.
 - External coordination: visto bueno del operador para aplicar migraciones y para la primera importación con
-  escritura. El prefijo del número y el arranque de la serie quedaron fijados por el CEO el 2026-10-12: ya no
-  requieren confirmación.
+  escritura. El prefijo del número y el arranque de la serie (15001) quedaron fijados por el CEO el 2026-10-12: ya
+  no requieren confirmación. El importador sólo acepta archivos commiteados y empujados: importar el catálogo vigente
+  exige que esté en el remoto, y empujar es decisión del operador.
 
 ### Security and access
 
@@ -354,10 +388,14 @@ Reglas obligatorias:
   Una identidad de agente pasa por la misma puerta como sujeto máquina derivado de su binding interno (ver
   «Identidad de agente»).
 - Sensitive data posture: documentos y artefactos llevan costos y márgenes internos; ningún dato de nómina ni de
-  personas. Permisos de base: `SELECT` e `INSERT` para `greenhouse_runtime` en las tablas de historia, sin `UPDATE` ni
-  `DELETE`; dueño `greenhouse_ops`. Los eventos llevan identificadores, versión, estado y huellas, nunca el texto.
-- Error contract: errores tipados del dominio en `src/lib/commercial/quoter/errors.ts`, que envuelven
-  `PricingV3Error` sin redefinir sus códigos; `captureWithDomain(err, 'commercial', …)`. La traducción a HTTP es de
+  personas. Permisos de base: `REVOKE ALL` y luego `SELECT` e `INSERT` para `greenhouse_runtime` en las tablas de
+  historia (el esquema concede `UPDATE` y `DELETE` por defecto a toda tabla nueva: se quitan a mano y el bloque de
+  verificación lo comprueba con `has_table_privilege`); sólo `SELECT` en números, contador y matriz; `UPDATE` sólo
+  en el índice de lectura. Dueño `greenhouse_ops`. Los eventos llevan identificadores, versión, estado y huellas,
+  nunca el texto.
+- Error contract: errores tipados del dominio en `src/lib/commercial/quoter/errors.ts`, que dejan pasar
+  `PricingV3Error` sin redefinir sus códigos y traducen cada rechazo con nombre de la base
+  (`QUOTER_CONSTRAINT_CODES`) a su código; `captureWithDomain(err, 'commercial', …)`. La traducción a HTTP es de
   las tasks de API.
 - Abuse/rate-limit posture: sin superficie expuesta en esta task. El importador es una herramienta de operador.
 
@@ -409,10 +447,9 @@ Reglas obligatorias:
   crea en el clúster local una base desechable con los roles `greenhouse_ops` y `greenhouse_runtime` y las tablas
   núcleo mínimas, aplica la mitad `Up` de las migraciones pendientes, las baja y las vuelve a subir, y corre las
   pruebas conectando como `greenhouse_runtime`. Una prueba omitida por falta de clúster no cuenta.
-- Volatilidad medida en discovery (clúster local, PostgreSQL 18.6): `sha256(bytea)` es inmutable y
+- Volatilidad medida (clúster local, PostgreSQL 16.15, la versión de la base real): `sha256(bytea)` es inmutable y
   `convert_to(text, name)` es `STABLE`. Por la regla de este slice la comprobación de huella va como disparador
-  `BEFORE INSERT`, con las funciones calificadas por esquema. Confirmar la misma volatilidad en la base real
-  (PostgreSQL 16) con una consulta de sólo lectura al catálogo antes del Slice 6.
+  `BEFORE INSERT`, con las funciones calificadas por esquema.
 - Verificar que cada artefacto del corpus declara un solo `engineVersion` y un solo contrato de entrada. Si alguno
   trae más de uno, `engine_version` y `contract_version` guardan el mayor y siguen siendo sólo índices de lectura.
 - El resultado decide el mecanismo y queda escrito en el documento de modelo de datos. Si alguna huella difiere, la
@@ -422,7 +459,8 @@ Reglas obligatorias:
 
 - Migración 1 (pendiente): `quoter_source_documents`, `quoter_pointer_history`, vista `quoter_current_pointer`,
   disparadores de sólo agregar (rechazan `UPDATE`, `DELETE` y `TRUNCATE`), de huella del texto y de control optimista
-  del puntero, bloque de verificación, permisos.
+  del puntero, todos con rechazo nombrado; `REVOKE` y permisos; bloque de verificación por nombre de disparador y por
+  privilegio.
 - `source-documents-store.ts` y `pointer-store.ts` (SQL directo sobre el cliente de la transacción recibida), con
   comprobación de huella al leer.
 - Eventos `commercial.quoter.source_document.stored` y `commercial.quoter.pointer.activated` publicados con
@@ -430,20 +468,25 @@ Reglas obligatorias:
 
 ### Slice 3 — Agregado de cotización
 
-- Migración 2 (pendiente): secuencias y funciones de número público, `quoter_quotes`, `quoter_quote_recipients`,
-  `quoter_quote_numbers`, `quoter_quote_versions`, `quoter_state_matrix` (con su siembra), `quoter_state_transitions`,
-  `quoter_exception_approvals`, `quoter_version_documents`, vista `quoter_quote_current`, disparadores, bloque de
-  verificación, permisos.
+- Migración 2 (pendiente): `quoter_quotes`, `quoter_quote_versions`, `quoter_quote_version_index`,
+  `quoter_state_matrix` (con su siembra), `quoter_version_documents`, `quoter_exception_approvals`,
+  `quoter_state_transitions`, `quoter_quote_recipients`, `quoter_quote_number_counters` (con su siembra: real 15001,
+  sintética 1), `quoter_quote_numbers`, vista `quoter_quote_current`, funciones `quoter_lock_quote` y
+  `quoter_quote_state`, disparadores con rechazo nombrado, `REVOKE` y permisos, bloque de verificación.
 - `quote-store.ts`, la única puerta de escritura al agregado: crear identidad con su versión 1 y su primer estado en
-  una transacción, agregar versión, agregar estado, asignar o reasignar la destinataria, registrar una aprobación de
-  excepción, asignar número, guardar datos de documento, leer versión (texto guardado y huellas verificadas). Toda
-  escritura recibe el contexto del comando (`commandExecutionId`, huella del pedido, actor). Antes de guardar una
-  versión toma un bloqueo por `replay_digest` y rechaza si ese cálculo ya vive en una cotización no retirada. Ninguna
-  de estas funciones queda expuesta por una ruta en esta task. Crear identidad
-  recibe la organización dueña ya resuelta por `resolveQuoterOwnerOrganizationId()`; nunca un valor de quien llama a
-  la API.
+  una transacción, agregar versión (sobre una emitida registra antes `issued → revising`), registrar un cambio de
+  estado (emitir fija versión y documento, y devuelve el número), asignar o reasignar la destinataria, decidir una
+  excepción (`decideException`: aprobar o revocar), guardar datos de documento, leer versión (texto guardado y
+  huellas verificadas) y reconstruir su índice de lectura (`rebuildVersionIndex`). No asigna números: lo hace la
+  base. Toda escritura recibe el contexto del comando (`commandExecutionId`, huella del pedido) y el actor con su
+  `principalId`. Antes de guardar una versión toma un bloqueo por `replay_digest` y rechaza si ese cálculo ya vive
+  en una cotización no retirada. Ninguna de estas funciones queda expuesta por una ruta en esta task. Crear
+  identidad recibe la organización dueña ya resuelta por `resolveQuoterOwnerOrganizationId()`; nunca un valor de
+  quien llama a la API.
+- `errors.ts`: registro cerrado de códigos y `QUOTER_CONSTRAINT_CODES`, el mapa nombre de rechazo → código, con
+  `constraint-names.test.ts` (todo `RAISE` nombrado tiene su código y ninguna entrada sobra).
 - `state-machine.ts` con la matriz en TypeScript y `state-machine-parity.test.ts`, que lee el bloque sembrado de la
-  migración y exige igualdad.
+  migración y exige igualdad; la misma comparación corre contra las filas reales en el clúster local.
 
 ### Slice 4 — Capacidades, permisos y puerta única
 
@@ -467,14 +510,19 @@ Reglas obligatorias:
   artefactos el `locator` es el `quote_id`: con él agrega una versión a esa cotización; sin él crea la cotización
   (identidad, versión 1 y `none → draft`) con el contexto de comando con que se construyó el adaptador. Siempre por
   las funciones de `quote-store.ts`.
-- La batería de `TASK-2024` gana una declaración del sujeto, `acceptsOnlyCalculated`: para este adaptador los
+- La batería de `TASK-2024` gana dos declaraciones del sujeto. `acceptsOnlyCalculated`: para este adaptador los
   artefactos no calculados deben ser **rechazados** (se prueba; el corpus tiene uno) y quedan fuera de los casos de
-  ida y vuelta. Para archivos y memoria nada cambia.
+  ida y vuelta. `pointerNamesOnlyHeldDocuments`: un puntero sólo entra si sus tres documentos ya están guardados, así
+  que el caso 7 los guarda primero y el caso del puntero que nombra un documento ausente espera el rechazo. El caso
+  3 pasa `replayDigest` (este adaptador no direcciona por ruta: `locator` devuelve `undefined`). Para archivos y
+  memoria nada cambia.
 - Ejecutar `runStorageConformance` contra este adaptador en el clúster local, con una base desechable por almacén
   vacío.
 - `scripts/commercial/quoter-import.ts` (`pnpm quoter:import`): recorre los documentos del repo, calcula su huella
-  con `catalogDigest`, y guarda los que falten. Subcomando separado para reflejar el puntero del repo, con
-  `--actor-member-id` y `--reason` obligatorios.
+  con `catalogDigest`, y guarda los que falten. Rechaza un archivo con cambios sin commitear o cuyo commit no está en
+  el remoto, y guarda el SHA del commit con cada fila. Subcomando separado para reflejar el puntero del repo, con
+  `--reason` obligatorio y el mismo SHA: el reflejo no exige una persona (la decisión fue el commit); activar en la
+  plataforma, sí.
 - Pruebas de `## Detailed Spec` §«Pruebas obligatorias».
 
 ### Slice 6 — Aplicación con visto bueno, importación y documentación
@@ -540,46 +588,73 @@ objetos que lo usan; reutiliza `stableJson` del motor. No transforma un artefact
 - `parent_digest text` (el documento al que sucede, cuando lo declara)
 - `origin text NOT NULL CHECK (origin IN ('repo_import','artifact_embedded','platform_apply'))`
 - `source_path text` (ruta del repo cuando `origin = 'repo_import'`; ruta del artefacto que lo trae dentro cuando
-  `origin = 'artifact_embedded'`: una versión que no existió como archivo propio)
+  `origin = 'artifact_embedded'`: una versión que no existió como archivo propio) y `source_commit_sha text` (40
+  hexadecimales): los dos obligatorios salvo en `platform_apply` (`quoter_source_documents_origin_names_its_source`)
 - `stored_by_actor_kind text NOT NULL CHECK (stored_by_actor_kind IN ('member','agent','service'))`,
-  `stored_by_member_id text`, `reason text NOT NULL CHECK (length(btrim(reason)) >= 5)`
-- `command_execution_id text`, `request_hash text CHECK (request_hash ~ '^[0-9a-f]{64}$')`
+  `stored_by_member_id text`, `stored_by_principal_id text NOT NULL`,
+  `reason text NOT NULL CHECK (length(btrim(reason)) >= 5)`
+- `command_execution_id text` (referencia blanda; el importador no corre bajo un comando),
+  `request_hash text CHECK (request_hash ~ '^[0-9a-f]{64}$')`
 - `stored_at timestamptz NOT NULL DEFAULT now()`
 - Llave primaria `(role, document_digest)`; única `(role, version)`: una versión ya usada no cambia de contenido.
 - Comprobación de huella sobre `canonical_text` por disparador `BEFORE INSERT` (resultado del Slice 1).
 - Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`. Vale para todas las tablas de sólo agregar de esta
   task: sin el rechazo de `UPDATE` la huella se podría saltar reescribiendo el texto.
+- **Lectura.** El lector comprueba el sha256 del texto y nada más: no vuelve a pasar el documento por el validador
+  de su rol, que es el de hoy. Un documento guardado bajo un contrato anterior tiene que seguir siendo legible
+  mientras un artefacto lo nombre. La identidad se compara por columnas (rol, versión, huella), que se derivaron
+  del valor validado al escribir.
+- **Rechazos con nombre (vale para todas las tablas de esta task).** Cada `RAISE` de un disparador usa
+  `USING ERRCODE = 'check_violation', CONSTRAINT = '<nombre>'`, y cada restricción de tabla que el código necesita
+  distinguir lleva nombre explícito. `QUOTER_CONSTRAINT_CODES` en `errors.ts` es el único lugar que lee esos nombres.
+- **Permisos (ídem).** `REVOKE ALL … FROM greenhouse_runtime, greenhouse_app` y después lo justo. Los privilegios
+  por defecto del esquema (migración de TASK-345) dan `SELECT`, `INSERT`, `UPDATE` y `DELETE` al runtime en toda
+  tabla nueva de `greenhouse_ops`; el clúster local los copia para que el olvido falle ahí.
+- **Cabecera (ídem).** `SET LOCAL lock_timeout = '5s'`: la migración no se queda esperando un bloqueo en la base
+  compartida.
 
 ### `quoter_pointer_history` (sólo agregar)
 
-- `pointer_seq bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY`
-- `pointer_digest text NOT NULL UNIQUE` (identidad), `pointer_text text NOT NULL` (como se escribió),
-  `pointer_text_digest text NOT NULL` con comprobación de huella del texto
+- `pointer_seq bigint PRIMARY KEY`, asignado por el disparador bajo bloqueo (correlativo, sin huecos)
+- `pointer_digest text NOT NULL` (identidad; **sin único**: volver a un puntero anterior, byte a byte, es legítimo
+  y una tabla de la que nada se borra no puede prohibirlo para siempre), `pointer_text text NOT NULL` (como se
+  escribió), `pointer_text_digest text NOT NULL` con comprobación de huella del texto
 - `previous_pointer_digest text` — obligatorio salvo en la primera fila
-- `catalog_digest`, `policy_digest`, `credits_digest`: cada una con llave foránea a
+- `catalog_digest`, `policy_digest`, `credits_digest`: cada una con llave foránea nombrada a
   `quoter_source_documents (role, document_digest)` con el rol fijo correspondiente
 - `origin text NOT NULL CHECK (origin IN ('repo_mirror','platform_activation'))`
-- `activated_by_member_id text NOT NULL` — mover el puntero es siempre un acto de una persona identificada
+- `activated_by_member_id text` — obligatorio en `platform_activation`
+  (`quoter_pointer_history_activation_needs_person`): activar en la plataforma es siempre un acto de una persona
+  identificada. Un reflejo del repo no la exige: la persona decidió al commitear el archivo
+- `activated_by_principal_id text NOT NULL`
+- `source_commit_sha text` — obligatorio en `repo_mirror` (`quoter_pointer_history_mirror_names_its_commit`)
 - `reason text NOT NULL CHECK (length(btrim(reason)) >= 5)`
 - `command_execution_id text`, `request_hash text`, `activated_at timestamptz NOT NULL DEFAULT now()`
-- Disparador `BEFORE INSERT`: toma un bloqueo transaccional, lee la fila de mayor `pointer_seq` y rechaza si
-  `previous_pointer_digest` no es su `pointer_digest` (o si no es nulo con la tabla vacía).
-- Disparadores: rechazo de `UPDATE` y de `DELETE`.
+- Disparador `BEFORE INSERT`: toma un bloqueo transaccional de dos claves, lee la fila de mayor `pointer_seq` y
+  rechaza (`quoter_pointer_history_follows_current`) si `previous_pointer_digest` no es su `pointer_digest` (o si no
+  es nulo con la tabla vacía).
+- Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`.
 - Vista `quoter_current_pointer`: la fila de mayor `pointer_seq`. No existe «la versión más alta gana».
 - Ningún disparador de `quoter_source_documents` inserta aquí.
 
 ### `quoter_quotes` (identidad; inmutable)
 
-- `quote_id text PRIMARY KEY DEFAULT ('qtr-' || gen_random_uuid()::text)`
-- `owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations(organization_id)` — la organización
-  dueña y emisora: siempre la canónica de Efeonce, resuelta por el servidor (ver «Organización dueña y destinataria»)
+- `quote_id text PRIMARY KEY DEFAULT ('qtr-' || gen_random_uuid()::text)`, con `CHECK` de formato: una ruta o un
+  texto de prueba no se vuelve un identificador permanente
+- `owner_organization_id text NOT NULL`, llave foránea nombrada a `greenhouse_core.organizations` — la organización
+  dueña y emisora: siempre la canónica de Efeonce, resuelta por el servidor (ver «Organización dueña y
+  destinataria»). Un disparador `BEFORE INSERT` exige además que sea la entidad operativa activa
+  (`quoter_quotes_owner_is_operating_entity`): comprueba el hecho, sin UUID en ninguna parte
 - Sin organización destinataria en esta fila: vive en `quoter_quote_recipients`, un solo lugar.
 - Sin referencia al negocio (ver `## Out of Scope`).
-- `data_origin text NOT NULL DEFAULT 'real' CHECK (data_origin IN ('real','synthetic'))`
-- `created_by_actor_kind`, `created_by_member_id`, `command_execution_id`, `request_hash`, `created_at`
+- `data_origin text NOT NULL CHECK (data_origin IN ('real','synthetic'))`, **sin valor por defecto**: una
+  cotización de prueba que naciera `real` por omisión consumiría un número real, y la fila no se corrige. Lo decide
+  la identidad que crea, nunca un campo del pedido (`TASK-2027`)
+- `created_by_actor_kind`, `created_by_member_id`, `created_by_principal_id text NOT NULL`,
+  `command_execution_id text NOT NULL`, `request_hash`, `created_at`
 - Sin columna de estado, de número, de destinataria ni de «versión vigente»: viven en tablas de sólo agregar y se
   leen por la vista.
-- Disparadores: rechazo de `UPDATE` y de `DELETE`.
+- Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`.
 
 ### Organización dueña y destinataria
 
@@ -604,38 +679,49 @@ potencial cliente.
   rechaza una transición a `issued` de una cotización sin destinataria asignada.
 - **Dónde vive: `quoter_quote_recipients` (sólo agregar).** `quote_id` (llave foránea), `assignment_seq integer`,
   llave primaria de los dos; `owner_organization_id` repetido y comprobado contra el padre;
-  `client_organization_id text NOT NULL REFERENCES greenhouse_core.organizations(organization_id)`;
-  `assigned_by_actor_kind`, `assigned_by_member_id`, `reason`, `command_execution_id`, `request_hash`, `assigned_at`.
+  `client_organization_id text NOT NULL` con llave foránea nombrada a `greenhouse_core.organizations` y `CHECK` de
+  que no es la dueña; `assigned_by_actor_kind`, `assigned_by_member_id`, `assigned_by_principal_id NOT NULL`,
+  `reason`, `command_execution_id NOT NULL`, `request_hash`, `assigned_at`.
   Rige la fila de mayor `assignment_seq`. Se puede reasignar mientras la cotización esté en `draft`: un agente se va
   a equivocar de organización en un borrador y la identidad no admite corrección. Un disparador `BEFORE INSERT`,
-  bajo el bloqueo de la cotización, exige `assignment_seq` igual al máximo más uno y rechaza la fila si el estado
-  vigente no es `draft`. Desde la primera emisión la destinataria queda congelada, y con ella lo que se emitió.
+  bajo el bloqueo de la cotización, asigna `assignment_seq` (máximo más uno) y rechaza la fila si el estado vigente
+  no es `draft` (`quoter_quote_recipients_only_in_draft`). Desde la primera emisión la destinataria queda congelada,
+  y con ella lo que se emitió. Quien emite puede declarar la destinataria que vio; si la vigente es otra, el almacén
+  responde `recipient_conflict`.
   Disparadores: rechazo de `UPDATE`, `DELETE` y `TRUNCATE`.
 - Ser la destinataria no da acceso a nada: abrir una lectura a una identidad de cliente es otra decisión
   (`TASK-2027`, «Organización»).
 
-### Número público: `quoter_quote_numbers` (sólo agregar)
+### Número público: `quoter_quote_number_counters` y `quoter_quote_numbers`
 
 - El número se asigna **en la primera emisión**, no al crear la cotización: un borrador no consume número y la
   identidad no necesita actualizarse.
-- `quote_id text PRIMARY KEY` (llave foránea): una cotización tiene como máximo un número, para siempre.
-- `quote_number text NOT NULL UNIQUE`, `number_series text NOT NULL CHECK (number_series IN ('real','synthetic'))`
-  igual al `data_origin` de la cotización (lo comprueba un disparador), `assigned_at`, `command_execution_id`.
-- Prefijo `EO-QTE-` y serie real que empieza en 15: la primera cotización real emitida es `EO-QTE-15` (CEO,
-  2026-10-12). El prefijo es lo único de estas tablas que ve un cliente.
-- `quoter_quote_number_seq` se crea con `START WITH 15`. Función `next_quoter_quote_number()` en plpgsql con **un**
-  `nextval`, que devuelve `'EO-QTE-' || n::text`: sin relleno, para que el número se lea como lo fijó el CEO, y por
-  lo tanto sin recorte posible. Nunca `to_char(…, 'FM…')` ni dos `nextval` en una expresión. Si alguna vez se pide
-  ancho fijo, la única forma admitida es `lpad(n::text, GREATEST(N, length(n::text)), '0')`.
-- El bloque de verificación de la migración comprueba el arranque leyendo `pg_sequences` (`start_value = 15`); no
-  llama a `nextval`, porque en la base compartida eso consumiría el 15.
-- Segunda secuencia y función para la serie sintética (`EO-QTE-T-1` en adelante), aprobada por el CEO el 2026-10-12,
-  de modo que un ejemplo emitido en la base compartida no consuma ni salte números reales.
-- El comando inserta una fila a la vez y la función se evalúa en ese `INSERT`; ningún `INSERT … SELECT … ON CONFLICT`
-  la evalúa por filas candidatas.
-- Disparadores: rechazo de `UPDATE` y de `DELETE`.
+- **Lo asigna la base, no el código.** Un disparador `AFTER INSERT` sobre `quoter_state_transitions`, cuando la fila
+  va a `issued` y la cotización todavía no tiene número, avanza el contador de su serie y agrega la fila del número,
+  en la misma transacción de la emisión. La función es `SECURITY DEFINER`, del dueño, con `search_path` fijo y sin
+  `EXECUTE` para nadie más: el runtime no puede insertar un número ni mover el contador, y nadie emite sin número ni
+  consume un número sin emitir.
+- `quoter_quote_number_counters`: `series` (`real | synthetic`, llave primaria), `prefix`, `next_value bigint`. Una
+  fila por serie, sembrada: real `EO-QTE-` desde **15001**, sintética `EO-QTE-T-` desde 1. Un disparador sólo
+  admite que avance de a uno (`quoter_quote_number_counters_advances_by_one`) y nada la borra.
+- Por qué un contador y no una secuencia: una secuencia consume un valor aunque la transacción falle, y la primera
+  cotización real tiene que ser `EO-QTE-15001` con correlativas después. El contador avanza dentro de la transacción
+  de la emisión: si la emisión no confirma, el número no se consumió. El costo es que dos emisiones esperan una a la
+  otra por esa fila; con este volumen no importa.
+- `quoter_quote_numbers` (sólo agregar): `quote_id text PRIMARY KEY` (una cotización tiene como máximo un número,
+  para siempre), `quote_number text NOT NULL UNIQUE`, `issued_transition_seq` (llave foránea a la emisión que lo
+  produjo), `assigned_at`.
+- Prefijo `EO-QTE-` y serie real que empieza en 15001: la primera cotización real emitida es `EO-QTE-15001` y sigue
+  correlativa (`EO-QTE-15002`, …) (CEO, 2026-10-12). Sin relleno: el número se imprime tal cual, así que no hay
+  recorte posible. El prefijo es lo único de estas tablas que ve un cliente.
+- La serie se decide por el `data_origin` de la cotización: una sintética (`EO-QTE-T-1` en adelante, aprobada por el
+  CEO el 2026-10-12) no consume ni salta números reales.
+- El bloque de verificación de la migración comprueba el arranque leyendo el contador (`next_value = 15001`): no
+  consume ningún número.
+- Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE` sobre los números; sobre el contador, sólo el
+  avance de a uno.
 
-### `quoter_quote_versions` (inmutable)
+### `quoter_quote_versions` (inmutable) y `quoter_quote_version_index` (reconstruible)
 
 - `quote_id` (llave foránea), `version_number integer NOT NULL CHECK (version_number >= 1)`, llave primaria
   `(quote_id, version_number)`; `owner_organization_id` repetido y comprobado contra el padre
@@ -643,28 +729,35 @@ potencial cliente.
   de huella del texto
 - `replay_digest text NOT NULL CHECK (replay_digest ~ '^[0-9a-f]{64}$')`, `calculation_id text NOT NULL`; única
   `(quote_id, replay_digest)` e índice no único sobre `replay_digest`. La huella es evidencia, no llave del registro
+- única `(quote_id, version_number, artifact_digest)`: existe para que un cambio de estado y una aprobación nombren
+  una versión real **con su huella** por llave foránea compuesta
 - `artifact_version text NOT NULL CHECK (artifact_version IN ('pricing-v3-local-artifact/1',
   'pricing-v3-selection-quote/1','pricing-v3-resource-composition/1'))`
-- `contract_version text NOT NULL`, `engine_version text NOT NULL` — el contrato de entrada y el motor que lo
-  calcularon, tal como los firma el artefacto
 - `calculation_status text NOT NULL CHECK (calculation_status = 'calculated')`
+- `below_floor boolean NOT NULL` — el veredicto del motor, congelado con la versión: alguna fila de algún período
+  trae el diagnóstico `MARGIN_BELOW_FLOOR`. No es un índice: la regla de la emisión lo lee
 - `origin text NOT NULL CHECK (origin IN ('platform','local'))` — calculada por la API o hecha en local y registrada
   después de recalcularla
-- Fuentes por versión y huella (`catalog_version`, `catalog_digest`, `policy_version`, `policy_digest`,
-  `credits_version`, `credits_digest`), anulables según el carril. Confirmar en Discovery qué carriles las declaran.
-  Son índices para trazar, no la fuente con que se reproduce: el artefacto lleva sus fuentes dentro.
-- `supersedes_version_number integer` — la versión de la misma cotización a la que reemplaza; un disparador exige que
-  exista y sea menor. Reemplazar es agregar una versión; ninguna fila anterior cambia.
-- Índices de lectura mínimos y comentados como tales (`COMMENT ON COLUMN … 'read index; never the source of a
-  result'`): `currency text` y, si hace falta para listar, un total en `numeric`. Ninguno más sin justificarlo.
-- `registered_by_actor_kind`, `registered_by_member_id`, `command_execution_id text NOT NULL`, `request_hash`,
-  `registered_at`
-- Disparador `BEFORE INSERT`: bloqueo transaccional por cotización y `version_number` igual al máximo más uno.
+- `registered_by_actor_kind`, `registered_by_member_id`, `registered_by_principal_id text NOT NULL`,
+  `command_execution_id text NOT NULL`, `request_hash`, `registered_at`
+- Sin `supersedes_version_number` ni `metadata_json`: reemplazar es agregar la versión siguiente, y eso ya lo dice
+  el correlativo.
+- Disparador `BEFORE INSERT`, bajo el bloqueo de la cotización: `version_number` igual al máximo más uno
+  (`quoter_quote_versions_next_number`), y el estado vigente admite versiones — sin estado todavía, `draft` o
+  `revising` (`quoter_quote_versions_state_admits_version`). Sobre una cotización emitida el almacén registra
+  primero `issued → revising`; una retirada no recibe versiones.
 - **Un cálculo vive en una sola cotización no retirada.** Lo hace cumplir `quote-store.ts`, no una restricción: antes
   de insertar toma un bloqueo transaccional por `replay_digest` y rechaza con `artifact_already_registered` (con la
   cotización y la versión existentes) si esa huella ya está en una cotización cuyo estado vigente no es `withdrawn`.
   Así, retirar un borrador libera el cálculo para registrarlo de nuevo.
-- Disparadores: rechazo de `UPDATE` y de `DELETE`.
+- Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`.
+
+**Índices de lectura, en tabla aparte.** `quoter_quote_version_index (quote_id, version_number)` con
+`contract_version`, `engine_version`, `currency`, y versión y huella de catálogo, política y créditos, todos
+anulables, más `indexed_at`. No es inmutable: el runtime puede insertar y actualizar, y `rebuildVersionIndex` la
+reescribe desde `artifact_text`. En la fila inmutable un error del extractor sería para siempre; aquí se corrige.
+Son índices para listar y trazar, nunca la fuente de un resultado ni la fuente con que se reproduce: el artefacto
+lleva sus fuentes dentro. Cuando un artefacto nombra más de un motor o contrato, guardan el mayor.
 
 ### `quoter_state_matrix` y `quoter_state_transitions`
 
@@ -673,18 +766,39 @@ par nuevo, entra por una migración que sólo agrega filas.
 
 - Matriz: `(from_state text, to_state text, requires_human_gate boolean NOT NULL)`, llave primaria
   `(from_state, to_state)`, sembrada en la migración. El estado inicial usa un origen centinela (`'none'`).
-- Historial (sólo agregar): `transition_id`, `quote_id`, `owner_organization_id`, `from_state`, `to_state`,
-  `version_number` y `artifact_digest` (obligatorios cuando `to_state = 'issued'`: dicen qué versión y qué huella se
-  emitió), `requires_human_gate` (copiado de la matriz por el disparador, no dado por quien llama), `actor_kind`,
-  `actor_member_id`, `reason text NOT NULL CHECK (length(btrim(reason)) >= 5)`, `metadata_json jsonb`,
-  `command_execution_id text NOT NULL`, `request_hash`, `occurred_at`.
+- Historial (sólo agregar): llave primaria `(quote_id, transition_seq)`; `transition_id` único;
+  `owner_organization_id`; `from_state`, `to_state`; `requires_human_gate` (copiado de la matriz por el disparador,
+  no dado por quien llama); `actor_kind`, `actor_member_id`, `actor_principal_id text NOT NULL`;
+  `reason text NOT NULL CHECK (length(btrim(reason)) >= 5)`; `command_execution_id text NOT NULL`, `request_hash`,
+  `occurred_at`. Sin `metadata_json`.
+- **Orden propio.** `transition_seq integer` lo asigna el disparador bajo el bloqueo de la cotización, correlativo
+  desde 1. El estado vigente es el de la fila de mayor `transition_seq`. `occurred_at` es la hora del inicio de la
+  transacción y no ordena: dos transacciones que se cruzan pueden confirmar en orden inverso a su hora, y un orden
+  por hora haría que la base y la aplicación respondieran estados distintos para la misma cotización.
+- **Qué se emitió.** `version_number`, `artifact_digest`, `document_seq` y `document_digest`: los cuatro presentes
+  cuando `to_state = 'issued'` y los cuatro nulos en cualquier otro cambio
+  (`quoter_state_transitions_issue_names_what_it_issues`). Llave foránea compuesta
+  `(quote_id, version_number, artifact_digest)` a la versión y
+  `(quote_id, version_number, document_seq, document_digest)` al documento: una emisión no puede nombrar una versión
+  inexistente, una huella que no es la de esa versión, ni un documento que no es de ella.
 - Restricción: `requires_human_gate = false OR (actor_kind = 'member' AND actor_member_id IS NOT NULL)`.
-- Disparador `BEFORE INSERT`: bloqueo transaccional por cotización; el par debe existir en la matriz; `from_state`
-  debe ser el estado vigente de la cotización (o el centinela si es su primera fila); una transición a `issued` exige
-  una destinataria asignada. Ninguna migración de referencia valida «el origen es el vigente» en la base (lo hacen
-  en la aplicación): este disparador es nuevo, no copiado.
-- Vista `quoter_quote_current`: por cotización, su estado vigente, su número si lo tiene, su última versión y su
-  última versión emitida.
+- Disparador `BEFORE INSERT`, bajo el bloqueo de la cotización, cada regla con su nombre:
+  - `from_state` es el estado vigente, o el centinela si es su primera fila (`…_from_is_current`);
+  - el par existe en la matriz (`…_pair_exists`);
+  - hacia `issued`: la versión es la última **o la última emitida** (`…_issues_last_or_issued_version`); la
+    cotización tiene destinataria (`…_issue_needs_recipient`); el documento nombrado es el que rige para esa versión
+    (`…_issues_document_in_force`); y si la versión está bajo el piso, la última decisión sobre su excepción es
+    `approved` (`…_issue_needs_exception_approval`).
+  Ninguna migración de referencia valida «el origen es el vigente» en la base (lo hacen en la aplicación): este
+  disparador es nuevo, no copiado.
+- **Volver desde `revising`.** `revising → issued` con la última versión emitida devuelve la cotización a lo que el
+  cliente ya tenía, sin fabricar una versión nueva. Sin eso, una revisión abierta por error sólo se cerraba
+  retirando la cotización. Con el mismo par se corrige el documento de una cotización emitida: `issued → revising`,
+  se guarda el documento corregido y se emite de nuevo; cada emisión conserva el documento que emitió.
+- Función `quoter_quote_state(quote_id)`: el estado vigente. Función `quoter_lock_quote(quote_id)`: el bloqueo
+  transaccional de dos claves que toman el almacén y todos los disparadores del agregado.
+- Vista `quoter_quote_current`: por cotización, su estado vigente, su número si lo tiene, su destinataria, su última
+  versión (con `below_floor`) y lo último que se emitió (versión, huella, documento y hora).
 
 | Origen | Destino | Compuerta humana | Lo dispara |
 | --- | --- | --- | --- |
@@ -703,36 +817,49 @@ Ningún par exige compuerta humana (decisión 7, enmendada por el CEO el 2026-10
 está dentro de política y, por el mismo principio, retira lo que puede emitir. Los dos actos de persona del
 cotizador no son cambios de estado y por eso no aparecen aquí: la aprobación de una excepción bajo el piso vive en
 `quoter_exception_approvals` (`actor_kind = 'member'`) y la activación del catálogo en `quoter_pointer_history`
-(`activated_by_member_id NOT NULL`). La columna `requires_human_gate` y su restricción se conservan como mecanismo:
-marcar un par exige una decisión del CEO y una migración. Que una versión bajo el piso no se emita sin su
-aprobación registrada —la emita quien la emita— lo comprueba el comando de emisión de `TASK-2027`.
+(persona obligatoria en `platform_activation`). La columna `requires_human_gate` y su restricción se conservan como
+mecanismo: marcar un par exige una decisión del CEO y una migración. Que una versión bajo el piso no se emita sin
+una aprobación vigente —la emita quien la emita— lo comprueba la base en el disparador de arriba, además del
+almacén: una regla de negocio de este peso no puede depender de que todo escritor pase por el mismo código.
 
 ### `quoter_exception_approvals` (sólo agregar)
 
 La aprobación de una excepción bajo el piso no es un estado: es un acto registrado que la emisión comprueba.
 
-- `quote_id`, `version_number` (llave foránea a la versión), `owner_organization_id`
-- `artifact_digest text NOT NULL` — debe ser el de esa versión (lo comprueba un disparador): una versión nueva no
-  hereda la aprobación
-- `approved_by_member_id text NOT NULL`, `actor_kind text NOT NULL CHECK (actor_kind = 'member')`
+- Llave primaria `(quote_id, version_number, approval_seq)`; `approval_seq` lo asigna el disparador bajo el bloqueo
+  de la cotización. `owner_organization_id`.
+- `artifact_digest text NOT NULL`, con llave foránea compuesta `(quote_id, version_number, artifact_digest)` a la
+  versión: una versión nueva no hereda la aprobación.
+- `decision text NOT NULL CHECK (decision IN ('approved','revoked'))`. **Rige la última decisión**: una aprobación
+  dada por error se revoca agregando una fila, y se puede volver a aprobar. Una fila única por versión no dejaba
+  salida en una tabla de la que nada se borra.
+- `actor_kind text NOT NULL CHECK (actor_kind = 'member')`, `decided_by_member_id text NOT NULL`,
+  `decided_by_principal_id text NOT NULL`
 - `reason text NOT NULL CHECK (length(btrim(reason)) >= 10)`
-- `command_execution_id`, `request_hash`, `approved_at`
-- Única `(quote_id, version_number)`. Disparadores: rechazo de `UPDATE` y de `DELETE`.
-- Que una versión bajo el piso no se emita sin esta fila lo decide el comando de `TASK-2027` leyendo el artefacto; la
-  base no lo infiere de una columna.
+- `command_execution_id text NOT NULL`, `request_hash`, `decided_at`
+- Disparador `BEFORE INSERT`: sólo una versión con `below_floor = true` recibe una decisión
+  (`quoter_exception_approvals_version_is_below_floor`), y la decisión cambia la vigente
+  (`quoter_exception_approvals_decision_changes_it`): se aprueba lo que no está aprobado y se revoca lo que sí.
+- Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`.
+- Revocar después de emitir no deshace la emisión: retirar la cotización es otro acto.
 
 ### `quoter_version_documents` (sólo agregar)
 
-- `quote_id`, `version_number`, `document_seq integer`, llave primaria de los tres; `owner_organization_id`
+- `quote_id`, `version_number`, `document_seq integer` (asignado por el disparador), llave primaria de los tres;
+  única además con `document_digest`, para la llave foránea de la emisión; `owner_organization_id`
 - `brief_text text NOT NULL`, `brief_digest text NOT NULL` — lo que se escribió para el documento (textos y
   referencias a opciones), en texto canónico con su huella
 - `document_text text NOT NULL`, `document_digest text NOT NULL` — los datos del documento que produce
   `compose document` sobre el artefacto guardado, congelados para que lo emitido se regenere igual
 - `template_data_version text NOT NULL` (la versión de datos de la plantilla A4)
-- `stored_by_actor_kind`, `stored_by_member_id`, `command_execution_id`, `request_hash`, `stored_at`
+- `stored_by_actor_kind`, `stored_by_member_id`, `stored_by_principal_id text NOT NULL`,
+  `command_execution_id text NOT NULL`, `request_hash`, `stored_at`
 - Corregir los textos es agregar una fila con `document_seq` mayor; rige la última.
-- Disparador: rechaza una fila nueva para una versión que ya fue emitida (existe un cambio de estado a `issued` con
-  ese `version_number`): lo emitido no cambia.
+- Disparador `BEFORE INSERT`: un documento entra mientras la cotización está en `draft` o en `revising`
+  (`quoter_version_documents_state_admits_document`). Lo emitido no cambia porque la emisión nombró su
+  `document_seq` y su `document_digest`: una corrección posterior es otra fila, y la emisión anterior sigue
+  apuntando a la suya. La regla anterior («ninguna fila nueva para una versión ya emitida») dejaba sin corrección
+  posible un error de tipeo en el documento de una cotización emitida.
 
 ### Capacidades y permisos
 
@@ -791,7 +918,12 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
 ### Adaptador PostgreSQL e importador
 
 - `storage-postgres.ts` construye el puerto sobre una transacción recibida; no abre conexiones propias
-  (`new Pool()` sólo existe en `src/lib/postgres/client.ts`).
+  (`new Pool()` sólo existe en `src/lib/postgres/client.ts`). No direcciona por ruta: su `locator` para la batería
+  devuelve `undefined`, y un artefacto se busca por `replayDigest`.
+- Un puntero sólo entra si sus tres documentos ya están guardados (llave foránea): el adaptador lo declara a la
+  batería (`pointerNamesOnlyHeldDocuments`).
+- Un artefacto se entrega y se registra con **un** serializador, el de la CLI: `JSON.stringify(artefacto, null, 2)`
+  más salto de línea. `TASK-2027` no habla de «texto canónico» para artefactos.
 - Lectura: devuelve el texto guardado y falla con error tipado si la huella recalculada no coincide.
 - Artefactos: `writeArtifact` con `locator` (un `quote_id`) agrega una versión; sin `locator` crea la cotización. Un
   `replay_digest` que ya vive en una cotización no retirada es `OUTPUT_EXISTS`. `readArtifact({ replayDigest })` sin
@@ -805,6 +937,8 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
   si todos los artefactos que la nombran la traen con la misma huella; si difieren, se detiene y lo reporta. Para cada
   uno: validar con el esquema del motor, calcular huella, comparar con el puntero cuando lo nombra, y guardar si
   falta. Si existe la misma `(role, version)` con otra huella, se detiene y reporta: nunca sobrescribe.
+- El importador sólo lee archivos commiteados y empujados (`git status` limpio para esa ruta y commit alcanzable
+  desde el remoto) y guarda el SHA con cada fila: lo que entra a una tabla inmutable se puede volver a encontrar.
 - Salida del importador: por documento, `stored | already_present | conflict`, con rol, versión y huella; nunca el
   contenido.
 
@@ -814,9 +948,9 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
    adaptador, leerlo, y comprobar que el texto es idéntico, que `artifact_digest` y `replay_digest` son los mismos y
    que la reproducción de su carril sobre el valor leído verifica. El artefacto no calculado del corpus se rechaza
    con `quote_not_calculated` y no deja fila.
-2. **El resultado no se reconstruye desde columnas.** Insertar por SQL de prueba una versión cuyas columnas de índice
-   (`currency`, total, `engine_version`) contradicen a propósito lo que dice su `artifact_text`; el lector debe
-   devolver los valores del artefacto y la reproducción debe verificar. Además, una prueba estática: ningún archivo de
+2. **El resultado no se reconstruye desde columnas.** Corromper a propósito el índice de lectura de una versión
+   (`currency`, `engine_version`); el lector debe devolver lo que dice el artefacto, y `rebuildVersionIndex` debe
+   dejar el índice como estaba. Además, una prueba estática: ningún archivo de
    `src/lib/commercial/quoter/` construye un artefacto o un resultado a partir de filas (el único origen de un
    resultado es `JSON.parse` del texto guardado o una llamada al motor).
 3. **Huella corrupta.** Una fila cuyo texto no corresponde a su huella no entra (restricción) y, forzada en una
@@ -826,14 +960,17 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
 5. **Puntero.** Guardar un documento no cambia `quoter_current_pointer`; una activación con huella previa equivocada
    falla; dos activaciones concurrentes dejan una sola fila nueva.
 6. **Estados y excepción.** Un par fuera de la matriz falla; un origen que no es el vigente falla; los siete pares
-   sembrados tienen `requires_human_gate = false` y un actor `agent` registra `draft → issued` e
-   `issued → withdrawn`; la restricción de compuerta se ejercita con un par marcado sólo en el clúster local, donde
-   un actor `agent` o `service` falla; una aprobación de excepción con una huella que no es la de su versión, o
-   registrada por un actor que no es una persona, falla; una fila del puntero sin `activated_by_member_id` falla.
-7. **Número.** En una base recién migrada la primera asignación real devuelve exactamente `EO-QTE-15`; la función no
-   rellena ni recorta (un valor de más de seis dígitos sale entero); dos asignaciones concurrentes obtienen números
-   distintos; una cotización no recibe un segundo número; una sintética no consume la secuencia real; crear un
-   borrador no consume ninguna.
+   sembrados tienen `requires_human_gate = false` y un actor `agent` emite y retira; el historial tiene
+   `transition_seq` correlativo; emitir exige versión emitible, destinataria y documento, en ese orden; desde
+   `revising` se vuelve a la última versión emitida y no a una anterior; una versión bajo el piso no se emite sin
+   aprobación vigente, ni por el almacén ni por SQL directo; sólo una persona decide, sólo sobre una versión bajo el
+   piso, y aprobar → revocar → aprobar deja vigente la última; una versión nueva no hereda la aprobación; una
+   activación del puntero en la plataforma sin persona falla, y un reflejo sin commit también.
+7. **Número.** En una base recién migrada la primera cotización real emitida recibe exactamente `EO-QTE-15001` y la
+   siguiente `EO-QTE-15002`; una emisión que no confirma no consume número; reemitir no cambia el número ni consume
+   otro; una sintética toma `EO-QTE-T-1` y no mueve el contador real; el runtime no puede insertar un número, mover
+   el contador ni ejecutar la función; el dueño no puede hacerlo saltar ni retroceder; crear un borrador no consume
+   ninguno.
 8. **Importador idempotente.** Segunda corrida: cero escrituras. Conflicto de versión con otra huella: se detiene.
 9. **Frontera.** Ningún archivo de `src/lib/commercial/quoter/` nombra `greenhouse_commercial.quotations`.
 10. **Dueña y sujeto máquina.** `resolveQuoterOwnerOrganizationId()` devuelve la fila de `EO-ORG-0007` y falla
@@ -847,9 +984,19 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
     `artifact_already_registered` mientras la primera no esté retirada, y pasa una vez retirada; el mismo cálculo
     dos veces en la misma cotización falla siempre; dos registros concurrentes del mismo cálculo dejan una sola fila.
 13. **Una sola puerta.** Una prueba estática confirma que sólo `quote-store.ts` contiene `INSERT` sobre las tablas del
-    agregado; una versión o un cambio de estado sin `command_execution_id` no entra.
+    agregado; una fila sin `command_execution_id`, sin `*_principal_id` o sin `data_origin` no entra.
+14. **Concurrencia real, con dos conexiones.** La misma cotización emitida dos veces a la vez deja una emisión y un
+    número; dos cotizaciones emitidas a la vez reciben números consecutivos; dos emisiones por SQL directo, sin
+    almacén, dejan una y la otra recibe `…_from_is_current`; una emisión y una reasignación de destinataria, o una
+    emisión y una corrección de documento, nunca dejan emitido algo que quien emitió no vio.
+15. **Rechazos con nombre.** Cada regla se ejercita por el almacén (código) y por SQL directo (SQLSTATE y nombre);
+    ninguna aserción lee el texto de un mensaje. `constraint-names.test.ts` exige que todo `RAISE` nombrado tenga su
+    código y que ninguna entrada del mapa sobre.
+16. **Falsificación.** Antes de dar una regla por probada se quita (en el SQL pendiente o en el almacén) y se
+    confirma que la suite se pone roja; se restaura y vuelve a verde. Hecho el 2026-10-12 para el bloqueo del
+    disparador de estados, la regla del piso, la regla del documento y el bloqueo del almacén.
 
-Las pruebas 1 a 8, 11, 12 y el lector de la dueña de la 10 corren contra el clúster PostgreSQL local. Una prueba omitida por
+Las pruebas 1 a 8, 11, 12, 14, 15 y el lector de la dueña de la 10 corren contra el clúster PostgreSQL local. Una prueba omitida por
 falta de clúster no cuenta como verde: el cierre exige una corrida con el clúster arriba.
 
 ## Rollout Plan & Risk Matrix
@@ -870,11 +1017,11 @@ falta de clúster no cuenta como verde: el cierre exige una corrida con el clús
 | Una migración aplicada desde local cambia producción sin que nadie lo haya decidido | migration / production | medium | Regla dura de visto bueno del operador; pruebas en clúster local; sólo objetos nuevos | Tablas `quoter_*` presentes en la base antes del Slice 6 |
 | PostgreSQL altera el texto o la huella de un artefacto | data | low | Slice 1 sobre el corpus completo antes del esquema; texto en `text`, nunca `jsonb` | Prueba 1 roja |
 | Historia de sólo agregar con un error de esquema: no se puede corregir editando | migration | medium | Pruebas en local; aplicar con tablas vacías; correcciones por migración nueva hacia adelante | Necesidad de un `UPDATE` sobre una tabla de historia |
-| Pruebas o ejemplos en la base compartida dejan filas permanentes y consumen números | data / production | high | `data_origin = 'synthetic'` con secuencia propia; organización de pruebas; pruebas automáticas sólo en clúster local | Cotizaciones `real` creadas por una prueba, un canario o una puerta de salida |
+| Pruebas o ejemplos en la base compartida dejan filas permanentes y consumen números | data / production | high | `data_origin` sin valor por defecto y decidido por la identidad; serie sintética con contador propio; pruebas automáticas sólo en clúster local | Cotizaciones `real` creadas por una prueba, un canario o una puerta de salida |
 | La siembra de capacidades llega a la base antes que el catálogo de TypeScript a producción | identity / production | medium | Misma entrega; revisar en Discovery si la prueba de paridad registro ↔ catálogo o alguna señal reacciona a filas sin entrada en el código desplegado; si reacciona, aplicar la migración 3 después del release | Señal o prueba de paridad de capacidades en rojo |
 | El importador activa un catálogo por accidente | finance | low | Guardar y activar son subcomandos distintos; ningún disparador activa; prueba 5 | Fila nueva en `quoter_pointer_history` sin motivo declarado |
 | La matriz de estados sembrada no coincide con el ciclo de vida que implemente la API de registro | data | low | Matriz igual a la que propone `TASK-2027`; como es dato, se amplía por una migración que sólo agrega filas | `TASK-2027` necesita un par inexistente |
-| El prefijo o el arranque de la serie cambian después de emitir | finance | low | Prefijo `EO-QTE-` y arranque en 15 fijados por el CEO el 2026-10-12; viven en la función y en la secuencia, y un cambio posterior no altera números ya asignados | Petición de cambio de prefijo con cotizaciones emitidas |
+| El prefijo o el arranque de la serie cambian después de emitir | finance | low | Prefijo `EO-QTE-` y arranque en 15001 fijados por el CEO el 2026-10-12; viven en la fila del contador, y un cambio posterior no altera números ya asignados | Petición de cambio de prefijo con cotizaciones emitidas |
 | El contrato del puerto cambia mientras se escribe el adaptador | checkout compartido | medium | Slice 5 empieza con `TASK-2024` cerrada o con su contrato congelado por escrito | La batería de conformidad no compila contra el adaptador |
 
 ### Feature flags / cutover
@@ -896,8 +1043,8 @@ visto bueno y la importación del catálogo.
 
 ### Production verification sequence
 
-1. Clúster local: aplicar las tres migraciones, correr las diez pruebas y la batería de conformidad; bajar y volver
-   a subir las migraciones para comprobar que la bajada deja la base como estaba.
+1. Clúster local (PostgreSQL 16): aplicar las tres migraciones, correr las pruebas obligatorias y la batería de
+   conformidad; bajar y volver a subir las migraciones para comprobar que la bajada deja la base como estaba.
 2. Operador: visto bueno explícito para aplicar a la base compartida. Sin él, la task queda en
    `code complete, rollout pendiente`.
 3. `pnpm pg:connect:migrate`; consulta de sólo lectura que confirma tablas, disparadores, restricciones, permisos de
@@ -905,7 +1052,7 @@ visto bueno y la importación del catálogo.
 4. `pnpm db:generate-types` y `pnpm pg:doctor`.
 5. Operador: visto bueno para la importación. `pnpm quoter:import` en simulación, revisar el plan, luego `--apply`.
 6. Segunda corrida: cero escrituras. Comparar, por documento, huella en la base contra huella en el repo.
-7. Reflejar el puntero del repo con actor y motivo; comprobar que `quoter_current_pointer` nombra las tres huellas de
+7. Reflejar el puntero del repo con motivo y commit; comprobar que `quoter_current_pointer` nombra las tres huellas de
    `data/pricing/v3-operating/current.json`.
 8. Comprobar que el cotizador actual no cambió: `pnpm staging:request /api/finance/quotes` responde como antes.
 
@@ -935,34 +1082,56 @@ visto bueno y la importación del catálogo.
       `-- Down Migration` y `pnpm migration-marker-gate` pasa.
 - [ ] En el clúster local las tres suben, bajan y vuelven a subir sin dejar objetos (`pnpm quoter:test:local`).
 - [ ] Ninguna migración nombra `greenhouse_commercial.quotations` ni altera un objeto existente.
-- [ ] Existen las diez tablas `greenhouse_commercial.quoter_*`, las dos vistas y las funciones de número, todas con
-      dueño `greenhouse_ops`; `greenhouse_runtime` no tiene `UPDATE` ni `DELETE` sobre las tablas de historia.
+- [ ] Existen las doce tablas `greenhouse_commercial.quoter_*`, las dos vistas y sus funciones, todas con dueño
+      `greenhouse_ops`; `greenhouse_runtime` no tiene `UPDATE`, `DELETE` ni `TRUNCATE` sobre las tablas de historia,
+      ni `INSERT` sobre los números, y la migración lo comprueba con `has_table_privilege`.
 - [ ] La huella de cada documento y de cada artefacto la comprueba la base al insertar (restricción o disparador,
       según el resultado del Slice 1) y el adaptador al leer.
-- [ ] `UPDATE`, `DELETE` y `TRUNCATE` fallan en `quoter_source_documents`, `quoter_pointer_history`, `quoter_quotes`,
+- [x] `UPDATE`, `DELETE` y `TRUNCATE` fallan en `quoter_source_documents`, `quoter_pointer_history`, `quoter_quotes`,
       `quoter_quote_recipients`, `quoter_quote_numbers`, `quoter_quote_versions`, `quoter_state_transitions`,
       `quoter_exception_approvals` y `quoter_version_documents`.
-- [ ] La destinataria se asigna y se reasigna sólo en `draft`, rige la última, y una cotización sin destinataria no
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; runtime sin privilegio (42501) y dueño rechazado por `quoter_append_only`.
+- [x] La destinataria se asigna y se reasigna sólo en `draft`, rige la última, y una cotización sin destinataria no
       pasa a `issued` (prueba 11).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; almacén y SQL directo (`quoter_quote_recipients_only_in_draft`).
 - [ ] El mismo cálculo no entra dos veces en una cotización ni en una segunda cotización viva; retirar lo libera
       (prueba 12). Sólo `quote-store.ts` escribe en las tablas del agregado, y versión y cambio de estado exigen
       `command_execution_id` (prueba 13).
-- [ ] Guardar un documento no agrega una fila a `quoter_pointer_history`; una activación exige persona identificada,
-      motivo y la huella del puntero que reemplaza.
-- [ ] `quoter_quote_versions` rechaza un artefacto cuyo estado de cálculo no es `calculated`.
-- [ ] La función de número usa un solo `nextval` y no rellena ni recorta (probado con un valor de más de seis
-      dígitos); la secuencia real arranca en 15 y su primer número es `EO-QTE-15`; crear una cotización no consume
-      número, una cotización no puede recibir un segundo número y una sintética no consume la secuencia real.
-- [ ] La matriz de estados en TypeScript y la sembrada en la migración son iguales (`state-machine-parity.test.ts`).
-- [ ] Ninguno de los siete pares sembrados exige compuerta humana: un actor `agent` registra una emisión y un retiro.
-      La restricción de compuerta sigue viva (probada con un par marcado sólo en el clúster local). Una aprobación de
-      excepción con un actor que no es una persona identificada falla en la base y exige la huella de su versión; una
-      fila del puntero sin persona identificada falla.
+- [x] Guardar un documento no agrega una fila a `quoter_pointer_history`; una activación en la plataforma exige
+      persona identificada, un reflejo del repo exige su commit, y las dos exigen motivo y la huella del puntero que
+      reemplazan.
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `source-documents-and-pointer.local-postgres.test.ts`.
+- [x] `quoter_quote_versions` rechaza un artefacto cuyo estado de cálculo no es `calculated`.
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; el almacén responde `quote_not_calculated` con el artefacto no calculado del corpus; la columna lleva el `CHECK`.
+- [x] El número lo asigna la base en la primera emisión, desde un contador por serie: la primera cotización real es
+      `EO-QTE-15001` y la siguiente `EO-QTE-15002`, sin relleno ni huecos; una emisión que no confirma no consume
+      número; crear una cotización no consume número, una cotización no recibe un segundo número, una sintética no
+      mueve el contador real y el runtime no puede escribir un número ni mover el contador (prueba 7).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `EO-QTE-15001`, `EO-QTE-15002`, `EO-QTE-T-1`, emisión sin confirmar, concurrencia de dos conexiones.
+- [x] Emitir fija la versión con su huella y el documento con su huella; exige destinataria, documento y, bajo el
+      piso, aprobación vigente, también por SQL directo; desde `revising` se vuelve a la última versión emitida
+      (pruebas 6 y 14).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `quote-aggregate.local-postgres.test.ts`.
+- [x] Toda fila inmutable tiene `*_principal_id`; `data_origin` no tiene valor por defecto; el historial de estados
+      se ordena por `transition_seq`.
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; columnas `NOT NULL` en las dos migraciones; fila sin principal, sin comando o sin origen rechazada (23502).
+- [x] Cada rechazo de la base tiene nombre y `QUOTER_CONSTRAINT_CODES` lo traduce; ninguna prueba lee el texto de un
+      mensaje (prueba 15).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `constraint-names.test.ts` y aserciones por SQLSTATE y nombre.
+- [x] Las reglas probadas se falsificaron: quitada la regla, la suite se puso roja (prueba 16).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; cuatro reglas quitadas de a una; la suite se puso roja cada vez y volvió a verde al restaurar.
+- [x] La matriz de estados en TypeScript y la sembrada en la migración son iguales (`state-machine-parity.test.ts`).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `state-machine-parity.test.ts` y la misma comparación contra las filas del clúster local.
+- [x] Ninguno de los siete pares sembrados exige compuerta humana: un actor `agent` registra una emisión y un retiro.
+      Una decisión sobre una excepción con un actor que no es una persona identificada falla en la base y exige la
+      huella de su versión; una activación del puntero en la plataforma sin persona identificada falla.
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; un agente emite y retira; decisión de excepción por un agente rechazada; activación sin persona rechazada.
 - [ ] Prueba 1: los artefactos calculados del corpus (47 de 48 al planificar) se guardan y se leen con el mismo
       texto, el mismo `artifact_digest` y el mismo `replay_digest`, y su reproducción verifica; el no calculado se
       rechaza con `quote_not_calculated`.
-- [ ] Prueba 2: con columnas de índice contradictorias, el lector devuelve lo que dice el artefacto; la prueba
-      estática confirma que nada en `src/lib/commercial/quoter/` construye un resultado desde filas.
+- [ ] Prueba 2: con el índice de lectura corrompido, el lector devuelve lo que dice el artefacto y el índice se
+      reconstruye; la prueba estática confirma que nada en `src/lib/commercial/quoter/` construye un resultado desde
+      filas.
 - [ ] `runStorageConformance` pasa contra el adaptador PostgreSQL en el clúster local.
 - [ ] Las pruebas con base de datos corrieron con el clúster local arriba (evidencia de corrida, no omitidas).
 - [ ] Las capacidades `commercial.quoter.catalog`, `commercial.quoter.catalog.activate`, `commercial.quoter.simulate`,
@@ -1044,17 +1213,21 @@ Resueltas en Discovery el 2026-10-12, con la sesión consultora:
 - **Dónde viven las migraciones antes del visto bueno.** `docs/tasks/pending-migrations/`.
 - **Mecanismo de comprobación de huella.** Disparador `BEFORE INSERT`.
 
-Abierta, del operador: **versión de PostgreSQL del clúster local.** La base es PostgreSQL 16 y el único instalado
-en la máquina es el 18. Instalar `postgresql@16` es su decisión; sin él, las migraciones se escriben compatibles
-con 16 y la primera aplicación real es la prueba en esa versión (cada migración corre en una transacción).
+Resuelta por el operador el 2026-10-12: **versión de PostgreSQL del clúster local.** Se instaló `postgresql@16`
+(16.15, la versión de la base real) y todas las pruebas con base corren ahí.
+
+Abierta, del operador: **empujar el catálogo vigente antes de importar.** El importador rechaza archivos sin
+commitear o sin empujar; la primera importación con escritura exige que el catálogo vigente esté en el remoto.
 
 Resueltas por el CEO el 2026-10-12 (ya no abiertas):
 
-- **Prefijo y arranque del número público.** `EO-QTE-`; la serie real empieza en 15 (`EO-QTE-15`), sin relleno.
+- **Prefijo y arranque del número público.** `EO-QTE-`; la serie real empieza en 15001 (`EO-QTE-15001`, después
+  `EO-QTE-15002`, …), sin relleno. La serie sintética no cambia (`EO-QTE-T-1`).
 - **Quién puede emitir.** `efeonce_admin`, `efeonce_account`, `finance_admin` y los agentes, dentro de política y sin
   aprobación de una persona. Retirar sigue el mismo principio.
 - **Organización dueña.** Efeonce siempre, por referencia estable.
 - **Organización destinataria obligatoria o no.** Cliente o potencial cliente; opcional en un borrador y obligatoria
   para emitir.
-- **Momento del número.** En la primera emisión, en una tabla de sólo agregar para no actualizar la identidad.
+- **Momento del número.** En la primera emisión, asignado por la base, en una tabla de sólo agregar para no
+  actualizar la identidad.
 - **Cotizaciones de ejemplo en la base compartida.** Sintéticas, con numeración aparte.

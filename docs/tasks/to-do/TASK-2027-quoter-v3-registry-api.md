@@ -10,6 +10,36 @@ task:
 - **El mismo cálculo dos veces.** La huella no es llave única del registro, pero un cálculo vive en una sola
   cotización no retirada: registrarlo de nuevo con otra clave responde 409 `artifact_already_registered`.
 - **Sin `dealReference`.** El vínculo con el negocio queda fuera (ver `## Out of Scope`).
+
+Lectura final del diseño de `TASK-2025` (2026-10-12), que cambia lo que estos comandos encuentran en la base. El
+almacén ya está escrito y probado en PostgreSQL 16 local; este documento se alinea con él:
+
+- **Un solo serializador para un artefacto**: `JSON.stringify(artefacto, null, 2)` más salto de línea, el de la
+  CLI. Donde esta task decía «texto canónico» de un artefacto, es ese texto. `stableJson` queda para los documentos
+  fuente y para los datos del documento del cliente, que sí se guardan canónicos.
+- **El número lo asigna la base** en la transacción de la primera emisión (disparador, contador por serie, sin
+  huecos). El comando no inserta en `quoter_quote_numbers` ni llama a ninguna función de número: lo lee después de
+  registrar el cambio de estado. La primera cotización real es `EO-QTE-15001`.
+- **`data_origin` no tiene valor por defecto.** El comando lo declara siempre, y lo decide la identidad que crea,
+  nunca un campo del pedido.
+- **Quién actuó viaja en cada fila**: todo comando pasa al almacén el actor con su `principalId` (el mismo
+  `principal_id` de la fila de ejecución del comando, que caduca).
+- **Emitir fija versión y documento.** El cambio de estado guarda `version_number`, `artifact_digest`,
+  `document_seq` y `document_digest`. Se emite la última versión **o la última emitida**: `revising → issued` con la
+  versión que el cliente ya tenía cierra una revisión sin fabricar otra versión.
+- **El documento se escribe en `draft` y en `revising`**, también el de una versión ya emitida: para corregirlo se
+  vuelve a `revising`, se guarda y se emite de nuevo. Cada emisión conserva el documento que emitió.
+- **La regla del piso la comprueba también la base**: la versión guarda `below_floor` (veredicto del motor) y el
+  disparador de la emisión exige una aprobación vigente. El comando la comprueba antes para responder su código.
+- **Aprobar y revocar.** `quoter_exception_approvals` guarda decisiones `approved | revoked`; rige la última. El
+  almacén ofrece `decideException`. Sólo una versión bajo el piso recibe una decisión.
+- **Una cotización emitida o retirada no recibe versiones**: el almacén registra `issued → revising` antes de
+  insertar la versión nueva.
+- **Códigos del almacén** (`src/lib/commercial/quoter/errors.ts`), que este documento traduce: `version_locked`,
+  `version_not_issuable`, `state_conflict`, `recipient_required`, `recipient_conflict`, `recipient_locked`,
+  `document_required`, `document_conflict`, `document_locked`, `exception_approval_required`,
+  `exception_not_applicable`, `exception_decision_unchanged`. Ya no existen `exception_already_approved`,
+  `number_already_assigned` ni la columna `supersedes_version_number`.
 - **Una sola puerta de escritura.** Todo comando escribe por las funciones de `quote-store.ts` de `TASK-2025`, que
   exigen `command_execution_id`.
 
@@ -395,8 +425,8 @@ Reglas obligatorias:
 ### Slice 2 — Crear cotización y agregar versión
 
 - `commands/create-quote.ts` y `commands/add-version.ts`: resuelven versiones (puntero o huella), ejecutan en
-  servidor la función de `compose quote`, rechazan lo que no calculó, guardan por `quote-store.ts` el texto canónico
-  y su huella, registran el cambio de estado que corresponda (`none → draft` al crear; `issued → revising` al
+  servidor la función de `compose quote`, rechazan lo que no calculó, guardan por `quote-store.ts` el texto del
+  artefacto (el serializador único de la CLI) y su huella, registran el cambio de estado que corresponda (`none → draft` al crear; `issued → revising` al
   agregar sobre una emitida) y el evento.
 - La organización dueña la pone el comando llamando a `resolveQuoterOwnerOrganizationId()` (TASK-2025): Efeonce
   siempre, también cuando quien crea es el sujeto máquina de un binding interno. `clientOrganizationId`, si viene,
@@ -423,8 +453,8 @@ Reglas obligatorias:
 - `commands/approve-exception.ts` (sólo `app`), con la compuerta humana, la capacidad y la huella esperada.
 - `commands/issue-quote.ts` y `commands/withdraw-quote.ts` (ambos carriles), con la capacidad, la huella esperada y
   la comprobación de política; sin compuerta humana. `commands/withdraw-draft.ts` (ambos carriles).
-- La emisión inserta la fila de `quoter_quote_numbers` la primera vez, con la serie que corresponde al
-  `data_origin` de la cotización.
+- El número no lo inserta el comando: la base lo asigna en la transacción de la primera emisión, de la serie que
+  corresponde al `data_origin` de la cotización, y el comando lo devuelve.
 - La ruta de aprobar una excepción existe sólo bajo `src/app/api/platform/app/quoter/quotes/**`. No se crea el
   archivo de ruta equivalente en `ecosystem`. Emitir y retirar tienen ruta en los dos carriles.
 
@@ -494,12 +524,15 @@ la operación 9 de TASK-2026 y:
 - si no calculó, responde 422 `quote_not_calculated` y no guarda nada. El detalle de lo que falta no viaja en este
   rechazo: se obtiene simulando la misma demanda con la operación 9 de TASK-2026, que lo devuelve completo. No existe
   `keepBlocked` en el registro; enviarlo se rechaza;
-- si calculó, guarda por `quote-store.ts` el texto canónico (`canonical-text.ts`) y su huella, `replay_digest`,
-  `calculation_id`, contrato, motor, las fuentes por versión y huella y `origin = 'platform'`. Antes de confirmar
-  recalcula la huella del texto que va a guardar;
+- si calculó, guarda por `quote-store.ts` el texto del artefacto —`JSON.stringify(artefacto, null, 2)` más salto de
+  línea, el mismo que escribe la CLI— con su huella, `replay_digest`, `calculation_id`, `below_floor` y
+  `origin = 'platform'`; contrato, motor, moneda y fuentes van al índice de lectura, que se reconstruye desde el
+  texto. Antes de confirmar recalcula la huella del texto que va a guardar;
 - `runNotices` se devuelve en la respuesta y no se guarda;
-- en 2, la versión nueva declara `supersedes_version_number` = N. Ninguna fila anterior cambia: una versión no tiene
-  estado propio. Sobre una cotización `withdrawn` responde 409 `quoter_invalid_transition`;
+- en 2, la versión nueva es N+1 y reemplaza a N por su correlativo; no hay columna que lo declare. Ninguna fila
+  anterior cambia: una versión no tiene estado propio. Sobre una cotización `withdrawn` responde 409
+  `quoter_invalid_transition` (`version_locked`). Sobre una `issued`, el almacén registra primero
+  `issued → revising` y después la versión;
 - los cambios de estado automáticos (`none → draft`, `issued → revising`) llevan un motivo fijo que escribe el
   comando, porque la columna `reason` es obligatoria.
 - Respuesta 201: `{ quoteId, version, artifactDigest, calculationId, state, summary }`, donde `summary` es el
@@ -517,7 +550,7 @@ opcional (sólo en 3), `expectedVersion` en 4. Orden fijo de comprobaciones, la 
    `source_version_not_held` con `option` del rol. No se importa una fuente desde el artefacto;
 5. el servidor recalcula con las fuentes **de la base** y la demanda congelada; la huella resultante debe ser
    idéntica a `artifact.replayDigest`; si no, 422 `REPLAY_MISMATCH`;
-6. se guarda el texto canónico con `origin = 'local'`; el `calculation_id` es el del artefacto y quién registró queda
+6. se guarda `artifactText` tal cual, con `origin = 'local'`; el `calculation_id` es el del artefacto y quién registró queda
    en las columnas `registered_by_*`.
 
 Un artefacto registrado dos veces con la misma clave de idempotencia devuelve la misma versión. Con otra clave, si
@@ -533,8 +566,10 @@ misma organización dueña), `expectedVersion`. El comando compone con `composeQ
 guardado; un rechazo del motor (`QUOTE_DOCUMENT_*`, `SCHEDULE_MILESTONES_INVALID`, `QUOTE_INCREMENT_*`) se traduce
 con la tabla de TASK-2026 y no guarda nada. Se guardan los dos textos que pide la tabla: `brief_text` (los textos y
 las referencias a opciones, en texto canónico) y `document_text` (los datos que produjo `compose document`), cada uno
-con su huella, más `template_data_version`. Corregir es agregar otra fila; rige la última. La base rechaza una fila
-nueva para una versión ya emitida; el comando lo traduce a 409 `quoter_invalid_transition`.
+con su huella, más `template_data_version`. Corregir es agregar otra fila; rige la última. Un documento se guarda
+mientras la cotización está en `draft` o en `revising`; en `issued` o `withdrawn` la base lo rechaza y el comando
+responde 409 `quoter_invalid_transition` (`document_locked`). Para corregir el documento de una cotización emitida:
+`issued → revising`, guardar, y emitir de nuevo; la emisión anterior sigue nombrando el documento que emitió.
 
 **Retirar borrador (6).** Cuerpo: `reason`, `expectedVersion`. Sólo desde `draft`; no exige persona (un agente puede
 descartar su borrador). Desde `issued` o `revising` responde 409 `quoter_invalid_transition`: eso es la operación 9.
@@ -542,12 +577,16 @@ descartar su borrador). Desde `issued` o `revising` responde 409 `quoter_invalid
 **Aprobar excepción (7).** Cuerpo: `artifactDigest`, `reason` (mínimo 10 caracteres, el de la tabla),
 `expectedVersion`. Persona con `commercial.quoter.exception:approve`, que TASK-2025 otorga sólo a `efeonce_admin`.
 
-- Sólo si el resumen del kernel de esa versión marca al menos una fila bajo su piso (`marginFloor`); aprobar una
-  versión que no lo necesita responde 409 `quoter_invalid_transition` con `details.code = exception_not_needed`.
+- Sólo si la versión está bajo el piso (`below_floor`, el veredicto del motor guardado con ella); aprobar una
+  versión que no lo necesita responde 409 `quoter_invalid_transition` con `details.code = exception_not_applicable`.
+  La base lo rechaza igual.
 - `n` debe ser la última versión de una cotización en `draft` o `revising`.
 - La fila vale para esa versión y esa huella (lo comprueba un disparador): una versión nueva no la hereda.
-- La tabla admite una aprobación por versión: repetirla con otra clave de idempotencia responde 409
-  `quoter_invalid_transition` con `details.code = exception_already_approved`.
+- La tabla guarda decisiones (`approved | revoked`) y rige la última: repetir la vigente con otra clave de
+  idempotencia responde 409 `quoter_invalid_transition` con `details.code = exception_decision_unchanged`. Revocar
+  es el mismo acto de persona con la decisión contraria (`decideException` en el almacén); si esta task expone la
+  revocación como operación propia o como campo del cuerpo es decisión de su Discovery. Revocar después de emitir no
+  deshace la emisión.
 - El motivo se guarda en la fila y no viaja en el evento.
 - **No existe solicitud ni rechazo de excepción**: TASK-2025 no modela ninguno de los dos y esta task no inventa una
   tabla ni un estado. Quien cotiza no «pide» por la API: la necesidad se lee del artefacto (lector 12 y lector 10).
@@ -560,20 +599,24 @@ transacción:
   para emitir y retirar»). No exige persona;
 - la cotización tiene organización destinataria (asignada en `quoter_quote_recipients`); si no, 422
   `recipient_organization_required`;
-- estado `draft` o `revising`, y `version` es la última de la cotización;
+- estado `draft` o `revising`, y `version` es la última de la cotización o la última emitida (volver a lo que el
+  cliente tenía); otra responde 409 `quoter_invalid_transition` (`version_not_issuable`);
+- opcionales `expectedClientOrganizationId` y `expectedDocumentDigest`: lo que quien emite vio. Si la destinataria
+  o el documento vigentes son otros, 409 `quoter_version_conflict` (`recipient_conflict`, `document_conflict`);
 - la huella guardada coincide con `artifactDigest` y con la recalculada del texto;
 - si el kernel marca alguna fila bajo el piso, existe en `quoter_exception_approvals` una fila para esa versión con
-  esa huella; si no, 409 `quoter_exception_approval_required`. La base no lo infiere de una columna: lo decide este
-  comando leyendo el artefacto. Vale para cualquiera que emita: es lo que hace que «dentro de política» sea una
+  esa huella cuya última decisión es `approved`; si no, 409 `quoter_exception_approval_required`. Lo comprueba el
+  almacén y lo vuelve a comprobar la base (`below_floor` y el disparador de la emisión). Vale para cualquiera que
+  emita: es lo que hace que «dentro de política» sea una
   comprobación del servidor y no una promesa de quien llama;
 - existe un documento guardado para la versión (propuesta: una cotización emitida siempre tiene documento; ver Open
   Questions); si no, 422 `document_required`;
-- el cambio de estado se inserta con `version_number` y `artifact_digest`, que la tabla exige cuando el destino es
-  `issued`: dicen qué versión y qué huella se emitió;
-- **número**: si la cotización no tiene fila en `quoter_quote_numbers`, el comando la inserta en esta transacción,
-  una fila, con `next_quoter_quote_number()` de la serie que corresponde a su `data_origin`. Si ya la tiene
-  (`revising → issued`), no se toca: el número es el mismo y lo que distingue es la versión.
-- Respuesta 200: `{ quoteId, quoteNumber, version, artifactDigest, state, issuedAt }`.
+- el cambio de estado se inserta con `version_number`, `artifact_digest`, `document_seq` y `document_digest`, que la
+  tabla exige cuando el destino es `issued`: dicen qué versión y qué documento se emitió, con sus huellas;
+- **número**: lo asigna la base en esta misma transacción si la cotización todavía no tiene uno, de la serie de su
+  `data_origin`. Si ya lo tiene (`revising → issued`), no cambia: el número es el mismo y lo que distingue es la
+  versión. Una emisión que no confirma no consume número.
+- Respuesta 200: `{ quoteId, quoteNumber, version, artifactDigest, documentSeq, documentDigest, state, issuedAt }`.
 
 **Retirar lo emitido (9).** Cuerpo: `reason`, `expectedVersion`. Identidad con `commercial.quoter.issue:approve`,
 persona o agente: quien puede emitir puede retirar (mismo principio que la emisión; CEO, 2026-10-12). Desde `issued`
@@ -711,12 +754,12 @@ evento de solicitud ni de rechazo de excepción porque esos actos no existen. Es
 | La base no tiene una fuente que el artefacto nombra | 422 | `bad_request` | `source_version_not_held` |
 | El artefacto no reproduce su huella | 422 | `bad_request` | `REPLAY_MISMATCH` |
 | Emisión sin documento guardado | 422 | `bad_request` | `document_required` |
-| Emisión de una cotización sin organización destinataria | 422 | `bad_request` | `recipient_organization_required` |
+| Emisión de una cotización sin organización destinataria (`recipient_required` en el almacén) | 422 | `bad_request` | `recipient_organization_required` |
 | Organización destinataria inexistente, inactiva, que es la entidad operativa o que no es cliente ni potencial cliente | 422 | `bad_request` | `recipient_organization_invalid` |
 | El mismo cálculo ya vive en una cotización no retirada | 409 | `quoter_artifact_already_registered` | `artifact_already_registered`, con la cotización y la versión existentes |
 | Asignar destinataria a una cotización que ya fue emitida | 409 | `quoter_invalid_transition` | `recipient_locked` |
-| La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict` |
-| El estado no admite el acto | 409 | `quoter_invalid_transition` | `invalid_transition`, `exception_not_needed` o `exception_already_approved` |
+| La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict`, `state_conflict`, `recipient_conflict` o `document_conflict` |
+| El estado no admite el acto | 409 | `quoter_invalid_transition` | `invalid_transition`, `version_locked`, `version_not_issuable`, `document_locked`, `exception_not_applicable` o `exception_decision_unchanged` |
 | Fila bajo el piso y no existe aprobación para esa versión y esa huella | 409 | `quoter_exception_approval_required` | `exception_approval_required` |
 | Misma clave de idempotencia, otro pedido | 409 | `idempotency_conflict` | — |
 | Bandera apagada | 503 | `service_unavailable` | `quoter_registry_disabled` |
@@ -750,7 +793,7 @@ que no se amplía. Todo rechazo del motor dentro de un comando usa la tabla de T
 
 Staging y producción comparten base de datos: una cotización de ejemplo registrada desde staging es una fila que
 producción ve y que no se puede borrar. TASK-2025 lo resuelve con `data_origin = 'synthetic'` y una serie de número
-aparte (`number_series`), aprobada por el CEO el 2026-10-12. Regla de esta task: `data_origin` lo decide el servidor
+aparte (su propio contador, `EO-QTE-T-1` en adelante), aprobada por el CEO el 2026-10-12. Regla de esta task: `data_origin` lo decide el servidor
 y nunca un campo del pedido. Cómo lo decide es lo único que sigue abierto; la propuesta es derivarlo de la
 organización destinataria (una cotización para la organización de pruebas designada es sintética). Toda cotización
 del exit gate es sintética; si alguna se emite, toma su número de la serie sintética. Una fila `real` creada por una
