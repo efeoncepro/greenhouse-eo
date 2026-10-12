@@ -36,7 +36,7 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 | 13 | Diez días hábiles, hasta dos rondas (el operador rechazó 15 a 20 el 12/10: «demasiado tiempo para un cliente de este tipo») | **Propuesta propia, sin validar por operaciones** |
 | 14 | Rondas, aprobación, IA, derechos | Modelo operativo de servicios creativos y brochure «Agencia Creativa» aprobado, pasados a usted |
 | 15 | Nombres y cargos | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; fotos reales del catálogo del compositor |
-| 16 | Seis horas en común (Santiago UTC−3 / Ciudad de México UTC−6 en esta época); Teams, Notion y Frame.io | Cálculo propio; herramientas del brochure «Agencia Creativa» |
+| 16 | Personas en Chile y en México; Teams, Notion y Frame.io | Indicación del operador del 12/10 (pidió quitar «desde Chile» y las horas en común: «nos puede jugar en contra»); herramientas del brochure «Agencia Creativa» |
 | 17 | +2.000 piezas, 39 campañas, 88 %, 0,12, 5 mercados | Caso SKY creativo, 12 meses (`.claude/skills/creative-practice/efeonce/ESTADO_ACTUAL.md`); autorización para citarlo fuera, sin verificar |
 
 ## Por confirmar antes de enviar
@@ -46,7 +46,7 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 3. Caso SKY (lámina 17): autorización de SKY para citar las cifras en una licitación.
 4. Reel base con locución y música incluidas; rodaje, talento y voz exclusiva, aparte (lámina 11): depende de la económica.
 5. Impresión, instalación y pauta fuera del servicio (lámina 12).
-6. Seis horas en común y herramientas con nombre (lámina 16).
+6. «Personas en Chile y en México» (lámina 16): lo indicó el operador; el repo no dice quiénes están en México. Herramientas con nombre.
 7. «El manual y la pieza madre quedan a disposición de Sika» (lámina 18): revisar contra la cláusula de derechos.
 8. Logo de Sika en la portada y miniaturas de su material (lámina 4): uso de marca de terceros (TASK-1937).
 9. Lámina 14: qué quiso decir Sika con «no AI/PSD» en su respuesta del 06/10. Hoy la lámina no promete archivos editables.

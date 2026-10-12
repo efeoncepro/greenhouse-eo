@@ -20,7 +20,7 @@ Secuencia: portada · resumen (tres documentos) · matriz de cumplimiento · pun
 4. Uso del logo y del material de Sika en el deck (TASK-1937).
 5. Sentido de «no AI/PSD» en la respuesta de Sika del 06/10; la lámina de control no promete archivos editables.
 6. Berel no se menciona: conflicto de interés sin decidir.
-7. Propuestas propias de las láminas nuevas: qué incluye el reel base, qué queda fuera del servicio (impresión, instalación, pauta), seis horas de jornada en común con México y la frase sobre lo que queda a disposición de Sika. Lista completa en el LEEME.
+7. Propuestas propias de las láminas nuevas: qué incluye el reel base, qué queda fuera del servicio (impresión, instalación, pauta), «personas en Chile y en México» (lo indicó el operador el 12/10; el repo no dice quiénes están en México) y la frase sobre lo que queda a disposición de Sika. Lista completa en el LEEME.
 
 ## Historial
 

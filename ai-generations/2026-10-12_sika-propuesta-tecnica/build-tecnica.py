@@ -451,13 +451,13 @@ add('equipo', 'Equipo', s_equipo)
 def s_mexico():
     def card(g, t, x, l, tp, hero=False):
         return obj(icon(g, 44) + otitle(t, 28, '; margin-top: 12px') + otext(x, 17), l, tp, 465, hero, '; height: 262px')
-    cards = (card('reloj', 'Horario compartido', 'Al menos seis horas de jornada en común con Ciudad de México, todos los días hábiles.', 820, 196, True) +
+    cards = (card('ubicacion', 'Equipo en dos países', 'Personas de Efeonce en Chile y en México trabajan sobre la misma campaña y comparten la mayor parte de la jornada.', 820, 196, True) +
              card('contenido', 'Español de México', 'Los titulares y los textos se escriben y se revisan en español de México, con los términos que Sika usa en sus fichas.', 1315, 196) +
              card('reunion', 'Un solo interlocutor', 'El Responsable de Cuenta atiende a Sika y coordina al equipo. Los comentarios llegan por un solo canal.', 820, 488) +
              card('integracion', 'Herramientas a la vista', 'Reuniones por Microsoft Teams, seguimiento del proyecto en Notion y revisión de las piezas en Frame.io.', 1315, 488))
     return page('Sika · Trabajo con México', halo(1300, 480, None) + cards +
-                left('El equipo · Trabajo con México', ['Desde Chile,', 'en el horario', 'de México'], 'Efeonce atiende a Sika Mexicana desde Santiago, con la mayor parte de la jornada en común y los textos en español de México. La moneda y la facturación se tratan en la oferta económica.', 80) +
-                means('La distancia no cambia la forma de trabajar: horario útil en común, mismo idioma y una persona responsable.',
+                left('El equipo · Trabajo con México', ['Un equipo', 'en Chile y', 'en México'], 'Efeonce atiende a Sika Mexicana con personas en Chile y en México, en el mismo idioma y con los textos en español de México. La moneda y la facturación se tratan en la oferta económica.') +
+                means('Sika trabaja con un equipo cercano: personas en su país, su mismo idioma y una persona responsable.',
                       'Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú.'), section=3)
 
 
