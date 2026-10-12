@@ -8,8 +8,10 @@ import type { TenantEntitlementSubject } from '@/lib/entitlements/types'
 import { resolveGrowthMarket } from '@/lib/growth/markets'
 import { publishOutboxEvent } from '@/lib/sync/publish-event'
 
+import { AI_VISIBILITY_MODULE_KEY } from '../entitlement'
 import { isMultiMarketEnabled } from '../flags'
 import { getGraderProfileForOrganization } from '../store'
+import { marketCoveredByContractSql } from './contract-coverage'
 import {
   type BrandAlias,
   type MatchMode,
@@ -240,6 +242,25 @@ export const configureGraderMarketRegrade = (
     if (!['weekly', 'monthly', 'quarterly'].includes(input.cadence))
       throw new GraderMarketConfigError('aeo_batch_invalid', 400)
     if (!market.isPrimary && !isMultiMarketEnabled()) throw new GraderMarketConfigError('aeo_multi_market_disabled')
+
+    // Habilitar un mercado secundario que el contrato no declara dejaba una cadencia que el
+    // scheduler jamás podría correr. Se rechaza acá, con el mismo predicado que usa quien
+    // reclama: «prendido» y «va a correr» tienen que ser la misma afirmación. Apagar siempre
+    // se permite — es la salida de un mercado que quedó fuera del contrato.
+    if (input.enabled && !market.isPrimary) {
+      const covered = await marketQueries(client)(
+        `SELECT 1 FROM greenhouse_growth.grader_profile_markets m
+           JOIN greenhouse_growth.grader_profiles p ON p.profile_id=m.profile_id
+           JOIN greenhouse_client_portal.module_assignments a ON a.organization_id=p.organization_id
+            AND a.module_key=$2 AND a.status='active' AND a.effective_to IS NULL
+            AND (a.expires_at IS NULL OR a.expires_at>now()) AND a.metadata_json->>'aeo_tier'='contracted'
+          WHERE m.market_id=$1 AND ${marketCoveredByContractSql('m', 'a')}`,
+        [market.marketId, AI_VISIBILITY_MODULE_KEY]
+      )
+
+      if (!covered[0]) throw new GraderMarketConfigError('aeo_market_not_included', 403)
+    }
+
     await client.query(
       `UPDATE greenhouse_growth.grader_profile_markets SET recurring_regrade_enabled=$2,recurring_regrade_cadence=$3,
       recurring_regrade_next_at=CASE WHEN $2 THEN COALESCE(recurring_regrade_next_at,now()) ELSE NULL END WHERE market_id=$1`,

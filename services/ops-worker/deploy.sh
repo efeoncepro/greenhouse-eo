@@ -1593,6 +1593,26 @@ upsert_scheduler_job \
   "false"
 echo "  -> ops-seo-rank-capture: 0 5 * * * ACTIVO (rank capture diario, TASK-1303 — despausado 2026-08-06 tras smoke E2E)"
 
+# Segunda pasada del rank capture — recupera el MISMO día lo que el proveedor no devolvió.
+#
+# El transporte aborta una consulta SERP a los 35 s y un POST no se reintenta (puede haberse
+# cobrado), así que una keyword con timeout quedaba sin medición del día para siempre: la SERP
+# de hoy no se puede comprar mañana. Medido en logs del 28-sep al 12-oct de 2026: cinco días
+# con huecos en Berel (29, 4, 28, 30 y 28 de 31 keywords).
+#
+# Es el MISMO endpoint con el mismo body: el pre-check de idempotencia filtra lo ya capturado
+# ANTES de llamar al proveedor, así que un día completo cuesta USD 0 y un día con huecos sólo
+# compra lo que falta. Dos horas después de la primera, para no reintentar contra el mismo
+# episodio de lentitud. `capture_date` es la fecha de Santiago: 07:00 sigue siendo el mismo día.
+# Rollback (<5 min): 5º arg a "true" + redeploy (pausar a mano se revierte en el próximo deploy).
+upsert_scheduler_job \
+  "ops-seo-rank-capture-retry" \
+  "0 7 * * *" \
+  "/seo/rank/capture-batch" \
+  '{}' \
+  "false"
+echo "  -> ops-seo-rank-capture-retry: 0 7 * * * ACTIVO (segunda pasada idempotente del rank capture)"
+
 # Site audit OnPage (2 fases desacopladas) + backlink snapshot — TASK-1304.
 #
 # OnPage es task-based ASYNC: `enqueue` (lunes 06:00 CLT) crea el crawl y persiste

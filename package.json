@@ -166,6 +166,7 @@
     "claude-md:rule-audit": "node scripts/ci/claude-md.mjs audit",
     "growth:ai-visibility:smoke": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/ai-visibility-smoke.ts",
     "growth:aeo-prompt-set": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/aeo-prompt-set.ts",
+    "growth:aeo-contracted-markets": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/growth/declare-aeo-contracted-markets.ts",
     "dataforseo": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/dataforseo/cli.ts",
     "dataforseo:catalog:sync": "tsx scripts/dataforseo/generate-catalog.ts",
     "dataforseo:catalog:check": "tsx scripts/dataforseo/generate-catalog.ts --check",

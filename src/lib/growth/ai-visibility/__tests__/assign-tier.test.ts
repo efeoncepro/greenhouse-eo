@@ -240,4 +240,73 @@ describe('assignAeoTier', () => {
       AssignAeoTierValidationError
     )
   })
+
+  describe('mercados incluidos en el contrato', () => {
+    const CONTRACTED = {
+      assignment_id: 'cpma-sky',
+      status: 'active',
+      expires_at: null,
+      metadata_json: { aeo_tier: 'contracted', other_key: 'kept' }
+    }
+
+    it('declarar mercados sobre un contracted existente supersede y conserva el resto de la metadata', async () => {
+      state.currentAssignment = CONTRACTED
+      state.enableResult = { assignmentId: 'cpma-sky-2', status: 'active', idempotent: false }
+
+      const result = await assignAeoTier({ ...BASE_INPUT, tier: 'contracted', marketsIncluded: ['us', 'AR', 'ar', 'BR'] })
+
+      expect(result).toMatchObject({
+        idempotent: false,
+        supersededAssignmentId: 'cpma-old',
+        marketsIncluded: ['AR', 'BR', 'US']
+      })
+      expect(spies.expire).toHaveBeenCalledWith(expect.objectContaining({ assignmentId: 'cpma-sky' }))
+      expect(spies.enable).toHaveBeenCalledWith(
+        expect.objectContaining({
+          metadataJson: { aeo_tier: 'contracted', other_key: 'kept', aeo_markets_included: ['AR', 'BR', 'US'] }
+        })
+      )
+    })
+
+    it('es idempotente cuando los mercados declarados ya son los vigentes, en cualquier orden', async () => {
+      state.currentAssignment = {
+        ...CONTRACTED,
+        metadata_json: { aeo_tier: 'contracted', aeo_markets_included: ['US', 'AR'] }
+      }
+
+      const result = await assignAeoTier({ ...BASE_INPUT, tier: 'contracted', marketsIncluded: ['AR', 'US'] })
+
+      expect(result).toMatchObject({ idempotent: true, assignmentId: 'cpma-sky', marketsIncluded: ['US', 'AR'] })
+      expect(spies.expire).not.toHaveBeenCalled()
+      expect(spies.enable).not.toHaveBeenCalled()
+    })
+
+    it('re-asignar el mismo tier SIN declarar mercados no borra los ya declarados', async () => {
+      state.currentAssignment = {
+        ...CONTRACTED,
+        metadata_json: { aeo_tier: 'contracted', aeo_markets_included: ['AR'] }
+      }
+
+      const result = await assignAeoTier({ ...BASE_INPUT, tier: 'contracted' })
+
+      expect(result).toMatchObject({ idempotent: true, marketsIncluded: ['AR'] })
+      expect(spies.enable).not.toHaveBeenCalled()
+    })
+
+    it('rechaza mercados en un tier que no es contracted, antes de tocar nada', async () => {
+      await expect(assignAeoTier({ ...BASE_INPUT, tier: 'trial', marketsIncluded: ['AR'] })).rejects.toMatchObject({
+        name: 'AssignAeoTierValidationError',
+        code: 'markets_require_contracted'
+      })
+      expect(spies.provision).not.toHaveBeenCalled()
+      expect(spies.enable).not.toHaveBeenCalled()
+    })
+
+    it.each([[['AR', 'ZZ']], [['AR', 7]], ['AR']])('rechaza una declaración fuera del catálogo: %j', async markets => {
+      await expect(
+        assignAeoTier({ ...BASE_INPUT, tier: 'contracted', marketsIncluded: markets as never })
+      ).rejects.toMatchObject({ code: 'markets_invalid' })
+      expect(spies.enable).not.toHaveBeenCalled()
+    })
+  })
 })

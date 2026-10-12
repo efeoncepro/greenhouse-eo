@@ -196,3 +196,23 @@ Cuando el chokepoint `enforceSeoRunEntitlement` bloquea una corrida, devuelve un
 - Sanity live: [`scripts/growth/_sanity-seo-entitlement.ts`](../../../scripts/growth/_sanity-seo-entitlement.ts)
 - Arquitectura (entitlements §9, datos §4, destino Wave §17): [GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md](../../architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md)
 - Doc funcional: [Modulo SEO — Search Visibility 360](../../documentation/growth/modulo-seo-search-visibility-360.md)
+
+## Declarar los mercados que incluye un contrato AEO (2026-10-12)
+
+Un mercado secundario del AI Visibility Grader sólo se mide —y sólo acepta cadencia recurrente— si
+el assignment `contracted` lo declara. El mercado principal va siempre incluido.
+
+1. Dry-run (no escribe; muestra qué mercados del perfil quedarían sin cubrir):
+
+   ```bash
+   pnpm growth:aeo-contracted-markets --org <organization_id> --markets AR,BR,CL --actor <user_id> --reason "<motivo>"
+   ```
+
+2. Repite el comando con `--apply`. Imprime el assignment nuevo, el que supersede y el readback.
+
+Qué no hacer: no edites `metadata_json` con un `UPDATE`; no declares un país que el cliente no
+contrató (cada mercado con cadencia prendida compra una medición por ciclo). Si al prender la
+cadencia de un mercado el portal responde «El mercado no está incluido en el servicio contratado»,
+falta este paso. También disponible en `POST /api/admin/growth/ai-visibility/assign-tier` con
+`marketsIncluded`. Referencia: `ISSUE-181`.
+

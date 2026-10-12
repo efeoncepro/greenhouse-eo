@@ -87,6 +87,7 @@ despauso el mismo dia (serie dia-1: Berel con 31 keywords).
 |---|---|---|
 | El worker lanza "no registró el contador de gasto" | Falta `import '@/lib/growth/seo/register-provider-spend'` en el entrypoint | Es un guard a proposito (TASK-1300); restaurar el import |
 | Corrida con `breakerOpen` en todos los combos | Circuit breaker de la familia `serp` abierto (5 fallos seguidos del proveedor) | Esperar el cooldown (60 s) o revisar credencial/saldo DataForSEO |
+| El log dice `partial=N missing=M` o llega un `AbortError` de `requestDataForSeo` | El proveedor tardo mas de 35 s en una consulta; un POST no se reintenta | La segunda pasada `ops-seo-rank-capture-retry` (07:00) compra solo lo que falta. Antes de su deploy, o si sigue faltando: `gcloud scheduler jobs run ops-seo-rank-capture --location us-east4 --project efeonce-group` el MISMO dia (ISSUE-182) |
 | `seo.rank.capture_lag` en warning con el cron activo | Un target dejo de capturarse (presupuesto agotado o proveedor caido) | Revisar outcomes de la ultima corrida en los logs del worker |
 | Snapshots en PG pero no en BigQuery | Outbox atascado o lane reactiva con dead-letter | Revisar `sync.outbox.unpublished_lag` y `sync.outbox.dead_letter` en `/admin/operations` |
 | Mirror con `Access Denied: bigquery.tables.updateData` | El dataset BQ nuevo no tiene grant WRITER para el SA del worker (`greenhouse-portal@`) | Agregar el access entry WRITER al dataset (patron de `greenhouse_conformed`); resuelto para `greenhouse_growth_analytics` el 2026-08-06 |

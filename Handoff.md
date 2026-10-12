@@ -4,6 +4,18 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-12 — Growth: dos errores de Sentry del ops-worker (ISSUE-181 / ISSUE-182)
+
+Regrade AEO: Sky tenía 6 mercados secundarios con cadencia y sin declarar en el contrato; fallaba a diario desde el
+3-oct. **Aplicado en producción**: `aeo_markets_included` de Sky = AR, BR, CL, CO, PE, US, UY (assignment
+`cpma-9755492d…`, command gobernado desde el árbol local). Código local sin push: predicado único
+`markets/contract-coverage.ts`, `assignAeoTier({ marketsIncluded })`, CLI `pnpm growth:aeo-contracted-markets`.
+Captura de rankings: job nuevo `ops-seo-rank-capture-retry` (07:00) y aviso de parciales, ambos **sólo tras el deploy
+del worker**. Pendiente: (1) el operador recupera hoy las 3 keywords de Berel con `gcloud scheduler jobs run
+ops-seo-rank-capture` (el clasificador bloqueó al agente); (2) mirar `failed=0` en el regrade del 13-oct 08:00 — encolará
+5 corridas `full` de Sky; (3) cerrar ambas issues tras el deploy. Verificado: typecheck, lint, 1.257 tests de
+ai-visibility/seo/worker, predicado SQL contra PG real. No se corrió `pnpm test` completo ni `pnpm build`.
+
 ## 2026-10-12 — AXIS: dependientes del pin `axis-brand-assets` 0.4.25 regenerados
 
 `596bfab90` subió el pin de 0.4.15 a 0.4.25 sin regenerar y dejó tres tests rojos en `pnpm test`. Corregido en

@@ -2022,17 +2022,31 @@ const handleSeoRankCaptureBatch = async (req: IncomingMessage, res: ServerRespon
   try {
     const summary = await runRankCaptureBatch({ captureDate, maxTargets })
 
+    // Combinaciones keyword×device que el proveedor no devolvió hoy (timeout, error o breaker).
+    const missingCombos = summary.outcomes.reduce(
+      (total, outcome) => total + outcome.providerErrors + outcome.breakerOpen,
+      0
+    )
+
     console.log(
       `[ops-worker] /seo/rank/capture-batch done — targets=${summary.targets} snapshots=${summary.snapshots} ` +
       `cost=$${summary.costUsd.toFixed(4)} skipped=${summary.skippedTargets} blocked=${summary.blockedTargets} ` +
-      `degraded=${summary.degradedTargets} failed=${summary.failedTargets}`
+      `partial=${summary.partialTargets} missing=${missingCombos} degraded=${summary.degradedTargets} ` +
+      `failed=${summary.failedTargets}`
     )
 
     // Un target degradado/fallido significa un día SIN medición para ese cliente — la
     // serie no se reconstruye después (la SERP de hoy no existe mañana): se grita.
-    if (summary.degradedTargets > 0 || summary.failedTargets > 0) {
+    //
+    // `partial` cuenta igual, y antes no se imprimía ni alertaba: un target con 28 de 31
+    // keywords salía como `degraded=0 failed=0` y la única huella era el AbortError suelto del
+    // transporte. Medido en logs: cinco días con huecos entre el 28-sep y el 12-oct, uno de
+    // ellos con 4 de 31. La segunda pasada (`ops-seo-rank-capture-retry`) los recupera el
+    // mismo día; lo que siga faltando después de ella es pérdida real.
+    if (summary.degradedTargets > 0 || summary.failedTargets > 0 || summary.partialTargets > 0) {
       captureMessageWithDomain(
-        `[TASK-1303] rank capture con ${summary.degradedTargets} target(s) degradado(s) y ${summary.failedTargets} fallido(s)`,
+        `[TASK-1303] rank capture con ${summary.partialTargets} target(s) parcial(es) (${missingCombos} keyword(s) sin medir), ` +
+        `${summary.degradedTargets} degradado(s) y ${summary.failedTargets} fallido(s)`,
         'growth',
         { level: 'warning', tags: { source: 'ops_worker_seo_rank_capture_batch' } }
       )

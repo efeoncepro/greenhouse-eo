@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — Growth: el regrade AEO respeta el contrato y la captura de rankings tiene segunda pasada
+
+- El regrade recurrente fallaba todos los días desde el 3 de octubre con los 6 mercados secundarios de Sky: tenían
+  cadencia prendida y el contrato no los declaraba. Ahora un solo predicado decide la cobertura para quien ejecuta,
+  quien reclama y quien habilita; `assignAeoTier` acepta `marketsIncluded` y existe `pnpm growth:aeo-contracted-markets`.
+  Sky quedó con AR, BR, CL, CO, PE, US y UY declarados (confirmación del operador). [ISSUE-181](docs/issues/open/ISSUE-181-aeo-regrade-claims-markets-outside-contract.md)
+- La captura diaria de rankings perdía keywords cuando DataForSEO tardaba más de 35 s y el resumen decía
+  `degraded=0 failed=0`. Se agrega la segunda pasada `ops-seo-rank-capture-retry` a las 07:00 (cuesta cero con el día
+  completo) y el log avisa los parciales. Rige tras el próximo deploy del `ops-worker`. [ISSUE-182](docs/issues/open/ISSUE-182-seo-rank-capture-partial-days-silent.md)
+
 ## 2026-10-12 — AXIS: lo que depende de `axis-brand-assets` 0.4.25 queda regenerado
 
 - El pin subió de 0.4.15 a 0.4.25 el 2026-10-06 sin regenerar sus dependientes y `pnpm test` mostraba tres fallas.
@@ -487,7 +497,3 @@ El traje de ficción de Nexa deja de describirse a mano: kit de 10 vistas desde 
 ## 2026-10-01 — Sparks: los agentes de Efeonce como personajes del kit (TASK-1941)
 
 Diseño elegido por el operador (el Spark de «Agents» alejado de Astro Bot: flota, chispa del Nexa Mark, órbita y tres ventanas de la nave). Spark base en 26 vistas + 4 escenas con Nexa, plantel de cinco con accesorio y gesto, entradas `spark-*` en `foto:prompt` con la guarda `validarRobots` (robots sólo como Sparks; nunca documental) y canon [`SPARKS_V1.md`](docs/operations/brand-characters/SPARKS_V1.md) con revisión de colisión del nombre. Kits en OneDrive `13- Branding/Sparks/`. Plantel aprobado; task cerrada.
-
-## 2026-10-01 — La órbita: perfiles sociales de Efeonce aprobados y documentados
-
-Portadas de LinkedIn (página y perfil personal), Facebook y YouTube, avatar de redes y nueve destacados de Instagram con su historia completa 9:16, aprobados por el operador; kit del equipo con «Tu portada de LinkedIn» y aviso 1:1. [Línea gráfica §10.1.1](docs/operations/brand-graphic-line/EFEONCE_GRAPHIC_LINE_V1.md#1011-perfiles-sociales-de-efeonce-aprobados-el-2026-10-01) · [manual de uso](docs/manual-de-uso/creative/usar-portadas-y-destacados-sociales-efeonce.md). Publicación en las redes pendiente.
