@@ -114,6 +114,7 @@ ranking fechado · **[decisión]** del operador · **sin dato** = no existe evid
 | Google directo (Vertex, `global`) | `pnpm ai:nano` local; runtime `generateImage` independiente | CLI: **Nano Banana 2.1** (`gemini-nano-banana-2.1`, default). Runtime conserva Nano Banana 2; Pro sigue sin superficie. [Manual y cobertura](../../../docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) |
 | Google Cloud directo (Interactions, `global`) | `pnpm ai:omni` (tooling local, fuera de Globe) | Gemini Omni 1.1 Flash `gemini-omni-1.1-flash-preview`: texto, imagen, cuadros inicial/final, referencias, edición y extensión de video |
 | Higgsfield CLI (out-of-band) | `higgsfield` | Recraft V4.1, **vectores SVG reales**. Estado 2026-09-24: CLI 1.1.26 con sesión y workspace fijado (`higgsfield auth login` + `workspace set`); la generación de un SVG real sigue **sin corrida**. Carril independiente del MCP remoto y de `pnpm ai:fal --capability hf-*`; estado y trampas en `higgsfield-provider` §Estado local verificado |
+| BytePlus directo (operador local) | `pnpm ai:byteplus`, `pnpm ai:layers` | Ruta por defecto para Seedream, Layerize, Seedance y Seed Speech del contrato Johor; tarifas de cuenta, secretos en Secret Manager. Manual `docs/manual-de-uso/creative-studio/byteplus-directo.md` |
 | fal.ai (out-of-band, NUNCA runtime) | `pnpm ai:fal` | Seedream 5 Pro/Lite/edit/layerize (imagen); Seedance, Minimax H3, Flux 3, Wan 3.0 (video) |
 | Higgsfield API (out-of-band, NUNCA runtime) | `pnpm ai:fal --capability hf-*` | SOUL 2/Cinema, Marketing Studio, Ideogram 4.0, Qwen Image 3, Z-Image Turbo, Grok Image 2.0, Recraft 4.1 (SVG **sin confirmar**: `model_type: vector` de la app, sin probar por API); video Kling/PixVerse/LTX/Happy Horse y otra vía para Seedance/Wan/H3. `--estimate` cotiza exacto sin cobrar. Estado 2026-09-16: 44/44 cotizan, **0 generaciones reales** (cuenta de API sin créditos). Guía §5.8 |
 
@@ -1035,6 +1036,22 @@ pnpm ai:fal --capability <id> --request-id <request_id>  # retoma un trabajo ya 
   `--prompt`/`--bbox` y caché; la base saca también las superficies y se cobra como una capa). Uso: rescatar un key visual aprobado como capas editables (texto, sujeto,
   fondo) para recomponer, retocar o animar por separado **sin volver a generar**. No reemplaza la composición
   determinística: el logo oficial y el copy final siguen saliendo del vector y del compositor.
+
+### BytePlus directo (2026-10-12)
+
+El operador autorizó el carril directo del fabricante para aprovechar el contrato de Johor.
+Para Seedream/Seedance/Seed Speech, usa BytePlus directo por defecto; Fal/Higgsfield sólo por elección explícita
+o una capacidad que el contrato directo no cubra. Los slugs y precios de Fal siguientes pertenecen a ese proveedor.
+`pnpm ai:byteplus --list` descubre los modelos conectados; `--doctor` verifica el consumer sin generar.
+[Manual de BytePlus](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md) y
+[ADR](../../../docs/architecture/creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md).
+
+`pnpm ai:layers` usa ahora **BytePlus Pro por defecto**; `--provider fal` conserva el carril anterior.
+BytePlus Pro y Flash admiten Layerize (`layer_decomposition: true`), con el mismo `layers.json` de las máscaras.
+Las tarifas ya incluyen el descuento de la cuenta: Pro US$0,02025/0,0405 por capa, Flash US$0,018.
+Se incluye la base y se calcula por el tamaño de cada salida; la cota conserva 17 salidas al tier mayor.
+Las claves están en Secret Manager, nunca en prompts, documentos o logs. Discovery/estimate/dry-run no generan;
+una corrida y su calidad/costo realizado requieren evidencia propia. Esta conexión no promueve ninguna ruta Globe.
 
 ### Seedream 5 still-image routing (verified 2026-07-18)
 

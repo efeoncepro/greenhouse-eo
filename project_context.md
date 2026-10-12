@@ -76,6 +76,7 @@ de Globe. “Imagen 2 de ChatGPT” se normaliza a
 canary y readback. `gpt-image-2.5` (Sunburst/Flare): provider-supported, sin ruta Globe ni Batch;
 el helper transporta 2.5. CLI `ai:image`: OpenAI,
 default `gpt-image-2`, con 2.5 seleccionable. [Matriz](docs/architecture/creative-studio/OPENAI_GPT_IMAGE_PROVIDER_CAPABILITY_MATRIX_V1.md).
+BytePlus: `pnpm ai:byteplus`/`ai:layers`, sin Globe.
 CLI: [Nano 2.1](docs/manual-de-uso/ai-tooling/nano-banana-2-1-cli.md) · [Omni](docs/architecture/GREENHOUSE_GEMINI_OMNI_CLI_DECISION_V1.md).
 Seedream T2I, GPT Image 2 y Nano Banana 2/Pro están disponibles
 según el reader live; Seedream Edit queda `gated` por binding deshabilitado. Seedream Lite, edición de OpenAI/Nano

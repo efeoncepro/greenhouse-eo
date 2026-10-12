@@ -314,6 +314,9 @@ importers:
       pngjs:
         specifier: ^5.0.0
         version: 5.0.0
+      protobufjs:
+        specifier: 7.5.4
+        version: 7.5.4
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
@@ -392,6 +395,9 @@ importers:
       valibot:
         specifier: 1.2.0
         version: 1.2.0(typescript@5.9.3)
+      ws:
+        specifier: 8.18.3
+        version: 8.18.3
       zod:
         specifier: ^3.25.76
         version: 3.25.76

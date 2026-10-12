@@ -20,6 +20,8 @@ La diferencia con otras capas de documentacion:
 
 ### Social y Creative Studio
 
+- [Usar BytePlus directo](creative-studio/byteplus-directo.md) — claves separadas en Secret Manager; Seedream, Layerize, Seedance y Seed Speech con el contrato Johor, por CLI local.
+
 - [Clasificar y planificar una pieza de video](creative-production/clasificar-y-planificar-una-pieza-de-video.md) — ficha de
   clasificación, camino propio o puente, dificultad por toma, referencias aprobadas antes de generar, motor y
   presupuesto con reserva; complemento del [manual de producción de video](creative-production/video-production.md).

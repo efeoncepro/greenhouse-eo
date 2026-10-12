@@ -1,9 +1,10 @@
 # Greenhouse — Guía de selección de modelos de IA para medios V1
 
 > **Tipo de documento:** Referencia técnica agent-facing
-> **Version:** 1.16
+> **Version:** 1.17
 > **Creado:** 2026-09-16 por Claude
-> **Ultima actualizacion:** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
+> **Ultima actualizacion:** 2026-10-12 por Codex — v1.17: BytePlus directo por defecto para sus modelos de media, incluido Layerize; secretos, CLI y evidencia por transporte en su ADR/manual.
+> **Antes (v1.16):** 2026-10-06 por Codex — v1.16: CLI Nano Banana 2.1 separada; generación real Nexa 4K/high y comparación visual acotada con NX7d Sunburst (§10.1). OpenAI conserva su default `gpt-image-2`.
 > **Antes (v1.15):** 2026-10-04 por Claude — v1.15: 🔁 **corrige una regla sobregeneralizada de Seedance.** La guía decía que Seedance rechaza personas reales y marcas en las referencias (filtro ByteDance) y recomendaba evitarlo con ese material. La evidencia es más acotada: **dos** rechazos medidos en fal el 2026-09-16, tras encolar y cobrados (`422 content_policy_violation` / `partner_validation_failed`: el isotipo de Efeonce, «potential copyright violation», y un video de barista, «likenesses of real people») [verificado 2026-09-16]; las mascotas 3D de partner pasaron sin rechazo [operador, 2026-09-22]; y el operador ha producido en fal videos con Seedance con personas y marcas reales sin problema [operador, 2026-10-04]. El rechazo es un **riesgo observado en casos puntuales, no un filtro sistemático**; qué lo dispara: [sin dato]. Seedance vuelve a ser candidato con personas y marcas, presupuestando el posible rechazo cobrado (prueba corta y a baja resolución antes del final) y con Flux 3 / Wan 3.0 como alternativa si rechaza (§3, §4.3, §5.2, §5.3, §5.4, §5.6, §5.7, §6.8, §6.9, §6.12, §7.3, §7.4, §10.3).
 > **Antes (v1.14):** 2026-10-03 por Claude — v1.14: evidencia de uso real del spot animado 2D «Sparks × Efeonce AEO» (aprobado por el operador el 2026-10-03): §5.5 H3 base > Max con personajes 2D, mismo eje de cámara, prohibir texto, fijar paleta, sondeo de resoluciones (`h3-i2v` sin 1080P; `h3max-i2v` sin 2K), tope 15 s y `--estimate` que cuelga con PNG grande; §5.9 Stable Audio 2.5 audio-to-audio para **cambiar de estilo** (rock → punk) acelerando la referencia; §4.3 `audio.voice` con `eleven_v4` vía el conector ElevenLabs Creative (MCP).
 > **Antes (v1.13):** 2026-10-03 por Claude — v1.13: nueva §4.3 **Video por operación y fase** (operación × motor, neutral de motor, con el puente de la CLI de la app de Higgsfield y la regla «propio primero», organizada en preproducción, producción y posproducción según la [taxonomía de video](GREENHOUSE_AI_VIDEO_PRODUCTION_TAXONOMY_V1.md)), con columna de canario de garantía separada de [verificado]; programa EPIC-051.
@@ -24,6 +25,14 @@
 > **Código fuente de verdad:** `src/lib/ai/fal-capabilities.ts` (registro), `src/lib/ai/higgsfield-capabilities.ts` + `higgsfield-schemas.json` (registro Higgsfield), `scripts/ai/higgsfield-lane.ts` (carril Higgsfield), `scripts/ai/fal-image.ts` (CLI `ai:fal`), `src/lib/ai/gemini-omni-cli.ts` + `scripts/ai/gemini-omni.ts` (CLI `ai:omni`), `src/lib/ai/openai-image.ts` + `scripts/ai/generate-image.ts` (CLI `ai:image`), `src/lib/ai/nano-banana-cli.ts` + `scripts/ai/nano-banana.ts` (CLI `ai:nano`), `src/lib/ai/fal.ts` (cuentas).
 
 ---
+
+## Ruta del fabricante BytePlus
+
+Para Seedream, Layerize, Seedance y Seed Speech del contrato Johor, usa `pnpm ai:byteplus` directo por defecto;
+`pnpm ai:layers` usa BytePlus Pro. [Manual y catálogo operativo](../manual-de-uso/creative-studio/byteplus-directo.md),
+[ADR](creative-studio/EFEONCE_BYTEPLUS_DIRECT_MEDIA_CLI_DECISION_V1.md). Las tarifas ya contienen el descuento de la cuenta.
+Los slugs, precios y mediciones de Fal/Higgsfield conservados abajo pertenecen a esos proveedores, que siguen
+como alternativas explícitas o para capacidades sin equivalencia directa. Esta elección local no habilita Globe.
 
 ## 0. Cómo usar esta guía
 

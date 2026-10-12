@@ -5,6 +5,7 @@ import { isAbsolute, join } from 'node:path'
 import { config as loadEnv } from 'dotenv'
 
 import { runLayerize } from './adapters/layerize-fal'
+import { runBytePlusLayerize } from './adapters/layerize-byteplus'
 import { bboxTag, describeLayers, readLayersDocument } from './layers'
 import { parseRect } from './mask'
 import { localDate } from './run-io'
@@ -25,6 +26,8 @@ de la imagen original.
 
 Opciones:
   --prompt <texto>          Qué elementos separar (opcional; sin él separa los principales)
+  --provider byteplus|fal   Default byteplus (tarifa directa); fal sigue disponible explícitamente
+  --model seedream5-pro|seedream5-flash   BytePlus; default Pro
   --bbox x0,y0,x1,y1        Región a separar en fracciones (repetible; se envía como <bbox> 0–1000)
   --image-size auto|auto_1K|auto_1.5K|auto_2K   Resolución de base y capas (default auto)
   --run <dir>               Carpeta de la pieza (default ai-generations/<fecha>_layers)
@@ -52,7 +55,7 @@ const main = async (): Promise<number> => {
     const value = argv[i + 1]
 
     if (!flag.startsWith('--') || value === undefined || value.startsWith('--')) throw new Error(`${flag} necesita un valor. Ver pnpm ai:layers --help.`)
-    if (!['--image', '--prompt', '--bbox', '--image-size', '--run', '--max-usd', '--list'].includes(flag)) throw new Error(`Flag desconocida: ${flag}.`)
+    if (!['--image', '--prompt', '--bbox', '--image-size', '--run', '--max-usd', '--list', '--provider', '--model'].includes(flag)) throw new Error(`Flag desconocida: ${flag}.`)
 
     if (flag === '--bbox') bboxes.push(value)
     else flags[flag] = value
@@ -93,7 +96,15 @@ const main = async (): Promise<number> => {
 
   const promptParts = [typeof flags['--prompt'] === 'string' ? flags['--prompt'] : '', ...bboxes.map(raw => bboxTag(parseRect(raw)))].filter(Boolean)
 
-  const result = await runLayerize({
+  const provider = flags['--provider'] ?? 'byteplus'
+  const model = flags['--model'] ?? 'seedream5-pro'
+
+  if (!['byteplus', 'fal'].includes(String(provider))) throw new Error('--provider espera byteplus|fal.')
+  if (!['seedream5-pro', 'seedream5-flash'].includes(String(model))) throw new Error('--model espera seedream5-pro|seedream5-flash.')
+  if (provider === 'fal' && model !== 'seedream5-pro') throw new Error('Flash Layerize no está declarado en el carril Fal.')
+
+  const result = await (provider === 'byteplus' ? runBytePlusLayerize : runLayerize)({
+    model: model as 'seedream5-pro' | 'seedream5-flash',
     imagePath: resolvePath(flags['--image']),
     prompt: promptParts.length ? promptParts.join(' ') : undefined,
     imageSize,

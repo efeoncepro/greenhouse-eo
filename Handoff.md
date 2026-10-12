@@ -1,5 +1,15 @@
 # Handoff
 
+## 2026-10-12 — BytePlus: media directa del contrato Johor
+
+Claves ModelArk y Seed Speech creadas/guardadas en Secret Manager con confirmación del operador; consumer
+local conectado con permisos sólo sobre esos secretos. `pnpm ai:byteplus` cubre 21 entradas; `pnpm ai:layers`
+usa Pro directo por defecto. [Manual](docs/manual-de-uso/creative-studio/byteplus-directo.md) y
+[evidencia](docs/audits/creative-studio/BYTEPLUS_DIRECT_CONNECTION_2026-10-12.md). Canary real: Flash, Pro
+Layerize, máscara, Seedance Mini y 2.5; consumo estimado total US$0,5713 (no factura). 24 tests, lint,
+typecheck y gates documentales pasan. Audio sin generación
+real de prueba; no clonaciones/slots. Código local versionado; sin push/deploy ni promoción Globe.
+
 ## 2026-10-12 — Medios: oferta integral y evaluación DSP acompañada
 
 Programmatic consolida la [oferta integral de medios Efeonce](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).

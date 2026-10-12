@@ -87,7 +87,10 @@ Cierra el loop **idear → guion/brief → producir → editar → mezclar → m
 
 - **Producir voz**: **ElevenLabs** (v3 audio tags, IVC/PVC cloning, dubbing multi-idioma, voice design;
   Flash v2.5 para real-time), **Seed Audio 1.0** (diálogo multi-personaje + música + SFX en una pasada),
-  **Higgsfield** (`create_voice`, `dubbing`, `voice_change`) — todo vía MCP.
+  **Higgsfield** (`create_voice`, `dubbing`, `voice_change`). Para Seed Audio, TTS/Voice Replication, ASR e
+  interpretación de BytePlus usa `pnpm ai:byteplus` directo por defecto, con la clave Seed Speech:
+  [manual](../../../docs/manual-de-uso/creative-studio/byteplus-directo.md). Los otros proveedores conservan su MCP.
+  Los transportes están conectados; audio no tiene una generación real verificada en este canary.
 - **Producir música**: **ElevenLabs Music**, **Suno/Udio** según controles reales, dirección y licencia verificada
   para la cuenta, pista y uso; una marca de proveedor no acredita derechos comerciales por sí sola.
 - **Producir SFX**: generación de SFX (ElevenLabs) + foley/librerías.

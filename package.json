@@ -311,6 +311,7 @@
     "ai:image": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/generate-image.ts",
     "ai:nano": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/nano-banana.ts",
     "ai:fal": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/fal-image.ts",
+    "ai:byteplus": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/byteplus.ts",
     "ai:omni": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/gemini-omni.ts",
     "ai:higgsfield:sync-schemas": "tsx scripts/ai/higgsfield-sync-schemas.ts",
     "ai:image:rmbg": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/ai/remove-bg.ts",
@@ -544,6 +545,7 @@
     "pg": "^8.20.0",
     "playwright": "1.59.1",
     "pngjs": "^5.0.0",
+    "protobufjs": "7.5.4",
     "qrcode": "^1.5.4",
     "react": "19.2.3",
     "react-apexcharts": "1.4.1",
@@ -570,6 +572,7 @@
     "simple-icons": "^16.11.0",
     "sonner": "^2.0.7",
     "valibot": "1.2.0",
+    "ws": "8.18.3",
     "zod": "^3.25.76"
   },
   "devDependencies": {

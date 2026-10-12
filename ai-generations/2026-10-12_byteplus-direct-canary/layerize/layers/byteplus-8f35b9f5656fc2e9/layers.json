@@ -1,0 +1,97 @@
+{
+  "kind": "ai-layers",
+  "version": 1,
+  "source": {
+    "image": "ai-generations/2026-10-12_byteplus-direct-canary/fixture.png",
+    "sha256": "140ad5eae69e80dd2df5b625db2e57c7bdef553f30d59a8bf5093043e1be89ee",
+    "width": 1024,
+    "height": 1024
+  },
+  "base": {
+    "file": "00-base.png",
+    "width": 1024,
+    "height": 1024
+  },
+  "layers": [
+    {
+      "index": 0,
+      "zIndex": 0,
+      "name": null,
+      "description": null,
+      "file": "00-base.png",
+      "width": 1024,
+      "height": 1024,
+      "box": null,
+      "alphaCoverage": null
+    },
+    {
+      "index": 1,
+      "zIndex": 1,
+      "name": "Plain light gray background",
+      "description": "Uniform plain light gray background, no extra patterns or elements",
+      "file": "01-plain-light-gray-background.png",
+      "width": 847,
+      "height": 817,
+      "box": {
+        "left": 89,
+        "top": 103,
+        "right": 936,
+        "bottom": 920
+      },
+      "alphaCoverage": 0.995
+    },
+    {
+      "index": 2,
+      "zIndex": 2,
+      "name": "Red rounded rectangle",
+      "description": "Solid red rounded rectangle, no other elements included",
+      "file": "02-red-rounded-rectangle.png",
+      "width": 709,
+      "height": 713,
+      "box": {
+        "left": 199,
+        "top": 309,
+        "right": 410,
+        "bottom": 521
+      },
+      "alphaCoverage": 0.986
+    },
+    {
+      "index": 3,
+      "zIndex": 3,
+      "name": "Blue circle",
+      "description": "Solid blue perfect circle, no other elements included",
+      "file": "03-blue-circle.png",
+      "width": 779,
+      "height": 773,
+      "box": {
+        "left": 544,
+        "top": 369,
+        "right": 826,
+        "bottom": 651
+      },
+      "alphaCoverage": 0.779
+    }
+  ],
+  "request": {
+    "prompt": "Separate the red rectangle and the blue circle into their own transparent layers, plus the plain background.",
+    "imageSize": "auto_1K"
+  },
+  "cost": {
+    "layerCount": 3,
+    "perLayerUsd": 0.02025,
+    "estimatedUsd": 0.081,
+    "note": "Estimado por tamaño de cada capa + base; no settlement. Tarifas de la cuenta 2026-10-12."
+  },
+  "providerMeta": {
+    "provider": "byteplus",
+    "model": "dola-seedream-5-0-pro-260628",
+    "requestId": "021791829393312c891133c7aa592195d19c3080f8a135d462879",
+    "usage": {
+      "input_images": 1,
+      "generated_images": 4,
+      "output_tokens": 16396,
+      "total_tokens": 16396
+    }
+  }
+}
