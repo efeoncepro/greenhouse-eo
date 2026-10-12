@@ -1,9 +1,9 @@
 # Sika Mexicana · Wherex N.º 1164 · Propuesta técnica (deck 16:9)
 
-**Estado al 12/10/2026:** borrador v3 (22 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
+**Estado al 12/10/2026:** borrador v3 (21 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
 **separado** del anexo gráfico «POSIBLE» (decisión del operador: no se presentan como una sola propuesta).
 
-- 22 láminas, línea Brand (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
+- 21 láminas, línea Brand (el 12/10 salió «Piezas adicionales» y todo lo que limitaba alcance: el operador no le vio aporte) (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
 - Títulos directos, sin pregunta y respuesta (instrucción del operador del 07/10). Registro formal, de usted.
 - Lienzo (privado): https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5 → página «3 · Propuesta técnica (documento aparte)».
 - PDF: OneDrive `Alineación/4. Comercial/Licitaciones/Sika/2. Campaña Creativa/Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf`.

@@ -222,7 +222,7 @@ def s_matriz():
             ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre sus materiales: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
             ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel se entrega como video de 25 segundos, con locución y música.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17 · Archivo de video'),
             ('Tiempos de entrega', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
-            ('Propuesta económica desglosada', 'Valor por pieza del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
+            ('Propuesta económica desglosada', 'Valor de cada pieza del lanzamiento tipo.', 'Documento aparte, en Wherex'),
             ('Además', 'Equipo con nombre y función, y un caso de éxito.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
     tpl = 'display: grid; grid-template-columns: 290px minmax(0, 1fr) 220px; column-gap: 26px'
     head = f'<div style="{tpl}; padding-bottom: 14px">{label("Lo que pide la ficha")}{label("Nuestra respuesta")}{label("Dónde está")}</div>'
@@ -390,7 +390,7 @@ def s_entregables():
     pdv = obj(okicker('Punto de venta e impresos') + f'<div style="margin-top: 16px">{rows([("1", "cartel tamaño tabloide"), ("1", "cenefa de anaquel"), ("1", "colgante"), ("1", "anuncio tamaño carta")])}</div>', 1480, 280, 300, False, '; height: 420px')
     return page('Sika · Lanzamiento tipo', halo(1300, 480, 800, 560, 46) + hero + dig + pdv +
                 left('La producción · Lanzamiento tipo', ['Una pieza', 'madre y sus', 'adaptaciones'], 'El alcance base de un lanzamiento es el que ustedes definieron en la ronda de preguntas: un Master Graphic y sus adaptaciones para redes sociales y para el punto de venta.') +
-                means('La oferta económica valora este lanzamiento tipo. Las piezas adicionales se valoran por separado.',
+                means('La oferta económica detalla el valor de cada pieza de este lanzamiento tipo.',
                       'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026. Formatos y cantidades finales se ajustan con ustedes al inicio.'), section=2)
 
 
@@ -399,11 +399,11 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 
 # ── Reel ───────────────────────────────────────────────────────────────────────────────────────────────────────
 def s_reel():
-    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram y adaptación para TikTok"])}</div>', 820, 456, 465, True, '; height: 364px')
-    extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva"], False)}</div>', 1315, 456, 465, False, '; height: 364px')
+    base = obj(okicker('Qué incluye el reel') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso"])}</div>', 820, 456, 465, True, '; height: 364px')
+    extra = obj(okicker('Formatos de salida') + f'<div style="margin-top: 12px">{bullets(["Vertical 9:16 para Instagram", "Adaptación para TikTok, con las prácticas de esa plataforma", "Las mismas escenas sirven para las historias"])}</div>', 1315, 456, 465, False, '; height: 364px')
     return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
-                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
-                means('Queda claro qué incluye el reel base y qué se decide como producción adicional.',
+                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel se construye con las escenas y el envase de la pieza madre, sin rodaje.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
+                means('El reel sale de la misma pieza madre que el resto del lanzamiento, y se ve como la campaña.',
                       'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
 
 
@@ -421,7 +421,7 @@ def s_adicionales():
                       'Sus respuestas en Wherex del 5 y 6 de octubre de 2026: recursos existentes y producción adicional, por separado.'), section=2)
 
 
-add('adicionales', 'Piezas adicionales', s_adicionales)
+# Lámina «Piezas adicionales» retirada el 12/10 por el operador: no aportaba («no le veo ningún tipo de sentido»).
 
 
 

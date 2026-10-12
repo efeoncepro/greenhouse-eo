@@ -4,13 +4,13 @@
 
 ## Borrador vigente (12/10/2026)
 
-Deck 16:9 de 22 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
+Deck 16:9 de 21 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
 
 - Fuentes y cómo regenerarlo: [`ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`](../../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md).
 - Lienzo (privado): <https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5>, página «3 · Propuesta técnica (documento aparte)».
 - PDF: OneDrive, carpeta de la licitación, `Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf` (19 páginas).
 
-Secuencia: portada · la idea · cumplimiento · punto de partida · evolución · el sistema · el brief, punto por punto · audiencias · las tres muestras · alcance del sistema · método · lanzamiento tipo · reel · piezas adicionales · plazo · control · equipo · trabajo con México · caso Sky · continuidad · insumos para empezar · cierre. El PDF de OneDrive sigue en la v2: el operador pidió no exportar hasta nuevo aviso.
+Secuencia: portada · la idea · cumplimiento · punto de partida · evolución · el sistema · el brief, punto por punto · audiencias · las tres muestras · alcance del sistema · método · lanzamiento tipo · reel · plazo · control · equipo · trabajo con México · caso Sky · continuidad · insumos para empezar · cierre. El PDF de OneDrive sigue en la v2: el operador pidió no exportar hasta nuevo aviso.
 
 ## Por confirmar antes de enviar
 
