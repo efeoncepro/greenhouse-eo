@@ -33,7 +33,8 @@ const seoMocks = vi.hoisted(() => ({
   readDomainOverviewForTarget: vi.fn(),
   readSeoWindowMovers: vi.fn(),
   readSeoWorkQueue: vi.fn(),
-  readSeoOverviewConnection: vi.fn()
+  readSeoOverviewConnection: vi.fn(),
+  readSeoContentScope: vi.fn()
 }))
 
 vi.mock('@/lib/growth/seo/flags', () => ({ isSeoModuleEnabled: seoMocks.isSeoModuleEnabled }))
@@ -44,6 +45,7 @@ vi.mock('@/lib/growth/seo/domain-overview/reader', () => ({ readDomainOverviewFo
 vi.mock('@/lib/growth/seo/overview/read-window-movers', () => ({ readSeoWindowMovers: seoMocks.readSeoWindowMovers }))
 vi.mock('@/lib/growth/seo/work-queue/reader', () => ({ readSeoWorkQueue: seoMocks.readSeoWorkQueue }))
 vi.mock('@/lib/growth/seo/overview/read-overview-connection', () => ({ readSeoOverviewConnection: seoMocks.readSeoOverviewConnection }))
+vi.mock('@/lib/growth/seo/content-scope/store', () => ({ readSeoContentScope: seoMocks.readSeoContentScope }))
 
 const aeoMocks = vi.hoisted(() => ({ readClientGraderReport: vi.fn() }))
 
@@ -89,6 +91,8 @@ describe('SEO adapter', () => {
     ], provenance: [] })
     seoMocks.readDomainOverviewForTarget.mockResolvedValue({ ok: true, subject: 'x.cl', capturedAt: '2026-09-01', etvMethodology: { version: 'improved_layout_clickstream_v2' }, history: [{ month: '2026-08', organicEtv: 1200 }, { month: '2026-07', organicEtv: 1000 }] })
     seoMocks.readSeoOverviewConnection.mockResolvedValue({ state: 'connected', dataAsOf: '2026-08-31' })
+    // Sin alcance declarado por defecto: el informe mide el sitio completo, como antes de TASK-2033.
+    seoMocks.readSeoContentScope.mockResolvedValue(null)
     seoMocks.readSeoWorkQueue.mockResolvedValue({
       ok: true,
       snapshot: { snapshotId: 'seowqs-1', organizationId: 'org', seoTargetId: 'tgt-1', priorityScoreVersion: 'v2', windowDays: 28, itemCount: 40, computedAt: '2026-09-02T13:00:00.000Z', expiresAt: '2026-09-03T13:00:00.000Z' },
@@ -242,6 +246,150 @@ describe('SEO adapter', () => {
 
     seoMocks.isSeoModuleEnabled.mockReturnValue(false)
     expect((await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })).rejections[0]!.reason).toBe('module_disabled')
+  })
+
+  describe('TASK-2033 — alcance de contenido', () => {
+    const SCOPE = {
+      organizationId: 'org',
+      version: 3,
+      label: 'Artículos y tutoriales',
+      rules: [{ kind: 'prefix' as const, path: '/articulos' }, { kind: 'exact' as const, path: '/guia-de-barniz' }],
+      createdAt: '2026-10-12T00:00:00.000Z'
+    }
+
+    const scopedGsc = () =>
+      seoMocks.readSeoOverviewKpisForWindow.mockImplementation(async (_org: string, window: { from: string }, options?: { scope?: unknown }) => {
+        const current = window.from === '2026-08-01'
+
+        // Con alcance, el reader devuelve la población recortada; sin él, la propiedad completa.
+        return options?.scope ? (current ? gscWindow(60, 12000, 31, '2026-08-31') : gscWindow(50, 11000, 31, '2026-07-31')) : current ? gscWindow(500, 20000, 31, '2026-08-31') : gscWindow(400, 18000, 31, '2026-07-31')
+      })
+
+    it('sin alcance declarado, ningún reader recibe recorte y la evidencia no lleva alcance ni totales del sitio', async () => {
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+      expect(seoMocks.readSeoOverviewKpisForWindow.mock.calls.every(call => !call[2]?.scope)).toBe(true)
+      expect(seoMocks.readSeoWindowMovers.mock.calls.every(call => !call[1].scope)).toBe(true)
+      expect(seoMocks.readSeoWorkQueue.mock.calls.every(call => !call[1].scope)).toBe(true)
+      expect(result.sources.every(source => source.contentScope === undefined)).toBe(true)
+      expect(result.facts.some(fact => fact.metricId.startsWith('site_total.'))).toBe(false)
+      expect(result.facts.find(fact => fact.factId === 'seo.clicks.2026-08-01_2026-09-01')!.value).toBe(500)
+      expect(result.facts.some(fact => fact.metricId === 'organic_etv')).toBe(true)
+    })
+
+    it('una versión sin reglas es el sitio completo: tampoco recorta', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue({ ...SCOPE, rules: [] })
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+      expect(result.facts.find(fact => fact.metricId === 'clicks')!.value).toBe(500)
+      expect(result.sources.every(source => source.contentScope === undefined)).toBe(true)
+    })
+
+    it('con alcance, las cifras salen del reader recortado, en las DOS ventanas, y cada fuente lo sella', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue(SCOPE)
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+      const clicks = result.facts.find(fact => fact.factId === 'seo.clicks.2026-08-01_2026-09-01')!
+      const previousClicks = result.facts.find(fact => fact.factId === 'seo.clicks.2026-07-01_2026-08-01')!
+
+      expect(clicks).toMatchObject({ value: 60, comparisonFactId: previousClicks.factId })
+      expect(previousClicks.value).toBe(50)
+      expect(clicks.population).toContain('Artículos y tutoriales')
+      expect(clicks.evidenceRef.endsWith(':scope_v3')).toBe(true)
+
+      // El alcance llega a los readers dueños: el adapter no filtra filas por su cuenta.
+      const scopedReads = seoMocks.readSeoOverviewKpisForWindow.mock.calls.filter(call => call[2]?.scope)
+
+      expect(scopedReads.map(call => call[1].from).sort()).toEqual(['2026-07-01', '2026-08-01'])
+      expect(scopedReads.every(call => call[2].scope.rules === SCOPE.rules)).toBe(true)
+      expect(seoMocks.readSeoWindowMovers.mock.calls.every(call => call[1].scope?.rules === SCOPE.rules)).toBe(true)
+      expect(seoMocks.readSeoWorkQueue.mock.calls.every(call => call[1].scope?.rules === SCOPE.rules)).toBe(true)
+
+      // Toda fuente SEO de la edición —también las de la comparación— sella la MISMA versión y reglas.
+      expect(result.sources.length).toBeGreaterThan(0)
+      expect(result.sources.every(source => source.contentScope?.version === 3 && source.contentScope.label === 'Artículos y tutoriales')).toBe(true)
+      expect(result.sources[0]!.contentScope!.rules).toEqual([{ kind: 'prefix', path: '/articulos' }, { kind: 'exact', path: '/guia-de-barniz' }])
+      expectContentContract(result.facts)
+    })
+
+    it('con alcance, el sitio completo entra sólo como referencia, con su comparable', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue(SCOPE)
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01', 'previous_period')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: windows.comparison, projectIds: [], editorialV2: true })
+
+      const site = result.facts.find(fact => fact.factId === 'seo.site_total.clicks.2026-08-01_2026-09-01')!
+
+      expect(site).toMatchObject({ value: 500, role: 'reference', comparisonFactId: 'seo.site_total.clicks.2026-07-01_2026-08-01' })
+      expect(result.facts.find(fact => fact.factId === site.comparisonFactId)).toMatchObject({ value: 400, role: 'reference' })
+      // La referencia no lleva la marca del alcance: mide la propiedad completa y lo dice.
+      expect(site.evidenceRef.includes('scope_v')).toBe(false)
+      expect(site.population).not.toContain('Artículos y tutoriales')
+      // Y es lo ÚNICO sin recorte: ningún hecho de medición viene de la propiedad completa.
+      expect(result.facts.filter(fact => fact.role !== 'reference' && fact.metricId === 'clicks').map(fact => fact.value).sort()).toEqual([50, 60])
+    })
+
+    it('con alcance, el ETV del dominio no se emite ni se consulta: sale como límite', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue(SCOPE)
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+      expect(result.facts.some(fact => fact.metricId === 'organic_etv')).toBe(false)
+      expect(result.rejections).toContainEqual(expect.objectContaining({ metricId: 'organic_etv', reason: 'outside_content_scope' }))
+      expect(seoMocks.readDomainOverviewForTarget).not.toHaveBeenCalled()
+    })
+
+    it('con alcance, el ranking cuenta sólo las keywords que posicionan con una página del contenido medido', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue(SCOPE)
+      scopedGsc()
+      seoMocks.readRankEvolution.mockResolvedValue({ ok: true, seoTargetId: 'tgt-1', organizationId: 'org', engine: 'google', device: 'desktop', range: { from: '2026-06-01', to: '2026-09-14', days: 106 }, source: 'postgres', series: [
+        { keyword: 'cómo barnizar', points: [{ date: '2026-08-20', position: 4, url: 'https://x.cl/articulos/como-barnizar' }] },
+        { keyword: 'guía de barniz', points: [{ date: '2026-08-21', position: 15, url: 'https://x.cl/guia-de-barniz/' }] },
+        { keyword: 'barniz precio', points: [{ date: '2026-08-22', position: 2, url: 'https://x.cl/productos/barniz' }] },
+        { keyword: 'articulos viejos', points: [{ date: '2026-08-22', position: 1, url: 'https://x.cl/articulos-viejos/x' }] },
+        { keyword: 'sin página', points: [{ date: '2026-08-22', position: 1, url: null }] }
+      ], provenance: [] })
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+      expect(result.facts.find(fact => fact.metricId === 'keywords_tracked')!.value).toBe(2)
+      expect(result.facts.find(fact => fact.metricId === 'page_one_keywords')).toMatchObject({ value: 1, numerator: 1, denominator: 2 })
+    })
+
+    it('con alcance y ninguna keyword posicionando con el contenido medido, el ranking es un límite, nunca un cero', async () => {
+      seoMocks.readSeoContentScope.mockResolvedValue(SCOPE)
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01')
+      const result = await seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })
+
+      // El mock por defecto posiciona sin URL: ninguna keyword pertenece al alcance.
+      expect(result.facts.some(fact => fact.metricId === 'keywords_tracked')).toBe(false)
+      expect(result.rejections).toContainEqual(expect.objectContaining({ metricId: 'rank', reason: 'no_data' }))
+    })
+
+    it('si el alcance no se puede leer, el adapter falla: nunca mide el sitio completo en silencio', async () => {
+      seoMocks.readSeoContentScope.mockRejectedValue(new Error('relation does not exist'))
+      scopedGsc()
+      const { seoReportAdapter } = await import('./seo-adapter')
+      const windows = month('2026-08-01', '2026-09-01')
+
+      await expect(seoReportAdapter.collect({ organizationId: 'org', audience: 'client', window: windows.current, comparison: null, projectIds: [] })).rejects.toThrow('relation does not exist')
+      expect(seoMocks.readSeoOverviewKpisForWindow).not.toHaveBeenCalled()
+    })
   })
 
   it('ETV con método no disponible declara method_mismatch; mes sin snapshot es insufficient_data', async () => {

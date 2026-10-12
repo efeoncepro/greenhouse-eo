@@ -95,6 +95,31 @@ export const GH_INSIGHTS = {
     site: 'Visitas orgánicas al sitio'
   } as Readonly<Record<string, string>>,
 
+  /**
+   * TASK-2033 — alcance de contenido: el informe mide sólo la parte del sitio que Efeonce trabaja. Las poblaciones
+   * son trazabilidad del snapshot (no se imprimen); la línea y la lectura sí llegan al documento.
+   */
+  contentScope: {
+    gscPopulation: 'Consultas de Search Console hacia el contenido medido',
+    rankPopulation: 'Keywords monitoreadas que posicionan con el contenido medido',
+    queuePopulation: 'Cola de trabajo SEO priorizada, sobre el contenido medido',
+    ga4Population: 'Sesiones del canal Organic Search que entraron por el contenido medido',
+    /**
+     * «Qué mide este informe» del capítulo de búsqueda cuando hay alcance: nombra el contenido medido (la etiqueta
+     * sellada, en minúscula inicial) entre las dos partes. Sin cifras: el validador del plan las rechazaría.
+     */
+    scopeLineLead: 'Visibilidad orgánica de',
+    scopeLineTail: 'sus clics, impresiones y posiciones en Google, sin el resto del sitio.',
+    /** Entrada del capítulo de búsqueda con alcance. Sin cifras. */
+    chapterOpening: 'Cómo encuentra Google el contenido que trabajamos y cuántas visitas le trae.',
+    /**
+     * Lectura de contexto: el contenido medido frente al sitio completo, con la variación de clics de cada uno.
+     * Se arma «{contextLead} {variación}{contextMiddle} {variación}.»; sólo existe cuando ambos tienen período anterior.
+     */
+    contextLead: 'Los clics de este contenido variaron',
+    contextMiddle: ' frente al período anterior; los de todo el sitio,'
+  },
+
   /** TASK-1962 — población de los hechos de GA4 (trazabilidad del snapshot; no se imprime como cifra). */
   ga4: {
     organicPopulation: 'Sesiones del canal Organic Search de la propiedad GA4 conectada',
@@ -141,7 +166,9 @@ export const GH_INSIGHTS = {
     noComparison: 'sin comparación con el período anterior en esta edición',
     insufficientData: 'sin datos suficientes en este período',
     /** TASK-1962 — una fuente que el cliente todavía no conectó (la petición del plan lo pide). */
-    notConnected: 'falta conectar la fuente'
+    notConnected: 'falta conectar la fuente',
+    /** TASK-2033 — la fuente mide el sitio completo y la edición mide una parte (p. ej. el tráfico estimado). */
+    outsideContentScope: 'se estima para todo el sitio, no para el contenido que mide esta edición'
   },
 
   rejections: {
@@ -153,7 +180,8 @@ export const GH_INSIGHTS = {
     module_disabled: 'el módulo está apagado',
     not_connected: 'la fuente no está conectada',
     target_ambiguous: 'hay más de un mercado activo',
-    no_data: 'sin datos'
+    no_data: 'sin datos',
+    outside_content_scope: 'la fuente mide el dominio completo, no el alcance de contenido'
   },
 
   /**
@@ -177,6 +205,9 @@ export const GH_INSIGHTS = {
     'driver.page': 'Páginas que más cambiaron',
     rank: 'Posiciones en buscadores',
     organic_etv: 'Tráfico orgánico estimado',
+    // TASK-2033 — la propiedad completa cuando el informe mide un alcance de contenido: sólo contexto.
+    'site_total.clicks': 'Clics orgánicos del sitio completo',
+    'site_total.impressions': 'Impresiones del sitio completo',
     overall_score: 'Puntaje de visibilidad en IA',
     rpa: 'Rondas de revisión por pieza',
     otd: 'Entregas a tiempo',

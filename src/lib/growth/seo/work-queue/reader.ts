@@ -48,6 +48,8 @@ import 'server-only'
 import { captureWithDomain } from '@/lib/observability/capture'
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { type SeoContentScopeFilter, isContentScopeActive } from '../content-scope/contracts'
+import { contentScopeSqlClause } from '../content-scope/sql'
 import { isSeoModuleEnabled, isSeoWorkQueueEnabled } from '../flags'
 import { seoProvenance, type SeoProvenance } from '../lens'
 import {
@@ -161,6 +163,12 @@ export const buildWorkQueueProvenance = (computedAt: string | null): SeoProvenan
 
 export interface ReadSeoWorkQueueOptions {
   origins?: readonly SeoWorkQueueOrigin[]
+  /**
+   * TASK-2033 — alcance de contenido: con reglas, sólo los ítems cuya página (`target_url`) pertenece al alcance.
+   * Un ítem sin página queda fuera. Es un FILTRO sobre el orden persistido (`rank_in_snapshot`), igual que
+   * `origins`: filtrar un orden total lo deja total; jamás reordena ni recalcula el score.
+   */
+  scope?: SeoContentScopeFilter | null
   limit?: number
   cursor?: string | null
   env?: NodeJS.ProcessEnv
@@ -266,6 +274,7 @@ export const readSeoWorkQueue = async (
 
     const cursor = options.cursor ? decodeCursor(options.cursor) : null
     const origins = options.origins && options.origins.length > 0 ? [...options.origins] : null
+    const scoped = isContentScopeActive(options.scope) ? contentScopeSqlClause('target_url', options.scope, 5) : null
 
     /*
      * Keyset sobre `rank_in_snapshot`: entero único por snapshot, sin NULL, persistido por
@@ -285,10 +294,10 @@ export const readSeoWorkQueue = async (
          FROM greenhouse_growth.seo_work_queue_items
         WHERE snapshot_id = $1
           AND ($2::text[] IS NULL OR origin = ANY($2::text[]))
-          AND ($3::int IS NULL OR rank_in_snapshot > $3::int)
+          AND ($3::int IS NULL OR rank_in_snapshot > $3::int)${scoped ? `\n          AND ${scoped.clause}` : ''}
         ORDER BY rank_in_snapshot ASC
         LIMIT $4::int`,
-      [snapshot.snapshot_id, origins, cursor?.rank ?? null, limit + 1]
+      [snapshot.snapshot_id, origins, cursor?.rank ?? null, limit + 1, ...(scoped?.params ?? [])]
     )
 
     const hasMore = rows.length > limit

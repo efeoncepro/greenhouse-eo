@@ -2,6 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { type SeoContentScopeFilter, isContentScopeActive } from '../content-scope/contracts'
+import { gscPagesInContentScopeSql } from '../content-scope/sql'
 import { isSeoModuleEnabled } from '../flags'
 
 /**
@@ -54,12 +56,26 @@ export const readSeoWindowMovers = async (
     previous: { from: string; toExclusive: string }
     dimension: SeoMoverDimension
     limit?: number
+    /**
+     * TASK-2033 — alcance de contenido: con reglas, los totales y los grupos salen SÓLO de las páginas del alcance
+     * (también al agrupar por consulta: son las consultas que llevaron a esas páginas). La suma de los grupos sigue
+     * siendo exactamente el total de la ventana, ahora del alcance.
+     */
+    scope?: SeoContentScopeFilter | null
   }
 ): Promise<ReadSeoWindowMoversResult> => {
   if (!isSeoModuleEnabled()) return { ok: false, errorCode: 'disabled' }
 
   const column = COLUMN[input.dimension]
   const limit = Math.min(MAX_LIMIT, Math.max(1, Math.floor(input.limit ?? 5)))
+  // Los parámetros del alcance van DESPUÉS de los propios de cada consulta ($6–$7 en totales, $7–$8 en grupos).
+  // Las páginas se clasifican sobre el rango que cubre AMBAS ventanas: una página que sólo existió en el período
+  // anterior también cuenta (es justo la que explica una caída).
+  const bothWindows = { organizationSql: '$1', fromSql: 'LEAST($2::date, $4::date)', toExclusiveSql: 'GREATEST($3::date, $5::date)' }
+  const totalsScope = isContentScopeActive(input.scope) ? gscPagesInContentScopeSql(input.scope, 6, bothWindows) : null
+  const groupsScope = isContentScopeActive(input.scope) ? gscPagesInContentScopeSql(input.scope, 7, bothWindows) : null
+  const totalsScopeSql = totalsScope ? `\n        AND ${totalsScope.clause}` : ''
+  const groupsScopeSql = groupsScope ? ` AND ${groupsScope.clause}` : ''
 
   const [totals] = await runGreenhousePostgresQuery<{ current: string | null; previous: string | null }>(
     `SELECT SUM(clicks) FILTER (WHERE capture_date >= $2::date AND capture_date < $3::date)::bigint AS current,
@@ -67,8 +83,8 @@ export const readSeoWindowMovers = async (
        FROM greenhouse_growth.seo_gsc_daily
       WHERE organization_id = $1
         AND capture_date >= LEAST($2::date, $4::date)
-        AND capture_date < GREATEST($3::date, $5::date)`,
-    [organizationId, input.window.from, input.window.toExclusive, input.previous.from, input.previous.toExclusive]
+        AND capture_date < GREATEST($3::date, $5::date)${totalsScopeSql}`,
+    [organizationId, input.window.from, input.window.toExclusive, input.previous.from, input.previous.toExclusive, ...(totalsScope?.params ?? [])]
   )
 
   // Sin datos en alguna de las dos ventanas no hay cambio que descomponer (nunca un «todo es nuevo» contra cero).
@@ -80,12 +96,12 @@ export const readSeoWindowMovers = async (
     `WITH cur AS (
        SELECT ${column} AS key, SUM(clicks)::bigint AS clicks, SUM(impressions)::bigint AS impressions
          FROM greenhouse_growth.seo_gsc_daily
-        WHERE organization_id = $1 AND capture_date >= $2::date AND capture_date < $3::date
+        WHERE organization_id = $1 AND capture_date >= $2::date AND capture_date < $3::date${groupsScopeSql}
         GROUP BY ${column}
      ), prev AS (
        SELECT ${column} AS key, SUM(clicks)::bigint AS clicks, SUM(impressions)::bigint AS impressions
          FROM greenhouse_growth.seo_gsc_daily
-        WHERE organization_id = $1 AND capture_date >= $4::date AND capture_date < $5::date
+        WHERE organization_id = $1 AND capture_date >= $4::date AND capture_date < $5::date${groupsScopeSql}
         GROUP BY ${column}
      )
      SELECT COALESCE(cur.key, prev.key) AS key,
@@ -98,7 +114,7 @@ export const readSeoWindowMovers = async (
       ORDER BY ABS(COALESCE(cur.clicks, 0) - COALESCE(prev.clicks, 0)) DESC,
                COALESCE(cur.key, prev.key) COLLATE "C"
       LIMIT $6`,
-    [organizationId, input.window.from, input.window.toExclusive, input.previous.from, input.previous.toExclusive, limit]
+    [organizationId, input.window.from, input.window.toExclusive, input.previous.from, input.previous.toExclusive, limit, ...(groupsScope?.params ?? [])]
   )
 
   return {

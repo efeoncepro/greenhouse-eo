@@ -14,7 +14,7 @@ import 'server-only'
  * - Token caído o consulta fallida ⇒ `insufficient_data`: el informe sale sin GA4 y lo dice.
  */
 
-import { type Ga4AnalyticsResult, readGa4Analytics } from '@/lib/growth/analytics-ga4/reader'
+import { type Ga4AnalyticsResult, type Ga4LandingMatchRule, readGa4Analytics } from '@/lib/growth/analytics-ga4/reader'
 
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
@@ -77,13 +77,19 @@ export interface Ga4WindowRead {
   result: Ga4AnalyticsResult
 }
 
-/** Una consulta por ventana: sesiones por canal por defecto y fuente/medio. */
-export const readGa4ChannelWindow = (organizationId: string, window: ResolvedInsightWindow): Promise<Ga4AnalyticsResult> =>
+/**
+ * Una consulta por ventana: sesiones por canal por defecto y fuente/medio.
+ *
+ * TASK-2033 — con `landingMatch` (las reglas del alcance de contenido) GA4 devuelve sólo las sesiones cuya página de
+ * entrada pertenece al alcance; el recorte lo hace la Data API, no este módulo.
+ */
+export const readGa4ChannelWindow = (organizationId: string, window: ResolvedInsightWindow, landingMatch?: ReadonlyArray<Ga4LandingMatchRule>): Promise<Ga4AnalyticsResult> =>
   readGa4Analytics(organizationId, {
     startDate: window.start,
     endDate: window.endInclusive,
     dimensions: ['sessionDefaultChannelGroup', 'sessionSourceMedium'],
-    metrics: ['sessions', 'engagedSessions']
+    metrics: ['sessions', 'engagedSessions'],
+    ...(landingMatch && landingMatch.length > 0 ? { landingMatch } : {})
   })
 
 export interface Ga4FactsOutput {
@@ -132,12 +138,12 @@ const sumWhere = (rows: Extract<Ga4AnalyticsResult, { ok: true }>['rows'], chann
  * SEO — visitas orgánicas al sitio y cuántas de ellas interactuaron (sesiones con interacción de GA4). «Organic Search»
  * de GA4 incluye todos los buscadores, no sólo Google: por eso estos hechos no llevan el canal `google`.
  */
-export const ga4OrganicFacts = (organizationId: string, window: ResolvedInsightWindow, result: Ga4AnalyticsResult, comparisonIds: Record<string, string | null>): Ga4FactsOutput => {
+export const ga4OrganicFacts = (organizationId: string, window: ResolvedInsightWindow, result: Ga4AnalyticsResult, comparisonIds: Record<string, string | null>, population: string = GH_INSIGHTS.ga4.organicPopulation): Ga4FactsOutput => {
   if (!result.ok) return { facts: [], rejections: rejectionOf('seo', result), source: null }
 
   const sessions = sumWhere(result.rows, ORGANIC_SEARCH, 'sessions')
   const engaged = sumWhere(result.rows, ORGANIC_SEARCH, 'engagedSessions')
-  const base = baseFor('seo', organizationId, result.propertyId, window, GH_INSIGHTS.ga4.organicPopulation)
+  const base = baseFor('seo', organizationId, result.propertyId, window, population)
   // TASK-1974 — sesiones SIN interacción (GA4: sesiones que no cumplen la definición de interacción), fila por fila. Es
   // el complemento de las con interacción dentro del total: el segmento superior de las barras apiladas, que llega como
   // hecho de la fuente y nunca como una resta en el render.

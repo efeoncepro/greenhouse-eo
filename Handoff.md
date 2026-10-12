@@ -4,6 +4,19 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-12 — Insights: alcance de contenido por organización (TASK-2033, en curso)
+
+El informe SEO de Berel medía la propiedad completa de Search Console; lo que Efeonce trabaja es el 4,3 % de sus
+clics. [`TASK-2033`](docs/tasks/in-progress/TASK-2033-efeonce-insights-content-scope-measurement.md) agrega un alcance
+de contenido por organización (reglas de ruta, append-only) en `src/lib/growth/seo/content-scope/`; los readers dueños
+lo aplican y el adapter de Insights lo sella en cada fuente. Slices 1–4 en `develop` local, **sin push**.
+**No empujar todavía:** la migración `20261012145214417_task-2033-growth-seo-content-scope.sql` está escrita y sin
+aplicar (espera autorización del operador), y el adapter falla cerrado si no puede leer el alcance: desplegar el código
+antes de la tabla dejaría sin capítulo SEO a toda edición. Quien corra `pnpm migrate:up` desde este árbol la aplica.
+Pendiente: aplicar la migración, fijar el alcance de Berel con `pnpm seo:content-scope`, vista previa real (PDF y
+deck), filtro de GA4 contra la propiedad real, tool MCP de lectura, documentación y skill. Verificado: 1.338 pruebas
+de Insights, SEO y GA4; `test:live` del alcance 9/9 contra PostgreSQL real; `pnpm typecheck`.
+
 ## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
 
 El operador aprobó [a dónde va cada dominio y en qué orden](docs/architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md):

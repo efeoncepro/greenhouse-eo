@@ -6,7 +6,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Alto`
@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Diseno`
+- Status real: `Slices 1–4 code complete en develop local (sin push); migración sin aplicar y alcance de Berel sin fijar, a la espera de autorización del operador; Slices 5 y 6 pendientes`
 - Rank: `TBD`
 - Domain: `insights|growth`
 - Blocked by: `none`
@@ -282,9 +282,15 @@ Reglas obligatorias:
 - Abrir el PDF y el deck página por página.
 - Documentación técnica, funcional y manual; skill `efeonce-insights` (ledger, mapa, contratos, operación, lecciones) y espejos.
 
+### Slice 6 — Lectura del alcance por el lane ecosystem y MCP
+
+- Recurso de lectura del alcance vigente en el lane ecosystem del módulo SEO y tool MCP `get_seo_content_scope`, con su entrada en `src/mcp/greenhouse/tool-manifest.ts` y `pnpm mcp:manifest:generate`.
+- Federación en el gateway `efeonce-mcp` (sync del manifiesto, paridad, versión) bajo el scope de lectura.
+- Lo exige la regla del dominio SEO: todo reader nuevo expone su tool en el mismo trabajo. Va después de Berel porque no cambia lo que mide el informe.
+
 ## Out of Scope
 
-- UI en el portal para editar el alcance, y exposición por App API, Ecosystem API o MCP con su capability (follow-up).
+- UI en el portal para editar el alcance, y ESCRIBIRLO por App API, Ecosystem API o MCP con su capability (follow-up); la lectura por MCP sí es de esta task (Slice 6).
 - Alcance por servicio contratado o por proyecto (`TASK-1960`).
 - Capítulo AEO: la visibilidad en motores de respuesta es de la marca y las visitas desde asistentes de IA siguen midiéndose sobre el sitio completo.
 - ETV recortado por ruta: no hay captura por URL; depende de `url_visibility` en `TASK-1992`.
@@ -300,7 +306,7 @@ Reglas obligatorias:
 CREATE TABLE greenhouse_growth.seo_content_scope_versions (
   organization_id        TEXT NOT NULL REFERENCES greenhouse_core.organizations (organization_id) ON DELETE RESTRICT,
   version                INTEGER NOT NULL CHECK (version >= 1),
-  label                  TEXT NOT NULL CHECK (char_length(label) BETWEEN 1 AND 120),
+  label                  TEXT NOT NULL CHECK (char_length(label) BETWEEN 1 AND 120), -- el command admite hasta 60
   rules_json             JSONB NOT NULL CHECK (jsonb_typeof(rules_json) = 'array'),
   reason                 TEXT NOT NULL CHECK (char_length(reason) >= 10),
   created_by_actor_kind  TEXT NOT NULL,
@@ -409,17 +415,19 @@ efecto en la siguiente edición, sin deploy.
 ## Acceptance Criteria
 
 - [ ] Existe `greenhouse_growth.seo_content_scope_versions`, append-only, y su migración aborta si la tabla no quedó creada.
-- [ ] `setSeoContentScope` crea una versión nueva sólo cuando cambian las reglas o la etiqueta, y rechaza reglas inválidas con error tipado.
-- [ ] `readSeoOverviewKpisForWindow` con el alcance de Berel devuelve 522 clics en agosto de 2026 y 605 en septiembre para `/articulos` + `/tutoriales`, leídos de PostgreSQL real.
-- [ ] La suma de clics por página de `readSeoWindowMovers` con alcance coincide con el total de clics del alcance.
-- [ ] El matcher TS y el fragmento SQL clasifican igual las URLs de una muestra real que incluye `/articulos-x`, query strings, barra final y `www`.
-- [ ] Una organización sin alcance produce el mismo snapshot que antes del cambio (prueba de adapter sin diferencias).
-- [ ] Con alcance, ninguna fuente SEO de la edición queda sin `contentScope`, y la ventana de comparación usa las mismas reglas.
-- [ ] Con alcance, `organic_etv` no aparece como hecho y sí como límite con la razón `outside_content_scope`.
-- [ ] Con alcance, «Qué mide este informe» nombra la etiqueta sellada y no contiene cifras.
-- [ ] La lectura de contexto cita los hechos de referencia `site_total.*` y pasa `plan-validation`.
+- [ ] `setSeoContentScope` crea una versión nueva sólo cuando cambian las reglas o la etiqueta, y rechaza reglas inválidas con error tipado. (Escrito; sin ejercitar contra PostgreSQL real porque la tabla aún no existe.)
+- [x] `readSeoOverviewKpisForWindow` con el alcance de Berel devuelve 522 clics en agosto de 2026 y 605 en septiembre para `/articulos` + `/tutoriales`, leídos de PostgreSQL real. (Medido 2026-10-12 con el SQL del reader; con el alcance completo acordado: 661 y 799.)
+- [x] La suma de clics por página de `readSeoWindowMovers` con alcance coincide con el total de clics del alcance. (`scoped-readers.live.test.ts`, suma independiente por página en TS, las dos ventanas.)
+- [x] El matcher TS y el fragmento SQL clasifican igual las URLs de una muestra real que incluye `/articulos-x`, query strings, barra final y `www`. (`content-scope.live.test.ts`: casos de borde y todas las páginas reales de la organización con más serie.)
+- [x] Una organización sin alcance produce el mismo snapshot que antes del cambio (prueba de adapter sin diferencias). (Las pruebas previas del adapter pasan sin tocar sus aserciones; las llamadas a los readers son idénticas.)
+- [x] Con alcance, ninguna fuente SEO de la edición queda sin `contentScope`, y la ventana de comparación usa las mismas reglas. (Prueba de adapter.)
+- [x] Con alcance, `organic_etv` no aparece como hecho y sí como límite con la razón `outside_content_scope`. (Pruebas de adapter y de plan.)
+- [x] Con alcance, «Qué mide este informe» nombra la etiqueta sellada y no contiene cifras. (`content-scope-plan.test.ts`.)
+- [x] La lectura de contexto cita los hechos de referencia `site_total.*` y pasa `plan-validation`. (`content-scope-plan.test.ts`, con las cifras reales de Berel.)
 - [ ] La vista previa real de Berel para septiembre de 2026 se abrió en PDF y deck, página por página.
-- [ ] `pnpm vitest run src/lib/efeonce-insights src/lib/growth/seo src/lib/growth/analytics-ga4` queda verde.
+- [x] `pnpm vitest run src/lib/efeonce-insights src/lib/growth/seo src/lib/growth/analytics-ga4` queda verde. (2026-10-12: 1.338 pruebas; `test:live` del alcance: 9 pasadas, ninguna saltada.)
+- [ ] La tool MCP `get_seo_content_scope` existe, está en el manifiesto y federada en el gateway.
+- [ ] La consulta real de GA4 de Berel filtrada por página de entrada coincide con la suma por página hecha en TS.
 - [ ] La skill `efeonce-insights` y sus espejos reflejan el alcance (ledger, mapa, contratos, operación, lecciones).
 
 ## Verification
@@ -446,7 +454,7 @@ efecto en la siguiente edición, sin deploy.
 
 ## Follow-ups
 
-- Exponer el alcance por App API, Ecosystem API y MCP con capability propia y grant, y UI en el portal.
+- Escribir el alcance por App API, Ecosystem API y MCP con capability propia y grant, y UI en el portal.
 - Lente «contenido que trabajamos» en el cockpit SEO.
 - Alcance por servicio contratado (`TASK-1960`).
 - ETV por URL cuando exista `url_visibility` (`TASK-1992`).
@@ -456,3 +464,12 @@ efecto en la siguiente edición, sin deploy.
 - ¿Entran al alcance de Berel `/consejos-para-pintar` y `/colores-de-temporada`? Hoy quedan fuera.
 - ¿Las visitas desde asistentes de IA del capítulo AEO deben recortarse también a las páginas del alcance?
 - ¿Se revisa la edición de septiembre de Berel ya creada o el alcance rige desde la edición de octubre?
+
+## Delta 2026-10-12
+
+- Slices 1–4 implementados en `develop` local, sin push. La migración `20261012145214417_task-2033-growth-seo-content-scope.sql` está escrita y **sin aplicar**: crea una tabla en la instancia compartida y espera autorización del operador. Mientras no se aplique, este código no se empuja: el adapter falla cerrado si no puede leer el alcance.
+- El predicado por fila sobre `seo_gsc_daily` tardaba ~5 s por consulta en un mes real de Berel (204 mil filas). Los readers usan `gscPagesInContentScopeSql`, que clasifica una vez por página distinta: ~0,4 s y el mismo resultado exacto.
+- La etiqueta admite 60 caracteres en el command (la columna, 120): se imprime dentro de la línea de alcance de la portada.
+- `site_total.*` responde la pregunta `outcome` del contrato de contenido; como `measurement` rompía el gate (SEO no tiene productor de metas).
+- La lectura de contexto es la última afirmación del capítulo, con rol `finding`: «Los clics de este contenido variaron +20,9 % frente al período anterior; los de todo el sitio, -13,6 %.» (cifras reales de Berel, septiembre de 2026).
+- Sin verificar todavía: el filtro de GA4 contra la propiedad real (la consulta ad hoc devolvió `query_failed`, sin diagnosticar), el store contra PostgreSQL real, y el PDF y el deck reales con alcance.

@@ -17,6 +17,43 @@ export interface Ga4AnalyticsParams {
   dimensions: Ga4ReportDimension[]
   metrics: Ga4ReportMetric[]
   landingPrefix?: string
+  /**
+   * TASK-2033 — varias reglas de página de entrada (alcance de contenido). Con reglas, gana sobre `landingPrefix`.
+   * Forma estructural a propósito: este reader no depende del módulo SEO; el caller le pasa sus reglas.
+   */
+  landingMatch?: ReadonlyArray<Ga4LandingMatchRule>
+}
+
+export interface Ga4LandingMatchRule {
+  kind: 'prefix' | 'exact'
+  /** Ruta sin dominio, sin barra final y sin query (`/articulos`). */
+  path: string
+}
+
+type Ga4StringFilterExpression = { filter: { fieldName: 'landingPagePlusQueryString'; stringFilter: { matchType: 'EXACT' | 'BEGINS_WITH'; value: string; caseSensitive: true } } }
+
+/**
+ * TASK-2033 — reglas de ruta → filtro de la Data API. `landingPagePlusQueryString` trae la ruta CON su query
+ * («/articulos/x?utm_source=…»), así que «la ruta es X» son varias comparaciones: X, X con query, X con barra final.
+ * Un prefijo es `X/…`, nunca `X…`: «/articulos-viejos» no entra por «/articulos». Distingue mayúsculas, igual que el
+ * recorte de Search Console; sin `caseSensitive` la API compara sin distinguirlas.
+ */
+export const buildGa4LandingMatchFilter = (rules: ReadonlyArray<Ga4LandingMatchRule>): { orGroup: { expressions: Ga4StringFilterExpression[] } } | null => {
+  if (rules.length === 0) return null
+
+  const expression = (matchType: 'EXACT' | 'BEGINS_WITH', value: string): Ga4StringFilterExpression => ({
+    filter: { fieldName: 'landingPagePlusQueryString', stringFilter: { matchType, value, caseSensitive: true } }
+  })
+
+  return {
+    orGroup: {
+      expressions: rules.flatMap(rule =>
+        rule.kind === 'prefix'
+          ? [expression('EXACT', rule.path), expression('BEGINS_WITH', `${rule.path}?`), expression('BEGINS_WITH', `${rule.path}/`)]
+          : [expression('EXACT', rule.path), expression('BEGINS_WITH', `${rule.path}?`), expression('EXACT', `${rule.path}/`), expression('BEGINS_WITH', `${rule.path}/?`)]
+      )
+    }
+  }
 }
 
 export type Ga4AnalyticsResult =
@@ -54,11 +91,13 @@ export const readGa4Analytics = async (organizationId: string, params: Ga4Analyt
   try {
     const client = new Ga4DataClient({ getAccessToken: () => refreshGa4AccessToken(config, refreshToken) })
 
+    const landingMatchFilter = buildGa4LandingMatchFilter(params.landingMatch ?? [])
+
     const requestBody = {
       dateRanges: [{ startDate: params.startDate, endDate: params.endDate }],
       dimensions: params.dimensions.map(name => ({ name })),
       metrics: params.metrics.map(name => ({ name })),
-      ...(params.landingPrefix ? {
+      ...(landingMatchFilter ? { dimensionFilter: landingMatchFilter } : params.landingPrefix ? {
         dimensionFilter: {
           filter: {
             fieldName: 'landingPagePlusQueryString',

@@ -7,6 +7,8 @@ import 'server-only'
  * inventa histórico y declara `unsupported_window` cuando el grano no coincide.
  */
 
+import { type SeoContentScopeV1, isContentScopeActive, isPathInContentScope } from '@/lib/growth/seo/content-scope/contracts'
+import { readSeoContentScope } from '@/lib/growth/seo/content-scope/store'
 import { readDomainOverviewForTarget } from '@/lib/growth/seo/domain-overview/reader'
 import { isSeoModuleEnabled } from '@/lib/growth/seo/flags'
 import { readSeoOverviewKpisForWindow } from '@/lib/growth/seo/overview/read-overview-kpis'
@@ -20,12 +22,24 @@ import type { SeoWorkQueueOrigin } from '@/lib/growth/seo/work-queue/contracts'
 import { GH_INSIGHTS } from '@/lib/copy/insights'
 
 import { SEO_SEARCH_CHANNEL } from '../contracts/channels'
-import type { EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
+import type { EvidenceContentScopeV1, EvidenceFactV1, EvidenceRejectionV1, EvidenceSourceV1 } from '../contracts/evidence'
 import type { ResolvedInsightWindow } from '../window'
 import { type AdapterCollectInput, type ModuleReportAdapterV1, asComparisonRejections, evidenceWindow, factId } from './contract'
 import { ga4OrganicFacts, readGa4ChannelWindow } from './ga4-site-facts'
 
 export const SEO_ADAPTER_VERSION = 'seo_report_adapter_v1'
+
+/**
+ * TASK-2033 — alcance de contenido. Cuando la organización declaró qué parte de su sitio trabaja Efeonce, el informe
+ * mide ESA parte: el adapter resuelve el alcance vigente una vez y se lo pasa a los readers dueños, que son quienes
+ * recortan. Lo que una fuente no puede medir sobre el alcance (el ETV del dominio) no se emite: sale como límite.
+ * Sin alcance (`null`) todo se comporta exactamente como antes.
+ */
+type ActiveScope = SeoContentScopeV1 | null
+
+const sealedScopeOf = (scope: SeoContentScopeV1): EvidenceContentScopeV1 => ({ version: scope.version, label: scope.label, rules: scope.rules.map(rule => ({ kind: rule.kind, path: rule.path })) })
+
+const scopeRef = (scope: ActiveScope): string => (scope ? `:scope_v${scope.version}` : '')
 
 const GSC_METHOD = { name: 'gsc_window_aggregate', version: 'seo_measurement_v1' }
 const RANK_METHOD = { name: 'dataforseo_serp_rank', version: 'seo_rank_v1' }
@@ -58,8 +72,12 @@ const weekBlocksOf = (window: ResolvedInsightWindow, locale = 'es-CL') => {
   return blocks
 }
 
-const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false) => {
-  const kpis = await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
+const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, editorialV2 = false, scope: ActiveScope = null) => {
+  // Sin alcance la llamada es idéntica a la de siempre (sin tercer argumento).
+  const kpis = scope
+    ? await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive }, { scope })
+    : await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
+
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
   const asOf = kpis.provenance[0]?.capturedAt ?? null
@@ -77,7 +95,7 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
     const connection = await readSeoOverviewConnection(organizationId)
     const notConnected = connection.state === 'not_connected'
 
-    rejections.push({ module: 'seo', metricId: 'gsc', reason: notConnected ? 'not_connected' : 'no_data', detail: notConnected ? 'Search Console no está conectado para la organización' : `Search Console no tiene capturas materializadas en ${window.start}–${window.endInclusive}` })
+    rejections.push({ module: 'seo', metricId: 'gsc', reason: notConnected ? 'not_connected' : 'no_data', detail: notConnected ? 'Search Console no está conectado para la organización' : `Search Console no tiene capturas materializadas en ${window.start}–${window.endInclusive}${scope ? ` para el alcance de contenido v${scope.version}` : ''}` })
 
     return { facts, rejections, source: null as EvidenceSourceV1 | null }
   }
@@ -85,14 +103,14 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
   const base = {
     factVersion: 'evidence_fact_v1' as const,
     module: 'seo' as const,
-    population: 'Consultas de Search Console de la propiedad conectada',
+    population: scope ? `${GH_INSIGHTS.contentScope.gscPopulation}: ${scope.label}` : 'Consultas de Search Console de la propiedad conectada',
     source: 'greenhouse_growth.seo_gsc_daily',
     method: GSC_METHOD,
     coverage,
     freshness: { asOf },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`,
+    evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`,
     // TASK-1888 — Search Console, el ranking y el ETV miden Google.
     channelId: SEO_SEARCH_CHANNEL
   }
@@ -127,6 +145,21 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
     }
   }
 
+  // TASK-2033 — con alcance, el sitio completo entra SÓLO como referencia: una lectura lo cita para dar contexto, pero
+  // no es hallazgo, no va a tablas y no compite con las cifras del contenido medido. Mismo reader, sin recorte.
+  if (scope) {
+    const site = await readSeoOverviewKpisForWindow(organizationId, { from: window.start, toExclusive: window.endExclusive })
+
+    if (site.coveredDays > 0) {
+      const siteBase = { ...base, population: 'Consultas de Search Console de la propiedad conectada', evidenceRef: `seo_gsc_daily:${organizationId}:${window.start}_${window.endExclusive}`, role: 'reference' as const, numerator: null, denominator: null, unit: 'count' as const }
+
+      facts.push(
+        { ...siteBase, factId: factId('seo', 'site_total.clicks', window), metricId: 'site_total.clicks', label: GH_INSIGHTS.metrics['site_total.clicks']!, value: site.totals.clicks, comparisonFactId: comparisonIds['site_total.clicks'] ?? null },
+        { ...siteBase, factId: factId('seo', 'site_total.impressions', window), metricId: 'site_total.impressions', label: GH_INSIGHTS.metrics['site_total.impressions']!, value: site.totals.impressions, comparisonFactId: comparisonIds['site_total.impressions'] ?? null }
+      )
+    }
+  }
+
   const source: EvidenceSourceV1 = {
     module: 'seo',
     adapterVersion: SEO_ADAPTER_VERSION,
@@ -140,7 +173,7 @@ const gscFacts = async (organizationId: string, window: ResolvedInsightWindow, c
   return { facts, rejections, source }
 }
 
-const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
+const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, scope: ActiveScope = null) => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
   const rangeDays = Math.max(1, daysBetween(window.start, new Date().toISOString().slice(0, 10)) + 1)
@@ -162,6 +195,9 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
     const last = inWindow[inWindow.length - 1]
 
     if (!last) continue
+    // TASK-2033 — con alcance, cuenta la keyword sólo si la página que posiciona pertenece al contenido medido. Es
+    // selección sobre lo que el reader ya entregó (como «el último punto de la ventana»), no una fórmula nueva.
+    if (scope && !(last.url && isPathInContentScope(last.url, scope.rules))) continue
 
     tracked += 1
     if (last.position !== null && last.position <= 10) pageOne += 1
@@ -169,7 +205,11 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
   }
 
   if (tracked === 0) {
-    rejections.push({ module: 'seo', metricId: 'rank', reason: 'unsupported_window', detail: `No hay mediciones de ranking dentro de ${window.start}–${window.endInclusive}`, alternative: { granularity: 'day', note: 'El tracking sirve puntos diarios desde su primera captura; elegir una ventana con capturas.' } })
+    rejections.push(
+      scope
+        ? { module: 'seo', metricId: 'rank', reason: 'no_data', detail: `Ninguna keyword monitoreada posiciona con una página del alcance de contenido v${scope.version} dentro de ${window.start}–${window.endInclusive}` }
+        : { module: 'seo', metricId: 'rank', reason: 'unsupported_window', detail: `No hay mediciones de ranking dentro de ${window.start}–${window.endInclusive}`, alternative: { granularity: 'day', note: 'El tracking sirve puntos diarios desde su primera captura; elegir una ventana con capturas.' } }
+    )
 
     return { facts, rejections, source: null as EvidenceSourceV1 | null }
   }
@@ -177,14 +217,14 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
   const base = {
     factVersion: 'evidence_fact_v1' as const,
     module: 'seo' as const,
-    population: 'Keywords trackeadas del target con medición dentro de la ventana',
+    population: scope ? `${GH_INSIGHTS.contentScope.rankPopulation}: ${scope.label}` : 'Keywords trackeadas del target con medición dentro de la ventana',
     source: 'greenhouse_growth.seo_rank_snapshots',
     method: RANK_METHOD,
     coverage: { kind: 'complete' as const, ratio: null, populationSize: tracked },
     freshness: { asOf: lastDate },
     observation: 'observed' as const,
     window: evidenceWindow(window, 'period'),
-    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}`,
+    evidenceRef: `seo_target:${seoTargetId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`,
     // TASK-1888 — Search Console, el ranking y el ETV miden Google.
     channelId: SEO_SEARCH_CHANNEL
   }
@@ -201,9 +241,17 @@ const rankFacts = async (seoTargetId: string, window: ResolvedInsightWindow, com
   }
 }
 
-const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>) => {
+const etvFacts = async (seoTargetId: string, window: ResolvedInsightWindow, comparisonIds: Record<string, string | null>, scope: ActiveScope = null) => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
+
+  // TASK-2033 — el ETV es una estimación del DOMINIO completo: no hay captura por ruta. Con alcance no se emite (ni se
+  // consulta): mostrarlo sería la cifra del dominio con el nombre del contenido medido.
+  if (scope) {
+    rejections.push({ module: 'seo', metricId: 'organic_etv', reason: 'outside_content_scope', detail: `ETV se estima para el dominio completo; la edición mide el alcance de contenido v${scope.version}` })
+
+    return { facts, rejections, source: null as EvidenceSourceV1 | null }
+  }
 
   if (!window.wholeMonths) {
     rejections.push({ module: 'seo', metricId: 'organic_etv', reason: 'unsupported_window', detail: 'ETV se sirve por mes calendario; la ventana no es de meses completos', alternative: { granularity: 'month', note: 'Pedir un rango de meses completos para incluir ETV.' } })
@@ -298,8 +346,8 @@ const OPPORTUNITY_ORIGINS: readonly SeoWorkQueueOrigin[] = ['gsc_striking_distan
 const OPPORTUNITY_LIMIT = 5
 const OPPORTUNITY_METHOD = { name: 'seo_work_queue', version: 'seo_work_queue_v1' }
 
-const opportunityFacts = async (seoTargetId: string): Promise<{ facts: EvidenceFactV1[]; sources: EvidenceSourceV1[] }> => {
-  const queue = await readSeoWorkQueue(seoTargetId, { origins: OPPORTUNITY_ORIGINS, limit: OPPORTUNITY_LIMIT })
+const opportunityFacts = async (seoTargetId: string, scope: ActiveScope = null): Promise<{ facts: EvidenceFactV1[]; sources: EvidenceSourceV1[] }> => {
+  const queue = await readSeoWorkQueue(seoTargetId, { origins: OPPORTUNITY_ORIGINS, limit: OPPORTUNITY_LIMIT, ...(scope ? { scope } : {}) })
 
   if (!queue.ok || !queue.snapshot || queue.items.length === 0) return { facts: [], sources: [] }
 
@@ -311,13 +359,13 @@ const opportunityFacts = async (seoTargetId: string): Promise<{ facts: EvidenceF
   const base = {
     factVersion: 'evidence_fact_v1' as const,
     module: 'seo' as const,
-    population: 'Cola de trabajo SEO priorizada del sitio',
+    population: scope ? `${GH_INSIGHTS.contentScope.queuePopulation}: ${scope.label}` : 'Cola de trabajo SEO priorizada del sitio',
     source: 'greenhouse_growth.seo_work_queue_items',
     method: OPPORTUNITY_METHOD,
     coverage,
     freshness: { asOf: computedAt },
     window: { start, endExclusive: end, granularity: 'period' as const, partial: false },
-    evidenceRef: `seo_work_queue:${queue.snapshot.snapshotId}`,
+    evidenceRef: `seo_work_queue:${queue.snapshot.snapshotId}${scopeRef(scope)}`,
     comparisonFactId: null,
     numerator: null,
     denominator: null,
@@ -361,7 +409,8 @@ const moverFacts = async (
   organizationId: string,
   window: ResolvedInsightWindow,
   previous: ResolvedInsightWindow,
-  current: EvidenceFactV1 | undefined
+  current: EvidenceFactV1 | undefined,
+  scope: ActiveScope = null
 ): Promise<{ facts: EvidenceFactV1[]; rejections: EvidenceRejectionV1[]; sources: EvidenceSourceV1[] }> => {
   const facts: EvidenceFactV1[] = []
   const rejections: EvidenceRejectionV1[] = []
@@ -376,7 +425,8 @@ const moverFacts = async (
       window: { from: window.start, toExclusive: window.endExclusive },
       previous: { from: previous.start, toExclusive: previous.endExclusive },
       dimension,
-      limit: MOVERS_LIMIT
+      limit: MOVERS_LIMIT,
+      ...(scope ? { scope } : {})
     })
 
     if (!result.ok) {
@@ -390,7 +440,7 @@ const moverFacts = async (
       factVersion: 'evidence_fact_v1' as const,
       module: 'seo' as const,
       metricId,
-      population: dimension === 'query' ? 'Consultas con texto de Search Console' : 'Páginas de Search Console',
+      population: `${dimension === 'query' ? 'Consultas con texto de Search Console' : 'Páginas de Search Console'}${scope ? ` (${scope.label})` : ''}`,
       source: 'greenhouse_growth.seo_gsc_daily',
       method: MOVERS_METHOD,
       coverage: current.coverage,
@@ -409,8 +459,8 @@ const moverFacts = async (
       const previousId = factId('seo', metricId, previous, rank)
 
       facts.push(
-        { ...base, factId: factId('seo', metricId, window, rank), label, value: mover.clicks, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: previousId, dimension: dims },
-        { ...base, factId: previousId, label, value: mover.previousClicks, window: evidenceWindow(previous, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${previous.start}_${previous.endExclusive}`, comparisonFactId: null, dimension: dims }
+        { ...base, factId: factId('seo', metricId, window, rank), label, value: mover.clicks, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: previousId, dimension: dims },
+        { ...base, factId: previousId, label, value: mover.previousClicks, window: evidenceWindow(previous, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${previous.start}_${previous.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: dims }
       )
     })
 
@@ -423,10 +473,10 @@ const moverFacts = async (
         const delta = mover.clicks - mover.previousClicks
 
         explained += delta
-        facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, String(index + 1)), metricId: 'driver.query.delta', label: mover.key, value: delta, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: null, dimension: { query: mover.key, rank: String(index + 1) } })
+        facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, String(index + 1)), metricId: 'driver.query.delta', label: mover.key, value: delta, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: { query: mover.key, rank: String(index + 1) } })
       })
 
-      facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, 'rest'), metricId: 'driver.query.delta', label: GH_INSIGHTS.figures.driversRestLabel, value: result.totalClicks - result.previousTotalClicks - explained, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}`, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversRestLabel, rank: 'rest' } })
+      facts.push({ ...base, factId: factId('seo', 'driver.query.delta', window, 'rest'), metricId: 'driver.query.delta', label: GH_INSIGHTS.figures.driversRestLabel, value: result.totalClicks - result.previousTotalClicks - explained, window: evidenceWindow(window, 'period'), evidenceRef: `seo_gsc_daily:movers:${organizationId}:${window.start}_${window.endExclusive}${scopeRef(scope)}`, comparisonFactId: null, dimension: { query: GH_INSIGHTS.figures.driversRestLabel, rank: 'rest' } })
     }
 
     sources.push({ module: 'seo', adapterVersion: SEO_ADAPTER_VERSION, reader: 'readSeoWindowMovers', asOf: current.freshness.asOf, method: MOVERS_METHOD, coverage: current.coverage, servedWindow: null })
@@ -435,12 +485,13 @@ const moverFacts = async (
   return { facts, rejections, sources }
 }
 
-const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>) => {
-  const gsc = await gscFacts(input.organizationId, window, comparisonIds, input.editorialV2 === true)
-  const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
-  const etv = seoTargetId ? await etvFacts(seoTargetId, window, comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
+const collectForWindow = async (input: AdapterCollectInput, window: ResolvedInsightWindow, seoTargetId: string | null, comparisonIds: Record<string, string | null>, scope: ActiveScope) => {
+  const gsc = await gscFacts(input.organizationId, window, comparisonIds, input.editorialV2 === true, scope)
+  const rank = seoTargetId ? await rankFacts(seoTargetId, window, comparisonIds, scope) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
+  const etv = seoTargetId ? await etvFacts(seoTargetId, window, comparisonIds, scope) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
   // TASK-1962 — qué pasa después del clic: visitas orgánicas al sitio según GA4 (sólo contrato v2).
-  const site = input.editorialV2 === true ? ga4OrganicFacts(input.organizationId, window, await readGa4ChannelWindow(input.organizationId, window), comparisonIds) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
+  // TASK-2033 — con alcance, sólo las sesiones cuya página de entrada pertenece al contenido medido.
+  const site = input.editorialV2 === true ? ga4OrganicFacts(input.organizationId, window, await readGa4ChannelWindow(input.organizationId, window, scope?.rules), comparisonIds, scope ? `${GH_INSIGHTS.contentScope.ga4Population}: ${scope.label}` : undefined) : { facts: [], rejections: [] as EvidenceRejectionV1[], source: null }
 
   return {
     facts: [...gsc.facts, ...rank.facts, ...etv.facts, ...site.facts],
@@ -471,12 +522,18 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     const seoTargetId = target.target?.seoTargetId ?? null
 
+    // TASK-2033 — el alcance se resuelve UNA vez y vale para la ventana actual y la de comparación: comparar un mes
+    // recortado contra otro sin recortar fabricaría una caída. Si la lectura falla, el adapter falla (el orquestador
+    // lo registra como límite del módulo): nunca se mide el sitio completo en silencio.
+    const declaredScope = await readSeoContentScope(input.organizationId)
+    const scope: ActiveScope = isContentScopeActive(declaredScope) ? declaredScope : null
+
     // La comparación se recolecta PRIMERO para poder enlazar comparisonFactId en el período actual.
     const comparisonIds: Record<string, string | null> = {}
     let comparison: Awaited<ReturnType<typeof collectForWindow>> | null = null
 
     if (input.comparison) {
-      comparison = await collectForWindow(input, input.comparison, seoTargetId, {})
+      comparison = await collectForWindow(input, input.comparison, seoTargetId, {}, scope)
 
       const etvOrder = comparison.facts.filter(fact => fact.metricId === 'organic_etv')
 
@@ -486,13 +543,17 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
       })
     }
 
-    const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds)
+    const current = await collectForWindow(input, input.window, seoTargetId, comparisonIds, scope)
 
-    const opportunities = input.editorialV2 === true && seoTargetId ? await opportunityFacts(seoTargetId) : { facts: [], sources: [] }
+    const opportunities = input.editorialV2 === true && seoTargetId ? await opportunityFacts(seoTargetId, scope) : { facts: [], sources: [] }
 
     const movers = input.editorialV2 === true && input.comparison
-      ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'))
+      ? await moverFacts(input.organizationId, input.window, input.comparison, current.facts.find(fact => fact.metricId === 'clicks'), scope)
       : { facts: [], rejections: [], sources: [] }
+
+    // TASK-2033 — toda fuente SEO de la edición sella el alcance con el que se leyó (las de la comparación incluidas).
+    const sealed = scope ? sealedScopeOf(scope) : null
+    const withScope = (sources: EvidenceSourceV1[]): EvidenceSourceV1[] => (sealed ? sources.map(source => ({ ...source, contentScope: sealed })) : sources)
 
     // TASK-1888 — con v2, la dirección de las métricas donde MENOR es mejor (posición media), para que el render no
     // lea una subida de posición como mejora. El resto queda sin dirección (neutro), como antes.
@@ -501,7 +562,7 @@ export const seoReportAdapter: ModuleReportAdapterV1 = {
 
     return {
       facts: [...directed(current.facts), ...directed(comparison?.facts ?? []), ...movers.facts, ...opportunities.facts],
-      sources: [...current.sources, ...(comparison?.sources ?? []), ...movers.sources, ...opportunities.sources],
+      sources: withScope([...current.sources, ...(comparison?.sources ?? []), ...movers.sources, ...opportunities.sources]),
       rejections: [...rejections, ...current.rejections, ...movers.rejections, ...asComparisonRejections(comparison?.rejections ?? [])]
     }
   }

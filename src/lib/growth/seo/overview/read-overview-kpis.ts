@@ -2,6 +2,8 @@ import 'server-only'
 
 import { runGreenhousePostgresQuery } from '@/lib/postgres/client'
 
+import { type SeoContentScopeFilter, isContentScopeActive } from '../content-scope/contracts'
+import { gscPagesInContentScopeSql } from '../content-scope/sql'
 import { isSeoModuleEnabled } from '../flags'
 import { type SeoProvenance, resolveSeoAsOf, seoProvenance } from '../lens'
 
@@ -151,13 +153,29 @@ export interface SeoOverviewWindowKpis {
   provenance: SeoProvenance[]
 }
 
+export interface ReadSeoOverviewKpisForWindowOptions {
+  /**
+   * TASK-2033 — alcance de contenido: con reglas, totales y serie se calculan SÓLO sobre las páginas del
+   * alcance (misma fórmula, otra población). Ausente, `null` o sin reglas ⇒ la propiedad completa, como antes.
+   */
+  scope?: SeoContentScopeFilter | null
+}
+
 export const readSeoOverviewKpisForWindow = async (
   organizationId: string,
-  window: { from: string; toExclusive: string }
+  window: { from: string; toExclusive: string },
+  options: ReadSeoOverviewKpisForWindowOptions = {}
 ): Promise<SeoOverviewWindowKpis> => {
   if (!isSeoModuleEnabled()) {
     return { totals: { clicks: 0, impressions: 0, position: null, ctr: null }, series: [], servedFrom: null, servedTo: null, coveredDays: 0, provenance: GSC_PROVENANCE(null) }
   }
+
+  const scoped = isContentScopeActive(options.scope)
+    ? gscPagesInContentScopeSql(options.scope, 4, { organizationSql: '$1', fromSql: '$2::date', toExclusiveSql: '$3::date' })
+    : null
+
+  const scopeSql = scoped ? `\n          AND ${scoped.clause}` : ''
+  const params = [organizationId, window.from, window.toExclusive, ...(scoped?.params ?? [])]
 
   const [totalsRows, seriesRows] = await Promise.all([
     runGreenhousePostgresQuery<TotalsRow>(
@@ -170,8 +188,8 @@ export const readSeoOverviewKpisForWindow = async (
          FROM greenhouse_growth.seo_gsc_daily
         WHERE organization_id = $1
           AND capture_date >= $2::date
-          AND capture_date < $3::date`,
-      [organizationId, window.from, window.toExclusive]
+          AND capture_date < $3::date${scopeSql}`,
+      params
     ),
     runGreenhousePostgresQuery<SeriesRow>(
       `SELECT capture_date::text AS capture_date,
@@ -184,10 +202,10 @@ export const readSeoOverviewKpisForWindow = async (
          FROM greenhouse_growth.seo_gsc_daily
         WHERE organization_id = $1
           AND capture_date >= $2::date
-          AND capture_date < $3::date
+          AND capture_date < $3::date${scopeSql}
         GROUP BY capture_date
         ORDER BY capture_date`,
-      [organizationId, window.from, window.toExclusive]
+      params
     )
   ])
 

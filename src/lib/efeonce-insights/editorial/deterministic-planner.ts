@@ -11,7 +11,7 @@ import type { InsightModule } from '../contracts/request'
 import { assistantStatFigureFor, compositionChartsFor, engineStatFigureFor, statFigureFor, statReading, subsetChartsFor, withQuestion } from './criterion-figures'
 import { canProduceFamily } from './family-evidence-matrix'
 import { orderByQuestion } from './figure-selection'
-import { assertChartsAllowed, bulletCharts, contextOfFacts, essentialsFor, humanFactSentence, LINE_MIN_POINTS, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
+import { assertChartsAllowed, bulletCharts, contentScopeContextClaim, contentScopeOf, contextOfFacts, essentialsFor, humanFactSentence, LINE_MIN_POINTS, lineCharts, openingFor, printedChange, readingsFor, scopeLinesFor, summaryFindingsFor, type ChapterContext as ChapterContextV2 } from './editorial-v2'
 import { asOfLabelOf, windowLabelOf } from '../presentation/vocabulary'
 import { hasFigurePage } from '../render/figure-slots'
 import { formatDeltaForUnit, formatFactValue } from './format'
@@ -45,7 +45,10 @@ const currentLimitText = (reason: EvidenceRejectionV1['reason'], metricId: strin
     : // TASK-1962 — Search Console sin conectar es algo que el cliente puede resolver (lo pide el plan), no un alcance.
       reason === 'not_connected' && (metricId === 'gsc' || metricId === 'ga4')
       ? READER.notConnected
-      : READER.outOfScope
+      : // TASK-2033 — la fuente mide todo el sitio y la edición, una parte: se dice así, no «no forma parte».
+        reason === 'outside_content_scope'
+        ? READER.outsideContentScope
+        : READER.outOfScope
 
 const limitsFor = (rejections: readonly EvidenceRejectionV1[]): string[] => {
   const bySubject = new Map<string, { current: EvidenceRejectionV1 | null; comparison: boolean }>()
@@ -842,6 +845,8 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
   const chapters: PlanChapterV1[] = []
   const summary: PlanClaimV1[] = []
   const editorialV2 = input.editorialV2 === true
+  // TASK-2033 — alcance de contenido con el que se midió la búsqueda (sellado en las fuentes); null = sitio completo.
+  const contentScope = contentScopeOf(snapshot.sources)
 
   for (const moduleKey of input.modules) {
     // Hechos del período actual (los del período anterior sólo entran como comparación). Una meta oficial es un
@@ -921,7 +926,9 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     }
 
     // TASK-1957 — roles: hallazgos materiales arriba, el resto respaldo. Las frases de figuras descartadas abren la lista.
-    const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? [])]
+    // TASK-2033 — con alcance de contenido, la última afirmación del capítulo pone el contenido medido frente al sitio.
+    const scopeContext = editorialV2 && moduleKey === 'seo' && contentScope ? contentScopeContextClaim(facts, referenceFacts, byId, input.locale) : null
+    const claims = [...withRoles([...uniformClaims, ...factClaims], facts, byId, input.locale), ...(drivers?.claims ?? []), ...(scopeContext ? [scopeContext] : [])]
 
     charts.push(...(weekly ? [weekly] : []), ...(drivers?.charts ?? []), ...(editorialV2 ? [...compositionChartsFor(moduleKey, facts, null, { aiSourceAsCards: assistants !== null }), ...subset.charts] : []))
 
@@ -955,7 +962,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
         ...(drivers?.tables ?? [])
       ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey), readings: [...statReadings, ...withDriverReadings(readingsFor(ordered, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(ordered, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))])] } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey, contentScope), readings: [...statReadings, ...withDriverReadings(readingsFor(ordered, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(ordered, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))])] } : {})
     })
   }
 
@@ -981,7 +988,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
     ...(editorialV2
       ? {
           essentials: essentialsFor(chapters, byId, input.locale, findings),
-          scopeLines: scopeLinesFor(input.modules),
+          scopeLines: scopeLinesFor(input.modules, contentScope),
           ...((ask => (ask ? { ask } : {}))(askFor(snapshot.rejections, input.modules))),
           ...(input.cover ? { cover: input.cover } : {})
         }
