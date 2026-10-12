@@ -52,11 +52,17 @@ const parsers: Record<CurrentSourceRole, (raw: unknown) => { version: string }> 
   credits: raw => creditCatalogSchema.parse(raw)
 }
 
-const identify = (role: CurrentSourceRole, document: unknown) => {
+/**
+ * The identity of a source document: its version and the digest of the document as its own contract parses it.
+ * A storage adapter that hands out a document by identity computes it here, so it can never disagree with the pointer.
+ */
+export const identifyCurrentSource = (role: CurrentSourceRole, document: unknown) => {
   const parsed = parsers[role](document)
 
   return { version: parsed.version, digest: catalogDigest(parsed) }
 }
+
+const identify = identifyCurrentSource
 
 /** Optimistic lock for replacing the pointer: the caller confirms the digest of the one it read. */
 export const currentVersionsDigest = (pointer: unknown) => catalogDigest(currentVersionsSchema.parse(pointer))
