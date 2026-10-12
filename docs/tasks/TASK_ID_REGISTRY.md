@@ -31,7 +31,7 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 | `TASK-2027` | `to-do` | Quoter V3 registry API: quotes, versions, lifecycle and numbering | `docs/tasks/to-do/TASK-2027-quoter-v3-registry-api.md` |
 | `TASK-2026` | `to-do` | Quoter V3 compute API: catalog reads, simulation and readings | `docs/tasks/to-do/TASK-2026-quoter-v3-compute-api.md` |
 | `TASK-2025` | `to-do` | Quoter V3 database foundation: catalog by digest and quote aggregate | `docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md` |
-| `TASK-2024` | `to-do` | Pricing V3 storage port and filesystem-free engine | `docs/tasks/to-do/TASK-2024-pricing-v3-storage-port.md` |
+| `TASK-2024` | `in-progress` | Pricing V3 storage port and filesystem-free engine | `docs/tasks/in-progress/TASK-2024-pricing-v3-storage-port.md` |
 | `TASK-2023` | `to-do` | Legacy quoter write-door containment | `docs/tasks/to-do/TASK-2023-legacy-quoter-write-containment.md` |
 | `TASK-2022` | `complete` | Pricing V3 operational catalog and agent workflow | `docs/tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md` |
 | `TASK-2021` | `complete` | Pricing V3 demand-based resource composition | `docs/tasks/complete/TASK-2021-pricing-v3-demand-resource-composition.md` |

@@ -121,7 +121,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-2024` (`docs/tasks/to-do/TASK-2024-pricing-v3-storage-port.md`) — puerto de almacenamiento y motor ejecutable
+- `TASK-2024` (`docs/tasks/in-progress/TASK-2024-pricing-v3-storage-port.md`) — puerto de almacenamiento y motor ejecutable
   sin acceso a disco. Esta task necesita que cada operación reciba sus fuentes por el puerto y no por una ruta.
 - `TASK-2025` (`docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md`) — tablas `quoter_*` del catálogo por
   huella y del puntero, adaptador PostgreSQL del puerto, capacidades con su permiso otorgado, importador repo → base.

@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-053`
-- Status real: `Diseno`
+- Status real: `Discovery y plan (2026-10-12); sin código todavía`
 - Rank: `EPIC-053-01 (fase 1 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
