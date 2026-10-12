@@ -31,6 +31,7 @@ con foco propuesto, señales, fuentes y procedencia del correo. No copiar direcc
 
 Lectura posterior: ocho contactos sin diferencias respecto de lo escrito; los ocho en Finanzas (153),
 investigados (180) y personas con email (181); cuatro en fit creativo (182); ninguno en Bancos Chile (188).
+Los ocho están además en Seguros Chile (195), creado ese mismo día a pedido de Julio.
 
 **Sin registro:** Pilar García, Jefe de Marca y Contenido desde 2026 según Apollo, es el objetivo creativo
 principal. Apollo no devolvió correo (`unavailable`), así que no se creó el contacto. Queda como brecha.

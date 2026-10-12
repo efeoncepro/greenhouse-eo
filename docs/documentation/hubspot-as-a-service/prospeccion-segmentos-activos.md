@@ -52,8 +52,10 @@ empresa es de finanzas, aunque nadie haya llenado la industria en su ficha.
 | 154 Contactos · Educación | Empresa principal en educación | 52 | 8 |
 | 155 Contactos · Gobierno | Empresa principal en administración pública | 63 | 14 |
 | 188 Bancos Chile · Personas con email | Investigado, con email, y empresa principal de banca en Chile | 26 | 26 |
+| 195 Seguros Chile · Personas con email | Investigado, con email, y empresa principal de seguros en Chile | 12 | 12 |
 
-Bancos es un valor de industria dentro de Finanzas: los 26 contactos de 188 están todos en 153. Un banco
+Bancos y Seguros son valores de industria dentro de Finanzas: los contactos de 188 y de 195 están todos en 153
+y ninguno está en ambos. Los conteos de la tabla son del 12/10 y cambian con cada alta. Un banco
 chileno nuevo entra solo, sin editar el filtro. Los segmentos 151–155 son globales, así que incluyen contactos
 históricos del CRM; la columna de la derecha dice cuántos vienen de la prospección actual.
 

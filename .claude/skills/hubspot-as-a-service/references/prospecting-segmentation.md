@@ -218,6 +218,10 @@ country = 'Chile'`. The complete `ilsListIds=188` read returned 26/26 expected c
 missing and zero extra, all contained in 153. Consorcio (2 contacts) left 188 because its Company record is the
 insurance group (`INSURANCE`); it remains in 153 and counting it as a bank is an operator decision on that one
 field. The 2026-10-11 definition (14 Company IDs, 28 contacts) is superseded; do not restore it.
+ACTIVE **195**, `Efeonce | Prospección continua | Seguros Chile | Personas con email`, created 2026-10-12 with the
+same key as 188 and `industry IN ('INSURANCE')`: 12/12 expected contacts from three accounts, zero missing and
+zero extra, contained in 153 and disjoint from 188. A sector sub-segment is one more value of the parent key;
+reuse 188/195 as the pattern and create one only when the operator asks for that sector.
 [Current definitions and counts](../../../../docs/operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
 [superseded snapshot](../../../../docs/operations/HUBSPOT_BANKS_SEGMENT_2026-10-11.json) ·
 [case, provenance and remaining gaps](../../../../docs/commercial/prospects/bancos-chile-2026-10/README.md).

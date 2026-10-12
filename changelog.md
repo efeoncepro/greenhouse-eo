@@ -23,6 +23,7 @@
   sólo 9 de 28 coincidían. Ahora los segmentos de contactos 151–155 leen la industria de la empresa principal
   y 188 se define como banca en Chile. Trece empresas corregidas; membresía real igual a la simulada en los
   seis segmentos. 188 pasa de 28 a 26: Consorcio sale por estar clasificada como seguros, pendiente de decisión.
+  Con la misma regla se creó Seguros Chile (195), contenido en Finanzas, tras prospectar BICE Vida.
 - La skill de prospección suma el módulo `segments-by-attribute` y el escenario P50; el adaptador de HubSpot,
   la regla vigente y el lector de membresía que funciona con OAuth de usuario.
   [Decisión](docs/architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md) ·

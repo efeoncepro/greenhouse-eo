@@ -363,6 +363,10 @@ hubspot objects search --type contacts --filter "hs_crm_search.ilsListIds=153" -
 
 Paginar con `--after` hasta que no haya cursor. `segments members-list` sigue exigiendo service key.
 
+**Subsegmentos por sector.** Bancos Chile (188) y Seguros Chile (195) usan la misma regla y sólo cambia el valor
+de industria de la empresa principal. Un sector nuevo se crea igual, a pedido del operador, y se comprueba que
+quede contenido en Finanzas (153) o en el segmento padre que corresponda.
+
 **Si un contacto no aparece en su segmento.** Revisar en este orden: empresa principal asociada, `industry` de
 esa empresa, `country` (sólo 188). Casi siempre falta la industria en la empresa o el enriquecimiento automático
 la clasificó mal. Corregir la empresa; no editar al contacto ni el filtro.

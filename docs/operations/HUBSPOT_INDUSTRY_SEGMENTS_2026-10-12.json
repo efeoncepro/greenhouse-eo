@@ -115,6 +115,26 @@
         "Santander": 1
       },
       "subsetOf153": true
+    },
+    {
+      "listId": 195,
+      "name": "Efeonce | Prospección continua | Seguros Chile | Personas con email",
+      "objectTypeId": "0-1",
+      "listType": "ACTIVE",
+      "filterExpression": "efeonce_prospecting_researched_on IS NOT NULL AND efeonce_prospecting_contact_kind IN ('individual_email') AND email IS NOT NULL AND ASSOCIATION(object = '0-2', association = 1) { industry IN ('INSURANCE') AND country = 'Chile' }",
+      "previousFilterExpression": null,
+      "created": "2026-10-12",
+      "verifiedMemberCount": 12,
+      "expected": 12,
+      "missing_count": 0,
+      "extra_count": 0,
+      "membersByCompany": {
+        "Bice Vida": 8,
+        "Consorcio": 2,
+        "QuePlan.cl": 2
+      },
+      "subsetOf153": true,
+      "disjointFrom188": true
     }
   ],
   "companyCorrections": [
@@ -272,6 +292,7 @@
     "Consorcio (Company 27779618095, INSURANCE) left 188 with 2 contacts and remains in 153; reclassifying it is an operator decision.",
     "Two researched contacts changed sector with the Company rule: one left Tecnologia (Company without industry) and one moved from Educacion to Tecnologia (Company is IT services).",
     "Historical cohort segments 166-170 still read Contact industria and were not changed.",
-    "Segment membership does not authorize sending, enrollment or workflows."
+    "Segment membership does not authorize sending, enrollment or workflows.",
+    "195 was created after the first verification of this snapshot, on the same day; counts of 153 and 180-182 grew with the BICE Vida intake and are not refreshed here."
   ]
 }
