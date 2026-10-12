@@ -69,8 +69,8 @@ mantenimiento del catálogo se opera con ella.
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 5, 6 y 7 y las reglas
-  duras).
+- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 5, 6, 7 y 8, las reglas
+  duras y «Delta 2026-10-12 — decisiones del CEO»).
 - `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md` (D5, fase 6, sección 4).
 - `docs/architecture/GREENHOUSE_PRICING_V3_CATALOG_MAINTENANCE_DECISION_V1.md` — **el contrato de mantenimiento que
   esta task traslada sin cambiarlo**: change-sets `add/replace/retire`, reemplazo íntegro de política y créditos,
@@ -88,7 +88,8 @@ Reglas obligatorias:
   el padre de las cotizaciones que se calcularon con ella.
 - **NUNCA** que aplicar active. Mover el puntero es otra llamada, otra huella y otra persona posible.
 - **NUNCA** que un agente active el puntero: no existe ruta de activación en el carril de ecosistema, y una sesión de
-  agente no cuenta como persona.
+  agente no cuenta como persona. Activar es uno de los dos únicos actos de persona del cotizador; el otro es aprobar
+  una excepción bajo el piso (`TASK-2027`).
 - **NUNCA** recalcular, actualizar ni cambiar de versión una cotización guardada como efecto de un cambio de catálogo.
   El impacto es un informe.
 - **NUNCA** resolver «lo vigente» por convención (número más alto, última fila aplicada): lo vigente es el puntero
@@ -385,10 +386,14 @@ Reglas obligatorias:
   `commercial.quoter.catalog:update`, y `catalog_activate` (activar) → `commercial.quoter.catalog.activate:execute`.
   Manda lo que haya materializado `TASK-2025`.
 - Consecuencia a decidir: `TASK-2025` otorga `commercial.quoter.catalog:update` a `efeonce_admin` y `finance_admin`. Un
-  consumidor de ecosistema no tiene capacidad por persona, así que «un agente aplica» depende de que el binding interno
-  de la CLI esté autorizado a esa necesidad (ver Open Questions).
+  consumidor de ecosistema no tiene capacidad por persona: su binding interno se modela como sujeto máquina con rol
+  `efeonce_account` (`TASK-2025`, «Identidad de agente»), que emite cotizaciones pero no tiene esa capacidad. Tal como
+  está el permiso, un agente no aplica; que pueda hacerlo sigue siendo la pregunta abierta de esta task (ver Open
+  Questions).
 - `catalog_activate` se otorga únicamente a `efeonce_admin` y `finance_admin`. La ruta rechaza: tenant cliente (404),
-  sesión de agente, consumidor de ecosistema y persona sin la capacidad (403).
+  sesión de agente, consumidor de ecosistema y persona sin la capacidad (403). Quien no es una persona recibe además
+  `details.code = human_gate_required`, por la misma comprobación (`human-gate.ts`) que `TASK-2027` usa para aprobar
+  una excepción; ese código no existe en ningún otro acto.
 - La base exige actor persona en la fila de activación. La guarda de aplicación y la de la base son dos controles; no
   se quita uno porque exista el otro.
 - Quien revisa o aplica no fija pisos ni costos «para una cotización»: propone una versión del catálogo que no rige
@@ -419,10 +424,9 @@ Reglas obligatorias:
   escribirse. La ruta sigue siendo obligatoria y nueva; la regla de hoy se mantiene: un sucesor que todavía no es
   vigente se escribe fuera de las carpetas canónicas.
 - `current set` en modo plataforma es un acto humano: inicio de sesión de persona, confirmación en terminal mostrando
-  las tres versiones y el motivo. Con token de consumidor se rechaza. Hereda la dependencia abierta de `TASK-2028`
-  (sección 7): si el carril de aplicación no admite el bearer delegado de una persona, activar desde la CLI no es
-  posible y sólo queda la sesión del portal, que no tiene pantalla hasta la fase 8. Sin esa decisión, el Slice 6 no se
-  puede cerrar.
+  las tres versiones y el motivo. Con token de consumidor se rechaza. El mecanismo quedó aceptado por el CEO el
+  2026-10-12: mientras no exista interfaz, la persona inicia sesión desde la CLI y el carril de aplicación admite ese
+  bearer delegado (`TASK-2027`, «Compuerta humana»; `TASK-2028`, sección 7). Ya no condiciona el Slice 6.
 - `current show` en modo plataforma ya existe (`TASK-2026`).
 - Con autoridad `platform`, `current set` y `catalog apply` en modo local siguen funcionando: el modo local no se
   condiciona. Lo que cambia es que un puntero local distinto del de la plataforma es divergencia, y `doctor` y la
@@ -561,7 +565,8 @@ en Vercel y un importador que corre en la máquina de quien lo ejecuta). La band
 - [ ] Activar exige la huella del puntero reemplazado y un motivo; con una huella vieja responde
       `CURRENT_VERSIONS_CONFLICT`; dos activaciones concurrentes dejan una sola fila nueva.
 - [ ] Activar se rechaza para: consumidor de ecosistema, sesión de agente, tenant cliente y persona sin la capacidad; y
-      se acepta para una persona con `efeonce_admin` y para una con `finance_admin`.
+      se acepta para una persona con `efeonce_admin` y para una con `finance_admin`, también con el bearer delegado
+      del inicio de sesión de la CLI.
 - [ ] No existe ruta de activación bajo `/api/platform/ecosystem/quoter/**` (prueba sobre el sistema de archivos).
 - [ ] La fila de activación no se puede insertar sin `activated_by_member_id` ni reemplazando un puntero que no es el
       vigente (prueba contra la base, sobre las guardas de `TASK-2025`).
@@ -629,10 +634,12 @@ en Vercel y un importador que corre en la máquina de quien lo ejecuta). La band
 ## Open Questions
 
 - ¿Aplicar puede hacerlo un agente por el carril de ecosistema (como hoy en local, donde aplicar no aprueba nada) o
-  sólo una persona? La propuesta es que sí, con la guarda de la sección 4.
+  sólo una persona? La propuesta es que sí, con la guarda de la sección 4. Hoy el sujeto máquina no tiene la
+  capacidad (sección 3).
 - ¿Quién puede cambiar la autoridad (`repo` ↔ `platform`)? La propuesta es `efeonce_admin`.
-- ¿Con qué identidad activa una persona antes de que exista interfaz? Depende de admitir el bearer delegado de una
-  persona verificada como acto humano (decisión abierta en `TASK-2027` y `TASK-2028`).
 - ¿La exportación al repo es obligatoria en el mismo acto de activar, o puede quedar pendiente con `doctor` en falla
   hasta que alguien exporte?
 - ¿Cuál es el cambio real de precio de la aceptación? Lo decide el dueño de los valores.
+
+Resuelta por el CEO el 2026-10-12 (ya no abierta): con qué identidad activa una persona antes de que exista interfaz.
+Inicia sesión desde la CLI; el carril de aplicación admite ese bearer delegado para los dos actos de persona.

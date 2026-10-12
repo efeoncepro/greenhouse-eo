@@ -51,8 +51,8 @@ salida distintas.
   qué, cuándo y por qué.
 - La CLI opera en local o contra la API con las mismas entradas, salidas, códigos de salida y errores tipados, con
   paridad medida entre ambos caminos.
-- Actos humanos separados y registrados: aprobar una excepción bajo el piso, mover el puntero del catálogo y emitir.
-  Un agente cotiza, registra y prepara el documento; nunca aprueba, activa ni emite.
+- Los agentes operan con autonomía: cotizan, registran, preparan el documento y emiten dentro de política. Sólo dos
+  actos son de persona y quedan registrados: aprobar una excepción bajo el piso y mover el puntero del catálogo.
 - El cotizador actual queda de sólo lectura para autoría desde el principio y se retira con decisión propia al final.
 
 ## Architecture Alignment
@@ -109,7 +109,7 @@ Fijada por las tasks de datos para que todas coincidan. Cualquier cambio se hace
 | `TASK-2027` | 4 · API de registro | Crear cotización, agregar versión, registrar una hecha en local, textos del documento, ciclo de vida con actos humanos, número | `TASK-2025`, `TASK-2026` |
 | `TASK-2028` | 5 · CLI sobre la API | Capa de transporte comando por comando, diagnóstico de conexión, comando de paridad; al cierre, cambio único del modo por defecto | `TASK-2026`, `TASK-2027` |
 | `TASK-2029` | 6 · catálogo en la plataforma | Revisar, aplicar y mover el puntero por la API; exportación al repo | `TASK-2028` |
-| `TASK-2030` | 7 · MCP | Herramientas de lectura, simulación y registro; aprobar y emitir no se exponen | `TASK-2028` |
+| `TASK-2030` | 7 · MCP | Herramientas de lectura, simulación y registro (emitir sólo si se decide el permiso de escritura); aprobar una excepción y activar el catálogo no se exponen | `TASK-2028` |
 
 ### Unidades sin task todavía
 
@@ -240,7 +240,7 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
       después del cambio.
 - [ ] **Fase 6 (`TASK-2029`).** Un cambio real de precio hecho por la API, con su copia en el repo; aplicar no activó.
 - [ ] **Fase 7 (`TASK-2030`).** Canario del gateway en verde; las herramientas actuales sobre V2 siguen respondiendo;
-      aprobar y emitir no están expuestas.
+      aprobar una excepción y activar el catálogo no están expuestas.
 - [ ] **Fase 8 (U1).** Puerta definida al abrir la fase, después de la decisión portal o Rooms.
 - [ ] **Fase 9 (U2).** Decisión propia de retiro aceptada, con plan de reversa, y ejecutada.
 - [ ] **Regla permanente.** En cada cierre de fase quedó evidencia de que el modo local de la CLI hace lo mismo que

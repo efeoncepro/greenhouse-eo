@@ -76,8 +76,8 @@ la base y número público de una secuencia (decisión 5), y un catálogo que pr
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (decisiones 2 a 7, ubicación, reglas
-  duras).
+- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (decisiones 2 a 8, ubicación, reglas
+  duras y «Delta 2026-10-12 — decisiones del CEO», que manda sobre lo que esta task decía antes).
 - `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md` (D2 a D6, fase 2 de §6, §7, §8).
 - `docs/architecture/GREENHOUSE_COMMERCIAL_FINANCE_DOMAIN_BOUNDARY_V1.md` (las cotizaciones son de Comercial y viven
   en `greenhouse_commercial`).
@@ -110,6 +110,10 @@ Reglas obligatorias:
   cotización.
 - Ninguna columna para fecha de inicio del servicio ni para duración de contrato. Ningún dato de nómina.
 - Organización por llave foránea a `greenhouse_core.organizations`; nunca texto libre.
+- La organización dueña de toda cotización es la canónica de Efeonce, resuelta por referencia estable (`public_id`
+  `EO-ORG-0007`); ningún UUID de organización escrito en código ni en una migración.
+- Ningún cambio de estado exige a una persona. Los únicos actos de persona del cotizador son aprobar una excepción
+  bajo el piso y activar el puntero del catálogo; un acto de persona nuevo exige una decisión del CEO.
 - Una capacidad nueva entra con su fila en el registro, su entrada en el catálogo de TypeScript y su permiso a un rol
   real, en el mismo cambio.
 - SQL embebido en TypeScript se ejercita contra PostgreSQL real antes de commitear; los mocks no prueban SQL.
@@ -238,20 +242,26 @@ Reglas obligatorias:
   - Guardar un documento no agrega una fila al historial del puntero.
   - Una fila del puntero sólo entra si declara la huella del puntero que reemplaza y esa huella es la vigente.
   - Un cambio de estado sólo entra si su par origen → destino existe en la matriz y su origen es el estado vigente de
-    esa cotización; si la matriz exige compuerta humana, el actor es una persona identificada.
+    esa cotización; si la matriz exige compuerta humana, el actor es una persona identificada. Ningún par sembrado
+    la exige: emitir y retirar los hace también un agente (decisión 7).
+  - La organización dueña de toda cotización es la canónica de Efeonce; la destinataria, cuando existe, es una
+    organización cliente o potencial cliente y no confiere acceso.
   - Una aprobación de excepción vale para una versión y una huella de artefacto, y sólo la registra una persona
     identificada.
   - Una versión guarda sólo un artefacto con estado de cálculo `calculated`.
   - El número público se asigna una sola vez por cotización, en su primera emisión, por una función con un solo
-    `nextval`, y no se recorta al crecer.
+    `nextval`, y no se recorta al crecer. La serie real empieza en 15 (`EO-QTE-15`).
   - El registro no escribe ni lee `greenhouse_commercial.quotations*`.
 - Write-target allowlist: el dominio comercial no tiene prueba de frontera; esta task la crea para el cotizador
   (`src/lib/commercial/quoter/boundary-domain.test.ts`) con las nueve tablas `quoter_*` más
   `greenhouse_sync.outbox_events` como únicos destinos de escritura, cada uno con su justificación.
 - Tenant/space boundary: `quoter_quotes.owner_organization_id` es obligatorio, referencia
-  `greenhouse_core.organizations` y es el alcance de autorización (sale de la identidad, nunca del pedido); las tablas
-  hijas lo repiten y un disparador comprueba que coincide con el del padre. La organización cliente es contenido
-  validado de la cotización, también por llave foránea. Catálogo y puntero son de Efeonce y no llevan organización.
+  `greenhouse_core.organizations` y es siempre la organización canónica de Efeonce, la cree una persona o un agente
+  (CEO, 2026-10-12). La resuelve el servidor por referencia estable; nunca sale del pedido ni de un UUID escrito en
+  código (ver «Organización dueña y destinataria»). Las tablas hijas la repiten y un disparador comprueba que coincide
+  con la del padre. El alcance de autorización es la identidad interna con su capacidad, no «la organización de quien
+  llama». La organización destinataria es contenido validado de la cotización, también por llave foránea, y no
+  confiere acceso. Catálogo y puntero son de Efeonce y no llevan organización.
 - Idempotency/concurrency: la idempotencia de comandos usa la tabla única `api_platform_command_executions`; no se
   crea una segunda. Cada fila escrita por un comando guarda `command_execution_id` y `request_hash`. Concurrencia:
   control optimista por huella en el puntero; bloqueo transaccional por cotización al agregar versión o estado;
@@ -270,12 +280,15 @@ Reglas obligatorias:
   reflejo del repo, que se puede reimportar). Después de la primera cotización real, sin retorno por bajada: la
   corrección es una migración nueva hacia adelante.
 - External coordination: visto bueno del operador para aplicar migraciones y para la primera importación con
-  escritura; confirmación del prefijo visible del número antes de aplicar (ver `## Open Questions`).
+  escritura. El prefijo del número y el arranque de la serie quedaron fijados por el CEO el 2026-10-12: ya no
+  requieren confirmación.
 
 ### Security and access
 
 - Auth/access gate: capacidades `commercial.quoter.*` resueltas en una sola puerta
   (`src/lib/commercial/quoter/authz.ts`) con `can(subject, capability, action, scope)`; nunca `roleCodes.includes`.
+  Una identidad de agente pasa por la misma puerta como sujeto máquina derivado de su binding interno (ver
+  «Identidad de agente»).
 - Sensitive data posture: documentos y artefactos llevan costos y márgenes internos; ningún dato de nómina ni de
   personas. Permisos de base: `SELECT` e `INSERT` para `greenhouse_runtime` en las tablas de historia, sin `UPDATE` ni
   `DELETE`; dueño `greenhouse_ops`. Los eventos llevan identificadores, versión, estado y huellas, nunca el texto.
@@ -349,7 +362,9 @@ Reglas obligatorias:
   verificación, permisos.
 - `quote-store.ts`: crear identidad con su versión 1 y su primer estado en una transacción, agregar versión, agregar
   estado, registrar una aprobación de excepción, asignar número, guardar datos de documento, leer versión (texto
-  canónico y huella verificada). Ninguna de estas funciones queda expuesta por una ruta en esta task.
+  canónico y huella verificada). Ninguna de estas funciones queda expuesta por una ruta en esta task. Crear identidad
+  recibe la organización dueña ya resuelta por `resolveQuoterOwnerOrganizationId()`; nunca un valor de quien llama a
+  la API.
 - `state-machine.ts` con la matriz en TypeScript y `state-machine-parity.test.ts`, que lee el bloque sembrado de la
   migración y exige igualdad.
 
@@ -361,6 +376,8 @@ Reglas obligatorias:
   commit que la migración.
 - `authz.ts`: tabla necesidad → `{ capability, action }` y un único núcleo que recibe un
   `TenantEntitlementSubject`, para que rutas, Nexa y el carril de ecosistema compartan la misma puerta.
+- `authz.ts` exporta también `resolveQuoterOwnerOrganizationId()` (organización canónica de Efeonce por `public_id`),
+  y una prueba fija qué puede y qué no puede el sujeto máquina de un binding interno (ver «Identidad de agente»).
 - `capability-grant-coverage.test.ts` en verde.
 
 ### Slice 5 — Adaptador PostgreSQL del puerto e importador
@@ -450,9 +467,10 @@ Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las 
 
 - `quote_id text PRIMARY KEY DEFAULT ('qtr-' || gen_random_uuid()::text)`
 - `owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations(organization_id)` — la organización
-  dueña: el alcance de autorización, derivado de la identidad de quien cotiza
-- `client_organization_id text REFERENCES greenhouse_core.organizations(organization_id)` — la organización para la
-  que se cotiza; contenido validado por el comando, nunca texto libre
+  dueña y emisora: siempre la canónica de Efeonce, resuelta por el servidor (ver «Organización dueña y destinataria»)
+- `client_organization_id text REFERENCES greenhouse_core.organizations(organization_id)` — la organización
+  destinataria: cliente o potencial cliente; contenido validado por el comando, nunca texto libre; anulable en un
+  borrador y obligatoria para emitir
 - `deal_reference text` — referencia opcional al negocio. Si existe una tabla canónica de negocios con llave estable
   (confirmar en Discovery contra `src/lib/commercial/deals-store.ts`), es llave foránea a ella; si no, texto con
   `CHECK` de forma. Un solo lugar responde «qué negocio es».
@@ -461,6 +479,31 @@ Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las 
 - Sin columna de estado, de número ni de «versión vigente»: viven en tablas de sólo agregar y se leen por la vista.
 - Disparadores: rechazo de `UPDATE` y de `DELETE`.
 
+### Organización dueña y destinataria
+
+Decisión del CEO del 2026-10-12: Efeonce es siempre la dueña y emisora; el destinatario es una organización cliente o
+potencial cliente.
+
+- **Dueña.** `resolveQuoterOwnerOrganizationId()` en `authz.ts` es el único lugar que la resuelve: lee
+  `organization_id` de `greenhouse_core.organizations` por el identificador público estable `EO-ORG-0007` y exige que
+  la fila sea la entidad operativa activa (`is_operating_entity = TRUE`, `active = TRUE`, `status = 'active'`). El
+  identificador público vive en una constante con nombre; el UUID no se escribe en código, en una migración ni en una
+  prueba. Es el patrón de `resolveBrandOrganizationId()` en `src/lib/brand-surfaces/production/authz.ts` y de
+  `INTERNAL_ORGANIZATION_PUBLIC_ID` en `src/lib/identity/internal-access/store.ts`. Si la fila no existe o no cumple,
+  crear una cotización falla cerrado, sin escribir: nunca cae a «la organización de quien llama».
+- Vale igual para una cotización creada por una persona o por un agente: un binding `internal` del carril de
+  ecosistema no trae organización y no la necesita.
+- **Destinataria.** Fila de `greenhouse_core.organizations` activa, distinta de la entidad operativa y en etapa
+  `prospect`, `opportunity` o `active_client` (`lifecycle_stage`). El modelo canónico sí representa a un potencial
+  cliente, así que no hace falta texto libre ni una identidad paralela; un prospecto que todavía no existe se crea
+  antes por la puerta canónica de organizaciones. La comprobación es del comando de `TASK-2027`; la base aporta la
+  llave foránea.
+- **Cuándo es obligatoria.** Opcional en un borrador, obligatoria para emitir. Como la identidad de la cotización es
+  inmutable, la destinataria se declara al crear: un borrador sin ella no se emite, y para emitir se crea la
+  cotización con su destinataria (un borrador no consume número).
+- Ser la destinataria no da acceso a nada: abrir una lectura a una identidad de cliente es otra decisión
+  (`TASK-2027`, «Organización»).
+
 ### Número público: `quoter_quote_numbers` (sólo agregar)
 
 - El número se asigna **en la primera emisión**, no al crear la cotización: un borrador no consume número y la
@@ -468,12 +511,16 @@ Nombres propuestos. Discovery puede ajustar tipos y columnas de índice; no las 
 - `quote_id text PRIMARY KEY` (llave foránea): una cotización tiene como máximo un número, para siempre.
 - `quote_number text NOT NULL UNIQUE`, `number_series text NOT NULL CHECK (number_series IN ('real','synthetic'))`
   igual al `data_origin` de la cotización (lo comprueba un disparador), `assigned_at`, `command_execution_id`.
-- `quoter_quote_number_seq` y función `next_quoter_quote_number()` en plpgsql con **un** `nextval` y
-  `lpad(n::text, GREATEST(6, length(n::text)), '0')`; nunca `to_char(…, 'FM…')` ni dos `nextval` en una expresión.
-- Prefijo propuesto `EO-QTE-` → `EO-QTE-000001`. El prefijo es lo único de estas tablas que ve un cliente:
-  confirmarlo con el operador antes de aplicar.
-- Segunda secuencia y función para la serie sintética (`EO-QTE-T-000001`), de modo que un ejemplo emitido en la base
-  compartida no consuma ni salte números reales.
+- Prefijo `EO-QTE-` y serie real que empieza en 15: la primera cotización real emitida es `EO-QTE-15` (CEO,
+  2026-10-12). El prefijo es lo único de estas tablas que ve un cliente.
+- `quoter_quote_number_seq` se crea con `START WITH 15`. Función `next_quoter_quote_number()` en plpgsql con **un**
+  `nextval`, que devuelve `'EO-QTE-' || n::text`: sin relleno, para que el número se lea como lo fijó el CEO, y por
+  lo tanto sin recorte posible. Nunca `to_char(…, 'FM…')` ni dos `nextval` en una expresión. Si alguna vez se pide
+  ancho fijo, la única forma admitida es `lpad(n::text, GREATEST(N, length(n::text)), '0')`.
+- El bloque de verificación de la migración comprueba el arranque leyendo `pg_sequences` (`start_value = 15`); no
+  llama a `nextval`, porque en la base compartida eso consumiría el 15.
+- Segunda secuencia y función para la serie sintética (`EO-QTE-T-1` en adelante), aprobada por el CEO el 2026-10-12,
+  de modo que un ejemplo emitido en la base compartida no consuma ni salte números reales.
 - El comando inserta una fila a la vez y la función se evalúa en ese `INSERT`; ningún `INSERT … SELECT … ON CONFLICT`
   la evalúa por filas candidatas.
 - Disparadores: rechazo de `UPDATE` y de `DELETE`.
@@ -523,15 +570,23 @@ par nuevo, entra por una migración que sólo agrega filas.
 | Origen | Destino | Compuerta humana | Lo dispara |
 | --- | --- | --- | --- |
 | `none` | `draft` | no | crear la cotización con su versión 1 |
-| `draft` | `issued` | sí | emitir |
+| `draft` | `issued` | no | emitir |
 | `draft` | `withdrawn` | no | retirar un borrador |
 | `issued` | `revising` | no | agregar o registrar una versión sobre una cotización emitida |
-| `revising` | `issued` | sí | emitir la versión nueva; la emitida anterior queda reemplazada |
-| `issued` | `withdrawn` | sí | retirar |
-| `revising` | `withdrawn` | sí | retirar |
+| `revising` | `issued` | no | emitir la versión nueva; la emitida anterior queda reemplazada |
+| `issued` | `withdrawn` | no | retirar |
+| `revising` | `withdrawn` | no | retirar |
 
 `withdrawn` es terminal y no hay vuelta de `issued` a `draft`. Qué capacidad exige cada acto lo resuelve la puerta
 única, no la matriz.
+
+Ningún par exige compuerta humana (decisión 7, enmendada por el CEO el 2026-10-12): un agente emite una versión que
+está dentro de política y, por el mismo principio, retira lo que puede emitir. Los dos actos de persona del
+cotizador no son cambios de estado y por eso no aparecen aquí: la aprobación de una excepción bajo el piso vive en
+`quoter_exception_approvals` (`actor_kind = 'member'`) y la activación del catálogo en `quoter_pointer_history`
+(`activated_by_member_id NOT NULL`). La columna `requires_human_gate` y su restricción se conservan como mecanismo:
+marcar un par exige una decisión del CEO y una migración. Que una versión bajo el piso no se emita sin su
+aprobación registrada —la emita quien la emita— lo comprueba el comando de emisión de `TASK-2027`.
 
 ### `quoter_exception_approvals` (sólo agregar)
 
@@ -571,14 +626,46 @@ Módulo `commercial`, alcance por defecto `tenant`. Roles reales de `src/config/
 | `commercial.quoter.catalog.activate` | `execute` (mover el puntero) | `efeonce_admin`, `finance_admin` | decisión 7 |
 | `commercial.quoter.simulate` | `read` | grupo de rutas `commercial` | propuesta |
 | `commercial.quoter.quote` | `read`, `create`, `update` | grupo de rutas `commercial` | propuesta |
-| `commercial.quoter.issue` | `approve` (emitir y retirar lo emitido) | `efeonce_admin`, `efeonce_account`, `finance_admin` | la decisión exige «una persona con la capacidad» y no nombra roles: confirmar |
+| `commercial.quoter.issue` | `approve` (emitir y retirar lo emitido) | `efeonce_admin`, `efeonce_account`, `finance_admin`; por el rol `efeonce_account`, también el sujeto máquina de un binding interno | decisión 7 (CEO, 2026-10-12) |
 | `commercial.quoter.exception` | `approve` | **sólo** `efeonce_admin` | decisión 7 |
 
 - Ninguna capacidad del cotizador actual se reutiliza: quien tiene `commercial.quotation:approve` no hereda la
   aprobación de excepciones de V3.
-- Los actos con compuerta humana exigen además persona identificada: una sesión de agente no los cumple. Esa regla
-  vive en la restricción de la base y en los comandos de `TASK-2027`, no en el permiso.
+- Los dos actos de persona —aprobar una excepción bajo el piso y activar el puntero— exigen además persona
+  identificada: una sesión de agente o un token de consumidor no los cumplen aunque el rol tenga la capacidad. Esa
+  regla vive en las restricciones de la base y en los comandos (`TASK-2027` para la excepción, `TASK-2029` para la
+  activación), no en el permiso. Ningún otro acto la lleva: emitir y retirar dependen sólo de la capacidad y de la
+  política.
 - Ningún rol de cliente recibe estas capacidades en esta task.
+
+#### Identidad de agente
+
+Cómo emite una identidad que no es una persona. La plataforma no tiene hoy un permiso por capacidad para el binding
+de un consumidor del carril de ecosistema (`src/lib/sister-platforms/types.ts`): el consumidor guarda sólo los tipos
+de alcance que admite y el binding resuelve uno (`organization | client | space | internal`). Los permisos por
+capacidad de `greenhouse_core.external_capability_grants` son de personas detrás del gateway, otro mecanismo, y no
+aplican a un token de consumidor. Lo que existe, y lo que el cotizador usa sin inventar nada, es el patrón de
+`src/lib/api-platform/resources/ecosystem-insights-scope.ts` y `ecosystem-brand-render-scope.ts`: el adaptador del
+carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`userId: consumer:<publicId>`,
+`tenantType: 'efeonce_internal'`, un rol real) y la puerta única le aplica `can()` como a cualquier sujeto.
+
+- El sujeto máquina del cotizador lleva el rol `efeonce_account`, el que ya fija `TASK-2026` en
+  `ecosystem-quoter-scope.ts`. Es el rol de menor privilegio que reúne lo que la decisión deja al agente: leer el
+  catálogo, simular, crear y actualizar cotizaciones, emitir y retirar.
+- El derecho del agente a emitir **es** la fila `commercial.quoter.issue:approve` → `efeonce_account` de
+  `runtime.ts`. No hay una concesión aparte para una identidad no humana, ni tabla, ni columna nueva.
+- Lo que la puerta comprueba para un binding: que el alcance resuelto sea `internal` y sin organización (otro alcance
+  se trata como definen `TASK-2026` y `TASK-2027`), y `can(subject, capability, action, 'tenant')` sobre el sujeto
+  máquina. No distingue consumidores: todo consumidor con un binding interno activo recibe el mismo sujeto (el del
+  gateway MCP, que existe hoy, y `efeonce-quoter-cli`, que crea `TASK-2026`). Limitar la emisión a un consumidor
+  concreto sería un mecanismo que la plataforma no tiene; quién actuó queda en
+  `api_platform_command_executions.principal_id`.
+- El rol `efeonce_account` no tiene `commercial.quoter.exception:approve`,
+  `commercial.quoter.catalog.activate:execute` ni `commercial.quoter.catalog:update`. Aunque los tuviera, los dos
+  actos de persona se rechazan por no venir de una persona.
+- En el carril de aplicación, una sesión de agente (`tenant.authMode === 'agent'`) emite si su rol tiene la
+  capacidad: emitir no es un acto de persona.
+- El actor de un cambio de estado hecho por el sujeto máquina se guarda como `agent`, nunca como `member`.
 
 ### Adaptador PostgreSQL e importador
 
@@ -608,17 +695,24 @@ Módulo `commercial`, alcance por defecto `tenant`. Roles reales de `src/config/
    operaciones.
 5. **Puntero.** Guardar un documento no cambia `quoter_current_pointer`; una activación con huella previa equivocada
    falla; dos activaciones concurrentes dejan una sola fila nueva.
-6. **Estados y excepción.** Un par fuera de la matriz falla; un origen que no es el vigente falla; un acto con
-   compuerta humana con actor `agent` o `service` falla; una aprobación de excepción con una huella que no es la de
-   su versión, o registrada por un actor que no es una persona, falla.
-7. **Número.** La función no recorta un valor de más de seis dígitos; dos asignaciones concurrentes obtienen números
+6. **Estados y excepción.** Un par fuera de la matriz falla; un origen que no es el vigente falla; los siete pares
+   sembrados tienen `requires_human_gate = false` y un actor `agent` registra `draft → issued` e
+   `issued → withdrawn`; la restricción de compuerta se ejercita con un par marcado sólo en el clúster local, donde
+   un actor `agent` o `service` falla; una aprobación de excepción con una huella que no es la de su versión, o
+   registrada por un actor que no es una persona, falla; una fila del puntero sin `activated_by_member_id` falla.
+7. **Número.** En una base recién migrada la primera asignación real devuelve exactamente `EO-QTE-15`; la función no
+   rellena ni recorta (un valor de más de seis dígitos sale entero); dos asignaciones concurrentes obtienen números
    distintos; una cotización no recibe un segundo número; una sintética no consume la secuencia real; crear un
    borrador no consume ninguna.
 8. **Importador idempotente.** Segunda corrida: cero escrituras. Conflicto de versión con otra huella: se detiene.
 9. **Frontera.** Ningún archivo de `src/lib/commercial/quoter/` nombra `greenhouse_commercial.quotations`.
+10. **Dueña y sujeto máquina.** `resolveQuoterOwnerOrganizationId()` devuelve la fila de `EO-ORG-0007` y falla
+    cerrado si no es la entidad operativa activa; ningún archivo de `src/lib/commercial/quoter/` contiene un UUID de
+    organización; el sujeto máquina de un binding interno pasa la puerta para emitir y retirar, y no la pasa para
+    aprobar una excepción, activar el puntero ni guardar un documento de catálogo.
 
-Las pruebas 1 a 8 corren contra el clúster PostgreSQL local. Una prueba omitida por falta de clúster no cuenta como
-verde: el cierre exige una corrida con el clúster arriba.
+Las pruebas 1 a 8 y el lector de la dueña de la 10 corren contra el clúster PostgreSQL local. Una prueba omitida por
+falta de clúster no cuenta como verde: el cierre exige una corrida con el clúster arriba.
 
 ## Rollout Plan & Risk Matrix
 
@@ -638,11 +732,11 @@ verde: el cierre exige una corrida con el clúster arriba.
 | Una migración aplicada desde local cambia producción sin que nadie lo haya decidido | migration / production | medium | Regla dura de visto bueno del operador; pruebas en clúster local; sólo objetos nuevos | Tablas `quoter_*` presentes en la base antes del Slice 6 |
 | PostgreSQL altera el texto o la huella de un artefacto | data | low | Slice 1 sobre el corpus completo antes del esquema; texto en `text`, nunca `jsonb` | Prueba 1 roja |
 | Historia de sólo agregar con un error de esquema: no se puede corregir editando | migration | medium | Pruebas en local; aplicar con tablas vacías; correcciones por migración nueva hacia adelante | Necesidad de un `UPDATE` sobre una tabla de historia |
-| Pruebas o ejemplos en la base compartida dejan filas permanentes y consumen números | data / production | high | `data_origin = 'synthetic'` con secuencia propia; organización de pruebas; pruebas automáticas sólo en clúster local | Cotizaciones `real` creadas por un actor técnico |
+| Pruebas o ejemplos en la base compartida dejan filas permanentes y consumen números | data / production | high | `data_origin = 'synthetic'` con secuencia propia; organización de pruebas; pruebas automáticas sólo en clúster local | Cotizaciones `real` creadas por una prueba, un canario o una puerta de salida |
 | La siembra de capacidades llega a la base antes que el catálogo de TypeScript a producción | identity / production | medium | Misma entrega; revisar en Discovery si la prueba de paridad registro ↔ catálogo o alguna señal reacciona a filas sin entrada en el código desplegado; si reacciona, aplicar la migración 3 después del release | Señal o prueba de paridad de capacidades en rojo |
 | El importador activa un catálogo por accidente | finance | low | Guardar y activar son subcomandos distintos; ningún disparador activa; prueba 5 | Fila nueva en `quoter_pointer_history` sin motivo declarado |
 | La matriz de estados sembrada no coincide con el ciclo de vida que implemente la API de registro | data | low | Matriz igual a la que propone `TASK-2027`; como es dato, se amplía por una migración que sólo agrega filas | `TASK-2027` necesita un par inexistente |
-| El prefijo del número cambia después de emitir | finance | low | Confirmación previa a aplicar; el prefijo vive en la función y un cambio posterior no altera números ya asignados | Petición de cambio de prefijo con cotizaciones emitidas |
+| El prefijo o el arranque de la serie cambian después de emitir | finance | low | Prefijo `EO-QTE-` y arranque en 15 fijados por el CEO el 2026-10-12; viven en la función y en la secuencia, y un cambio posterior no altera números ya asignados | Petición de cambio de prefijo con cotizaciones emitidas |
 | El contrato del puerto cambia mientras se escribe el adaptador | checkout compartido | medium | Slice 5 empieza con `TASK-2024` cerrada o con su contrato congelado por escrito | La batería de conformidad no compila contra el adaptador |
 
 ### Feature flags / cutover
@@ -664,7 +758,7 @@ visto bueno y la importación del catálogo.
 
 ### Production verification sequence
 
-1. Clúster local: aplicar las tres migraciones, correr las nueve pruebas y la batería de conformidad; bajar y volver
+1. Clúster local: aplicar las tres migraciones, correr las diez pruebas y la batería de conformidad; bajar y volver
    a subir las migraciones para comprobar que la bajada deja la base como estaba.
 2. Operador: visto bueno explícito para aplicar a la base compartida. Sin él, la task queda en
    `code complete, rollout pendiente`.
@@ -680,7 +774,8 @@ visto bueno y la importación del catálogo.
 ### Out-of-band coordination required
 
 - Visto bueno del operador (CEO) para aplicar migraciones y para la importación con escritura, cada uno en su momento.
-- Confirmación del prefijo visible del número y de los roles que pueden emitir (ver `## Open Questions`).
+- Prefijo del número, arranque de la serie, roles que emiten y numeración sintética: resueltos por el CEO el
+  2026-10-12; no requieren coordinación adicional.
 - Aviso a quien esté ejecutando `TASK-2026` y `TASK-2027` cuando el esquema quede aplicado y cuando cambie cualquier
   nombre respecto de lo propuesto aquí.
 - Ninguna configuración en HubSpot, Nubox, GCP, Azure ni Vercel.
@@ -709,11 +804,14 @@ visto bueno y la importación del catálogo.
 - [ ] Guardar un documento no agrega una fila a `quoter_pointer_history`; una activación exige persona identificada,
       motivo y la huella del puntero que reemplaza.
 - [ ] `quoter_quote_versions` rechaza un artefacto cuyo estado de cálculo no es `calculated`.
-- [ ] La función de número usa un solo `nextval` y no recorta pasados seis dígitos (probado); crear una cotización no
-      consume número, una cotización no puede recibir un segundo número y una sintética no consume la secuencia real.
+- [ ] La función de número usa un solo `nextval` y no rellena ni recorta (probado con un valor de más de seis
+      dígitos); la secuencia real arranca en 15 y su primer número es `EO-QTE-15`; crear una cotización no consume
+      número, una cotización no puede recibir un segundo número y una sintética no consume la secuencia real.
 - [ ] La matriz de estados en TypeScript y la sembrada en la migración son iguales (`state-machine-parity.test.ts`).
-- [ ] Un cambio de estado con compuerta humana y actor que no es una persona identificada falla en la base; lo mismo
-      una aprobación de excepción, que además exige la huella de su versión.
+- [ ] Ninguno de los siete pares sembrados exige compuerta humana: un actor `agent` registra una emisión y un retiro.
+      La restricción de compuerta sigue viva (probada con un par marcado sólo en el clúster local). Una aprobación de
+      excepción con un actor que no es una persona identificada falla en la base y exige la huella de su versión; una
+      fila del puntero sin persona identificada falla.
 - [ ] Prueba 1: los 48 artefactos del corpus se guardan y se leen con el mismo texto, el mismo `artifact_digest` y el
       mismo `replay_digest`, y su reproducción verifica.
 - [ ] Prueba 2: con columnas de índice contradictorias, el lector devuelve lo que dice el artefacto; la prueba
@@ -723,8 +821,14 @@ visto bueno y la importación del catálogo.
 - [ ] Las capacidades `commercial.quoter.catalog`, `commercial.quoter.catalog.activate`, `commercial.quoter.simulate`,
       `commercial.quoter.quote`, `commercial.quoter.issue` y `commercial.quoter.exception` existen en el
       registro, en `entitlements-catalog.ts` y otorgadas en `runtime.ts`; `commercial.quoter.exception:approve` sólo a
-      `efeonce_admin` y `commercial.quoter.catalog.activate:execute` sólo a `efeonce_admin` y `finance_admin`.
+      `efeonce_admin`, `commercial.quoter.catalog.activate:execute` sólo a `efeonce_admin` y `finance_admin`, y
+      `commercial.quoter.issue:approve` a `efeonce_admin`, `efeonce_account` y `finance_admin`.
 - [ ] `capability-grant-coverage.test.ts` y la prueba de paridad registro ↔ catálogo pasan.
+- [ ] El sujeto máquina de un binding interno (rol `efeonce_account`) pasa la puerta única para emitir y retirar, y
+      no la pasa para aprobar una excepción, activar el puntero ni guardar un documento de catálogo (probado).
+- [ ] La organización dueña de una cotización se resuelve en una sola función por el identificador público
+      `EO-ORG-0007` y falla cerrado si la fila no es la entidad operativa activa; ningún archivo de
+      `src/lib/commercial/quoter/` ni migración de esta task contiene un UUID de organización.
 - [ ] `pnpm quoter:import --apply` dejó en la base todos los documentos de catálogo, política y créditos del repo,
       incluidas las versiones históricas que nombra el corpus; una segunda corrida no escribe; cada huella en la base
       es igual a la del repo.
@@ -776,17 +880,20 @@ visto bueno y la importación del catálogo.
 
 ## Open Questions
 
-- **Prefijo del número público.** Propuesto `EO-QTE-`. Es visible para el cliente y queda fijo desde la primera
-  emisión. Lo confirma el operador antes de aplicar la migración 2.
-- **Quién puede emitir.** La decisión dice «una persona con la capacidad correspondiente» sin nombrar roles.
-  Propuesto: `efeonce_admin`, `efeonce_account`, `finance_admin`. Lo confirma el operador.
 - **Quién puede guardar un documento de catálogo sin activarlo.** Propuesto: `efeonce_admin` y `finance_admin`.
-- **Organización cliente obligatoria o no.** La dueña es obligatoria y sale de la identidad. La cliente se propone
-  anulable para poder cotizar a un prospecto que todavía no existe como organización; si debe ser obligatoria, el
-  prospecto se crea antes por la puerta canónica de organizaciones. Confirmar con el operador y con `TASK-2027`.
-- **Momento del número.** Esta task lo asigna en la primera emisión (la decisión dice «con número y versión al
-  emitir» y el plan «asignado una sola vez»), en una tabla de sólo agregar para no actualizar la identidad.
-- **Cotizaciones de ejemplo en la base compartida.** Las puertas de salida de las fases 3 y 4 del plan piden ejemplos
-  «en staging», que es la misma base que producción y con historia que no se borra. Esta task propone marcarlas
-  `synthetic` con numeración aparte; confirmar con el operador.
+- **Asignar la destinataria después de crear.** La identidad es inmutable, así que hoy sólo se declara al crear; si
+  hace falta, es una tabla de sólo agregar como la del número. No bloquea.
+- **Cómo decide el servidor que una cotización es sintética.** La numeración aparte está aprobada; la regla la
+  propone `TASK-2027` y el esquema sólo guarda el resultado (`data_origin`).
 - **Dónde corre la reproducción de lo persistido** cuando cambie el motor (ver Follow-ups).
+
+Resueltas por el CEO el 2026-10-12 (ya no abiertas):
+
+- **Prefijo y arranque del número público.** `EO-QTE-`; la serie real empieza en 15 (`EO-QTE-15`), sin relleno.
+- **Quién puede emitir.** `efeonce_admin`, `efeonce_account`, `finance_admin` y los agentes, dentro de política y sin
+  aprobación de una persona. Retirar sigue el mismo principio.
+- **Organización dueña.** Efeonce siempre, por referencia estable.
+- **Organización destinataria obligatoria o no.** Cliente o potencial cliente; opcional en un borrador y obligatoria
+  para emitir.
+- **Momento del número.** En la primera emisión, en una tabla de sólo agregar para no actualizar la identidad.
+- **Cotizaciones de ejemplo en la base compartida.** Sintéticas, con numeración aparte.

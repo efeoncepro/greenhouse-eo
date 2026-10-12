@@ -32,26 +32,30 @@
 ## Summary
 
 Fase 7 de `EPIC-053`. Agrega herramientas MCP para leer, simular y registrar una cotización del cotizador V3 sobre las
-rutas de ecosistema de `TASK-2026` y `TASK-2027`, y las federa en el gateway `efeonce-mcp`. Aprobar una excepción,
-activar el puntero del catálogo y emitir **no** se exponen. Las herramientas actuales del motor V2 (`search_services`,
-`quote_price`) siguen respondiendo sin cambios. Registrar necesita una clase de escritura que hoy no existe: la task la
-plantea como decisión con dueño y ofrece un primer corte de lectura y simulación que no la necesita.
+rutas de ecosistema de `TASK-2026` y `TASK-2027`, y las federa en el gateway `efeonce-mcp`. Aprobar una excepción
+bajo el piso y activar el puntero del catálogo **nunca** se exponen: son los dos actos de persona. Emitir no es un
+acto de persona (CEO, 2026-10-12) y se ofrece como herramienta sólo si la decisión de alcance de escritura lo
+permite. Las herramientas actuales del motor V2 (`search_services`, `quote_price`) siguen respondiendo sin cambios.
+Registrar y emitir necesitan una clase de escritura que hoy no existe: la task la plantea como decisión con dueño y
+ofrece un primer corte de lectura y simulación que no la necesita.
 
 ## Why This Task Exists
 
 Un agente que conversa por MCP hoy sólo llega al motor V2, que la auditoría mostró que no se usa para cotizar y cuyo
 número no sale del motor de precios. El cotizador que sí se usa es una CLI: un cliente MCP remoto no puede ejecutarla.
-La decisión aceptada pone MCP después de la CLI y antes de la interfaz, con un límite fijo: un agente cotiza, registra y
-prepara el documento; nunca aprueba, activa ni emite. Federar es parte de «listo»: una herramienta interna que no se
+La decisión aceptada pone MCP después de la CLI y antes de la interfaz, con un límite fijo: un agente cotiza, registra,
+prepara el documento y emite lo que está dentro de política; nunca aprueba una excepción bajo el piso ni activa el
+catálogo. Federar es parte de «listo»: una herramienta interna que no se
 federa ni se excluye con razón escrita es deriva, y una herramienta registrada no es una herramienta que funciona.
 
 ## Goal
 
 - Herramientas de lectura y simulación del cotizador V3 en el servidor MCP de Greenhouse y en el gateway, con su manual
   servido.
-- La herramienta de registro lista y federada sólo cuando exista su clase de escritura; hasta entonces no se publica.
+- Las herramientas de escritura (registrar y, si la decisión la incluye, emitir) listas y federadas sólo cuando exista
+  su clase de escritura; hasta entonces no se publican.
 - Ninguna herramienta lleva un identificador de organización en su entrada, ni transporta un artefacto congelado.
-- Aprobar, activar y emitir no existen como herramientas, y una prueba lo sostiene.
+- Aprobar una excepción y activar el puntero no existen como herramientas, y una prueba lo sostiene.
 - `search_services` y `quote_price` conservan nombre, descripción y comportamiento.
 - El canario del gateway en verde contra producción, después del release de Greenhouse que publica las rutas.
 
@@ -66,8 +70,8 @@ federa ni se excluye con razón escrita es deriva, y una herramienta registrada 
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 7, 8 y 13 y las reglas
-  duras).
+- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 7, 8 y 13, las reglas
+  duras y «Delta 2026-10-12 — decisiones del CEO»).
 - `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md` (D6, D7, fase 7).
 - `docs/architecture/agent-invariants/MCP_TOOL_SURFACE_INVARIANTS.md` (completo; §0, §5, §7, §8, §9 y §11 son puertas de
   esta task).
@@ -82,7 +86,9 @@ Revisar y respetar:
 
 Reglas obligatorias:
 
-- **NUNCA** exponer como herramienta la aprobación de una excepción, la activación del puntero ni la emisión.
+- **NUNCA** exponer como herramienta la aprobación de una excepción bajo el piso ni la activación del puntero.
+- **NUNCA** exponer la emisión sin la clase de escritura decidida (sección 4, decisión A): emitir no es un acto de
+  persona, pero es una escritura.
 - **NUNCA** poner un identificador de organización, de actor o un estado en el `inputSchema` de una herramienta: se
   derivan de la identidad.
 - **NUNCA** lógica de precio en una herramienta, en su cliente HTTP ni en el gateway: la herramienta llama a una ruta
@@ -117,7 +123,7 @@ Reglas obligatorias:
 
 - `TASK-2026` — rutas de cálculo y lectura bajo `/api/platform/ecosystem/quoter/**`, con su bandera
   `QUOTER_COMPUTE_API_ENABLED` y su tabla de errores.
-- `TASK-2027` — rutas de registro y lectura de cotizaciones guardadas.
+- `TASK-2027` — rutas de registro, lectura y emisión de cotizaciones guardadas en el carril de ecosistema.
 - `TASK-2028` — la paridad entre transportes en verde: las herramientas se montan sobre rutas ya probadas con el
   instrumento principal.
 - El consumidor y el binding con que el gateway llama a Greenhouse (los existentes del gateway, documentados en la
@@ -213,16 +219,16 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: ninguna tabla nueva. El corte de escritura crea filas en las tablas `greenhouse_commercial.quoter_*` a través de la ruta de registro de `TASK-2027`.
+- Entidades/tablas/views afectadas: ninguna tabla nueva. El corte de escritura crea filas en las tablas `greenhouse_commercial.quoter_*` a través de las rutas de registro y de emisión de `TASK-2027`.
 - Invariantes que no se pueden romper:
-  - Ninguna herramienta del cotizador aprueba, activa ni emite.
+  - Ninguna herramienta del cotizador aprueba una excepción ni activa el puntero; la de emisión existe sólo en el corte de escritura.
   - Ninguna entrada de herramienta nombra organización, actor, piso, costo ni estado.
   - Una herramienta de lectura o simulación no deja filas en el registro.
-  - `writes: true` sólo en la herramienta de registro; `spendsProviderBudget: false` en todas.
+  - `writes: true` sólo en las herramientas del corte de escritura (registro y emisión); `spendsProviderBudget: false` en todas.
   - Los nombres y las descripciones de `search_services` y `quote_price` son idénticos antes y después.
 - Write-target allowlist: no aplica a un cliente HTTP; las tablas las declara el dominio en `TASK-2025`/`TASK-2027`.
-- Tenant/space boundary: la organización sale del binding del consumidor del gateway; el cliente al que se cotiza es un dato de la demanda que valida el servidor, no una autoridad.
-- Idempotency/concurrency: la herramienta de registro recibe `idempotencyKey` y la reenvía como cabecera del carril con un prefijo propio, para que un reintento del gateway tras un timeout no duplique.
+- Tenant/space boundary: la organización dueña es siempre Efeonce y la resuelve el servidor (`TASK-2025`); el binding interno del gateway no la trae. La organización destinataria es contenido de la cotización que valida el servidor, no una autoridad (ver sección 2).
+- Idempotency/concurrency: cada herramienta de escritura recibe `idempotencyKey` y la reenvía como cabecera del carril con un prefijo propio, para que un reintento del gateway tras un timeout no duplique.
 - Audit/outbox/history: los produce la ruta. La herramienta no agrega historial propio.
 
 ### Migration, backfill and rollout
@@ -293,9 +299,9 @@ Reglas obligatorias:
 
 ### Slice 4 — Herramienta de registro (condicionada)
 
-- Sólo con la decisión de clase de scope tomada: herramienta de registro en Greenhouse, clase en
-  `src/lib/auth-server/oauth/scopes.ts` con su prueba de paridad, clase en el gateway, alta en Entra, federación y
-  canario que **no** registra.
+- Sólo con la decisión de clase de scope tomada: herramienta de registro —y la de emisión, si la decisión la
+  incluye— en Greenhouse, clase en `src/lib/auth-server/oauth/scopes.ts` con su prueba de paridad, clase en el
+  gateway, alta en Entra, federación y canario que **no** registra ni emite.
 - Si la decisión no llega, este slice se cierra como diferido con su razón y la task puede completarse con el primer
   corte.
 
@@ -306,7 +312,9 @@ Reglas obligatorias:
 ## Out of Scope
 
 - Rutas, commands, readers o banderas del cotizador (`TASK-2026`, `TASK-2027`, `TASK-2029`).
-- Herramientas para aprobar una excepción, activar el puntero, emitir, retirar o cambiar el catálogo.
+- Herramientas para aprobar una excepción o activar el puntero (actos de persona: nunca son herramientas) y para
+  cambiar el catálogo. Retirar no es un acto de persona, pero es terminal y no se expone en esta task: queda como
+  seguimiento, con la misma clase de escritura.
 - Renombrar, redescribir, retirar o redirigir `search_services` y `quote_price`; tocar la herramienta `quote_price` de
   Nexa o la acción `author_quote`. Todo eso pertenece a la unidad de retiro del cotizador actual de `EPIC-053`.
 - Política para el emisor nativo (Efeonce ID v2) más allá de declarar las herramientas `unsupported` con razón.
@@ -333,12 +341,17 @@ gana). Cada una delega en una ruta del carril de ecosistema; si la ruta no exist
 | `get_quote` | 1 | no | `GET /quotes/{quoteId}` | Una cotización, sus versiones con huella y su estado. |
 | `get_quote_reading` | 1 | no | `GET /quotes/{quoteId}/versions/{n}/replay`, `/preview` y `/document` | Una lectura de una versión guardada: reproducción, vista apta para el cliente o datos del documento. |
 | `register_quote` | 2 | sí | `POST /quotes` y `POST /quotes/{quoteId}/versions` | La API recalcula la demanda y guarda la versión; devuelve identificador, versión y huella. No emite ni asigna número. |
+| `issue_quote` | 2, sólo si la decisión A incluye emitir | sí | `POST /quotes/{quoteId}/issue` | Emite la última versión; devuelve número, versión y huella. La ruta rechaza una versión bajo el piso sin su excepción aprobada y una cotización sin destinataria. |
 
 - Dominio del manifiesto: se propone uno nuevo, `quoter`, en vez de `commercial`, para que el gateway derive sus listas
   por dominio sin mezclar las dos herramientas V2. Se confirma en Discovery contra el guard de paridad del gateway.
 - `spendsProviderBudget: false` en todas. Simular no compra nada.
-- Anotaciones: lectura e idempotencia verdaderas en las de lectura; la de registro declara que escribe y que no es
-  destructiva.
+- Anotaciones: lectura e idempotencia verdaderas en las de lectura; las de registro y emisión declaran que escriben y
+  que no son destructivas.
+- Emitir se ofrece como herramienta si y sólo si la decisión A permite escribir por MCP: un agente emite dentro de
+  política sin aprobación de una persona, y la política la aplica la ruta, no la herramienta. Aprobar una excepción
+  y activar el puntero no se ofrecen con ninguna decisión. Como `TASK-2027` propone exigir un documento guardado para
+  emitir, ofrecer `issue_quote` arrastra ofrecer también el guardado de los textos del documento.
 - El resumen que devuelve una herramienta dice, donde se toma la decisión, que una simulación calculada no es un precio
   aprobado ni una cotización emitida, y que el exit `3` de la ruta significa «calculada, bajo revisión».
 - No se exponen por MCP `assess`, `split`, `schedule`, `cash`, `commitments` ni `increment` en esta task: sobre una
@@ -354,7 +367,12 @@ gana). Cada una delega en una ruta del carril de ecosistema; si la ruta no exist
 - Las fuentes no se suben: sin argumento rigen las vigentes; un argumento opcional las fija por huella.
 - La demanda y el brief viajan como objeto con el contrato de entrada que valida el servidor; la herramienta no
   completa ni corrige campos.
-- `register_quote` exige `idempotencyKey`.
+- `register_quote` e `issue_quote` exigen `idempotencyKey`. `issue_quote` nombra la cotización, la versión y la huella
+  que el agente leyó con `get_quote`; nunca un estado.
+- Organización destinataria: es contenido de la cotización, obligatorio para emitir y declarable sólo al crear
+  (`TASK-2027`, «Organización»). La regla de entradas de esta sección la excluye, así que una cotización registrada
+  por `register_quote` nace sin destinataria y no se puede emitir. Admitir una referencia a la destinataria como
+  contenido validado —no como alcance— es una pregunta abierta ligada a la decisión A (ver Open Questions).
 - Ningún argumento elige audiencia más amplia que la de la identidad. Pedir una más estrecha es válido.
 
 ### 3. Requisitos sobre la API (para verificar en Discovery)
@@ -362,29 +380,32 @@ gana). Cada una delega en una ruta del carril de ecosistema; si la ruta no exist
 - **El artefacto no cruza MCP.** El contrato de la CLI devuelve y recibe el artefacto congelado; un cliente MCP no
   puede sostener un documento de megabytes en su contexto. `TASK-2027` ya da lo necesario para no transportarlo:
   registro a partir de la demanda (filas 1 y 2) y lecturas por referencia para reproducir, vista previa y documento
-  (filas 12 a 14). Por eso `register_quote` usa esas rutas y **no** las de registrar un artefacto local (filas 3 y 4),
+  (filas 13 a 15). Por eso `register_quote` usa esas rutas y **no** las de registrar un artefacto local (filas 3 y 4),
   que son de la CLI. Falta confirmar: que `POST /compose/quote` permita omitir el artefacto en la respuesta, o que el
-  manejador lo descarte sin reenviarlo; y que la lectura de versión (fila 11) nunca se pida con `include=artifact`.
+  manejador lo descarte sin reenviarlo; y que la lectura de versión (fila 12) nunca se pida con `include=artifact`.
   Lo que falte va como `## Delta` con criterio a la task dueña. Esta task no encadena dos llamadas con el artefacto en
   medio.
 - Las lecturas internas por referencia distintas de esas tres (`assess`, `split`, `schedule`, `cash`, `commitments`)
   son seguimiento declarado de `TASK-2027`: no existen todavía y no se simulan aquí.
 - Qué versiones puede nombrar un registro hecho por un agente (ver `TASK-2029`, versiones aplicadas y nunca activadas).
+- Que emitir tenga ruta en el carril de ecosistema (`TASK-2027`, fila 8). La puerta de esa ruta no distingue
+  consumidores: lo único que separa al gateway de emitir es que la herramienta exista y su clase de escritura.
 - Respuesta honesta con la bandera apagada, para traducirla a bloqueo por política y no a «no encontrado».
 
 ### 4. Decisiones de scope (con dueño)
 
-**A. Clase de escritura para registrar.** No existe ninguna clase para cotizaciones. La regla del gateway es una clase
-por tipo de alcance del daño, nunca una por capacidad. Opciones:
+**A. Clase de escritura para registrar y emitir.** No existe ninguna clase para cotizaciones. La regla del gateway es
+una clase por tipo de alcance del daño, nunca una por capacidad. Opciones:
 
 | Opción | Qué implica | Costo entre sistemas |
 | --- | --- | --- |
-| Clase nueva `efeonce.mcp.quoter.write` (propuesta) | Registrar una cotización es un artefacto con ciclo de vida propio y con cifras comerciales; no comparte clase con Insights ni con SEO | `src/config.ts` del gateway; paridad en `src/lib/auth-server/oauth/scopes.ts` y su prueba; alta del scope en la aplicación recurso «Efeonce MCP Resource» de Entra; ningún cliente la porta hasta un consentimiento gobernado, así que la herramienta queda cerrada por diseño |
-| No publicar el registro por MCP en esta task | El registro por agente sigue disponible por la CLI de `TASK-2028` | Ninguno; se pierde el registro desde un cliente conversacional |
+| Clase nueva `efeonce.mcp.quoter.write` (propuesta) | Registrar una cotización es un artefacto con ciclo de vida propio y con cifras comerciales, y emitirla le asigna número; no comparte clase con Insights ni con SEO | `src/config.ts` del gateway; paridad en `src/lib/auth-server/oauth/scopes.ts` y su prueba; alta del scope en la aplicación recurso «Efeonce MCP Resource» de Entra; ningún cliente la porta hasta un consentimiento gobernado, así que la herramienta queda cerrada por diseño |
+| No publicar escrituras por MCP en esta task | El registro y la emisión por agente siguen disponibles por la CLI de `TASK-2028` | Ninguno; se pierden el registro y la emisión desde un cliente conversacional |
 | Reutilizar una clase existente | Descartada: mezcla alcances de daño distintos | — |
 
-Dueño de la decisión: CEO (si un agente conversacional registra y con qué alcance); ejecución en Entra y en el gateway:
-Platform. Sin decisión, el Slice 4 queda diferido.
+Dueño de la decisión: CEO (si un agente conversacional registra y emite, y con qué alcance); ejecución en Entra y en el
+gateway: Platform. Sin decisión, el Slice 4 queda diferido. La decisión del 2026-10-12 sobre la autonomía de los
+agentes dice que emitir no espera a una persona; no dice que la escritura por MCP esté abierta: eso es esta decisión.
 
 **B. Audiencia de las lecturas bajo el scope base.** Según `TASK-2026`, casi todas las operaciones son de audiencia
 `internal` (llevan costo y margen) y sólo la vista previa y los datos del documento son `client_safe`. El consumidor
@@ -432,7 +453,7 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
    lista de excluidas con razón, nunca simplemente ausente.
 5. Política para el emisor nativo: las herramientas del cotizador se declaran `unsupported` con una razón propia.
 6. Canario `scripts/greenhouse-quoter-canary.mjs`: versiones vigentes, búsqueda de catálogo, una simulación (no deja
-   filas), negativa 404 y 401 sin token. **Nunca registra.**
+   filas), negativa 404 y 401 sin token. **Nunca registra ni emite.**
 7. `efeonce.gateway.status` lista el provider en el mismo PR, con una prueba que lo llama por el servidor construido.
 8. Versión en `package.json`: agregar herramientas es una versión menor sobre la vigente al momento de ejecutar.
    `pnpm surface:baseline`. `pnpm check` en verde.
@@ -470,7 +491,8 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
 | Riesgo | Sistema | Probabilidad | Mitigation | Signal de alerta |
 |---|---|---|---|---|
 | Costo y margen visibles para quien no debe | gateway / identidad | medium | Decisión B antes de federar; audiencia declarada por la ruta; ningún argumento amplía audiencia | lectura interna servida a una identidad no prevista en el canario de negativa |
-| Un agente aprueba, activa o emite por MCP | registro | low | Esas herramientas no existen; prueba sobre el manifiesto; las rutas tampoco existen en ecosistema | entrada del manifiesto con ese verbo |
+| Un agente aprueba una excepción o activa el puntero por MCP | registro | low | Esas herramientas no existen; prueba sobre el manifiesto; las rutas tampoco existen en ecosistema | entrada del manifiesto con ese verbo |
+| Un agente conversacional emite por MCP algo fuera de política | registro | low | La herramienta existe sólo con la clase de escritura; la ruta aplica la política a cualquiera (bajo el piso exige la excepción aprobada; sin destinataria no emite) y la clave de idempotencia es obligatoria | rechazo `quoter_exception_approval_required` devuelto a la herramienta |
 | El agente elige `quote_price` (V2) cuando se le pide cotizar | selección | medium | Nombres medidos, casos en el fixture, criterio en el manual; lado V2 documentado como excepción | regresión en el eval de selección |
 | El gateway se despliega antes que las rutas | gateway | medium | Orden fijo; canario contra producción como puerta | canario con `not_found` o `provider_unavailable` |
 | Registro duplicado por reintento del gateway | registro | low | Clave de idempotencia obligatoria y reenviada como cabecera del carril | dos cotizaciones con la misma huella y distinto número |
@@ -496,7 +518,7 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
 | Slice 1 | Quitar las entradas del manifiesto y el registro, regenerar el artefacto | minutos | sí |
 | Slice 2 | Quitar el manual y su entrada, regenerar el catálogo | minutos | sí |
 | Slice 3 | Apagar el provider; revertir el PR y redesplegar la revisión anterior del gateway | menos de 30 minutos | sí; el cambio de versión del servidor queda en el historial |
-| Slice 4 | Apagar el provider o quitar la herramienta; el scope en Entra puede quedar sin uso; las cotizaciones registradas se conservan | menos de 30 minutos | parcial: lo registrado no se borra |
+| Slice 4 | Apagar el provider o quitar la herramienta; el scope en Entra puede quedar sin uso; las cotizaciones registradas y las emisiones se conservan | menos de 30 minutos | parcial: lo registrado y lo emitido no se borran |
 | Slice 5 | Revertir documentos | minutos | sí |
 
 ### Production verification sequence
@@ -510,8 +532,8 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
 6. `search_services` y `quote_price` responden igual que antes (comparación de `tools/list` y de una llamada a cada
    una).
 7. Corte de escritura, si aplica: alta del scope en Entra con lectura de vuelta de los scopes previos intactos; la
-   herramienta responde `insufficient_scope` sin el scope; el registro se prueba sólo con un token humano que porte la
-   clase y con una cotización marcada como sintética.
+   herramienta responde `insufficient_scope` sin el scope; el registro —y la emisión, si se ofrece— se prueban sólo
+   con un token humano que porte la clase y con una cotización marcada como sintética.
 
 ### Out-of-band coordination required
 
@@ -532,11 +554,12 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
 
 - [ ] Cada herramienta nueva tiene entrada en `tool-manifest.ts` con `writes` y `spendsProviderBudget` declarados, y
       `pnpm mcp:manifest:check` queda en verde con el artefacto regenerado.
-- [ ] Sólo la herramienta de registro declara `writes: true`; todas declaran `spendsProviderBudget: false`.
+- [ ] Sólo las herramientas del corte de escritura (registro y, si la decisión A la incluye, emisión) declaran
+      `writes: true`; todas declaran `spendsProviderBudget: false`.
 - [ ] Ninguna herramienta del cotizador tiene en su entrada una clave de organización, inquilino, espacio, actor, piso,
       costo o estado (prueba sobre el manifiesto generado).
-- [ ] El manifiesto no contiene ninguna herramienta que apruebe una excepción, active el puntero o emita, y una prueba
-      falla si aparece.
+- [ ] El manifiesto no contiene ninguna herramienta que apruebe una excepción o active el puntero, y una prueba falla
+      si aparece. La de emisión existe si y sólo si la decisión A permite escribir e incluye emitir.
 - [ ] Cada herramienta delega en una ruta de `/api/platform/ecosystem/quoter/**` y su manejador no contiene cálculo ni
       proyección (revisión y prueba de que la salida es la de la ruta).
 - [ ] Simular por la herramienta no crea filas en el registro (lectura antes y después).
@@ -561,10 +584,11 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
       directo a `main`.
 - [ ] El gateway se desplegó después del release de Greenhouse que publica las rutas, y el canario de lectura pasó
       contra producción.
-- [ ] El canario no registra ninguna cotización.
-- [ ] Corte de escritura: o bien la clase existe en `scopes.ts`, en el gateway y en Entra, la herramienta reenvía la
-      clave de idempotencia y responde `insufficient_scope` sin la clase; o bien el Slice 4 quedó diferido con la
-      decisión A registrada.
+- [ ] El canario no registra ni emite ninguna cotización.
+- [ ] Corte de escritura: o bien la clase existe en `scopes.ts`, en el gateway y en Entra, cada herramienta de
+      escritura reenvía la clave de idempotencia y responde `insufficient_scope` sin la clase, y emitir por la
+      herramienta una versión bajo el piso sin excepción aprobada devuelve el rechazo de la ruta; o bien el Slice 4
+      quedó diferido con la decisión A registrada.
 - [ ] El cliente PKCE público compartido no cambió.
 
 ## Verification
@@ -604,17 +628,23 @@ deploy.yml`) y su rama actual; no mover trabajo ajeno en ese checkout.
 - Retiro del cotizador actual (`EPIC-053`): destino de `search_services`, `quote_price`, herramienta de Nexa y
   `author_quote`; cierre de la excepción de ruteo.
 - Lecturas internas adicionales por MCP (`split`, `schedule`, `cash`, `commitments`, `increment`) si hacen falta.
+- Herramienta para retirar una cotización, con la misma clase de escritura.
 - Política para el emisor nativo y consentimiento gobernado de la clase nueva.
 - Declaración de paridad de capacidades del dominio comercial (federada, interna a propósito o pendiente), como la que
   ya existe para Hiring.
 
 ## Open Questions
 
-- Decisión A: ¿registrar por MCP con clase nueva `efeonce.mcp.quoter.write`, o dejar el registro sólo en la CLI por
-  ahora?
+- Decisión A: ¿registrar y emitir por MCP con clase nueva `efeonce.mcp.quoter.write`, o dejar las escrituras sólo en la
+  CLI por ahora? Emitir se ofrece como herramienta sólo si esta decisión lo permite.
+- ¿Las herramientas de escritura reciben una referencia a la organización destinataria como contenido validado? Sin
+  ella, lo registrado por MCP no se puede emitir.
 - Decisión B: ¿qué audiencia cruza bajo el scope base: sólo lo `client_safe`, lo interno con aceptación explícita, o
   una clase de lectura propia?
 - ¿Dominio nuevo `quoter` en el manifiesto o reutilizar `commercial`?
 - ¿El provider del gateway lleva interruptor propio o comparte el del provider SEO?
 - ¿Agregar un manual a la descripción de `get_greenhouse_skill` se trata en el gateway como cambio menor (como en la
   federación de Insights) o mayor? Lo define el `AGENTS.md` del gateway al momento de ejecutar.
+
+Resuelta por el CEO el 2026-10-12 (ya no abierta): emitir no es un acto de persona. Aprobar una excepción bajo el piso
+y activar el puntero sí lo son y no se ofrecen como herramienta con ninguna decisión.

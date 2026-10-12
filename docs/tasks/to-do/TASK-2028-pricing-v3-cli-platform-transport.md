@@ -50,8 +50,9 @@ de modo por defecto una sola vez y con paridad medida, y ningún respaldo silenc
 
 - Cada comando de la tabla de esta task corre por los dos transportes con salida idéntica byte a byte, mismo exit code y
   mismo error tipado.
-- Un agente sin sesión interactiva opera el modo plataforma con un token de consumidor que nunca se imprime ni se
-  escribe en el repo; una persona ejecuta los actos humanos con inicio de sesión propio.
+- Un agente sin sesión interactiva opera el modo plataforma —cotiza, registra, emite y retira dentro de política— con
+  un token de consumidor que nunca se imprime ni se escribe en el repo; una persona ejecuta los dos actos humanos
+  (aprobar una excepción bajo el piso y, desde `TASK-2029`, activar el catálogo) con inicio de sesión propio.
 - Una cotización hecha en local se registra en la plataforma sin recalcularla a mano.
 - La paridad queda como comando permanente, cableada donde ya se corren chequeos.
 - El modo local no se retira, no se degrada y no queda condicionado a nada.
@@ -67,8 +68,8 @@ de modo por defecto una sola vez y con paridad medida, y ningún respaldo silenc
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 1, 7, 8, 9, 10 y las
-  reglas duras).
+- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` (Accepted; puntos 1, 7, 8, 9, 10, las
+  reglas duras y «Delta 2026-10-12 — decisiones del CEO», que manda sobre lo que esta task decía antes).
 - `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md` — **la sección 4 es el contrato que protege la
   CLI** y es la puerta de esta task.
 - `docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md` (exit codes `0/2/3/1`, errores tipados,
@@ -94,11 +95,13 @@ Reglas obligatorias:
   enviar el pedido.
 - **NUNCA** imprimir, registrar en logs ni escribir en el repo un token, una cabecera de autorización o el secreto de
   bypass de Vercel.
-- **NUNCA** enviar a la API un piso, un costo, una organización o un estado tomados de un archivo de quien llama: las
-  fuentes (catálogo, policy, créditos) viajan como referencia por versión y huella, y la organización sale de la
-  identidad.
-- **NUNCA** que un agente ejecute un acto humano: esos comandos exigen inicio de sesión de una persona por el carril de
-  aplicación.
+- **NUNCA** enviar a la API un piso, un costo, una organización dueña o un estado tomados de un archivo de quien
+  llama: las fuentes (catálogo, policy, créditos) viajan como referencia por versión y huella, y la dueña la pone el
+  servidor (Efeonce siempre). La organización destinataria sí viaja, como contenido que el servidor valida.
+- **NUNCA** que un agente ejecute un acto humano. Son dos: aprobar una excepción bajo el piso (esta task) y mover el
+  puntero del catálogo (`TASK-2029`); exigen inicio de sesión de una persona por el carril de aplicación.
+- **NUNCA** pedir una persona para lo que la decisión deja al agente: emitir y retirar una cotización que está dentro
+  de política corren con el token de consumidor, sin aprobación.
 - **SIEMPRE** que esta task toque el motor o su entorno, los artefactos congelados del repo se recalculan idénticos y
   `pnpm pricing:v3:test` queda en verde.
 - El cambio de modo por defecto ocurre una sola vez, al final, y se revierte con un cambio de una línea.
@@ -130,7 +133,7 @@ Reglas obligatorias:
 - `TASK-2026` — API de cálculo en `/api/platform/{app,ecosystem}/quoter/**`: lecturas de catálogo, scaffold, plan,
   prepare, simular y lecturas de una cotización, con paridad en staging.
 - `TASK-2027` — API de registro: cotizaciones, versiones, registro de un artefacto local, datos del documento, ciclo de
-  vida con actos humanos y numeración.
+  vida (emitir y retirar por los dos carriles; aprobar una excepción sólo por persona) y numeración.
 - Un consumidor de ecosistema con binding activo para la CLI y un cliente OAuth para el inicio de sesión de personas
   (los crea esta task si las fases 3 y 4 no los dejaron; ver Slice 3).
 
@@ -226,7 +229,7 @@ Reglas obligatorias:
   - El comando de paridad no registra nada: usa sólo rutas sin estado.
   - Una cotización se registra sólo si la API la recalcula con las versiones que el artefacto nombra y la huella coincide.
 - Write-target allowlist: no aplica a la CLI; las tablas las declara el dominio en `TASK-2025`/`TASK-2027`.
-- Tenant/space boundary: la organización sale del binding del consumidor o de la persona autenticada. La CLI no envía un identificador de organización leído de un archivo de entrada; los parámetros de alcance que el carril exige salen del perfil de entorno.
+- Tenant/space boundary: la organización dueña es siempre Efeonce y la resuelve el servidor; la CLI nunca la envía. La organización destinataria es contenido de la cotización que quien cotiza nombra de forma explícita al crear o registrar, y el servidor la valida; no se lee de un archivo de entrada. Los parámetros de alcance que el carril exige salen del perfil de entorno.
 - Idempotency/concurrency: cabecera `Idempotency-Key` en toda mutación; clave derivada del contenido por defecto y `--key` para fijarla; sin reintento automático; ante resultado dudoso, error tipado que devuelve la clave para repetir el mismo pedido.
 - Audit/outbox/history: los produce la API. La CLI imprime en stderr el `requestId` de cada llamada para poder buscarla.
 
@@ -240,7 +243,7 @@ Reglas obligatorias:
 
 ### Security and access
 
-- Auth/access gate: token de consumidor de ecosistema para el agente; bearer delegado de una persona, obtenido por PKCE en loopback, para actos humanos y para quien quiera operar como persona.
+- Auth/access gate: token de consumidor de ecosistema para el agente, con el que también emite y retira; bearer delegado de una persona, obtenido por PKCE en loopback, para los dos actos humanos y para quien quiera operar como persona.
 - Sensitive data posture: las salidas internas llevan costo y margen igual que hoy; los archivos nuevos nacen `0600` y nunca se sobrescriben. Tokens y secreto de bypass sólo en memoria.
 - Error contract: el `code` del registro cerrado de `PricingV3Error` que la API devuelve en `details.code` se imprime tal cual; los fallos del transporte usan códigos nuevos del grupo de adaptador. Nunca se copia un mensaje del servidor, una ruta ni un valor recibido.
 - Abuse/rate-limit posture: límites por consumidor de la API; la paridad corre en serie y respeta las cabeceras de límite.
@@ -315,8 +318,8 @@ Reglas obligatorias:
 ### Slice 5 — Registro y actos humanos
 
 - Grupo `registry`: crear una cotización o una versión desde una demanda, registrar un artefacto local, guardar los
-  textos del documento, las lecturas del registro y, si la decisión de la sección 7 lo permite, los actos humanos de
-  `TASK-2027`.
+  textos del documento, las lecturas del registro, emitir y retirar (agente o persona, sin aprobación) y el acto
+  humano de `TASK-2027`: aprobar una excepción bajo el piso (sólo persona).
 - Clave de idempotencia impresa antes del pedido; sin reintentos; manejo de resultado dudoso.
 
 ### Slice 6 — Paridad permanente
@@ -396,14 +399,15 @@ y un `## Delta` en la task dueña de la ruta.
 | `compose document` | sí | `TASK-2026` | Lectura sobre un artefacto. Los datos con número y versión de una cotización registrada salen de `registry document`. |
 | `catalog preview`, `apply` | no | `TASK-2029` | Mantenimiento: el repo es la autoridad. |
 | `resources preview`, `apply` | no | `TASK-2029` | Mantenimiento: el repo es la autoridad. |
-| `current set` | no | `TASK-2029` | Mover el puntero será un acto humano por la API. |
+| `current set` | no | `TASK-2029` | Mover el puntero es el otro acto humano: gana modo plataforma, sólo para una persona, en `TASK-2029`. |
 | `doctor` (nuevo) | sólo plataforma | `TASK-2026` | Diagnóstico de conexión. |
 | `parity` (nuevo) | los dos a la vez | `TASK-2026` | Compara los dos transportes. |
 | `registry create`, `add-version` (nuevos) | sólo plataforma | `TASK-2027` (filas 1 y 2) | La API recalcula la demanda y guarda la versión. |
 | `registry register` (nuevo) | sólo plataforma | `TASK-2027` (filas 3 y 4) | Registra un artefacto local como cotización nueva o, con `--quote`, como versión nueva. |
 | `registry document-texts` (nuevo) | sólo plataforma | `TASK-2027` (fila 5) | Guarda los textos del documento de una versión. |
-| `registry list`, `show`, `version`, `replay`, `preview`, `document`, `history` (nuevos) | sólo plataforma | `TASK-2027` (filas 9 a 15) | Lecturas del registro. |
-| `registry approve-exception`, `issue`, `withdraw` (nuevos) | sólo plataforma, sólo persona | `TASK-2027` (filas 6 a 8) | Actos humanos. Condicionados a la decisión de la sección 7. |
+| `registry list`, `show`, `version`, `replay`, `preview`, `document`, `history` (nuevos) | sólo plataforma | `TASK-2027` (filas 10 a 16) | Lecturas del registro. |
+| `registry issue`, `withdraw` (nuevos) | sólo plataforma; agente o persona | `TASK-2027` (filas 8 y 9) | Emiten y retiran con el token de consumidor, sin aprobación de una persona. La API rechaza una versión bajo el piso sin su excepción aprobada. |
+| `registry approve-exception` (nuevo) | sólo plataforma, sólo persona | `TASK-2027` (fila 7) | Acto humano: inicio de sesión de persona y confirmación en terminal. |
 
 Las diecinueve operaciones con ruta son las de la tabla de operaciones de `TASK-2026`; si esa tabla cambia, manda ella.
 Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta por la API, entra como `## Delta` de
@@ -434,7 +438,7 @@ Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta po
 - Exit codes: `0`, `2` y `3` salen de `meta.exitCode` de la respuesta (los tres son HTTP 200); `1` es toda respuesta de
   error. La paridad comprueba que coinciden con el criterio local. Para los comandos nuevos: `doctor` → `0` conforme, `2` falta configuración, `1` falla;
   `parity` → `0` idéntico, `1` cualquier diferencia; `registry register` → `3` mientras la cotización registrada siga
-  en revisión; lecturas del registro → `0`; acto humano completado → `0`.
+  en revisión; lecturas del registro → `0`; emisión, retiro o acto humano completado → `0`.
 - Errores: una respuesta de error de la API con `details.code` de `PricingV3Error` se imprime con ese mismo `code` y sus
   `issues` (`path`, `rule`), más `details.option` cuando la respuesta nombra la entrada a corregir. Los demás fallos usan códigos
   nuevos del grupo de adaptador. Propuesta de nombres, a cerrar contra `pricing-v3-errors.test.ts`:
@@ -461,6 +465,10 @@ Si la aceptación del Slice 7 demuestra que un comando sólo local hace falta po
 - Rechazos esperados, cada uno con su código: artefacto bloqueado, versión de catálogo no reflejada, huella distinta,
   motor no registrado.
 - Sin `--quote` crea la cotización con su primera versión; con `--quote` agrega una versión que reemplaza a la anterior.
+- Al crear una cotización (`registry create`, y `registry register` sin `--quote`), `--client-organization <id>` nombra
+  la organización destinataria. Es contenido que el servidor valida, no alcance: opcional en un borrador y
+  obligatoria para emitir, y como la identidad de la cotización es inmutable se declara en ese momento (`TASK-2027`,
+  «Organización»). La dueña no se envía nunca.
 - Calcular por la API **no registra**: registrar es siempre un paso aparte y explícito, una mutación por comando.
 - Hay una sola base para staging y producción: registrar contra staging escribe en las mismas tablas que producción.
   Las pruebas de registro en staging usan `data_origin = 'synthetic'` (`TASK-2025`), que tiene secuencia de número
@@ -480,20 +488,22 @@ Agente sin sesión interactiva (carril de ecosistema):
   precedente de `scripts/api-platform/provision-mcp-gateway-seo-consumer.ts`; el token se muestra una vez y va a Secret
   Manager como escalar crudo (`printf %s … | gcloud secrets versions add … --data-file=-`).
 - Los parámetros de alcance que exige el carril salen del perfil, no de los archivos de entrada.
+- Con ese token el agente cotiza, registra, guarda los textos del documento, emite y retira: la API lo modela como
+  sujeto máquina con rol `efeonce_account`, que tiene la capacidad de emitir (`TASK-2025`, «Identidad de agente»). Lo
+  único que la API le niega son los dos actos humanos.
 
 Persona (carril de aplicación):
 
 - Inicio de sesión por PKCE en loopback, como `scripts/globe-credit-funding.ts`: navegador, escucha en
   `127.0.0.1:<puerto aleatorio>`, intercambio del código, token en memoria durante la ejecución, nada en disco.
-- Obligatorio para todo acto humano; opcional (`--sign-in`) para quien quiera cotizar o registrar como persona.
-- **Dependencia abierta.** Ese inicio de sesión produce un bearer `sister_platform_oauth`, y `TASK-2027`, tal como está
-  escrita, lo rechaza como acto humano (`human_gate_required`): su compuerta acepta sólo `cookie_session` o
-  `first_party_app`, y deja «admitir un bearer delegado de una persona verificada» como decisión del dueño. Mientras
-  esa decisión no exista, los tres comandos de acto humano no se construyen y la task lo declara; el resto del Slice 5
-  no depende de ello. La alternativa de sesión de primera parte (`POST /api/platform/app/sessions`, correo y
-  contraseña) no se adopta por defecto: los usuarios internos entran por SSO y poner una contraseña en una terminal
-  operada por agentes es lo que la política prohíbe. Sin interfaz hasta la fase 8, esta decisión define si alguien
-  puede aprobar una excepción o emitir antes de esa fase.
+- Obligatorio para los dos actos humanos (`registry approve-exception` aquí; `current set` en `TASK-2029`); opcional
+  (`--sign-in`) para quien quiera cotizar, registrar o emitir como persona.
+- **Decisión tomada (CEO, 2026-10-12).** Ese inicio de sesión produce un bearer `sister_platform_oauth` y es el
+  mecanismo aceptado para los dos actos humanos mientras no exista interfaz: la compuerta de `TASK-2027` lo admite
+  cuando lo emite el cliente OAuth de la CLI para una persona, nunca para una sesión de agente. `registry
+  approve-exception` se construye en esta task. La alternativa de sesión de primera parte (`POST
+  /api/platform/app/sessions`, correo y contraseña) no se adopta: los usuarios internos entran por SSO y poner una
+  contraseña en una terminal operada por agentes es lo que la política prohíbe.
 - Un acto humano pide además confirmación en la terminal mostrando qué se va a hacer. Sin terminal interactiva termina
   con `TRANSPORT_HUMAN_SESSION_REQUIRED`.
 - Una sesión de `/api/auth/agent-session` no se usa para actos humanos: la API la rechaza y en producción ese endpoint
@@ -554,8 +564,10 @@ Ya previstos por `TASK-2026` y que esta task consume tal cual: claves del cuerpo
 Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible a la task dueña:
 
 - Una lectura de las versiones del registro de motores que sirve el despliegue (`doctor` la compara con las locales).
-- Que el carril de aplicación acepte el bearer delegado de una persona para los actos humanos: hoy `TASK-2027` lo
-  rechaza a propósito (ver sección 7). Es una decisión del operador, no un hueco técnico.
+- Que el carril de aplicación acepte el bearer delegado de una persona para los dos actos humanos: decidido el
+  2026-10-12 y recogido en `TASK-2027` (ver sección 7). Falta sólo comprobar que la ruta lo implementa así.
+- Que emitir y retirar tengan ruta en el carril de ecosistema y admitan el token de consumidor (`TASK-2027`, filas 8
+  y 9).
 - Cómo marca quien llama una cotización como sintética (`data_origin = 'synthetic'` de `TASK-2025`, con su secuencia
   propia) para las pruebas de registro en staging.
 - El límite de tamaño del cuerpo: el artefacto más grande del repo mide cerca de 2,5 MB. Un `413` se traduce a un error
@@ -581,8 +593,9 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 | Una cotización parece registrada y no lo está | registro | low | Sin respaldo silencioso; registrar es un comando aparte que devuelve identificador, versión y huella | salida de `registry register` sin identificador |
 | Doble registro por reintento | registro | low | Clave derivada del contenido, impresa antes; sin reintentos; resultado dudoso tipado | `TRANSPORT_AMBIGUOUS_OUTCOME` |
 | Fuga de un token o del secreto de bypass | identidad | low | Una sola fuente, en memoria, redacción, rechazo de archivos dentro del repo, prueba de que ninguna salida lo contiene | prueba de redacción en rojo |
-| Un agente ejecuta un acto humano | registro | low | Carril de aplicación con persona; confirmación en terminal; la API rechaza sesión de agente | `TRANSPORT_HUMAN_SESSION_REQUIRED` |
-| Registros de prueba mezclados con reales | base compartida | medium | Marcador de origen sintético obligatorio; la paridad no registra | filas sin marcador creadas por el consumidor de la CLI |
+| Un agente ejecuta uno de los dos actos humanos (aprobar una excepción, mover el puntero) | registro | low | Carril de aplicación con persona; confirmación en terminal; la API rechaza sesión de agente y token de consumidor | `TRANSPORT_HUMAN_SESSION_REQUIRED` |
+| Un agente emite durante una prueba una cotización que no es sintética y consume un número real | base compartida | medium | La emisión de prueba se hace sólo sobre cotizaciones sintéticas, que toman número de su propia serie; la paridad no emite; `data_origin` lo decide la API, no la CLI | número real asignado durante una prueba |
+| Registros de prueba mezclados con reales | base compartida | medium | Marcador de origen sintético obligatorio; la paridad no registra | filas sin marcador creadas durante una prueba |
 | Punteros distintos entre repo y plataforma | catálogo | medium | `doctor` y `parity` comparan huellas y fallan | paso de puntero de `doctor` en falla |
 
 ### Feature flags / cutover
@@ -612,9 +625,11 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 
 1. Local: caracterización y paridad sin red en verde; `pnpm local:check`.
 2. Staging: `doctor` conforme; `pnpm pricing:v3:parity --profile staging` en verde; un registro sintético con su
-   marcador, leído de vuelta, y su repetición con la misma clave devolviendo lo mismo.
-3. Staging: una negativa por cada caso (sin token, token revocado, fuente no reflejada, artefacto bloqueado, acto humano
-   sin persona).
+   marcador, leído de vuelta, y su repetición con la misma clave devolviendo lo mismo. Con el mismo token de
+   consumidor, `registry issue` sobre esa cotización sintética: recibe número de la serie sintética sin intervención
+   de una persona.
+3. Staging: una negativa por cada caso (sin token, token revocado, fuente no reflejada, artefacto bloqueado, aprobar
+   una excepción sin persona, emitir una versión bajo el piso sin su aprobación).
 4. Producción, después del release que publica las rutas: `doctor` conforme y `pnpm pricing:v3:parity --profile
    production` en verde.
 5. Producción: aceptación del Slice 7 con un negocio real.
@@ -667,9 +682,11 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
       un archivo con otros permisos o un archivo dentro del repo se rechazan.
 - [ ] Una prueba recorre stdout, stderr y los archivos escritos de todas las rutas de error y confirma que ni el token
       ni el secreto de bypass aparecen.
-- [ ] Actos humanos: o bien la decisión de admitir el bearer delegado de una persona está tomada y los tres comandos
-      exigen inicio de sesión de persona y confirmación en terminal (con token de consumidor o sin terminal interactiva
-      se rechazan); o bien quedan sin construir, con la decisión pendiente registrada en esta task y en `EPIC-053`.
+- [ ] `registry issue` y `registry withdraw` corren con el token de consumidor, sin inicio de sesión ni confirmación de
+      una persona: un agente emite una cotización sintética que está dentro de política y recibe su número; una
+      versión bajo el piso sin excepción aprobada se rechaza con el código de la API.
+- [ ] `registry approve-exception` exige inicio de sesión de persona y confirmación en terminal; con token de
+      consumidor o sin terminal interactiva se rechaza con `TRANSPORT_HUMAN_SESSION_REQUIRED`.
 - [ ] La cabecera de bypass de Vercel se envía sólo a orígenes de staging (probado con un origen de producción y uno de
       terceros).
 - [ ] `pnpm pricing:v3 doctor` reporta cada comprobación de la sección 9 y falla cuando el puntero reflejado difiere del
@@ -682,8 +699,8 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 - [ ] El paso de paridad figura en `docs/operations/runbooks/production-release.md` y en la lista de la skill
       `greenhouse-production-release`, y `pnpm qa:gates --changed` la exige para los caminos de la sección 11.
 - [ ] La referencia de la skill y el manual traen el modo plataforma como procedimiento (elegir modo, credencial,
-      `doctor`, cotizar, registrar, actos humanos, qué hacer ante cada error de transporte); `pnpm skills:mirrors` en
-      verde.
+      `doctor`, cotizar, registrar, emitir y retirar, los dos actos humanos, qué hacer ante cada error de transporte);
+      `pnpm skills:mirrors` en verde.
 - [ ] Un agente sin contexto, sólo con la skill y el manual, cotizó y registró un negocio real de punta a punta por la
       API sin leer código fuente; sus dudas quedaron resueltas en los documentos.
 - [ ] El modo por defecto cambió a `platform` en un único commit final, con las cuatro condiciones del Slice 8
@@ -737,6 +754,8 @@ Pendientes de confirmar; si faltan, van como `## Delta` con su criterio exigible
 - ¿Qué perfil rige cuando el modo por defecto pasa a `platform`: `production` implícito o perfil siempre explícito? La
   propuesta es exigirlo por `PRICING_V3_PROFILE`, sin perfil implícito.
 - ¿Quién opera el alta del consumidor y dónde vive su secreto (nombre y proyecto)?
-- ¿Se admite el bearer delegado de una persona verificada como acto humano del cotizador? Sin eso no hay forma de
-  aprobar una excepción ni de emitir desde la CLI, y la interfaz llega recién en la fase 8.
 - ¿Un agente puede pedir datos de documento con número antes de la emisión, o sólo el borrador?
+
+Resueltas por el CEO el 2026-10-12 (ya no abiertas): el bearer delegado de una persona se admite para los dos actos
+humanos mientras no exista interfaz; emitir y retirar no son actos de persona y un agente los ejecuta con su token
+de consumidor.

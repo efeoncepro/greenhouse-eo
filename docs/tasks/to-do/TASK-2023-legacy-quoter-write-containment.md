@@ -538,11 +538,9 @@ Sin botón de reintento (`actionable: false`).
 
 ## Open Questions
 
-- Proposal Studio (`EPIC-029`) exige una cotización de `quotations` vinculada para pasar su compuerta de GO. Con la
-  autoría cerrada no nacen filas nuevas del portal. El plan del programa mantiene ese vínculo hasta la fase de retiro
-  y dice que las licitaciones se cotizan con la CLI. Falta confirmar con el operador si alguna licitación en curso
-  necesita vincular una cotización nueva antes de que exista el registro de V3; si la hay, la salida es reabrir por
-  flag durante esa operación, no agregar una excepción al código.
+- Resuelta 2026-10-12 por el CEO: el flujo de Proposal Studio que exige una cotización de `quotations` para su
+  compuerta de GO no se usa. La contención no tiene ese bloqueo. Si alguna vez hiciera falta, la salida sigue siendo
+  reabrir por flag durante esa operación, nunca una excepción en el código.
 - Las rutas de configuración V2 (`quotation-governance`, `pricing/config`, `pricing-catalog`) quedan abiertas en esta
   task. Si el operador quiere también congelar el catálogo V2, es una decisión aparte: ese catálogo alimenta los
   productos que se envían a HubSpot.

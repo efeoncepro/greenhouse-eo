@@ -147,7 +147,7 @@ una persona o un agente.
 | 4 | API de registro | Crear cotización, agregar versión, registrar una hecha en local, guardar textos del documento, ciclo de vida con actos humanos, número | Igual que hoy | Cotizaciones de ejemplo registradas en staging y verificadas recalculando desde la base |
 | 5 | CLI sobre la API | Capa de transporte, comando por comando; diagnóstico de conexión; comando de paridad; skill y manual al día. Al cierre, el modo plataforma pasa a ser el modo por defecto | Local por defecto durante la fase; plataforma al cierre; local disponible siempre | Un agente nuevo, sólo con la skill, cotiza y registra un negocio real de punta a punta por la API |
 | 6 | Catálogo en la plataforma | Revisar, aplicar y mover el puntero por la API; exportación al repo | Mantenimiento de catálogo también por la API | Un cambio real de precio hecho por la API, con su copia en el repo |
-| 7 | MCP | Herramientas de lectura, simulación y registro; las de aprobar y emitir no se exponen | Sin cambios | Canario del gateway en verde; herramientas actuales de V2 siguen respondiendo |
+| 7 | MCP | Herramientas de lectura, simulación y registro; las de aprobar una excepción y activar el catálogo no se exponen | Sin cambios | Canario del gateway en verde; herramientas actuales de V2 siguen respondiendo |
 | 8 | Interfaz y documento en producción | Decisión portal o Rooms; pantallas de lista, detalle, aprobación y emisión; enlace público; render del PDF en producción | Sin cambios | Se define al abrir la fase |
 | 9 | Retiro del cotizador actual | (El cierre de sus puertas de escritura se adelantó: `TASK-2023`.) Herramientas de Nexa y MCP apuntando a V3; vínculo de propuestas de licitación; salida a HubSpot | Sin cambios | Decisión propia, con su plan de reversa |
 
@@ -187,7 +187,7 @@ Estas reglas ya existen en los documentos de V3 o en la plataforma. El programa 
 | La CLI queda inutilizable en la transición | Modo local intacto y por defecto hasta el cierre de la fase 5; sin respaldo silencioso; cada entrega recalcula los artefactos del repo |
 | Dos catálogos que divergen | Paso de espejo por huella con el repo como autoridad; después una sola autoridad, con exportación |
 | Guardar el artefacto en la base altera su huella | Se guarda el texto canónico y se verifica la huella al escribir y al leer; prueba específica en la fase 2 |
-| Un agente aprueba o emite | Actos humanos sólo por el carril de aplicación y con persona identificada; una sesión de agente no cuenta como aprobación |
+| Un agente aprueba una excepción o activa el catálogo | Esos dos actos van sólo por el carril de aplicación y con persona identificada; una sesión de agente no cuenta. Emitir dentro de política no es un riesgo: es el trabajo del agente |
 | El programa choca con trabajo en curso sobre el cotizador actual | Barrido de tareas en la fase 0; las que suponen el motor V2 se reencuadran o se cierran como superadas |
 | El vínculo de las propuestas de licitación exige una cotización del cotizador actual | Se mantiene hasta la fase 9; mientras tanto las licitaciones siguen cotizándose con la CLI y la plantilla A4, como hoy |
 | El render del PDF en producción resulta caro | Se aísla en la fase 8 con una prueba de concepto antes de comprometerlo; hasta entonces el PDF se genera en local |

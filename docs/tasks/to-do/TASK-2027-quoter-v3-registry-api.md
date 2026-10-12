@@ -34,8 +34,9 @@
 Fase 4 de EPIC-053. Agrega a la API del cotizador V3 los comandos y lectores con estado: crear una cotización y
 agregarle versiones (el servidor recalcula y guarda el artefacto congelado), registrar una cotización hecha en local
 (sólo si su huella se reproduce contra las versiones de catálogo que nombra), guardar el documento y entregar sus
-datos, mover el ciclo de vida con los actos humanos de la decisión y numerar en la primera emisión. Detrás de una bandera
-apagada, sin escribir en `quotations*` y sin interfaz.
+datos, mover el ciclo de vida —un agente emite y retira dentro de política; el único acto de persona de esta task es
+aprobar una excepción bajo el piso— y numerar en la primera emisión. Detrás de una bandera apagada, sin escribir en
+`quotations*` y sin interfaz.
 
 ## Why This Task Exists
 
@@ -51,8 +52,9 @@ local durante la transición no se puede incorporar.
 - Comandos de registro con el servidor como único calculador: nunca se guarda un resultado que traiga quien llama.
 - Una versión guardada es el artefacto congelado tal cual, verificado por huella al escribir y al leer, y se
   reproduce desde la base con las versiones que nombra.
-- Ciclo de vida de la cotización sobre la matriz como dato, con los actos humanos de la decisión separados de lo
-  que puede hacer un agente y sólo por el carril `app`.
+- Ciclo de vida de la cotización sobre la matriz como dato: un agente crea, registra, emite y retira dentro de
+  política sin esperar a nadie, por los dos carriles; aprobar una excepción bajo el piso es acto de persona y va sólo
+  por el carril `app`.
 - Cada comando lleva clave de idempotencia, huella del pedido, auditoría y evento en una sola transacción, con
   concurrencia optimista.
 - Lectores de lista, cotización y versión, incluida la única proyección apta para cliente.
@@ -68,8 +70,8 @@ local durante la transición no se puede incorporar.
 
 Revisar y respetar:
 
-- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` — puntos 2, 4, 5, 7, 8, 10, 11, 12 y
-  «Reglas duras».
+- `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md` — puntos 2, 4, 5, 7, 8, 10, 11, 12,
+  «Reglas duras» y «Delta 2026-10-12 — decisiones del CEO», que manda sobre lo que esta task decía antes.
 - `docs/architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md` — fase 4 y su puerta de salida.
 - `docs/documentation/finance/cotizador-v3-promocion-canonica.md` — «Contratos locales que la adaptación debe
   conservar»: snapshot, contratos versionados, `runNotices`, lecturas como derivaciones, documento, cuarta regla de
@@ -95,8 +97,12 @@ Reglas obligatorias:
 - **NUNCA** borrar ni editar una versión, un cambio de estado o una fila de auditoría. Corregir es una versión nueva.
 - **NUNCA** aceptar de quien llama el piso, el costo, la organización dueña ni el estado. Un comando nombra una
   transición; no recibe un estado.
-- **NUNCA** que un agente apruebe una excepción, emita o retire lo emitido: una sesión de agente no cuenta como
-  persona, y los actos humanos no tienen ruta en el carril `ecosystem`.
+- **NUNCA** que un agente apruebe una excepción bajo el piso: una sesión de agente no cuenta como persona, y ese acto
+  no tiene ruta en el carril `ecosystem`.
+- **NUNCA** una aprobación humana en el flujo normal de un agente: dentro de política, crear, registrar, guardar el
+  documento, emitir y retirar no esperan a nadie. Un acto de persona nuevo exige una decisión del CEO.
+- **NUNCA** emitir —persona o agente— una versión que el motor marca bajo el piso sin su aprobación de excepción
+  registrada.
 - **NUNCA** escribir en `greenhouse_commercial.quotations*` ni leer esas tablas para calcular o autorizar.
 - **NUNCA** una segunda proyección para el cliente: sale de `clientSafePeriodItems`.
 - **NUNCA** fecha de inicio ni duración de contrato; **NUNCA** la nómina como costo.
@@ -142,14 +148,16 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- `TASK-2028` — la CLI en modo plataforma registra y lee por estas rutas (`registry register`, `list`, `show`,
-  `versions`, `document` y los actos humanos).
-- `TASK-2030` — herramientas MCP de registro; las de aprobar y emitir no se exponen.
-- Unidades sin tarea de EPIC-053 (interfaz y retiro del cotizador actual): consumen los lectores, los comandos de
-  acto humano y los eventos de esta task.
+- `TASK-2028` — la CLI en modo plataforma registra, lee, emite y retira por estas rutas (`registry register`, `list`,
+  `show`, `versions`, `document`, `issue`, `withdraw`) y lleva el acto humano de aprobar una excepción.
+- `TASK-2030` — herramientas MCP de registro; aprobar una excepción nunca se expone, y emitir sólo si la decisión de
+  alcance de escritura de esa task lo permite.
+- Unidades sin tarea de EPIC-053 (interfaz y retiro del cotizador actual): consumen los lectores, los comandos
+  y los eventos de esta task.
 - `TASK-2025`: la matriz que siembra es la que consumen estos comandos; esta task no agrega pares.
 - `greenhouse_commercial.proposals.quote_id` sigue apuntando a `quotations`: esta task no lo toca y una propuesta de
-  licitación no puede enlazar todavía una cotización V3. Queda declarado, no resuelto.
+  licitación no puede enlazar todavía una cotización V3. Queda declarado, no resuelto, y no bloquea nada: el flujo
+  que exige una cotización del cotizador actual no se usa (CEO, 2026-10-12).
 - No toca `src/app/api/finance/quotes/**`, `src/lib/commercial/submit-quote-from-builder.ts`,
   `src/lib/commercial/quotation-events.ts` ni `src/lib/finance/quote-share/**`.
 - No editar los archivos de TASK-2023, TASK-2024, TASK-2025, TASK-2026, TASK-2028, TASK-2029 ni TASK-2030.
@@ -196,6 +204,12 @@ Reglas obligatorias:
   `src/lib/efeonce-insights/request-hash.ts`.
 - Precedente de alcance por carril: `src/lib/api-platform/resources/app-insights-scope.ts` (el cliente deriva su
   organización de la sesión; el interno la declara y sin ella es 400).
+- Precedente de sujeto máquina para un binding `internal`:
+  `src/lib/api-platform/resources/ecosystem-insights-scope.ts` y `ecosystem-brand-render-scope.ts`
+  (`userId: consumer:<publicId>`, `tenantType: 'efeonce_internal'`, un rol real; la puerta le aplica `can()`). La
+  plataforma no tiene un permiso por capacidad para un binding.
+- Precedente de organización canónica de Efeonce resuelta por `public_id` (`EO-ORG-0007`):
+  `resolveBrandOrganizationId()` en `src/lib/brand-surfaces/production/authz.ts`.
 
 ### Gap
 
@@ -237,7 +251,7 @@ Reglas obligatorias:
   `quoter-registry.v1` en el OpenAPI; siete tipos de evento; tres códigos nuevos en `ApiPlatformErrorCode`.
 - Backward compatibility: aditivo y detrás de bandera. Nada del cotizador actual cambia.
 - Full API parity: cada acto es un comando del agregado con adaptadores finos por carril; la interfaz futura, la CLI
-  y MCP llaman lo mismo. Los actos humanos existen sólo en `app`.
+  y MCP llaman lo mismo. El único acto humano de esta task, aprobar una excepción, existe sólo en `app`.
 
 ### Data model and invariants
 
@@ -250,21 +264,24 @@ Reglas obligatorias:
   - una versión guardada lleva contrato y motor que la calcularon y sus fuentes dentro del artefacto;
   - versiones, cambios de estado, aprobaciones y documentos son de sólo agregar;
   - el número público se asigna una sola vez, en la primera emisión: un borrador no tiene número;
-  - un cambio de estado con compuerta humana y una aprobación de excepción sólo los registra una persona
-    identificada;
+  - una aprobación de excepción sólo la registra una persona identificada; ningún cambio de estado exige persona;
+  - la organización dueña de toda cotización es la canónica de Efeonce, y una cotización sin organización
+    destinataria no se emite;
   - una versión que el kernel marca bajo el piso se emite únicamente si existe su fila en
-    `quoter_exception_approvals` para esa versión y esa huella;
+    `quoter_exception_approvals` para esa versión y esa huella, la emita una persona o un agente;
   - una identidad ligada a una organización sólo ve la proyección apta para cliente de la versión emitida de
     cotizaciones cuyo `client_organization_id` es el suyo.
 - Write-target allowlist: si TASK-2025 dejó un boundary test del dominio, cada tabla que esta task escribe queda
   declarada allí en el mismo PR con su justificación; `quotations*` nunca aparece.
-- Tenant/space boundary: `owner_organization_id` es el alcance de autorización y sale de la identidad, nunca del
-  pedido. `client_organization_id` es contenido validado de la cotización, anulable, y no concede nada a quien lo
-  escribe (ver «Organización»). Un recurso fuera del alcance responde 404.
+- Tenant/space boundary: `owner_organization_id` es siempre la organización canónica de Efeonce, resuelta por el
+  servidor por referencia estable y nunca tomada del pedido; el alcance de autorización es la identidad interna con
+  su capacidad. `client_organization_id` es contenido validado de la cotización —cliente o potencial cliente—,
+  anulable en un borrador y obligatorio para emitir, y no concede nada a quien lo escribe ni a la organización
+  nombrada (ver «Organización»). Un recurso fuera del alcance responde 404.
 - Idempotency/concurrency: header `Idempotency-Key` obligatorio en todo comando; reclamo en
   `greenhouse_core.api_platform_command_executions` y `request_hash` en las filas del agregado; reclamo, cambio y
   respuesta en una transacción con `executeAtomicApiPlatformCommand`. Concurrencia optimista con `expectedVersion` y,
-  en los actos humanos, `artifactDigest`. El bloqueo transaccional por cotización lo aporta TASK-2025.
+  al aprobar una excepción y al emitir, `artifactDigest`. El bloqueo transaccional por cotización lo aporta TASK-2025.
 - Audit/outbox/history: fila de ejecución de comando del harness, fila en `quoter_state_transitions` o en
   `quoter_exception_approvals` con actor y motivo, y evento en el outbox con `publishOutboxEvent(event, client)`
   dentro de la misma transacción.
@@ -279,13 +296,15 @@ Reglas obligatorias:
   masiva ni por SQL.
 - Rollback path: apagar `QUOTER_REGISTRY_API_ENABLED` y redeploy. Las filas ya escritas se conservan: no se borra
   una versión ni un cambio de estado.
-- External coordination: alta de la variable en Vercel; visto bueno del operador sobre filas sintéticas en la
-  instancia compartida, prefijo del número y roles que emiten (preguntas abiertas de TASK-2025); sin secretos nuevos.
+- External coordination: alta de la variable en Vercel; confirmación del operador de la regla con que el servidor
+  decide que una fila es sintética, antes de escribir en la instancia compartida; sin secretos nuevos. Prefijo y
+  arranque del número, roles que emiten y organización dueña quedaron resueltos por el CEO el 2026-10-12.
 
 ### Security and access
 
-- Auth/access gate: sesión o bearer en `app`; token de consumidor + binding `internal` en `ecosystem`; capacidades
-  por necesidad en la puerta única; compuerta humana por tipo de sesión además de la capacidad.
+- Auth/access gate: sesión o bearer en `app`; token de consumidor + binding `internal` en `ecosystem`, modelado como
+  sujeto máquina con rol `efeonce_account`; capacidades por necesidad en la puerta única; compuerta humana por tipo
+  de sesión, además de la capacidad, sólo al aprobar una excepción.
 - Sensitive data posture: el artefacto contiene costo, margen, pisos y proveedores: vista interna. Los eventos y los
   registros llevan identificadores, número, versión, estados y huellas; nunca importes, costos, textos ni nombres.
 - Error contract: `ApiPlatformError` vía `quoter-errors.ts`; `captureWithDomain(err, 'commercial', …)`; nunca un
@@ -300,7 +319,9 @@ Reglas obligatorias:
 - DB/runtime checks: lectura posterior de cada comando; `UPDATE`/`DELETE` rechazados por las guardas; par fuera de
   la matriz rechazado por la base; orden y paginación de la lista ejercitados de punta a punta.
 - Integration checks: registro de las cotizaciones de ejemplo en staging por los dos carriles como filas sintéticas
-  y reproducción desde la base; rutas de negación (cálculo bloqueado, identidad de agente, organización ajena).
+  y reproducción desde la base; emisión de una versión sintética dentro de política por un agente; rutas de
+  negación (cálculo bloqueado, agente que pide aprobar una excepción, emisión bajo el piso sin aprobación,
+  organización ajena).
 - Reliability signals/logs: Sentry dominio `commercial` para una huella que no coincide al leer; evento del outbox
   verificado en `greenhouse_sync.outbox_events`. Señal de confiabilidad propia queda como seguimiento.
 - Production verification sequence: sección Rollout de esta task.
@@ -324,10 +345,12 @@ Reglas obligatorias:
       capacidad, idempotencia, auditoría, outbox, errores saneados y observabilidad.
 - [ ] Capacidades y permisos: las siembra y otorga TASK-2025; esta task las usa sin ampliar permisos, y
       `capability-grant-coverage.test.ts` queda en verde. Aprobar una excepción la tiene únicamente `efeonce_admin`.
-- [ ] Camino programático declarado: `api/platform/app` y `api/platform/ecosystem` (sin actos humanos); CLI en
-      TASK-2028; MCP en TASK-2030.
-- [ ] Escrituras aptas para `propose → confirm → execute`: aprobar una excepción y emitir **son** el paso de
-      confirmación humana; no se construye integración específica para Nexa.
+- [ ] Camino programático declarado: `api/platform/app` y `api/platform/ecosystem` (todo salvo aprobar una
+      excepción, que va sólo por `app`); CLI en TASK-2028; MCP en TASK-2030.
+- [ ] Escrituras aptas para `propose → confirm → execute`: aprobar una excepción **es** el único acto que el
+      cotizador reserva a una persona; emitir dentro de política es un comando que un agente del carril de
+      ecosistema ejecuta solo. Si Nexa lo ofrece, lo hace por su loop gobernado de siempre; no se construye
+      integración específica para Nexa.
 - [ ] Un primitive, muchos consumidores: cero lógica duplicada por carril.
 - [ ] Parity check = SÍ a nivel de capacidad.
 
@@ -362,6 +385,9 @@ Reglas obligatorias:
   servidor la función de `compose quote`, rechazan lo que no calculó, guardan por `quote-store.ts` el texto canónico
   y su huella, registran el cambio de estado que corresponda (`none → draft` al crear; `issued → revising` al
   agregar sobre una emitida) y el evento.
+- La organización dueña la pone el comando llamando a `resolveQuoterOwnerOrganizationId()` (TASK-2025): Efeonce
+  siempre, también cuando quien crea es el sujeto máquina de un binding interno. `clientOrganizationId`, si viene,
+  se valida como cliente o potencial cliente.
 - Rutas `POST /quoter/quotes` y `POST /quoter/quotes/{quoteId}/versions` en ambos carriles.
 
 ### Slice 3 — Registrar una cotización hecha en local
@@ -381,12 +407,13 @@ Reglas obligatorias:
 
 ### Slice 5 — Excepción, emisión, número y retiro
 
-- `commands/approve-exception.ts`, `commands/issue-quote.ts` y `commands/withdraw-quote.ts` (sólo `app`), con la
-  compuerta humana, la capacidad y la huella esperada; `commands/withdraw-draft.ts` (ambos carriles).
+- `commands/approve-exception.ts` (sólo `app`), con la compuerta humana, la capacidad y la huella esperada.
+- `commands/issue-quote.ts` y `commands/withdraw-quote.ts` (ambos carriles), con la capacidad, la huella esperada y
+  la comprobación de política; sin compuerta humana. `commands/withdraw-draft.ts` (ambos carriles).
 - La emisión inserta la fila de `quoter_quote_numbers` la primera vez, con la serie que corresponde al
   `data_origin` de la cotización.
-- Las rutas de los tres actos humanos existen sólo bajo `src/app/api/platform/app/quoter/quotes/**`. No se crea el
-  archivo de ruta equivalente en `ecosystem`.
+- La ruta de aprobar una excepción existe sólo bajo `src/app/api/platform/app/quoter/quotes/**`. No se crea el
+  archivo de ruta equivalente en `ecosystem`. Emitir y retirar tienen ruta en los dos carriles.
 
 ### Slice 6 — Lectores, verificación y documentación
 
@@ -419,7 +446,7 @@ Reglas obligatorias:
 ### Tabla de operaciones
 
 Todas bajo `/api/platform/<carril>/quoter`. «C» comando (harness de comando, `Idempotency-Key` obligatorio), «L»
-lector. «Persona» significa compuerta humana. Capacidades y estados son los de TASK-2025.
+lector. «Persona» significa compuerta humana: sólo la fila 7 la lleva. Capacidades y estados son los de TASK-2025.
 
 | # | Operación | Tipo | Método y ruta | Carriles | Capacidad | Efecto |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -430,8 +457,8 @@ lector. «Persona» significa compuerta humana. Capacidades y estados son los de
 | 5 | Guardar documento | C | `POST /quotes/{quoteId}/versions/{n}/document` | app, ecosystem | `commercial.quoter.quote:update` | compone y agrega una fila a `quoter_version_documents`; no cambia el estado |
 | 6 | Retirar borrador | C | `POST /quotes/{quoteId}/withdraw-draft` | app, ecosystem | `commercial.quoter.quote:update` | `draft → withdrawn` |
 | 7 | Aprobar excepción bajo el piso | C | `POST /quotes/{quoteId}/versions/{n}/exception-approval` | **sólo app**, persona | `commercial.quoter.exception:approve` | agrega una fila a `quoter_exception_approvals`; no cambia el estado |
-| 8 | Emitir | C | `POST /quotes/{quoteId}/issue` | **sólo app**, persona | `commercial.quoter.issue:approve` | `draft → issued` o `revising → issued`; asigna el número en la primera emisión |
-| 9 | Retirar lo emitido | C | `POST /quotes/{quoteId}/withdraw` | **sólo app**, persona | `commercial.quoter.issue:approve` | `issued → withdrawn` o `revising → withdrawn` |
+| 8 | Emitir | C | `POST /quotes/{quoteId}/issue` | app, ecosystem | `commercial.quoter.issue:approve` | `draft → issued` o `revising → issued`; asigna el número en la primera emisión; bajo el piso exige la aprobación registrada |
+| 9 | Retirar lo emitido | C | `POST /quotes/{quoteId}/withdraw` | app, ecosystem | `commercial.quoter.issue:approve` | `issued → withdrawn` o `revising → withdrawn` |
 | 10 | Listar cotizaciones | L | `GET /quotes` | app, ecosystem | `commercial.quoter.quote:read` | página por keyset sobre `quoter_quote_current` |
 | 11 | Leer cotización | L | `GET /quotes/{quoteId}` | app, ecosystem | `commercial.quoter.quote:read` | identidad, estado, número si lo tiene y lista de versiones |
 | 12 | Leer versión | L | `GET /quotes/{quoteId}/versions/{n}` | app, ecosystem | `commercial.quoter.quote:read`, sólo alcance interno | resumen del kernel; con `include=artifact`, el texto guardado |
@@ -507,12 +534,16 @@ descartar su borrador). Desde `issued` o `revising` responde 409 `quoter_invalid
 **Emitir (8).** Cuerpo: `version`, `artifactDigest`, `reason` opcional, `expectedVersion`. Condiciones, todas en la
 transacción:
 
-- persona (ver «Compuerta humana») con `commercial.quoter.issue:approve`;
+- identidad con `commercial.quoter.issue:approve`: una persona con uno de los tres roles o un agente (ver «Autoridad
+  para emitir y retirar»). No exige persona;
+- la cotización tiene organización destinataria (`client_organization_id`); si no, 422
+  `recipient_organization_required`;
 - estado `draft` o `revising`, y `version` es la última de la cotización;
 - la huella guardada coincide con `artifactDigest` y con la recalculada del texto;
 - si el kernel marca alguna fila bajo el piso, existe en `quoter_exception_approvals` una fila para esa versión con
   esa huella; si no, 409 `quoter_exception_approval_required`. La base no lo infiere de una columna: lo decide este
-  comando leyendo el artefacto;
+  comando leyendo el artefacto. Vale para cualquiera que emita: es lo que hace que «dentro de política» sea una
+  comprobación del servidor y no una promesa de quien llama;
 - existe un documento guardado para la versión (propuesta: una cotización emitida siempre tiene documento; ver Open
   Questions); si no, 422 `document_required`;
 - el cambio de estado se inserta con `version_number` y `artifact_digest`, que la tabla exige cuando el destino es
@@ -522,15 +553,16 @@ transacción:
   (`revising → issued`), no se toca: el número es el mismo y lo que distingue es la versión.
 - Respuesta 200: `{ quoteId, quoteNumber, version, artifactDigest, state, issuedAt }`.
 
-**Retirar lo emitido (9).** Cuerpo: `reason`, `expectedVersion`. Persona con `commercial.quoter.issue:approve`.
-Desde `issued` o `revising`. `withdrawn` es terminal; el número, si existe, se conserva.
+**Retirar lo emitido (9).** Cuerpo: `reason`, `expectedVersion`. Identidad con `commercial.quoter.issue:approve`,
+persona o agente: quien puede emitir puede retirar (mismo principio que la emisión; CEO, 2026-10-12). Desde `issued`
+o `revising`. `withdrawn` es terminal; el número, si existe, se conserva.
 
 ### Máquina de estados
 
 El estado es **de la cotización** y la matriz es la que siembra TASK-2025 en `quoter_state_matrix` (sección
 «`quoter_state_matrix` y `quoter_state_transitions`» de ese documento): `none → draft`, `draft → issued`,
-`draft → withdrawn`, `issued → revising`, `revising → issued`, `issued → withdrawn`, `revising → withdrawn`, con la
-compuerta humana que allí se declara. No se repite aquí para que no existan dos copias. Lo que agrega esta task es
+`draft → withdrawn`, `issued → revising`, `revising → issued`, `issued → withdrawn`, `revising → withdrawn`; ninguno
+exige compuerta humana. No se repite aquí para que no existan dos copias. Lo que agrega esta task es
 qué comando dispara cada par:
 
 | Par | Comando | Persona |
@@ -538,22 +570,24 @@ qué comando dispara cada par:
 | `none → draft` | 1, 3 | no |
 | `issued → revising` | 2, 4 sobre una cotización emitida | no |
 | `draft → withdrawn` | 6 | no |
-| `draft → issued`, `revising → issued` | 8 | sí |
-| `issued → withdrawn`, `revising → withdrawn` | 9 | sí |
+| `draft → issued`, `revising → issued` | 8 | no |
+| `issued → withdrawn`, `revising → withdrawn` | 9 | no |
 
 - Las versiones no tienen ciclo de vida propio: son filas inmutables que se reemplazan por
   `supersedes_version_number`. «Versión emitida vigente» es la del último cambio de estado a `issued`, que la vista
   `quoter_quote_current` entrega.
 - En `revising`, lo que ve un cliente sigue siendo la última versión emitida; la nueva no se muestra hasta emitirse.
 - La aprobación de una excepción **no es un estado**: es una fila de `quoter_exception_approvals` que la emisión
-  comprueba.
+  comprueba. Es el único acto de persona de esta task y por eso no aparece en esta tabla.
 - Los comandos no deciden si un par existe ni si exige persona: insertan el cambio y traducen el rechazo de la base.
   La matriz en TypeScript (`state-machine.ts`) y su prueba de paridad son de TASK-2025.
 - Qué capacidad exige cada acto lo resuelve la puerta única (`authz.ts`), no la matriz.
 
 ### Compuerta humana
 
-Un acto humano (operaciones 7, 8 y 9) exige, además de la capacidad:
+El único acto humano de esta task es la operación 7, aprobar una excepción bajo el piso. El otro acto humano del
+cotizador, activar el puntero del catálogo, es de TASK-2029 y usa esta misma comprobación. Emitir (8) y retirar (9)
+no la llevan. Un acto humano exige, además de la capacidad:
 
 1. carril `app` (no existe la ruta en `ecosystem`);
 2. tenant interno con `memberId`;
@@ -565,29 +599,53 @@ Un acto humano (operaciones 7, 8 y 9) exige, además de la capacidad:
      siembra TASK-2028.
 
 Un token de consumidor, una sesión de agente, un bearer delegado nacido de una sesión de agente o de otro cliente
-OAuth, y cualquier identidad sin `memberId` reciben 403 `forbidden` con `details.code = human_gate_required`. El
-actor se guarda como `member`; las restricciones de la base (`requires_human_gate = false OR actor_kind = 'member'`
-en los cambios de estado; `actor_kind = 'member'` en las aprobaciones) son la segunda barrera. La comprobación vive
-en un solo lugar, `human-gate.ts`.
+OAuth, y cualquier identidad sin `memberId` reciben 403 `forbidden` con `details.code = human_gate_required`. Ese
+código existe sólo para los dos actos humanos. El actor se guarda como `member`; la restricción de la base
+(`actor_kind = 'member'` en las aprobaciones) es la segunda barrera. La comprobación vive en un solo lugar,
+`human-gate.ts`.
 
-Admitir el bearer delegado es lo que hace operables los actos humanos antes de que exista una interfaz, y es lo que
-supone TASK-2028. La decisión dice «carril de aplicación» y «una sesión de agente no cuenta»; no nombra este caso:
-queda para confirmación del dueño (Open Questions). Si la respuesta es no, se elimina la segunda credencial y nada
-más cambia.
+El bearer delegado es el mecanismo aceptado por el CEO el 2026-10-12 (decisión 8): mientras no exista interfaz, una
+persona ejerce los dos actos humanos iniciando sesión desde la CLI. Ya no es una pregunta abierta.
+
+### Autoridad para emitir y retirar
+
+Decisión del CEO del 2026-10-12: los agentes operan con autonomía. Emitir una versión que está dentro de política no
+espera a ninguna persona, y quien puede emitir puede retirar.
+
+- Personas: roles `efeonce_admin`, `efeonce_account` y `finance_admin`, que TASK-2025 otorga con
+  `commercial.quoter.issue:approve`. Por `app`, con sesión o bearer.
+- Agente por `ecosystem`: el token de consumidor con binding `internal` se convierte en el sujeto máquina de
+  `ecosystem-quoter-scope.ts` (`userId: consumer:<publicId>`, `tenantType: 'efeonce_internal'`, rol
+  `efeonce_account`), y la puerta única le aplica `can()` como a cualquier sujeto. Su derecho a emitir es la fila de
+  permiso de ese rol; la plataforma no tiene un permiso por capacidad para un binding y esta task no inventa uno
+  (TASK-2025, «Identidad de agente»).
+- Agente por `app`: una sesión de agente (`tenant.authMode === 'agent'`) emite y retira si su rol tiene la capacidad.
+- La puerta no distingue consumidores: todo binding interno activo recibe el mismo sujeto máquina. Quién actuó queda
+  en la fila de ejecución del comando (`principal_id`) y el actor del cambio de estado se guarda como `agent`.
+- «Dentro de política» lo decide el servidor y vale para todos: pisos, costos y estado salen del catálogo vigente y
+  del motor, nunca del pedido, y una versión con filas bajo el piso no se emite sin su aprobación registrada.
+- Lo que un agente no puede: aprobar una excepción (operación 7) y activar el puntero (TASK-2029).
 
 ### Organización
 
-- **Dueña** (`owner_organization_id`, obligatoria): es el alcance de autorización y la resuelve el servidor desde la
-  identidad en una sola función. Ninguna ruta acepta `organizationId`, `ownerOrganizationId` ni un estado. De dónde
-  sale para una identidad que no lleva organización —un binding `internal`, que en la plataforma no la tiene— es una
-  pregunta abierta que hay que cerrar antes del Slice 2 (ver Open Questions): no se resuelve con un parámetro.
-- **Cliente** (`client_organization_id`, anulable): contenido de la cotización. Las operaciones 1 y 3 la reciben como
-  `clientOrganizationId`; el servidor comprueba que exista en `greenhouse_core.organizations`. No concede ni amplía
-  acceso a quien la escribe. Puede faltar: se cotiza a un prospecto que aún no es una organización.
-- Alcance de lectura: identidad interna con `commercial.quoter.quote:read` → las cotizaciones de su organización
-  dueña. Identidad ligada a una organización (sesión cliente o binding de organización) → sólo las operaciones 10,
-  11, 14 y 15, sólo cotizaciones cuyo `client_organization_id` es el suyo y sólo la versión emitida vigente; en 10 y
-  11 recibe número, versión emitida, fecha de emisión, moneda y estado, sin versiones internas, huellas ni origen.
+- **Dueña** (`owner_organization_id`, obligatoria): Efeonce, siempre, la cree una persona o un agente (CEO,
+  2026-10-12). La resuelve el servidor en una sola función, `resolveQuoterOwnerOrganizationId()` de TASK-2025, que
+  busca la organización canónica por su identificador público estable `EO-ORG-0007` y exige que sea la entidad
+  operativa activa; el UUID no se escribe en código. Ninguna ruta acepta `organizationId`, `ownerOrganizationId` ni
+  un estado. Con esto queda resuelto el bloqueo del Slice 2: un binding `internal` no trae organización y no la
+  necesita. Si la fila no existe o no es la entidad operativa, el comando responde 500 con captura y no escribe.
+- **Destinataria** (`client_organization_id`): contenido de la cotización. Las operaciones 1 y 3 la reciben como
+  `clientOrganizationId`; el servidor comprueba que exista en `greenhouse_core.organizations`, que esté activa, que
+  no sea la entidad operativa y que su etapa sea `prospect`, `opportunity` o `active_client`; si no, 422
+  `recipient_organization_invalid`. No concede ni amplía acceso a quien la escribe ni a la organización nombrada.
+  **Opcional en un borrador, obligatoria para emitir** (operación 8). La identidad de la cotización es inmutable, así
+  que se declara al crear: un borrador sin destinataria no se emite, y para emitir se crea la cotización con ella. Un
+  prospecto que todavía no es una organización se crea antes por la puerta canónica de organizaciones.
+- Alcance de lectura: identidad interna con `commercial.quoter.quote:read` (persona o sujeto máquina) → todas las
+  cotizaciones, porque la dueña es siempre Efeonce. Identidad ligada a una organización (sesión cliente o binding de
+  organización) → sólo las operaciones 10, 11, 14 y 15, sólo cotizaciones cuyo `client_organization_id` es el suyo y
+  sólo la versión emitida vigente; en 10 y 11 recibe número, versión emitida, fecha de emisión, moneda y estado, sin
+  versiones internas, huellas ni origen.
 - Fuera de alcance, inexistente, o no visible para la audiencia: el mismo 404 `not_found`, con el mismo cuerpo.
 - TASK-2025 no otorga ninguna capacidad del cotizador a roles de cliente, así que hoy una identidad ligada a una
   organización recibe 404 en todo: el mecanismo se construye y se prueba con un sujeto de prueba, y abrirlo es otra
@@ -599,8 +657,8 @@ más cambia.
 - `request_hash` = sha256 del JSON estable de `{ operación, quoteId, versión, cuerpo }`. Misma clave y misma huella
   devuelve la respuesta guardada con `Idempotency-Replayed: true`; misma clave y otra huella, 409
   `idempotency_conflict`.
-- `expectedVersion` es el número de la última versión que el llamador conoce; en los actos humanos se envía además
-  `artifactDigest`. Si la cotización avanzó, 409 `quoter_version_conflict`: la acción es recargar.
+- `expectedVersion` es el número de la última versión que el llamador conoce; al aprobar una excepción y al emitir
+  se envía además `artifactDigest`. Si la cotización avanzó, 409 `quoter_version_conflict`: la acción es recargar.
 - El reclamo de idempotencia, las filas del agregado, el cambio de estado o la aprobación, el número y el evento van
   en una transacción. Si el evento no se puede insertar, no hay cambio.
 
@@ -624,12 +682,14 @@ evento de solicitud ni de rechazo de excepción porque esos actos no existen. Es
 | Pedido mal formado, opción no admitida, falta `Idempotency-Key` | 400 | `bad_request` | `SCHEMA_INVALID`, `UNKNOWN_OPTION` o `MISSING_ARGUMENT` |
 | Recurso inexistente, fuera de alcance o no visible para la audiencia | 404 | `not_found` | — |
 | Identidad interna sin la capacidad | 403 | `forbidden` | — |
-| Acto humano pedido por un agente, una máquina o un bearer no admitido | 403 | `forbidden` | `human_gate_required` |
+| Aprobación de una excepción pedida por un agente, una máquina o un bearer no admitido (único acto humano de esta task; el otro, activar el puntero, es de TASK-2029) | 403 | `forbidden` | `human_gate_required` |
 | El cálculo no terminó calculado | 422 | `bad_request` | `quote_not_calculated` |
 | Familia de artefacto no admitida | 422 | `bad_request` | `artifact_family_not_accepted` |
 | La base no tiene una fuente que el artefacto nombra | 422 | `bad_request` | `source_version_not_held` |
 | El artefacto no reproduce su huella | 422 | `bad_request` | `REPLAY_MISMATCH` |
 | Emisión sin documento guardado | 422 | `bad_request` | `document_required` |
+| Emisión de una cotización sin organización destinataria | 422 | `bad_request` | `recipient_organization_required` |
+| Organización destinataria inexistente, inactiva, que es la entidad operativa o que no es cliente ni potencial cliente | 422 | `bad_request` | `recipient_organization_invalid` |
 | La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict` |
 | El estado no admite el acto | 409 | `quoter_invalid_transition` | `invalid_transition`, `exception_not_needed` o `exception_already_approved` |
 | Fila bajo el piso y no existe aprobación para esa versión y esa huella | 409 | `quoter_exception_approval_required` | `exception_approval_required` |
@@ -665,18 +725,20 @@ que no se amplía. Todo rechazo del motor dentro de un comando usa la tabla de T
 
 Staging y producción comparten base de datos: una cotización de ejemplo registrada desde staging es una fila que
 producción ve y que no se puede borrar. TASK-2025 lo resuelve con `data_origin = 'synthetic'` y una serie de número
-aparte (`number_series`). Regla de esta task: `data_origin` lo decide el servidor y nunca un campo del pedido; la
-propuesta es derivarlo de la organización cliente (una cotización para la organización de pruebas designada es
-sintética). Toda cotización del exit gate es sintética; si alguna se emite, toma su número de la serie sintética.
-Una fila `real` creada por un actor técnico es un incidente.
+aparte (`number_series`), aprobada por el CEO el 2026-10-12. Regla de esta task: `data_origin` lo decide el servidor
+y nunca un campo del pedido. Cómo lo decide es lo único que sigue abierto; la propuesta es derivarlo de la
+organización destinataria (una cotización para la organización de pruebas designada es sintética). Toda cotización
+del exit gate es sintética; si alguna se emite, toma su número de la serie sintética. Una fila `real` creada por una
+prueba, un canario o un exit gate es un incidente; una fila `real` creada por un agente que cotiza un negocio es el
+uso normal.
 
 ## Rollout Plan & Risk Matrix
 
 ### Slice ordering hard rule
 
 Slice 1 → Slice 2 → Slice 3 → Slice 4 → Slice 5 → Slice 6. El Slice 1 cierra con la diferencia contra el esquema
-materializado escrita en la task antes de cualquier comando. El Slice 2 no empieza sin resuelta la regla de la
-organización dueña para una identidad sin organización. Ningún comando llega a `develop` sin su prueba contra
+materializado escrita en la task antes de cualquier comando. La regla de la organización dueña quedó resuelta el
+2026-10-12 (Efeonce siempre) y ya no condiciona el Slice 2. Ningún comando llega a `develop` sin su prueba contra
 PostgreSQL real. Ninguna fila se escribe en la instancia compartida antes de que la regla de filas sintéticas esté
 confirmada por el operador. La bandera no se enciende en producción antes de que el exit gate de staging esté
 registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén completas.
@@ -687,15 +749,16 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 |---|---|---|---|---|
 | Guardar el artefacto altera su huella | Data | medium | Texto canónico en columna `text`; huella recalculada antes de confirmar y en cada lectura; prueba sobre el corpus | 500 con captura en Sentry al leer |
 | Se registra un cálculo bloqueado o un resultado calculado fuera | Motor V3 | low | El servidor recalcula siempre; rechazo antes de abrir escritura; `keepBlocked` no existe aquí; `CHECK` de la tabla | prueba de negación del exit gate |
-| Un agente aprueba una excepción o emite | Identity | medium | `human-gate.ts` + restricción en la base + ausencia de ruta en `ecosystem` | prueba de negación con sesión de agente |
+| Un agente aprueba una excepción bajo el piso | Identity | medium | `human-gate.ts` + restricción en la base + ausencia de ruta en `ecosystem` | prueba de negación con sesión de agente y con token de consumidor |
+| Cualquier consumidor con binding interno puede emitir, no sólo la CLI | Identity | medium | La puerta no distingue consumidores y la plataforma no tiene un permiso por capacidad para un binding; sólo lo tienen el gateway MCP y, desde TASK-2026, `efeonce-quoter-cli`, y el gateway no ofrece la herramienta sin su clase de escritura (TASK-2030); auditoría por `principal_id` | emisión cuyo `principal_id` no es el consumidor de la CLI ni una persona |
 | Una organización ve cotizaciones de otra | Access | medium | Alcance desde la identidad; 404 uniforme; prueba con dos organizaciones y un sujeto ligado a una | prueba de negación |
 | Costos llegan a un cliente | Access | low | Identidad ligada a organización sólo en cuatro lectores, todos sobre el único filtro; `include=artifact` sólo interno | prueba de negación |
-| Filas de ejemplo de staging aparecen como reales o gastan la numeración | Data | high | `data_origin` decidido en servidor; secuencia sintética; exit gate sólo con filas sintéticas | cotizaciones `real` creadas por un actor técnico |
+| Filas de ejemplo de staging aparecen como reales o gastan la numeración | Data | high | `data_origin` decidido en servidor; secuencia sintética; exit gate sólo con filas sintéticas | cotizaciones `real` creadas por una prueba, un canario o un exit gate |
 | Dos comandos simultáneos crean la misma versión | Data | medium | Bloqueo por cotización de TASK-2025, `expectedVersion`, llave primaria `(quote_id, version_number)` | 409 `quoter_version_conflict` |
 | Un reintento duplica una cotización | Data | medium | `Idempotency-Key` obligatorio + huella del pedido + transacción única | filas duplicadas por clave |
 | Evento publicado sin cambio de estado, o al revés | Outbox | low | Evento dentro de la transacción; sin evento no hay confirmación | fila de agregado sin evento hermano |
 | La matriz sembrada no trae un par que un comando usa | Data | low | Esta task usa sólo los siete pares de TASK-2025; un par faltante detiene la task y va como Delta a TASK-2025 | rechazo de la base en una transición esperada |
-| Emisión bajo el piso sin aprobación | Finance | low | El comando lee el veredicto del kernel en el artefacto y exige la fila de `quoter_exception_approvals` para esa versión y huella | prueba de negación |
+| Emisión bajo el piso sin aprobación, por una persona o por un agente | Finance | medium | El comando lee el veredicto del kernel en el artefacto y exige la fila de `quoter_exception_approvals` para esa versión y huella; pisos y costos salen del catálogo vigente y del motor, nunca del pedido | prueba de negación con persona y con agente |
 | Un borrador consume un número, o una cotización recibe dos | Data | low | El número se inserta sólo en la primera emisión; `quote_id` es llave primaria de `quoter_quote_numbers` | fila de número sin cambio de estado a `issued` |
 | Una excepción pendiente no la ve nadie | Finance | medium | No hay estado ni tabla de solicitud: el lector 12 expone el veredicto del kernel y si hay aprobación; cola de pendientes queda como seguimiento | sin señal — revisión manual |
 | El registro de un artefacto local supera el límite de cuerpo | Vercel | medium | Tope declarado; 413 documentado; el artefacto más grande del repo mide cerca de 2,5 MB | 413 en staging |
@@ -736,8 +799,10 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
    a. crear cotizaciones de ejemplo desde demandas del corpus y registrar artefactos locales del corpus;
    b. reproducir cada una desde la base (`…/replay`) y comparar la huella con la del repo;
    c. una demanda que no calcula responde 422 `quote_not_calculated` y no deja fila;
-   d. una sesión de agente pide aprobar una excepción y emitir: 403 `human_gate_required`; el carril `ecosystem` no
-      tiene esas rutas;
+   d. un agente (token de consumidor por `ecosystem` y sesión de agente por `app`) emite una versión sintética que
+      está dentro de política: 200, con número de la serie sintética; pide aprobar una excepción: 403
+      `human_gate_required` en `app`, y el carril `ecosystem` no tiene esa ruta; emite una versión bajo el piso sin
+      aprobación: 409 `quoter_exception_approval_required`;
    e. una identidad ligada a otra organización pide una cotización existente: 404, igual que un identificador
       inexistente;
    f. cada comando dejó su evento en `greenhouse_sync.outbox_events` y el publicador lo pasó a `published`.
@@ -752,7 +817,7 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 - Sesión de TASK-2025: cualquier necesidad de esquema que aparezca en Discovery va como Delta a su task; aquí no
   se agrega una migración.
 - Operador: confirmar la regla de filas sintéticas y la organización de pruebas antes de escribir en la instancia
-  compartida; confirmar si un bearer delegado de una persona cuenta como acto humano.
+  compartida. El bearer delegado de una persona como acto humano quedó aceptado por el CEO el 2026-10-12.
 - Operador: alta de `QUOTER_REGISTRY_API_ENABLED` en Vercel por entorno y sus redeploys.
 - Sesiones de TASK-2028 y TASK-2030: avisar cuando la tabla de operaciones y la de errores queden fijas.
 - Avisar a las sesiones activas antes de registrar filas sintéticas en la instancia compartida.
@@ -767,8 +832,8 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 
 ## Acceptance Criteria
 
-- [ ] Las dieciséis operaciones de la tabla existen con su ruta; las tres de acto humano (7, 8 y 9) no tienen
-      archivo de ruta bajo `src/app/api/platform/ecosystem/quoter/**`.
+- [ ] Las dieciséis operaciones de la tabla existen con su ruta; la de acto humano (7) no tiene archivo de ruta bajo
+      `src/app/api/platform/ecosystem/quoter/**`; emitir (8) y retirar (9) existen en los dos carriles.
 - [ ] Crear y agregar versión recalculan en servidor desde la demanda con las versiones resueltas; un cuerpo que
       trae un resultado, un artefacto, un piso, un costo, una organización dueña o un estado es rechazado.
 - [ ] Una demanda que no calcula responde 422 `quote_not_calculated` y no deja ninguna fila en ninguna tabla
@@ -790,12 +855,19 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
       únicamente una persona con rol `efeonce_admin`; otro rol interno recibe 403. No existe ruta, estado ni fila de
       solicitud o de rechazo de excepción.
 - [ ] Emitir una versión que el kernel marca bajo el piso sin fila de aprobación para esa versión y esa huella
-      responde 409 `quoter_exception_approval_required`; con la fila, emite; una aprobación de la versión anterior
-      no sirve para la nueva.
+      responde 409 `quoter_exception_approval_required`, la pida una persona o un agente; con la fila, emite; una
+      aprobación de la versión anterior no sirve para la nueva.
 - [ ] Una sesión de agente, un token de consumidor y un bearer delegado nacido de una sesión de agente reciben 403
-      `human_gate_required` en las operaciones 7, 8 y 9, aun con la capacidad otorgada.
-- [ ] Emitir y retirar lo emitido exigen `commercial.quoter.issue:approve`; retirar un borrador exige
-      `commercial.quoter.quote:update` y no exige persona.
+      `human_gate_required` en la operación 7, aun con la capacidad otorgada; una persona con rol `efeonce_admin` la
+      completa con sesión de portal y con el bearer delegado del cliente OAuth de la CLI.
+- [ ] Un agente —el sujeto máquina de un binding interno por `ecosystem` y una sesión de agente por `app`— emite y
+      retira una versión que está dentro de política sin intervención de una persona; el cambio de estado queda con
+      actor `agent`. Ninguna respuesta de las operaciones 8 y 9 trae `human_gate_required`.
+- [ ] Emitir y retirar lo emitido exigen `commercial.quoter.issue:approve` y la tienen `efeonce_admin`,
+      `efeonce_account` y `finance_admin`; un rol interno sin ella recibe 403. Retirar un borrador exige
+      `commercial.quoter.quote:update`. Ninguna de las tres exige persona.
+- [ ] Emitir una cotización sin organización destinataria responde 422 `recipient_organization_required`; crear con
+      una destinataria que no es cliente ni potencial cliente responde 422 `recipient_organization_invalid`.
 - [ ] Agregar una versión a una cotización `issued` la deja en `revising`; emitirla la devuelve a `issued` con el
       mismo número, y el cambio de estado guarda la versión y la huella emitidas.
 - [ ] **Número:** una cotización en `draft` no tiene fila en `quoter_quote_numbers` ni número en ninguna respuesta;
@@ -811,7 +883,8 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 - [ ] Un sujeto ligado a una organización recibe únicamente la proyección apta para cliente de la versión emitida de
       cotizaciones cuyo cliente es su organización; organización ajena, borrador, versión no emitida e identificador
       inexistente responden el mismo 404; y ningún rol de cliente recibió una capacidad del cotizador en esta task.
-- [ ] La organización dueña sale de la identidad en una sola función; ninguna ruta la lee del pedido.
+- [ ] La organización dueña de toda cotización es la canónica de Efeonce, resuelta en una sola función por
+      referencia estable, la cree una persona o un agente; ninguna ruta la lee del pedido.
       `clientOrganizationId` se acepta sólo en las operaciones 1 y 3, se valida contra `greenhouse_core.organizations`
       y no cambia lo que puede ver quien la envía.
 - [ ] Ningún `INSERT`, `UPDATE`, `DELETE` ni `SELECT` del agregado toca `greenhouse_commercial.quotations*`.
@@ -822,8 +895,10 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 - [ ] `pnpm vercel:reachability-gate` en verde con las rutas nuevas.
 - [ ] **Exit gate:** en staging, cotizaciones de ejemplo sintéticas creadas desde demandas y registradas desde
       artefactos del corpus se reproducen desde la base con huella idéntica a la del repo; un cálculo bloqueado es
-      rechazado como cotización; una identidad de agente es rechazada al aprobar y al emitir; una organización ajena
-      recibe 404. La evidencia está enlazada en esta task.
+      rechazado como cotización; una identidad de agente es rechazada al aprobar una excepción (activar el puntero, el
+      otro acto de persona, se comprueba en TASK-2029), EMITE una versión que está dentro de política y es rechazada
+      cuando la versión está bajo el piso sin aprobación; una organización ajena recibe 404. La evidencia está
+      enlazada en esta task.
 
 ## Verification
 
@@ -886,20 +961,25 @@ registrado. Nada de esta task empieza antes de que TASK-2025 y TASK-2026 estén 
 
 ## Open Questions
 
-- **Organización dueña de una identidad sin organización.** `owner_organization_id` es obligatoria y sale de la
-  identidad, pero un binding `internal` del carril `ecosystem` no lleva organización, y hay que confirmar qué
-  organización trae una sesión interna. Hace falta una regla de servidor (por ejemplo, la organización operadora
-  asociada al consumidor) antes del Slice 2. No se resuelve con un parámetro del pedido.
-- **Organización cliente obligatoria o no.** TASK-2025 la propone anulable; aquí se recibe como contenido opcional al
-  crear. Si pasa a obligatoria, cambia el contrato de las operaciones 1 y 3.
-- **Bearer delegado como persona** en los actos humanos (ver «Compuerta humana»). TASK-2028 lo supone.
 - **Documento obligatorio para emitir.** Propuesto aquí; la decisión no lo exige de forma expresa.
 - **Cómo decide el servidor que una fila es sintética.** Propuesto: por la organización de pruebas designada como
-  cliente. El esquema guarda el resultado (`data_origin`), no la regla.
+  destinataria. El esquema guarda el resultado (`data_origin`), no la regla. Es lo único abierto de ese frente.
 - **Excepción sin aprobar.** No hay registro de una solicitud ni de un rechazo. Confirmar que basta con que la
   necesidad se lea del artefacto y con que no aprobar no deje huella.
-- **Roles con capacidad de emitir** y **prefijo del número**: preguntas abiertas de TASK-2025 que condicionan el
-  manual de esta task.
+- **Asignar la destinataria después de crear.** Hoy sólo se declara al crear (misma pregunta en TASK-2025). No
+  bloquea.
+
+Resueltas por el CEO el 2026-10-12 (ya no abiertas):
+
+- **Organización dueña de una identidad sin organización.** Efeonce siempre, por referencia estable; el Slice 2
+  queda sin bloqueo.
+- **Organización destinataria obligatoria o no.** Cliente o potencial cliente; opcional en un borrador, obligatoria
+  para emitir.
+- **Bearer delegado como persona.** Aceptado: mientras no haya interfaz, la persona inicia sesión desde la CLI.
+- **Roles con capacidad de emitir** y **prefijo del número.** `efeonce_admin`, `efeonce_account` y `finance_admin`,
+  además de los agentes dentro de política; `EO-QTE-`, la serie real empieza en 15.
+- **Cotizaciones de prueba.** Sintéticas, con numeración aparte.
+- **Propuestas de licitación.** El flujo que exige una cotización del cotizador actual no se usa: no bloquea.
 
 Resuelto por TASK-2025 y ya no abierto: el número se asigna en la primera emisión; el estado es de la cotización; la
 excepción es un acto registrado y no un estado.
