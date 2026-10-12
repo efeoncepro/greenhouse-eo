@@ -262,6 +262,13 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 | Si V3 publica cotizaciones en HubSpot | **Abierta.** La contención detiene la salida actual; el destino se decide en la unidad U2 |
 | Cómo se vincula una propuesta de licitación mientras dure la contención | **Abierta.** Ver `TASK-2023` |
 | Ejemplos de cotización en la base compartida | **Abierta.** Hay una sola base y la historia no se borra; propuesta de marcarlos como sintéticos en `TASK-2025` |
+| Actos humanos desde la CLI antes de que exista interfaz | **Abierta, bloquea el uso real del registro.** No habrá pantalla hasta la fase 8; sin admitir el inicio de sesión de una persona desde la CLI nadie puede aprobar una excepción, emitir ni activar el catálogo. `TASK-2027` lo admite de forma acotada (persona verificada, nunca sesión de agente) y espera confirmación; `TASK-2028` y `TASK-2029` dependen de ella |
+| A qué organización pertenece una cotización creada por un agente sin sesión | **Abierta, bloquea `TASK-2027` (slice 2).** `TASK-2025` exige organización dueña derivada de la identidad y un agente no trae ninguna |
+| Solicitud y rechazo de una excepción | **Abierta.** El modelo registra sólo la aprobación; no queda rastro de una solicitud ni de un rechazo, ni existe cola de pendientes. Ver `TASK-2027` |
+| Quién ve costo y margen por MCP | **Abierta, bloquea la federación de `TASK-2030`.** Casi toda lectura del cálculo es de audiencia interna y el carril de ecosistema no distingue personas |
+| Alcance de escritura por MCP para registrar cotizaciones | **Abierta.** Exige una clase de permiso nueva entre sistemas; `TASK-2030` puede cerrar sólo con lectura y simulación |
+| Si un agente puede aplicar un cambio de catálogo | **Abierta.** Ver `TASK-2029` |
+| Número y versión impresos en el documento | **Abierta.** La plantilla A4 no tiene esas claves; hace falta una versión nueva de sus datos, sin tarea dueña |
 
 ## Non-goals
 

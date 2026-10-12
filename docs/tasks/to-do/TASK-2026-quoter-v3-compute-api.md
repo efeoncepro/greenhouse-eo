@@ -147,7 +147,7 @@ Reglas obligatorias:
 
 - `src/lib/commercial/quoter/compute/**` (nuevo propuesto: resolución de versiones y orquestación por operación)
 - `src/lib/commercial/quoter/flags.ts` (nuevo propuesto; TASK-2027 le agrega su bandera)
-- `src/lib/commercial/quoter/authz.ts` (la puerta única; nace aquí sólo si TASK-2025 no la entregó)
+- `src/lib/commercial/quoter/authz.ts` (la puerta única nace en TASK-2025; esta task le agrega dos necesidades)
 - `src/lib/api-platform/resources/quoter-errors.ts` (+ test)
 - `src/lib/api-platform/resources/app-quoter-scope.ts`, `ecosystem-quoter-scope.ts`
 - `src/lib/api-platform/resources/app-quoter-read.ts`, `ecosystem-quoter-read.ts`
@@ -155,7 +155,7 @@ Reglas obligatorias:
 - `src/app/api/platform/app/quoter/{catalog,resources,versions,compose,explain,replay}/**`
 - `src/app/api/platform/ecosystem/quoter/{catalog,resources,versions,compose,explain,replay}/**`
 - `src/lib/finance/pricing-v3/**` — sólo el traslado sin cambio de comportamiento descrito en el Slice 1
-- `scripts/api-platform/provision-pricing-cli-consumer.ts` (nuevo propuesto)
+- `scripts/api-platform/provision-quoter-cli-consumer.ts` (nuevo propuesto; TASK-2028 lo reutiliza y no crea otro)
 - `scripts/commercial/quoter-api-parity.ts` (nuevo propuesto; TASK-2028 lo absorbe)
 - `docs/architecture/GREENHOUSE_QUOTER_V3_API_CONTRACT_V1.md` (nuevo propuesto)
 - `docs/api/GREENHOUSE_API_PLATFORM_V1.openapi.yaml`, `docs/api/GREENHOUSE_API_PLATFORM_V1.md`
@@ -341,8 +341,9 @@ Reglas obligatorias:
   de entregar nada.
 - `src/lib/commercial/quoter/flags.ts`: `isQuoterComputeApiEnabled()` sobre `QUOTER_COMPUTE_API_ENABLED`, con la
   forma de `src/lib/efeonce-insights/flags.ts`. Fila en el libro de banderas en el mismo PR.
-- `src/lib/commercial/quoter/authz.ts`: una puerta, una tabla `NEED → { capability, action }`, un núcleo que recibe
-  un `TenantEntitlementSubject`. Dos entradas (ruta con `TenantContext`, sujeto máquina), una sola puerta.
+- `src/lib/commercial/quoter/authz.ts` (de TASK-2025): agregar las necesidades `catalog_read` y `compute` a su
+  tabla `NEED → { capability, action }`. Dos entradas (ruta con `TenantContext`, sujeto máquina), una sola puerta;
+  no se escribe una segunda.
 - `src/lib/api-platform/resources/quoter-errors.ts`: `toQuoterApiPlatformError` y `withQuoterErrors`, con el mapa
   tipado `Record<PricingV3ErrorCode, …>` de Detailed Spec y su test de totalidad.
 - `app-quoter-scope.ts` y `ecosystem-quoter-scope.ts`: derivan el sujeto; no leen `organizationId` de ningún lado.
@@ -358,7 +359,7 @@ Reglas obligatorias:
 
 - Las mismas diecinueve rutas bajo `src/app/api/platform/ecosystem/quoter/**` sobre `runEcosystemReadRoute`, con el
   mismo módulo de operación y la misma tabla de errores.
-- `scripts/api-platform/provision-pricing-cli-consumer.ts` (idempotente, no rota un token existente, publica el
+- `scripts/api-platform/provision-quoter-cli-consumer.ts` (idempotente, no rota un token existente, publica el
   secreto por stdin, no imprime el token) y su runbook. **El ejecutor escribe el script y el runbook; no lo corre sin
   la autorización explícita del operador**, y registra en el Handoff quién lo corrió y cuándo.
 
@@ -427,7 +428,7 @@ servidor por puntero o por huella.
 
 | # | Operación CLI | Método y ruta bajo `/quoter` | Entrada (claves) | Fuentes | `result` | `artifact` | Exit | Audiencia |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | `current show` | `GET /versions/current` | — | puntero | puntero y su verificación | — | 0 · 2 si no es consistente | internal |
+| 1 | `current show` | `GET /versions/current` | — | puntero | puntero y su verificación; `meta.engines` con el registro de motores del despliegue | — | 0 · 2 si no es consistente | internal |
 | 2 | `catalog search` | `GET /catalog/search` | `query`, `kind`, `date` | catálogo | `resolution` y `candidates` | — | 0 · 2 sin candidatos | internal |
 | 3 | `catalog show` | `GET /catalog/show` | `query` obligatorio, `kind`, `date` | catálogo | igual que 2, filtrado por identidad | — | 0 · 2 sin candidatos | internal |
 | 4 | `resources inspect` | `GET /resources/inspect` | `date` obligatorio, `query` | catálogo, política, créditos | descubrimiento + `priceReview` + huellas | — | 0 | internal |
@@ -456,6 +457,9 @@ Notas a la tabla:
 - `explain` y `replay` despachan por `artifactVersion` exactamente como la CLI (`pricing-v3-resource-composition/1`,
   `pricing-v3-selection-quote/1`, `pricing-v3-local-artifact/1`), con la función movida al motor. Las lecturas
   `compose *` aceptan sólo la primera familia, como hoy.
+- `meta.engines` de la fila 1 lista contrato → motor de `PRICING_V3_ENGINES` tal como lo sirve el despliegue. Es una
+  constante del código, no un cálculo; la CLI de TASK-2028 la compara con la local para diagnosticar una versión
+  desalineada.
 - `runNotices` describe la corrida contra las fuentes de ese momento. Viaja en `result` porque es parte de stdout; no
   se guarda en ningún lado y TASK-2027 no la persiste.
 - Fila 9 con `keepBlocked: false` y sin cálculo: `artifact` es `null` y `result.runNotices.output` trae el mismo
@@ -473,9 +477,9 @@ Notas a la tabla:
 ### Autorización
 
 - Puerta única `assertQuoterAccess({ subject, need })`. Necesidades de esta task: `catalog_read` (filas 1 a 4) y
-  `compute` (filas 5 a 19). Claves propuestas, a reconciliar en Discovery con lo que sembró TASK-2025 (manda
-  TASK-2025): `commercial.quoter.catalog` acción `read` y `commercial.quoter.simulate` acción `read`. No reutilizar
-  `commercial.quote.simulate`, que gobierna el motor V2.
+  `compute` (filas 5 a 19). Capacidades de TASK-2025: `commercial.quoter.catalog` acción `read` y
+  `commercial.quoter.simulate` acción `read`, otorgadas allí al grupo de rutas `commercial`. Si al materializarse
+  difieren, manda TASK-2025. No reutilizar `commercial.quote.simulate`, que gobierna el motor V2.
 - Carril `app`: sesión o bearer de primera parte. `tenantType === 'client'` responde 404 `not_found` en toda ruta de
   cálculo (anti-oráculo: la capacidad no existe para esa identidad). Un actor interno sin la capacidad responde 403
   `forbidden`. Una sesión de agente (`tenant.authMode === 'agent'`) **sí** puede calcular: un agente cotiza.
@@ -537,9 +541,10 @@ Reglas de la tabla:
 
 ### Identidad máquina de la CLI (acto del operador)
 
-- Consumidor nuevo `efeonce-pricing-cli` con `allowedGreenhouseScopeTypes = ['internal']`, binding `internal` activo
-  (alcance externo `other/efeonce-pricing-cli`) y token `ghspk_*` generado una vez y publicado por stdin en Secret
-  Manager como `greenhouse-pricing-cli-ecosystem-token`.
+- Consumidor nuevo `efeonce-quoter-cli` con `allowedGreenhouseScopeTypes = ['internal']`, binding `internal` activo
+  (alcance externo `other/efeonce-quoter-cli`) y token `ghspk_*` generado una vez y publicado por stdin en Secret
+  Manager como `greenhouse-quoter-cli-ecosystem-token`. El cliente OAuth para el inicio de sesión de personas es de
+  TASK-2028, no de esta task.
 - No reutilizar el consumidor del gateway MCP: la tabla de idempotencia y auditoría identifica por principal.
 - La instancia de PostgreSQL es una sola para staging y producción, así que el mismo consumidor autentica contra los
   dos despliegues: lo que separa los entornos es la bandera de cada uno. El runbook lo dice con esas palabras.
@@ -636,7 +641,7 @@ antes de que TASK-2024 y TASK-2025 estén completas.
 
 ### Out-of-band coordination required
 
-- Operador: autorizar y ejecutar el alta del consumidor `efeonce-pricing-cli`, su binding y su secreto.
+- Operador: autorizar y ejecutar el alta del consumidor `efeonce-quoter-cli`, su binding y su secreto.
 - Operador: alta de `QUOTER_COMPUTE_API_ENABLED` en Vercel por entorno y sus redeploys.
 - Operador: importar a la base las versiones históricas que nombra el corpus, si TASK-2025 no las dejó.
 - Sesiones de TASK-2027 y TASK-2028: avisar cuando la tabla de errores y la forma de `data`/`meta` queden fijas.
@@ -678,7 +683,7 @@ antes de que TASK-2024 y TASK-2025 estén completas.
 - [ ] Con `QUOTER_COMPUTE_API_ENABLED` apagada, toda ruta responde 503 `quoter_compute_disabled` sin tocar el motor.
 - [ ] `pnpm vercel:reachability-gate` en verde y `quoter-read-boundary.test.ts` afirma que ningún módulo del
       cotizador alcanza `scripts/**`, `node:fs`, el puntero en archivo ni un motor de render.
-- [ ] El consumidor `efeonce-pricing-cli` existe con binding `internal` propio, creado por el operador según el
+- [ ] El consumidor `efeonce-quoter-cli` existe con binding `internal` propio, creado por el operador según el
       runbook; el token no aparece en ningún archivo, registro ni salida.
 - [ ] **Exit gate:** la corrida de paridad en staging, por `app` y por `ecosystem`, da para cada demanda del corpus la
       misma huella de artefacto y, para cada lectura, el mismo documento byte a byte y el mismo `exitCode` que la CLI
@@ -732,8 +737,8 @@ antes de que TASK-2024 y TASK-2025 estén completas.
 
 ## Open Questions
 
-- Nombres finales de las capacidades y de la puerta: los fija TASK-2025. Si difieren de los propuestos aquí, se usa
-  lo que TASK-2025 sembró y se actualiza esta task antes de escribir código.
+- Capacidades y puerta: este documento usa las de TASK-2025. Si su migración las materializa con otro nombre o con
+  otros roles, se usa lo sembrado y se actualiza esta task antes de escribir código.
 - Visibilidad de costos entre roles internos: esta task supone que quien puede simular ve el resumen con costo y
   margen, como en la CLI. Si el dueño quiere un rol interno que simule sin ver costo, la respuesta correcta es negar
   la operación, no redactar; requiere decisión antes de abrir el acceso a más roles.
