@@ -80,3 +80,23 @@ de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo 
 ## Voz: se le habla a Sika (12/10)
 
 El operador marcó que varias láminas contaban a un tercero lo que Sika dijo («Sika pidió», «Sika indicó», «Sika confirmó»). El deck se entrega a Sika: todo va en segunda persona (ustedes, su brief, sus respuestas en Wherex, «Qué significa para ustedes»). «Sika» queda sólo como nombre de la marca (el triángulo de Sika, el logotipo de Sika). El anexo gráfico todavía tiene frases en tercera persona (por ejemplo, en Audiencias).
+
+## Reel v2 · «El agua siempre busca una entrada» (12/10)
+
+El operador rechazó el animatic con audio («no se ve cinemático y profesional»; Sika pauta en TV) y aprobó el replanteo:
+el agua como antagonista. Todo vive en `reel/v2/`:
+
+- **Cuadros fijos** (`stills/`): `pnpm ai:image --model gpt-image-2.5-sunburst --quality high --size 1024x1536 --batch stills.batch.json`;
+  el envase (`s4-hero`), con el render oficial de Sika como `--image` (etiqueta revisada al 100 %: exacta).
+- **Planos** (`clips/`): `bash planos.sh <plano…>` → Seedance 2.5 por BytePlus (`pnpm ai:byteplus --model seedance25`), 5 s,
+  9:16, 1080p, sin audio, con el cuadro fijo como primer cuadro y el movimiento en `<plano>.motion.txt`. En el plano del
+  envase la etiqueta se mantiene exacta en movimiento. El plano de la gota sólo se usa hasta el segundo 2,85 (después la junta se deforma).
+- **Motion** (`overlay.html` + `overlay-render.mjs`): tipografía de la campaña (Barlow Condensed) con GSAP, renderizada cuadro a cuadro
+  con alfa. `window.seek` no debe devolver la línea de tiempo: Playwright cierra la página al serializarla.
+- **Firma**: segundos 16,9–20,9 del animatic del 06/10 (POSIBLE se arma con el logo de Sika).
+- **Locución** (`vo.mp3`): Eleven v4, voz «Marco» (mexicano, locutor). **Música** (`musica-43.mp3`): ElevenLabs Music v2.5; salió de
+  43 s y `montaje.sh` la rearma a 25 s con sus golpes en los cortes.
+- **Montaje**: `bash montaje.sh` (por segmentos; `SOLO_AUDIO=1` rehace sólo la mezcla). Un ffmpeg con ocho entradas y `concat`
+  se quedó detenido dos veces: por eso va por segmentos, y todos con `-nostdin`.
+
+Pendiente: llevar cuadros del reel nuevo a la lámina 13 del deck y al storyboard del anexo (página 17), que siguen con el guion anterior.
