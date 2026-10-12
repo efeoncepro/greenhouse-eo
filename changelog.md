@@ -43,7 +43,8 @@
 - Diez escenarios con y sin la skill, calificados a ciegas: la skill evita el alta de contactos sin correo,
   pero respondía 74 % más largo. Se agrega proporcionalidad al método, veinte decisiones que cierran
   ambigüedades (D2 y D6 aprobadas por el operador; D3 modificada: registrar contactos cubre crear la Company
-  verificada), módulo de sesión Claude y evals v7 con 49 escenarios. Tras corregir: 20 de 20 sin fallos críticos y ruido de 1,55 a 0,60.
+  verificada), módulo de sesión Claude y evals v7 con 49 escenarios. En HubSpot: fecha de investigación =
+  verificación, encaje de adyacentes por función propia y Lead sólo tras interacción real. Tras corregir: 20 de 20 sin fallos críticos y ruido de 1,55 a 0,60.
   [Evidencia y límites](docs/audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
   Sin runtime, créditos, CRM ni envíos.
 

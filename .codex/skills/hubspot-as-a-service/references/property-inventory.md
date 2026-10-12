@@ -20,7 +20,8 @@ históricas: nuevo intake usa researched_on separado en Company/Contact. El cat�
 
 1. Elegir objeto y fase: investigación de cuenta/persona, calificación, oportunidad, propuesta o cierre.
    Declarar crear/reutilizar/actualizar/no crear por objeto. Contact no implica un Lead nuevo; antes comprobar
-   el existente o automático. ABM no implica Deal. Usar el portal del mandato, no extrapolar este snapshot.
+   el existente o automático. Un Lead se crea sólo tras una interacción real de una persona registrable
+   (respuesta con interés, reunión aceptada, solicitud entrante); investigar y registrar no lo crea. ABM no implica Deal. Usar el portal del mandato, no extrapolar este snapshot.
 2. Consultar sólo las filas pertinentes del CSV y su JSON: nombre interno, descripción/grano, tipo,
    opciones, flags de valor/definición, cálculo y writer. Releer en vivo los campos a cambiar y resolver
    sus catálogos externos. Labels similares no autorizan copiar valores entre objetos.

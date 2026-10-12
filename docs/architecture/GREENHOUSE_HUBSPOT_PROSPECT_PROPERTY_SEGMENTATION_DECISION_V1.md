@@ -218,6 +218,23 @@ lectura del 08/10). Los segmentos históricos 166–170 siguen leyendo `industri
 restaurar las seis expresiones y los valores previos de las trece empresas desde el
 [snapshot](../operations/HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json), que guarda ambos.
 
+### Delta 2026-10-12 — fecha de investigación, encaje de adyacentes y evento mínimo de Lead
+
+Tres vacíos que salieron al probar la skill de prospección bajo Claude; el operador aprobó las tres reglas.
+
+- `efeonce_prospecting_researched_on` lleva el día en que se verificó la evidencia, no el de la escritura ni
+  `createdate`. Si pasan más de 7 días entre verificar y escribir, se revalidan empleo y correo y se escribe
+  esa fecha. El plazo de 7 días lo propuso el agente por delegación del operador y es revisable.
+- `efeonce_prospecting_service_fit` de un contacto adyacente se decide por su propia función y el encaje de la
+  cuenta. La señal de otra persona no es evidencia para un colega. Sin valor aplicable queda vacío y se
+  reporta. Sumar opciones al enum (canal, SEO/AEO, Salesforce) cambia propiedad y segmentos: tarea aparte.
+- Un Lead se crea sólo tras una interacción real de una persona registrable: respuesta con interés, reunión
+  aceptada o solicitud entrante. Investigar y registrar no lo crea. Lectura del portal `48713323` ese día:
+  2.251 Leads, 2.222 creados por el workflow «Create Lead Upon Contact LCS Update», 28 por integración y 1
+  por interfaz. El operador pidió apagar ese workflow; el cambio en el portal se registra aparte cuando ocurra.
+
+Sin cambio de schema ni de segmentos. [Origen](../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
+
 ## Revisit when
 
 Cambie la granularidad de cohortes, se requiera ingestión programada o sincronización cross-object, o un campo

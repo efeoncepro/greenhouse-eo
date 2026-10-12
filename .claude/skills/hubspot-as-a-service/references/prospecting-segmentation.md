@@ -114,10 +114,25 @@ If the user requests both global and new-base segments, keep them separate, name
 Do not infer that “new” means every company was newly created, or substitute a created-date filter for origin.
 If scope is already explicit, proceed within it; ask only when a material ambiguity remains unresolved.
 
+## Rules settled 2026-10-12 (operator-approved)
+
+- Research date: write the day the evidence was verified, not the day the record is written and never
+  `createdate`. If more than 7 days pass between verifying and writing, re-verify employment and email first
+  and write that re-verification date.
+- Service fit of an adjacent contact: set it from that person's own function plus the account's fit. Another
+  person's signal is not evidence for a colleague. If the function matches no option, leave it blank and
+  report the blank; the property only has `creative` and `hubspot_crm`, and a new option is a schema decision.
+- Lead: create one only after a real interaction from a registrable person, such as a reply showing interest,
+  an accepted meeting or an inbound request. Researching and registering an account does not create a Lead,
+  and neither does a public signal from someone without a verified individual email. An existing Lead is not
+  proof of qualification: on 2026-10-12, 2,222 of the 2,251 Leads in portal `48713323` had been created by
+  the workflow «Create Lead Upon Contact LCS Update», not by a qualifying event.
+
 ## Research and enrichment contract
 
 1. Inventory existing companies, contacts, associations, properties and native lists in the verified portal.
-   Research remains in the lead stage until effective qualification. Creating/enriching a prospect is not
+   Research stays pre-qualification, with no Lead object created for it, until effective qualification.
+   Creating/enriching a prospect is not
    authority to create a qualified opportunity. Preserve existing Deals when the operator explicitly says to
    leave them unchanged; document the exception instead of retroactively moving or deleting them.
 2. Keep source identity, source date, signal, service fit, observed intent/state and contact type in a bounded

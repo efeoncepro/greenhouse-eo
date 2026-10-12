@@ -32,10 +32,10 @@ y requisitos operativo/carril/UI por separado. Este plan se entrega aunque la ej
 | Uso | Campos | Cuándo poblar |
 | --- | --- | --- |
 | Admisión de prospecto | `email`, `firstname`, `lastname` | Correo corporativo **individual verificado contra la persona** e identidad reconciliada; usar sólo nombres conocidos, sin expandir iniciales por intuición. Sin email elegible: investigación o nota de Company autorizada y buscar contactos relacionados. |
-| Intake actual | `efeonce_prospecting_contact_kind`, `efeonce_prospecting_researched_on` | Para nuevos prospectos elegibles, `individual_email`; fecha de investigación real en Contact, separada de Company y de createdate. Las opciones no-email existentes no permiten crear nuevos contactos vacíos. |
+| Intake actual | `efeonce_prospecting_contact_kind`, `efeonce_prospecting_researched_on` | Para nuevos prospectos elegibles, `individual_email`; fecha de investigación real en Contact, separada de Company y de createdate: el día en que se verificó la evidencia, no el de la escritura; si pasan más de 7 días, revalidar empleo y correo y escribir esa fecha. Las opciones no-email existentes no permiten crear nuevos contactos vacíos. |
 | Vinculación | Asociación Primary Company; `hubspot_owner_id` | Empresa/empleo vigente y asignación sustentados. `company` texto no crea Primary; `associatedcompanyid` no sustituye el contrato de asociaciones. Owner requiere ID actual, no email/nombre. |
 | Hechos opcionales | `jobtitle`, `phone`, `mobilephone`, `hs_linkedin_url`, `country`, `city` | Cargo/permanencia y datos atribuibles a esa persona. Sede de la empresa no prueba ubicación del individuo. No inventar ni completar rangos con cifras exactas. |
-| Fit | `efeonce_prospecting_service_fit` | Sólo `creative` / `hubspot_crm` cuando encaje investigado y compatible con el segmento. No significa interés ni contrato. |
+| Fit | `efeonce_prospecting_service_fit` | Sólo `creative` / `hubspot_crm` cuando encaje investigado y compatible con el segmento. Se decide por la función propia de la persona y el encaje de la cuenta; la señal de otra persona no cuenta. Sin valor aplicable, vacío y reportado. No significa interés ni contrato. |
 | Calificación/compra | `hs_lead_status`, `estado_del_lead`, `lifecyclestage`, `hs_buying_role` | Estado o participación comprobados y mandato. No hay mapping aprobado automático entre estados custom/nativo. Buying role global: preservar selecciones existentes; mapa por iniciativa en nota/dossier. No atribuir authority por cargo. |
 
 Guardar procedencia de email, verificación/vigencia, señal pública, relación real y desconocidos en nota/
@@ -60,7 +60,11 @@ actividad nativa y `hs_current_customer` tienen writers propios; prospecting no 
 
 ## Lead: calificación
 
-Primero comprobar si ya existe o lo crea una automatización. Un Lead nuevo sigue el gate de correo del
+Un Lead se crea sólo tras una interacción real de una persona registrable: respuesta con interés, reunión
+aceptada o solicitud entrante. Investigar y registrar una cuenta no lo crea, ni una señal pública de alguien
+sin correo. Primero comprobar si ya existe o lo crea una automatización; al 2026-10-12 el workflow «Create Lead
+Upon Contact LCS Update» había creado 2.222 de los 2.251 Leads del portal, así que un Lead existente no prueba
+calificación. Un Lead nuevo sigue el gate de correo del
 Contact asociado, aunque el canal permita asociarlo sólo a Company. No usar Company-only para eludirlo.
 
 | Uso | Campos | Cuándo poblar |
