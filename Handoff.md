@@ -4,6 +4,18 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-12 — SEO/AEO: categoría y representación de marca
+
+[Método aceptado](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md): aspirar a referencia
+para categoría/comprador/situación con pruebas y representación fiel; conservar non-brand y separar
+presencia/cita/recomendación de consideración y negocio. ADR/index, manual/plan, contexto, modelo SV360,
+caso de negocio y cuatro skills Codex/Claude alineados. Oferta, briefs, QBR/retención y mensajes corrigen
+promesas históricas de citación/recovery paid. [Verificación](docs/audits/seo/2026-10-12-category-leadership-docs-skills.md):
+espejos y destinos locales correctos, revisión semántica y gates proporcionales. Método documental;
+sin scoring/runtime, precio, programa de cliente o publicación. Primera parte capturada por commit
+concurrente `4fa5e6ce4`; cierre restante de este alcance separado. Siguiente aplicación: delimitar una
+categoría/cuenta y registrar baseline, pruebas y brechas; liderazgo/eficacia aún requieren evidencia.
+
 ## 2026-10-11 — Diseño de skill de prospección B2B
 
 [Inventario HubSpot](docs/audits/commercial/hubspot-properties-2026-10-11/README.md): tres subagentes,

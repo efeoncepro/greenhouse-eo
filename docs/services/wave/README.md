@@ -49,6 +49,14 @@ su [ficha de servicio](product-design-360.md), el nombre público «Product Desi
 pilotos gobernados por SOW». Los gates G1–G6 del modelo quedan como validación posterior a la aprobación. Lo aprobó
 el operador: no hay precios nuevos ni una revisión de Legal o de Finance registrada.
 
+## Dirección de Search Visibility 360
+
+El [método de categoría y representación](../../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md)
+orienta estrategia, ejecución y evaluación: ser una opción de referencia pertinente para compradores,
+con pruebas y representación fiel. Conserva descubrimiento non-brand y separa resultados de búsqueda,
+consideración y negocio. Es criterio operativo; no una ficha de servicio nueva, garantía de liderazgo ni
+cambio de precios/packaging o de los estados de portfolio.
+
 ## Product Services compuestos
 
 `Experience LaunchOps` y `Agentic Readiness` son composiciones sobre las capabilities base. Sus modelos viven en

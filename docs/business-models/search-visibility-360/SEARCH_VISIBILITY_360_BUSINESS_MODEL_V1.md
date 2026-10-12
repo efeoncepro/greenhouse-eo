@@ -28,6 +28,17 @@ ownership de Wave sobre la oferta de visibilidad.
 
 Social Media es una composición inmediata pero separada: Wave conserva ownership de Search Visibility 360 y Efeonce Social Media conserva ownership de operación social, community, publishing y Social Search. La composición y sus gates están documentados en [`Search + Social Visibility Composition V1`](SEARCH_SOCIAL_VISIBILITY_COMPOSITION_V1.md).
 
+## Dirección estratégica y evidencia de valor
+
+Norte aceptado el 2026-10-12: ser descubiertos, comprendidos y considerados como opción de referencia
+para compradores de una categoría/situación delimitada, con representación fiel y pruebas reales.
+El [método operativo](../../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md) conecta
+territorio, decisión de compra, evidencia, acceso/comprensión, reconocimiento y aprendizaje.
+
+Conservar tráfico branded/non-brand y separar descubrimiento/representación, comportamiento y negocio.
+La dirección no garantiza liderazgo ni cambia precio, billing/value metric, packaging o gates económicos;
+el alcance se contrata por capacidad/acciones controlables, con resultados observados por separado.
+
 ## Model questions
 
 | Question | Required answer |
@@ -57,4 +68,5 @@ Social Media es una composición inmediata pero separada: Wave conserva ownershi
 - [ ] productization threshold;
 - [ ] capital requirement and milestone.
 
-`Draft` remains the only valid state until these gates are evidenced.
+La familia conserva el estado `Accepted` declarado arriba; estos gates requieren su propia evidencia
+antes de afirmar resultados, economía o capacidad productizada. Aceptar el método de categoría no los cierra.

@@ -201,6 +201,16 @@ Las 4 capas verbales (en secuencia natural de conversación):
 
 > ⚠️ Coherencia de proof points: el corpus usa "120+ empresas" y "80% de renovación" (marca-agencia) y también "10+ años" (ecosistema). El GTM cita "win rate ~50%". Mantén consistencia y no infles cifras; ante duda, usa las del documento de autoridad correspondiente.
 
+### Referencia de categoría en búsqueda y respuestas IA
+
+El norte del trabajo SEO/AEO es que compradores de una categoría delimitada puedan descubrir,
+comprender y considerar la marca como opción de referencia para necesidades pertinentes. Una
+representación correcta describe capacidades, público y límites reales; el liderazgo es aspiración
+estratégica y requiere pruebas, no se deduce de un ranking o panel. Visibilidad de marca ante consultas
+non-brand conserva el propósito del descubrimiento genérico. Consideración y elección requieren
+información del comprador y del negocio. El método no cambia el posicionamiento corporativo, naming,
+portfolio ni compromisos de servicio: [canon operativo](../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
+
 ### Content Engineering como doctrina editorial emergente
 
 Efeonce adopta **Content Engineering** como territorio de thought leadership y método para diseñar contenido que

@@ -117,7 +117,7 @@ gobierna Vercel y `ops-worker` conjuntamente; no flip aislado. Contratos, crons 
 [arquitectura SEO](docs/architecture/GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md) e
 [invariantes ops](docs/architecture/agent-invariants/OPS_RELIABILITY_AGENT_INVARIANTS.md).
 
-SEO: [ownership y trabajo pendiente](docs/audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
+SEO: [categoría y representación](docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md).
 Greenhouse posee datos/prioridad/outcomes; Marketing Studio posee flujo editorial; Insights posee informes.
 [ADR ETV](docs/architecture/GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md).
 

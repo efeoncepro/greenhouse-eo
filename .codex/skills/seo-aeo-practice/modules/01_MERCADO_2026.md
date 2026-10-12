@@ -5,76 +5,30 @@
 
 ---
 
-## 0. La tesis del módulo, en cuatro líneas
+## 0. Lectura vigente: evidencia antes que urgencia supuesta
 
-```
-El tráfico de los LLMs es el ~1% del total, y los estudios de conversión
-se contradicen salvajemente (de +900% a −13%).
-🔴 Cualquiera que te dé un ROI de AEO te lo está inventando.
+Aplicar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §7: las fuentes de
+Pew y Ahrefs contextualizan menos clics asociados a respuestas IA bajo muestras concretas. No describen
+por sí solas el tráfico, inversión o comprador del prospecto. El norte incorpora representación fiel y
+consideración ante consultas pertinentes, preservando descubrimiento non-brand.
 
-PERO el otro 99% se está evaporando: −58% de CTR donde hay AI Overview,
-que ya aparece en el 48% de las búsquedas.
+## 1. Cómo usar evidencia de CTR
 
-🎯 Y las marcas CITADAS reciben 35% MÁS clics orgánicos y 91% MÁS clics pagados.
-```
+Verificar fuente, fecha, dispositivo, país, intención, muestra y referencia. El 58% de Ahrefs es una
+asociación estimada para CTR de posición 1 de su muestra, no caída del tráfico total ni una trayectoria
+universal inevitable. Pew observa comportamiento de adultos de EE.UU.; no es un panel B2B.
+Registrar el dato del cliente por separado antes de describir una pérdida concreta o urgencia.
 
-> ## La citación no es un canal nuevo. Es la condición para seguir existiendo en el viejo.
+## 2. Citación y negocio
 
-**Ese reencuadre es el argumento de venta más honesto del mercado — y casi nadie lo está haciendo**, porque
-todos están vendiendo la fantasía del *"tráfico de ChatGPT"*.
+La presencia/citación puede ser resultado relevante, pero no garantiza recomendación, clic, recuperación
+del orgánico, ahorro de paid ni revenue. Cita, mención de marca y fidelidad tienen lecturas distintas.
+Estudios de marcas citadas/no citadas no son el efecto causal de citarse; conservar comparadores y límites.
+Referencias y conversiones observadas se miden cuando hay acceso/datos. El modelo incremental necesita
+su propia evidencia; no usar un estudio externo como promesa para la cuenta.
 
----
-
-## 1. Lo que se está muriendo: el clic orgánico
-
-| Dato | Valor | Fecha | Marca |
-|---|---|---|---|
-| **AI Overviews aparecen en…** | **48% de las búsquedas** | 2026 | ✅ |
-| **Caída de CTR del resultado #1 con AI Overview** | 🔴 **−58%** | Ahrefs, dic-2025 | ✅ |
-| **La misma métrica, ocho meses antes** | −34,5% | Ahrefs, abr-2025 | ✅ |
-| **Caída de CTR orgánico** | **−61%** *(de 1,76% a 0,61%)* | Seer, sep-2025 | ✅ |
-| **Caída de CTR PAGADO** | 🔴 **−68%** *(de 19,7% a 6,34%)* | Seer, sep-2025 | ✅ |
-| **Zero-click** | **de 54% → 72%** en queries con AIO | Field study aleatorizado | ✅ |
-
-### 🔴 El número que hay que decir en voz alta
-
-> **En ocho meses, el daño casi se duplicó: de −34,5% a −58%.**
-> **No es una meseta. Es una pendiente. Y sigue bajando.**
-
-⚠️ **Varía brutalmente por industria:** salud puede ver **−70%**; e-commerce, **−30%**.
-**Nunca cites un número plano: pregunta la industria del prospecto primero.**
-
-### 🎯 Y el dato que casi nadie usa: el AI Overview también mató el clic PAGADO
-
-**−68% de CTR en paid.** 🔴 **Esto no es un problema de SEO: es un problema de todo el presupuesto de medios.**
-**El CMO que solo está mirando su SEO no ha entendido lo que le está pasando a su inversión en Google Ads.**
-
-*(Es la frase que abre la conversación con un CMO que "ya tiene agencia de SEO".)*
-
----
-
-## 2. 🎯 Lo que compensa: ser citado
-
-| Dato | Valor | Marca |
-|---|---|---|
-| **Marcas citadas en AI Overviews → clics orgánicos** | 🎯 **+35%** | ✅ |
-| **Marcas citadas en AI Overviews → clics PAGADOS** | 🎯 **+91%** | ✅ |
-
-> ## La citación no te trae tráfico nuevo. Te devuelve el que estabas perdiendo — y abarata tu paid.
-
-🎯 **Esto es el puente de atribución que el mercado dice que no existe**, y es honesto:
-
-```
-❌ NO podemos decir:  "ser citado por ChatGPT te va a generar X pesos"
-                       (no existe el modelo, y quien lo prometa miente)
-
-✅ SÍ podemos decir:  "las marcas citadas reciben 35% más clics orgánicos y
-                       91% más clics pagados — y esas dos cosas las medimos
-                       EN TU PROPIO GA4 y TU PROPIA cuenta de Ads."
-```
-
-🎯 **El AEO no se vende como canal. Se vende como eficiencia de medios.** Y eso **sí se mide** —
-**en las cuentas del cliente, no en las nuestras.** → `modules/08_PRUEBA.md`.
+Los apartados de mercado históricos siguientes conservan su fecha de origen. Cualquier cifra que se use
+hoy requiere verificación en `SOURCES.md` y fuente primaria; no es benchmark universal del prospecto.
 
 ---
 

@@ -12,6 +12,11 @@ Si el operador no tiene más datos, iniciar con fuentes públicas y registrar hi
 información como condición de arranque. Los accesos privados son opcionales para refinar la propuesta,
 no una capacidad que ya tengamos.
 
+Para definir el norte y priorizar intervención, usar también
+[operar referencia de categoría](../growth/operar-liderazgo-categoria-seo-aeo.md).
+Mantener descubrimiento/representación, comportamiento/consideración y negocio como planos distintos;
+el caso económico no convierte una mención o recomendación en venta causal.
+
 ## Procedimiento
 
 1. **Registrar la decisión.** Definir comprador, producto, país, dominio y outcome. Escribir moneda,

@@ -26,7 +26,7 @@ Grader corrido    →  Reunión 1: el diagnóstico      ← EVIDENCIA (gratis)
 |---|---|---|
 | **1** | 🔴 **El mercado primero** *(−58% CTR · −68% en paid · 48% de búsquedas con AIO)* | **Primero el "por qué te importa", después el "cómo estás"** |
 | **2** | **Su resultado, sin adornar** | Si está mal, se dice. **Si está bien, también** |
-| **3** | 🎯 **Sus competidores** | *"Nadie en tu categoría ganó el AEO todavía"* ← **la ventana** |
+| **3** | 🎯 **Sus competidores** | Comparar presencia, fidelidad y recomendaciones en el mismo corpus; no inferir una categoría vacía |
 | **4** | 🔴 **Lo que NO le vamos a poder resolver** | **Obligatorio.** Sin esto, eres el anterior |
 | **5** | **La prescripción, priorizada** | **Acá empieza la venta** |
 | **6** | El siguiente paso *(no el precio todavía)* | — |
@@ -128,7 +128,7 @@ de la categoría.**
 |---|---|---|
 | **1** | 🔴 **Qué NO funcionó** | **Va primero.** Si no hay nada, no estás mirando |
 | **2** | Qué sí, con el denominador declarado | — |
-| **3** | 🎯 **El puente**: citabilidad → clics orgánicos → **CTR pagado** | **En SU cuenta** |
+| **3** | Descubrimiento/representación, comportamiento y negocio | Fuentes y denominadores separados; asociación no prueba causalidad |
 | **4** | Lo que viene, y por qué | — |
 | **5** | 🎯 **Qué necesitamos de ellos** | *(Aprobaciones lentas = motor detenido. **Dilo.**)* |
 | **6** | **Expansión** *(+mercado · +marca · +superficie)* | **Nunca "+artículos"** |
@@ -147,3 +147,11 @@ de la categoría.**
 5. 🔴 **El QBR abre con lo que no funcionó.**
 6. 🎯 **La pregunta 3 del discovery** *("¿qué pasó con tu agencia anterior?")* **es la que gana la venta.
    Hazla, y cállate.**
+
+## Aplicación del norte de categoría
+
+Antes de discovery/propuesta/QBR, cargar `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md`.
+Fijar categoría, comprador/situación y pruebas antes del formato. Revisar visibilidad ante consultas non-brand,
+fidelidad y participación en comparaciones; considerar tráfico absoluto y fuentes nativas. Una recomendación
+IA no equivale a elección del comprador. El QBR identifica el siguiente obstáculo con evidencia y acuerda
+acciones controlables, sin prometer liderazgo o conversión citas→ventas.

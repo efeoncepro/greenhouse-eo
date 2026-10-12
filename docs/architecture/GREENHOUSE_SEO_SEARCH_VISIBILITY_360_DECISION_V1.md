@@ -73,3 +73,61 @@ fila, parte de la clave de idempotencia y del contrato de lectura. No es una ter
 fórmula; `not_available_for_method` es ausencia declarada, no cero. Detalle en
 `GREENHOUSE_DATAFORSEO_ETV_METHOD_VERSIONING_DECISION_V1.md` y en `GREENHOUSE_SEO_MODULE_ARCHITECTURE_V1.md`
 (§4.2, §5, §6, delta 2026-09-03).
+
+<a id="architecture-decision-2026-10-12--liderazgo-de-categoria-y-representacion-fiel"></a>
+
+## Architecture Decision 2026-10-12 — liderazgo de categoría y representación fiel
+
+- **Status:** Accepted — criterio estratégico y método documental, aprobado por el operador al solicitar
+  incorporar la conversación a docs/skills y hacer commit.
+- **Date:** 2026-10-12.
+- **Owner:** práctica SEO/AEO + Brand Studio + Content Marketing Studio, con sus fronteras vigentes.
+- **Scope:** dirección de Search Visibility 360, estrategia, briefs, propuesta y medición por agentes.
+- **Reversibility:** two-way.
+- **Confidence:** medium para el mecanismo comercial; el norte es decisión estratégica, no eficacia medida.
+- **Validated as of:** 2026-10-12 — conversación, documentación y fuentes; sin cambios o canary de runtime.
+
+### Context
+
+El tráfico non-brand observa captación por necesidades sin exigir el nombre de la marca. Las respuestas
+IA pueden incluir o representar a una empresa sin visita a su sitio. Evaluar sólo clics o contar toda
+citación como reconocimiento de marca deja incompleta la lectura de descubrimiento y consideración.
+
+### Decision
+
+Adoptar como norte ser descubiertos, comprendidos y considerados como opción de referencia cuando
+compradores de una categoría delimitada buscan resolver necesidades pertinentes. Liderazgo es aspiración,
+con capacidades/pruebas reales y representación fiel; no garantía de ranking ni claim de superioridad.
+
+Aplicar el [método operativo](../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md):
+territorio → decisión de compra → evidencia → comprensión/acceso → reconocimiento/distribución →
+medición/corrección → aprendizaje desde operación. Conservar non-brand/branded e intención por separado;
+cita, mención, fidelidad, prominencia y recomendación no se equiparan a consideración, preferencia o venta.
+
+### Alternatives Considered
+
+- Tráfico non-brand como única lectura: conserva valor, pero no observa representación sin clic.
+- Presencia/citas como éxito suficiente: no prueba pertinencia, precisión, audiencia real ni compra.
+- Abandonar descubrimiento genérico y optimizar sólo branded: confunde visibilidad de marca con consulta
+  de marca y presume composición universal sin evidencia.
+- Prometer liderazgo o recovery paid por citación: resultados no controlables y causalidad no demostrada.
+
+### Consequences
+
+La priorización parte de categoría/comprador/situación y pruebas; requiere coordinación con marca,
+contenido, experiencia y Comercial. Los compromisos son acciones/capacidad/medición controlables;
+resultados algorítmicos y negocio se observan con sus fuentes. Un panel comparable no es cuota de mercado.
+
+### Runtime Contract
+
+El canon del método vive en operations y las skills son consumidores espejados. Esta decisión no cambia
+las diez decisiones técnicas anteriores, schema, scoring, entitlement, tools/API ni precio/packaging.
+Greenhouse conserva datos/prioridad/outcomes; Studio el flujo editorial; Insights informes. Campos de
+análisis manual no se declaran implementados en el Grader ni en ningún dashboard. Futuras capacidades
+requieren unidad formal, contratos, autorización y verificación propios.
+
+### Revisit When
+
+Revisar si la evidencia del comprador cambia la categoría elegida, si el corpus deja de representar
+situaciones pertinentes, si cambian recuperación/medición de una plataforma o si una implementación
+propone nuevos scores/DTOs. Los resultados comerciales pueden refinar el método sin borrar esta decisión.

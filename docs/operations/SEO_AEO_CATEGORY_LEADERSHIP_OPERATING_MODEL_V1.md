@@ -9,6 +9,8 @@ Decisión: [ADR Search Visibility 360](../architecture/GREENHOUSE_SEO_SEARCH_VIS
 Procedimiento: [operar el método](../manual-de-uso/growth/operar-liderazgo-categoria-seo-aeo.md).
 Plantilla: [plan de categoría](../../.codex/skills/seo-aeo/templates/category-leadership-plan.md).
 
+Estado de ownership e implementación: [auditoría EPIC-022](../audits/seo/2026-10-04-epic-022-ownership-and-remaining-work.md).
+
 ## 1. Norte y unidad de trabajo
 
 > Ser descubiertos, comprendidos y considerados como una opción de referencia cuando nuestros compradores

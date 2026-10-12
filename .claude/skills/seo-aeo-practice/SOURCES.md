@@ -176,3 +176,12 @@ Datos de plataforma (Apple, Google, OpenAI): `seo-aeo/SOURCES.md` §5.
 | *"La IA te va a traer instalaciones"* | ❌ No existe source type ni estudio público |
 | *"Ask Play lee tu web"* | Lo dicen vendors; Google no lo confirma |
 | Cualquier precio "de mercado LATAM" para ASO | ❌ Nadie lo publica |
+
+## Norte de categoría y evidencia de AI Search — 2026-10-12
+
+Fuentes y límites consultados en `docs/operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md` §7.
+Pew y Ahrefs observan presión sobre clics en muestras específicas; Google documenta fundamentos y
+funciones de su plataforma. La dirección de categoría es decisión del operador y el método es síntesis
+operativa, no resultado causal demostrado. Ninguna de esas fuentes garantiza recuperación de paid,
+90–95% de tráfico branded, liderazgo real ni ventas por citación. Preservar fuentes/fechas y verificar
+los datos antes de reutilizarlos en propuestas o copy.

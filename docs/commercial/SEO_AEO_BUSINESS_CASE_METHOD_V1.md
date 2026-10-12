@@ -51,6 +51,16 @@ Registrar el buying group como hipótesis cuando no está confirmado: interlocut
 usuarios, Finanzas, Tecnología, cumplimiento y Compras. Cargo o asistencia a reunión no prueba autoridad
 ni presupuesto. La propuesta debe permitir que cada rol evalúe resultado, esfuerzo y condiciones.
 
+### Norte de categoría y representación
+
+Aplicar el [método de liderazgo de categoría](../operations/SEO_AEO_CATEGORY_LEADERSHIP_OPERATING_MODEL_V1.md)
+para delimitar comprador, situación y mercado, identificar capacidades/pruebas y priorizar brechas.
+Visibilidad de marca puede surgir ante consultas non-brand sin visita; conservar esa lente y tráfico
+absoluto/branded-non-brand. Separar fuente, mención, fidelidad y recomendación de consideración y negocio.
+El caso de inversión mantiene outcome propio: una aspiración de liderazgo o un panel no demuestra ventas
+ni cuota real. No convertir menciones/citas en ingresos mediante una tasa inventada; modelar sólo lo
+sustentado, con hipótesis, requisitos y límites explícitos.
+
 ## 3. Registro de evidencia y supuestos
 
 Cada variable o claim que mueve el modelo debe tener un ID y estos campos:

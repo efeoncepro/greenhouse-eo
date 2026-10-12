@@ -467,23 +467,22 @@ una estimación como medición.
 
 ## 7. Principios cross-cutting (válidos en todos los módulos)
 
-1. **Entidad > keyword.** En 2026 los motores (clásicos e IA) razonan por
-   entidades. Construir la entidad de marca (`03_EEAT_ENTITY.md`) es el
-   multiplicador de fondo de todo lo demás.
+1. **Necesidad, capacidad y entidad coherentes.** Delimitar categoría/comprador/situación y hacer
+   verificable qué marca ofrece qué; no afirmar un pipeline universal de selección (`03_EEAT_ENTITY.md`).
 2. **Claridad editorial.** Encabezados descriptivos, respuestas directas y
    contexto suficiente ayudan a las personas. Los mecanismos de recuperación y
    las señales de cita se verifican por plataforma; no hay estructura universal
    que garantice ser citado (`04_AEO_GEO.md`).
-3. **Las menciones de marca pesan ~3× más que los backlinks** para visibilidad
-   IA (data 2026). Off-page moderno ≠ solo links (`05_OFFPAGE_AUTHORITY.md`).
+3. **Reconocimiento externo con evidencia.** Menciones y enlaces se observan por separado;
+   correlación de un corpus no es peso algorítmico ni causalidad universal (`05_OFFPAGE_AUTHORITY.md`).
 4. **La frescura es una señal que se prueba por motor, query set y vertical.** El contenido no se
    publica y se olvida; se mantiene, pero no uses el claim retirado «<2 meses → +28% citas»:
    `SOURCES.md` no pudo localizar una fuente reproducible para esa cifra.
 5. **Cada plataforma y superficie tiene su evidencia.** No transfieras una
    observación de Google a Perplexity, ChatGPT o Claude; declara qué motor y
    modo verificaste, y separa documentación oficial de estudios externos.
-6. **Mide o no existió.** GSC/GA4 para clásico; Share of Voice + tráfico IA para
-   AEO. Sin medición, no hay caso.
+6. **Evidencia con alcance.** Separar descubrimiento/representación, comportamiento y negocio;
+   datos nativos y paneles conservan fuente, cobertura y denominador (`07_MEASUREMENT.md`).
 7. **Una verdad, dos interfaces.** En Content Engineering, la experiencia humana y la representación computable
    deben derivar del mismo contenido gobernado. Schema, FAQ, entidades y respuestas nunca mantienen una versión
    manual paralela a lo visible.

@@ -168,11 +168,10 @@ modelos. Audítala y contrólala:
 
 ## Menciones sin enlace (unlinked mentions)
 
-- Detéctalas (alertas de marca, Semrush brand monitoring) y, donde tenga sentido,
-  pide convertirlas en enlace — pero **incluso sin enlace ya cuentan** para
-  entidad/AEO.
-- Co-ocurrencia: que tu marca se mencione *junto a* las entidades y temas de tu
-  categoría enseña a los modelos tu posicionamiento.
+- Detectar referencias, conservar contexto y verificar identidad/capacidad descritas. Un enlace útil
+  puede facilitar acceso a pruebas; una mención independiente puede aportar reconocimiento al comprador.
+- Medir si las fuentes aparecen en la superficie investigada. Co-ocurrencia no prueba entrenamiento,
+  peso algorítmico ni inclusión; la relación con la categoría debe sostenerse en capacidades reales.
 
 ## Reddit, foros y UGC — el canal que explotó
 
