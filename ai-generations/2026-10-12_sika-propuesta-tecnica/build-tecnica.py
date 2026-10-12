@@ -205,7 +205,15 @@ def s_resumen():
                      'Sika pidió evolucionar «Innovar es hacerlo posible, innovar es hacerlo Sika» para sus lanzamientos de producto. Proponemos una identidad de campaña, una pieza madre y un método para adaptarla a cada producto.', extra=receives))
 
 
-add('resumen', 'Resumen', s_resumen)
+# El resumen de «tres documentos» salió el 12/10 (su contenido está en la lámina de cumplimiento): tras la portada va el trabajo.
+def s_idea():
+    return page('Sika · La idea', halo(960, 520, None, op=0.3) +
+                zone(eyebrow('La propuesta · Master Graphic'), 200, 56, 900) +
+                zone(f'<div style="font-size: 18px; font-weight: 300; color: {SOFT}; text-align: right">La campaña de Sika, en una palabra</div>', 1120, 54, 600) +
+                frame('master.jpg', 'Master Graphic de la campaña: Innovar es hacerlo POSIBLE, con SikaSeal-170 y Sikaflex-119. Innovar para construir con confianza.', 200, 104, 1520, 855, hero=True))
+
+
+add('idea', 'La idea', s_idea)
 
 
 # ── Cumplimiento ───────────────────────────────────────────────────────────────────────────────────────────────
@@ -231,15 +239,31 @@ add('matriz', 'Cumplimiento', s_matriz)
 
 # ── 03 · Punto de partida ──────────────────────────────────────────────────────────────────────────────────────
 def s_partida():
-    a = obj(okicker('La firma, hoy') + f'<img src="{A("antes-firma.jpg")}" alt="Cuatro versiones de la firma de campaña en el material actual de Sika" style="display: block; width: 100%; height: 252px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 820, 196, 540, False)
-    b = obj(okicker('Las piezas, hoy') + f'<img src="{A("antes-sistema.jpg")}" alt="Piezas actuales de Sika para distintos productos, cada una con una composición distinta" style="display: block; width: 100%; height: 256px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 1200, 496, 580, True)
+    a = obj(okicker('La firma, en el material compartido') + f'<img src="{A("antes-firma.jpg")}" alt="Cuatro versiones de la firma de campaña en el material actual de Sika" style="display: block; width: 100%; height: 252px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 820, 196, 540, False)
+    b = obj(okicker('Las piezas, en el material compartido') + f'<img src="{A("antes-sistema.jpg")}" alt="Piezas actuales de Sika para distintos productos, cada una con una composición distinta" style="display: block; width: 100%; height: 256px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 1200, 496, 580, True)
     return page('Sika · Punto de partida', halo(1320, 480, None) + a + b +
-                left('La propuesta · Punto de partida', ['Un concepto,', 'cuatro formas', 'de firmarlo'], 'En el material que Sika compartió, la firma de la campaña aparece en cuatro versiones y cada producto resuelve su pieza con una composición propia. El concepto es sólido. Le falta un sistema que lo haga reconocible de un lanzamiento al siguiente.', 80) +
-                means('La evolución conserva el concepto y la autoridad de la marca Sika, y ordena la forma en que se aplica.',
+                left('La propuesta · Punto de partida', ['Partimos de', 'un concepto', 'que ya', 'funciona'], '«Innovar es hacerlo posible, innovar es hacerlo Sika» ya dice lo que Sika quiere decir. El brief pide que agrupe todos los lanzamientos con una identidad distintiva y reconocible. En el material compartido, cada producto aplica el concepto con su propia firma y composición: ahí está la oportunidad de evolucionarlo.') +
+                means('La evolución no reemplaza lo que Sika ya construyó: lo ordena para que se reconozca en cada lanzamiento.',
                       'Brief y material de referencia de la licitación N.º 1164. Comparación completa en el anexo gráfico, página 2.'), section=1)
 
 
 add('partida', 'Punto de partida', s_partida)
+
+
+# ── Evolución: qué se conserva y qué se ordena ─────────────────────────────────────────────────────────────────
+def s_evolucion():
+    keep = obj(okicker('Se conserva') + f'<div style="margin-top: 12px">{bullets(["El concepto y la frase completa: «Innovar es hacerlo posible, innovar es hacerlo Sika»", "El amarillo, el rojo y el negro de Sika", "El logotipo de Sika como firma de cada pieza", "Los mensajes clave del brief: «Innovar para…»", "El envase real como protagonista"], False)}</div>', 820, 196, 465, False, '; height: 424px')
+    order = obj(okicker('Se ordena') + f'<div style="margin-top: 12px">{bullets(["Una sola firma en lugar de cuatro", "La palabra POSIBLE al centro, con el triángulo de Sika como acento", "Una fórmula única de titular", "Una composición común para todos los productos", "Una pieza madre que rige cada lanzamiento"])}</div>', 1315, 196, 465, True, '; height: 424px')
+    arrow = f'<svg width="70" height="24" viewBox="0 0 70 24" style="position: absolute; left: 1238px; top: 730px" aria-hidden="true"><path d="M2 12h60m-10-9 10 9-10 9" fill="none" stroke="{ACC}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    return page('Sika · Evolución', halo(1300, 420, None) + keep + order +
+                frame('antes-firma.jpg', 'La firma de la campaña en el material compartido por Sika', 820, 654, 388, 176) + arrow +
+                frame('firma.jpg', 'La firma propuesta: Innovar es hacerlo POSIBLE, innovar es hacerlo Sika', 1338, 654, 270, 176, hero=True) +
+                left('La propuesta · Evolución', ['Se conserva', 'el concepto,', 'se ordena', 'la forma'], 'Sika pide desarrollar y evolucionar su línea gráfica, no cambiarla. La propuesta mantiene todo lo que identifica a la campaña y a la marca, y ordena la forma en que se aplica.') +
+                means('Quien ya conoce la campaña la reconoce. Quien la ve por primera vez la recuerda.',
+                      'Comparación completa, fila por fila, en el anexo gráfico, página 2.'), section=1)
+
+
+add('evolucion', 'Evolución', s_evolucion)
 
 
 # ── 04 · El sistema ────────────────────────────────────────────────────────────────────────────────────────────
@@ -258,6 +282,28 @@ def s_sistema():
 
 
 add('sistema', 'El sistema', s_sistema)
+
+
+# ── El brief, punto por punto ──────────────────────────────────────────────────────────────────────────────────
+def s_brief():
+    rows = [('Unificar todos los lanzamientos bajo una sola campaña', 'Una firma y una pieza madre para todos los productos.', f'Lámina {ref("sistema")}'),
+            ('Convertir la innovación técnica en beneficios claros', 'El titular «Innovar para…» nombra el beneficio. Cada pieza lleva uno principal y hasta tres de apoyo.', f'Láminas {ref("sistema")} y {ref("muestras")}'),
+            ('Mensajes clave que deben repetirse', 'Son la fórmula de titular: «Innovar para simplificar», «para resolver», «para construir con confianza».', f'Lámina {ref("muestras")} · Anexo, página 14'),
+            ('Escalabilidad para futuros lanzamientos', 'El mismo sistema aplicado a Sikaflex®-119, a la línea industrial y al punto de venta.', f'Lámina {ref("alcance")}'),
+            ('Identidad distintiva y reconocible en todos los puntos de contacto', 'Firma, color y composición comunes, de la publicación en redes al anaquel.', f'Láminas {ref("alcance")} y {ref("entregables")}'),
+            ('Tono innovador, confiable, cercano y profesional', 'Un solo aspecto, con el tono y el nivel de dato ajustados a cada audiencia.', f'Lámina {ref("audiencias")}')]
+    tpl = 'display: grid; grid-template-columns: 300px minmax(0, 1fr) 210px; column-gap: 26px'
+    head = f'<div style="{tpl}; padding-bottom: 12px">{label("Lo que dice el brief")}{label("Cómo responde la propuesta")}{label("Dónde se ve")}</div>'
+    body_rows = ''.join(f'<div style="{tpl}; align-items: start; padding: 14px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 20px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.16">{a}</div>'
+                        f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 16px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
+    return page('Sika · El brief, punto por punto', halo(1300, 470, None) + obj(head + body_rows, 820, 190, 960, True, '; padding: 28px 32px 18px') +
+                left('La propuesta · El brief', ['El brief,', 'punto por', 'punto'], 'La propuesta responde a lo que el brief define como factores diferenciadores, mensajes clave y tono de la campaña. Esta tabla cruza cada uno con la parte del sistema que lo resuelve.') +
+                means('La evolución gráfica sirve a los objetivos de la campaña: reconocimiento y posicionamiento del concepto y de cada producto.',
+                      'Brief «Innovar es hacerlo posible, innovar es hacerlo Sika», 9 de septiembre de 2026, secciones 2 y 6.'), section=1)
+
+
+add('brief', 'El brief, punto por punto', s_brief)
+
 
 
 # ── Audiencias ─────────────────────────────────────────────────────────────────────────────────────────────────
@@ -487,6 +533,21 @@ def s_experiencia():
 # Lámina de caso de éxito aprobada (receta decision-case, compositor oficial): composer/caso.json. La lámina hecha a mano
 # (s_experiencia) quedó fuera por indicación del operador del 12/10: «esta no es la lámina de caso de éxito nuestra».
 add('experiencia', 'Caso de éxito · Sky', lambda: img_page('Sika · Caso de éxito', 'caso-sky.png', 'Caso Sky, 12 meses. ¿Qué cambió con Sky? Más rápido: más de 2.000 piezas aprobadas, 39 campañas, 88 % de entregas a tiempo y 25 % menos de tiempo de producción. Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses.'))
+
+
+# ── Continuidad ────────────────────────────────────────────────────────────────────────────────────────────────
+def s_continuidad():
+    cards = (obj(icon('calendario', 46) + okicker('Antes') + otitle('Calendario de lanzamientos', 28) + otext('Se acuerda al inicio y se revisa cada trimestre, con los productos y las fechas de Sika.'), 820, 300, 300, False, '; height: 340px') +
+             obj(icon('medicion', 46) + okicker('Al cierre de cada lanzamiento') + otitle('Un balance breve', 32) + otext('Entregas a tiempo, rondas de ajuste por pieza y lo aprendido para el siguiente producto.'), 1150, 250, 300, True, '; height: 420px') +
+             obj(icon('presentacion', 46) + okicker('Siempre') + otitle('Un manual que crece', 28) + otext('El manual de identidad de la campaña se actualiza con cada producto nuevo y cada formato que se suma.'), 1480, 300, 300, False, '; height: 340px'))
+    return page('Sika · Continuidad', halo(1300, 480, 740, 560, 46) + cards +
+                left('La continuidad', ['Una campaña', 'que llega', 'hasta 2027'], 'El brief fija la campaña para lo que queda de 2026 y todo 2027. Proponemos trabajar por calendario de lanzamientos y cerrar cada uno con un balance, para que el sistema mejore de un producto al siguiente.') +
+                means('Sika cuenta con un socio para toda la campaña, no con un proveedor para una pieza.',
+                      'Brief, secciones 6.2 y 7.2: duración de la campaña, de 2026 a diciembre de 2027.'), section=4)
+
+
+add('continuidad', 'Continuidad', s_continuidad)
+
 
 
 # ── 13 · Inicio ────────────────────────────────────────────────────────────────────────────────────────────────
