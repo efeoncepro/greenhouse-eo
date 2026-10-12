@@ -59,7 +59,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Status real: `Diseno`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
-- Blocked by: `TASK-2024 (sólo el Slice 5; el esquema y las capacidades no dependen de ella)`
+- Blocked by: `none`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`

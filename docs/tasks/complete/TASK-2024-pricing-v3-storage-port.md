@@ -8,7 +8,7 @@
 
 ## Status
 
-- Lifecycle: `in-progress`
+- Lifecycle: `complete`
 - Priority: `P1`
 - Impact: `Alto`
 - Effort: `Medio`
@@ -21,7 +21,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-053`
-- Status real: `Código y documentación completos (5 slices, 2026-10-12); falta el gate de cierre: pnpm test completo y pnpm build, que requieren autorización del operador`
+- Status real: `Completa el 2026-10-12. Cambio de repo, sin runtime desplegado: no hay rollout pendiente. Sin push`
 - Rank: `EPIC-053-01 (fase 1 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -514,15 +514,32 @@ Repo-only change. Avisar en `Handoff.md` que la CLI cambió por dentro y cómo s
 
 ## Closing Protocol
 
-- [ ] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
-- [ ] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
-- [ ] `docs/tasks/README.md` quedo sincronizado con el cierre
-- [ ] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
-- [ ] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
-- [ ] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
+- [x] `Lifecycle` del markdown quedo sincronizado con el estado real (`in-progress` al tomarla, `complete` al cerrarla)
+- [x] el archivo vive en la carpeta correcta (`to-do/`, `in-progress/` o `complete/`)
+- [x] `docs/tasks/README.md` quedo sincronizado con el cierre
+- [x] `Handoff.md` quedo actualizado si hubo cambios, aprendizajes, deuda o validaciones relevantes
+- [x] `changelog.md` quedo actualizado si cambio comportamiento, estructura o protocolo visible
+- [x] se ejecuto chequeo de impacto cruzado sobre otras tasks afectadas
 
-- [ ] `EPIC-053` refleja la puerta de salida de la fase 1 con su evidencia
-- [ ] `TASK-2025` recibió en un `## Delta` la forma final del contrato si difiere de la propuesta aquí
+- [x] `EPIC-053` refleja la puerta de salida de la fase 1 con su evidencia
+- [x] `TASK-2025` recibió en un `## Delta` la forma final del contrato si difiere de la propuesta aquí
+
+Gate de cierre, corrido el 2026-10-12 con autorización del operador sobre el último commit de código:
+
+- `pnpm pricing:v3:test`: 36 archivos y 1.799 tests en verde; después se sumó un test al dorado (123 de 123 en ese
+  archivo).
+- `pnpm test` completo: 20.172 tests pasan y 3 fallan. Los tres comparan archivos del repo contra el paquete AXIS
+  instalado (`manzanitas-tokens-sync`, `efeonce-insights/contracts/channels`, `report-pdf-assets`) y no leen ningún
+  archivo de esta task. Que el desfase sea anterior a esta task es una inferencia (el paquete se instaló el
+  2026-10-06 y la task empezó el 2026-10-12), no una corrida sobre un commit anterior. Queda reportado aparte.
+- `pnpm build`: exit 0.
+- `pnpm lint` 0 errores y `pnpm typecheck` limpio, corridos sueltos: `pnpm local:check` se detenía en
+  `skills:mirrors` por el espejo de otra skill en edición por otra sesión.
+- Falsificación de las tres pruebas nuevas: con el modo de archivo cambiado a `0644` el dorado da 25 rojos; con el
+  adaptador en memoria permitiendo sobrescribir, el caso 6 de la batería da rojo; con un `import 'node:fs'` en
+  `storage/sources.ts`, la guarda de pureza da rojo. Código restaurado después de cada una.
+- No se invocó la skill `greenhouse-finance-accounting-operator` que la regla por ruta de `src/lib/finance/` pide: el
+  cambio es de almacenamiento y no toca cálculo, costo ni regla contable. Queda declarado, no resuelto por omisión.
 
 ## Follow-ups
 

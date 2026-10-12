@@ -1,5 +1,16 @@
 # TASK-2028 — Pricing V3 CLI platform transport and parity gate
 
+## Delta 2026-10-12
+
+- `TASK-2024` cerró: deja de bloquear. La CLI ya es asíncrona (`run()` en `scripts/commercial/pricing-v3.ts`) y todo
+  su acceso a disco pasa por `createFileStorage` más dos funciones para argumentos y salidas; el transporte de
+  plataforma entra como otra implementación de esas mismas costuras.
+- La línea base de la que parte la paridad entre transportes ya existe:
+  `src/lib/finance/pricing-v3/__tests__/pricing-v3-cli-golden.test.ts` (107 comandos; salida, error, código de
+  salida y archivos escritos). El modo plataforma debe dar lo mismo caso por caso.
+- No son JSON y deben viajar como texto: la vista previa en markdown de `compose preview` y los borradores de
+  `export`. El resto de las salidas sobrevive a `JSON.parse` e impresión (test en ese mismo archivo).
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +35,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `finance|platform`
-- Blocked by: `TASK-2024, TASK-2026, TASK-2027`
+- Blocked by: `TASK-2026, TASK-2027`
 - Branch: `Greenhouse develop; checkout compartido; sin worktrees ni rama por task`
 - Legacy ID: `none`
 - GitHub Issue: `none`

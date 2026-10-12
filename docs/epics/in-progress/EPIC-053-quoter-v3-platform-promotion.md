@@ -2,11 +2,11 @@
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Programa aprobado por el CEO el 2026-10-12; épica y ocho tasks hijas registradas como planificación; 0 capacidades implementadas, 0 migraciones aplicadas`
+- Status real: `Programa aprobado por el CEO el 2026-10-12. Fase 1 completa (TASK-2024, puerto de almacenamiento; cambio de repo sin runtime desplegado). 0 capacidades de plataforma implementadas, 0 migraciones aplicadas`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `CEO (precios, pisos, excepciones y orden del programa) · Commercial/Finance (catálogo y política) · Platform (contrato, API y datos)`
@@ -228,13 +228,13 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 - [ ] **Contención (`TASK-2023`).** Cada puerta de escritura del cotizador actual responde el rechazo canónico; una
       copia de HubSpot y otra de Nubox entran sin error; lista, detalle, PDF y página pública responden como antes;
       nada sale hacia HubSpot.
-- [ ] **Fase 1 (`TASK-2024`).** Suite de V3 en verde; todos los artefactos del repo se recalculan idénticos a través
+- [x] **Fase 1 (`TASK-2024`).** Suite de V3 en verde; todos los artefactos del repo se recalculan idénticos a través
       del puerto; ninguna salida de la CLI cambió respecto de la línea base.
-      Evidencia del 2026-10-12, con la task todavía sin cerrar: `pnpm pricing:v3:test` 36 archivos y 1.799 tests en
-      verde; los 48 artefactos se leen byte a byte y se reproducen con su huella por los tres adaptadores
-      (archivos sobre el repo, archivos sobre una carpeta llenada por el puerto, memoria); la línea base de 107
-      comandos, capturada antes de tocar la CLI, pasa sin regenerar un fixture. Falta el gate de cierre de la task
-      (`pnpm test` completo), que requiere autorización del operador; la casilla se marca al cerrarla.
+      Evidencia del 2026-10-12: `pnpm pricing:v3:test` 36 archivos y 1.799 tests en verde; los 48 artefactos se leen
+      byte a byte y se reproducen con su huella por los tres adaptadores (archivos sobre el repo, archivos sobre una
+      carpeta llenada por el puerto, memoria); la línea base de 107 comandos, capturada antes de tocar la CLI, pasa
+      sin regenerar un fixture; `pnpm build` exit 0; `pnpm test` completo con 3 rojos ajenos (desfase del paquete
+      AXIS). Detalle en la task.
 - [ ] **Fase 2 (`TASK-2025`).** Catálogo vigente importado; huellas en la base iguales a las del repo; un artefacto
       guardado se lee con la misma huella.
 - [ ] **Fase 3 (`TASK-2026`).** Paridad en staging: cada ejemplo del repo da la misma huella por la API.

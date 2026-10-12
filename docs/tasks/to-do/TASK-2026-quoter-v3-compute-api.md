@@ -1,5 +1,17 @@
 # TASK-2026 — Quoter V3 compute API: catalog reads, simulation and readings
 
+## Delta 2026-10-12
+
+- `TASK-2024` cerró: deja de bloquear. Existe `PricingV3Storage` y la resolución de «lo vigente» sobre el puerto
+  (`createCurrentSourceResolver`, `readCurrentVersions`, `verifyPointedSources` en
+  `src/lib/finance/pricing-v3/storage/sources.ts`), reutilizable tal cual por un servidor.
+  [Contrato](../../architecture/GREENHOUSE_PRICING_V3_STORAGE_PORT_V1.md).
+- Lo que sigue en `scripts/commercial/pricing-v3.ts` y esta task debe mover al motor: el formateador de salida
+  (`json`), el armado del cuerpo de cada respuesta y la clasificación de errores (`classify`, `schemaIssue`).
+- Dato medido para el contrato de respuesta: las 106 salidas JSON de la línea base se leen idénticas después de
+  `JSON.parse` e impresión, así que pueden viajar como objeto. Viajan como texto el artefacto, la vista previa en
+  markdown de `compose preview` y los borradores de `export`.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -24,7 +36,7 @@
 - Status real: `Diseno`
 - Rank: `TBD`
 - Domain: `platform|finance`
-- Blocked by: `TASK-2024, TASK-2025`
+- Blocked by: `TASK-2025`
 - Branch: `Greenhouse develop; sin branch dedicada ni worktrees`
 - Legacy ID: `none`
 - GitHub Issue: `none`
@@ -121,7 +133,7 @@ Reglas obligatorias:
 
 ### Depends on
 
-- `TASK-2024` (`docs/tasks/in-progress/TASK-2024-pricing-v3-storage-port.md`) — puerto de almacenamiento y motor ejecutable
+- `TASK-2024` (`docs/tasks/complete/TASK-2024-pricing-v3-storage-port.md`) — puerto de almacenamiento y motor ejecutable
   sin acceso a disco. Esta task necesita que cada operación reciba sus fuentes por el puerto y no por una ruta.
 - `TASK-2025` (`docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md`) — tablas `quoter_*` del catálogo por
   huella y del puntero, adaptador PostgreSQL del puerto, capacidades con su permiso otorgado, importador repo → base.
