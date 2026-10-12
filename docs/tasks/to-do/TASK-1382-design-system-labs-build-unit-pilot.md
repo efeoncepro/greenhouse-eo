@@ -142,6 +142,15 @@ Reglas obligatorias:
 - Run clean/warm A/B for current Portal baseline, decomposed Portal and Labs.
 - Produce `expand|hold|rollback` verdict against thresholds.
 
+## Delta 2026-10-12 — desacople por dominios de producto aprobado
+
+- El operador aprobó [`GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md`](../../architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md):
+  el corte pasa a ser por producto, y el Lab se retira de este repositorio (corte 2a). Esta task **sigue sin
+  ejecutarse como está escrita** y su sujeto formal sigue sin decidir.
+- Sujeto propuesto, sin decisión del operador: medir el build del portal antes y después de retirar las 43 páginas y
+  15 rutas de `/design-system`. Es el primer número real de cuánto compra sacar páginas — cerrado por el trabajo de
+  arquitectura del 2026-10-12, no por una task.
+
 ## Delta 2026-07-30 — contradicción de destino con `TASK-1590`
 
 Detectado al contrastar el estado real de AXIS contra las specs (no leído de la doc).

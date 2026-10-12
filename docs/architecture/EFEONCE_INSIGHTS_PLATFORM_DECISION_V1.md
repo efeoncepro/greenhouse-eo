@@ -178,3 +178,12 @@ scope; ningún PDF, vista web, enlace, correo ni recurrencia existe todavía (de
 Think siguen en diseño: TASK-1846–1849 y TASK-1875). TASK-1845 sigue `in-progress` por dos evidencias
 pendientes (ensayo de `migrate:down` en la instancia compartida y `tools/list` por una sesión MCP humana).
 Detalle verificado: [arquitectura §14](EFEONCE_INSIGHTS_ARCHITECTURE_V1.md#14-estado-de-implementación-y-rollout--task-1845-2026-09-15).
+
+## Delta 2026-10-12 — Dominio propio como destino
+
+El operador decidió que Insights pase a ser un dominio propio, fuera de Greenhouse:
+[`GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md`](GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), corte 4, el último del orden. **Nada cambió
+todavía** y el contrato de este ADR se conserva (ventanas, idempotencia, snapshots inmutables, gate humano). Sale
+después de Growth y del motor del compositor porque los consume, y antes del corte sus 32 referencias SQL directas a
+`greenhouse_growth` tienen que pasar por readers del dueño. Queda sin decidir si nace en repositorio propio.
+

@@ -4,6 +4,19 @@
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).
 
+## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
+
+El operador aprobó [a dónde va cada dominio y en qué orden](docs/architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md):
+Knowledge se retira; el Design System Lab, los catálogos de marca, `brand-surfaces` y el motor del compositor van a
+AXIS (`artifact-worker` se queda y consume el paquete); Growth y Search Visibility 360 van enteros a Marketing
+Studio; Insights pasa a dominio propio y sale último; Commercial queda diferido con su API aquí; Hiring se queda.
+Enmienda la cláusula «un repositorio» del ADR de build units. **Sólo documentos**: no hay tasks, repositorios ni
+código movido, y el trabajo nuevo sigue naciendo donde vive hoy su dominio. Para quien toque esos dominios: un
+dominio se mueve con su API y sus procesos asíncronos o no se mueve, y no se agregan lecturas SQL cruzadas (Insights
+ya tiene 32 hacia `greenhouse_growth` que hay que retirar antes de su corte). Sin decidir: ledger de migraciones de un
+schema con otro dueño, hospedaje de Insights, interfaz del cotizador (portal o Rooms). Verificado: `pnpm epic:lint`,
+`pnpm task:lint --task TASK-1382`, `pnpm docs:context-check:strict`. No se corrió ningún build. Local, sin push.
+
 ## 2026-10-12 — Growth: dos errores de Sentry del ops-worker (ISSUE-181 / ISSUE-182)
 
 Regrade AEO: Sky tenía 6 mercados secundarios con cadencia y sin declarar en el contrato; fallaba a diario desde el

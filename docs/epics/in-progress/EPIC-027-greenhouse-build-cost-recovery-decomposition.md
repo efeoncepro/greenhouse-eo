@@ -32,6 +32,7 @@ El costo reportado escaló de ~USD 20 a USD 530 en Elastic; Standard llegó a 45
 
 - `docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`
 - `docs/architecture/GREENHOUSE_BUILD_UNIT_DECOMPOSITION_ARCHITECTURE_V1.md`
+- `docs/architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md` — enmienda del 2026-10-12: el corte pasa a ser por producto, no por build unit dentro de un repositorio.
 - `docs/architecture/GREENHOUSE_CLOUD_INFRASTRUCTURE_V1.md`
 - `docs/operations/MODULAR_MIGRATION_NEW_WORK_OPERATING_MODEL_V1.md`
 
@@ -44,6 +45,22 @@ El costo reportado escaló de ~USD 20 a USD 530 en Elastic; Standard llegó a 45
 - `TASK-1393` — Artifact Composer: extracción domain-free, catálogos y brand pack: mueve el motor, formaliza `deck-axis`/`outputTarget` y hace AXIS un input generado desde SoT; no crea deployable ni implementa el catálogo social.
 - `TASK-1828` (EPIC-044) — Efeonce auth server `services/auth-server/` (Cloud Run Service): boundary **authorized 2026-09-03 via documented exception** (operator decision); cost/routing-auth/rollback/ownership evidence recorded in `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` → Delta 2026-09-03. Covers ONLY the isolated auth service published as a second host of the MCP gateway front door; the portal next-boundary decision remains gated by the ordinary path.
 - `TASK-1391` — Artifact Renderer worker/artifact pipeline: the `artifact-worker` Cloud Run Job boundary was **authorized 2026-07-12 via documented exception** (operator decision; cost/routing-auth/rollback/ownership evidence recorded in `GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md` → Delta 2026-07-12). This exception covers ONLY the batch render Job; the portal next-boundary decision (Labs/Admin/Public) remains gated by the ordinary path (TASK-1382 pilot + 30-day cost rebaseline).
+
+## Delta 2026-10-12 — El programa pasa a cortes por dominio de producto
+
+El operador aprobó [`GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md`](../../architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md). Cambia la
+forma del programa, no su objetivo:
+
+- La unidad de corte es el producto con su repositorio. La cláusula «un repositorio» del ADR de build units queda
+  enmendada; el resto sigue vigente.
+- Orden aprobado: Knowledge (retiro) → Design System Lab a AXIS → catálogos de marca y `brand-surfaces` a AXIS →
+  motor del compositor como paquete de AXIS → Growth y Search Visibility 360 a Marketing Studio → Insights como
+  dominio propio. Commercial queda diferido; Hiring se queda.
+- **Ningún corte tiene task todavía.** Cada uno se registra como hija de esta épica al prepararlo y trae la
+  evidencia de siempre: costo, routing/auth, rollback y ownership del runtime.
+- `TASK-1382` sigue sin sujeto formal. Lo que la reemplaza en la práctica es medir el build del portal antes y
+  después de retirar las rutas de `/design-system`; el primer exit criterion («Labs-only changes do not build
+  Portal») se cumple por construcción cuando el Lab ya no vive en este repositorio.
 
 ## Existing Related Work
 
