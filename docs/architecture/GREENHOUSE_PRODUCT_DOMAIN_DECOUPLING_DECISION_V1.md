@@ -7,8 +7,7 @@
 - Date: `2026-10-12`
 - Owner: `Platform / Architecture`
 - Scope: `topología de productos y repositorios, ownership de dominios, grafo de build del portal, tren de release`
-- Reversibility: `two-way-but-slow` por corte; el retiro de Knowledge y el traspaso de ownership de un schema son
-  los más lentos de revertir
+- Reversibility: `two-way-but-slow` por corte; el traspaso de ownership de un schema es lo más lento de revertir
 - Confidence: `high` en la dirección; `medium` en el beneficio medible de build (no se corrió ningún build para esta
   decisión)
 - Validated as of: `2026-10-12`
