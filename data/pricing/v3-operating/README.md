@@ -11,7 +11,10 @@ fechado: la noche del 2026-10-11 eran `catalog.review-v10.json`,
 eran el catálogo v8 y la policy v6; por la tarde el catálogo pasó a v9 y la policy por v7, v8, v9 y v10; por la
 noche el catálogo pasó a v10). El siguiente catálogo sería v11. La policy pasó a v11 esa noche
 (`resources.review-v11.json`, cambio `adobe-price-decided.change.json`: el precio de Adobe sin descuento queda
-`confirmed`; ningún monto cambia).
+`confirmed`; ningún monto cambia). Y con la última emisión del 2026-10-11 el catálogo pasó a v11
+(`catalog.review-v11.json`, versión `operating-review-2026-10-11-v11`, cambio `offer-commercial-unit.change.json`:
+cada oferta declara la unidad comercial con que se vende; ningún precio, costo, factor ni política cambia). Desde
+entonces el puntero nombra catálogo v11, policy v11 y créditos v1, y el siguiente catálogo sería v12.
 
 ```bash
 pnpm --silent pricing:v3 current show
@@ -36,6 +39,10 @@ la cortesía de un documento, y qué hace `--out` cuando la cotización no calcu
 Cómo se lee un adicional opcional que amplía la cotización base (`compose increment`, `compose document --increment`)
 y qué deja fuera del cotizador la decisión de que una cotización no es un contrato:
 [delta del cierre](#delta-2026-10-11-cierre--compose-increment-un-adicional-que-amplía-la-base-se-lee-como-un-incremento).
+Qué trae el catálogo v11 y lo que se agregó con él —un precio por todo el trabajo (`agreed_total`), la unidad
+comercial de cada oferta, la evidencia de la dedicación, `compose assess` contra el piso de la propia oferta y el
+documento de un precio de programa o de proyecto (`combine`)—:
+[delta del catálogo v11](#delta-2026-10-11-última--catálogo-v11-un-precio-por-todo-el-trabajo-la-unidad-de-cada-oferta-y-la-evidencia-de-las-horas).
 Donde una viñeta o un delta anterior dice «el vigente es…», «último delta» o «hay que pasar la ruta», léelo como
 historia fechada.
 
@@ -261,7 +268,11 @@ activar nada; después de emitir una versión en esta carpeta hay que mover el p
 Las fixtures del diseñador y servicio son simulaciones calculadas; assessment conserva gaps y preview sólo
 proyecta precio para revisión. Los ejemplos no financian el interno/no asignado mediante ventas supuestas.
 40%/35% son propuesta genérica; Creative Practice conserva 45% bruto aprobado. No usar el diagnóstico genérico
-como certificado de cumplimiento del piso de una práctica. Las suscripciones de ChatGPT/Claude no incluyen
+como certificado de cumplimiento del piso de una práctica.
+*Corrección 2026-10-11 (última):* esa propuesta 40%/35% ya no existe en `compose assess`. Se retiró: `margin` trae
+la regla de precio de la oferta de cada línea (`pricingPolicies[]`) y `belowPolicyFloor`. Los archivos
+`designer.assessment.json` y `service.assessment.json` de esta carpeta son salidas congeladas de antes y conservan
+las claves antiguas. Las suscripciones de ChatGPT/Claude no incluyen
 consumo API por el hecho de registrar el seat.
 
 Evidencia de TASK-2022:135 tests V3 +78 V2 =213, y 26 smokes de `verification.cli.json`; esos conteos describen el
@@ -710,7 +721,9 @@ su concepto.
   margen 0,5016. Reserva 436.800, que es 12 % de 3.640.000. Ninguna fila marcada.
 - Filas de terceros: producción 4.500.000 → 4.950.000; talento, USD 1.250 → costo 1.250.000 y neto 1.380.000;
   medios 3.333.333 → 3.333.333, exactos.
-- `compose assess`: `margin.ownWorkRate` 0,5016, `proposedFloorReadOn: "ownWorkRate"`, `belowProposedFloor: false`;
+- `compose assess`: `margin.ownWorkRate` 0,5016, `proposedFloorReadOn: "ownWorkRate"`, `belowProposedFloor: false`
+  (así salía esa noche; desde el final del 2026-10-11 esas dos claves no existen y la misma corrida trae
+  `pricingPolicies[]`, `thirdPartyPolicies[]` y `belowPolicyFloor: false`);
   brechas `THIRD_PARTY_FX_EXPOSURE` (talento), `THIRD_PARTY_COST_EVIDENCE_REQUIRED` (medios) y
   `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED`.
 - `compose preview`: fee del período 11.370.000 más tres ítems de terceros; `clientPaidDirectly` con la licencia,
@@ -965,3 +978,85 @@ Importes en CLP. Las corridas «fuera de esta carpeta» usan copias con un solo 
 - `pnpm pricing:v3:test`: 28 archivos y 1.445 pruebas.
 
 Evidencia fechada. Los artefactos que se agregaron a esta carpeta son los tres de `managed-addon-increment`.
+
+## Delta 2026-10-11 (última) — catálogo v11: un precio por todo el trabajo, la unidad de cada oferta y la evidencia de las horas
+
+Catálogo nuevo, `catalog.review-v11.json`; el puntero se movió a él. No hay contrato del kernel, motor ni policy
+nuevos, y todos los artefactos anteriores se reproducen igual. Paso a paso por tipo de negocio:
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#cotizar-un-negocio-de-punta-a-punta).
+Por qué así:
+[decisión de flujo](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11--un-precio-por-todo-el-trabajo-agreed_total)
+y [decisión de composición](../../../docs/architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11--la-unidad-comercial-es-un-dato-de-la-oferta).
+
+- **Catálogo v11 y su cambio.** `offer-commercial-unit.change.json` (`operating-offer-commercial-unit-2026-10-11`,
+  sobre el v10) agrega tres registros de una clase nueva, `offer`, uno por oferta: `creative-managed-service` y
+  `seo-aeo-managed-service` se venden como `managed_service`; `talent-assurance-staffing`, como `role_capacity`.
+  Cada uno rige desde la primera fecha en que su oferta tiene política de precio (2026-10-10, 2026-10-11 y
+  2026-10-09). El catálogo pasa de 391 a 394 registros. Ningún precio, costo, factor ni política cambia.
+- **El puntero.** `current.json` nombra `catalog.review-v11.json` (`operating-review-2026-10-11-v11`),
+  `resources.review-v11.json` y `../v3-resources/ai-credits.review-v1.json`. `current show` responde
+  `"consistent": true`.
+- **Qué hace el registro `offer`.** `compose scaffold` escribe la unidad comercial desde ahí, y una demanda que
+  declara otra no calcula (`COMMERCIAL_UNIT_CONTRADICTS_OFFER`). Por eso `service.demand.json` y `service.plan.json`
+  de esta carpeta, y `../v3-composition/seo-service.demand.json`, que emparejan la oferta de staffing con
+  `managed_service`, ya no cotizan con `--current`. Sus artefactos congelados se siguen reproduciendo.
+- **Un precio por todo el trabajo.** El brief admite el ajuste `agreed_total`: el neto de las líneas nombradas en
+  todo el plazo, que la resolución reparte en netos acordados por período y clase de cobro. Ninguna demanda
+  versionada de esta carpeta lo usa todavía; las corridas de abajo lo ejercitan sobre copias.
+- **Evidencia de la dedicación.** `compose workload --brief` escribe `dedicationEvidence` en las líneas que
+  dimensiona. Las demandas versionadas de esta carpeta son anteriores y no la declaran: su costo de persona sale en
+  `estimateExposure.dedicationNotEvidenced`.
+- **`compose assess`.** Ya no compara contra el 40 %/35 % genérico: informa la regla de precio de cada línea.
+- **Ejemplo nuevo.** `managed-addon-increment.programme-price.document-brief.json` y su `.document.json`: la
+  cotización de tres meses de `managed-addon-increment.artifact.json` impresa como un precio de programa, con
+  `combine`, `cover.netLabel` y dos hitos de pago con su impuesto y su total. Se emite sin `--increment`.
+- **Ejemplos que cambiaron.** Los cinco briefs de documento anteriores dejaron de declarar `schedule.note` y la
+  condición «Plazo e inicio», que sólo decían lo que toda cotización implica; sus `.document.json` se volvieron a
+  emitir y los tres con impuesto resuelto llevan ahora `taxPeriods`. Ningún importe cambió.
+- **Ledger.** `operational-gaps.json` agrega `PROJECT_OFFER_NOT_MODELLED`, `PLATFORM_FEE_PER_LINE` (abierto, del
+  CEO, con el peso medido en los ejemplos), `TOOLS_WITHOUT_CURRENT_PRICE`,
+  `TENDER_CEILING_AND_SCORING_NOT_MODELLED`, `LATE_PAYMENT_COST_OF_MONEY_NOT_MODELLED`,
+  `PLATFORM_PANEL_AND_INSIGHTS_NOT_COSTED` y `QUOTE_REGISTRY_IN_GREENHOUSE`; y precisa
+  `ASSURANCE_OPERATIONS_ONBOARDING_COSTS` (las provisiones «TEST ONLY»), `MANAGED_SERVICE_SETUP_NOT_PARAMETRIC` y
+  `COMMERCIAL_POLICY` (el 40/35 retirado de `compose assess` y la unidad comercial como dato del catálogo).
+- **Lo que todavía no se puede.** Una oferta propia para proyectos únicos; una puesta en marcha con costo para un
+  servicio gestionado; prorratear el fee de plataforma por dedicación; cotizar con el precio vigente de una
+  herramienta que no tiene importe; modelar el precio techo y el puntaje de una licitación, o el costo financiero de
+  un pago tardío. Número de cotización, versiones, QR, firmas y aprobación siguen siendo del cotizador de Greenhouse.
+
+### Corridas del 2026-10-11 (última)
+
+Importes en CLP. Las corridas «fuera de esta carpeta» usan copias y no están versionadas.
+
+- `current show`: exit 0, `consistent: true`, las tres fuentes en `match`. `catalog validate --current`:
+  `operating-review-2026-10-11-v11`, 394 registros.
+- `catalog search --current --kind offer`: exit 0, tres registros. `--kind offers`: exit 1, `INVALID_ARGUMENT` con
+  las catorce clases en `allowed`.
+- `compose scaffold --current` de `writer.brief.json`: exit 2, `commercialUnit` `role_capacity`, del catálogo.
+- `compose prepare --current` de cada demanda de esta carpeta: calculan (exit 3) `designer-on-demand` (2.870.000),
+  `designer-three-months-iva` (7.970.000), `designer-startup-courtesy` (7.650.000) y sus dos opciones,
+  `managed-addon-increment` (16.950.000) con sus dos variantes y `managed-on-demand-third-party` (21.033.333). No
+  calculan (exit 2) las fechadas antes del 2026-10-11 (`designer`, `crm-client-tools`, `managed-care`, `service`) y
+  `managed-care-colombia`, que no declara ni excluye Adobe Express.
+- Una copia de `designer-on-demand.demand.json` con un `agreed_total` de 2.800.000 sobre `design` (fuera de esta
+  carpeta): exit 3, neto 2.800.000, rebaja 70.000, reparto 2.487.804 (mensual) y 312.196 (puesta en marcha), margen
+  0,3490, ninguna fila marcada.
+- Una copia de `managed-on-demand-third-party.demand.json` con un `agreed_total` de 20.500.000 sobre sus seis
+  líneas y sus tres costos refacturados (fuera de esta carpeta): exit 3, neto 20.500.000; la fila de medios, que se
+  cobra al costo, queda marcada con `netShortOfFloor` 84.522. Con el total sólo sobre las seis líneas, en
+  11.000.000: neto 20.663.333 y ninguna fila marcada.
+- Un programa SEO/AEO de tres meses armado desde un brief con `compose scaffold` (fuera de esta carpeta), con IVA de
+  19 % y un `agreed_total` de 9.500.000: exit 3, motor 1.4.0, precio de política 10.110.000, reparto 3.166.600,
+  3.166.600 y 3.166.800 (unidad 100, `tax_exact`), impuesto 1.805.000 y total 11.305.000.
+- `compose document` de `managed-addon-increment.artifact.json` con el brief `programme-price`: exit 3, idéntico al
+  versionado. Una línea «1 programa» de 16.950.000; IVA 3.220.500; hitos de 8.480.000 + 1.611.200 = 10.091.200 y
+  8.470.000 + 1.609.300 = 10.079.300. Generado con la plantilla: exit 0, cuatro páginas.
+- `compose document` de `managed-addon-increment.artifact.json` con su brief y `--increment`: exit 3, idéntico a
+  `managed-addon-increment.document.json`. Sin el flag: exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID`.
+- `compose workload --brief` de `managed-care`: exit 0; `primary` y `backup` salen con `dedicationEvidence`
+  `estimated`.
+- `replay` de los 36 artefactos versionados del repositorio: todos `verified: true`.
+- `pnpm pricing:v3:test`: 32 archivos y 1.582 pruebas.
+
+Evidencia fechada. Los archivos que se agregaron a esta carpeta son `catalog.review-v11.json`,
+`offer-commercial-unit.change.json` y los dos `managed-addon-increment.programme-price.*`.

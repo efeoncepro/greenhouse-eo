@@ -37,11 +37,620 @@ cotizaciones congeladas, con `compose increment`, y se imprime con `compose docu
 ([Un adicional que amplía la base](#un-adicional-que-amplía-la-base-compose-increment)); y el CEO decidió que la
 fecha de inicio del servicio y la duración del contrato no son datos del cotizador, porque una cotización no es un
 contrato: ya no se listan como pendientes.
+Lo último del 2026-10-11, después de cotizar tres negocios reales más: catálogo v11, en el que cada oferta declara
+la unidad comercial con que se vende; un precio por todo el trabajo (`agreed_total`); la evidencia de la dedicación
+de cada línea; `compose assess` juzga contra el piso de la propia oferta; los diagnósticos nombran su causa; y el
+documento imprime un precio de programa o de proyecto (`combine`). Todo está en
+[Cotizar un negocio de punta a punta](#cotizar-un-negocio-de-punta-a-punta), que es por donde se empieza.
 
 El operador puede pedir «cotiza un diseñador senior al 50%, talento Colombia, mercado Chile».
 El agente consulta perfiles y recursos, interpreta las tareas, completa una demanda explícita y usa la CLI.
 El dominio calcula; el agente explica el resultado desde el artefacto. Si falta un dato, devuelve su campo y motivo.
 Una simulación calculada sigue pendiente de revisión comercial.
+
+## Cotizar un negocio de punta a punta
+
+**Para qué sirve.** Llevar un negocio desde el pedido hasta el documento para el cliente sin leer el resto del
+manual: elegir qué se cotiza, armar la demanda, registrar el precio pactado, leer el resultado y emitir el
+documento. Cada paso enlaza a la sección que lo detalla. Los comandos y las cifras de esta sección se corrieron el
+2026-10-11 con las versiones vigentes (catálogo v11, policy v11, créditos v1).
+
+**Antes de empezar.**
+
+- `pnpm --silent pricing:v3 current show` responde `"consistent": true`. Toda corrida que carga fuentes usa
+  `--current` ([Versiones vigentes](#versiones-vigentes)).
+- La demanda lleva la fecha del día en `brief.quoteDate`. Una cotización no puede llevar una fecha anterior a los
+  datos que usa ([qué pasa si la lleva](#una-fecha-anterior-a-los-datos)).
+- Tienes del negocio: qué se vende, el país del cliente, la moneda, el equipo con su dedicación y, si existe, el
+  precio ya conversado. Lo que no tienes no se inventa: se declara como estimación con su evidencia y se informa
+  como supuesto.
+- Quién decide: el precio que se presenta, los pisos y toda excepción son del CEO. Tú entregas el margen real que
+  calcula el motor, lo que quedó estimado y lo que quedó bajo un piso. El costo de una persona es el **costo
+  objetivo** del perfil, no la nómina. Una cotización no es un contrato: la fecha de inicio y la duración del
+  contrato no son datos del cotizador.
+
+### Paso 1 — Elegir oferta, unidad, forma y periodos
+
+Son cuatro decisiones y las cuatro salen del negocio, no de la herramienta.
+
+| Tipo de negocio | `brief.offerId` | `commercialUnit` | `brief.engagementForm` | `brief.periods` | Precio pactado | Cómo sale en el documento |
+| --- | --- | --- | --- | --- | --- | --- |
+| Una persona por dedicación, como refuerzo acotado (un mes, unas semanas) | `talent-assurance-staffing` | `role_capacity` | `on_demand` | Los meses del refuerzo; `1` si dura un mes o menos | `agreed_total` si se pactó un precio por todo (mes y puesta en marcha); `agreed_net` si se pactó un valor por mes | Una línea por persona («1 mes») y su puesta en marcha («1 pago único»), o una sola con `combine` |
+| Una persona por dedicación, de forma continua | `talent-assurance-staffing` | `role_capacity` | `on_going` | Los meses del compromiso inicial; `1` si no hay ninguno | `agreed_net` con `billing: "monthly"` | «N meses» al valor de un mes, y la puesta en marcha aparte |
+| Un servicio gestionado recurrente de la práctica creativa (contenido, diseño, social care, producción) | `creative-managed-service` | `managed_service` | `on_going` | Los meses del compromiso inicial; `1` si no hay ninguno | `agreed_net` con `billing: "monthly"` | Una línea de fee: «N meses» al valor de un mes |
+| Un programa SEO/AEO | `seo-aeo-managed-service` | `managed_service` | `on_going` si continúa mes a mes; `on_demand` si tiene inicio, término y entregables | Los meses del programa | `agreed_net` mensual, o `agreed_total` si el precio es por el programa | Fee por meses, o «1 programa» con `combine` |
+| Un programa de plazo fijo con un solo precio (por ejemplo, tres meses en una licitación) | La oferta de servicio gestionado de la práctica que lo entrega | `managed_service` | `on_demand` | Los meses del programa | `agreed_total` | «1 programa» con `combine` y `cover.netLabel` |
+| Un proyecto único de alcance cerrado (un sitio web, una campaña) | La oferta de servicio gestionado de la práctica que lo entrega: **no existe una oferta propia para proyectos** | `managed_service` | `on_demand` | `1` si dura unas semanas; sus meses si dura más | `agreed_total` | «1 proyecto» con `combine` y `cover.netLabel` |
+
+Cómo leer la tabla:
+
+- **La oferta** la decide lo que se vende y la práctica que lo entrega, nunca el margen que deja pasar
+  ([Oferta y piso de margen](#selección-y-asignación)). Hoy hay tres. Un proyecto único se cotiza con una oferta de
+  servicio gestionado vendida On-Demand a un solo precio, porque no hay otra; si el proyecto no es de la práctica
+  creativa ni de la SEO/AEO, cuál de las dos corresponde lo decide el operador y se informa como supuesto.
+- **La unidad comercial no se elige.** Desde el catálogo v11 es un dato de la oferta (registro `offer`):
+  `compose scaffold` la escribe sola, y una demanda que declare otra no calcula
+  (`COMMERCIAL_UNIT_CONTRADICTS_OFFER`). `managed_service` se vende como un fee y nunca muestra a su equipo;
+  `role_capacity` se vende línea por línea. Para verlo:
+  `pnpm --silent pricing:v3 catalog search --current --kind offer` (exit 0, tres registros).
+- **La forma se decide por el negocio, aunque no haya a quién preguntar.** Es `on_demand` si el trabajo tiene un
+  alcance acotado, un inicio y un término, y una entrega o aceptación que lo cierra. Es `on_going` si es un servicio
+  mensual que sigue hasta que alguien lo termina. Si tiene las dos cosas, son dos cotizaciones. La forma se declara
+  siempre: sin ella el precio sale como On-Going y nada avisa. Si la decidiste tú con ese criterio, dilo al
+  entregar.
+- **On-Demand cambia el precio.** Multiplica por `1,10` el precio de todas las filas del equipo, en cualquier oferta.
+  En las dos ofertas de servicio gestionado suma además la reserva de contingencia: 12 % del costo de persona, como
+  costo ([Cotizar On-Demand u On-Going](#cotizar-on-demand-u-on-going),
+  [Reserva de contingencia](#reserva-de-contingencia)). Una persona por dedicación no lleva reserva.
+- **Los periodos son los meses que la cotización valoriza, no la duración del contrato.** Cuántos poner:
+
+  | Lo que se vende | `periods` | Qué imprime el documento |
+  | --- | --- | --- |
+  | Un precio mensual con compromiso inicial de N meses | N | «N meses» al valor de un mes y el neto de los N. La portada imprime el neto de esos N meses: nómbralo con `cover.netLabel` |
+  | Un precio mensual sin compromiso declarado | `1` | «1 mes» |
+  | Un programa de N meses | N | Una línea por tramo de meses iguales, o «1 programa» con `combine` |
+  | Un proyecto de unas semanas | `1` | «1 mes», o «1 proyecto» con `combine` |
+
+  No hay periodos más cortos que un mes: un trabajo de dos semanas es un periodo con la dedicación que corresponde
+  ([horas como unidad](#paso-2--componer-la-demanda)). Lo que se cobra una sola vez (la puesta en marcha) cae en el
+  periodo en que entra la persona; un costo de terceros, en los periodos que declara.
+
+### Paso 2 — Componer la demanda
+
+1. **Descubre perfiles y herramientas** a la fecha del día. `--query` filtra por texto:
+
+   ```bash
+   pnpm --silent pricing:v3 resources inspect --current --date 2026-10-12 --query seo
+   ```
+
+   Devuelve exit 0 con `profiles` (id exacto, kit por defecto y las tareas de su receta) y `tools` con sus precios.
+
+2. **Escribe el brief** (`pricing-v3-brief/1`): fecha, oferta, `engagementCode: "monthly"`, forma, país del
+   cliente, moneda, periodos y una línea por perfil. Por línea:
+
+   | Campo | Qué se escribe |
+   | --- | --- |
+   | `profile` | El id exacto del perfil (`ECG-020`) |
+   | `talentCountry` | El país donde está la persona; mueve su costo ([por país](#cotizar-según-el-país-del-cliente-y-del-equipo)) |
+   | `headcount` | Personas de esa línea |
+   | `dedication` | `{ "unit": "fte", "value": "0.5" }` (hasta `1`) o `{ "unit": "hours_per_month", "value": "90" }` |
+   | `allocationMode`, `allocationPolicyId` | `shared` con `allocation:shared`: se cobra la dedicación declarada. `dedicated` con `allocation:dedicated`: se cobra la persona completa (1 FTE), cualquiera sea la dedicación escrita |
+   | `kitId` | En un servicio gestionado, `managed-service-core`. En una persona por dedicación se omite: toma el kit de su perfil |
+   | `dedicationEvidence` | De dónde sale la dedicación y si es un hecho o una estimación (abajo) |
+
+   **Horas como unidad.** `hours_per_month` se convierte a FTE dividiendo por las horas de un mes a tiempo completo
+   de la regla de asignación de la línea (`hoursPerFteMonth`): hoy `180` en `allocation:shared` y en
+   `allocation:dedicated`, las dos marcadas `estimated`. 90 horas son 0,5 FTE. Más de 180 horas da
+   `INVALID_DEDICATION`. El resumen lo dice en `estimateExposure.estimatedRules`: la regla `allocation_policy` lista
+   la línea en `billedFteSetByRuleOn`. Para verla:
+   `pnpm --silent pricing:v3 catalog search --current --kind allocation`.
+
+   **Evidencia de la dedicación.** `dedicationEvidence` tiene la forma de toda evidencia:
+
+   ```json
+   "dedicationEvidence": {
+     "reference": "scope-estimate:seo-programme-example",
+     "effectiveFrom": "2026-10-01",
+     "effectiveUntil": "2026-12-31",
+     "status": "estimated"
+   }
+   ```
+
+   - `status` es `confirmed` (la dedicación está acordada o medida) o `estimated` (la estimaste tú o el operador).
+     `pending` no calcula (`PENDING_DEDICATION_EVIDENCE`), y tampoco una evidencia que no rige en `quoteDate`
+     (`DEDICATION_EVIDENCE_NOT_EFFECTIVE`).
+   - `reference` es un identificador de la fuente, no el documento ni un nombre de persona.
+   - `compose workload --brief` la escribe sola en las líneas que dimensiona
+     ([por volumen](#cotizar-un-servicio-gestionado-por-volumen)).
+   - **Sin ella la cotización calcula, pero el costo de esa persona no cuenta como confirmado.** Si adivinaste las
+     horas, decláralo `estimated`: es lo que hace que la cotización lo diga
+     ([cómo se lee](#dónde-pesa-un-dato-estimado-estimateexposure)).
+
+3. **Saca el andamio de la demanda.** Siempre devuelve exit 2: deja preguntas.
+
+   ```bash
+   pnpm --silent pricing:v3 compose scaffold --current --input /tmp/mi-brief.json > /tmp/mi-andamio.json
+   ```
+
+   - `demand.commercialUnit` viene del catálogo. Si viene `null` con la pregunta `COMMERCIAL_UNIT_REQUIRED`, el
+     catálogo no la declara para esa oferta: la confirma el operador.
+   - `demand.work[].assigneeIds` trae `planned-<lineId>-<n>`. Son marcadores, no personas ni asientos comprados.
+     Reemplázalos por un **id anónimo estable**: un texto que nombra el puesto y que se repite igual en todas las
+     líneas, periodos y cotizaciones donde es la misma persona (`seo-slot`, `care-titular`). Nunca un nombre, un
+     correo ni un RUT. Cuando nadie está asignado todavía, el id del puesto basta. Si dejas un `planned-`,
+     `compose assess` lo marca con `USER_ASSIGNMENT_REQUIRED`.
+   - **El andamio pregunta sólo por lo que el brief permite saber**: las herramientas base (Notion y Microsoft 365)
+     y las de las tareas de la receta de cada perfil. No pregunta por lo que el trabajo agrega.
+
+4. **Declara lo que el trabajo agrega, y sólo lo que el negocio compromete.** Va en `work[]`, por línea:
+
+   - `tasks`: tareas adicionales a la receta del perfil; cada una trae sus herramientas.
+   - `aiToolIds` con `aiSelectionReason`: herramientas de IA, sólo si el trabajo las usa.
+   - `excludedProfileTasks`: una tarea de la receta que este trabajo no hace, con su motivo.
+   - `serviceToolIds` (raíz de la demanda): herramientas del servicio que no son de una persona, como
+     `agent-runtime-usage`.
+
+   Una herramienta «por si acaso» no se declara: entra al costo y al precio.
+
+5. **Declara una asignación por cada herramienta incluida** (`allocations`), con `periodIds` cuando los meses son
+   iguales:
+
+   - `priceId`: uno con importe. En `resources inspect`, cada precio trae `availability`: `needs_input` (hoy no
+     tiene importe: está pendiente, fuera de vigencia o su registro no tiene monto) o `reference_only` (tiene un
+     importe vigente; «referencia» porque un precio no prueba que el asiento exista). `historical` es un `priceId`:
+     el valor del Excel histórico, marcado estimado. Si `current` está en `needs_input`, se elige entre los que
+     tienen importe el que corresponde a como se compra la herramienta —un plan público `public-…` o
+     `historical`— y **la elección se informa como supuesto**. Nombrar un precio pendiente da
+     `RESOURCE_PRICE_PENDING`; uno que no existe, `RESOURCE_PRICE_SELECTION_REQUIRED` con los utilizables en
+     `candidates`.
+   - `quantity`: asientos o paquetes que se pagan, siempre enteros en una herramienta nominativa.
+   - `driver` y `serviceShare`: qué parte de ese costo carga esta cotización. **`serviceShare` es exactamente
+     `allocatedUnits ÷ totalUnits`, truncado (no redondeado) a 18 decimales**: `1` de `3` es
+     `"0.333333333333333333"`. Otra cifra da `ALLOCATION_DRIVER_MISMATCH`.
+   - Cuánto carga una persona a tiempo parcial:
+     [Asientos de una persona a tiempo parcial](#asientos-de-una-persona-a-tiempo-parcial).
+   - Herramienta con precio en CLP (Adobe) o en EUR (Magnific): nombra `fx:CLP:USD` o `fx:EUR:USD` en `fxRecordIds`.
+
+6. **Créditos de IA.** Una herramienta de créditos (Higgsfield, Magnific) pide dos cosas por cada mes en que se usa:
+
+   - en la línea, `work[].creditDemand`: `{ "periodIds": [1, 2, 3], "toolId": "higgsfield", "credits": 1000 }`,
+     créditos **enteros** de ese proveedor en cada mes;
+   - en la raíz, `creditBudgets`: una entrada por herramienta y por mes, con `purchaseDate` y `useBy` **dentro del
+     mes calendario de ese periodo**. El periodo 1 es el mes de `quoteDate`; el periodo 2, el siguiente. En el
+     periodo 1, `purchaseDate` no puede ser anterior a `quoteDate`. Si no, `CREDIT_PERIOD_WINDOW_MISMATCH`.
+
+   Faltar la demanda da `CREDIT_DEMAND_REQUIRED`; faltar el presupuesto, `CREDIT_BUDGET_REQUIRED`
+   ([planner](presupuestar-creditos-ia-v3.md)).
+
+7. **Una herramienta que aporta el cliente** se declara en `clientProvidedTools` sólo con evidencia `confirmed` que
+   cubra todo el uso. Sin esa evidencia la corrida da `CLIENT_ACCESS_EVIDENCE_REQUIRED` y su `detail` dice qué
+   parte falla. En ese caso no se inventa la evidencia: la herramienta se deja fuera del trabajo y se dice en las
+   condiciones del documento que la aporta el cliente
+   ([detalle](#herramientas-del-cliente-y-créditos)).
+
+8. **Cotiza hasta que calcule.** `compose prepare` no escribe nada; `compose quote --out` congela.
+
+   ```bash
+   pnpm --silent pricing:v3 compose prepare --current --input /tmp/mi-demanda.json
+   pnpm --silent pricing:v3 compose quote --current --input /tmp/mi-demanda.json \
+     --out /tmp/mi-cotizacion.artifact.json > /tmp/mi-cotizacion.summary.json
+   ```
+
+   Exit 2 es falta de información: cada entrada de `diagnostics` trae `code`, `path` y, cuando la causa se puede
+   nombrar, `detail` o `candidates` ([tabla](#diagnósticos-que-nombran-su-causa)). Exit 3 es calculado y en
+   revisión.
+
+**Dos costos que entran solos y hay que conocer.**
+
+- **El fee de plataforma se cobra entero por línea y por mes, cualquiera sea la dedicación.** Es el requisito
+  `platform` de todos los kits: USD 49 al mes por cada persona de la línea (`fee:<perfil>`, estimado; con
+  `headcount` 1, que es lo usual, es uno por línea, y con `headcount` 2 son dos). Pesa poco en una persona a
+  tiempo completo y mucho en una línea chica o en muchas líneas parciales. Medido en los ejemplos versionados: 2,8 %
+  del costo en `designer-on-demand` (una línea completa); 4,8 % en `managed-addon-increment` (tres líneas, dos de
+  ellas a 0,2 y 0,1); y 24,0 % en `managed-addon-increment.option-standalone` (una línea de 0,08). Si debe
+  prorratearse por dedicación es una decisión **abierta** del CEO: hoy no se prorratea y no se corrige a mano.
+- **Las provisiones «TEST ONLY» de los kits de una persona por dedicación.** Los requisitos `assurance` y
+  `operations` de esos kits resuelven a `trial-assurance` y `trial-operations`: USD 25 al mes cada una, con la
+  etiqueta «TEST ONLY, NOT MEASURED». Son marcadores de prueba heredados, no costos medidos: salen como estimados
+  en `estimateExposure` y `compose assess` levanta `PROVISION_COST_EVIDENCE_REQUIRED`. Están pendientes de medición
+  (`ASSURANCE_OPERATIONS_ONBOARDING_COSTS` en el ledger). Se informan así; no se quitan ni se presentan como costo
+  real.
+
+### Paso 3 — Registrar el precio pactado
+
+Sin precio pactado no se declara nada: el precio es el de la política. Con uno, se declara en `brief.adjustments`
+y pasa por el motor, para que el piso se compruebe contra el precio real.
+
+| Lo que se pactó | Ajuste | `amount` es | Qué cubre |
+| --- | --- | --- | --- |
+| Un precio por todo el trabajo: un programa, un proyecto, un mes con su puesta en marcha incluida | `agreed_total` | El neto de las líneas nombradas **en todo el plazo** | Todos los periodos y todas las clases de cobro (mensual y puesta en marcha) de esas líneas. Si `lineIds` nombra además un costo refacturado por su `costId`, también lo cubre |
+| Un precio por mes | `agreed_net` con `billing: "monthly"` | El neto de esas líneas **en cada periodo** | Las filas mensuales. La puesta en marcha queda al precio de la política |
+| Un precio para la puesta en marcha | `agreed_net` con `billing: "setup"` | El neto de esas filas en el periodo en que caen | Las filas de puesta en marcha |
+| Un neto para un costo de terceros | `agreed_net` con `billing: "third_party"` | El neto de ese costo en cada periodo | Las filas de los `costId` nombrados |
+| Un descuento pactado como porcentaje | `discount` | Una tasa | Las filas mensuales y de puesta en marcha de esas líneas |
+
+```json
+"adjustments": [
+  {
+    "adjustmentId": "programme-price",
+    "kind": "agreed_total",
+    "amount": "9500000",
+    "lineIds": ["seo", "lead"],
+    "reason": "Precio acordado por el programa de tres meses, todo incluido. Quién lo aprobó y cuándo."
+  }
+]
+```
+
+- Un `agreed_total` no lleva `billing`. Una línea o un costo que nombra no puede estar en otro ajuste
+  (`AGREED_TOTAL_OVERLAPS_ADJUSTMENT`).
+- El cotizador reparte el total entre los periodos en proporción al precio de política de cada uno, y el último
+  toma lo que sobra: los periodos suman exactamente el total, pero **pueden no ser iguales entre sí**. Con un
+  impuesto exclusivo reparte en una unidad en la que el impuesto no se redondea (100 pesos a 19 %), así que el
+  impuesto de la cotización es el de la tasa sobre el total.
+- Ningún ajuste aprueba nada: una fila bajo su piso sale marcada igual.
+
+Detalle, reglas y fallas: [Registrar el precio acordado](#registrar-el-precio-acordado).
+
+### Paso 4 — Leer el resultado
+
+Del resumen que imprimió `compose quote` ([Leer el resumen](#leer-el-resumen)), en este orden:
+
+1. `calculationStatus` es `calculated` y `diagnostics` está vacío. Si no, no hay precio.
+2. `totals.net`, y `periods[].totals.net` por mes. Con un ajuste, `totals.discount` o `totals.uplift` dicen cuánto
+   se apartó del precio de política; con un `agreed_total`, `agreedTotals` trae el reparto.
+3. `marginRateRoundedDown`: el margen real. Con costos de terceros, además `ownWork.marginRateRoundedDown`.
+4. `marginFloor.lines[]`: las filas bajo su piso. En cada una, `netShortOfFloor` responde «cuánto más tendría que
+   valer» ([qué significa cada clave](#qué-significa-una-línea-marcada)). Una fila marcada se le lleva al CEO antes
+   de presentar nada.
+5. `estimateExposure`: cuánto del costo es estimado, cuánto depende de una dedicación sin evidencia
+   (`dedicationNotEvidenced`) y qué dato conviene confirmar primero.
+6. `assumptions`, `reviewSignals` y `runNotices`: se informan todos. `HISTORICAL_ONLY` sale en toda cotización: el
+   catálogo es de revisión, no una lista de precios aprobada.
+
+Después, sobre el artefacto: `compose assess` (qué falta por evidenciar y contra qué piso se juzgó cada fila) y, en
+un trabajo acotado, `compose commitments`
+([Tres lecturas de una cotización](#tres-lecturas-de-una-cotización)).
+
+### Paso 5 — Producir el documento
+
+1. `compose document --input <artefacto> --out <brief>` devuelve exit 2 y deja el brief con cada texto por llenar y
+   cada línea bajo su clave.
+2. Llena sólo textos. Decide cómo se imprime el precio:
+
+   - **Por meses (lo que sale sin hacer nada):** cada clave es un concepto plegado por meses, «3 meses» al valor de
+     uno. Si el neto cambia entre meses, sale una línea por tramo.
+   - **Un precio por todo (`combine`):** varias claves, o una sola, como una línea de cantidad 1, sin valor
+     unitario, con la suma exacta del plazo:
+
+     ```json
+     "combine": [
+       { "keys": ["fee"], "label": "Programa SEO/AEO de tres meses", "unit": "programa" }
+     ]
+     ```
+
+     Úsalo siempre que el precio se pactó con `agreed_total`: su reparto deja el último mes distinto y, plegado por
+     meses, el documento imprimiría dos tramos.
+
+3. `cover.netLabel` nombra el neto de la portada cuando «Valor neto del servicio completo» no es lo que se cobra:
+   «Valor neto del programa», «Valor neto del proyecto», o «Valor neto de los tres primeros meses» en un servicio
+   mensual que continúa.
+4. `paymentMilestones` si hay hitos de pago. Con un impuesto exclusivo, cada hito se imprime con su neto, su
+   impuesto y su total.
+5. `buyer.unit` y `schedule.note` son optativos y el andamio no los trae: se omiten antes que llenarlos con
+   relleno. No se escribe quién define la fecha de inicio.
+6. Lo que el documento no tiene como dato va como texto en `conditions.rows`: la vigencia de la oferta, la forma y
+   el plazo de pago, y lo que el cliente debe aportar (accesos, lineamientos, una herramienta propia).
+7. La portada lleva la leyenda de borrador mientras el CEO no apruebe el precio. Que el precio lo haya puesto él no
+   es todavía la excepción a un piso: si hay filas marcadas, se las muestras con lo que falta y la leyenda se
+   mantiene hasta que apruebe con esa información.
+8. Emite los datos con `--brief` (exit 3) y genera el PDF con `render-cotizacion-a4.mjs`.
+
+Detalle: [Producir el documento de cotización](#producir-el-documento-de-cotización).
+
+### Caso A — Una persona por un mes, con un precio por todo
+
+Un diseñador sénior a tiempo completo durante un mes, cliente y persona en Chile, en CLP. Refuerzo acotado:
+`talent-assurance-staffing`, `role_capacity`, `on_demand`, un periodo. La demanda es la versionada
+[`designer-on-demand.demand.json`](../../../data/pricing/v3-operating/designer-on-demand.demand.json).
+
+```bash
+caso=data/pricing/v3-operating/designer-on-demand
+
+pnpm --silent pricing:v3 compose prepare --current --input "$caso.demand.json"
+```
+
+Exit 3. Precio de política: `totals.net` `2870000` (fila mensual 2.550.000 y puesta en marcha 320.000), costo
+`1822704`, margen `0.364911`, motor `pricing-v3-local/1.3.0`, ninguna fila bajo el piso de 25 %.
+
+El cliente acepta 2.800.000 por el mes completo, puesta en marcha incluida. Es un precio por todo: `agreed_total`.
+
+```bash
+node -e '
+const fs = require("fs")
+const demand = JSON.parse(fs.readFileSync("data/pricing/v3-operating/designer-on-demand.demand.json", "utf8"))
+demand.brief.adjustments = [{
+  adjustmentId: "job-price",
+  kind: "agreed_total",
+  amount: "2800000",
+  lineIds: ["design"],
+  reason: "Example: price agreed for the month, start-up included. Declared for this example; not a commercial approval."
+}]
+fs.writeFileSync("/tmp/caso-a.demand.json", JSON.stringify(demand, null, 2) + "\n", { flag: "wx" })
+'
+
+pnpm --silent pricing:v3 compose quote --current --input /tmp/caso-a.demand.json \
+  --out /tmp/caso-a.artifact.json > /tmp/caso-a.summary.json
+```
+
+Exit 3. Qué leer:
+
+| Clave | Valor | Qué dice |
+| --- | --- | --- |
+| `totals.net` | `2800000` | Exactamente lo pactado |
+| `totals.discount` | `70000` | Lo que el acuerdo rebajó del precio de política |
+| `agreedTotals[0].distribution` | `monthly` 2.487.804 y `setup` 312.196 | El total repartido entre las dos clases de cobro, en proporción a 2.550.000 y 320.000 |
+| `agreedTotals[0].distributionUnitBasis` | `currency_precision` | El impuesto no está resuelto: reparte al peso |
+| `marginRateRoundedDown` | `0.349034` | Margen real |
+| `marginFloor.lines` | `[]` | Ninguna fila bajo el piso |
+| `estimateExposure.dedicationNotEvidenced` | `design`, `1310000` (71,9 % del costo) | La línea no declara `dedicationEvidence`: el costo de la persona no cuenta como confirmado |
+
+Para el documento, las dos claves (`design` y `design:setup`) en una línea:
+
+```json
+"cover": { "netLabel": "Valor neto del servicio" },
+"combine": [
+  {
+    "keys": ["design", "design:setup"],
+    "label": "Diseñador visual sénior por un mes",
+    "detail": "Dedicación completa, con su puesta en marcha",
+    "unit": "servicio"
+  }
+]
+```
+
+Sobre una copia de `designer-on-demand.document-brief.json` sin su bloque `lines` (una clave combinada no admite
+entrada en `lines`), `compose document` devuelve exit 3 con una sola línea, «1 servicio», neto 2.800.000 e impuesto
+«Por confirmar». Generado, son cuatro páginas.
+
+**Variante: la misma persona tres meses, con un valor por mes.** Sobre
+[`designer-three-months-iva.demand.json`](../../../data/pricing/v3-operating/designer-three-months-iva.demand.json)
+(tres periodos, IVA de 19 % declarado sólo para el ejemplo; política: 7.970.000), un valor pactado de 2.450.000 al
+mes es un `agreed_net`: `"kind": "agreed_net"`, `"amount": "2450000"`, `"billing": "monthly"`,
+`"lineIds": ["design"]`. Resultado: periodos de 2.770.000 (el mes más la puesta en marcha de 320.000, que el acuerdo
+no cubre), 2.450.000 y 2.450.000; neto 7.670.000, impuesto 1.457.300, total 9.127.300, margen `0.339229`. El
+documento, sin `combine`, imprime «3 meses» a 2.450.000 y «1 pago único» de 320.000.
+
+### Caso B — Un servicio gestionado recurrente, con un valor por mes
+
+Un servicio de atención en redes de la práctica creativa, continuo, con tres meses de compromiso inicial y un fee
+pactado de 5.650.000 al mes: `creative-managed-service`, `managed_service`, `on_going`, tres periodos y un
+`agreed_net` mensual sobre sus tres líneas. Es el ejemplo versionado `managed-addon-increment`.
+
+```bash
+caso=data/pricing/v3-operating/managed-addon-increment
+
+pnpm --silent pricing:v3 replay --input "$caso.artifact.json"
+pnpm --silent pricing:v3 compose assess --input "$caso.artifact.json"
+pnpm --silent pricing:v3 compose document --input "$caso.artifact.json" \
+  --brief "$caso.document-brief.json" \
+  --increment conversations="$caso.with-addon.artifact.json" \
+  --out /tmp/caso-b.document.json
+```
+
+Los tres devuelven exit 3 y `replay` responde `"verified": true`. Neto 16.950.000 (3 × 5.650.000), IVA 3.220.500,
+total 20.170.500, margen `0.455520`, ninguna fila bajo el piso de 45 %. `assess` trae en
+`margin.pricingPolicies` la regla con que se puso precio a las tres líneas (`creative-managed-service`,
+`target_margin` `0.45`, `minimumMargin` `0.45`) y `belowPolicyFloor: false`. El documento imprime una línea de fee:
+«3 meses» a 5.650.000, y es idéntico al versionado `managed-addon-increment.document.json`. El brief de ese ejemplo
+nombra además una opción adicional, por eso la corrida lleva `--increment`
+([adicionales](#un-adicional-que-amplía-la-base-compose-increment)): sin el flag se rechaza con
+`QUOTE_DOCUMENT_BRIEF_INVALID`, porque el brief nombra una opción que la corrida no recibió. En un servicio que
+sigue después del tercer mes, la portada nombra su neto con `cover.netLabel` («Valor neto de los tres primeros
+meses»); el brief versionado no lo declara.
+
+### Caso C — Un programa SEO/AEO de tres meses, con un precio por el programa
+
+Un especialista SEO a 90 horas al mes y un líder a 0,1, tres meses con inicio y término, cliente y equipo en Chile,
+CLP, IVA de 19 % declarado sólo para el ejemplo. Programa acotado de la práctica SEO/AEO:
+`seo-aeo-managed-service`, `managed_service`, `on_demand`, tres periodos.
+
+1. El brief, en `/tmp/caso-c.brief.json`:
+
+   ```json
+   {
+     "schemaVersion": "pricing-v3-brief/1",
+     "mode": "simulation",
+     "quoteDate": "2026-10-12",
+     "offerId": "seo-aeo-managed-service",
+     "engagementCode": "monthly",
+     "engagementForm": "on_demand",
+     "accountId": "seo-programme-example",
+     "offerMarketCountry": "CL",
+     "outputCurrency": "CLP",
+     "periods": 3,
+     "lines": [
+       {
+         "lineId": "seo",
+         "profile": "ECG-020",
+         "talentCountry": "CL",
+         "headcount": 1,
+         "dedication": { "unit": "hours_per_month", "value": "90" },
+         "allocationMode": "shared",
+         "allocationPolicyId": "allocation:shared",
+         "kitId": "managed-service-core",
+         "allowUnlocalizedCost": false,
+         "choices": []
+       },
+       {
+         "lineId": "lead",
+         "profile": "ECG-001",
+         "talentCountry": "CL",
+         "headcount": 1,
+         "dedication": { "unit": "fte", "value": "0.1" },
+         "allocationMode": "shared",
+         "allocationPolicyId": "allocation:shared",
+         "kitId": "managed-service-core",
+         "allowUnlocalizedCost": false,
+         "choices": []
+       }
+     ]
+   }
+   ```
+
+2. El andamio y la demanda completa. El andamio (exit 2) trae `commercialUnit: "managed_service"` y pregunta por
+   Notion, Microsoft 365 y SEMrush, que es la herramienta de la tarea `seo-writing` del perfil:
+
+   ```bash
+   pnpm --silent pricing:v3 compose scaffold --current --input /tmp/caso-c.brief.json > /tmp/caso-c.scaffold.json
+
+   node -e '
+   const fs = require("fs")
+   const demand = JSON.parse(fs.readFileSync("/tmp/caso-c.scaffold.json", "utf8")).demand
+   demand.brief.taxTreatment = {
+     kind: "exclusive", rate: "0.19", policyRef: "example:iva-cl-19",
+     source: { reference: "example: IVA 19 % declared for this example; not a tax ruling for any client",
+       effectiveFrom: "2026-01-01", effectiveUntil: "9999-12-31", status: "confirmed" }
+   }
+   for (const line of demand.brief.lines)
+     line.dedicationEvidence = { reference: "scope-estimate:seo-programme-example",
+       effectiveFrom: "2026-10-01", effectiveUntil: "2026-12-31", status: "estimated" }
+   demand.work[0].assigneeIds = ["seo-slot"]
+   demand.work[1].assigneeIds = ["lead-slot"]
+   const base = (toolId) => ({ periodIds: [1, 2, 3], toolId, priceId: "current", quantity: "2", seatCapacity: 2,
+     serviceShare: "0.3", driver: { unit: "declared-fte-share", totalUnits: "2", allocatedUnits: "0.6" },
+     reason: "Example hypothesis: two named seats (the SEO specialist and the lead); the programme carries 0.6 of 2, its declared dedication." })
+   demand.allocations = [base("notion"), base("microsoft-365"), {
+     periodIds: [1, 2, 3], toolId: "semrush", priceId: "public-seo-pro-monthly", quantity: "1", serviceShare: "0.25",
+     driver: { unit: "projects-on-the-account", totalUnits: "4", allocatedUnits: "1" },
+     reason: "Example hypothesis: one of four projects of the shared account. Public list price; the contracted plan is not confirmed." }]
+   demand.brief.adjustments = [{ adjustmentId: "programme-price", kind: "agreed_total", amount: "9500000",
+     lineIds: ["seo", "lead"],
+     reason: "Example: price agreed for the three-month programme, all included. Declared for this example; not a commercial approval." }]
+   fs.writeFileSync("/tmp/caso-c.demand.json", JSON.stringify(demand, null, 2) + "\n", { flag: "wx" })
+   '
+   ```
+
+   Lo que el script decide y hay que informar: `current` de SEMrush está en `needs_input`, así que usa el plan
+   público `public-seo-pro-monthly` (supuesto); los dos asientos de Notion y de Microsoft 365 se cargan por la
+   dedicación declarada, 0,6 de 2; y la dedicación de las dos líneas es una estimación.
+
+3. Cotiza:
+
+   ```bash
+   pnpm --silent pricing:v3 compose quote --current --input /tmp/caso-c.demand.json \
+     --out /tmp/caso-c.artifact.json > /tmp/caso-c.summary.json
+   ```
+
+   Exit 3, motor `pricing-v3-local/1.4.0` (lleva reserva de contingencia).
+
+   | Clave | Valor | Qué dice |
+   | --- | --- | --- |
+   | `agreedTotals[0].policyNet` | `10110000` | El precio de política del programa: 3.370.000 al mes. Es lo que da la misma demanda sin el ajuste |
+   | `totals.net` | `9500000` | Lo pactado |
+   | `agreedTotals[0].differenceFromPolicyNet` | `-610000` | Lo que el acuerdo rebajó |
+   | `agreedTotals[0].distribution` | 3.166.600 en los periodos 1 y 2; 3.166.800 en el 3 | El reparto: el último mes toma lo que sobra |
+   | `agreedTotals[0].distributionUnit`, `distributionUnitBasis` | `100`, `tax_exact` | Reparte de a 100 pesos para que el IVA no se redondee |
+   | `totals.tax`, `totals.grandTotal` | `1805000`, `11305000` | Exactamente 19 % de 9.500.000 |
+   | `totals.cost`, `totals.contingencyReserve` | `4131024`, `392400` | Costo del plazo; la reserva es 12 % del costo de persona (3.270.000) |
+   | `marginRateRoundedDown` | `0.565155` | Margen real; al precio de política era `0.591392` |
+   | `marginFloor.lines` | `[]` | Ninguna fila bajo el piso de 45 % |
+   | `estimateExposure.estimatedShareOfCost` | `0.983137` | Casi todo el costo es estimado, porque la dedicación lo es |
+   | `estimateExposure.costInputs[0]` | `dedication` / `seo`, `shareOfCost` `0.732022`, `marginRateLostIfTenPctHigher` `0.031832` | Lo primero a confirmar son las horas del especialista: 10 % más de horas son 3,2 puntos de margen |
+   | `reviewSignals` | `ESTIMATED_SOURCE`, `HISTORICAL_ONLY` | Datos estimados y catálogo de revisión |
+
+   Sin `dedicationEvidence` el precio es el mismo y la lectura es otra: `estimatedShareOfCost` `0.096577` y
+   `dedicationNotEvidenced.cost` `3662400` (88,7 % del costo). Parecería una cotización con poco costo estimado; no
+   lo es.
+
+4. `compose assess` sobre el artefacto (exit 3): `margin.pricingPolicies` trae `seo-aeo-managed-service`,
+   `target_margin` `0.55`, `minimumMargin` `0.45`; `belowPolicyFloor: false`; y dos gaps
+   `DEDICATION_EVIDENCE_REVIEW`, uno por línea.
+
+5. El documento. Sin brief, el andamio muestra por qué hace falta `combine`: la clave `fee` saldría en dos líneas,
+   «Meses 1 a 2» a 3.166.600 y «Mes 3» a 3.166.800. Con este bloque, sobre una copia de
+   [`managed-addon-increment.programme-price.document-brief.json`](../../../data/pricing/v3-operating/managed-addon-increment.programme-price.document-brief.json)
+   con sus textos cambiados:
+
+   ```json
+   "cover": { "netLabel": "Valor neto del programa" },
+   "combine": [
+     {
+       "keys": ["fee"],
+       "label": "Programa SEO/AEO de tres meses",
+       "detail": "Equipo, herramientas y dirección del programa",
+       "unit": "programa"
+     }
+   ],
+   "paymentMilestones": [
+     { "id": "advance", "label": "Anticipo", "share": "0.5", "when": "A la aceptación de la cotización" },
+     { "id": "closing", "label": "Saldo", "share": "0.5", "when": "Contra la entrega del balance del programa" }
+   ]
+   ```
+
+   `compose document` devuelve exit 3: una línea «1 programa» de 9.500.000; `vatRate` `0.19`, `taxAmount`
+   `1805000`, `taxPeriods` `3`; y dos hitos de 4.750.000 de neto, 902.500 de IVA y 5.652.500 de total cada uno.
+   Generado, son cuatro páginas.
+
+El ejemplo versionado de un precio de programa es ese mismo brief sobre `managed-addon-increment.artifact.json`:
+una línea «1 programa» de 16.950.000, IVA 3.220.500, y hitos de 8.480.000 + 1.611.200 = 10.091.200 y
+8.470.000 + 1.609.300 = 10.079.300.
+
+### Caso D — Un proyecto único de alcance cerrado, con un solo precio
+
+Una campaña de un mes con producción, talento y medios comprados a terceros: servicio gestionado de la práctica
+creativa vendido On-Demand, un periodo. Es el ejemplo versionado
+[`managed-on-demand-third-party.demand.json`](../../../data/pricing/v3-operating/managed-on-demand-third-party.demand.json):
+política 21.033.333, de los cuales 11.370.000 son trabajo propio y 9.663.333 terceros refacturados
+([Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros)).
+
+Un precio por el proyecto se puede pactar de dos maneras, y dan resultados distintos:
+
+| Qué cubre el `agreed_total` | `lineIds` | Resultado medido |
+| --- | --- | --- |
+| Sólo el trabajo propio, en 11.000.000 | Las seis líneas del equipo | Neto 20.663.333: 11.000.000 más los terceros a su regla (9.663.333). Margen del trabajo propio `0.484843`. Ninguna fila marcada |
+| Todo el proyecto, en 20.500.000 | Las seis líneas y `tp-production`, `tp-talent`, `tp-media` | Neto 20.500.000: 11.081.695 de trabajo propio y 9.418.305 de terceros. Margen del trabajo propio `0.488641`. **La fila de medios sale marcada** |
+
+En la segunda, la rebaja se reparte en proporción entre todo lo nombrado, también los medios, que se cobran al costo
+y tienen su piso en el costo: `tp-media` queda en 3.248.811 contra un `floorNet` de 3.333.333, con
+`netShortOfFloor` `84522`. Un precio por todo bajo el precio de política deja bajo su piso a lo que se refactura al
+costo. Si eso no es lo que se pactó, los costos que se traspasan al costo quedan fuera del `agreed_total`; si lo es,
+es una fila marcada y la decide el CEO.
+
+Para el documento, todo en una línea «1 proyecto»:
+
+```json
+"cover": { "netLabel": "Valor neto del proyecto" },
+"combine": [
+  {
+    "keys": ["fee", "third_party:tp-production", "third_party:tp-talent", "third_party:tp-media"],
+    "label": "Campaña de contenidos y comunidad",
+    "detail": "Servicio, producción, talento y medios",
+    "unit": "proyecto"
+  }
+]
+```
+
+Sobre el artefacto de la segunda variante y una copia de `managed-on-demand-third-party.document-brief.json` sin su
+bloque `lines`: exit 3, una línea «1 proyecto» de 20.500.000, impuesto «Por confirmar», hitos de 10.250.000,
+6.150.000 y 4.100.000, y aparte el costo de USD 890 que paga el cliente. Generado, son cinco páginas. Combinar es
+una decisión de presentación: sin `combine`, el fee y cada costo de terceros son una línea cada uno.
+
+### Lo que hoy no se puede cotizar así
+
+Se dice cuando el negocio lo toca; no se resuelve por cuenta propia:
+
+- una oferta propia para proyectos únicos (se usa una de servicio gestionado, On-Demand);
+- la puesta en marcha de un servicio gestionado como costo (su kit no la tiene);
+- el fee de plataforma prorrateado por dedicación (decisión abierta del CEO);
+- el costo medido detrás de las provisiones «TEST ONLY»;
+- una herramienta cuyo precio vigente no tiene importe: se elige otro precio y se informa;
+- el precio techo del comprador y la lógica de puntaje de una licitación;
+- el costo financiero de un pago tardío;
+- el panel de Greenhouse e Insights como recursos con costo;
+- número de cotización, versiones, QR, firmas y aprobación: son del cotizador de Greenhouse, y adoptarlos es el
+  paso siguiente acordado, todavía sin empezar.
+
+Fuera del cotizador por decisión del CEO, no como pendiente: la fecha de inicio y la duración del contrato.
 
 ## Archivos y comandos
 
@@ -57,10 +666,12 @@ pnpm --silent pricing:v3 catalog validate --current
 ```
 
 `current show` devuelve exit 0 con `"consistent": true` y, por fuente, `"status": "match"`, e imprime qué archivo y
-qué versión nombra el puntero; esa es la fuente, no este manual. Al cierre del 2026-10-11 son
+qué versión nombra el puntero; esa es la fuente, no este manual. Hasta la noche del 2026-10-11 eran
 `catalog.review-v10.json` (`operating-review-2026-10-11-v10`), `resources.review-v11.json`
-(`operating-review-2026-10-11-v11`) y `ai-credits.review-v1.json`. `catalog validate --current` responde esa misma
-versión del catálogo, con exit 0. Los siguientes serían el catálogo v11 y la policy v12.
+(`operating-review-2026-10-11-v11`) y `ai-credits.review-v1.json`. Con la última emisión de ese día el catálogo pasó
+a `catalog.review-v11.json` (`operating-review-2026-10-11-v11`, 394 registros); la policy y los créditos son los
+mismos. `catalog validate --current` responde esa versión del catálogo, con exit 0. Los siguientes serían el
+catálogo v12 y la policy v12.
 
 - `--current` es un interruptor sin valor. Rellena cada uno de `--catalog`, `--policy` y `--credits` que el comando
   acepta y que no recibió; una opción escrita a mano gana sobre el puntero. En `resources budget` rellena `--catalog`
@@ -82,7 +693,9 @@ de margen de la oferta de staffing desde el v7 y la oferta propia de la práctic
 ([Oferta y piso de margen](#selección-y-asignación)). El v9 agrega la forma del compromiso con su razón de precio,
 las dos provisiones de puesta en marcha y el tipo de cambio CLP→USD para un costo facturado en CLP. El v10 agrega
 la regla de precio de los costos de terceros por categoría y la reserva de contingencia de los servicios gestionados
-vendidos On-Demand, y deja confirmados desde el 2026-10-12 los factores de país que seguían estimados.
+vendidos On-Demand, y deja confirmados desde el 2026-10-12 los factores de país que seguían estimados. El v11 agrega
+un registro `offer` por cada oferta, con la unidad comercial con que se vende; no cambia ningún precio, costo, factor
+ni política ([Oferta y piso de margen](#selección-y-asignación)).
 La policy vigente tiene 27 precios de herramientas que rigen hasta que se reemplacen, cada uno con una fecha de
 revisión ([Un precio unitario no vence](#un-precio-unitario-no-vence)). La v7 registró Adobe como se factura (dos
 productos, en CLP) y la v8 declaró por cuánto tiempo hay que pagar una licencia de Notion o de Microsoft 365 una
@@ -93,16 +706,32 @@ Adobe, y la v10 dejó como precio por defecto de Creative Cloud Pro el precio si
 **La fecha de la demanda decide qué valores recibe.** Cada valor del catálogo y de la policy se toma según
 `brief.quoteDate`, no según el archivo que se carga. La policy vigente rige desde el 2026-10-11, igual que la forma
 del compromiso, las provisiones de puesta en marcha y los factores de país: una cotización nueva lleva la fecha del
-día en `quoteDate`, y al copiar un ejemplo anterior se cambia también esa fecha. Con las versiones vigentes, una
-demanda fechada antes del 2026-10-11 no calcula: devuelve exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` en
-`policy.source`. Para repetir un caso anterior se nombran las versiones de su fecha
-([abajo](#secuencia-de-comandos)).
+día en `quoteDate`, y al copiar un ejemplo anterior se cambia también esa fecha. Para repetir un caso anterior se
+nombran las versiones de su fecha ([abajo](#secuencia-de-comandos)).
 
-Cuando la demanda está fechada antes de valores más nuevos del catálogo, `compose prepare` y `compose quote` lo
-dicen: el resumen trae `runNotices.laterCatalogValues`, con la fecha de la demanda, la fecha más reciente del
-catálogo y cuántos valores posteriores no se usaron, por clase. Si aparece en una cotización nueva, la fecha está
-atrasada: corregir `quoteDate` y volver a correr. No aparece cuando la fecha está al día, ni en `replay`, que
-reproduce una cotización tal como se congeló ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)).
+#### Una fecha anterior a los datos
+
+**Una cotización no puede llevar una fecha anterior a los datos que usa.** Con las versiones vigentes, una demanda
+fechada antes del 2026-10-11 no calcula (exit 2), y desde el 2026-10-11 el diagnóstico nombra la causa y la fecha a
+la que hay que moverse, en vez de una lista de selecciones faltantes:
+
+| `quoteDate` de la demanda | Qué devuelve `diagnostics` | Qué significa |
+| --- | --- | --- |
+| Anterior al 2026-10-09 | `QUOTE_DATE_BEFORE_CATALOG` en `quoteDate`, con la primera fecha en que rige el catálogo en `detail` | Ningún valor del catálogo rige ese día. No se reporta nada más del catálogo |
+| Anterior a la primera política de precio de la oferta (2026-10-11 en `seo-aeo-managed-service`) | `QUOTE_DATE_BEFORE_OFFER_POLICY` en `offerId`, una sola vez, con la fecha en `detail` | La oferta todavía no tenía política de precio. Antes salía un `MISSING_CATALOG_SELECTION` por línea |
+| Anterior al registro de una selección (forma del compromiso, factor de país, regla de terceros…) | `MISSING_CATALOG_SELECTION` en su `path`, con `detail` «The quote date is before the first date a record for this selection is in force…» | El registro existe, pero empieza a regir después |
+| Anterior al 2026-10-11 | `RESOURCE_POLICY_NOT_EFFECTIVE` en `policy.source`, con la fecha en `detail` | La policy de recursos vigente rige desde ese día |
+
+En los cuatro casos se corrige igual: la fecha del día en `quoteDate`. No se cambia la vigencia de un registro ni se
+nombra una versión anterior para que una cotización nueva pase.
+
+**`runNotices.laterCatalogValues` es el aviso de lo mismo cuando la corrida sí calcula.** Dice que el catálogo
+tiene valores que empiezan a regir después de la fecha de la demanda y que por eso no se usaron: trae la fecha de la
+demanda (`quoteDate`), la fecha más reciente en que empieza a regir un valor (`newestEffectiveFrom`), cuántos
+valores quedaron fuera (`records`) y cuántos de cada clase (`byKind`). La cotización se calculó con los valores de
+su fecha, sin error. Si aparece en una cotización nueva, la fecha está atrasada: corregir `quoteDate` y volver a
+correr. No aparece cuando la fecha está al día, ni en `replay`, que reproduce una cotización tal como se congeló
+([Avisos de la corrida](#avisos-de-la-corrida-runnotices)).
 
 **Único caso en que el aviso sale con la fecha correcta: una cotización fechada 2026-10-11.** El catálogo v10
 confirma ocho factores de país desde el 2026-10-12 (cinco de talento y tres de mercado), así que toda cotización con
@@ -147,7 +776,8 @@ pnpm --silent pricing:v3 compose preview --input /tmp/cotizacion-v3-hoy.json \
   --format markdown --out /tmp/preview-v3-hoy.md
 ```
 
-`inspect` devuelve exit 0, `scaffold` exit 2 (siempre deja preguntas) y los demás exit 3. El resumen de
+`inspect` devuelve exit 0, `scaffold` exit 2 (siempre deja preguntas; `demand.commercialUnit` es el que el catálogo
+declara para la oferta, aquí `role_capacity`) y los demás exit 3. El resumen de
 `compose quote` trae `engineVersion` `pricing-v3-local/1.1.0`, `totals.net` `1450.00` en USD y
 `priceRounding.multiple` `10`; el preview lo muestra como 1.160,00 del diseñador más 290,00 de implementación
 inicial, que es el onboarding de la persona ([Puesta en marcha](#puesta-en-marcha-onboarding-y-reclutamiento)). El
@@ -207,11 +837,15 @@ cotización guarda una cotización calculada o no guarda nada
 Exit 0: operación técnica verificada. Exit 2: falta información. Exit 3: preparado/calculado en revisión;
 **no es un error de cálculo ni una aprobación comercial**. Replay de una composición en revisión devuelve 3.
 Exit 1: rechazo (entrada inválida, conflicto, overwrite o export comercial bloqueado). stdout queda vacío y stderr
-trae un único JSON: `{ "error": { "code", "message", "option"?, "issues"? }, "binding": false }`. `code` nombra la
-causa y sale de un registro cerrado ([`errors.ts`](../../../src/lib/finance/pricing-v3/errors.ts)); `message` es un
-texto fijo que no describe el caso; `option` nombra la opción a corregir, sin su valor; `issues` lista hasta 20
-ubicaciones `{ "path", "rule" }` dentro del documento rechazado. El reporte nunca contiene un valor, una ruta de
-archivo ni el mensaje de un parser: decidir por `code`, no por el texto. Tabla en
+trae un único JSON: `{ "error": { "code", "message", "option"?, "allowed"?, "issues"? }, "binding": false }`. `code`
+nombra la causa y sale de un registro cerrado ([`errors.ts`](../../../src/lib/finance/pricing-v3/errors.ts));
+`message` es un texto fijo que no describe el caso; `option` nombra la opción a corregir, sin su valor; `allowed`,
+cuando la opción admite una lista cerrada, la trae (un `--kind` que no existe devuelve los catorce que sí);
+`issues` lista hasta 20 ubicaciones `{ "path", "rule" }` dentro del documento rechazado. Desde el 2026-10-11 una
+ubicación dice además qué pedía el contrato en ese lugar, cuando la regla lo tiene: `limit` (el tope que rompió un
+tamaño o un número, en `too_big` y `too_small`), `allowed` (la lista cerrada de un enum) o `expected` (el tipo
+esperado). El reporte nunca contiene el valor recibido, una ruta de archivo ni el mensaje de un parser: decidir por
+`code`, no por el texto. Tabla en
 [Qué hacer con cada error](#qué-hacer-con-cada-error).
 No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interpretar explícitamente estos estados.
 
@@ -220,18 +854,19 @@ No concatenar una secuencia con `&&` esperando exit 0 de una simulación: interp
 | Comando                                                | Input/formato                                                      | Resultado y estado                                                                                           |
 | ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | `current show` / `current set`                         | Sin input / las tres rutas, `--reason` y `--confirm`               | Puntero de versiones vigentes, su `pointerDigest` y estado por fuente (exit 0 coherente, 2 si no) / puntero nuevo |
-| `catalog search` / `catalog show` / `catalog validate` | Catálogo monetario, consulta/kind y fecha opcionales               | Registros con fuentes o digest validado; no vigencia comercial aprobada. `--kind third_party_policy` y `--kind contingency_reserve` listan las reglas de terceros y la reserva |
+| `catalog search` / `catalog show` / `catalog validate` | Catálogo monetario, consulta/kind y fecha opcionales               | Registros con fuentes o digest validado; no vigencia comercial aprobada. `--kind third_party_policy` y `--kind contingency_reserve` listan las reglas de terceros y la reserva; `--kind offer`, la unidad comercial de cada oferta; `--kind allocation`, las horas de un mes a tiempo completo. Un `--kind` que no existe devuelve en `allowed` los catorce admitidos |
 | `prepare` / `quote`                                    | Brief y catálogo                                                   | Selección / quote del carril de kits; no recibe demanda compuesta                                            |
 | `validate` / `calculate`                               | Request + snapshot resuelto                                        | Validación / artefacto del núcleo; no lee Excel ni descubre tools. `calculate --out` escribe sólo si calcula; `--keep-blocked` guarda el bloqueado |
 | `resources inspect`                                    | Catálogo + policy + fecha; créditos opcionales                     | Perfiles, tools, planes, fee separado, necesidades y hashes; precio vencido deja `needs_input` en su entrada; `priceReview` lista revisiones y vigencias por fecha |
-| `compose scaffold`                                     | Brief + policy + catálogo                                          | Demanda editable con slots y preguntas, siempre exit 2; completar planes/asignaciones/alcance                |
+| `compose workload`                                     | Volúmenes, capacidad y reparto por línea (`pricing-v3-workload/1`); `--brief` y `--out` para escribir un brief | Dedicación por línea a partir del volumen; con `--brief`, un brief nuevo con `dedication` y `dedicationEvidence` en las líneas dimensionadas; exit 0 listo, 2 si falta algo. No recibe `--current` |
+| `compose scaffold`                                     | Brief + policy + catálogo                                          | Demanda editable con slots y preguntas, siempre exit 2; completar planes/asignaciones/alcance. `commercialUnit` es el que el catálogo declara para la oferta; si no lo declara, `null` y la pregunta `COMMERCIAL_UNIT_REQUIRED` |
 | `resources portfolio`                                  | Portfolio + policy; fecha/catálogo para costos                     | Cuotas reconciliadas, interno/sin asignar y residual; exit 3 preparado o 2 pendiente                         |
 | `compose plan`                                         | Plan con demanda y portfolio opcional + las tres fuentes           | Demanda resuelta y cálculo de prueba; `--out` guarda la demanda, **no** el artefacto                         |
-| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Resumen derivado en stdout; `quote` añade `replayDigest`; `runNotices` si la corrida tiene avisos; `ownWork`, `thirdParty` y `contingencyReserve` en una cotización 1.4.0. Resultado completo sólo en el artefacto de `--out`, que se escribe sólo si la cotización calcula; `--keep-blocked` guarda a propósito uno bloqueado |
+| `compose prepare` / `compose quote`                    | Demanda + catálogo/policy/créditos                                 | Resumen derivado en stdout; `quote` añade `replayDigest`; `runNotices` si la corrida tiene avisos; `agreedTotals` si la demanda declara un `agreed_total`; `ownWork`, `thirdParty` y `contingencyReserve` en una cotización 1.4.0. Resultado completo sólo en el artefacto de `--out`, que se escribe sólo si la cotización calcula; `--keep-blocked` guarda a propósito uno bloqueado |
 | `resources budget`                                     | Request de créditos; `--catalog` es catálogo de packs              | Presupuesto independiente; no es input de quote/replay de cotizaciones                                       |
 | `explain` / `replay`                                   | Artefacto snapshot, catálogo o composición                         | Detalle completo / verificación con inputs congelados, sin sucesor; replay de composición devuelve resumen   |
 | `compare`                                              | Dos artefactos compatibles de snapshot o catálogo                  | Diferencias internas; el CLI actual no compara artefactos de composición directamente                        |
-| `compose assess`                                       | Artefacto compuesto                                                | Gaps, `costEvidencePriority` (qué dato estimado confirmar primero), margen propuesto (leído sobre el trabajo propio si hay terceros) y piso de la política por línea; siempre revisión, no aprueba excepciones; JSON |
+| `compose assess`                                       | Artefacto compuesto                                                | Gaps, `costEvidencePriority` (qué dato estimado confirmar primero y qué costo depende de una dedicación sin evidencia) y `margin`: el margen real, la regla de precio con que se cotizó cada línea (`pricingPolicies`, con su objetivo y su piso) y si el kernel marcó alguna fila bajo su piso (`belowPolicyFloor`); siempre revisión, no aprueba excepciones; JSON |
 | `compose preview`                                      | Artefacto compuesto calculado                                      | Allowlist JSON/Markdown para revisión; fee agregado si servicio, un ítem por costo de terceros y lo que el cliente paga directo aparte; importes en escala de moneda, sin emisión |
 | `compose split`                                        | Artefacto compuesto calculado + `--tools`                          | El mismo neto presentado en dos cifras por fila: persona y kit de herramientas (tres con terceros); no cambia el total; JSON |
 | `compose schedule`                                     | Artefacto compuesto calculado + `--milestones` (arreglo JSON)      | Calendario de pagos: el neto repartido en hitos que suman exactamente el neto, terceros incluidos; no es factura ni cobro; exit 3 |
@@ -253,7 +888,9 @@ con `explain` sobre ese archivo (salida grande; pedirla sólo cuando haga falta 
 calcula, `--out` no escribe nada y el resumen lo dice en `runNotices.output`. `replay` de una
 composición responde `{ verified, calculationId, summary }`: verifica el archivo y devuelve su resumen, no el
 resultado entero. `compose assess` añade un gap `MARGIN_BELOW_POLICY_FLOOR` por cada línea que el kernel marcó bajo
-el piso de su política y las lista en `margin.policyFloor.linesBelowFloor`; sus 40 %/35 % genéricos no cambian.
+el piso de su política y las lista en `margin.policyFloor.linesBelowFloor`. Desde el 2026-10-11 no compara contra
+ningún margen genérico: el 40 %/35 % que traía como propuesta se retiró, y `margin.pricingPolicies` dice con qué
+regla (objetivo y piso de su propia oferta) se cotizó cada línea.
 `compose preview` imprime los importes derivados en la escala de la moneda (CLP sin decimales) y sólo el neto final:
 no detalla redondeo, descuento ni recargo. Los carriles
 `prepare`/`quote` de catálogo y `calculate` del núcleo conservan su salida. Opciones ajenas al subcomando se rechazan
@@ -331,6 +968,36 @@ contingencia ([tabla](#si-un-costo-de-terceros-o-la-reserva-fallan)), y los de l
 ([tabla](#si-la-cuenta-de-asientos-no-cierra)). `compose commitments` sobre una cotización
 bloqueada tampoco es un rechazo: devuelve exit 2 con `calculationStatus` `needs_input`.
 
+### Diagnósticos que nombran su causa
+
+Un exit 2 no es un error de argumentos: la demanda necesita algo. Cada entrada de `diagnostics` trae `code` y `path`
+y, desde el 2026-10-11, lo que hace falta para corregirla sin leer el código: `detail` (qué parte falla, por regla y
+nunca con el dato que escribiste) o `candidates` (los ids utilizables). Los de esa fecha:
+
+| `code` y `path` | Qué pasó | Qué hacer |
+| --- | --- | --- |
+| `QUOTE_DATE_BEFORE_CATALOG` en `quoteDate` | La demanda está fechada antes del primer día en que rige el catálogo; `detail` dice cuál | Fecha del día en `quoteDate` ([detalle](#una-fecha-anterior-a-los-datos)) |
+| `QUOTE_DATE_BEFORE_OFFER_POLICY` en `offerId` | La oferta no tenía política de precio ese día; `detail` dice desde cuándo la tiene | Lo mismo |
+| `RESOURCE_POLICY_NOT_EFFECTIVE` en `policy.source` | La fecha cae fuera de la vigencia de la policy de recursos; `detail` dice de qué lado y la fecha | Lo mismo. No nombrar una policy anterior para una cotización nueva |
+| `COMMERCIAL_UNIT_CONTRADICTS_OFFER` en `commercialUnit` | La demanda declara una unidad comercial y el catálogo vende esa oferta con otra; `detail` nombra las dos y el registro | Corregir `commercialUnit` al que declara el catálogo. Si lo que se vende es otra cosa, lo que cambia es `offerId` |
+| `RESOURCE_ALLOCATION_REQUIRED` en `<periodo>:<herramienta>` | El trabajo de ese mes usa la herramienta y la demanda no declara su asignación; `candidates` trae los `priceId` con importe | Declarar la asignación con uno de esos precios, o excluir con motivo la tarea que la pide si este trabajo no la hace |
+| `RESOURCE_PRICE_SELECTION_REQUIRED` en el mismo `path` | La asignación nombra un `priceId` que la herramienta no tiene; `candidates` trae los utilizables | Nombrar uno de ellos |
+| `RESOURCE_PRICE_PENDING` en el mismo `path` | El `priceId` existe pero hoy no tiene importe; `detail` trae el motivo que declara la policy | Elegir un precio con importe e informar la elección como supuesto |
+| `ALLOCATION_DRIVER_MISMATCH` en el mismo `path` | `serviceShare` no es `allocatedUnits ÷ totalUnits` truncado a 18 decimales, o `allocatedUnits` supera a `totalUnits` | Recalcular `serviceShare` desde el driver |
+| `CLIENT_ACCESS_EVIDENCE_REQUIRED` en la herramienta | La evidencia de una herramienta que aporta el cliente no alcanza; `detail` dice el periodo y qué falla: no está confirmada, empieza después del primer día que debe cubrir, termina antes del último día del mes, o `lineIds` repite una línea | Conseguir la evidencia. Si no existe, quitar la entrada de `clientProvidedTools`, dejar la herramienta fuera del trabajo y decirlo en las condiciones ([detalle](#herramientas-del-cliente-y-créditos)) |
+| `PENDING_DEDICATION_EVIDENCE`, `DEDICATION_EVIDENCE_NOT_EFFECTIVE` en `lines.<lineId>.dedicationEvidence` | La evidencia de la dedicación está `pending`, o no rige en `quoteDate` | Declararla `estimated` o `confirmed`, con una vigencia que incluya la fecha de la demanda |
+| `AGREED_TOTAL_OVERLAPS_ADJUSTMENT` en `adjustments.<adjustmentId>` | Una línea o un costo que nombra el total está dos veces en él, o en otro ajuste | Dejar cada línea en un solo ajuste ([reglas](#registrar-el-precio-acordado)) |
+| `AGREED_TOTAL_NOT_REPRESENTABLE` en `adjustments.<adjustmentId>.amount` | El total tiene más decimales que la moneda | Escribirlo en la escala de la moneda |
+| `AGREED_TOTAL_WITHOUT_BASE` en `adjustments.<adjustmentId>` | Un total mayor que cero sobre filas que valen cero en todos los periodos | Corregir `lineIds` |
+| `AGREED_TOTAL_WITHOUT_POLICY_PRICE` en `adjustments.<adjustmentId>` | La cotización no calcula sin el total, así que no hay precio de política sobre el cual repartirlo | Resolver primero los demás diagnósticos de la corrida |
+| `ADJUSTMENTS_EXCEED_PERIOD_LIMIT` en `periods.<n>.adjustments` | Un total se vuelve hasta un ajuste por clase de cobro en cada periodo; con los demás, ese periodo supera los 10 que admite | Reducir los ajustes declarados |
+| `DUPLICATE_ADJUSTMENT_ID` en `adjustments` | Un `adjustmentId` choca con otro, o con el nombre que toma un total al repartirse (`<adjustmentId>:monthly`, `:setup`, `:third_party`) | Un id distinto por ajuste |
+| `INVALID_DEDICATION` en `periods.<n>.request.lines.<i>.dedication` | La dedicación supera 1 FTE: más de `1` en `fte`, o más horas que las de un mes a tiempo completo | Corregirla, o subir `headcount` |
+
+Los demás diagnósticos están en la tabla de su tema: [asientos](#si-la-cuenta-de-asientos-no-cierra),
+[terceros y reserva](#si-un-costo-de-terceros-o-la-reserva-fallan), [forma del compromiso](#cotizar-on-demand-u-on-going)
+y [Problemas comunes](#problemas-comunes).
+
 ## Selección y asignación
 
 1. Resolver la variante exacta del perfil: consultores HubSpot y otros niveles mantienen costos distintos.
@@ -338,7 +1005,13 @@ bloqueada tampoco es un rechazo: devuelve exit 2 con `calculationStatus` `needs_
 3. Base común Notion/Microsoft 365; añadir Adobe, plataformas e IA sólo cuando el trabajo lo requiere.
 4. Elegir `priceId`, frecuencia y plan explícitos. Público, operador, factura e histórico conservan fuente separada.
 5. Identificar usuarios con IDs estables sin PII. `planned-*` son slots, nunca personas contratadas ni seats existentes.
-6. Declarar cantidad, capacidad contractual, driver y parte atribuida por mes. No hay reparto automático por FTE.
+   Un id estable es un texto que nombra el puesto y se repite igual donde es la misma persona (`design-slot`,
+   `care-titular`): el cotizador cuenta asientos por esos ids, así que la misma persona con dos ids paga dos asientos y
+   dos personas con el mismo id, uno. Cuando nadie está asignado todavía, el id del puesto basta; nunca un nombre, un
+   correo ni un RUT. Un `planned-*` que queda en la demanda sale en `compose assess` como `USER_ASSIGNMENT_REQUIRED`.
+6. Declarar cantidad, capacidad contractual, driver y parte atribuida por mes. No hay reparto automático por FTE:
+   `serviceShare` se escribe, y tiene que ser exactamente `allocatedUnits ÷ totalUnits` truncado a 18 decimales
+   (`ALLOCATION_DRIVER_MISMATCH` si no).
    Los asientos de una herramienta nominativa se declaran como se compran, y los meses iguales, una sola vez
    ([Declarar los asientos de una herramienta](#declarar-los-asientos-de-una-herramienta)).
 7. Presupuestar créditos por proveedor/mes; la CLI suma consumo de roles y elige paquetes discretos una sola vez.
@@ -355,7 +1028,11 @@ un perfil en un país se aparta del costo de Chile por su factor
 
 **Oferta y piso de margen.** La oferta del brief (`brief.offerId`) elige la política de precio de cada perfil y, con
 ella, el objetivo y el piso que el motor vigila. Hay tres, todas decididas por el CEO. Se elige por lo que se vende y
-por la práctica que lo entrega:
+por la práctica que lo entrega ([tabla por tipo de negocio](#paso-1--elegir-oferta-unidad-forma-y-periodos)). Desde
+el catálogo v11 la unidad comercial de cada una es un dato del catálogo (registro `offer`,
+`catalog search --current --kind offer`): `compose scaffold` la escribe y una demanda que declare otra no calcula
+(`COMMERCIAL_UNIT_CONTRADICTS_OFFER`). No existe una oferta propia para un proyecto único de alcance cerrado: hoy se
+cotiza con una oferta de servicio gestionado vendida On-Demand a un solo precio, y se dice así.
 
 - Una persona vendida por dedicación (staff augmentation): `offerId: "talent-assurance-staffing"`, con
   `commercialUnit: "role_capacity"`. Piso de 25 % (2026-10-11, catálogo v7). El objetivo es 30 %, 35 % o 40 % según el
@@ -378,7 +1055,9 @@ cotizador no lo rechaza ni lo corrige: marca la línea con `MARGIN_BELOW_FLOOR` 
 resumen, con su `minimumMargin` y su margen real ([Leer el resumen](#leer-el-resumen)). Eso se le informa al operador
 tal cual; no se «arregla» quitando costo, con un descuento ni con el redondeo. La excepción bajo un piso es del CEO,
 caso por caso, y no sirve de referencia para otro cliente. Una cotización con fecha anterior al 2026-10-11 conserva
-el recargo histórico de staffing, sin piso.
+el recargo histórico de staffing, sin piso; eso vale para un artefacto ya congelado o para un caso repetido con las
+versiones de su fecha, porque con `--current` una demanda con esa fecha no calcula
+([por qué](#una-fecha-anterior-a-los-datos)).
 
 **La oferta no es la forma del compromiso.** Qué se vende lo dice `offerId`; si es un trabajo continuo o uno acotado
 lo dice otro campo, `brief.engagementForm`, que mueve el precio y nunca el piso
@@ -403,9 +1082,12 @@ No convertir EUR a USD sin la referenciaFX explícita en demanda.
 Ejemplo **hipotético** (`portfolio.example.json`, corrido con `--current` y la policy v10): Adobe Creative Cloud
 Pro CLP 325.405,5 al mes (el precio sin descuento), capacidad 160, cliente 40, interno 80, sin asignar 40 → CLP
 81.351,375 / 162.702,75 / 81.351,375.
-El 25% deriva de las unidades del ejemplo; no se guarda como default de cartera. Cuando lo que se atribuye es la
-licencia de una persona, la parte es una de las tres licencias del paquete (1/3), no una fracción de horas
-([Herramientas con contrato](#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor)). Vercel/GCP se reparten con el
+El 25% deriva de las unidades del ejemplo; no se guarda como default de cartera. Ese ejemplo reparte un paquete
+entre cuentas por capacidad declarada. Cuando lo que se atribuye es la licencia de una persona, la parte es una de
+las tres licencias del paquete (1/3), no esas horas
+([Herramientas con contrato](#herramientas-con-contrato-adobe-y-los-plazos-del-proveedor)); y cuánto carga la
+cotización del asiento de una persona a tiempo parcial está en
+[Asientos de una persona a tiempo parcial](#asientos-de-una-persona-a-tiempo-parcial). Vercel/GCP se reparten con el
 mismo contrato por capacidad de plataforma declarada. No inventar 10 clientes ni aplicar el rango de Vercel como
 importe exacto: seleccionar mínimo 60 o máximo 100 explícitamente hasta contar con factura/consumo concreto.
 
@@ -424,6 +1106,32 @@ por usuarios únicos; los créditos por consumo. No atribuirles una ponderación
 El costo del recurso Efeonce se omite sólo para esas líneas; el desglose registra `client-provided`.
 BaseNotion/M365 y herramientas de créditos no se sustituyen por esta excepción. Sin evidencia, con vigencia
 insuficiente o cobertura de líneas desconocidas, el cálculo completo queda bloqueado.
+
+**Qué tiene que cubrir la evidencia.** Estado `confirmed` y una vigencia que cubra todo el uso del periodo: en el
+periodo 1, desde `quoteDate` hasta el último día de ese mes; en los demás, el mes calendario completo. Si no,
+`CLIENT_ACCESS_EVIDENCE_REQUIRED` en la herramienta, y desde el 2026-10-11 su `detail` dice el periodo y qué parte
+falla: que no está confirmada, que empieza después del primer día que debe cubrir, que termina antes del último día
+del mes, o que `lineIds` nombra una línea dos veces. Notion, Microsoft 365 o una herramienta de créditos en
+`clientProvidedTools` dan `CLIENT_COVERAGE_NOT_ALLOWED`.
+
+**Si el cliente dice que la aporta y no hay evidencia confirmada.** No se escribe una evidencia que no existe ni se
+marca `confirmed` para que la corrida pase. Se quita la entrada de `clientProvidedTools` y la herramienta se deja
+fuera del trabajo: si la pide una tarea de la receta del perfil, se excluye esa tarea en
+`work[].excludedProfileTasks` con el motivo («la herramienta la aporta el cliente»); si la agregaste tú en `tasks` o
+`aiToolIds`, se quita de ahí. Y se dice en las condiciones del documento que el cliente la aporta: es un supuesto de
+la cotización, no un dato comprobado.
+
+**Cómo se llenan los créditos.** La demanda de créditos va en la línea que los usa y el presupuesto, en la raíz:
+
+- `work[].creditDemand`: `{ periodId | periodIds, toolId, credits }`. `credits` es un entero (de 1 a 1.000.000):
+  los créditos de ese proveedor que la línea consume en cada mes nombrado. Una herramienta de créditos incluida en
+  una línea sin demanda en un mes da `CREDIT_DEMAND_REQUIRED`.
+- `creditBudgets`: una entrada por herramienta y por mes (no admite `periodIds`), con `purchaseDate`, `useBy`,
+  `subscriptionCreditsAllocated`, `subscriptionCreditsAvailable`, `activeSubscription` y `allowRepeatedPacks`.
+  `purchaseDate` y `useBy` tienen que caer **dentro del mes calendario del periodo**, contado desde `quoteDate`: el
+  periodo 1 es el mes de la fecha de la demanda y el periodo 2, el siguiente. `purchaseDate` no puede ser anterior a
+  `quoteDate`. Fuera de eso, `CREDIT_PERIOD_WINDOW_MISMATCH`; sin presupuesto, `CREDIT_BUDGET_REQUIRED`.
+- La CLI suma la demanda de todas las líneas de ese proveedor y mes y elige los packs una sola vez.
 
 Higgsfield 139 USD/3000 créditos y Magnific 40 EUR/45000 créditos son bases reportadas. Se atribuye la parte de créditos
 base presupuestada y se suma el costo completo del pack extra requerido. Se muestran caja extra, créditos
@@ -456,6 +1164,34 @@ sobrante está ocioso ni que dos personas se turnan uno.
 
 Los ejemplos usan la bandeja de atención social (`social-inbox`) de un servicio de doce meses: una persona todo el
 año (`care-titular`) y otra de refuerzo en cinco meses de campaña (`care-refuerzo`). Los motivos son de ejemplo.
+
+### Asientos de una persona a tiempo parcial
+
+Son dos cosas distintas y las dos se declaran:
+
+- **Cuántos asientos se pagan (`quantity`).** Siempre enteros en una herramienta nominativa: una licencia no se
+  compra por fracciones, y cada asiento pagado se usa, se comparte o se declara ocioso.
+- **Qué parte de ese costo carga esta cotización (`serviceShare`, con su `driver`).** Puede ser una fracción. El
+  cotizador no la deduce de la dedicación: la escribe la demanda y la CLI sólo comprueba que sea
+  `allocatedUnits ÷ totalUnits`.
+
+Así lo aplican los ejemplos versionados:
+
+| Caso | Ejemplo | Qué declara |
+| --- | --- | --- |
+| Persona dedicada a la cuenta | `designer-on-demand`: Notion y Microsoft 365 | Un asiento, `serviceShare` `"1"`: el asiento es de esa persona y esa persona es de esta cuenta |
+| Personas compartidas con otras cuentas | `managed-addon-increment`: tres personas a 1, 0,2 y 0,1 | Tres asientos (`quantity` `"3"`) y la cotización carga `1.3` de `3` (`driver.unit` `declared-fte-share`, `serviceShare` `"0.433333333333333333"`): de cada asiento, la parte igual a la dedicación declarada. El resto es de las otras cuentas de esas personas |
+| Asiento comprado para el servicio | Los ejemplos `managed-care`: la bandeja `social-inbox` | Un asiento por persona que la trabaja, `serviceShare` `"1"`, aunque esa persona dedique una fracción de su tiempo: se compra para este servicio y no lo usa nadie más |
+| Una licencia de un paquete | `designer-on-demand`: Adobe Creative Cloud Pro | Una de las tres licencias del paquete: `1` de `3`, `serviceShare` `"0.333333333333333333"` |
+
+- En Adobe, el tercio es lo que una licencia es del paquete: un dato de la compra. Lo que no se hace es reemplazarlo
+  por horas del paquete (40 de 160 horas no son «un cuarto de Adobe» para quien tiene una licencia).
+- Ningún ejemplo versionado tiene una persona **compartida** con licencia de Adobe. En ese caso se carga la licencia
+  completa (1 de 3) y se informa como supuesto; cargarla por dedicación, como las herramientas base, lo decide el
+  operador y se declara con su driver y su motivo.
+- Dentro de la cotización, el costo de una herramienta se reparte entre las líneas que la usan por asiento, no por
+  horas. Por eso una línea de 0,1 FTE con asiento propio carga el mismo costo de herramienta base que una de 1 FTE
+  de esa misma cotización.
 
 ### Caso 1 — dos personas comparten un asiento
 
@@ -573,7 +1309,7 @@ herramientas por tres meses) pasan a 3 y la corrida da el mismo costo y el mismo
 
 | Dónde | Qué aparece | Qué hacer |
 | --- | --- | --- |
-| Resumen, `attributions` | Una fila por plan. `seats` (`needed`, `paid`, `idle`, `sharedSeats`), `idle` y `bornByLineIds`, sólo donde se declararon | Comprobar que la cuenta es la que dijo el operador y decirle qué asiento se paga sin uso y cuál se comparte |
+| Resumen, `attributions` | Una fila por plan. `seats` (`needed`, `paid`, `idle`, `sharedSeats`), `idle` y `bornByLineIds`, sólo donde se declararon: `seats` existe únicamente cuando ese mes hay un asiento compartido, uno ocioso o más de un plan. Una herramienta con un solo plan y un asiento por persona no trae `seats`, y eso no es un faltante | Comprobar que la cuenta es la que dijo el operador y decirle qué asiento se paga sin uso y cuál se comparte |
 | `compose commitments` | Entradas `idle_seat`, la señal `PAID_SEAT_IDLE_WITHIN_ENGAGEMENT` y `totals.idleSeats` | Informar los meses-asiento ociosos y su costo. Ese costo ya está dentro de la cotización: no se suma |
 | `compose assess` | `IDLE_SEAT_COST_REVIEW` y `SHARED_SEAT_TERMS_REVIEW`, por herramienta y mes | Son puntos por confirmar con el proveedor y con el operador, no errores |
 
@@ -749,6 +1485,17 @@ Qué declarar en el workload (`pricing-v3-workload/1`):
 persona: horas sin dueño, una línea que no existe en el brief, y una línea que necesita más de lo que su dotación
 declarada puede dar (`LINE_OVER_CAPACITY`: se sube la dotación o se reparte el trabajo, no se redondea).
 
+**La dedicación dimensionada lleva su evidencia.** Desde el 2026-10-11, con `--brief`, cada línea que el workload
+dimensiona sale con `dedication` y con `dedicationEvidence`: la referencia es `workload:<versión>`, la vigencia es
+el tramo en que rigen a la vez todas sus fuentes (la capacidad y cada volumen o bloque fijo del que la línea toma
+parte), y el estado es el más débil de ellas. Un workload en `mode: "simulation"` es siempre `estimated`. En el
+ejemplo, `primary` y `backup` salen con `workload:managed-care-extended-example-v1`, `estimated`, vigente del
+2026-10-10 al 2026-12-31; las otras cuatro líneas, que el workload no nombra, conservan lo que el brief traía (aquí,
+ninguna evidencia). Si las fuentes de una línea no coinciden en ninguna fecha, `WORKLOAD_SOURCES_NOT_CONCURRENT`.
+Con eso la cotización dice sola que sus horas son una estimación
+([cómo se lee](#dónde-pesa-un-dato-estimado-estimateexposure)). La demanda versionada del paso 2 es anterior y no
+trae evidencia: su costo de persona sale en `dedicationNotEvidenced`.
+
 En la demanda:
 
 - Las líneas usan `kitId: "managed-service-core"`. Las provisiones (`assurance`, `operations`) son opcionales y se
@@ -768,7 +1515,7 @@ En la demanda:
   persona que trabaja la bandeja —salvo que la demanda declare que dos personas comparten uno, o que hay un asiento
   pagado y ocioso ([cómo](#declarar-los-asientos-de-una-herramienta))—, con `priceId: "sprout-advanced-annual"` (USD 399 por asiento al mes, precio
   público con facturación anual). Alternativa más barata: `sprout-professional-annual` (USD 299; perfiles ilimitados,
-  sin API, integraciones ni informes de atención). El plan Standard no sirve con más de cinco perfiles. Un asiento se paga completo aunque la persona dedique una fracción de su tiempo.
+  sin API, integraciones ni informes de atención). El plan Standard no sirve con más de cinco perfiles. Un asiento se paga completo aunque la persona dedique una fracción de su tiempo, y como se compra para este servicio la cotización lo carga entero (`serviceShare` `"1"`); las herramientas base de una persona compartida con otras cuentas son otro caso ([cuál](#asientos-de-una-persona-a-tiempo-parcial)).
 - El consumo de agentes se declara en `serviceToolIds: ["agent-runtime-usage"]` con una asignación cuya cantidad es
   el número de bloques de 1.000 ítems procesados al mes.
 
@@ -800,7 +1547,8 @@ Excel y, desde el catálogo v5, declarados como el costo de cada perfil en Chile
 `managed-care.demand.json` está fechada el 2026-10-10, un día antes de esa declaración y del inicio de la policy
 vigente. Cotizada tal cual con `--current` no calcula: exit 2 con `RESOURCE_POLICY_NOT_EFFECTIVE` en `policy.source`,
 `RESOURCE_PRICE_NOT_EFFECTIVE` en `1:notion` y `RESOURCE_ALLOCATION_REQUIRED` en `1:adobe-express`, y su resumen
-avisa en `runNotices.laterCatalogValues` que hay 136 valores del catálogo posteriores a esa fecha. Por eso el paso 2
+avisa en `runNotices.laterCatalogValues` que hay 137 valores del catálogo posteriores a esa fecha (136 con el
+catálogo v10; el v11 suma el registro `offer` de la práctica SEO/AEO, que rige desde el 2026-10-11). Por eso el paso 2
 la copia con la fecha del día: la copia da el precio de arriba —cliente y equipo en Chile: los dos factores de país
 valen 1— sin el supuesto `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY`. Para un cliente o un equipo de otro país:
 [Cotizar según el país del cliente y del equipo](#cotizar-según-el-país-del-cliente-y-del-equipo).
@@ -827,27 +1575,51 @@ Los dos devuelven exit 3 en este ejemplo, igual que el `compose quote` que lo ge
 | `reviewStatus`, `quoteReviewStatus`                                     | Revisión de la composición (siempre `requires_review`) y revisión que devuelve el kernel                                                                                                                                                                                                                                                                                                                                                               | Tratar el número como simulación; ninguno de los dos es una aprobación                                                                                                                                                                                                |
 | `engineVersion` | Motor que calculó: `pricing-v3-local/1.4.0` si la demanda refactura al menos un costo de terceros o si la cotización tiene una reserva de contingencia (también cuando se renuncia a ella); si no, `pricing-v3-local/1.3.0` si la demanda declara la forma del compromiso (`brief.engagementForm`), también con razón 1; si no, `pricing-v3-local/1.2.0` si el factor de mercado del país del cliente declara que el piso lo acompaña (hoy Colombia y Perú); `pricing-v3-local/1.1.0` si la cotización usa un neto acordado, varios ajustes o una regla de redondeo para su moneda; `pricing-v3-local/1.0.0` en los demás casos. `null` si la demanda quedó bloqueada antes de llegar al motor | No se elige: sale de la demanda y del catálogo. Dice qué lectura de `totals` y del piso aplica |
 | `totals`, `marginRateRoundedDown` | Del plazo: `cost`, `undiscountedPrice` (precio calculado; ya incluye el factor de mercado, la razón de la forma del compromiso y el redondeo), `discount`, `net`, margen, impuestos y moneda. Con el motor 1.1.0 se agregan `roundingAdjustment` (lo que sumó el redondeo) y `uplift` (recargo de un neto acordado sobre el precio); en una cotización 1.0.0 esas dos claves no existen. Con el motor 1.2.0 se agrega `marketAdjustment`: cuánto movió el precio el factor de mercado, con signo (negativo en un mercado bajo 1). Con el motor 1.3.0 se agrega `engagementAdjustment`: cuánto movió el precio la forma del compromiso (`"0"` en On-Going). Los dos son informativos y no se suman otra vez. Con el motor 1.4.0 se agregan `thirdPartyCost` y `thirdPartyNet` (costo y neto de las filas de terceros, ya incluidos en `cost` y `net`), `ownWorkMarginRate` (margen del trabajo propio), `contingencyReserve` (reserva dentro de `cost`), `contingencyBase` (costo sobre el que se calculó) y `contingencyReserveWaived` (reserva a la que se renunció). `net = undiscountedPrice + uplift − discount`. `marginRateRoundedDown` es **siempre el margen real** del neto final contra el costo, a 6 decimales y redondeado hacia abajo, en cualquier mercado; con terceros es el margen **mezclado** | Leer el margen de aquí, no recalcularlo. Es el que se informa al operador, también cuando ninguna línea sale marcada. Con costos de terceros se informa junto al de `ownWork`, que es el que se compara con el piso de la oferta ([regla](#cómo-leer-una-cotización-con-terceros)). `tax` y `grandTotal` en `null` significan impuestos pendientes, no cero |
-| `commercialAdjustments`                                                 | Los ajustes tal como los declara el `brief` congelado: neto acordado (`agreed_net`) o descuento por tasa (`discount`), con su `reason`. `[]` si no hay                                                                                                                                                                                                                                                                                                 | Comprobar que el monto y el motivo son los que aprobó el operador ([Registrar el precio acordado](#registrar-el-precio-acordado))                                                                                                                                     |
+| `commercialAdjustments` | Los ajustes tal como los declara el `brief` congelado: precio por todo el plazo (`agreed_total`), neto acordado por periodo (`agreed_net`) o descuento por tasa (`discount`), con su `reason`. `[]` si no hay | Comprobar que el monto y el motivo son los que aprobó el operador ([Registrar el precio acordado](#registrar-el-precio-acordado)) |
+| `agreedTotals` | Sólo si la demanda declara un `agreed_total`. Por cada uno: `amount` (lo pactado), `policyNet` (lo que esas filas valían al precio de política), `differenceFromPolicyNet` (negativo si se vendió bajo él), `distributionUnit` y `distributionUnitBasis` (en qué unidad se repartió y por qué) y `distribution`: una entrada por clase de cobro y neto, con `policyNet`, `agreedNet` y los `periodIds` que lo llevan | Comprobar que `amount` es lo pactado y que el reparto suma eso. El último periodo puede diferir de los demás: tomó lo que sobraba ([cómo se reparte](#un-precio-por-todo-el-trabajo-agreed_total)) |
 | `priceRounding`                                                         | Regla de redondeo aplicada a la moneda de salida: `{ currency, multiple, scope, offerId, recordId, revision, sourceStatus }`; `scope` es `general` (regla de la moneda) u `offer` (regla propia de la oferta, que prevalece). `null`: esta cotización no redondea                                                                                                                                                                                      | Con valor, una línea marcada es un incumplimiento real; con `null`, leer «Qué significa una línea marcada» abajo                                                                                                                                                            |
 | `marketFactor` | Factor de mercado del país del cliente: `{ country, factor, floorBasis, recordId, revision, sourceStatus }`. Sólo aparece cuando cambia algo: factor distinto de 1 o `floorBasis` declarado. Con cliente en Chile o México (factor 1) la clave no existe. `floorBasis: "base_market"` dice que el piso se lee sobre el precio del mercado base; `null`, sobre el neto final. `sourceStatus` dice si el factor es una decisión (`confirmed`) o un estimado (`estimated`) | Comprobar que el país es el del cliente. Con `floorBasis`, leer «Qué significa una línea marcada» abajo. Si esperabas un factor y la clave no está, revisar `offerMarketCountry` y `quoteDate` ([por país](#cotizar-según-el-país-del-cliente-y-del-equipo)) |
 | `engagementForm` | Forma del compromiso que la demanda declaró y su razón de precio: `{ form, priceRatio, scope, offerId, recordId, revision, sourceStatus }`; `scope` es `general` (registro de la forma) u `offer` (registro propio de la oferta, que prevalece). La clave sólo existe si la demanda declara la forma; aparece también con razón 1 | Comprobar que la forma es la del pedido. Si la clave no está, la cotización se calculó como On-Going sin decirlo: en un trabajo acotado, declarar la forma y volver a correr ([formas](#cotizar-on-demand-u-on-going)) |
 | `ownWork`, `thirdParty`, `contingencyReserve` | Sólo en una cotización 1.4.0. `ownWork`: costo, neto y margen de la cotización sin las filas de terceros. `thirdParty`: lo refacturado (`reinvoiced`, con una fila por costo), lo que el cliente paga directo (`clientDirect`, fuera de todo total) y los costos con proveedor en otra moneda (`fxExposed`). `contingencyReserve`: tasa, base, monto y si se renunció a ella. En una cotización anterior las tres claves no existen | [Cómo leer una cotización con terceros](#cómo-leer-una-cotización-con-terceros). Comparar con el piso de la oferta el margen de `ownWork`, no el mezclado |
 | `periods[]`                                                             | Estado y totales de cada periodo                                                                                                                                                                                                                                                                                                                                                                                                                       | Revisar que ningún periodo quede sin calcular y si el neto varía entre meses                                                                                                                                                                                          |
-| `assumptions` | Supuestos con que se resolvió el pedido. `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` (el costo no declara país y se asume para el de la línea) sólo aparece en demandas fechadas antes del 2026-10-11; desde esa fecha los costos son el costo en Chile y el país de la persona entra por su factor. `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM` aparece cuando la oferta tiene una reserva de contingencia que depende de la forma del compromiso y la demanda no declara la forma: la reserva no se evaluó | Declararlos al explicar el precio. Si aparece el primero en una cotización nueva, la fecha de la demanda es anterior al catálogo v5: los factores de país no se aplicaron. Si aparece el segundo, preguntar la forma, declararla y volver a correr ([reserva](#reserva-de-contingencia)) |
-| `reviewSignals[]` | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales. Un factor de país sale como `ESTIMATED_SOURCE` con `paths` `snapshot.talentFactors` (país de la persona) o `snapshot.marketFactors` (país del cliente) sólo en una cotización fechada 2026-10-11: desde el 2026-10-12 están confirmados. La reserva de contingencia y las reglas de terceros, que son estimadas, salen con `paths` `snapshot.contingencyReserve` y `snapshot.thirdPartyPolicies.<categoría>`; una renuncia a la reserva, como `CONTINGENCY_RESERVE_WAIVED` | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`, `CONTINGENCY_RESERVE_WAIVED`…); `paths` dice qué dato lo origina. Con un dato estimado, decir que el precio depende de un estimado |
-| `marginFloor.lines[]` | Líneas que el kernel marcó bajo su piso (una fila de equipo, el de su política; una fila de terceros, con `kind` `third_party`, el de su categoría): `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` (margen real de la línea) y cuánto falta. En un mercado cuyo piso acompaña al factor: `floorNet` (neto mínimo de esa línea en ese mercado) y `netShortOfFloor` (neto que falta para alcanzarlo), con `marginAmountShortOfFloor` en `null`. En los demás mercados: `marginAmountShortOfFloor` (margen que falta al neto actual), y las otras dos claves no existen | Ver «Qué significa una línea marcada» abajo |
+| `assumptions` | Supuestos con que se resolvió el pedido. `UNLOCALIZED_COST_ASSUMED_FOR_COUNTRY` (el costo no declara país y se asume para el de la línea) sólo aparece en demandas fechadas antes del 2026-10-11; desde esa fecha los costos son el costo en Chile y el país de la persona entra por su factor. `CONTINGENCY_RESERVE_NOT_EVALUATED_WITHOUT_ENGAGEMENT_FORM` aparece cuando la oferta tiene una reserva de contingencia que depende de la forma del compromiso y la demanda no declara la forma: la reserva no se evaluó. `DEDICATION_ESTIMATED` (una por línea, en `lines.<lineId>.dedicationEvidence`) aparece cuando la demanda declara que la dedicación de esa línea es una estimación | Declararlos al explicar el precio. Si aparece el primero en una cotización nueva, la fecha de la demanda es anterior al catálogo v5: los factores de país no se aplicaron. Si aparece el segundo, preguntar la forma, declararla y volver a correr ([reserva](#reserva-de-contingencia)). El tercero no se corrige: se informa que las horas son una estimación y cuánto pesan ([exposición](#dónde-pesa-un-dato-estimado-estimateexposure)) |
+| `reviewSignals[]` | Todos los diagnósticos de los periodos, una entrada por código y severidad, con `count`, `periodIds`, `lineIds` y `paths`. No bloquean los totales. Un factor de país sale como `ESTIMATED_SOURCE` con `paths` `snapshot.talentFactors` (país de la persona) o `snapshot.marketFactors` (país del cliente) sólo en una cotización fechada 2026-10-11: desde el 2026-10-12 están confirmados. La reserva de contingencia y las reglas de terceros, que son estimadas, salen con `paths` `snapshot.contingencyReserve` y `snapshot.thirdPartyPolicies.<categoría>`; una renuncia a la reserva, como `CONTINGENCY_RESERVE_WAIVED` | Explicar cada código presente (`ESTIMATED_SOURCE`, `HISTORICAL_ONLY`, `MARGIN_BELOW_FLOOR`, `CONTINGENCY_RESERVE_WAIVED`…); `paths` dice qué dato lo origina. Con un dato estimado, decir que el precio depende de un estimado. `HISTORICAL_ONLY` (`paths` `snapshot.mode`, una vez por periodo) sale en **toda** cotización: el catálogo vigente está declarado `historical`, es decir, sus valores son de revisión y no una lista de precios aprobada para emitir. No apunta a ningún dato de la demanda ni se corrige en ella; se informa como «simulación sobre un catálogo en revisión» |
+| `marginFloor.lines[]` | Líneas que el kernel marcó bajo su piso (una fila de equipo, el de su política; una fila de terceros, con `kind` `third_party`, el de su categoría): `minimumMargin`, `net`, `marginAmount`, `marginRateRoundedDown` (margen real de la línea) y cuánto falta, en hasta tres claves: `floorNet` (el neto mínimo que cumple el piso), `netShortOfFloor` (cuánto más tendría que valer la fila) y `marginAmountShortOfFloor` (margen que falta al neto actual). Cuáles vienen depende del motor, no sólo del país | Ver «Qué significa una línea marcada» abajo |
 | `toolSelections`                                                        | `counts` y las herramientas incluidas, las que aporta el cliente y las excluidas con motivo                                                                                                                                                                                                                                                                                                                                                            | Confirmar que cada herramienta incluida corresponde al alcance y que cada exclusión tiene un motivo defendible                                                                                                                                                        |
 | `attributions`                                                          | Por herramienta y precio (una fila por plan): estado de la fuente, cantidad, parte del servicio y costo mensual completo, atribuido y sin asignar. Sólo donde la demanda lo declaró: `seats` (`needed`, `paid`, `idle`, `sharedSeats`), `idle` (asientos ociosos de ese plan, su motivo y su costo) y `bornByLineIds` (las líneas que cargan un asiento que nadie usa) | Revisar fuentes no confirmadas y el costo que queda sin asignar. Con `idle` o `sharedSeats`, decirle al operador qué asiento se paga sin uso y qué asiento se comparte, con el motivo declarado ([asientos](#declarar-los-asientos-de-una-herramienta)) |
 | `creditBudgets`, `resourceIncrementalCash`, `cashLedger`, `cashMeaning` | Presupuesto de créditos y caja. Costo atribuido no es dinero nuevo por pagar; `cashMeaning` lo explica                                                                                                                                                                                                                                                                                                                                                 | No presentar `cashCommitment` como factura ni como compra                                                                                                                                                                                                             |
-| `estimateExposure` | Cuánto del costo descansa en datos estimados y, por dato, cuánto costo depende de él (`costAtRisk`, `shareOfCost`, `marginRateLostIfTenPctHigher`). La cotización estimada de un proveedor es un dato más del ranking (`kind` `third_party`). `null` si la cotización quedó bloqueada | Decirle al operador qué dato estimado conviene confirmar primero ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Es una lectura de sensibilidad, no una validación |
+| `estimateExposure` | Cuánto del costo descansa en datos estimados, cuánto depende de una dedicación que nadie evidenció (`dedicationNotEvidenced`) y, por dato, cuánto costo depende de él (`costAtRisk`, `shareOfCost`, `marginRateLostIfTenPctHigher`). La dedicación estimada de una línea (`kind` `dedication`) y la cotización estimada de un proveedor (`kind` `third_party`) son datos del ranking. `null` si la cotización quedó bloqueada | Decirle al operador qué dato estimado conviene confirmar primero ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Es una lectura de sensibilidad, no una validación |
 | `runNotices` | Avisos sobre la corrida, no sobre la cotización: `laterCatalogValues` (la demanda está fechada antes de valores más nuevos del catálogo) y `priceDates` (fechas de revisión o de vigencia de los precios que esta cotización usa, incluida la vigencia de la cotización de cada proveedor). Desde el 2026-10-11, también `output`: qué hizo la corrida con `--out` cuando la cotización no calculó. La clave no existe si no hay nada que avisar; no está en el artefacto ni en `replay` | Nunca bloquea. Informarlo al operador junto al resultado ([Avisos de la corrida](#avisos-de-la-corrida-runnotices)). Con `output.written: false`, corregir la demanda y repetir con el mismo `--out` |
 | `fullDetail` | Recuerda que el detalle vive en el artefacto, bajo `semantic.result` | Ir al artefacto con `explain` para una fila de selección, una asignación o los componentes de costo de una línea. `explain.commercialAdjustments.rows` trae el recorrido del precio por fila: `undiscountedPrice`, `roundingAdjustment`, `discount`, `uplift` y `net`; con el motor 1.2.0, además `marketAdjustment`, `marketPriceRatio` (cuánto del precio base conserva la fila tras el factor) y `floorNet`; con el motor 1.3.0, además `engagementAdjustment` y `engagementPriceRatio` por fila, y `explain.commercialAdjustments.engagementForm`; con el motor 1.4.0, además `contingencyReserve` por fila, las filas de terceros (`kind` `third_party`) y `explain.commercialAdjustments.thirdPartyPolicies[]` y `.contingencyReserve` |
 
 Las filas que sólo difieren por periodo se agrupan en una con `periodIds`.
 
-**Qué significa una línea marcada.** El kernel compara el neto final de cada línea con el piso de su política y la
-marca (`MARGIN_BELOW_FLOOR`); nunca corrige un incumplimiento. La lectura depende de dos claves del resumen,
-`marketFactor` y `priceRounding`:
+### Qué significa una línea marcada
+
+El kernel compara el neto final de cada línea con el piso de su política y la marca (`MARGIN_BELOW_FLOOR`); nunca
+corrige un incumplimiento.
+
+**Las tres claves de «cuánto falta».** Medidas sobre `designer-on-demand.demand.json` con `--current`, cliente en
+Chile, y un `agreed_net` mensual de 2.000.000 (piso de 25 %, costo de la fila 1.622.704):
+
+| Clave | En el ejemplo | Qué responde |
+| --- | --- | --- |
+| `floorNet` | `2163606` | El neto mínimo de esa fila que cumple su piso, con el costo que tiene |
+| `netShortOfFloor` | `163606` | **Cuánto más tendría que valer la fila** para cumplirlo: `floorNet − net`. Es la cifra que se lleva al operador |
+| `marginAmountShortOfFloor` | `122704` | Cuánto margen falta si el neto no se mueve: `minimumMargin × net − marginAmount`. Sirve para distinguir un faltante de redondeo de una decisión de precio; no es lo que hay que subir el precio |
+
+Cuáles trae cada línea:
+
+| Cotización | `marginAmountShortOfFloor` | `floorNet` y `netShortOfFloor` |
+| --- | --- | --- |
+| Motor 1.0.0 o 1.1.0 (cliente en Chile, México, Estados Unidos o España, sin forma declarada, sin terceros ni reserva) | Sí | No existen |
+| Motor 1.2.0 o posterior con el piso leído sobre el neto final (los mismos países, con la forma declarada o con terceros o reserva) | Sí | Sí |
+| Cliente en Colombia o Perú (el piso acompaña al factor) | `null` | Sí |
+
+Como toda cotización nueva declara la forma del compromiso, una línea marcada de un cliente en Chile trae hoy las
+tres. La misma demanda sin `engagementForm` (motor 1.1.0) trae sólo `marginAmountShortOfFloor` `122704`.
+
+La lectura de «marcada» depende además de dos claves del resumen, `marketFactor` y `priceRounding`:
 
 - **Dónde se lee el piso** (`marketFactor.floorBasis`):
   - Sin `marketFactor`, o con `floorBasis: null` (cliente en Chile, México, Estados Unidos o España): el piso se lee
@@ -904,8 +1676,9 @@ Reglas de lectura:
 
 Casos verificados con `--current`: `managed-care.demand.json` (fechada 2026-10-10) queda bloqueada por la fecha
 (exit 2, `RESOURCE_POLICY_NOT_EFFECTIVE`) y aun así trae `laterCatalogValues` con `newestEffectiveFrom` `2026-10-12`
-y `records` `136` (64 políticas de precio, 32 costos, 11 factores de talento, 9 de mercado, 7 kits, 5 reglas de
-terceros, 2 reservas de contingencia, 2 tipos de cambio, 2 formas del compromiso y 2 recursos); la copia de
+y `records` `137` (64 políticas de precio, 32 costos, 11 factores de talento, 9 de mercado, 7 kits, 5 reglas de
+terceros, 2 reservas de contingencia, 2 tipos de cambio, 2 formas del compromiso, 2 recursos y, desde el catálogo
+v11, 1 registro `offer`; con el v10 eran 136); la copia de
 `managed-care-colombia.demand.json` que arma
 [el ejemplo de Colombia](#en-colombia-y-perú-el-piso-acompaña-al-factor) (fechada 2026-10-11) trae
 `laterCatalogValues` con `records` `8` (los factores de país confirmados desde el día siguiente); esa misma copia
@@ -924,8 +1697,9 @@ también viene en `replay`.
 | Clave                                                    | Qué dice                                                                                                                                                                                                                              |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `currency`, `totalCost`, `net`                           | Costo y neto del plazo: los mismos de `totals`                                                                                                                                                                                        |
-| `estimatedCost`, `confirmedCost`, `estimatedShareOfCost` | Cuánto del costo depende de al menos un dato estimado y cuánto no; los dos montos suman `totalCost`. Un componente cuenta una sola vez aunque dependa de dos datos estimados                                                          |
-| `costInputs[]`                                           | Los datos estimados del lado del costo, de mayor a menor `costAtRisk`: `kind` (`talent_factor`, `person_cost`, `fx`, `tool`, `platform_fee`, `talent_assurance`, `operations`, `setup`, `third_party`), `id`, `label`, `lineIds` y `periodIds`. `third_party` es el monto de un proveedor cuya evidencia está `estimated`; su `id` es el `costId` |
+| `estimatedCost`, `confirmedCost`, `estimatedShareOfCost` | Cuánto del costo depende de al menos un dato estimado y cuánto está confirmado. Un componente cuenta una sola vez aunque dependa de dos datos estimados. Desde el 2026-10-11 los dos montos ya no suman solos `totalCost`: `estimatedCost + dedicationNotEvidenced.cost + confirmedCost = totalCost` |
+| `dedicationNotEvidenced` | `{ lineIds, cost, shareOfCost }`: las líneas cuya dedicación no declara `dedicationEvidence` y el costo que esa dedicación gobierna (el costo de la persona y la reserva que descansa en él) donde ningún dato estimado ya lo cuenta. No es un estimado que alguien declaró y nunca se lee como confirmado. `cost` `0` con líneas listadas significa que ese costo ya estaba contado como estimado por otro dato |
+| `costInputs[]`                                           | Los datos estimados del lado del costo, de mayor a menor `costAtRisk`: `kind` (`dedication`, `talent_factor`, `person_cost`, `fx`, `tool`, `platform_fee`, `talent_assurance`, `operations`, `setup`, `third_party`), `id`, `label`, `lineIds` y `periodIds`. `dedication` es la dedicación de una línea que la demanda declara estimada; su `id` es el `lineId` y su `costAtRisk`, el costo que esa dedicación gobierna. Con `capacitySetByRule: true` la capacidad cobrada la fijó la regla de asignación (una línea `dedicated`) y la lectura «10 % más alto» no aplica en proporción. `third_party` es el monto de un proveedor cuya evidencia está `estimated`; su `id` es el `costId`. El fee de plataforma es un registro por perfil (`fee:<perfil>`): una cotización con varias líneas trae una entrada `platform_fee` por cada perfil distinto |
 | `costAtRisk`                                             | Costo de esta cotización que depende de ese dato. Como un componente puede depender de dos datos, la suma de los `costAtRisk` puede superar `estimatedCost`                                                                           |
 | `shareOfCost`                                            | `costAtRisk ÷ totalCost`                                                                                                                                                                                                              |
 | `marginRateLostIfTenPctHigher`                           | Margen que se pierde si ese dato resulta 10 % más alto y el neto no cambia: `0,10 × costAtRisk ÷ net`, redondeado hacia arriba. `0.037825` son 3,8 puntos de margen                                                                   |
@@ -944,13 +1718,20 @@ Ejemplo, la copia de `managed-care-colombia.demand.json` de
 
 La misma copia fechada 2026-10-12 da el mismo precio y otra lectura, porque los factores de país ya están
 confirmados: `estimatedShareOfCost` baja a `0.340370` (34,0 %), `talent_factor` sale del ranking y el primer dato es
-`tool` / `social-inbox`, con los mismos `0.177258` y `0.010366`.
+`tool` / `social-inbox`, con los mismos `0.177258` y `0.010366`. Pero ese 34,0 % no deja el resto como confirmado:
+la copia no declara de dónde salen sus dedicaciones, así que `dedicationNotEvidenced.cost` es `10628800` (64,7 % del
+costo, sus seis líneas) y `confirmedCost` es `210238`, apenas 1,3 %. El 2026-10-11 ese mismo costo de persona ya
+contaba como estimado por el factor de talento, y por eso `dedicationNotEvidenced.cost` era `0`.
 
 Qué hacer con esto:
 
-1. Decírselo al operador junto al precio: qué parte del costo es estimada, cuál es el primer dato a confirmar y
-   cuántos puntos de margen mueve. En el ejemplo fechado 2026-10-12: «un tercio del costo es estimado; lo primero a
-   confirmar es el plan de Sprout (1,0 punto de margen por cada 10 % de error)».
+1. Decírselo al operador junto al precio: qué parte del costo es estimada, qué parte depende de una dedicación sin
+   evidencia, cuál es el primer dato a confirmar y cuántos puntos de margen mueve. En el ejemplo fechado 2026-10-12:
+   «un tercio del costo es estimado y casi dos tercios dependen de dedicaciones que nadie respaldó; de lo estimado,
+   lo primero a confirmar es el plan de Sprout (1,0 punto de margen por cada 10 % de error)».
+   Una cotización cuyas horas adivinaste no se presenta como confirmada: se declara `dedicationEvidence` con
+   `status: "estimated"` y la dedicación entra al ranking con su peso
+   ([caso](#caso-c--un-programa-seoaeo-de-tres-meses-con-un-precio-por-el-programa)).
 2. Leerlo como sensibilidad, no como validación ni pronóstico. No dice que el dato esté mal ni que el margen vaya a
    bajar: dice dónde un error costaría más.
 3. No usarlo para aprobar ni rechazar una cotización, ni para «corregir» un dato en la demanda. Un dato se confirma
@@ -960,7 +1741,11 @@ Qué hacer con esto:
    aparece sólo con `quoteDate` 2026-10-11; desde el 2026-10-12 es un valor de política confirmado y no entra.
 
 `compose assess` entrega el mismo orden en `costEvidencePriority`: `{ currency, estimatedCost, confirmedCost,
-estimatedShareOfCost, confirmFirst }`, donde `confirmFirst` son los cinco primeros `costInputs`. Es la forma de
+estimatedShareOfCost, dedicationNotEvidenced, confirmFirst }`, donde `confirmFirst` son los cinco primeros
+`costInputs`. Un dato que se cobra por línea ocupa un lugar por cada registro: dos líneas de perfiles distintos traen
+dos entradas `platform_fee`, y entre los cinco primeros pueden quedar varias del mismo tipo. `assess` agrega además
+un gap por línea: `DEDICATION_NOT_EVIDENCED` si la línea no declara evidencia y `DEDICATION_EVIDENCE_REVIEW` si la
+declara estimada. Es la forma de
 priorizar los gaps de evidencia, que por sí solos se leen todos igual. `assess` no lista un factor de país estimado
 entre sus `gaps`; en `confirmFirst` sí aparece (sólo en cotizaciones fechadas 2026-10-11).
 
@@ -1122,7 +1907,9 @@ dos: lo que el factor 0,90 ya había rebajado antes del acuerdo. Una línea marc
 excepción la decide el operador («Quién decide», en [Registrar el precio acordado](#registrar-el-precio-acordado)).
 
 En los mercados sin `floorBasis` (Chile, México, Estados Unidos, España) el piso se lee sobre el neto final, como
-siempre, y la línea marcada trae `marginAmountShortOfFloor`.
+siempre, y la línea marcada trae `marginAmountShortOfFloor`; desde el motor 1.2.0 trae además `floorNet` y
+`netShortOfFloor`, que ahí se leen igual: el neto mínimo de la fila y lo que le falta
+([las tres claves](#qué-significa-una-línea-marcada)).
 
 ### País no es moneda
 
@@ -1210,8 +1997,8 @@ Devuelve exit 3 con `totals.net` `9530.00` y `totals.currency` `USD`.
   la fila COP no es el precio para un cliente colombiano, que con el mismo equipo en Chile sale en 32.400.000 y con
   el equipo en Colombia en 28.100.000.
 
-- **Un precio acordado va en la moneda de salida**: el `amount` de un `agreed_net` se declara en esa moneda y con sus
-  decimales (CLP y COP, ninguno; USD, MXN y PEN, hasta dos).
+- **Un precio acordado va en la moneda de salida**: el `amount` de un `agreed_net` o de un `agreed_total` se declara
+  en esa moneda y con sus decimales (CLP y COP, ninguno; USD, MXN y PEN, hasta dos).
 - **Moneda sin regla de redondeo** (hoy CLF): calcula, pero sin redondear (`priceRounding: null`, motor 1.0.0) y con un
   FX USD→CLF estimado de 2025; las líneas al piso vuelven a salir marcadas por fracciones. No presentar un precio en
   CLF mientras el operador no decida su FX y su múltiplo (`QUOTE_FX_REVIEW`, `COMMERCIAL_ROUNDING_SCOPE`).
@@ -1261,8 +2048,13 @@ lleva reserva: el ejemplo de esta sección sigue en 1.3.0.
   y los compromisos con proveedores se costean aparte en vez de esconderse en el recargo. El Excel de pricing y el
   cotizador de Greenhouse ya traían ese multiplicador (On-Going 0 %, On-Demand +10 %).
 
-**Antes de empezar.** Confirmar con el operador que el trabajo es acotado; que la demanda está fechada 2026-10-11 o
-después; y, si es un trabajo acotado, qué deja fuera el cotizador (al final de esta sección).
+**Antes de empezar.** Decidir la forma por el negocio: es `on_demand` si el trabajo tiene un alcance acotado, un
+inicio y un término, y una entrega o aceptación que lo cierra; es `on_going` si es un servicio mensual que sigue
+hasta que alguien lo termina. Si el operador está disponible, se le confirma; si no, se decide con ese criterio, se
+declara siempre y se dice al entregar que la forma la decidiste tú. Tener presente lo que la forma trae consigo: el
+10 % sobre todas las filas del equipo y, en un servicio gestionado, la reserva de contingencia. Comprobar que la
+demanda está fechada 2026-10-11 o después; y, si es un trabajo acotado, qué deja fuera el cotizador (al final de
+esta sección).
 
 **Paso a paso.**
 
@@ -1344,7 +2136,9 @@ operación.
 - La duración del contrato no es un input y no lo será: una cotización tiene periodos, no un plazo. Es una decisión
   del CEO (2026-10-11, cierre), no un pendiente: la duración y la fecha de inicio del servicio son materia del
   contrato y no mueven ningún costo, precio ni impuesto.
-- Un trabajo de menos de un mes se expresa como horas dentro de un periodo; no hay periodos más cortos.
+- Un trabajo de menos de un mes se expresa como horas dentro de un periodo; no hay periodos más cortos. La unidad
+  es `{ "unit": "hours_per_month", "value": "…" }` y se convierte a FTE con las 180 horas de un mes a tiempo
+  completo de la regla de asignación ([horas como unidad](#paso-2--componer-la-demanda)).
 - Los costos de terceros y la reserva de contingencia **sí** están modelados desde el contrato 1.4.0
   ([Costos de terceros](#costos-de-terceros), [Reserva de contingencia](#reserva-de-contingencia)). Lo que falta de
   ellos está en [Lo que todavía no está modelado](#lo-que-todavía-no-está-modelado).
@@ -1397,6 +2191,10 @@ y el CEO las aceptó, para medirlas en las próximas dos incorporaciones reales.
   Una entrada de reclutamiento en una línea de ese kit devuelve exit 2 con `UNKNOWN_RESOURCE_REQUIREMENT` en
   `lines.<lineId>`.
 - Una cotización fechada antes del 2026-10-11 sigue resolviendo `trial-setup`.
+
+**Un precio «todo incluido».** Si lo pactado es un solo precio por la persona y su puesta en marcha, no se pacta
+cada fila por separado ni se reparte a mano: es un `agreed_total` sobre la línea, que cubre la fila mensual y la de
+puesta en marcha juntas ([caso](#caso-a--una-persona-por-un-mes-con-un-precio-por-todo)).
 
 **Qué no hacer.**
 
@@ -1503,7 +2301,9 @@ incluye: un diseñador con Creative Cloud Pro no lleva además Adobe Express.
 **Qué no hacer.**
 
 - No quitarle el IVA a los montos de Adobe ni pasarlos a USD a mano.
-- No atribuir el paquete entero a una persona, ni una fracción por horas a quien usa una licencia.
+- No atribuir el paquete entero a una persona, ni reemplazar su licencia por una fracción de las horas del paquete:
+  quien usa una licencia carga una de tres. Para una persona compartida con otras cuentas, ver
+  [Asientos de una persona a tiempo parcial](#asientos-de-una-persona-a-tiempo-parcial).
 - No elegir `invoiced-with-discount` por cuenta propia: es para un trabajo que termina antes que el descuento y lo
   decide el operador. Tampoco nombrar `renewal-scenario`, que ya no existe.
 - No declarar `adobe-express` en una línea que ya lleva `adobe`, ni excluir `express-design` sin un motivo cierto.
@@ -1682,7 +2482,10 @@ se cobran al peso.
 **Lo que nunca toca a una fila de terceros.** El factor de mercado del país del cliente, la razón de la forma del
 compromiso (el 10 % de On-Demand), un `discount` por tasa, la reserva de contingencia y la política de precio de la
 oferta. Un `discount` o un `agreed_net` de clase `monthly` o `setup` que nombre un `costId` devuelve exit 2 con
-`INVALID_ADJUSTMENT_LINE`. El único ajuste que llega a una fila de terceros es un neto acordado explícito.
+`INVALID_ADJUSTMENT_LINE`. A una fila de terceros llegan sólo dos ajustes, los dos explícitos: un neto acordado de
+clase `third_party` (abajo) o un `agreed_total` que nombre su `costId` y la traiga dentro del precio de todo el
+trabajo ([cómo](#un-precio-por-todo-el-trabajo-agreed_total)). Un `agreed_total` que no la nombra la deja fuera, a
+su regla.
 
 ### Acordar el neto de un costo de terceros
 
@@ -1929,9 +2732,14 @@ Identidades que se pueden comprobar: trabajo propio = `totals` − terceros (11.
 
 ### En cada lectura del artefacto
 
-- **`compose assess`.** `margin.ownWorkRate` trae el margen del trabajo propio y `margin.proposedFloorReadOn` dice
-  `"ownWorkRate"`: `belowProposedFloor` se lee sobre el trabajo propio, no sobre el mezclado (`modeledRate`). Sus
-  40 %/35 % siguen siendo propuestas genéricas. Gaps nuevos:
+- **`compose assess`.** `margin.modeledRate` es el margen mezclado y `margin.ownWorkRate`, el del trabajo propio.
+  No compara ninguno de los dos con un margen genérico: la comparación 40 %/35 % que traía se retiró el 2026-10-11
+  (`proposedTarget`, `proposedFloor`, `belowProposedFloor` y `proposedFloorReadOn` ya no existen). En su lugar
+  `margin.pricingPolicies[]` dice con qué regla se puso precio a cada línea (aquí `creative-managed-service`,
+  `target_margin` `0.45`, `minimumMargin` `0.45`, las seis líneas), `margin.thirdPartyPolicies[]` trae la regla de
+  cada categoría con sus `costIds` (`production` y `talent`: `markup` `0.10`, piso `0.05`; `media`: `markup` `0`,
+  piso `0`) y `margin.belowPolicyFloor` es `true` sólo si el kernel marcó alguna fila; aquí, `false`. Gaps propios
+  de una cotización con terceros:
 
   | Gap                                    | Cuándo sale                                                              | Qué hacer                                                                                             |
   | -------------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
@@ -2008,7 +2816,7 @@ Todos llegan en `diagnostics` del resumen, con exit 2 y sin precio, salvo donde 
 | `UNCONFIRMED_THIRD_PARTY_COST` en `thirdPartyCosts.<costId>.evidence`               | Demanda en `mode: "commercial_draft"` con un costo refacturado cuya `evidence` no está `confirmed`                                      | Confirmar la cotización del proveedor. Hoy toda composición es simulación: sale junto a otros bloqueos     |
 | `STALE_SOURCE` en `periods.<n>.request.thirdPartyCosts.<i>.source`                  | `quoteDate` fuera de la vigencia de la cotización del proveedor                                                                         | Pedirle una cotización nueva al proveedor y actualizar la `evidence`                                       |
 | `MISSING_SOURCE_CONFIRMATION` en la misma ruta                                      | `evidence.status` es `pending`                                                                                                          | Conseguir el respaldo; `estimated` calcula en revisión                                                     |
-| `INVALID_ADJUSTMENT_LINE` en `adjustments`                                          | Un `discount`, o un `agreed_net` `monthly`/`setup`, nombra un `costId`; o un `agreed_net` `third_party` nombra una línea o un costo `client_direct` | Las líneas van con `monthly`/`setup`; los costos refacturados, con `third_party`                |
+| `INVALID_ADJUSTMENT_LINE` en `adjustments`                                          | Un `discount`, o un `agreed_net` `monthly`/`setup`, nombra un `costId`; o un `agreed_net` `third_party` nombra una línea o un costo `client_direct`; o un `agreed_total` nombra un id que no es una línea ni un costo refacturado | Las líneas van con `monthly`/`setup`; los costos refacturados, con `third_party`. Un `agreed_total` admite líneas y costos refacturados juntos |
 | `UNUSED_FX_SELECTION` en un `fx:…`                                                  | `fxRecordIds` nombra el par de la moneda de un proveedor                                                                                | Quitarlo: el tipo de cambio de un costo de terceros se elige solo                                          |
 | `AMBIGUOUS_CONTINGENCY_RESERVE` en `contingency`                                    | Dos registros de reserva del mismo nivel aplican a la cotización; `candidates` los lista                                                | Error del catálogo: versión nueva que retire uno                                                           |
 | `CONTINGENCY_WAIVER_WITHOUT_RESERVE` en `contingency`                               | La demanda renuncia a una reserva que esta cotización no tiene                                                                          | Quitar `contingency`, o corregir la oferta, la forma o la fecha                                            |
@@ -2034,7 +2842,19 @@ En el ledger: `THIRD_PARTY_AND_CONTINGENCY`.
 
 El precio que el operador acuerda de verdad tiene que pasar por el motor. Si se anota sólo en la propuesta, el
 artefacto congelado sigue mostrando el precio calculado y nadie comprueba el piso contra el precio real. El precio se
-declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a mano.
+declara directo, en `brief.adjustments`: no se calcula ninguna tasa a mano.
+
+**Hay dos ajustes para un precio pactado, y se elige por cómo se pactó:**
+
+| Se pactó | Ajuste | `amount` es |
+| --- | --- | --- |
+| Un valor por mes (un fee mensual, el valor mensual de una persona), o un valor para una sola clase de cobro | `agreed_net`, con `billing` | El neto de esas líneas **en cada periodo**, para esa clase de cobro. En doce meses, el plazo suma doce veces `amount` |
+| Un precio por todo el trabajo (un programa, un proyecto, un precio «todo incluido» con su puesta en marcha) | `agreed_total`, sin `billing` | El neto de esas líneas **en todo el plazo**: todos los periodos y todas las clases de cobro juntas |
+
+Antes del 2026-10-11 sólo existía el primero, y un precio por todo el trabajo había que dividirlo a mano entre meses
+y clases. Ya no: se declara el total y el cotizador lo reparte.
+
+### Un precio por mes (`agreed_net`)
 
 1. Cotizar sin ajustes con `--current` y leer `totals.undiscountedPrice`: es el precio calculado, ya redondeado.
 2. Copiar la demanda a un archivo nuevo y declarar el acuerdo dentro de `brief`:
@@ -2054,12 +2874,13 @@ declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a
 
    - `amount`: el neto acordado antes de impuestos, en la moneda de salida, como cadena y sin más decimales que los de
      la moneda.
-   - Es **por periodo**: con `billing: "monthly"` es lo que se factura cada mes por esas líneas, no el total del plazo.
-     En doce meses, el plazo suma doce veces `amount`.
+   - Es **por periodo y por clase de cobro**: con `billing: "monthly"` es lo que se factura cada mes por esas líneas.
+     Si lo pactado es un monto por todo el plazo, no se divide a mano: es un `agreed_total`
+     ([abajo](#un-precio-por-todo-el-trabajo-agreed_total)).
    - `billing`: `monthly` acuerda las filas mensuales de esas líneas; `setup`, las de implementación (cobro único), y
-     sólo rige en los periodos que tienen filas de implementación. Acordar las dos cosas son dos ajustes. Un tercer
-     valor, `third_party`, acuerda el neto de costos de terceros: ahí `lineIds` lleva `costId`, no líneas
-     ([cómo](#acordar-el-neto-de-un-costo-de-terceros)).
+     sólo rige en los periodos que tienen filas de implementación. Acordar las dos cosas por separado son dos
+     ajustes. Un tercer valor, `third_party`, acuerda el neto de costos de terceros: ahí `lineIds` lleva `costId`, no
+     líneas ([cómo](#acordar-el-neto-de-un-costo-de-terceros)).
    - `lineIds`: los IDs de las líneas del brief que cubre el acuerdo. El motor reparte la diferencia entre sus filas
      en proporción al precio de cada una.
    - `reason`: obligatorio. Dice qué se acordó, quién lo aprobó y cuándo.
@@ -2072,18 +2893,89 @@ declara directo, como neto acordado (`agreed_net`): no se calcula ninguna tasa a
    cliente en Colombia o Perú; `1.3.0` si la demanda declara la forma del compromiso; `1.4.0` si refactura un costo
    de terceros o lleva reserva de contingencia). El motor no juzga si el monto
    es razonable (acepta incluso `"0"`): revisar la cifra antes de congelar.
-4. Leer el margen real en `marginRateRoundedDown` y las líneas bajo el piso en `marginFloor.lines[]`:
-   `marginAmountShortOfFloor` es el margen que falta en cada una; con cliente en Colombia o Perú la línea trae en su
-   lugar `floorNet` y `netShortOfFloor`, el neto mínimo de ese mercado y lo que falta para alcanzarlo
-   ([el piso acompaña al factor](#en-colombia-y-perú-el-piso-acompaña-al-factor)). Una línea marcada es un
-   incumplimiento real: se lleva al operador antes de congelar.
+4. Leer el margen real en `marginRateRoundedDown` y las líneas bajo el piso en `marginFloor.lines[]`. En cada una,
+   `netShortOfFloor` dice cuánto más tendría que valer la fila para cumplir su piso y `floorNet`, cuál es ese neto
+   mínimo; `marginAmountShortOfFloor` es el margen que falta si el neto no se mueve. Qué claves trae cada línea
+   depende del motor y del país del cliente ([las tres claves](#qué-significa-una-línea-marcada)). Una línea marcada
+   es un incumplimiento real: se lleva al operador antes de congelar.
 5. Congelar con `compose quote --out` en una ruta nueva, guardar el resumen y correr `compose assess` sobre el
    artefacto. Conservar los cuatro archivos junto al expediente, con una nota de la decisión.
 
-Se admiten hasta 10 ajustes y cada fila facturable recibe a lo más uno. Un `discount` (rebaja por tasa, para un
-descuento que de verdad se pacta como porcentaje) toma las filas mensuales y las de implementación de sus líneas, así
-que no convive con un `agreed_net` sobre la misma línea. Ningún ajuste aprueba nada: el piso se controla sobre el neto
-final. Si el ajuste está mal declarado no hay precio:
+### Un precio por todo el trabajo (`agreed_total`)
+
+```json
+"adjustments": [
+  {
+    "adjustmentId": "programme-price",
+    "kind": "agreed_total",
+    "amount": "9500000",
+    "lineIds": ["seo", "lead"],
+    "reason": "Precio acordado por el programa de tres meses, todo incluido. Quién lo aprobó y cuándo."
+  }
+]
+```
+
+- `amount`: el neto de todo lo que nombra `lineIds`, en todo el plazo, en la moneda de salida y con sus decimales.
+- `lineIds`: líneas del brief y, si el precio los incluye, costos de terceros refacturados, por su `costId`. Un costo
+  que no se nombra queda fuera del total, a la regla de su categoría.
+- No lleva `billing`: cubre las filas mensuales, las de puesta en marcha y, de los costos nombrados, las de terceros.
+- `adjustmentId` admite hasta 100 caracteres; `reason` es obligatorio.
+- Lo que nombra un `agreed_total` no puede estar dos veces en él ni en ningún otro ajuste —`discount`, `agreed_net` u
+  otro `agreed_total`—: `AGREED_TOTAL_OVERLAPS_ADJUSTMENT`.
+
+**Cómo lo reparte el cotizador.** El motor no conoce el total: recibe netos acordados por periodo, como siempre. La
+resolución hace dos pasadas:
+
+1. Cotiza la demanda una vez **sin** el acuerdo y lee el neto de política de cada grupo de filas que el total nombra:
+   un grupo es un periodo y una clase de cobro (`monthly`, `setup`, `third_party`).
+2. Reparte el total entre los grupos en proporción a ese neto. Cada parte se corta hacia abajo a un múltiplo de la
+   unidad de reparto y el último grupo con precio toma lo que queda. Los grupos suman exactamente el total. A cada
+   periodo le llega un `agreed_net` por clase, llamado `<adjustmentId>:<clase>`.
+
+El resumen lo deja en `agreedTotals`, y el artefacto lo congela:
+
+| Clave | Qué dice |
+| --- | --- |
+| `amount`, `currency` | El total declarado |
+| `policyNet` | Lo que esas filas valían al precio de política: el neto de la primera pasada |
+| `differenceFromPolicyNet` | `amount − policyNet`. Negativo: se vendió bajo el precio de política |
+| `distributionUnit`, `distributionUnitBasis` | La unidad de la que cada parte es múltiplo, y por qué (abajo) |
+| `distribution[]` | Por clase de cobro y neto: `policyNet`, `agreedNet` y los `periodIds` que lo llevan. Periodos con la misma parte se juntan en una entrada |
+
+**La unidad de reparto cuida el impuesto.** El kernel redondea el impuesto de cada periodo y la cotización los suma;
+repartido al peso, un total puede dejar un impuesto a un peso del de la tasa sobre el total.
+
+| `distributionUnitBasis` | Cuándo | Unidad | Impuesto de la cotización |
+| --- | --- | --- | --- |
+| `tax_exact` | Impuesto exclusivo con tasa `p/q` en su mínima expresión | `q` unidades mínimas de la moneda: 100 pesos o USD 1,00 a 19 %; 400 pesos a 19,25 % | Exactamente la tasa sobre el total, redondeada una vez. Vale para una cotización cuyas filas están todas dentro de un solo `agreed_total` |
+| `currency_precision` | Impuesto sin resolver o que no aplica | La unidad mínima de la moneda | No hay impuesto que cuidar |
+| `currency_precision_fallback` | La unidad exacta es más grande que la parte de algún grupo, que quedaría en cero | La unidad mínima de la moneda | Puede diferir del impuesto del total en una unidad por periodo |
+
+Ejemplo, medido: 9.500.000 por un programa de tres meses a 19 % se reparte en 3.166.600, 3.166.600 y 3.166.800
+(unidad `100`, `tax_exact`), y el impuesto es 1.805.000, que es 19 % de 9.500.000
+([caso completo](#caso-c--un-programa-seoaeo-de-tres-meses-con-un-precio-por-el-programa)).
+
+**Qué tener presente.**
+
+- **Los periodos pueden no ser iguales**: el último toma el resto. En el documento, un fee pactado así sale partido
+  en dos tramos si se pliega por meses; se imprime como un solo precio con `combine`
+  ([Producir el documento](#producir-el-documento-de-cotización)).
+- **El piso sigue siendo por fila.** El reparto es proporcional al precio de política, así que una rebaja le toca a
+  todo lo nombrado en la misma proporción, también a un costo de terceros que se cobra al costo y tiene su piso en el
+  costo: esa fila sale marcada ([caso medido](#caso-d--un-proyecto-único-de-alcance-cerrado-con-un-solo-precio)).
+- **Sobre el precio de política también sirve**: la diferencia sale como `uplift`.
+- **No sirve para acordar un mes**: para un valor mensual es `agreed_net`. Y no convive con otro ajuste sobre las
+  mismas líneas: si una parte del trabajo tiene su propio precio pactado, o entra al total o se nombra aparte, con
+  otras líneas.
+
+### Reglas comunes y fallas
+
+Se admiten hasta 10 ajustes y cada fila facturable recibe a lo más uno. Un `agreed_total` cuenta en cada periodo
+como un ajuste por clase de cobro que alcanza; si con los demás un periodo supera los 10, la corrida devuelve
+`ADJUSTMENTS_EXCEED_PERIOD_LIMIT`. Un `discount` (rebaja por tasa, para un descuento que de verdad se pacta como
+porcentaje) toma las filas mensuales y las de implementación de sus líneas, así que no convive con un `agreed_net`
+ni con un `agreed_total` sobre la misma línea. Ningún ajuste aprueba nada: el piso se controla sobre el neto final.
+Si el ajuste está mal declarado no hay precio:
 
 | Qué devuelve                                               | Causa                                                                                 | Arreglo                                                      |
 | ---------------------------------------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
@@ -2091,8 +2983,14 @@ final. Si el ajuste está mal declarado no hay precio:
 | Exit 2, `diagnostics` con `INVALID_AGREED_AMOUNT`          | `amount` tiene más decimales que la moneda                                            | Escribir el monto en la escala de la moneda                  |
 | Exit 2, `diagnostics` con `AGREED_NET_WITHOUT_BASE`        | No hay filas de esa clase que acordar (ej. `setup` en un servicio sin implementación) | Corregir `billing` o `lineIds`                               |
 | Exit 2, `diagnostics` con `DUPLICATE_ID`                   | `adjustmentId` repetido                                                               | Un ID distinto por ajuste                                    |
-| Exit 2, `diagnostics` con `INVALID_ADJUSTMENT_LINE`        | Un `lineId` no existe en el brief                                                     | Usar los IDs de `brief.lines`                                |
-| Exit 1, `SCHEMA_INVALID` en stderr (`issues` da el `path`) | Falta `reason`, `amount` no es una cadena, un campo sobra o hay más de 10 ajustes     | Corregir cada `path`                                         |
+| Exit 2, `diagnostics` con `INVALID_ADJUSTMENT_LINE`        | Un `lineId` no existe en el brief, o un `agreed_total` nombra un id que no es una línea ni un costo refacturado | Usar los IDs de `brief.lines` y los `costId` refacturados |
+| Exit 2, `AGREED_TOTAL_OVERLAPS_ADJUSTMENT` en `adjustments.<adjustmentId>` | Algo que nombra el total está dos veces en él o en otro ajuste | Dejar cada línea y cada costo en un solo ajuste |
+| Exit 2, `AGREED_TOTAL_NOT_REPRESENTABLE` en `adjustments.<adjustmentId>.amount` | El total tiene más decimales que la moneda | Escribirlo en la escala de la moneda |
+| Exit 2, `AGREED_TOTAL_WITHOUT_BASE` en `adjustments.<adjustmentId>` | Un total mayor que cero sobre filas que valen cero en todos los periodos | Corregir `lineIds` |
+| Exit 2, `AGREED_TOTAL_WITHOUT_POLICY_PRICE` en `adjustments.<adjustmentId>` | La cotización no calcula sin el acuerdo: no hay precio de política que repartir | Resolver los otros diagnósticos de la corrida; este desaparece con ellos |
+| Exit 2, `ADJUSTMENTS_EXCEED_PERIOD_LIMIT` en `periods.<n>.adjustments` | Con el reparto de un total, ese periodo supera los 10 ajustes | Reducir los ajustes declarados |
+| Exit 2, `DUPLICATE_ADJUSTMENT_ID` en `adjustments` | Un `adjustmentId` choca con otro o con `<adjustmentId>:monthly`, `:setup` o `:third_party` de un total | Un ID distinto por ajuste |
+| Exit 1, `SCHEMA_INVALID` en stderr (`issues` da el `path`) | Falta `reason`, `amount` no es una cadena, un campo sobra (un `billing` en un `agreed_total`) o hay más de 10 ajustes | Corregir cada `path`                                         |
 
 El método anterior —un `discount` cuya tasa `1 − neto ÷ precio` se calculaba a mano con siete decimales— sólo sirve
 para leer artefactos congelados antes del motor 1.1 (`acordado.*` de SKY); no se usa para registrar un acuerdo nuevo.
@@ -2180,6 +3078,18 @@ Nota 2026-10-11 (noche): desde `compose document` el cliente sí tiene un docume
 cotización y, si se pide, su calendario de pagos. Sigue sin existir una versión para el cliente del reparto en
 persona y kit, de la lectura de caja y de los compromisos; lo que falta del documento está en
 [Lo que el documento todavía no hace](#lo-que-el-documento-todavía-no-hace).
+Nota 2026-10-11 (última): después de tres negocios reales más, la lista de lo abierto y de lo no modelado queda así.
+**Abierto y del CEO, sin decidir:** si el fee de plataforma (USD 49 al mes por persona de cada línea, entero cualquiera sea la
+dedicación) debe prorratearse por dedicación (`PLATFORM_FEE_PER_LINE` en el ledger). No se presenta como decidido en
+ningún sentido ni se prorratea a mano. **Sin modelar, y se dice cuando el negocio lo toca:** una oferta propia para
+proyectos únicos (`PROJECT_OFFER_NOT_MODELLED`); un costo de puesta en marcha para un servicio gestionado
+(`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC`); el costo medido detrás de las provisiones «TEST ONLY» de los kits de una
+persona por dedicación (`ASSURANCE_OPERATIONS_ONBOARDING_COSTS`); las herramientas cuyo precio vigente no tiene
+importe; el precio techo del comprador y la lógica de puntaje de una licitación; el costo financiero de un pago
+tardío; el panel de Greenhouse e Insights como recursos con costo; y número de cotización, versiones, QR, firmas y
+aprobación, que son del cotizador de Greenhouse (adoptarlos es el paso siguiente acordado, sin empezar).
+**Cerrado ese día:** un precio por todo el trabajo (`agreed_total`), la unidad comercial de cada oferta como dato
+del catálogo, la evidencia de la dedicación y el documento de un precio de programa o de proyecto (`combine`).
 
 ## Presentar el precio en fee de la persona y kit de herramientas
 
@@ -2262,6 +3172,10 @@ Devuelve exit 3 con `pricing-v3-payment-schedule/1`: 1.400.000, 840.000 y 550.00
   aquí 550.000 y no 558.000, y `remainder.absorbed` (`-8000`) dice cuánto absorbió.
 - `totals.net` es el neto de la cotización: los montos suman exactamente eso.
 - `tax` y `total` vienen sólo si la cotización resolvió impuestos; si no, `null`. Aquí no se supone ninguna tasa.
+  Con el impuesto resuelto, cada hito trae su parte del impuesto congelado y su total, y las partes suman el
+  impuesto y el total de la cotización: sobre `designer-three-months-iva.artifact.json` (neto 7.970.000, IVA
+  1.514.300), los mismos tres hitos son 3.990.000 + 758.100 = 4.748.100, 2.390.000 + 454.100 = 2.844.100 y
+  1.590.000 + 302.100 = 1.892.100.
 
 **Lo que declara de sí mismo.** Es un calendario: dice cuándo vence un monto. **No es una factura ni un monto
 cobrado, y no es un precio nuevo.** `periodId` y `when` son lo que declaró quien llamó: nada comprueba una fecha, una
@@ -2470,8 +3384,15 @@ sólo el brief, listo para editar. Qué leer en stdout:
 
 **2. Llenar el brief. Sólo textos.**
 
-- Llenar **todos** los textos vacíos: `reference`, `supplier`, `buyer`, `cover`, `service`, `scope`, `schedule`,
-  `pricing` y `conditions`. Un texto vacío se rechaza.
+- Llenar **todos** los textos que el andamio trae vacíos: `reference`; `supplier` (`name`, `taxId`, `contact`,
+  `email`, `phone`); `buyer` (`name`, `taxId`); `cover` (`label`, `title`, `subtitle`); `service.name`; `scope`
+  (`title`, `intro`, `rows`); `schedule` (`title`, `phases`); `pricing` (`title`, `intro`, `summary`, `taxNote`) y
+  `conditions` (`title`, `rows`). Un texto vacío se rechaza.
+- **Tres textos son optativos y el andamio no les deja hueco** (desde el 2026-10-11): `buyer.unit` (el área del
+  cliente a la que va el documento), `schedule.note` (una línea junto al título del calendario del trabajo) y
+  `cover.netLabel` (el rótulo del neto en la portada). Se escriben sólo cuando dicen algo: no se repite el nombre
+  del cliente como unidad ni se anota que el trabajo «empieza en la fecha acordada». Nunca se escribe quién define
+  la fecha de inicio. Una clave presente es un texto no vacío.
 - `scope.rows` admite de 1 a 7 filas; `schedule.phases`, de 1 a 3; `conditions.rows`, de 1 a 6. Un título es una
   línea o un arreglo de hasta tres líneas cortas. `schedule` es el calendario **del trabajo**; el de pagos es
   `paymentMilestones`.
@@ -2488,10 +3409,18 @@ sólo el brief, listo para editar. Qué leer en stdout:
   ```
 
 - Mientras el precio no esté aprobado, la portada y las condiciones lo dicen. Los ejemplos usan «Borrador · Sin
-  validez comercial» en `cover.label`.
+  validez comercial» en `cover.label`. **Si el precio lo fijó el propio CEO y aun así hay filas bajo su piso**, la
+  leyenda no se quita por eso: un precio dictado dice cuánto se cobra, no que él vio qué filas quedan marcadas ni
+  cuánto les falta. Se le muestran (`marginFloor.lines[]`, con `netShortOfFloor`) y la leyenda se mantiene hasta
+  que apruebe el precio con esa información; se cambia por indicación suya. `status: "draft"` en los datos no
+  cambia en ningún caso.
+- **Lo que el documento no tiene como dato se escribe en `conditions.rows`** (de 1 a 6 filas): la vigencia de la
+  oferta, la forma y el plazo de pago, y lo que el cliente debe aportar (accesos, lineamientos, aprobaciones, una
+  herramienta propia). Ninguno de los tres sale de la cotización, y la fecha de inicio y la duración del contrato
+  no van.
 - Optativos, según `optional`: `paymentMilestones` y `paymentScheduleTexts` (calendario de pagos),
-  `pricing.monthly` (`{ months, note }`: una cantidad de meses, no un importe), `pricing.taxLabel`, `buyer.logo` y
-  `locale`. Desde el 2026-10-11, también `lines.<clave>.courtesy`, `options` y `optionsTexts`
+  `pricing.monthly` (`{ months, note }`: una cantidad de meses, no un importe), `pricing.taxLabel`, `buyer.logo`,
+  `buyer.unit`, `schedule.note`, `cover.netLabel`, `combine` y `locale`. Desde el 2026-10-11, también `lines.<clave>.courtesy`, `options` y `optionsTexts`
   ([Agregar opciones y una cortesía](#agregar-opciones-y-una-cortesía)).
 
 Las claves según el tipo de cotización:
@@ -2500,6 +3429,42 @@ Las claves según el tipo de cotización:
 | ----------------------------------------------- | ----------------------------------------------------- |
 | Servicio gestionado                             | `fee`, `setup` y `third_party:<costId>`               |
 | Vendida por líneas (una persona por dedicación) | `<lineId>`, `<lineId>:setup` y `third_party:<costId>` |
+
+**Cantidad y unidad de cada línea.** Sin hacer nada, cada clave es un concepto plegado por meses: «3 meses» al
+valor de uno y el neto de los tres; un periodo solo es «1 mes»; un cobro único, «1 pago único» sin valor unitario; y
+un concepto cuyo neto cambia durante el plazo sale en una línea por tramo. Para un precio por todo —un programa, un
+proyecto— se usa `combine`, desde el 2026-10-11:
+
+```json
+"combine": [
+  {
+    "keys": ["fee"],
+    "label": "Programa de atención en redes sociales",
+    "detail": "Equipo, herramientas y continuidad de la atención",
+    "unit": "programa"
+  }
+]
+```
+
+- Cada entrada imprime sus claves como **una** línea: cantidad 1 de `unit` («programa», «proyecto», «servicio»), sin
+  valor unitario, y por neto la suma exacta que la cotización congeló para esas claves en todo el plazo.
+- `keys`, `label` y `unit` son obligatorios; `detail` y `group`, optativos. Se admiten hasta 40 entradas.
+- Una sola clave se puede combinar: un fee impreso como precio de programa en vez de meses.
+- Una clave va en una sola combinación (`duplicate_key`) y entonces no lleva entrada en `lines`
+  (`key_is_combined`). Una clave que la cotización no tiene es `unknown_key`; una que bonifica por completo no se
+  combina (`key_not_charged`): una cortesía se imprime con su propia marca.
+- Es presentación: las líneas suman el mismo neto con o sin `combine`, y el bloque no tiene dónde escribir un
+  importe.
+- La línea queda donde aparece la primera de sus claves y, sin `group`, en el grupo por defecto de la primera que
+  lista el brief.
+- **Úsalo cuando el precio se pactó con `agreed_total`**: su reparto deja el último mes distinto de los demás, y
+  plegado por meses el documento imprimiría dos tramos («Meses 1 a 2», «Mes 3») de un precio que el cliente conoce
+  como uno solo.
+
+Con `combine` va casi siempre `cover.netLabel`: la portada imprime el neto de la cotización bajo el rótulo «Valor
+neto del servicio completo», y `cover.netLabel` lo reemplaza por el que corresponde («Valor neto del programa»,
+«Valor neto del proyecto»). En un servicio mensual que sigue después de los meses cotizados ese rótulo tampoco es
+cierto: se nombra lo que la cifra es («Valor neto de los tres primeros meses»).
 
 **3. Emitir los datos del documento.**
 
@@ -2510,8 +3475,9 @@ pnpm --silent pricing:v3 compose document --input "$artefacto" \
 ```
 
 Devuelve exit 3: es el borrador de una cotización en revisión. Imprime y guarda los datos del documento (la versión
-2 de los datos de la plantilla). Con este ejemplo: dos líneas que suman 7.970.000, `vatRate` `0.19` y `taxAmount`
-`1514300`, el impuesto que la cotización congeló. El archivo es idéntico al versionado
+2 de los datos de la plantilla). Con este ejemplo: dos líneas que suman 7.970.000, `vatRate` `0.19`, `taxAmount`
+`1514300`, el impuesto que la cotización congeló, y `taxPeriods` `3`, los periodos sobre los que el kernel redondeó
+ese impuesto. El archivo es idéntico al versionado
 `designer-three-months-iva.document.json`. Con tu propio brief, usa la ruta del paso 1 ya llena.
 
 **4. Generar el HTML y el PDF.**
@@ -2793,6 +3759,11 @@ En `compose increment`, `option` es `input` (se corrige la cotización con el ad
   de un mes y el neto de los tres. Un cobro único es «1 pago único», sin valor unitario. Si el neto de un concepto
   cambia durante el plazo, sale una línea por tramo y el detalle dice qué meses cubre («Mes 3», «Meses 1 a 2»). Un
   mes con neto cero no imprime nada, salvo una línea bonificada que el brief marca.
+- **Un precio por todo (`combine`).** Las claves que el brief combina salen como una línea de cantidad 1 con la
+  unidad que el brief escribe («1 programa»), sin valor unitario y con la suma exacta del plazo. Esas claves no
+  imprimen línea propia.
+- **Portada.** El neto de la cotización bajo «Valor neto del servicio completo», o bajo `cover.netLabel` si el brief
+  lo declara.
 - **Línea bonificada.** Sale sólo si el brief marca su clave con `courtesy: true`: «Bonificado» y, debajo, su «Valor
   de referencia», el precio que la cotización tenía para esa fila antes de la rebaja. No suma al subtotal, al
   impuesto ni al total.
@@ -2805,9 +3776,17 @@ En `compose increment`, `option` es `input` (se corrige la cotización con el ad
   Sale solo cuando la cotización los declara.
 - **Calendario de pagos.** Sale cuando el brief declara `paymentMilestones`, la misma lista de
   [`compose schedule`](#calendario-de-pagos-compose-schedule): partes del neto que suman exactamente 1. Los importes
-  los calcula la herramienta y suman el neto. Aquí cada hito necesita `periodId` o `when`.
+  los calcula la herramienta y suman el neto. Aquí cada hito necesita `periodId` o `when`, y se admiten hasta 12.
+  Con un impuesto exclusivo resuelto, cada hito se imprime con su neto, su parte del impuesto congelado y su total,
+  y las partes suman el impuesto y el total de la cotización; el calendario no lleva entonces la nota «Importes
+  netos, sin impuestos» salvo que el brief escriba una. Con el impuesto sin resolver o que no aplica, un hito es su
+  neto.
 - **Impuesto.** El de la cotización: la tasa y el importe que congeló, «Por confirmar» si no lo resolvió, o «No
-  aplica» si lo declaró así.
+  aplica» si lo declaró así. Nunca se recalcula. Los datos llevan `taxPeriods`, los periodos de la cotización: el
+  kernel redondea el impuesto de cada periodo y la cotización los suma, así que el impuesto congelado se acepta si
+  está a no más de una unidad mínima por periodo del impuesto de la tasa sobre el neto, se presenten las líneas por
+  meses o combinadas. Una cotización pactada con `agreed_total` se reparte de modo que su impuesto es exactamente el
+  de la tasa sobre el total.
 - **Opciones adicionales.** Un bloque aparte, el último de la sección de precio, con el rótulo «Opcional · Fuera de
   esta cotización» y una frase fija que dice que no forman parte de la cotización y que sus valores son netos. Sale
   sólo cuando la corrida recibe `--option` o `--increment`. Ninguna opción entra a una línea, al neto, al impuesto ni
@@ -2822,6 +3801,7 @@ Ejemplos versionados, emitidos y generados el 2026-10-11 (importes en CLP; el co
 | `managed-on-demand-third-party`        | Fee de 11.370.000 y tres costos de terceros (4.950.000, 1.380.000 y 3.333.333); aparte, un costo de USD 890 que paga el cliente; calendario de 50 %, 30 % y 20 % | 21.033.333 | «Por confirmar»                      | 5       |
 | `designer-startup-courtesy`            | Tres meses en una línea (3 × 2.550.000), la puesta en marcha bonificada con valor de referencia 320.000 y dos opciones (2.580.000 al mes y 3.570.000 por mes de campaña) | 7.650.000  | IVA 19 %: 1.453.500; total 9.103.500 | 5       |
 | `managed-addon-increment`              | Un fee de servicio gestionado en una línea (3 × 5.650.000) y una opción pasada con `--increment`, 300.000 al mes (cierre del 2026-10-11)                          | 16.950.000 | IVA 19 %: 3.220.500; total 20.170.500 | 4       |
+| `managed-addon-increment.programme-price` | La misma cotización impresa como un precio de programa: una línea «1 programa» con `combine`, `cover.netLabel` «Valor neto del programa» y dos hitos con su IVA y su total (8.480.000 + 1.611.200 = 10.091.200; 8.470.000 + 1.609.300 = 10.079.300). Se emite sobre `managed-addon-increment.artifact.json`, sin `--increment` | 16.950.000 | IVA 19 %: 3.220.500; total 20.170.500 | 4       |
 
 El calendario del tercer ejemplo: 10.520.000, 6.310.000 y 4.203.333. Cada ejemplo tiene su
 `<nombre>.document-brief.json` y su `<nombre>.document.json`.
@@ -2865,6 +3845,12 @@ El calendario del tercer ejemplo: 10.520.000, 6.310.000 y 4.203.333. Cada ejempl
 - **No escribir a mano un valor de referencia**, ni decir «bonificado» de una línea que la cotización cobra. La
   cortesía se declara en la cotización y se marca en el brief; el valor lo pone la herramienta.
 - **No presentar una opción como parte del total**, ni sumar su precio al neto en un texto.
+- **No llenar `buyer.unit`, `schedule.note` ni `cover.netLabel` con relleno** para que el brief «quede completo»:
+  son optativos y se omiten. Tampoco escribir quién define la fecha de inicio.
+- **No plegar por meses un precio que se pactó por todo el trabajo**, ni combinar claves para esconder una línea:
+  `combine` es para imprimir como uno un precio que el cliente conoce como uno.
+- **No quitar la leyenda de borrador porque el precio lo dictó el CEO** si hay filas bajo su piso que él no ha
+  visto: se le muestran primero.
 
 ### Problemas comunes del documento
 
@@ -2877,9 +3863,14 @@ El calendario del tercer ejemplo: 10.520.000, 6.310.000 y 4.203.333. Cada ejempl
 | Exit 1, `SCHEDULE_MILESTONES_INVALID` con `option: "brief"`                                  | La lista de hitos no cumple las reglas del calendario de pagos                                                                                | [Tabla de reglas](#calendario-de-pagos-compose-schedule); la ruta empieza en `paymentMilestones`                                           |
 | Exit 1, `QUOTE_DOCUMENT_REQUIRES_CALCULATED_QUOTE`                                           | La cotización está bloqueada (`needs_input`)                                                                                                  | Resolver los `diagnostics` de la demanda, cotizar con un `--out` nuevo y leer ese artefacto                                                |
 | Exit 1, `QUOTE_DOCUMENT_NOT_REPRESENTABLE`                                                   | La cotización no cabe en el documento: más de 40 líneas, más de 8 costos pagados por el cliente, o un importe que su moneda no puede escribir | No se arregla en el brief. Leer `issues` y llevarle al operador qué excede; se cambia la cotización                                        |
-| Exit 1, `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` o `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE`        | Las líneas no suman el neto, o el impuesto congelado no corresponde a su tasa                                                                 | No emitir a mano. Es una cotización que el documento no puede representar: reportar el comando exacto a quien mantiene la herramienta      |
+| Exit 1, `QUOTE_DOCUMENT_LINES_DO_NOT_ADD_UP` o `QUOTE_DOCUMENT_TAX_NOT_REPRESENTABLE`        | Las líneas no suman el neto; o el impuesto congelado se aparta del de su tasa sobre el neto en más de una unidad mínima por periodo; o la tasa tiene más de 4 decimales; o la cotización tiene más de 120 periodos | No emitir a mano. Es una cotización que el documento no puede representar: reportar el comando exacto a quien mantiene la herramienta      |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con `duplicate_key`, `key_not_charged` o `unknown_key` en `combine.<n>.keys.<m>` | Una clave está en dos combinaciones (o dos veces en una); o es una línea que la cotización bonifica por completo; o la cotización no la tiene | Cada clave en una sola combinación; una cortesía se imprime con `courtesy: true` en `lines`; copiar las claves del andamio. `<n>` y `<m>` son posiciones, desde 0 |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con `key_is_combined` en `lines.<n>`                  | `lines` nombra una clave que ya está en `combine`: esa clave no tiene línea propia                                                            | Quitar la entrada de `lines`; el nombre y el detalle de la línea combinada van en `combine`                                                |
+| Exit 1, `QUOTE_DOCUMENT_BRIEF_INVALID` con `missing_label`, `missing_unit` o `invalid_keys` en `combine.<n>` | A una combinación le falta el nombre, la unidad o la lista de claves                                                              | Llenarlos: `keys`, `label` y `unit` son obligatorios                                                                                       |
+| El generador falla con «El encabezado de las páginas interiores no cabe…»                    | El encabezado interior admite tres líneas entre la unidad del cliente, la sección y la referencia: con `buyer.unit`, la referencia tiene que caber en una; sin ella, en dos | Acortar `reference`, o acortar o quitar `buyer.unit`. Falla antes de abrir el navegador y dice qué acortar ([plantilla](../../commercial/templates/cotizacion-a4/README.md#páginas-fijas-portada-alcance-y-condiciones)) |
+| Una línea de fee pactada con `agreed_total` sale partida en «Meses 1 a 2» y «Mes 3»          | El reparto del total deja el último periodo con el resto                                                                                      | Imprimirla como un precio con `combine`                                                                                                    |
 | El documento imprime impuesto y total «Por confirmar»                                        | La cotización se congeló con el impuesto sin resolver                                                                                         | Es correcto. Si el operador ya decidió el tratamiento, declararlo en la demanda y volver a cotizar                                         |
-| El generador falla con «Contenido fuera del A4» y nombra la página 1                         | El título de la portada es demasiado largo: la portada es una página fija                                                                     | Acortar `cover.title` (hasta tres líneas cortas) o `cover.subtitle`, emitir de nuevo y generar. La tipografía no se reduce                 |
+| El generador falla con «Contenido fuera del A4» y nombra la página 1                         | El título de la portada es demasiado largo: la portada es una página fija. Cada entrada de `cover.title` es una línea del diseño, y la que no entra en el ancho del título se parte en dos y empuja lo demás | Acortar `cover.title` o `cover.subtitle`, emitir de nuevo y generar. Como orientación, sin logo caben un título de tres líneas con una bajada de hasta cinco, o uno de cuatro con una bajada de hasta tres. Un `cover.netLabel` largo también suma altura. La tipografía no se reduce |
 | El generador falla con «Contenido fuera del A4» en alcance o condiciones                     | Demasiadas filas o textos largos para una página fija                                                                                         | Acortar la redacción sin quitar obligaciones                                                                                               |
 | El generador dice que la carpeta de salida contiene archivos                                 | `--out` apunta a una carpeta con contenido                                                                                                    | Usar una carpeta nueva; cada versión conserva la suya                                                                                      |
 | Una línea sale partida en dos, con «Mes 1» y «Meses 2 a 3»                                   | El neto de ese concepto cambia entre meses                                                                                                    | Es lo que dice la cotización. Un `detail` del brief en esa clave reemplaza el texto de los meses en todos sus tramos: mejor no ponerlo ahí |
@@ -2910,6 +3901,8 @@ Se dice cuando el pedido lo toca; no se resuelve por cuenta propia:
 - Una portada, un alcance o unas condiciones de más de una página: son páginas fijas.
 - Un documento en una moneda distinta de la de la cotización.
 - Un valor de referencia para la puesta en marcha de un servicio gestionado: su cotización no tiene esa fila.
+- Llevar como dato la vigencia de la oferta, la forma y el plazo de pago o lo que el cliente debe aportar: no son
+  datos de la cotización y se escriben como texto en `conditions.rows`.
 
 Dos puntos que esta lista traía ya no están en ella (2026-10-11, cierre):
 
@@ -3005,6 +3998,24 @@ y [qué es y qué no es](../../documentation/finance/cotizador-v3-superficie-imp
   ([Un adicional que amplía la base](#un-adicional-que-amplía-la-base-compose-increment)).
 - **No tratar un artefacto guardado con `--keep-blocked` como una cotización**, ni buscar el archivo de una corrida
   bloqueada: no lo dejó ([Qué hace una corrida bloqueada](#qué-hace-una-corrida-bloqueada)).
+- **No dividir a mano un precio pactado por todo el trabajo** entre meses o entre fee y puesta en marcha: se declara
+  como `agreed_total` y lo reparte el cotizador. Y no usar `agreed_total` para un valor mensual: ese es `agreed_net`
+  ([cuál usar](#registrar-el-precio-acordado)).
+- **No cambiar `commercialUnit` para que una demanda pase.** La unidad es de la oferta y la declara el catálogo; si
+  lo que se vende es otra cosa, cambia la oferta.
+- **No presentar como confirmado un costo cuyas horas adivinaste.** Se declara `dedicationEvidence` con
+  `status: "estimated"`; sin evidencia, se informa lo que trae `dedicationNotEvidenced`. Tampoco marcar `confirmed`
+  una dedicación que nadie acordó ni midió.
+- **No prorratear a mano el fee de plataforma** de una línea parcial ni quitarlo: hoy se cobra entero por línea, y
+  si debe prorratearse es una decisión abierta del CEO. Tampoco quitar las provisiones «TEST ONLY» ni presentarlas
+  como costo medido.
+- **No inventar la evidencia de una herramienta que aporta el cliente** ni marcarla `confirmed`: sin evidencia, la
+  herramienta queda fuera del trabajo y se dice en las condiciones.
+- **No elegir el precio de una herramienta sin decirlo** cuando `current` no tiene importe: el `priceId` elegido es
+  un supuesto de la cotización.
+- **No fechar una cotización antes de los datos que usa**, ni nombrar versiones anteriores para que pase.
+- **No citar un margen propuesto de 40 % o un piso de 35 %**: esa comparación genérica de `compose assess` se retiró
+  el 2026-10-11 y nunca fue un piso. Los pisos son los de cada oferta.
 - **No usar el redondeo, un ajuste ni un cambio de fecha para «cumplir» un piso** o para llegar a un precio.
 - **No editar un archivo versionado** (catálogo, policy, demanda de ejemplo, artefacto): se copia a una ruta nueva o
   se emite una versión.
@@ -3045,6 +4056,16 @@ y [qué es y qué no es](../../documentation/finance/cotizador-v3-superficie-imp
 | Exit 2, `UNACCOUNTED_NAMED_SEATS` o `INSUFFICIENT_NAMED_SEAT_CAPACITY` en `<periodo>:<herramienta>`                                      | Los asientos pagados menos los ociosos no son los que se necesitan: sobra uno sin explicar, o falta uno                                                                    | Declarar el asiento como es: ocioso, compartido o de otro plan ([tabla](#si-la-cuenta-de-asientos-no-cierra)). No quitar la tarea de la persona                                                                                                    |
 | Exit 1, `SCHEMA_INVALID` en `allocations.<n>` con la regla `custom`                                                                      | La entrada trae `periodId` y `periodIds` a la vez, ninguna de las dos, un mes repetido, o `idleSeats` sin `idleReason`                                                     | Dejar una sola de las dos claves de periodo; `idleSeats` e `idleReason` van juntos                                                                                                                                                                |
 | Exit 1, `OUTPUT_EXISTS`                                                                                                                  | La ruta de `--out` ya existe                                                                                                                                              | Elegir una ruta nueva; no borrar un artefacto para reutilizar su nombre                                                                                                                                                                           |
+| Exit 2, `COMMERCIAL_UNIT_CONTRADICTS_OFFER` en `commercialUnit` | La demanda declara una unidad comercial distinta de la que el catálogo v11 declara para su oferta. Le pasa con `--current` a dos demandas versionadas antiguas, `data/pricing/v3-operating/service.demand.json` (y el plan `service.plan.json`, que la contiene) y `data/pricing/v3-composition/seo-service.demand.json`, que emparejan la oferta de staffing con `managed_service`; sus artefactos congelados se siguen reproduciendo con `replay` | Usar la unidad de la oferta (`compose scaffold` la escribe), o cambiar la oferta si lo que se vende es otra cosa |
+| `compose scaffold` deja `commercialUnit` en `null` y pregunta `COMMERCIAL_UNIT_REQUIRED` | El catálogo no tiene un registro `offer` vigente para esa oferta, o tiene dos | La confirma el operador; una demanda sin unidad no se cotiza |
+| Exit 2, `QUOTE_DATE_BEFORE_CATALOG` o `QUOTE_DATE_BEFORE_OFFER_POLICY` | La demanda está fechada antes de los datos que usa | Fecha del día en `quoteDate` ([detalle](#una-fecha-anterior-a-los-datos)) |
+| Exit 2, `RESOURCE_PRICE_PENDING` en `<periodo>:<herramienta>` | La asignación nombra un precio que hoy no tiene importe (suele ser `current`) | Elegir uno de los que `resources inspect` muestra con `availability` `reference_only` e informar la elección |
+| Exit 2, `ALLOCATION_DRIVER_MISMATCH` en `<periodo>:<herramienta>` | `serviceShare` no es `allocatedUnits ÷ totalUnits` truncado a 18 decimales (por ejemplo `0.33` o `0.333333333333333334` para 1 de 3) | Escribir el cociente truncado: `"0.333333333333333333"` |
+| Exit 2, `CREDIT_PERIOD_WINDOW_MISMATCH` en `<periodo>:<herramienta>` | Las fechas de un `creditBudgets` no caen en el mes calendario de su periodo, o `purchaseDate` es anterior a `quoteDate`. Pasa al copiar un ejemplo y cambiar sólo `quoteDate` | Fechar cada presupuesto dentro del mes de su periodo, contado desde `quoteDate` |
+| Exit 2, `AGREED_TOTAL_OVERLAPS_ADJUSTMENT` | Una línea está en un `agreed_total` y en otro ajuste | Un ajuste por línea ([reglas](#un-precio-por-todo-el-trabajo-agreed_total)) |
+| El costo de una persona no aparece como estimado ni como confirmado | La línea no declara `dedicationEvidence`: ese costo está en `estimateExposure.dedicationNotEvidenced` | Declarar de dónde sale la dedicación y si es un hecho o una estimación |
+| El neto de los periodos no es igual aunque el precio se pactó como uno | Es un `agreed_total`: el último periodo toma lo que sobra del reparto | Es lo esperado; `agreedTotals.distribution` lo muestra. En el documento, `combine` |
+| El margen de una línea chica sale muy bajo | El fee de plataforma se cobra entero por línea: en una línea de 0,08 FTE fue 24 % de su costo en el ejemplo versionado | Informarlo. Si es un adicional de una persona que ya está en la base, se lee con `compose increment`. No se prorratea a mano |
 
 Los demás rechazos están en [Qué hacer con cada error](#qué-hacer-con-cada-error); los de costos de terceros y
 reserva, en [su tabla](#si-un-costo-de-terceros-o-la-reserva-fallan); los de los asientos de una herramienta, en
@@ -3063,9 +4084,14 @@ fechada antes lo sigue emitiendo por línea, porque ese día los registros no de
 factor de país estimado entre sus `gaps`: eso se lee en `reviewSignals` del resumen, y su peso, en
 `costEvidencePriority` ([Dónde pesa un dato estimado](#dónde-pesa-un-dato-estimado-estimateexposure)). Cuando el
 factor de mercado cambia algo, `margin.policyFloor.marketFactor` lo repite. Con costos de terceros o una renuncia a
-la reserva, `assess` agrega sus propios gaps y lee el margen propuesto sobre el trabajo propio
-([detalle](#en-cada-lectura-del-artefacto)).
-Márgenes 40%/35% son propuestas genéricas, no aprobaciones. Los pisos aprobados son los de cada oferta (45 % en los servicios gestionados de las prácticas creativa y SEO/AEO, 25 % en una persona por dedicación); `assess` no los sustituye ni aprueba una excepción. El precio que se presenta y toda excepción los decide el operador (CEO). El preview está redactado, local y marcado como simulación;
+la reserva, `assess` agrega sus propios gaps y trae el margen del trabajo propio junto al mezclado
+([detalle](#en-cada-lectura-del-artefacto)). Desde el 2026-10-11 agrega además un gap por línea según la evidencia
+de su dedicación (`DEDICATION_NOT_EVIDENCED` o `DEDICATION_EVIDENCE_REVIEW`). `PROVISION_COST_EVIDENCE_REQUIRED`, que
+ya existía, marca cada provisión no medida: las «TEST ONLY» de los kits de una persona por dedicación y las
+hipótesis de reemplazo y guardia de un servicio gestionado.
+`assess` ya no compara contra un 40 %/35 % genérico: esa propuesta, que nunca fue una aprobación, se retiró el
+2026-10-11. `margin.pricingPolicies` dice con qué regla de su propia oferta se cotizó cada línea y
+`margin.belowPolicyFloor`, si el kernel marcó alguna fila. Los pisos aprobados son los de cada oferta (45 % en los servicios gestionados de las prácticas creativa y SEO/AEO, 25 % en una persona por dedicación); `assess` no los sustituye ni aprueba una excepción. El precio que se presenta y toda excepción los decide el operador (CEO). El preview está redactado, local y marcado como simulación;
 no es oferta emitida. La promoción futura tiene [mapa de integración](../../documentation/finance/cotizador-v3-promocion-canonica.md),
 con la autoridad y lifecycle del cotizador vigente. Este trabajo no despliega ni escribe API/DB/CRM.
 

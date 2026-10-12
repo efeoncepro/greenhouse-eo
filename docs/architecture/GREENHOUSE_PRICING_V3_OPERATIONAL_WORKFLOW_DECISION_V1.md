@@ -298,6 +298,8 @@ códigos de salida 0/2/3/1, los flags ni el escritor exclusivo `wx`/0600.
    `MARGIN_BELOW_POLICY_FLOOR` por cada línea que el kernel marcó y el campo `margin.policyFloor.linesBelowFloor`. No
    repite la comparación: el kernel es el único dueño del control de piso. `proposedTarget` 0,40 y `proposedFloor`
    0,35 siguen igual, como propuestas genéricas sin aprobar.
+   *Nota 2026-10-11:* esas dos claves ya no existen. La comparación genérica se retiró al final de ese día
+   ([delta](#delta-2026-10-11--compose-assess-juzga-contra-el-piso-de-la-propia-oferta)).
 4. **Escala de moneda en `compose preview`.** En `managed_service` los importes derivados usaban dos decimales fijos;
    ahora conservan la escala con la que el kernel formateó el período (CLP mostraba `9508946.00` en la línea y
    `9508946` en el total).
@@ -734,7 +736,8 @@ el mismo día** («sí me sirven»): los registros están marcados `confirmed` y
 
 **Qué no cambia.** `creative-managed-service` sigue en objetivo 0,45 y mínimo 0,45: el piso de 45 % de los servicios
 gestionados de la práctica creativa. El 40/35 de `compose assess` sigue siendo una propuesta genérica sin aprobar,
-nunca un piso. Una cotización con fecha anterior al 2026-10-11, las versiones anteriores del catálogo y los artefactos
+nunca un piso (nota del final del 2026-10-11: esa propuesta se retiró de `compose assess`; no era un piso y ya no
+aparece). Una cotización con fecha anterior al 2026-10-11, las versiones anteriores del catálogo y los artefactos
 congelados conservan el recargo histórico. No hay cambio de motor ni de contrato.
 
 **Alternativas que el operador tuvo a la vista y por qué no se tomaron.**
@@ -818,6 +821,9 @@ tiene dos líneas con ese perfil. Tal como está versionada, con `--current` que
   baja un piso para que un precio pase.
 - La excepción bajo un piso es del CEO, caso por caso, y nunca es referencia para otro cliente.
 - El 40/35 de `compose assess` sigue siendo una propuesta genérica sin aprobar, nunca un piso.
+  *Nota del final del 2026-10-11:* retirado de `compose assess`
+  ([delta](#delta-2026-10-11--compose-assess-juzga-contra-el-piso-de-la-propia-oferta)). La regla queda más simple:
+  no se cita.
 
 ## Delta 2026-10-11 — presentar persona y kit de herramientas (`compose split`)
 
@@ -1199,7 +1205,10 @@ piso donde se decidió.
   desglose de costo; la reserva bajo su propia clave, no como un recurso.
 - **`compose assess`.** `margin.ownWorkRate` y `margin.proposedFloorReadOn: "ownWorkRate"`: `belowProposedFloor` se
   lee sobre el trabajo propio. Ese umbral sigue siendo el 40/35 genérico sin aprobar, nunca el piso de una oferta; el
-  piso de la oferta lo juzga el kernel por fila (`margin.policyFloor`). Brechas nuevas:
+  piso de la oferta lo juzga el kernel por fila (`margin.policyFloor`).
+  *Nota del final del 2026-10-11:* `proposedFloorReadOn` y `belowProposedFloor` se retiraron junto con el 40/35.
+  `ownWorkRate` se conserva, y `margin` trae `pricingPolicies[]`, `thirdPartyPolicies[]` y `belowPolicyFloor`
+  ([delta](#delta-2026-10-11--compose-assess-juzga-contra-el-piso-de-la-propia-oferta)). Brechas nuevas:
   `THIRD_PARTY_COST_EVIDENCE_REQUIRED` (evidencia no confirmada),
   `THIRD_PARTY_FX_EXPOSURE` (el proveedor cobra en otra moneda y se le paga al tipo de cambio del día),
   `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED`, `THIRD_PARTY_TAX_TREATMENT_REVIEW` (sólo con impuesto `exclusive` y un
@@ -1270,7 +1279,8 @@ ejemplo son marcadores; aquí los costos se nombran por su concepto.
   (fuera de la carpeta de datos, con `--current`): neto 20.163.333, 870.000 menos; costo 14.313.255; trabajo propio
   10.500.000 con 50,19 %; `contingencyReserveWaived` 436.800 y la señal `CONTINGENCY_RESERVE_WAIVED`.
 - **`compose assess`**: `modeledRate` 0,2987, `ownWorkRate` 0,5016, `proposedFloorReadOn: "ownWorkRate"`,
-  `belowProposedFloor: false`. Brechas de terceros: `THIRD_PARTY_FX_EXPOSURE` en el talento,
+  `belowProposedFloor: false` (medido esa noche; desde el final del 2026-10-11 la misma lectura trae
+  `belowPolicyFloor: false` y no esas dos claves). Brechas de terceros: `THIRD_PARTY_FX_EXPOSURE` en el talento,
   `THIRD_PARTY_COST_EVIDENCE_REQUIRED` en los medios (evidencia estimada) y
   `THIRD_PARTY_SCOPE_AND_TERMS_REQUIRED`. `costEvidencePriority` pone primero los medios: 22,6 % del costo.
 - **`compose preview`**: fee del período 11.370.000 y tres ítems (4.950.000, 1.380.000 y 3.333.333), que suman el
@@ -1743,6 +1753,216 @@ allá es el paso acordado y **no ha empezado**).
   presentarlas como un pendiente del cotizador.
 - **NUNCA** escribir en el documento del cliente quién define la fecha de inicio.
 - **SIEMPRE** decir lo que una lectura supone de su calendario cuando la cifra depende de él.
+
+## Delta 2026-10-11 — un precio por todo el trabajo (`agreed_total`)
+
+Después del cierre de ese día se cotizaron tres negocios reales más, de tipos que no se habían probado: una persona
+vendida por dedicación, un proyecto web de alcance cerrado y un programa de tres meses en una licitación. Tres
+agentes sin contexto, con sólo la skill y el manual, reprodujeron el precio pactado y produjeron el documento, pero
+tuvieron que leer código para lograrlo. Este delta y los tres que siguen registran lo que se decidió a partir de
+eso. Ninguno toca un contrato del kernel; todos los artefactos congelados se reproducen byte a byte.
+
+**El problema.** Dos de los tres negocios tenían un precio por todo el trabajo: un monto por el programa completo,
+un monto por el proyecto. El único ajuste de precio pactado era `agreed_net`, que es un neto por período y por clase
+de cobro. Quien cotizaba tenía que dividir el total a mano entre meses y entre fee y puesta en marcha, y esa
+división tenía tres defectos: nadie la registraba, no había una regla para hacerla, y el impuesto de la cotización
+—que el kernel redondea período por período— podía quedar a una unidad del impuesto de la tasa sobre el total que el
+cliente tiene en la cabeza.
+
+**Decisión.**
+
+1. **Un ajuste del brief, no del kernel.** `brief.adjustments` admite `{ adjustmentId, kind: "agreed_total",
+   amount, lineIds, reason }`: el neto de las líneas nombradas en todo el plazo, todos los períodos y todas las
+   clases de cobro juntas. `lineIds` puede nombrar además costos de terceros refacturados, que así entran al precio.
+2. **Se resuelve a los ajustes que el kernel ya tiene.** La resolución cotiza la demanda una vez sin el acuerdo, lee
+   el neto de política de cada grupo (un período y una clase de cobro) y reparte el total en proporción. A cada
+   período le llega un `agreed_net` por clase, llamado `<adjustmentId>:<clase>`. El kernel no sabe que existe un
+   total.
+3. **El reparto se hace en una unidad en la que el impuesto es exacto.** Con un impuesto exclusivo de tasa `p/q` en
+   su mínima expresión, cada parte es un múltiplo de `q` unidades mínimas de la moneda (100 pesos a 19 %), se corta
+   hacia abajo, y el último grupo con precio toma el resto. El impuesto de cada parte no tiene nada que redondear;
+   sólo el último período redondea, una vez, y la suma es el impuesto de la tasa sobre el total.
+4. **Corre cuando los inputs son definitivos.** Una composición agrega el costo de sus herramientas después de
+   resolver; el reparto se hace después de eso, en la orquestación compartida por los dos carriles.
+5. **Queda congelado.** Lo declarado, el neto de política leído, la unidad con su motivo y el reparto viajan con la
+   resolución (`agreedTotals`) y el resumen los publica. Un replay hace las mismas dos pasadas.
+6. **El piso no se mueve.** Se sigue juzgando por fila, sobre el neto final.
+
+**Por qué un ajuste del brief que se resuelve a los del kernel, y no un cambio del kernel.** El kernel calcula un
+período por vez: cada entrada que recibe es un mes. Un total sobre el plazo no es un dato de ningún período, y
+dárselo habría exigido un contrato y un motor nuevos para expresar algo que `agreed_net` ya expresa, período por
+período, cuando alguien hace la división. La división es una decisión de resolución, igual que elegir el registro
+de un factor: se hace antes del kernel, se congela y se reproduce. Así todas las lecturas (resumen, `assess`,
+documento, incremento) siguen leyendo netos acordados y ninguna tuvo que aprender una clase nueva de fila.
+
+**Por qué la unidad exacta para el impuesto.** Un precio pactado como total tiene un impuesto que el cliente calcula
+de una sola manera: la tasa por el total. Repartido a la unidad mínima de la moneda, el mismo total puede dar otra
+cifra, porque cada período redondea el suyo. Serían dos impuestos para una cotización. La unidad `q` evita el
+redondeo en vez de corregirlo después. Vale para una cotización cuyas filas están todas dentro de un solo total; con
+filas fuera de él, o con varios totales, esos períodos redondean como siempre, y lo dice `distributionUnitBasis`.
+Cuando la unidad exacta dejaría sin parte a un grupo que tiene precio, el reparto vuelve a la unidad mínima
+(`currency_precision_fallback`): no se regala un mes para que un impuesto cuadre.
+
+**Alternativas descartadas.**
+
+- *Una clase nueva de ajuste en el kernel (contrato 1.5.0).* Un contrato y un motor más para algo que el kernel ya
+  sabe aplicar; y el kernel tendría que conocer el plazo, que no conoce.
+- *Seguir dividiendo a mano y documentar cómo.* Es lo que había: sin regla, sin registro y con el impuesto a una
+  unidad.
+- *Repartir en partes iguales entre los períodos.* Ignora que los períodos no valen lo mismo (una puesta en marcha
+  en el primero, un costo de terceros en uno solo) y dejaría filas bajo su piso sin motivo.
+- *Repartir siempre a la unidad mínima y aceptar la diferencia de impuesto.* Deja dos cifras posibles para el mismo
+  precio pactado.
+- *Cambiar el redondeo del impuesto del kernel para calcularlo una vez sobre el plazo.* Mueve un contrato ya usado y
+  el impuesto de todas las cotizaciones congeladas.
+- *Un `agreed_net` con una clase `all`.* Seguiría siendo por período: no resuelve el total.
+
+**Medido el 2026-10-11** (con `--current`, catálogo v11 y policy v11; las demandas con el ajuste están fuera de la
+carpeta de datos).
+
+- Un programa SEO/AEO de tres meses, On-Demand, con IVA de 19 % de ejemplo: precio de política 10.110.000; pactado
+  9.500.000. Reparto: 3.166.600, 3.166.600 y 3.166.800, unidad 100, `tax_exact`. Impuesto 1.805.000, que es 19 % de
+  9.500.000; total 11.305.000; margen 0,5651; ninguna fila marcada.
+- `designer-on-demand.demand.json` con un total de 2.800.000 sobre su línea: reparto 2.487.804 (mensual) y 312.196
+  (puesta en marcha), en proporción a 2.550.000 y 320.000; sin impuesto resuelto, `currency_precision`.
+- `managed-on-demand-third-party.demand.json` con un total de 20.500.000 sobre sus seis líneas y sus tres costos
+  refacturados (política 21.033.333): trabajo propio 11.081.695 y terceros 9.418.305. La fila de medios, que se cobra
+  al costo y tiene su piso en el costo, queda marcada: le faltan 84.522. Con el total sólo sobre las seis líneas, en
+  11.000.000, ninguna fila queda marcada.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** declarar un precio pactado por todo el trabajo como `agreed_total`; **NUNCA** dividirlo a mano entre
+  períodos o clases de cobro.
+- **NUNCA** usar `agreed_total` para un valor mensual: ese es `agreed_net`.
+- **SIEMPRE** leer `agreedTotals` después de cotizar: el último período puede diferir de los demás, y una rebaja
+  alcanza a todo lo nombrado, también a un costo que se cobra al costo.
+- Un total bajo el precio de política que deja una fila marcada es una excepción al piso: la decide el CEO.
+
+## Delta 2026-10-11 — `compose assess` juzga contra el piso de la propia oferta
+
+**El problema.** `compose assess` comparaba el margen de la cotización con un 40 % objetivo y un 35 % de piso
+genéricos. Este ADR los llamó siempre «propuestas genéricas sin aprobar»; aun así estaban en la salida, junto a un
+booleano (`belowProposedFloor`). Una persona por dedicación cotizada al objetivo de su propia oferta, 30 %, salía
+«bajo el piso propuesto»; un servicio gestionado bajo su piso de 45 % pero sobre 35 % salía sin esa marca. La lectura
+daba dos veredictos, y el que estaba primero era el que nadie había aprobado.
+
+**Decisión.** La comparación genérica se retira: `proposedTarget`, `proposedFloor`, `belowProposedFloor` y
+`proposedFloorReadOn` dejan de existir. `margin` informa con qué se puso precio y contra qué se juzga:
+
+- `pricingPolicies[]`: la regla de precio de cada línea, tal como la resolución la enlazó y la cotización la
+  congeló. Una entrada por regla distinta, con oferta, método, `rate` (el margen objetivo en `target_margin`), base,
+  `minimumMargin`, estado de la fuente y las líneas.
+- `thirdPartyPolicies[]`, sólo con costos refacturados: la regla de cada categoría, con su piso.
+- `belowPolicyFloor`: `true` sólo si el kernel marcó al menos una fila. Nunca se lee sobre un margen de toda la
+  cotización.
+- `modeledRate`, `ownWorkRate` y `policyFloor` quedan como estaban.
+
+**Por qué.** Los pisos son de cada oferta y los decide el CEO; el veredicto de piso es del kernel, por fila. Una
+referencia genérica en la misma lectura competía con las dos cosas. Donde un pasaje anterior de este ADR describe el
+40/35 como vigente, lleva una nota fechada.
+
+**Alternativas descartadas.**
+
+- *Dejar el 40/35 con una advertencia más fuerte.* Ya tenía la advertencia, y se leía igual.
+- *Reemplazar las constantes por el piso más alto de las ofertas.* Seguiría siendo un piso que no es el de la
+  cotización.
+- *Un veredicto de toda la cotización ponderando los pisos de sus filas.* El piso se juzga por fila; un promedio
+  esconde la fila que lo incumple.
+
+**Medido.** `designer-on-demand.artifact.json`: `pricingPolicies` trae `talent-assurance-staffing`, `target_margin`
+0,30, `minimumMargin` 0,25, y `belowPolicyFloor` es `false`. `managed-on-demand-third-party.artifact.json`:
+`creative-managed-service`, 0,45 y 0,45 para sus seis líneas; tres reglas de terceros; `belowPolicyFloor` `false`.
+
+**Regla para agentes.** **NUNCA** citar 40 % o 35 % como objetivo o piso de nada. El piso que se informa es el de la
+oferta de la cotización, y la excepción bajo él es del CEO.
+
+## Delta 2026-10-11 — diagnósticos que nombran su causa
+
+**El problema.** Varios bloqueos decían que algo faltaba sin decir qué. Una demanda fechada un día antes del
+catálogo devolvía una selección faltante por cada línea, kit, factor y política, y ninguna era la causa. Una
+herramienta sin asignación no decía qué precios se podían nombrar. La evidencia de una herramienta del cliente
+fallaba con un solo código para cuatro motivos distintos.
+
+**Decisión.** Un diagnóstico dice la regla que falla y, donde hay una lista cerrada, lo que se admite; nunca repite
+el dato recibido.
+
+- `QUOTE_DATE_BEFORE_CATALOG` y `QUOTE_DATE_BEFORE_OFFER_POLICY`: la fecha anterior a los datos se dice una vez, con
+  la fecha a la que hay que moverse. Una selección cuyo registro empieza después lleva esa fecha en `detail`.
+- `detail` en `CLIENT_ACCESS_EVIDENCE_REQUIRED` y en `RESOURCE_POLICY_NOT_EFFECTIVE`; `candidates` en
+  `RESOURCE_ALLOCATION_REQUIRED` y `RESOURCE_PRICE_SELECTION_REQUIRED`.
+- En un rechazo: `allowed` para una opción de lista cerrada, y `limit`, `allowed` o `expected` en cada ubicación de
+  un schema.
+- Cuando la resolución no construye ningún período, la composición ya no reporta cada entrada de la demanda como no
+  usada.
+
+**Por qué no más.** La frontera de los errores no se mueve: un reporte nunca lleva un valor, una ruta de archivo ni
+el mensaje de un validador, porque una demanda trae costos y nombres. Lo que se agrega son constantes del contrato y
+fechas de vigencia del catálogo, que no son contenido del llamador.
+
+**Alternativa descartada.** *Devolver el mensaje del validador.* Puede citar el valor recibido.
+
+**Regla que queda.** Una cotización no puede llevar una fecha anterior a los datos que usa: se corrige la fecha, no
+la vigencia de un registro.
+
+## Delta 2026-10-11 — el documento imprime un precio de programa o de proyecto
+
+**El problema.** El documento plegaba cada concepto por meses: «3 meses» al valor de uno. Para un programa o un
+proyecto con un solo precio eso imprime una cuenta que nadie pactó; y con un `agreed_total`, cuyo último período
+toma el resto del reparto, imprimía dos tramos de un precio que el cliente conoce como uno. Además el brief obligaba
+a llenar dos textos (`buyer.unit`, `schedule.note`) que muchas veces no tenían nada que decir, y terminaban con
+relleno: el nombre del cliente repetido, o «desde el inicio acordado».
+
+**Decisión.**
+
+1. **`combine`.** El brief puede listar claves para imprimirlas como una línea: cantidad 1 de la unidad que escribe
+   («programa», «proyecto», «servicio»), sin valor unitario, y por neto la suma exacta que la cotización congeló
+   para esas claves en todo el plazo. Una clave va en una sola combinación y entonces no tiene línea propia; una
+   clave bonificada por completo no se combina. Las líneas suman el mismo neto con o sin combinaciones.
+2. **`cover.netLabel`.** El rótulo del neto de la portada es un texto del brief cuando el de la plantilla no
+   corresponde.
+3. **`buyer.unit` y `schedule.note` son optativos.** El andamio no les deja hueco.
+4. **Cada hito con su impuesto.** Con un impuesto exclusivo, cada hito del calendario de pagos lleva su neto, su
+   parte del impuesto congelado y su total; las partes suman el impuesto y el total de la cotización.
+5. **La tolerancia del impuesto es por período de la cotización.** Los datos llevan `taxPeriods`, y el impuesto
+   congelado se acepta a no más de una unidad mínima por período del impuesto de la tasa sobre el neto.
+
+**Por qué.** `combine` es presentación: nombra claves y textos, y la cifra sigue saliendo de la cotización. La regla
+de este ADR —toda cifra del documento sale de la cotización congelada— no se movió. La tolerancia se contaba antes
+por las cantidades de las líneas; con `combine`, tres meses pasan a ser una línea de cantidad 1 y la misma
+cotización habría dejado de aceptarse. Cuántos períodos redondearon el impuesto es un hecho de la cotización, no de
+cómo se imprime.
+
+**Alternativas descartadas.**
+
+- *Permitir cantidad y unidad en `lines.<clave>`.* Una clave sola no junta el fee con la puesta en marcha ni con un
+  costo de terceros, que es lo que un precio de proyecto necesita.
+- *Volver a dividir el total en meses iguales para imprimirlo.* El documento imprimiría netos que la cotización no
+  tiene.
+- *Dejar que el brief escriba el precio del programa.* Rompe la regla de la que depende todo el documento.
+- *Mantener los dos textos obligatorios.* Produce relleno, y el relleno sobre la fecha de inicio contradice que una
+  cotización no es un contrato.
+
+**Medido.** `managed-addon-increment.artifact.json` con el brief `programme-price`: una línea «1 programa» de
+16.950.000; `taxAmount` 3.220.500 y `taxPeriods` 3; hitos de 8.480.000 + 1.611.200 = 10.091.200 y 8.470.000 +
+1.609.300 = 10.079.300. Generado: cuatro páginas. Los cinco briefs de ejemplo anteriores dejaron de declarar
+`schedule.note` y la condición «Plazo e inicio».
+
+**Reglas para agentes.**
+
+- **SIEMPRE** imprimir con `combine` un precio que se pactó por todo el trabajo.
+- **NUNCA** llenar un texto optativo con relleno, ni escribir quién define la fecha de inicio.
+- Lo que el documento no tiene como dato —vigencia de la oferta, forma y plazo de pago, lo que el cliente debe
+  aportar— se escribe en las condiciones.
+
+**Todavía no se modela.** Una oferta propia para proyectos únicos: hoy se cotiza con una oferta de servicio
+gestionado vendida On-Demand a un solo precio (`PROJECT_OFFER_NOT_MODELLED`). Un costo de puesta en marcha de un
+servicio gestionado (`MANAGED_SERVICE_SETUP_NOT_PARAMETRIC`). El costo medido detrás de las provisiones «TEST ONLY»
+(`ASSURANCE_OPERATIONS_ONBOARDING_COSTS`). Las herramientas cuyo precio vigente no tiene importe. El precio techo del
+comprador y la lógica de puntaje de una licitación. El costo financiero de un pago tardío. El panel de Greenhouse e
+Insights como recursos con costo. Y lo que ya se listaba: número de cotización, versiones, QR, firmas y aprobación son del
+cotizador de Greenhouse, y adoptarlos es el paso siguiente acordado, **sin empezar**. **Abierto y del CEO:** si el
+fee de plataforma, que hoy se cobra entero por línea, debe prorratearse por dedicación (`PLATFORM_FEE_PER_LINE`).
 
 ## Evidencia y rutas de operación
 

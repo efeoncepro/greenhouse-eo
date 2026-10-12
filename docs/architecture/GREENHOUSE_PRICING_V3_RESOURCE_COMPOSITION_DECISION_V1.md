@@ -30,6 +30,13 @@ un mismo asiento, que un asiento pagado está ocioso y que una herramienta se ti
 la regla pasa a ser que todo asiento pagado queda explicado. No reducir licencias por FTE sigue igual. Ver el
 [delta de asientos](#delta-2026-10-11--asientos-como-se-compran-y-períodos-declarados-una-vez).
 
+*Nota 2026-10-11 (última):* «no reducir licencias por FTE» habla de cuántos asientos se pagan, que es siempre un
+número entero. Qué parte del costo de esos asientos carga una cotización es otro dato, la cuota atribuida que este
+párrafo ya pide «con razón»: los ejemplos vigentes cargan las herramientas base de personas compartidas con otras
+cuentas por su dedicación declarada (1,3 de 3 asientos), una persona dedicada carga su asiento entero y una licencia
+de un paquete es una de sus licencias. El compositor no deduce esa cuota: comprueba que sea
+`allocatedUnits ÷ totalUnits`.
+
 Créditos se agregan por proveedor/mes antes de planear un paquete; consumo por función distribuye costo del
 presupuesto con remanente visible. Saldo disponible declarado, no live. Cuota atribuida y nueva compra se
 separan; caja modelada del kernel no es factura ni gasto incremental. No reutilizar créditos/paquetes fuera de
@@ -472,3 +479,113 @@ el ledger, `NAMED_SEATS_UNDER_TWO_PLANS` quedó cerrado.
   *Nota 2026-10-11 (cierre):* esto no sigue abierto. El CEO decidió que las dos quedan fuera del cotizador, porque
   una cotización no es un contrato ([delta](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--una-cotización-no-es-un-contrato)). La segunda
   frase se mantiene: es lo que una cotización supone de su calendario.
+
+## Delta 2026-10-11 — la unidad comercial es un dato de la oferta
+
+**El problema.** Una demanda declara su `commercialUnit`: `managed_service` (se vende como un fee y nunca muestra a
+su equipo) o `role_capacity` (se vende línea por línea). `compose scaffold` escribía siempre `role_capacity` y
+pedía «confirmarlo» en una nota. Al cotizar un proyecto real con una oferta de servicio gestionado, el andamio salió
+como capacidad por rol: la cotización calculaba, y después se habría presentado como un equipo con precios, que es
+exactamente lo que un servicio gestionado no muestra. Nada lo detenía, porque la unidad no estaba escrita en ningún
+dato: dos demandas versionadas de ejemplo emparejaban la oferta de staffing con `managed_service`.
+
+**Decisión.**
+
+1. El catálogo monetario admite una clase de registro más, `offer`: `{ offerId, label, commercialUnit }`, un
+   registro por oferta, con fuente, vigencia y nota como todo registro. El catálogo v11 trae tres:
+   `creative-managed-service` y `seo-aeo-managed-service` como `managed_service`, y `talent-assurance-staffing`
+   como `role_capacity`, cada uno vigente desde la primera fecha en que su oferta tiene política de precio.
+2. La resolución lo enlaza cuando existe. Un catálogo sin registro para la oferta no declara nada, y todo resuelve
+   como antes: por eso las cotizaciones congeladas se reproducen igual.
+3. La composición rechaza una demanda que declara otra unidad (`COMMERCIAL_UNIT_CONTRADICTS_OFFER`).
+4. `compose scaffold` escribe la unidad del registro. Si el catálogo no la declara, o tiene dos registros vigentes,
+   deja `commercialUnit` en `null` —que ninguna cotización acepta— y pregunta (`COMMERCIAL_UNIT_REQUIRED`).
+
+**Por qué una clase de registro y no un campo de las políticas de precio.** La política de precio es un registro
+por perfil y por tier: 96 registros vigentes para tres ofertas, 32 por cada una. Con la unidad como campo de cada una, una oferta
+podría contradecirse a sí misma entre dos perfiles, y habría que agregar una guarda para impedir lo que el modelo
+permite. La unidad es un hecho de la oferta, no del precio de un perfil dentro de ella; un registro por oferta lo
+dice una vez y no admite la contradicción. Además ningún input del kernel la necesita: va en el catálogo y la lee
+la composición, sin tocar ningún contrato.
+
+**Alternativas descartadas.**
+
+- *Un campo `commercialUnit` en cada política de precio.* Lo de arriba: 96 lugares para un dato que es uno por
+  oferta.
+- *Una tabla fija en la CLI o en el andamio.* Es un dato del negocio fuera del catálogo: no tiene fuente, vigencia
+  ni versión, y una oferta nueva exigiría cambiar código.
+- *Deducirla del kit (`managed-service-core`).* El kit es una receta de costos y se elige por línea; una línea
+  puede nombrar otro.
+- *Dejar el valor por defecto con una advertencia más visible.* Es lo que había: la nota existía y no evitó el caso.
+- *Guardarla en la policy de recursos.* La policy describe herramientas y tareas; no conoce ofertas.
+
+**Consecuencia medida.** `data/pricing/v3-operating/service.demand.json` (y `service.plan.json`, que la contiene) y
+`data/pricing/v3-composition/seo-service.demand.json` ya no cotizan con `--current`: devuelven
+`COMMERCIAL_UNIT_CONTRADICTS_OFFER`. Sus artefactos congelados responden `verified: true` en `replay`. No se
+corrigieron: un archivo versionado no se edita, y son ejemplos anteriores a la primera oferta de servicio
+gestionado.
+
+**Todavía no se modela.** Una oferta propia para proyectos únicos de alcance cerrado: hoy se cotizan con una oferta
+de servicio gestionado vendida On-Demand a un solo precio (`PROJECT_OFFER_NOT_MODELLED`).
+
+**Reglas para agentes.**
+
+- **NUNCA** cambiar `commercialUnit` para que una demanda pase: si lo que se vende es otra cosa, cambia la oferta.
+- **SIEMPRE** tomar la unidad del andamio o de `catalog search --kind offer`; si viene `null`, la confirma el
+  operador.
+
+## Delta 2026-10-11 — la dedicación de una línea lleva su evidencia
+
+**El problema.** El costo de una persona es su costo objetivo por su dedicación. El costo objetivo está confirmado
+por su autor. La dedicación, en dos de los tres negocios reales cotizados ese día, la estimó quien cotizaba. La
+lectura de exposición (`estimateExposure`) no lo veía: contaba ese costo como confirmado, porque ninguno de los
+datos que conocía era estimado. Una cotización con horas adivinadas se leía como una con horas acordadas.
+
+**Decisión.**
+
+1. Cada línea del brief admite `dedicationEvidence`, con el schema de toda fuente (`reference`, `effectiveFrom`,
+   `effectiveUntil`, `status`). Sin valor por defecto. Se congela con la cotización y nunca llega al kernel.
+2. `compose workload --brief` la escribe en las líneas que dimensiona: referencia al workload, vigencia común de
+   sus fuentes y el estado más débil de ellas; un workload de simulación es siempre una estimación.
+3. La evidencia se juzga como toda evidencia: `pending` o fuera de vigencia en la fecha de la cotización bloquea;
+   `estimated` deja la cotización en revisión con un supuesto.
+4. `estimateExposure` trata una dedicación estimada como un dato más (`kind: dedication`), con el costo que
+   gobierna. Una dedicación **sin** evidencia no se cuenta como confirmada ni como estimada: su costo sale aparte, en
+   `dedicationNotEvidenced`. La identidad pasa a ser estimado + sin evidencia + confirmado = costo total.
+5. `compose assess` levanta `DEDICATION_NOT_EVIDENCED` o `DEDICATION_EVIDENCE_REVIEW` por línea.
+
+**Por qué opcional y sin valor por defecto.** Obligatoria, habría dejado sin cotizar a todas las demandas
+existentes; con un valor por defecto, la cotización afirmaría una declaración que nadie hizo, que es el mismo motivo
+por el que `thirdPartyCosts` no lo tiene. Ausente significa «nadie dijo de dónde salió», y se lee así.
+
+**Por qué «sin evidencia» va aparte y no dentro de lo estimado.** Una estimación declarada tiene autor, referencia
+y vigencia; el silencio no. Mezclarlas esconde cuál es cuál, y lo que hay que hacer con cada una es distinto:
+confirmar un volumen, o empezar por decir de dónde salió.
+
+**Alternativas descartadas.**
+
+- *Un booleano `dedicationEstimated`.* No dice de dónde sale ni hasta cuándo vale; la forma de fuente ya existía.
+- *Dejar la evidencia sólo en el workload.* El workload no se congela con la cotización: el artefacto perdería el
+  dato.
+- *Tratar toda dedicación como estimada.* Una dedicación acordada con el cliente es un hecho.
+- *Bloquear una cotización sin evidencia.* Lo de arriba: las demandas y los artefactos anteriores.
+
+**Medido el 2026-10-11.** Un programa SEO/AEO de tres meses armado desde un brief: sin evidencia, 9,7 % del costo
+figuraba como estimado y 88,7 % quedaba en `dedicationNotEvidenced`; con la dedicación declarada como estimación,
+98,3 % es estimado y el primer dato del ranking son las horas del especialista (73,2 % del costo). El precio es el
+mismo. El ejemplo de Colombia fechado 2026-10-12, que antes se leía como 34,0 % estimado y el resto confirmado, es
+34,0 % estimado, 64,7 % sin evidencia de dedicación y 1,3 % confirmado.
+
+**Horas como unidad, que ya existía y no estaba dicha.** Una dedicación puede declararse en horas al mes; se
+convierte a FTE con `hoursPerFteMonth` de la regla de asignación de la línea (180 en las dos reglas vigentes,
+marcadas estimadas). La lectura de exposición lista esas líneas en `billedFteSetByRuleOn`.
+
+**Abierto, del CEO.** Si el fee de plataforma, que se cobra entero por línea cualquiera sea su dedicación, debe
+prorratearse por dedicación (`PLATFORM_FEE_PER_LINE`). Medido: 2,8 % del costo en una línea a tiempo completo,
+24,0 % en una línea de 0,08. Este delta no lo decide.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** declarar la dedicación que estimaste como `estimated`, con su referencia.
+- **NUNCA** marcar `confirmed` una dedicación que nadie acordó ni midió, ni presentar como confirmado el costo que
+  trae `dedicationNotEvidenced`.

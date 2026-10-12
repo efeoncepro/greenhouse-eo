@@ -30,14 +30,14 @@
     {
       "code": "ASSURANCE_OPERATIONS_ONBOARDING_COSTS",
       "owner": "Operations/Finance",
-      "required": "Measured delivery cost and driver for assurance, operations, continuity and initial onboarding",
-      "known": "Trialvalues for simulation only."
+      "required": "Measured delivery cost and driver for assurance, operations and continuity, to replace the two «TEST ONLY» provisions of the staffing kits",
+      "known": "Still open on 2026-10-11. The assurance and operations requirements of the seven staffing kits resolve to trial-assurance and trial-operations, USD 25 a month each, labelled «TEST ONLY, NOT MEASURED»: placeholders kept from the historical simulation, not measured costs and not a Talent Assurance standard. They enter the cost and the price of every quote of a person sold by dedication (CLP 50,000 a month in designer-on-demand), show as estimated inputs, and compose assess raises PROVISION_COST_EVIDENCE_REQUIRED for them. The trial set-up amount was replaced on 2026-10-11 by the two start-up provisions (see STARTUP_PROVISIONS_NOT_MEASURED); the managed-service provisions are tracked in MANAGED_SERVICE_PROVISIONS_UNMEASURED"
     },
     {
       "code": "COMMERCIAL_POLICY",
       "owner": "CEO",
       "required": "Nothing owed by the operator. Exceptions below a floor are decided by the CEO case by case",
-      "known": "Decided by the CEO: 45% is the margin floor of the managed services of the creative practice (2026-10-10; offer creative-managed-service, target 45, minimum 45), and 25% is the margin floor of a person sold by dedication (2026-10-11; offer talent-assurance-staffing, catalog v7), with the price rising from there case by case. The managed services of the SEO/AEO practice have their own offer since catalog v8 (seo-aeo-managed-service): floor 45%, approved on 2026-07-13, and target 55%, the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Where more can be earned the target of the offer is raised, not the floor. The staff-augmentation targets by workbook tier (30% tiers 1 and 2, 35% tier 3, 40% tier 4) were proposed by the agent and confirmed by the CEO the same day; they replace the historical markup. The country factors are closed as policy values (see COUNTRY_FACTORS_UNVALIDATED): confirmed in catalog v10 from 2026-10-12. The 40 target / 35 floor of the readiness proposal was never approved and is not a floor"
+      "known": "Decided by the CEO: 45% is the margin floor of the managed services of the creative practice (2026-10-10; offer creative-managed-service, target 45, minimum 45), and 25% is the margin floor of a person sold by dedication (2026-10-11; offer talent-assurance-staffing, catalog v7), with the price rising from there case by case. The managed services of the SEO/AEO practice have their own offer since catalog v8 (seo-aeo-managed-service): floor 45%, approved on 2026-07-13, and target 55%, the low end of the 55-60% band of that policy, proposed by the agent and confirmed by the CEO on 2026-10-11. Where more can be earned the target of the offer is raised, not the floor. The staff-augmentation targets by workbook tier (30% tiers 1 and 2, 35% tier 3, 40% tier 4) were proposed by the agent and confirmed by the CEO the same day; they replace the historical markup. The country factors are closed as policy values (see COUNTRY_FACTORS_UNVALIDATED): confirmed in catalog v10 from 2026-10-12. The 40 target / 35 floor of the readiness proposal was never approved and is not a floor. It was removed from compose assess on 2026-10-11: the reading now reports the pricing rule each line was priced with (its target and floor) and whether the kernel flagged a row. What an offer is sold as is a fact of the catalog since v11 (record kind offer): the two managed services as managed_service, staff augmentation as role_capacity"
     },
     {
       "code": "SERVICE_AND_CONTRACT_TERMS",
@@ -73,7 +73,7 @@
       "code": "MANAGED_SERVICE_SETUP_NOT_PARAMETRIC",
       "owner": "Finance/Architecture",
       "required": "A setup that scales with onboarding weeks and people instead of a fixed catalog amount",
-      "known": "managed-service-core carries no setup; setup is quoted outside the V3 flow"
+      "known": "managed-service-core carries no setup; setup is quoted outside the V3 flow. Still not modelled on 2026-10-11: a managed-service quote has no start-up row, so an all-in price of a managed service (agreed_total) covers its fee only, and a waived start-up of a managed service is a text of the document with no reference value"
     },
     {
       "code": "MARGIN_FLOOR_SCOPE",
@@ -146,6 +146,48 @@
       "owner": "Finance/Architecture",
       "required": "Nothing owed. Closed on 2026-10-11: an add-on that extends people already in the base quote is declared as the base with the add-on in it, and `compose increment` reads its price, cost and margin as the difference between the two frozen quotes; `compose document --increment` prints it. A standalone `--option` stays right for an add-on that is a new person or a separate job",
       "known": "Found on 2026-10-11. The document prints an optional add-on from its own frozen quote, which is the right source for its price. When the add-on is a few more points of a person who is already a line of the base quote, the add-on's quote is a new line and takes the per-line platform fee and its share of the base tools again. Measured on a real add-on of eight points of one person: the fee alone was about a quarter of its cost and moved its margin from above the floor to well below it. The price printed is unaffected; the margin of such an add-on is a lower bound. Closed the same day. On that real add-on the increment removes exactly the per-line fee charged again, and its margin is back above the floor; on the second add-on of that quote the incremental cost matches the one estimated independently"
+    },
+    {
+      "code": "PROJECT_OFFER_NOT_MODELLED",
+      "owner": "Finance/Architecture",
+      "required": "An offer for one-off fixed-scope projects: its offer record with the commercial unit, and its pricing policies. Its target and floor are the CEO’s to decide if it is created",
+      "known": "Found on 2026-10-11 quoting a real fixed-scope web project. There are three offers: two managed services and staff augmentation. A one-off project is quoted today with a managed-service offer sold On-Demand at one price (agreed_total, printed as one line with combine), which brings the 10% ratio and the 12% contingency reserve of that offer. Which of the two managed-service offers fits a project of neither practice is not stated anywhere"
+    },
+    {
+      "code": "PLATFORM_FEE_PER_LINE",
+      "owner": "CEO",
+      "required": "Decide whether the platform fee is prorated by the dedication of the line. Open: not decided either way, and not to be prorated by hand in a quote",
+      "known": "The platform fee is USD 49 a month for each person of a line (one record per profile, estimated; one per line when the line is one person, which is the usual case), charged whole whatever the dedication of the line. Measured on the committed examples on 2026-10-11: 2.8% of the cost of a full-time line (designer-on-demand, CLP 49,000 of 1,768,438); 4.8% of a three-line managed service with two part-time lines (managed-addon-increment, CLP 441,000 of 9,228,927); 5.2% of the own-work cost of a six-line service (managed-on-demand-third-party, CLP 294,000 of 5,666,722); and 24.0% of the cost of a line of 0.08 FTE (managed-addon-increment.option-standalone, CLP 147,000 of 612,288). It weighs on small jobs and on quotes with many part-time lines. An add-on that extends a person already in the base quote avoids charging it twice through compose increment (see OPTION_QUOTES_REPEAT_PER_LINE_FEES); that does not answer this question"
+    },
+    {
+      "code": "TOOLS_WITHOUT_CURRENT_PRICE",
+      "owner": "Operations",
+      "required": "The contracted plan and amount of each tool whose current price holds no amount, issued as a new policy version",
+      "known": "Read on 2026-10-11 with policy v11: the current price of 22 of the 33 tools is pending (no amount), so a quote that uses one of them names another priced id of the same tool (a public plan or the historical value) and reports that choice as an assumption. HubSpot holds no priced id on purpose (see SUPPLIER_CONTRACT_TERMS). Related: UNIT_PRICE_REVIEW and CURRENT_LICENSE_CONTRACTS"
+    },
+    {
+      "code": "TENDER_CEILING_AND_SCORING_NOT_MODELLED",
+      "owner": "Commercial/Finance",
+      "required": "If tenders are to be quoted inside the quoter: the buyer’s price ceiling and the scoring logic of the tender as inputs of a quote",
+      "known": "Found on 2026-10-11 quoting a three-month programme in a public tender. The quoter prices the work and records the agreed price; it does not know the ceiling a buyer publishes or how price is scored against the other bidders. Both are handled outside it"
+    },
+    {
+      "code": "LATE_PAYMENT_COST_OF_MONEY_NOT_MODELLED",
+      "owner": "Finance",
+      "required": "If payment terms are to weigh on a price: the cost of money of a late payment as a cost of the quote",
+      "known": "Not modelled as of 2026-10-11. A quote carries periods and, in its document, payment milestones; neither the payment term nor the cost of financing a late payment enters cost or price. Payment terms are written as condition text of the document"
+    },
+    {
+      "code": "PLATFORM_PANEL_AND_INSIGHTS_NOT_COSTED",
+      "owner": "Finance/Architecture",
+      "required": "If they are to be costed in a quote: the Greenhouse panel and Insights as resources with a cost and a price rule",
+      "known": "Not modelled as of 2026-10-11. Neither is a resource of the catalog or of the resource policy; a quote that includes them carries no cost for them"
+    },
+    {
+      "code": "QUOTE_REGISTRY_IN_GREENHOUSE",
+      "owner": "Platform/Finance",
+      "required": "The agreed next step: the Greenhouse quoter adopts this document design and provides what it lacks. Not started",
+      "known": "As of 2026-10-11 the document produced by compose document is a draft: it has no quote number, versions, QR verification, signatures or approval, which exist only in the Greenhouse quoter. Related: CANONICAL_PROMOTION. Outside the quoter by the CEO’s decision of 2026-10-11, and not a pending item: the start date of the service and the length of the contract, because a quote is not a contract"
     }
   ]
 }

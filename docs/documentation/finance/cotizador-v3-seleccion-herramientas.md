@@ -35,9 +35,12 @@ excepción a la base requiere decisión explícita y cobertura suficiente; las o
 ## Asignación y desglose
 
 Separar quién necesita acceso, qué suscripción/seat lo cubre y qué parte de su costo corresponde al trabajo.
-Las licencias nominativas se cuentan por usuarios distintos; no reducir un seat al 50% por una dedicación
-parcial. Un mismo seat usado por una persona en varios servicios requiere reparto
-documentado, no repetir su costo completo ni borrar todas las repeticiones por nombre del proveedor.
+Las licencias nominativas se cuentan por usuarios distintos, siempre en asientos enteros: una dedicación parcial no
+convierte un seat en medio seat. Otra cosa es qué parte del costo de ese seat carga un trabajo: un mismo seat usado
+por una persona en varios servicios requiere reparto documentado, no repetir su costo completo ni borrar todas las
+repeticiones por nombre del proveedor. Ese reparto se declara en la demanda (`serviceShare` con su `driver`), y los
+ejemplos vigentes lo hacen por la dedicación declarada de la persona
+([cómo](#asientos-de-una-persona-a-tiempo-parcial-precios-sin-importe-y-lo-que-el-trabajo-agrega-2026-10-11)).
 Desde el 2026-10-11, que dos personas usen un mismo seat ya no es algo que la demanda no pueda decir: se declara
 expresamente, con su motivo, y que el proveedor lo permita se confirma aparte. Lo que sigue sin admitirse es
 repartir el costo de un seat entre personas sin declararlo. Detalle:
@@ -78,7 +81,8 @@ normalizan las reglas anteriores. El registro raw del operador sigue siendo ante
 El agente interpreta demanda y elige variantes/supuestos explícitos; el dominio exige base/selección y
 calcula desde precios versionados. No elige automáticamente variante barata ni porcentajes de reparto.
 Usuarios únicos cuentan seats (salvo los que la demanda declara que comparten uno, desde el 2026-10-11); varios
-roles comparten un pool según asignación declarada, sin descuento FTE.
+roles comparten un pool según asignación declarada. El dominio no aplica ningún descuento por FTE por su cuenta: la
+parte del costo que carga la cotización es la que la demanda declara con su driver.
 Créditos se agregan por proveedor/mes antes de elegir packs. El desglose conserva selección/omisiones,
 fuente, usuarios, cantidad, driver, costo/cuota y remanentes; caja adicional separada de costo atribuido.
 
@@ -156,7 +160,9 @@ quién tiene asignada cada licencia: las asignaciones de los ejemplos siguen sie
 ## Asientos de una herramienta nominativa: las tres formas de declararlos (2026-10-11)
 
 Una herramienta nominativa con precio por asiento es la que se paga por persona: cada persona que la usa necesita un
-asiento, y el asiento se paga entero aunque esa persona le dedique una fracción de su tiempo. Hasta el 2026-10-11 la
+asiento, y el asiento se paga entero aunque esa persona le dedique una fracción de su tiempo (qué parte de ese pago
+carga cada cotización es una declaración aparte:
+[abajo](#asientos-de-una-persona-a-tiempo-parcial-precios-sin-importe-y-lo-que-el-trabajo-agrega-2026-10-11)). Hasta el 2026-10-11 la
 demanda sólo podía decir «tantas personas, tantos asientos, un solo plan». La compra real suele ser otra cosa, y
 desde ese día se declara tal como es. Hay tres formas, que se pueden combinar:
 
@@ -206,3 +212,49 @@ Reglas, claves y diagnósticos:
 [contrato](cotizador-v3-contrato-y-validacion.md#demanda-de-composición-asientos-y-períodos-declarados-una-vez-2026-10-11).
 Cómo se declara paso a paso:
 [manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#declarar-los-asientos-de-una-herramienta).
+
+## Asientos de una persona a tiempo parcial, precios sin importe y lo que el trabajo agrega (2026-10-11)
+
+Tres puntos que aparecieron al cotizar negocios reales con sólo la documentación a la vista. Ninguno cambia una
+regla: dicen cómo se aplica.
+
+**Cuántos asientos se pagan y cuánto carga la cotización son dos datos.** El primero (`quantity`) es siempre un
+número entero en una herramienta nominativa. El segundo (`serviceShare`, con su `driver`) lo declara la demanda y
+puede ser una fracción; la CLI sólo comprueba que sea `allocatedUnits ÷ totalUnits`, truncado a 18 decimales, y
+bloquea con `ALLOCATION_DRIVER_MISMATCH` si no. Los ejemplos versionados lo aplican así:
+
+| Caso | Qué declara el ejemplo |
+| --- | --- |
+| Una persona dedicada a la cuenta (`designer-on-demand`) | Un asiento de Notion y uno de Microsoft 365, cargados enteros |
+| Personas compartidas con otras cuentas (`managed-addon-increment`: 1, 0,2 y 0,1 de dedicación) | Tres asientos de cada herramienta base, y la cotización carga 1,3 de 3: de cada asiento, la parte igual a la dedicación declarada |
+| Un asiento comprado para el servicio (la bandeja de los ejemplos `managed-care`) | Un asiento por persona, cargado entero aunque la persona trabaje una fracción de su tiempo |
+| Una licencia de un paquete (Adobe en `designer-on-demand`) | Una de las tres licencias: un tercio del paquete, que es un dato de la compra y no una fracción de horas |
+
+Ningún ejemplo versionado tiene una persona compartida con licencia de Adobe: en ese caso se carga la licencia
+entera (una de tres) y se informa como supuesto; cargarla por dedicación lo decide el operador. Dentro de la
+cotización, el costo de una herramienta se reparte entre las líneas que la usan por asiento, no por horas.
+
+**Un precio puede no tener importe.** `resources inspect` muestra cada precio de una herramienta con su
+disponibilidad: `needs_input` (hoy no tiene importe: está pendiente, fuera de vigencia o su registro no trae
+monto) o `reference_only` (tiene un importe vigente; es una referencia porque un precio no prueba que el asiento
+exista ni que el plan sea el contratado). `historical` es el nombre de un precio: el valor del Excel histórico,
+marcado estimado. En la policy vigente (v11, leída con `--date 2026-10-12`), el precio `current` de 22 de las 33 herramientas está en
+`needs_input`; HubSpot no tiene ningún precio con importe, a propósito. La demanda
+nombra entonces otro precio de la misma herramienta —un plan público o el histórico— y esa elección es un supuesto
+de la cotización que se informa. Nombrar un precio pendiente bloquea con `RESOURCE_PRICE_PENDING`; uno que no
+existe, con `RESOURCE_PRICE_SELECTION_REQUIRED` y los precios utilizables en `candidates`.
+
+**El andamio pregunta por lo que el brief permite saber.** `compose scaffold` recibe sólo un brief: pregunta por
+las herramientas base (Notion y Microsoft 365) y por las de las tareas de la receta de cada perfil. Lo que el
+trabajo agrega se declara en `work[]`: tareas adicionales (`tasks`), herramientas de IA con su motivo
+(`aiToolIds`, `aiSelectionReason`) y, para un servicio, `serviceToolIds`. Se declara sólo lo que el negocio
+compromete. Una herramienta de créditos pide además su demanda (`work[].creditDemand`, créditos enteros por
+proveedor y mes) y su presupuesto (`creditBudgets`, uno por herramienta y mes, con fechas dentro del mes
+calendario de ese período contado desde la fecha de la cotización).
+
+**Una herramienta que aporta el cliente** se declara sólo con evidencia confirmada que cubra todo el uso. Sin ella,
+`CLIENT_ACCESS_EVIDENCE_REQUIRED` dice desde el 2026-10-11 qué parte falla; la herramienta se deja fuera del
+trabajo —excluyendo con su motivo la tarea que la pide— y se dice en las condiciones del documento que la aporta el
+cliente.
+
+Paso a paso: [manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#paso-2--componer-la-demanda).

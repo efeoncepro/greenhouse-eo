@@ -1,6 +1,6 @@
 # V3 — Componentes de costo, provisiones y evidencia
 
-Fecha: 2026-10-09. Propuesta interna ligada a TASK-2017; no valores aprobados ni asientos contables. El flujo local de TASK-2022 ejecuta asignaciones/presupuestos declarados, no estas fórmulas de drivers. La propuesta genérica 40%/35% no reemplaza el piso creativo 45% aprobado.
+Fecha: 2026-10-09. Propuesta interna ligada a TASK-2017; no valores aprobados ni asientos contables. El flujo local de TASK-2022 ejecuta asignaciones/presupuestos declarados, no estas fórmulas de drivers. La propuesta genérica 40%/35% no reemplaza el piso creativo 45% aprobado (nota 2026-10-11: esa propuesta dejó de aparecer en `compose assess`, que ahora informa la regla de precio de la oferta de cada línea).
 [Pricing Integrity Pack](../../business-models/EFEONCE_CAPACITY_PRICING_INTEGRITY_PACK_V1.md) posee las recomendaciones de política.
 [Inputs de revisión](../../../data/pricing/v3-pilot/economics/commercial-policy-proposal/driver-inputs.json) registran drivers, unknowns y destinos en el catálogo candidato. No se pasan directamente a la CLI.
 
@@ -10,6 +10,10 @@ Actualización 2026-10-11 (tarde): dos secciones más, también al final. La [pu
 
 Actualización 2026-10-11 (noche): una sección más, al final, con dos costos que el cotizador ya sabe expresar y antes
 se sumaban a mano: los [costos de terceros de un trabajo y la reserva de contingencia](#costos-de-terceros-y-reserva-de-contingencia-como-costos-2026-10-11).
+
+Actualización 2026-10-11 (última): una sección más, al final, con tres cosas que aparecieron al cotizar negocios
+reales: [la dedicación de una persona es un dato con evidencia, el fee de plataforma se cobra entero por línea y las
+provisiones de prueba siguen sin medir](#la-dedicación-con-evidencia-el-fee-de-plataforma-por-línea-y-las-provisiones-de-prueba-2026-10-11).
 La misma sección explica que los factores de país quedaron cerrados: donde este documento los presenta como
 estimaciones pendientes, vale la nota fechada que acompaña a cada párrafo.
 
@@ -118,6 +122,7 @@ Lo que responde, en lenguaje simple:
 | Pregunta | Dónde mirar |
 | --- | --- |
 | ¿Qué parte del costo depende de algún dato estimado? | `estimatedShareOfCost` (y los importes `estimatedCost` y `confirmedCost`) |
+| ¿Qué parte depende de horas que nadie respaldó? | `dedicationNotEvidenced` (desde el cierre del 2026-10-11): las líneas sin evidencia de su dedicación y el costo que gobiernan |
 | ¿Cuál es el dato estimado que más pesa? | El primero de `costInputs[]`; la lista va de mayor a menor |
 | ¿Cuánto costo descansa en ese dato? | `costAtRisk` y `shareOfCost` |
 | ¿Cuánto margen está en juego? | `marginRateLostIfTenPctHigher`: puntos de margen que se perderían si ese dato fuera 10 % más alto y el precio no cambiara |
@@ -140,6 +145,11 @@ Nota 2026-10-11 (tarde): la demanda versionada de ese ejemplo necesita ahora dec
 > y el mismo margen, pero sólo el 34,0 % del costo descansa en datos estimados y el primero de la lista pasa a ser la
 > bandeja de atención (17,7 % del costo, 1,0 punto): el factor de talento ya es un valor de política confirmado y
 > sale del ranking.
+>
+> Nota 2026-10-11 (última): ese 34,0 % no deja el resto como confirmado. La demanda del ejemplo no declara de dónde
+> salen sus dedicaciones, así que el 64,7 % del costo (10.628.800, el costo de sus seis personas) queda en
+> `dedicationNotEvidenced` y lo confirmado es 1,3 % (210.238). Con equipo y cliente en Chile, la misma lectura es
+> 29,3 % estimado, 69,6 % sin evidencia de dedicación (3.640.000) y 1,1 % confirmado (57.602).
 
 Lectura: en esa cotización lo primero que conviene validar es el factor de talento de Colombia, no el precio de una licencia. La misma demanda con equipo y cliente en Chile da otra lectura: sólo el 29,3 % del costo descansa en estimados y el primero de la lista es la bandeja de Sprout (15,3 % del costo, 0,8 puntos), porque el factor de talento de Chile es 1 por definición y el costo de las personas es el objetivo ya confirmado por su autor.
 
@@ -150,6 +160,7 @@ Reglas para leerlo bien:
 - No recalcula la cotización: se deriva del resultado ya congelado, y `replay` lo muestra igual.
 - «Confirmado» en esta lectura significa que la fuente del dato está confirmada. Para el costo de una persona eso es el costo objetivo de la sección anterior, no un costo medido contra la nómina.
 - Un componente que depende de dos datos estimados cuenta una sola vez en el total estimado. Por eso la suma de la lista puede ser mayor que `estimatedCost`.
+- Desde el cierre del 2026-10-11, `estimatedCost` y `confirmedCost` ya no suman solos el costo total: entre los dos está `dedicationNotEvidenced.cost`. Lo que no es estimado no es por eso confirmado.
 - Un factor de mercado estimado aparece aparte, en `priceInputs[]`: mueve el precio, no el costo.
 - Las políticas estimadas que son reglas y no importes (capacidad facturada, política de precio, redondeo, impuesto) aparecen en `estimatedRules[]` y quedan fuera del ranking.
 
@@ -301,3 +312,68 @@ y los de mercado de Colombia y Estados Unidos, ya estaban confirmados.
 
 El precio de HubSpot es un caso distinto y tampoco es un pendiente: el CEO indicó que hoy no se necesita en las
 cotizaciones, y queda sin precio a propósito.
+
+## La dedicación con evidencia, el fee de plataforma por línea y las provisiones de prueba (2026-10-11)
+
+Lo que sigue salió de cotizar tres negocios reales más con sólo la documentación a la vista.
+
+### Las horas de una persona son un dato, y tienen evidencia
+
+El costo de una persona en una cotización es su costo objetivo por su dedicación. El costo objetivo está confirmado
+por su autor; la dedicación, muchas veces, la estima quien cotiza. Hasta ese día esa diferencia no se veía: una
+cotización con horas adivinadas mostraba su costo de persona como confirmado.
+
+- Cada línea puede declarar de dónde sale su dedicación (`dedicationEvidence`: referencia, vigencia y estado).
+  `compose workload` la escribe sola cuando dimensiona una línea desde un volumen.
+- **Declarada como estimación**, la dedicación entra al ranking de datos estimados (`kind: dedication`) con el costo
+  que gobierna: el costo de la persona y la reserva de contingencia que descansa en él.
+- **Sin evidencia**, ese costo no se cuenta como confirmado ni como estimado: sale aparte, en
+  `dedicationNotEvidenced`.
+- En una línea dedicada la capacidad cobrada es la persona completa, cualquiera sea la dedicación escrita: el dato lo
+  dice con `capacitySetByRule`, y ahí «10 % más de horas» no significa 10 % más de costo.
+
+Ejemplo medido el 2026-10-11 (programa SEO/AEO de tres meses, armado para el manual, con un precio pactado por el
+programa): con la dedicación declarada como estimación, 98,3 % del costo descansa en datos estimados y el primero de
+la lista son las horas del especialista, con 73,2 % del costo y 3,2 puntos de margen por cada 10 % de error. La
+misma demanda sin esa declaración decía 9,7 % estimado y dejaba 88,7 % sin evidencia. El precio es el mismo; lo que
+cambia es lo que la cotización confiesa.
+
+**Horas como unidad.** Una dedicación se puede declarar en horas al mes. Se convierten a una fracción de persona
+con las horas de un mes a tiempo completo de la regla de asignación: 180, en las dos reglas vigentes, que están
+marcadas como estimadas. 90 horas son media persona.
+
+### El fee de plataforma se cobra entero por línea
+
+Cada línea de una cotización lleva un fee de plataforma: USD 49 al mes por cada persona de la línea (uno por línea
+cuando la línea es una persona, que es lo usual), un registro por perfil, marcado estimado. Se cobra entero,
+cualquiera sea la dedicación de la línea. Pesa poco en una persona a tiempo completo y mucho en una
+línea chica o en un servicio con muchas líneas parciales. Medido sobre los ejemplos versionados:
+
+| Ejemplo | Líneas | Fee de plataforma | Parte del costo |
+| --- | --- | --- | --- |
+| `designer-on-demand` | Una, a tiempo completo, un mes | CLP 49.000 | 2,8 % |
+| `managed-addon-increment` | Tres (1, 0,2 y 0,1), tres meses | CLP 441.000 | 4,8 % |
+| `managed-on-demand-third-party` | Seis, un mes | CLP 294.000 | 5,2 % del costo del trabajo propio; 2,0 % del costo total |
+| `managed-addon-increment.option-standalone` | Una, de 0,08, tres meses | CLP 147.000 | 24,0 % |
+
+**Si debe prorratearse por dedicación es una decisión abierta del CEO.** Hoy no se prorratea, y no se corrige a mano
+en una cotización. Para un adicional que amplía a una persona que ya está en la cotización base existe otra salida,
+que no toca esta regla: leerlo como incremento
+([superficie](cotizador-v3-superficie-implementada.md#un-adicional-que-amplía-la-base-se-lee-como-un-incremento-2026-10-11)).
+En el ledger: `PLATFORM_FEE_PER_LINE`.
+
+### Las provisiones «TEST ONLY» siguen sin medir
+
+Los kits de una persona vendida por dedicación piden dos provisiones, de continuidad y de operación, y hoy las
+resuelven con dos marcadores de prueba: `trial-assurance` y `trial-operations`, USD 25 al mes cada uno, con la
+etiqueta «TEST ONLY, NOT MEASURED». No son costos medidos ni un estándar de Talent Assurance. Entran al costo y al
+precio de toda cotización de una persona por dedicación (CLP 50.000 al mes en `designer-on-demand`), salen como
+estimados en `estimateExposure` y `compose assess` levanta `PROVISION_COST_EVIDENCE_REQUIRED`. El importe de
+prueba de la puesta en marcha sí se reemplazó el 2026-10-11
+([puesta en marcha](#puesta-en-marcha-onboarding-por-persona-y-reclutamiento-opcional-2026-10-11)); estos dos no.
+Están pendientes de medición: `ASSURANCE_OPERATIONS_ONBOARDING_COSTS` en el ledger. Un servicio gestionado no los
+usa: sus provisiones de reemplazo y de guardia son otras dos, también hipótesis sin medir.
+
+Otros costos que el cotizador todavía no modela, y que se dicen cuando el negocio los toca: una puesta en marcha
+para un servicio gestionado, el costo financiero de un pago tardío, y el panel de Greenhouse e Insights como
+recursos con costo.
