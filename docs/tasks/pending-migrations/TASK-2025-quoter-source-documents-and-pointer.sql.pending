@@ -1,0 +1,269 @@
+-- Owner: operador (CEO), TASK-2025 (EPIC-053). Migración 1 de 3.
+-- Condición: visto bueno explícito del operador para aplicar a la base compartida (una sola instancia para
+-- desarrollo, staging y producción). Antes: `pnpm quoter:test:local` en verde sobre PostgreSQL 16 (sube, baja y
+-- vuelve a subir). Para ejecutar: `pnpm migrate:create task-2025-quoter-source-documents-and-pointer`, copiar desde
+-- `-- Up Migration`, borrar este archivo en el mismo commit, `pnpm migration-marker-gate`, `pnpm pg:connect:migrate`.
+-- Up Migration
+
+-- TASK-2025 — Cotizador V3 en la plataforma: documentos fuente por huella y puntero de versiones vigentes.
+--
+-- Qué crea, todo nuevo y todo en greenhouse_commercial bajo el prefijo quoter_:
+--   quoter_source_documents   catálogo, política y créditos guardados por rol, versión y huella (sólo agregar)
+--   quoter_pointer_history    historial de «qué rige», con quién lo activó, cuándo y por qué (sólo agregar)
+--   quoter_current_pointer    vista: la fila vigente del puntero. No existe «la versión más alta gana»
+--
+-- Qué NO hace: no toca ni lee greenhouse_commercial.quotations*; guardar un documento nunca lo activa (ningún
+-- disparador de quoter_source_documents inserta en el puntero); no siembra datos.
+--
+-- Huellas. Cada objeto guardado lleva dos, con funciones distintas: la del TEXTO (sha256 de los bytes guardados;
+-- la comprueba esta base al insertar) y la de IDENTIDAD (la que define el motor; la verifica el adaptador). En un
+-- documento fuente el texto guardado es el canónico del documento ya validado, así que las dos son la misma
+-- columna. En el puntero el texto se guarda como se escribió, y lleva las dos.
+--
+-- Por qué disparador y no CHECK: medido en PostgreSQL 16.15, sha256(bytea) es inmutable pero convert_to(text, name)
+-- es STABLE. Un CHECK pide funciones inmutables; como estas tablas rechazan UPDATE, un BEFORE INSERT vale lo mismo.
+
+-- ── Funciones compartidas por las tablas quoter_* (las reutiliza la migración del agregado) ──────────────────
+
+-- Sólo agregar, para todo rol y también para el dueño: no hay excepción por current_user ni SECURITY DEFINER.
+-- Sin el rechazo de UPDATE la huella se podría saltar reescribiendo el texto.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assert_append_only()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+BEGIN
+  RAISE EXCEPTION '% es de sólo agregar: una fila no se actualiza, no se borra y la tabla no se trunca. Corregir es agregar una fila nueva', TG_TABLE_NAME
+    USING ERRCODE = 'check_violation';
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_assert_append_only() OWNER TO greenhouse_ops;
+
+-- La huella de un texto guardado: sha256 de sus bytes UTF-8, en hexadecimal en minúsculas.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_text_digest(p_text text)
+RETURNS text
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT pg_catalog.encode(pg_catalog.sha256(pg_catalog.convert_to(p_text, 'UTF8')), 'hex')
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_text_digest(text) OWNER TO greenhouse_ops;
+
+-- ── quoter_source_documents ──────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_source_documents (
+  role text NOT NULL CHECK (role IN ('catalog', 'policy', 'credits')),
+  version text NOT NULL CHECK (length(btrim(version)) BETWEEN 1 AND 200),
+  -- Huella del texto y huella de identidad a la vez: el texto guardado es el canónico del documento validado.
+  document_digest text NOT NULL CHECK (document_digest ~ '^[0-9a-f]{64}$'),
+  canonical_text text NOT NULL,
+  -- Índice de lectura: el schemaVersion que declara el documento.
+  schema_version text,
+  -- El documento al que sucede, cuando quien lo guarda lo conoce.
+  parent_digest text CHECK (parent_digest IS NULL OR parent_digest ~ '^[0-9a-f]{64}$'),
+  -- repo_import: existe como archivo en el repo. artifact_embedded: sólo existe dentro de un artefacto congelado.
+  -- platform_apply: nació en la plataforma (TASK-2029).
+  origin text NOT NULL CHECK (origin IN ('repo_import', 'artifact_embedded', 'platform_apply')),
+  source_path text,
+  stored_by_actor_kind text NOT NULL CHECK (stored_by_actor_kind IN ('member', 'agent', 'service')),
+  stored_by_member_id text,
+  reason text NOT NULL CHECK (length(btrim(reason)) >= 5),
+  command_execution_id text,
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  stored_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_source_documents_pkey PRIMARY KEY (role, document_digest),
+  -- Una versión ya usada no cambia de contenido.
+  CONSTRAINT quoter_source_documents_version_unique UNIQUE (role, version),
+  CONSTRAINT quoter_source_documents_member_identified
+    CHECK (stored_by_actor_kind <> 'member' OR stored_by_member_id IS NOT NULL),
+  CONSTRAINT quoter_source_documents_origin_names_its_source
+    CHECK (origin = 'platform_apply' OR source_path IS NOT NULL)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_source_documents OWNER TO greenhouse_ops;
+
+COMMENT ON TABLE greenhouse_commercial.quoter_source_documents IS
+  'Cotizador V3: catálogo, política y créditos por rol, versión y huella. Sólo agregar. Guardar no activa.';
+COMMENT ON COLUMN greenhouse_commercial.quoter_source_documents.canonical_text IS
+  'stableJson del documento validado por el contrato de su rol. Su sha256 es document_digest, la huella que nombra el puntero.';
+COMMENT ON COLUMN greenhouse_commercial.quoter_source_documents.schema_version IS
+  'read index; never the source of a result';
+
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assert_source_document_digest()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+BEGIN
+  IF NEW.document_digest IS DISTINCT FROM greenhouse_commercial.quoter_text_digest(NEW.canonical_text) THEN
+    RAISE EXCEPTION 'quoter_source_documents: document_digest no es el sha256 de canonical_text (rol %, versión %)', NEW.role, NEW.version
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_assert_source_document_digest() OWNER TO greenhouse_ops;
+
+CREATE TRIGGER trg_quoter_source_documents_digest
+  BEFORE INSERT ON greenhouse_commercial.quoter_source_documents
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_source_document_digest();
+
+CREATE TRIGGER trg_quoter_source_documents_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_source_documents
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_source_documents_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_source_documents
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+-- ── quoter_pointer_history ───────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE greenhouse_commercial.quoter_pointer_history (
+  -- Lo asigna el disparador bajo bloqueo: correlativo, sin huecos y en el orden en que cada fila se aceptó.
+  pointer_seq bigint NOT NULL,
+  -- Identidad del puntero para el motor: currentVersionsDigest. La verifica el adaptador.
+  pointer_digest text NOT NULL CHECK (pointer_digest ~ '^[0-9a-f]{64}$'),
+  -- El puntero como se escribió, opaco: nadie lo reserializa. Su sha256 lo comprueba esta base.
+  pointer_text text NOT NULL,
+  pointer_text_digest text NOT NULL CHECK (pointer_text_digest ~ '^[0-9a-f]{64}$'),
+  -- La huella del puntero que esta fila reemplaza. Nula sólo en la primera fila.
+  previous_pointer_digest text CHECK (previous_pointer_digest IS NULL OR previous_pointer_digest ~ '^[0-9a-f]{64}$'),
+  catalog_role text NOT NULL DEFAULT 'catalog' CHECK (catalog_role = 'catalog'),
+  catalog_digest text NOT NULL,
+  policy_role text NOT NULL DEFAULT 'policy' CHECK (policy_role = 'policy'),
+  policy_digest text NOT NULL,
+  credits_role text NOT NULL DEFAULT 'credits' CHECK (credits_role = 'credits'),
+  credits_digest text NOT NULL,
+  origin text NOT NULL CHECK (origin IN ('repo_mirror', 'platform_activation')),
+  -- Mover el puntero es siempre un acto de una persona identificada: no hay columna de tipo de actor.
+  activated_by_member_id text NOT NULL CHECK (length(btrim(activated_by_member_id)) > 0),
+  reason text NOT NULL CHECK (length(btrim(reason)) >= 5),
+  command_execution_id text,
+  request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  activated_at timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT quoter_pointer_history_pkey PRIMARY KEY (pointer_seq),
+  -- Un puntero sólo puede nombrar documentos que la base tiene, cada uno con su rol.
+  CONSTRAINT quoter_pointer_history_catalog_fk FOREIGN KEY (catalog_role, catalog_digest)
+    REFERENCES greenhouse_commercial.quoter_source_documents (role, document_digest),
+  CONSTRAINT quoter_pointer_history_policy_fk FOREIGN KEY (policy_role, policy_digest)
+    REFERENCES greenhouse_commercial.quoter_source_documents (role, document_digest),
+  CONSTRAINT quoter_pointer_history_credits_fk FOREIGN KEY (credits_role, credits_digest)
+    REFERENCES greenhouse_commercial.quoter_source_documents (role, document_digest)
+);
+
+ALTER TABLE greenhouse_commercial.quoter_pointer_history OWNER TO greenhouse_ops;
+
+-- No único a propósito: volver a activar exactamente el mismo puntero no puede quedar bloqueado para siempre en una
+-- tabla de la que nada se borra. La identidad de una fila es pointer_seq; rige la de mayor pointer_seq.
+CREATE INDEX quoter_pointer_history_digest_idx ON greenhouse_commercial.quoter_pointer_history (pointer_digest);
+
+COMMENT ON TABLE greenhouse_commercial.quoter_pointer_history IS
+  'Cotizador V3: historial del puntero de versiones vigentes. Sólo agregar. Rige la fila de mayor pointer_seq.';
+
+-- Una fila entra sólo sobre el puntero que quien llama leyó: comparar y reemplazar es un solo acto.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assert_pointer_follows_current()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $fn$
+DECLARE
+  current_seq bigint;
+  current_digest text;
+BEGIN
+  PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('greenhouse_commercial.quoter_pointer_history', 0));
+
+  SELECT p.pointer_seq, p.pointer_digest
+    INTO current_seq, current_digest
+    FROM greenhouse_commercial.quoter_pointer_history p
+   ORDER BY p.pointer_seq DESC
+   LIMIT 1;
+
+  IF current_digest IS DISTINCT FROM NEW.previous_pointer_digest THEN
+    RAISE EXCEPTION 'quoter_pointer_history: previous_pointer_digest no es la huella del puntero vigente'
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  IF NEW.pointer_text_digest IS DISTINCT FROM greenhouse_commercial.quoter_text_digest(NEW.pointer_text) THEN
+    RAISE EXCEPTION 'quoter_pointer_history: pointer_text_digest no es el sha256 de pointer_text'
+      USING ERRCODE = 'check_violation';
+  END IF;
+
+  NEW.pointer_seq := COALESCE(current_seq, 0) + 1;
+
+  RETURN NEW;
+END
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_assert_pointer_follows_current() OWNER TO greenhouse_ops;
+
+CREATE TRIGGER trg_quoter_pointer_history_follows_current
+  BEFORE INSERT ON greenhouse_commercial.quoter_pointer_history
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_pointer_follows_current();
+
+CREATE TRIGGER trg_quoter_pointer_history_append_only
+  BEFORE UPDATE OR DELETE ON greenhouse_commercial.quoter_pointer_history
+  FOR EACH ROW EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE TRIGGER trg_quoter_pointer_history_no_truncate
+  BEFORE TRUNCATE ON greenhouse_commercial.quoter_pointer_history
+  FOR EACH STATEMENT EXECUTE FUNCTION greenhouse_commercial.quoter_assert_append_only();
+
+CREATE VIEW greenhouse_commercial.quoter_current_pointer AS
+  SELECT p.pointer_seq, p.pointer_digest, p.pointer_text, p.pointer_text_digest, p.previous_pointer_digest,
+         p.catalog_digest, p.policy_digest, p.credits_digest, p.origin, p.activated_by_member_id, p.reason,
+         p.command_execution_id, p.activated_at
+    FROM greenhouse_commercial.quoter_pointer_history p
+   ORDER BY p.pointer_seq DESC
+   LIMIT 1;
+
+ALTER VIEW greenhouse_commercial.quoter_current_pointer OWNER TO greenhouse_ops;
+
+-- ── Verificación: aborta si algo de lo anterior no quedó creado ──────────────────────────────────────────────
+
+DO $$
+DECLARE
+  missing text := '';
+BEGIN
+  IF to_regclass('greenhouse_commercial.quoter_source_documents') IS NULL THEN missing := missing || ' quoter_source_documents'; END IF;
+  IF to_regclass('greenhouse_commercial.quoter_pointer_history') IS NULL THEN missing := missing || ' quoter_pointer_history'; END IF;
+  IF to_regclass('greenhouse_commercial.quoter_current_pointer') IS NULL THEN missing := missing || ' quoter_current_pointer'; END IF;
+  IF to_regprocedure('greenhouse_commercial.quoter_assert_append_only()') IS NULL THEN missing := missing || ' quoter_assert_append_only()'; END IF;
+  IF to_regprocedure('greenhouse_commercial.quoter_text_digest(text)') IS NULL THEN missing := missing || ' quoter_text_digest(text)'; END IF;
+
+  IF (SELECT count(*) FROM pg_catalog.pg_trigger t
+       WHERE NOT t.tgisinternal
+         AND t.tgrelid IN ('greenhouse_commercial.quoter_source_documents'::regclass,
+                           'greenhouse_commercial.quoter_pointer_history'::regclass)) <> 6 THEN
+    missing := missing || ' triggers(!=6)';
+  END IF;
+
+  -- La función de huella da el vector estándar de sha256: si no, la comprobación de toda la tabla no vale.
+  IF greenhouse_commercial.quoter_text_digest('abc') <> 'ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad' THEN
+    missing := missing || ' quoter_text_digest(vector)';
+  END IF;
+
+  IF missing <> '' THEN
+    RAISE EXCEPTION 'TASK-2025 anti pre-up-marker check (documentos y puntero): faltan objetos:%', missing;
+  END IF;
+END
+$$;
+
+-- ── Permisos: el runtime lee y agrega; nunca actualiza ni borra ──────────────────────────────────────────────
+
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_source_documents TO greenhouse_runtime;
+GRANT SELECT, INSERT ON greenhouse_commercial.quoter_pointer_history TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_current_pointer TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_text_digest(text) TO greenhouse_runtime;
+
+-- Down Migration
+
+-- SÓLO deshacer. Con el reflejo del repo importado, la bajada lo pierde y se reimporta con `pnpm quoter:import`.
+-- Con cotizaciones reales registradas no se baja: la corrección es una migración nueva hacia adelante.
+DROP VIEW IF EXISTS greenhouse_commercial.quoter_current_pointer;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_pointer_history;
+DROP TABLE IF EXISTS greenhouse_commercial.quoter_source_documents;
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_assert_pointer_follows_current();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_assert_source_document_digest();
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_text_digest(text);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_assert_append_only();

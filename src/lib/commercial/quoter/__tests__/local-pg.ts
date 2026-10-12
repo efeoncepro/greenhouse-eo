@@ -117,3 +117,19 @@ export const rejectionOf = async (operation: Promise<unknown>): Promise<{ code: 
 
   return null
 }
+
+/** Runs `work` in a transaction of `client`, as a governed command does: committed if it returns, rolled back if not. */
+export const inTransaction = async <T>(client: Client, work: () => Promise<T>): Promise<T> => {
+  await client.query('BEGIN')
+
+  try {
+    const result = await work()
+
+    await client.query('COMMIT')
+
+    return result
+  } catch (error) {
+    await client.query('ROLLBACK')
+    throw error
+  }
+}
