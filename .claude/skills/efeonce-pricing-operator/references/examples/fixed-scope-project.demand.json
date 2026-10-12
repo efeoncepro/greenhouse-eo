@@ -141,7 +141,13 @@
         "totalUnits": "3",
         "allocatedUnits": "0.7"
       },
-      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month)."
+      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month).",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
     },
     {
       "periodId": 1,
@@ -154,7 +160,13 @@
         "totalUnits": "3",
         "allocatedUnits": "0.7"
       },
-      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month)."
+      "reason": "Three named seats, one per person; this job carries 0.7 of 3, the declared dedication of the three people (126 of 180 hours each month).",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
     },
     {
       "periodId": 1,
@@ -168,7 +180,13 @@
         "totalUnits": "1",
         "allocatedUnits": "0.2"
       },
-      "reason": "One seat for the designer; this job carries the 0.2 of it that matches the declared dedication. Price chosen: the reference of the pricing history, because the current plan has no amount."
+      "reason": "One seat for the designer; this job carries the 0.2 of it that matches the declared dedication. Price chosen: the reference of the pricing history, because the current plan has no amount.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2026-12-31",
+        "status": "estimated"
+      }
     }
   ],
   "creditBudgets": [],

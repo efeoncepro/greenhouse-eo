@@ -17,7 +17,7 @@ ni Architecture; coordina sus decisiones y deja explícito qué está aprobado, 
 
 El presupuesto máximo del comprador no demuestra costo ni precio competitivo. Cuando el operador prioriza calidad al menor costo sostenible, separar costos fijos ya existentes, dedicación incremental, capacidad comprometida, costos externos y caja; no tratar el trabajo humano como gratuito por tener el equipo contratado. La ausencia de un costeo medido se registra, no se rellena con cero ni con un margen inventado.
 
-El precio aprobado y presentado gobierna la cotización; las recomendaciones anteriores quedan históricas. Mostrar neto, IVA y total del plazo completo. Una división por meses es referencia aritmética mientras las bases no confirmen cobro mensual. Para CRM, conciliar la unidad comercial con el importe total neto del programa; mantener presupuesto comprador e impuestos separados. Si el precio del programa pasa por el Cotizador V3, se declara como `agreed_total` (un neto por todo el plazo) y el documento lo imprime como una línea «1 programa» con `combine`; el presupuesto máximo del comprador y su fórmula de puntaje no están modelados ahí ([procedimiento](references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
+El precio aprobado y presentado gobierna la cotización; las recomendaciones anteriores quedan históricas. Mostrar neto, IVA y total del plazo completo. Una división por meses es referencia aritmética mientras las bases no confirmen cobro mensual. Para CRM, conciliar la unidad comercial con el importe total neto del programa; mantener presupuesto comprador e impuestos separados. Si el precio del programa pasa por el Cotizador V3, se declara como `agreed_total` (un neto por todo el plazo) y el documento lo imprime como una línea «1 programa» con `combine`; lleva hitos de pago sólo si las bases los fijan, y declara lo que las bases exigen como lo piden; el presupuesto máximo del comprador y su fórmula de puntaje no están modelados ahí ([procedimiento](references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme)).
 
 Caso fechado: [UTEM, 08/10/2026](../../../docs/commercial/tenders/utem-seo-aeo-2026/PRESENTACION-2026-10-08.md). El importe acordado no se convierte en rate card, mínimo sostenible comprobado ni margen validado.
 
@@ -167,23 +167,34 @@ Lo que hay que saber antes de abrirlo:
    trabajo con alcance, inicio, término y aceptación (+10 % y, en un servicio gestionado, la reserva de
    contingencia); `on_going` para un servicio mensual continuo. No existe una oferta para proyectos únicos: hoy van
    con la oferta gestionada de su práctica, On-Demand y a un precio.
-3. **El precio acordado se declara y se vuelve a cotizar; nunca se calcula una tasa a mano.** Un precio por el
-   trabajo completo (programa, proyecto, todo incluido) es `agreed_total`: un neto por todo el plazo, que el
-   documento imprime como «1 programa» o «1 proyecto» con `combine`. Un precio por mes es `agreed_net` (por periodo
-   y por clase de cobro). El piso se juzga por fila y contra el de la propia oferta (`compose assess` →
-   `margin.pricingPolicies[]`, `belowPolicyFloor`): una fila bajo su piso es un incumplimiento real y la excepción
-   es del CEO, nunca del agente ni referencia para otro cliente.
+3. **El precio acordado se declara y se vuelve a cotizar; nunca se calcula una tasa a mano.** Hay tres maneras, y
+   se elige por cómo se acordó: un precio por el trabajo completo (programa, proyecto) es `agreed_total`, un neto
+   por todo el plazo, que el documento imprime como «1 programa» o «1 proyecto» con `combine`; un valor mensual con
+   todo incluido (la puesta en marcha adentro) es `agreed_total` con `per: "period"`, que el documento imprime
+   como «n meses» × el valor mensual con `combine` `per: "period"`; un valor mensual de una sola clase de cobro, con
+   la puesta en marcha aparte, es `agreed_net`. El piso se juzga por fila y contra el de la propia oferta
+   (`compose assess` → `margin.pricingPolicies[]`, `belowPolicyFloor`): una fila bajo su piso es un incumplimiento
+   real —también las del mes de la puesta en marcha de un valor mensual con todo incluido— y la excepción es del
+   CEO, nunca del agente ni referencia para otro cliente.
 4. **Lo que se informa junto al precio:** el margen real (`marginRateRoundedDown`; con terceros refacturados,
-   también `ownWork.marginRateRoundedDown`, que es el que se compara con el piso), las filas marcadas con
-   `netShortOfFloor`, qué parte del costo es estimada (`estimateExposure`; una dedicación sin evidencia o estimada
-   nunca se lee como confirmada), los supuestos tomados y `runNotices`. Los costos de persona son el costo objetivo
-   que fijó el CEO, no la nómina: no proponer conectarla.
+   también `ownWork.marginRateRoundedDown`, que es el que se compara con el piso), las filas marcadas con el total
+   `marginFloor.netShortOfFloor` (las entradas vienen plegadas por mes: no se suman a mano), qué parte del costo es
+   estimada (`estimateExposure`; una dedicación sin evidencia o estimada nunca se lee como confirmada), los
+   supuestos tomados, las asignaciones de herramientas sin evidencia confirmada y `runNotices`. Los costos de
+   persona son el costo objetivo que fijó el CEO, no la nómina: no proponer conectarla.
+5. **Tres reglas de la demanda que no admiten variantes:** `work[].tasks` lleva sólo tareas más allá de la receta
+   del perfil (vacío si no hay); un cupo `planned-*` se queda mientras nadie esté asignado y pasa a un id anónimo
+   estable sólo cuando hay una persona específica; y cada asignación declara en `evidence` de dónde sale (lo que
+   diga `reason` no se interpreta). Dos alternativas de una oferta son dos cotizaciones y dos documentos.
 
 **«La cotización» para el cliente** es el PDF de la plantilla A4 (versión 2), cuyos datos emite `compose document`
 desde la cotización congelada. El agente escribe sólo textos: **nunca digitar ni editar una cifra** en el brief ni
 en los datos emitidos; si un número debe cambiar, se cambia la demanda y se vuelve a correr. Una cotización no es un
 contrato (decisión del CEO): la fecha de inicio y la duración del contrato no se piden ni se listan como pendiente,
-y el documento no dice lo obvio; `buyer.unit` y `schedule.note` son opcionales y se omiten cuando no dicen nada. El
+y el documento de una cotización comercial no dice lo obvio; en una licitación, lo que las bases exigen que la
+oferta declare se declara como lo piden. `buyer.unit`, `buyer.contact` («Atención: …») y `schedule.note` son
+opcionales y se omiten cuando no dicen nada. Los hitos de pago se declaran sólo cuando el negocio los tiene (los
+acordó el operador o los fijan las bases); el documento lleva la fecha de la cotización. El
 PDF se entrega como borrador mientras el operador no apruebe el precio: no es `quotation_id`, precio aprobado ni
 cotización emitida. Opciones, incrementos, cortesías, hitos con su impuesto y lo que queda como texto de
 condiciones: [sección 6 del procedimiento](references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente).

@@ -387,10 +387,17 @@ FacturaNotion acredita importe/período facturado, no pago. Público/operador/hi
 provisión estimada: onboarding USD 200 una vez por persona (por defecto) y reclutamiento USD 500 sólo si hay que
 contratar; la regla del Excel de «un mes del recurso» no se usa. Margen sobre venta y markup no son intercambiables;
 `compose assess` juzga cada línea contra el objetivo y el piso de su propia oferta (`margin.pricingPolicies[]`,
-`belowPolicyFloor`); ya no compara contra un 40/35 genérico, y nunca otorga aprobación. Un precio por el trabajo
-completo se declara como `agreed_total` (un neto por todo el plazo; con impuesto exclusivo, el impuesto de la
-cotización es el de la tasa sobre ese total) y `agreed_net` queda para un precio por periodo; la dedicación de cada
-línea lleva su evidencia y una estimada cuenta como costo estimado
+`belowPolicyFloor`); ya no compara contra un 40/35 genérico, y nunca otorga aprobación. Un precio acordado se
+declara de una de tres maneras, según cómo se acordó: `agreed_total` por el trabajo completo (un neto por todo el
+plazo; con impuesto exclusivo, el impuesto de la cotización es el de la tasa sobre ese total); `agreed_total` con
+`per: "period"` para un valor mensual con todo incluido (cada mes neta el mismo monto y la puesta en marcha lleva
+su parte dentro de su mes, sin bonificarse: las filas de ese mes pueden quedar bajo su piso aunque el plazo quede
+sobre la política, y eso se informa); y `agreed_net` para un valor por periodo de una sola clase de cobro. El piso
+que falta se lee en el total `marginFloor.netShortOfFloor` (las filas vienen plegadas por mes: no sumarlas a mano).
+La dedicación de cada línea lleva su evidencia y una estimada cuenta como costo estimado; cada asignación de
+herramienta declara la suya en `evidence` (plan, asientos y parte que carga la cuenta), y `compose assess` levanta
+`ALLOCATION_EVIDENCE_REQUIRED` si falta, no está confirmada o no rige en la fecha de la cotización: lo que diga el
+texto de `reason` no se interpreta
 ([procedimiento](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#39-el-precio-acordado)).
 Hay tres ofertas, todas del CEO: servicio gestionado creativo (`creative-managed-service`, objetivo 45%, piso 45%),
 servicio gestionado SEO/AEO (`seo-aeo-managed-service`, objetivo 55%, piso 45%, desde 2026-10-11) y una persona
@@ -398,7 +405,7 @@ vendida por dedicación (staff augmentation, `talent-assurance-staffing`, objeti
 2026-10-11); sobre el piso el objetivo sube según el caso y nunca se baja un piso para que un precio pase.
 On-Demand no es una cuarta oferta ni un delivery model: es la forma del compromiso declarada en la cotización, +10% al
 precio sobre On-Going con el mismo piso; arranque, coordinación y compromisos con proveedores van como costo.
-Las cifras y sus excepciones las decide el CEO (SKY social care 2027, 40,26%, es una y no es referencia): el agente
+Las cifras y sus excepciones las decide el CEO (SKY social care 2027 es una y no es referencia): el agente
 lleva una recomendación verificada contra sus datos.
 
 Explain/replay reconstruyen snapshots; preview redactado sigue simulación. Mantenimiento crea sucesores con

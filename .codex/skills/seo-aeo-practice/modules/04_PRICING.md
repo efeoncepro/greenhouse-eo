@@ -36,7 +36,7 @@ Adobe Express (CEO): declara su reparto o excluye la tarea con motivo.
 Las cifras históricas de los casos conservan su contexto; no repricearlas ni mutar snapshots desde V3.
 En V3 el costo de personas es el nivel salarial objetivo del Excel de pricing (decisión del CEO, 2026-10-11), no la
 nómina real del §4: el margen real en personas hoy es mayor que el que muestra V3; no proponer conectarle nómina.
-Excepción bajo el piso: sólo el CEO (SKY social care 2027, 40,26%, es una y no es referencia); donde se puede ganar
+Excepción bajo el piso: sólo el CEO (SKY social care 2027 es una y no es referencia); donde se puede ganar
 más se sube el objetivo de la oferta, no el piso. El FX de cotización de V3 es política del CEO con USD de
 referencia (CLP 1000 · COP 3650 · MXN 19,25 · PEN 3,70), no el spot de §1/§7, y cada moneda redondea hacia arriba
 (CLP 10.000 · USD 10 · PEN 50 · COP 50.000 · MXN 100): cotiza en la moneda pedida, nunca conviertas a mano; en EUR

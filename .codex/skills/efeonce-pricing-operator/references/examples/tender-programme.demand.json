@@ -147,7 +147,13 @@
         "totalUnits": "3",
         "allocatedUnits": "0.85"
       },
-      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people."
+      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
     },
     {
       "periodIds": [
@@ -164,7 +170,13 @@
         "totalUnits": "3",
         "allocatedUnits": "0.85"
       },
-      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people."
+      "reason": "Three named seats, one per person; the programme carries 0.85 of 3, the declared dedication of the three people.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
     },
     {
       "periodIds": [
@@ -181,7 +193,13 @@
         "totalUnits": "4",
         "allocatedUnits": "1"
       },
-      "reason": "One shared subscription; the programme carries one of four declared account shares. Price chosen: the public list price of the plan, because the contracted plan has no amount."
+      "reason": "One shared subscription; the programme carries one of four declared account shares. Price chosen: the public list price of the plan, because the contracted plan has no amount.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-01-31",
+        "status": "estimated"
+      }
     }
   ],
   "creditBudgets": [],

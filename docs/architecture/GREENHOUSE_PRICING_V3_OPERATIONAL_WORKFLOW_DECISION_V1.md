@@ -1834,7 +1834,10 @@ carpeta de datos).
 
 - **SIEMPRE** declarar un precio pactado por todo el trabajo como `agreed_total`; **NUNCA** dividirlo a mano entre
   períodos o clases de cobro.
-- **NUNCA** usar `agreed_total` para un valor mensual: ese es `agreed_net`.
+- **NUNCA** usar `agreed_total` sin `per` para un valor mensual: ahí `amount` es todo el plazo. (Corregido al
+  cierre del 2026-10-11: la regla decía «ese es `agreed_net`». Desde ese cierre un valor mensual que incluye la
+  puesta en marcha es `agreed_total` con `per: "period"`, y `agreed_net` queda para un valor mensual con la puesta
+  en marcha aparte: [delta](#delta-2026-10-11-cierre--un-precio-todo-incluido-por-período-per-de-agreed_total).)
 - **SIEMPRE** leer `agreedTotals` después de cotizar: el último período puede diferir de los demás, y una rebaja
   alcanza a todo lo nombrado, también a un costo que se cobra al costo.
 - Un total bajo el precio de política que deja una fila marcada es una excepción al piso: la decide el CEO.
@@ -1963,6 +1966,112 @@ comprador y la lógica de puntaje de una licitación. El costo financiero de un 
 Insights como recursos con costo. Y lo que ya se listaba: número de cotización, versiones, QR, firmas y aprobación son del
 cotizador de Greenhouse, y adoptarlos es el paso siguiente acordado, **sin empezar**. **Abierto y del CEO:** si el
 fee de plataforma, que hoy se cobra entero por línea, debe prorratearse por dedicación (`PLATFORM_FEE_PER_LINE`).
+
+## Delta 2026-10-11 (cierre) — un precio todo incluido por período (`per` de `agreed_total`)
+
+Tres agentes nuevos repitieron los tres negocios reales con la skill y el manual reescritos, sin abrir el código.
+Ninguno lo abrió, y cada uno reprodujo el precio pactado y generó su documento. Lo que todavía encontraron produjo
+este delta y el siguiente, y uno en la
+[decisión de composición](GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11-cierre--la-evidencia-de-una-asignación-es-un-dato-declarado).
+Ninguno toca un contrato del kernel; no hay catálogo ni policy nuevos; los 36 artefactos congelados se reproducen
+igual.
+
+**El problema.** Una persona vendida de forma continua se pacta como «tanto al mes, con todo adentro». `agreed_net`
+mensual no cubre la puesta en marcha, y `agreed_total` era el precio de todo el plazo. Para que el primer mes
+valiera lo mismo que los demás había que declarar la puesta en marcha bonificada, y la cotización afirmaba una
+cortesía que nadie dio.
+
+**Decisión.** `agreed_total` admite `per`: `term` (también cuando falta) o `period`. Con `period`, `amount` es el
+neto de lo nombrado en cada período en que se cobra, con todas sus clases de cobro juntas. La resolución hace el
+mismo reparto de siempre una vez por período; el kernel sigue recibiendo un `agreed_net` por período y clase. El
+resumen informa `per` y `agreedNetOverTerm`, y lee la diferencia contra el precio de política sobre el plazo. El
+documento lo imprime con `combine` y `per: "period"`: meses al valor de uno.
+
+**Por qué una opción de `agreed_total` y no un tercer ajuste.** Es la misma declaración —un precio por todo lo
+nombrado, todas las clases juntas— con otra base. Comparte la regla de no superponerse, el reparto proporcional, la
+unidad que cuida el impuesto y los mismos bloqueos. Un ajuste nuevo habría duplicado todo eso para cambiar un
+divisor.
+
+**Por qué la puesta en marcha lleva su parte y no se bonifica.** Lo que se vendió es un valor mensual que la
+incluye, no un regalo. Bonificarla diría en el artefacto, en el piso y en el documento algo que no pasó: una fila en
+cero, marcada bajo su piso por su neto mínimo completo y, si se imprime, una cortesía con un valor de referencia.
+Repartido, cada fila conserva un precio y el piso se juzga contra lo que de verdad se cobra.
+
+**Lo que hay que saber.** El mes de la puesta en marcha reparte el mismo importe entre dos filas, así que las dos
+reciben menos que su precio de política y cualquiera puede quedar bajo su piso aunque el plazo quede sobre la
+política. Es un incumplimiento real por fila, no un defecto del reparto.
+
+**Alternativas descartadas.**
+
+- *Un tercer ajuste propio.* Duplica reglas, bloqueos y lecturas de `agreed_total` para cambiar la base.
+- *`agreed_net` con una clase `all`.* Mezcla en un ajuste por clase lo que es un precio de todas las clases.
+- *`agreed_net` mensual más la puesta en marcha bonificada.* Es lo que había: declara una cortesía falsa.
+- *`agreed_total` por plazo, multiplicando a mano el valor mensual.* Los períodos dejan de ser iguales: el reparto
+  es proporcional y el último toma el resto.
+- *Repartir la puesta en marcha entre todos los meses.* Mueve un cobro del mes en que ocurre a meses en que no hay
+  fila que lo lleve.
+
+**Medido el 2026-10-11** (con `--current`, sobre una copia de `designer-three-months-iva.demand.json` vendida
+On-Going; política 7.250.000). Con 2.450.000 por período: tres períodos de 2.450.000, neto 7.350.000, impuesto
+1.396.500; primer mes 2.177.700 y 272.300; margen 0,3104; ninguna fila marcada. Con 2.420.000: el plazo queda
+10.000 sobre la política y la fila mensual del primer mes sale marcada, 12.506 bajo su neto mínimo.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** elegir entre las tres maneras por cómo se pactó: por todo el trabajo, `agreed_total`; por mes con
+  todo incluido, `agreed_total` con `per: "period"`; por mes con la puesta en marcha aparte, `agreed_net`.
+- **NUNCA** bonificar la puesta en marcha para que un valor mensual cierre, ni cambiar la manera de declarar un
+  precio para que una fila no salga marcada.
+- **SIEMPRE** mirar las filas del mes de la puesta en marcha y llevarle al CEO la que quede bajo su piso.
+
+## Delta 2026-10-11 (cierre) — el assessment se pliega y el andamio escribe lo que la composición lee
+
+**El problema.** Dos cosas hacían leer mal una cotización correcta. `compose assess` listaba cada brecha una vez
+por mes: doce meses, doce copias, y nadie leía la lista. Y el andamio escribía en `work[].tasks` la receta del
+perfil y pedía reemplazar los cupos `planned-*`, mientras la skill y el manual decían cosas distintas entre sí:
+tres agentes, tres maneras de llenar los mismos dos campos.
+
+**Decisión.**
+
+1. `compose assess` trae una entrada por brecha. Una brecha de un período se levanta bajo una ruta sin él
+   (`tools.<toolId>`, `result.lines.<lineId>`) y las que sólo difieren por período son una, con `periodIds`.
+   `gapOccurrences` conserva la cuenta sin plegar. `USER_ASSIGNMENT_REQUIRED` es una sola brecha por cotización.
+2. El resumen agrega `marginFloor.netShortOfFloor`, el total que falta sobre todas las filas marcadas: las filas
+   plegadas traen la cifra de un mes, y sumarlas a mano daba menos.
+3. El andamio deja `work[].tasks` vacío. La composición aplica siempre la receta del perfil y le suma esas tareas:
+   son las del trabajo más allá de la receta. La receta va en la pregunta de la línea (`profileTasks`).
+4. Un cupo `planned-<lineId>-<n>` se queda mientras nadie esté asignado y se reemplaza por un id anónimo estable
+   sólo cuando hay una persona específica asignada. La pregunta del andamio, la skill y el manual lo dicen igual.
+5. El andamio lista en `candidates` sólo los precios que la composición aceptaría ese día, y los demás en
+   `unavailablePrices` con el diagnóstico que daría nombrarlos. Es una sola lectura, compartida con la composición.
+
+**Por qué las rutas pierden el período.** Plegar exige que dos entradas sean la misma salvo el mes; con el período
+dentro de la ruta nunca lo eran. El período pasa a ser un dato de la entrada.
+
+**Por qué el cupo se queda.** Un id inventado calla la brecha sin que nadie haya sido asignado: la cotización
+afirmaría una asignación que no existe. El cupo dice la verdad y la brecha la informa una vez.
+
+**Alternativas descartadas.**
+
+- *Plegar sólo en una vista y dejar `gaps` como estaba.* Dos listas para la misma lectura, y la larga seguiría
+  siendo la que se cita.
+- *Quitar `gapOccurrences`.* Se pierde cuántas veces hay que resolver cada cosa.
+- *Seguir escribiendo la receta en `tasks`.* No cambia el cálculo y enseña que borrar una tarea la quita.
+- *Exigir un id anónimo en vez del cupo.* Obliga a inventar una asignación.
+- *Bloquear una cotización con cupos.* Cotizar antes de asignar es el caso normal.
+
+**Abierto.** Los bloqueos de una cotización que no calculó siguen saliendo una vez por período
+(`BLOCKERS_REPEATED_PER_PERIOD`). Los `*.assessment.json` versionados son fotos anteriores a este cambio y no se
+regeneran (`ASSESSMENT_SNAPSHOTS_PREDATE_FOLDED_READING`). Un solo documento con dos alternativas de una misma
+oferta no existe: son dos cotizaciones y dos documentos (`QUOTE_DOCUMENT_ALTERNATIVES_NOT_MODELLED`).
+
+**Medido el 2026-10-11.** `compose assess` de `managed-addon-increment.artifact.json` (tres meses): 16 entradas y
+`gapOccurrences` 36. `pnpm pricing:v3:test`: 33 archivos y 1640 pruebas.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** leer el total bajo el piso en `marginFloor.netShortOfFloor`; **NUNCA** sumar las filas plegadas.
+- **NUNCA** copiar la receta del perfil a `work[].tasks` ni reemplazar un cupo por un id inventado.
 
 ## Evidencia y rutas de operación
 

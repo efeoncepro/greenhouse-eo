@@ -73,7 +73,7 @@
     ],
     "intro": "Valores en pesos chilenos (CLP). El precio es por el programa completo.",
     "summary": "Programa completo · Pesos chilenos · IVA no incluido en el valor neto",
-    "taxNote": "El valor del programa es neto. El total incluye IVA. Cada hito de pago se informa con su valor neto, su IVA y su total."
+    "taxNote": "El valor del programa es neto. El total incluye IVA."
   },
   "conditions": {
     "title": [
@@ -86,8 +86,12 @@
         "text": "Un precio único por el alcance descrito en la propuesta técnica."
       },
       {
+        "title": "Plazo de ejecución",
+        "text": "Tres meses, contados como lo establecen las bases del proceso."
+      },
+      {
         "title": "Facturación y pago",
-        "text": "Cada hito se factura al cierre de su mes. Las condiciones de pago son las de las bases del proceso."
+        "text": "La facturación y el pago son los que establecen las bases del proceso."
       },
       {
         "title": "Vigencia",
@@ -103,26 +107,6 @@
       "label": "Programa SEO y AEO",
       "detail": "Tres meses: diagnóstico, optimización y medición",
       "unit": "programa"
-    }
-  ],
-  "paymentMilestones": [
-    {
-      "id": "m1",
-      "label": "Mes 1",
-      "share": "0.333333",
-      "periodId": 1
-    },
-    {
-      "id": "m2",
-      "label": "Mes 2",
-      "share": "0.333333",
-      "periodId": 2
-    },
-    {
-      "id": "m3",
-      "label": "Mes 3",
-      "share": "0.333334",
-      "periodId": 3
     }
   ]
 }

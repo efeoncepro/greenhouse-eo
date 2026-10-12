@@ -240,6 +240,8 @@ sustenta el periodo declarado. Créditos adicionales retienen incertidumbre de p
 para las policies v2 a v5. En v6 un precio unitario de herramienta no vence: rige hasta que una versión nueva lo
 reemplaza, y la revisión es una fecha (`reviewBy`) que avisa y nunca bloquea. Lo que sí bloquea sigue siendo una
 vigencia dura vencida; `resources inspect` las lista en `priceReview.expired`.
+*Corrección 2026-10-11 (cierre):* bajo `expired` queda sólo lo que de verdad bloquea. Un registro del catálogo cuya
+vigencia pasó y al que otro registro vigente responde sale bajo `priceReview.superseded`, sin bloqueo.
 
 Legacy `v3-catalog/`, `v3-composition/`, Excel/seeds y todos sus artifacts se conservan. Las nuevas fixtures tampoco
 se sobrescriben. El próximo costo/plan pide versión y nueva quote. TASK-2017 mantiene economía parcial; API/UI/MCP
@@ -534,7 +536,8 @@ puntero nombre la versión de número más alto de cada familia, y el mensaje tr
 ### Corridas del 2026-10-11 con `--current` (v6 + v6)
 
 - `resources inspect --current --date 2026-10-11`: `priceReview` sin revisiones vencidas ni fechas próximas y con un
-  solo `expired`, el registro EUR→USD del BCE de un día. Con la policy v5 a la misma fecha, 24 de los 25 precios
+  solo `expired`, el registro EUR→USD del BCE de un día (así se leía ese día; desde el cierre del 2026-10-11 ese
+  registro sale bajo `superseded`, con `supersededBy` `fx:EUR:USD`, y `expired` queda vacío). Con la policy v5 a la misma fecha, 24 de los 25 precios
   salían en `dueSoon` por su fecha de término.
 - `managed-care-colombia.demand.json`: exit 3 (calculada, requiere revisión), motor `pricing-v3-local/1.2.0`,
   COP 28.100.000 al mes, margen real 0,4152, ninguna línea marcada, sin `runNotices`. Es el mismo neto del artefacto
@@ -1060,3 +1063,64 @@ Importes en CLP. Las corridas «fuera de esta carpeta» usan copias y no están 
 
 Evidencia fechada. Los archivos que se agregaron a esta carpeta son `catalog.review-v11.json`,
 `offer-commercial-unit.change.json` y los dos `managed-addon-increment.programme-price.*`.
+
+## Delta 2026-10-11 (cierre de la segunda prueba) — lecturas que cambiaron, sin archivos nuevos
+
+Tres agentes repitieron los tres negocios reales con la skill y el manual reescritos, sin abrir el código. Lo que
+todavía encontraron cambió el cotizador en cinco puntos, todos aditivos. **Esta carpeta no recibió ningún archivo y
+ninguno se regeneró**: no hay catálogo, policy ni contrato del kernel nuevos, el puntero no se movió y los 36
+artefactos versionados responden `verified: true`. Lo que cambia es cómo se leen. Paso a paso:
+[manual](../../../docs/manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#cotizar-un-negocio-de-punta-a-punta).
+Por qué así:
+[decisión de flujo](../../../docs/architecture/GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md#delta-2026-10-11-cierre--un-precio-todo-incluido-por-período-per-de-agreed_total)
+y [decisión de composición](../../../docs/architecture/GREENHOUSE_PRICING_V3_RESOURCE_COMPOSITION_DECISION_V1.md#delta-2026-10-11-cierre--la-evidencia-de-una-asignación-es-un-dato-declarado).
+
+- **`compose assess` sobre los artefactos de esta carpeta.** Trae una entrada por brecha, con `periodIds`, bajo
+  rutas sin período (`tools.<toolId>`, `result.lines.<lineId>`), y `gapOccurrences` con el total sin plegar.
+  `ALLOCATION_EVIDENCE_REQUIRED` depende de la evidencia que declara cada asignación (`allocations[].evidence`) y
+  ya no de las palabras de su `reason`. **Ninguna demanda de esta carpeta declara `evidence`**: son anteriores al
+  campo, así que la brecha sale hoy en cada herramienta con asignación de cada artefacto, también en los que antes
+  no la traían. `USER_ASSIGNMENT_REQUIRED` sale una vez por cotización; los ejemplos de esta carpeta llevan ids
+  propios (`design-slot`, `care-slot`), escritos con la indicación anterior, y no la traen.
+- **Los `*.assessment.json` versionados son fotos de su fecha.** `designer.assessment.json` y
+  `service.assessment.json` (2026-10-09), igual que los de una carpeta de prospecto, son anteriores al assessment
+  plegado: traen una brecha por mes, rutas `<período>:<herramienta>` y no traen `gapOccurrences`. No se regeneran
+  ni se comparan con la lectura de hoy; la de hoy se obtiene con `compose assess` sobre el artefacto.
+- **El resumen de `replay`.** Agrega `marginFloor.netShortOfFloor`, el total que falta sobre todas las filas
+  marcadas, en los artefactos que tienen alguna y cuyo contrato trae el neto mínimo (1.2.0 en adelante).
+  `designer-startup-courtesy.artifact.json` lo trae en 266.667: su puesta en marcha bonificada sale marcada, con
+  neto 0, y su `netShortOfFloor` es su neto mínimo completo.
+- **`compose scaffold` y `resources inspect`.** El andamio deja `work[].tasks` vacío (la receta del perfil va en
+  `profileTasks` de la pregunta de cada línea), conserva los cupos `planned-<lineId>-<n>` y lista en `candidates`
+  sólo los precios que una asignación puede nombrar, con los demás en `unavailablePrices`. `resources inspect` lee
+  `availability` igual y agrega `priceReview.superseded`.
+- **Un precio por período.** `agreed_total` admite `per: "period"`, y `combine` del brief del documento también.
+  Ninguna demanda ni brief de esta carpeta lo usa; las corridas de abajo lo ejercitan sobre copias. Las demandas de
+  ejemplo que sí lo declaran, con su evidencia de asignación y sus cupos sin asignar, están en la skill de pricing
+  (`.claude/skills/efeonce-pricing-operator/references/examples/`).
+- **Ledger.** `operational-gaps.json` agrega `PROVISION_EVIDENCE_READ_FROM_LABEL` (la comparación por texto que
+  queda), `BLOCKERS_REPEATED_PER_PERIOD`, `QUOTE_DOCUMENT_ALTERNATIVES_NOT_MODELLED` y
+  `ASSESSMENT_SNAPSHOTS_PREDATE_FOLDED_READING`.
+
+### Corridas del 2026-10-11 (cierre de la segunda prueba)
+
+Importes en CLP, con `--current`. Las corridas «sobre una copia» no están versionadas.
+
+- `compose assess` de `managed-addon-increment.artifact.json`: exit 3, 16 entradas y `gapOccurrences` 36;
+  `ALLOCATION_EVIDENCE_REQUIRED` en sus cuatro herramientas, con `periodIds` 1 a 3.
+- Una copia de `designer-three-months-iva.demand.json` vendida On-Going con un `agreed_total` de 2.450.000 y
+  `per: "period"` sobre `design`: exit 3; tres períodos de 2.450.000; neto 7.350.000, impuesto 1.396.500, total
+  8.746.500; el primer mes repartido en 2.177.700 (mes) y 272.300 (puesta en marcha); ninguna fila marcada. A
+  precio de política esa copia vale 7.250.000. Con 2.420.000, el plazo queda 10.000 sobre la política y la fila
+  mensual del primer mes sale marcada (`marginFloor.netShortOfFloor` 12.506).
+- `compose document` de esa cotización, sobre una copia de `designer-three-months-iva.document-brief.json` con
+  `combine` de `design` y `design:setup` y `per: "period"`: exit 3, una línea «3 meses» a 2.450.000. Generado con
+  la plantilla: exit 0, cuatro páginas.
+- `compose document` de `managed-addon-increment.artifact.json` con su brief y `--increment`: exit 3, idéntico a
+  `managed-addon-increment.document.json`.
+- `replay` de `designer-startup-courtesy.artifact.json`: `verified: true`; `marginFloor.flaggedLinePeriods` 1 y
+  `marginFloor.netShortOfFloor` 266.667.
+- `resources inspect --current --date 2026-10-11`: exit 0; `expired` vacío y una entrada en `superseded`.
+- `pnpm pricing:v3:test`: 33 archivos y 1.640 pruebas.
+
+Evidencia fechada. No se agregó ningún archivo a esta carpeta; `operational-gaps.json` es el único que cambió.

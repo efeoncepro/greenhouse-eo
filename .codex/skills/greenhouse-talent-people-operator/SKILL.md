@@ -1043,8 +1043,10 @@ not current status for future runs). Do not repeat the closed operation during d
 Para simular una persona o squad con costos y herramientas, cargar
 [contrato operativo V3](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md).
 Talent define perfil/variante/seniority, país del talento, dedicación (FTE u horas al mes: 180 horas = 1 FTE-mes) con
-su evidencia (`dedicationEvidence`: confirmada o estimada; una estimada cuenta como costo estimado), headcount, tareas
-e IDs estables sin PII; una persona por dedicación se cotiza con `talent-assurance-staffing` como `role_capacity`
+su evidencia (`dedicationEvidence`: confirmada o estimada; una estimada cuenta como costo estimado), headcount, las
+tareas que van más allá de la receta del perfil (la receta se aplica sola y no se escribe) y, sólo cuando hay una
+persona específica asignada, su id anónimo estable sin PII (mientras nadie esté asignado, el cupo `planned-*` se
+queda); una persona por dedicación se cotiza con `talent-assurance-staffing` como `role_capacity`
 ([procedimiento y ejemplo](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#71-una-persona-por-dedicación--person-by-dedication));
 Commercial conserva el mercado del comprador; las cifras salen del catálogo versionado y el precio lo decide el CEO.
 **El costo del cotizador no es la nómina actual:** es el nivel salarial objetivo del Excel de pricing (decisión del

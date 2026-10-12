@@ -589,3 +589,61 @@ prorratearse por dedicación (`PLATFORM_FEE_PER_LINE`). Medido: 2,8 % del costo 
 - **SIEMPRE** declarar la dedicación que estimaste como `estimated`, con su referencia.
 - **NUNCA** marcar `confirmed` una dedicación que nadie acordó ni midió, ni presentar como confirmado el costo que
   trae `dedicationNotEvidenced`.
+
+## Delta 2026-10-11 (cierre) — la evidencia de una asignación es un dato declarado
+
+**El problema.** `compose assess` levantaba `ALLOCATION_EVIDENCE_REQUIRED` cuando el `reason` de una asignación
+contenía ciertas palabras en inglés (simulación, hipótesis, prototipo, ejemplo). La brecha dependía de cómo se
+redactaba un texto libre: un motivo en español, o con otras palabras, pasaba sin ella aunque el plan, los asientos
+y la parte atribuida fueran igual de supuestos. Y un motivo honesto la activaba mientras uno escueto no.
+
+**Decisión.**
+
+1. Cada asignación de la demanda admite `evidence`, con el schema de toda fuente (`reference`, `effectiveFrom`,
+   `effectiveUntil`, `status`): de dónde sale el plan contratado, sus asientos y la parte que carga la cuenta, y si
+   está confirmado. Sin valor por defecto. Un recurso de un portfolio admite la misma clave y la entrega a las
+   asignaciones que produce.
+2. No llega al kernel, no bloquea y no cambia ningún costo. Se congela con la demanda.
+3. `compose assess` levanta la brecha por cada asignación sin evidencia, con evidencia no confirmada o con una
+   vigencia que no incluye la fecha de la cotización, y dice cuál. `reason` ya no se lee.
+4. Una herramienta que se compra en créditos no tiene asignación y no levanta la brecha.
+
+**Por qué no una comparación de texto.** Un texto libre es para quien lo lee. Leerlo como dato premia la redacción
+y no el respaldo, depende del idioma y no distingue una hipótesis de una asignación confirmada que se describe con
+la palabra equivocada. Es la misma razón por la que la dedicación de una línea lleva su `dedicationEvidence`.
+
+**Qué les hace a las lecturas existentes.** Ningún artefacto cambia ni deja de reproducirse. Cambia lo que `assess`
+dice de ellos hoy: ninguna demanda versionada declara `evidence`, así que la brecha sale en cada herramienta con
+asignación de cada ejemplo, también en los que antes no la traían. Es correcto: ninguna de esas asignaciones fue
+evidenciada. Los `*.assessment.json` versionados conservan la lectura de su fecha y no se regeneran.
+
+**Opcional, sin bloquear.** Obligatoria, habría dejado sin cotizar a todas las demandas existentes. Que falte se
+lee como lo que es: una declaración que nadie respaldó.
+
+**Alternativas descartadas.**
+
+- *Ampliar la lista de palabras, o agregarlas en español.* Sigue leyendo redacción, y siempre faltará una.
+- *Un booleano `hypothetical`.* No dice de dónde sale el dato ni hasta cuándo vale; la forma de fuente ya existía.
+- *Leer el estado de la fuente del precio.* Un precio confirmado no prueba que el asiento exista ni cuánto de él
+  carga la cuenta: son dos hechos.
+- *Bloquear una asignación sin evidencia.* Lo de arriba, y cotizar con hipótesis declaradas es el caso normal.
+
+**Abierto.** Queda una comparación de texto del mismo tipo: `PROVISION_COST_EVIDENCE_REQUIRED` reconoce las
+provisiones de prueba por su etiqueta. Cerrarla pide un dato declarado en los registros de recursos del catálogo, y
+por eso una versión nueva (`PROVISION_EVIDENCE_READ_FROM_LABEL` en el ledger).
+
+**Además, en el mismo cierre.** Los diagnósticos de asientos traen sus cuentas (`detail` en
+`INSUFFICIENT_NAMED_SEAT_CAPACITY` y `TEAM_CONTRACT_CAPACITY_REQUIRED`: cuántos se necesitan y cuántos hay, nunca
+quiénes). Y `resources inspect` lista bajo `priceReview.superseded`, sin bloqueo, un registro del catálogo cuya
+vigencia pasó y al que otro vigente responde: se informaba como un vencimiento que bloquea, y no bloqueaba nada.
+
+**Medido el 2026-10-11.** `compose assess` de `managed-addon-increment.artifact.json`: `ALLOCATION_EVIDENCE_REQUIRED`
+en sus cuatro herramientas. Un programa SEO/AEO de tres meses con sus tres asignaciones declaradas `estimated`: la
+brecha en las tres, con el texto «no confirmada». Con una evidencia `confirmed` y vigente, la brecha no sale para
+esa herramienta.
+
+**Reglas para agentes.**
+
+- **SIEMPRE** declarar `evidence` en cada asignación, `estimated` si es una hipótesis.
+- **NUNCA** marcarla `confirmed` sin la factura o la consola del proveedor, ni redactar el `reason` para evitar la
+  brecha.

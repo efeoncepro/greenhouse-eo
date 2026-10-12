@@ -54,6 +54,14 @@ programa o de proyecto. No toca ningún contrato del kernel y todos los artefact
 Donde un párrafo anterior describía como vigente algo que ese cambio retiró, quedó corregido en su lugar. El resumen
 para leer primero está en
 [Un precio por todo el trabajo, la unidad de cada oferta y la evidencia de las horas](#un-precio-por-todo-el-trabajo-la-unidad-de-cada-oferta-y-la-evidencia-de-las-horas-2026-10-11).
+Los párrafos marcados «cierre (2026-10-11)» describen lo que se agregó al terminar ese día, después de repetir esos
+tres negocios con agentes que no abrieron el código: un valor mensual todo incluido (`agreed_total` con
+`per: "period"`), la evidencia de cada asignación como dato declarado, un `compose assess` plegado por período, un
+andamio que escribe sólo lo que la composición lee, diagnósticos de asientos con sus cuentas y un registro
+reemplazado que ya no se informa como vencido. No hay versión nueva de catálogo ni de policy, no toca ningún
+contrato del kernel y todos los artefactos congelados se reproducen igual. Donde un párrafo anterior quedó falso,
+está corregido en su lugar. El resumen para leer primero está en
+[Un valor por período, evidencia declarada y un assessment que se lee](#un-valor-por-período-evidencia-declarada-y-un-assessment-que-se-lee-2026-10-11-cierre).
 
 ## Qué versiones se usan hoy (2026-10-11)
 
@@ -971,7 +979,9 @@ Un bloqueo ya no obliga a leer el código para saber qué corregir:
   que `RESOURCE_POLICY_NOT_EFFECTIVE`.
 - `CLIENT_ACCESS_EVIDENCE_REQUIRED` dice en `detail` qué parte de la evidencia falla.
 - `RESOURCE_ALLOCATION_REQUIRED` y `RESOURCE_PRICE_SELECTION_REQUIRED` traen en `candidates` los `priceId` que
-  tienen importe.
+  una asignación puede nombrar a la fecha de la cotización. Hasta el cierre de ese día eran los que no estaban
+  pendientes, y podían incluir uno cuyo valor ya no regía
+  ([cierre](#el-andamio-escribe-lo-que-la-composición-lee)).
 - Un rechazo por schema dice lo que el contrato pedía: `limit` en un tope, `allowed` en una lista cerrada, `expected`
   en un tipo. Un `--kind` que no existe devuelve en `allowed` las clases admitidas.
 
@@ -1013,6 +1023,150 @@ El dato que el llamador escribió nunca viaja: sólo la regla.
 Estado verificado el 2026-10-11: `pnpm pricing:v3:test`, 32 archivos y 1582 pruebas; los 36 artefactos versionados
 se reproducen con `"verified": true`; el documento del ejemplo nuevo se emite idéntico al versionado.
 
+## Un valor por período, evidencia declarada y un assessment que se lee (2026-10-11, cierre)
+
+Después de lo anterior, tres agentes nuevos repitieron los mismos tres negocios con la skill y el manual
+reescritos, con la instrucción de no abrir el código. Ninguno lo abrió. Cada uno llegó a una cotización calculada
+con a lo más un rechazo, reprodujo el precio pactado y generó un documento que lo imprime como se vendió. Lo que
+todavía encontraron es lo que esta sección agrega. Es aditivo: no hay versión nueva de catálogo ni de policy, no
+toca ningún contrato del kernel y todos los artefactos congelados se reproducen igual.
+
+### Un valor mensual todo incluido (`agreed_total` con `per: "period"`)
+
+Faltaba una manera de decir «tanto al mes, con todo adentro». Un `agreed_net` mensual no cubre la puesta en marcha,
+y un `agreed_total` era el precio de todo el plazo: quien pactaba un valor mensual que incluía la puesta en marcha
+terminaba declarándola bonificada para que el mes cerrara.
+
+- `agreed_total` admite `per`: `"term"` (también cuando falta) o `"period"`. Con `per: "period"`, `amount` es el
+  neto de lo nombrado en **cada** período en que se cobra, con todas sus clases de cobro juntas.
+- El reparto es el mismo de siempre, hecho una vez por período: entre las clases de cobro de ese mes, en proporción
+  a su precio de política, en la misma unidad, y la última con precio toma lo que queda. Cada período vale
+  exactamente `amount`.
+- **La puesta en marcha lleva su parte del mes en que cae.** No se bonifica: sigue siendo una fila con precio y con
+  piso. Ese mes reparte el mismo importe entre dos filas, así que las dos reciben menos que su precio de política y
+  cualquiera puede quedar bajo su piso aunque el plazo completo quede sobre la política. Es un incumplimiento real
+  por fila y se informa; no se rodea bonificando la puesta en marcha.
+- Con todas las filas de un período dentro del total, el impuesto del período es el de la tasa sobre `amount`.
+- `agreedTotals` agrega `per` y, con `per: "period"`, `agreedNetOverTerm` (el importe una vez por cada período
+  cobrado); `differenceFromPolicyNet` se lee contra esa suma. Un total que no declara `per` conserva las claves que
+  tenía.
+- Un período en que lo nombrado tiene filas y ninguna tiene precio se rechaza nombrando el período
+  (`AGREED_TOTAL_WITHOUT_BASE`). Un período sin ninguna fila de lo nombrado no recibe nada.
+
+Quedan así tres maneras de declarar un precio pactado: `agreed_total` por plazo (un programa, un proyecto, un mes de
+refuerzo todo incluido), `agreed_total` por período (un valor mensual todo incluido durante varios meses) y
+`agreed_net` (un valor por mes para una clase de cobro, con la puesta en marcha aparte).
+
+Corrida de control (2026-10-11, `--current`, sobre una copia de `designer-three-months-iva.demand.json` vendida
+On-Going): precio de política 7.250.000 (2.610.000 el primer mes, con 290.000 de puesta en marcha, y 2.320.000 los
+otros dos). Con 2.450.000 por período: tres períodos de 2.450.000, neto 7.350.000, impuesto 1.396.500, total
+8.746.500, margen 0,3104; el primer mes se reparte en 2.177.700 de mes y 272.300 de puesta en marcha (unidad 100,
+`tax_exact`); ninguna fila marcada. Con 2.420.000 el plazo suma 7.260.000, 10.000 sobre el precio de política, y
+aun así la fila mensual del primer mes queda en 2.151.100 contra un neto mínimo de 2.163.606 y sale marcada, con
+`netShortOfFloor` 12.506.
+
+### El documento lo imprime (`combine` con `per: "period"`)
+
+Una entrada de `combine` admite `per`. Con `"term"` (o sin él) es lo que ya existía: una línea de cantidad 1 con la
+unidad que el brief escribe y la suma del plazo. Con `"period"` las claves se suman dentro de cada mes y los meses
+se pliegan como una sola clave: «3 meses» al valor de un mes, con su valor unitario. Esa forma no lleva `unit`
+(`unit_not_allowed_per_period` si la trae); otro valor de `per` es `invalid_per`. Si la suma cambia entre meses, o
+hay un mes en que ninguna de las claves se cobra, sale una línea por tramo. En la corrida de control, las claves
+`design` y `design:setup` salen como una línea de «3 meses» a 2.450.000 y 7.350.000 de neto; sin combinarlas serían
+tres líneas. Generado: cuatro páginas.
+
+El brief admite además `buyer.contact`, la persona a quien va dirigido el documento: la portada imprime
+«Atención: …». Es optativo y el andamio no le deja hueco. Sin logo, la portada nombra al comprador una sola vez.
+
+### La evidencia de una asignación es un dato declarado
+
+`compose assess` levantaba `ALLOCATION_EVIDENCE_REQUIRED` cuando el `reason` de una asignación contenía ciertas
+palabras en inglés (simulación, hipótesis, prototipo, ejemplo). Un motivo escrito con otras palabras, o en español,
+pasaba sin la brecha aunque la asignación fuera igual de hipotética.
+
+- Una asignación de la demanda admite `evidence`, con la forma de toda evidencia (`reference`, `effectiveFrom`,
+  `effectiveUntil`, `status`): de dónde sale —el plan contratado, sus asientos y la parte que carga la cuenta— y si
+  está confirmado. Un recurso de un portfolio (`compose plan`) admite la misma `evidence` y la entrega a las
+  asignaciones que produce.
+- No bloquea y nunca llega a un cálculo.
+- `compose assess` levanta la brecha por cada asignación que no declara evidencia, que la declara sin confirmar o
+  cuya vigencia no incluye la fecha de la cotización; su `action` dice cuál. Las palabras de `reason` no se leen.
+- Una herramienta que se compra en créditos no tiene asignación y no levanta la brecha.
+- **Qué les pasa a las lecturas existentes.** Ninguna demanda versionada de `data/pricing/v3-operating/` declara
+  `evidence` (los ejemplos de la skill de pricing sí, y sirven de modelo de la forma), así que hoy `assess`
+  levanta la brecha en cada herramienta con asignación de cada uno, también en los que antes no la traían. No es un
+  cambio de sus cotizaciones, que se reproducen igual: es la lectura de hoy sobre lo que declararon.
+
+### `compose assess` se lee como una cotización de un mes
+
+Una cotización de doce meses traía cada brecha doce veces, una por mes, bajo rutas como `<período>:<herramienta>`.
+
+- `gaps` trae **una entrada por brecha**. Una brecha de un período se levanta bajo una ruta sin él —
+  `tools.<toolId>`; `result.lines.<lineId>`, que en el artefacto es `periods.<periodId>.result.lines.<lineId>`— y
+  las entradas que sólo difieren por período son una con `periodIds`.
+- `gapOccurrences` cuenta cada entrada una vez por período: el tamaño de la lista antes de plegar.
+- `USER_ASSIGNMENT_REQUIRED` es una sola brecha por cotización, en `work.assigneeIds`, con cuántos cupos
+  `planned-` quedan.
+- Los bloqueos de una cotización que no calculó conservan la ruta con que la cotización los reportó, uno por
+  período: no se pliegan. Está abierto en el ledger.
+- El resumen de una cotización agrega `marginFloor.netShortOfFloor`: el total que falta sobre todas las filas
+  marcadas (`flaggedLinePeriods`). `marginFloor.lines[]` pliega los meses iguales y cada entrada dice lo que falta
+  en **un** mes, así que sumarlas a mano cuenta un mes de cada una. La clave existe cuando hay filas marcadas y el
+  kernel dice su neto mínimo (contrato 1.2.0 en adelante).
+- Una fila bonificada (neto cero) sale marcada: su `netShortOfFloor` es su `floorNet` completo y entra a ese total.
+  Una cotización con una puesta en marcha de cortesía siempre muestra una fila marcada, y se informa aparte de las
+  que un precio dejó cortas.
+
+Corridas de control: `managed-addon-increment.artifact.json` (tres meses) da 16 entradas y `gapOccurrences` 36; el
+programa SEO/AEO de tres meses, armado del andamio y con sus cupos sin asignar, 12 entradas y 26.
+
+### El andamio escribe lo que la composición lee
+
+- **`work[].tasks` viene vacío.** La composición aplica siempre la receta del perfil de la línea y le suma
+  `work[].tasks`: son las tareas del trabajo más allá de la receta. El andamio copiaba ahí la receta, lo que no
+  cambiaba nada y hacía creer que borrar una tarea la quitaba. La receta sale ahora en la pregunta de la línea
+  (`profileTasks`); una tarea de la receta se deja fuera sólo con `excludedProfileTasks`.
+- **Los cupos se quedan mientras nadie esté asignado.** `work[].assigneeIds` trae `planned-<lineId>-<n>`. Un cupo
+  se reemplaza por un id anónimo estable sólo cuando hay una persona específica asignada; hasta entonces el
+  assessment lo dice una vez. La pregunta del andamio decía «reemplácelos», y la skill y el manual decían cosas
+  distintas entre sí.
+- **`candidates` lista sólo precios utilizables.** Los precios que una asignación puede nombrar a la fecha de la
+  cotización se leen como los lee la composición; los demás salen en `unavailablePrices`, cada uno con `blocksWith`
+  (`RESOURCE_PRICE_PENDING`, `RESOURCE_PRICE_NOT_EFFECTIVE`, `CATALOG_RESOURCE_PRICE_REQUIRED` o
+  `UNSUPPORTED_TOOL_PRICE_UNIT`) y `reason`. Los `candidates` de `RESOURCE_ALLOCATION_REQUIRED` y de
+  `RESOURCE_PRICE_SELECTION_REQUIRED`, y `availability` de `resources inspect`, siguen la misma lectura.
+
+### Los diagnósticos de asientos dicen cuántos faltan
+
+`INSUFFICIENT_NAMED_SEAT_CAPACITY` trae en `detail` cuántos asientos necesita el período y cuántos provee la demanda
+(pagados uno a uno y en uso, y de capacidad de paquete), o que un precio por paquete no declara `seatCapacity`.
+`TEAM_CONTRACT_CAPACITY_REQUIRED` trae el mínimo de asientos con que se vende el plan (`minimumContractSeats` de la
+policy), los que la asignación tiene que sentar y el menor `contractSeatCount` que cumple los dos. Sólo cuentas:
+nunca quiénes son.
+
+### Un registro reemplazado no es un vencimiento
+
+`resources inspect` listaba bajo `priceReview.expired`, con el diagnóstico con que bloquearía, todo registro del
+catálogo cuya vigencia había pasado. Cuando otro registro vigente responde la misma selección (otro id para el
+mismo par de monedas, el mismo costo o la misma regla), una cotización elige ése y nada se bloquea. Ese registro
+sale ahora bajo `priceReview.superseded`, con `supersededBy` y `blocksWith` `null`; sólo una demanda o un brief que
+lo nombre por su id tiene que nombrar el que lo reemplazó. Uno todavía vigente al que otro responderá desde el día
+siguiente a su término se queda en `dueSoon`, también sin bloqueo. Con `--current` y fecha 2026-10-11:
+`expired` vacío y una entrada en `superseded`, la referencia EUR→USD de un solo día, reemplazada por `fx:EUR:USD`.
+
+### Lo que sigue abierto
+
+- Queda una comparación por texto: `PROVISION_COST_EVIDENCE_REQUIRED` reconoce las provisiones de prueba por su
+  etiqueta. Cerrarla pide un dato declarado en los registros de recursos del catálogo.
+- Una cotización bloqueada repite el mismo diagnóstico una vez por período.
+- Un solo documento con dos alternativas de una misma oferta no existe: son dos cotizaciones y dos documentos.
+- Los `*.assessment.json` versionados (los de ejemplos anteriores y los de una carpeta de prospecto) son fotos de su
+  fecha, anteriores al assessment plegado. No se regeneran.
+- Lo abierto y lo no modelado de la sección anterior sigue igual.
+
+Estado verificado al cierre del 2026-10-11: `pnpm pricing:v3:test`, 33 archivos y 1640 pruebas; los 36 artefactos
+versionados se reproducen con `"verified": true`.
+
 ## Las piezas y sus versiones
 
 | Pieza                     | Contrato ejecutable                                         | Qué recibe y qué devuelve                                                                      |
@@ -1050,7 +1204,8 @@ reinterpretan con la versión más reciente.
 El agente interpreta el pedido y el alcance. El dominio resuelve IDs, valida selecciones y calcula.
 `scaffold` prepara una demanda editable y preguntas: no adivina plan, divisor, usuarios reales o presupuesto IA.
 Los IDs `planned-*` representan capacidad por confirmar: el andamio los escribe como `planned-<lineId>-<n>` y se
-reemplazan por un id anónimo estable, que nombra el puesto y se repite igual donde es la misma persona.
+quedan así mientras nadie esté asignado. Se reemplazan por un id anónimo estable, que se repite igual donde es la
+misma persona, sólo cuando hay una persona específica (cierre, 2026-10-11).
 Precio total y unidad (2026-10-11, última): `scaffold` ya no supone la unidad comercial; la lee del registro `offer`
 de la oferta en el catálogo, y si el catálogo no la declara la deja en `null` y la pregunta. `plan` incorpora el reparto de la cuenta declarada;
 `compose quote` congela la demanda y las tres fuentes. `explain` y `replay` usan esa evidencia congelada.
@@ -1334,7 +1489,9 @@ Motor 1.2 (2026-10-11): `assess` sigue leyendo sólo `MARGIN_BELOW_FLOOR` y el t
 fila 1.2.0 trae `floorNet` y `netShortOfFloor`. `modeledRate` es el margen real: con un factor de mercado cuyo piso
 acompaña al mercado base puede estar bajo el mínimo de la política con `linesBelowFloor` vacío. Una fila 1.2.0 o
 posterior cuyo piso se lee sobre el neto final (cliente en Chile, con la forma declarada) trae las tres claves:
-`marginAmountShortOfFloor`, `floorNet` y `netShortOfFloor`.
+`marginAmountShortOfFloor`, `floorNet` y `netShortOfFloor`. La excepción es una fila llevada a neto cero (una puesta
+en marcha bonificada): sin neto no hay margen que medir sobre él, y trae `marginAmountShortOfFloor` y
+`marginRateRoundedDown` en `null` junto a las otras dos.
 
 Versiones vigentes (2026-10-11): `assess` agrega `costEvidencePriority`, el orden en que conviene confirmar los
 datos estimados del costo. Trae `currency`, `estimatedCost`, `confirmedCost`, `estimatedShareOfCost`, desde el
@@ -1445,8 +1602,10 @@ Motor 1.2 (2026-10-11), qué imprime cada comando. No hay comandos, flags ni có
   `totals` y los totales por período agregan `marketAdjustment`.
 - `marginFloor.lines[]`: en una fila 1.2.0 o posterior (también 1.3.0 y 1.4.0, es decir, toda cotización que declara
   la forma del trabajo) cada línea marcada agrega `floorNet` y `netShortOfFloor` (`floorNet − net`). Si el piso de esa fila se lee sobre el mercado base (`ρ < 1`), `marginAmountShortOfFloor` es
-  `null`: esa cifra sería la del mercado base. Si `ρ = 1` se conserva junto a las dos nuevas. `net`, `marginAmount`
-  y `marginRateRoundedDown` son siempre los reales.
+  `null`: esa cifra sería la del mercado base. Si `ρ = 1` se conserva junto a las dos nuevas, salvo en una fila con
+  neto cero, donde también es `null`. `net`, `marginAmount` y `marginRateRoundedDown` son siempre los reales
+  (`marginRateRoundedDown` es `null` con neto cero). Desde el cierre del 2026-10-11, `marginFloor.netShortOfFloor`
+  trae el total que falta sobre todas las filas marcadas.
 - `compose assess`: `margin.policyFloor` agrega `marketFactor` cuando no es neutral; `linesBelowFloor` trae las
   mismas claves nuevas por línea.
 - `explain` (catálogo y composición): `commercialAdjustments` agrega `marketFactor` cuando la quote es 1.2.0, la
@@ -1489,9 +1648,10 @@ Versiones vigentes (2026-10-11), qué imprime cada comando. Hay un comando nuevo
   corrida, no la cotización: no se guarda en el artefacto, `replay` no lo imprime y la clave no existe cuando no hay
   nada que avisar. Nunca bloquea; se informa al operador junto al resultado. Forma de las dos claves:
   [contrato](cotizador-v3-contrato-y-validacion.md#resumen-avisos-de-la-corrida-y-exposición-a-estimados-2026-10-11).
-- `resources inspect` agrega `priceReview` (`{ withinDays, reviewDue, dueSoon, expired }`): fechas de revisión ya
-  pasadas, fechas que caen en los próximos 30 días y vigencias que ya terminaron. Sólo estas últimas bloquean una
-  cotización de esa fecha. Con `--current` incluye además el digest del catálogo de créditos.
+- `resources inspect` agrega `priceReview` (`{ withinDays, reviewDue, dueSoon, expired }` y, desde el cierre del
+  2026-10-11, `superseded`): fechas de revisión ya pasadas, fechas que caen en los próximos 30 días, vigencias que
+  ya terminaron sin que nada responda por ellas y registros a los que otro vigente reemplazó. Sólo las de `expired`
+  bloquean una cotización de esa fecha. Con `--current` incluye además el digest del catálogo de créditos.
 - `compose assess` agrega `costEvidencePriority`, descrito en la sección de evaluación.
 - `compose split --input <artefacto> --tools <ids|all>` presenta una cotización ya calculada en dos cifras por
   fila, la persona y un kit con las herramientas elegidas, sin cambiar el total. Sirve para vender una persona por
@@ -1915,6 +2075,42 @@ Corridas de control del 2026-10-11, con `--current` (catálogo v11, policy v11):
 | Ese documento generado con la plantilla | 0 | Cuatro páginas |
 | `compose workload --brief` del ejemplo `managed-care` | 0 | `primary` y `backup` con `dedicationEvidence` `estimated`, referencia `workload:managed-care-extended-example-v1` |
 | `replay` de los 36 artefactos versionados | 3 o 0 | Todos `"verified": true` |
+
+Cierre (2026-10-11), qué imprime cada comando. No hay comandos nuevos; hay una opción nueva de un ajuste, un campo
+nuevo de la demanda y claves nuevas, todas aditivas.
+
+- `compose scaffold`: `work[].tasks` vacío; `profileTasks` en la pregunta de cada línea; `candidates` con los precios
+  utilizables y `unavailablePrices` con los demás.
+- `compose prepare` y `compose quote`: un `agreed_total` con `per` lo repite en `agreedTotals`, con
+  `agreedNetOverTerm` si es por período; `marginFloor.netShortOfFloor` cuando hay filas marcadas con su neto mínimo;
+  `detail` en `INSUFFICIENT_NAMED_SEAT_CAPACITY` y `TEAM_CONTRACT_CAPACITY_REQUIRED`, y en
+  `RESOURCE_PRICE_NOT_EFFECTIVE`, `CATALOG_RESOURCE_PRICE_REQUIRED` y `UNSUPPORTED_TOOL_PRICE_UNIT`.
+- `compose plan`: un recurso del portfolio admite `evidence` y la entrega a sus asignaciones.
+- `compose assess`: `gapOccurrences`; `periodIds` en las brechas de un período; rutas `tools.<toolId>` y
+  `result.lines.<lineId>`; `USER_ASSIGNMENT_REQUIRED` en `work.assigneeIds`; `ALLOCATION_EVIDENCE_REQUIRED` por la
+  evidencia declarada.
+- `compose document`: `per` en `combine`, `buyer.contact` en el brief. Reglas nuevas de
+  `QUOTE_DOCUMENT_BRIEF_INVALID` en `combine`: `unit_not_allowed_per_period` e `invalid_per`.
+- `resources inspect`: `priceReview.superseded`.
+
+Corridas de control del cierre del 2026-10-11, con `--current` (catálogo v11, policy v11):
+
+| Corrida | Salida | Resultado |
+| --- | --- | --- |
+| Una copia de `designer-three-months-iva.demand.json` vendida On-Going, a precio de política | 3 | Neto 7.250.000: 2.610.000, 2.320.000 y 2.320.000 |
+| Esa copia con un `agreed_total` de 2.450.000 y `per: "period"` sobre `design` | 3 | Tres períodos de 2.450.000; neto 7.350.000; impuesto 1.396.500; `agreedNetOverTerm` 7.350.000; `differenceFromPolicyNet` 100.000; primer mes 2.177.700 y 272.300; margen 0,3104; ninguna fila marcada |
+| La misma con 2.420.000 | 3 | Neto 7.260.000, 10.000 sobre la política; la fila mensual del primer mes marcada (2.151.100 contra 2.163.606); `marginFloor.netShortOfFloor` 12.506; margen 0,3019 |
+| `compose document` de la de 2.450.000, con `combine` de `design` y `design:setup` y `per: "period"` | 3 | Una línea «3 meses» a 2.450.000, neto 7.350.000; `taxAmount` 1.396.500, `taxPeriods` 3. Generado: cuatro páginas |
+| El mismo brief con `unit` en esa entrada, o con `per: "month"` | 1 | `QUOTE_DOCUMENT_BRIEF_INVALID`: `unit_not_allowed_per_period` en `combine.0.unit`; `invalid_per` en `combine.0.per` |
+| Un `agreed_net` con `per`, o un `agreed_total` con `per: "month"` | 1 | `SCHEMA_INVALID`: `unrecognized_keys`; `invalid_enum_value` con `allowed` `term` y `period` |
+| `compose assess` de `managed-addon-increment.artifact.json` | 3 | 16 entradas, `gapOccurrences` 36; `ALLOCATION_EVIDENCE_REQUIRED` en sus cuatro herramientas, con `periodIds` 1 a 3 |
+| `compose assess` del programa SEO/AEO de tres meses, con evidencia `estimated` en sus asignaciones y sus cupos sin asignar | 3 | 12 entradas, `gapOccurrences` 26; `ALLOCATION_EVIDENCE_REQUIRED` en tres herramientas; `USER_ASSIGNMENT_REQUIRED` una vez, por 2 cupos |
+| `compose scaffold` de ese brief | 2 | `work[].tasks` vacío; `profileTasks` `seo-writing` en la línea del especialista; en SEMrush, `current` bajo `unavailablePrices` con `RESOURCE_PRICE_PENDING` |
+| Una asignación de ChatGPT Business sin `contractSeatCount` | 2 | `TEAM_CONTRACT_CAPACITY_REQUIRED` en `1:chatgpt`, con el mínimo de 2 en `detail`; con `contractSeatCount` 2 calcula, y con 5 da el mismo costo |
+| La asignación de Adobe de `designer-on-demand` sin `seatCapacity` | 2 | `INSUFFICIENT_NAMED_SEAT_CAPACITY` en `1:adobe`: un paquete sin `seatCapacity` |
+| `resources inspect --current --date 2026-10-11` | 0 | `expired` vacío; `superseded` con `fx:EUR:USD:ECB:2026-10-09`, `supersededBy` `fx:EUR:USD` |
+| `replay` de `designer-startup-courtesy.artifact.json` | 3 | La puesta en marcha bonificada, marcada con `net` 0, `marginAmountShortOfFloor` `null`, `floorNet` y `netShortOfFloor` 266.667; `marginFloor.netShortOfFloor` 266.667 |
+| `pnpm pricing:v3:test` | 0 | 33 archivos, 1640 pruebas |
 
 Las cifras son evidencia fechada de esas corridas, no un contrato.
 [Evidencia de comandos](../../../data/pricing/v3-operating/verification.cli.json). El inventario vivo, salarios

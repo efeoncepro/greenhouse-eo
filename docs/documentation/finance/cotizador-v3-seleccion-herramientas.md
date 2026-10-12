@@ -235,9 +235,10 @@ entera (una de tres) y se informa como supuesto; cargarla por dedicación lo dec
 cotización, el costo de una herramienta se reparte entre las líneas que la usan por asiento, no por horas.
 
 **Un precio puede no tener importe.** `resources inspect` muestra cada precio de una herramienta con su
-disponibilidad: `needs_input` (hoy no tiene importe: está pendiente, fuera de vigencia o su registro no trae
-monto) o `reference_only` (tiene un importe vigente; es una referencia porque un precio no prueba que el asiento
-exista ni que el plan sea el contratado). `historical` es el nombre de un precio: el valor del Excel histórico,
+disponibilidad: `needs_input` (una asignación no puede nombrarlo ese día: está pendiente, fuera de vigencia, su
+registro no trae monto o se cobra una sola vez; desde el cierre del 2026-10-11 es la misma lectura con que la
+composición pone precio) o `reference_only` (tiene un importe vigente; es una referencia porque un precio no prueba
+que el asiento exista ni que el plan sea el contratado). `historical` es el nombre de un precio: el valor del Excel histórico,
 marcado estimado. En la policy vigente (v11, leída con `--date 2026-10-12`), el precio `current` de 22 de las 33 herramientas está en
 `needs_input`; HubSpot no tiene ningún precio con importe, a propósito. La demanda
 nombra entonces otro precio de la misma herramienta —un plan público o el histórico— y esa elección es un supuesto
@@ -246,8 +247,9 @@ existe, con `RESOURCE_PRICE_SELECTION_REQUIRED` y los precios utilizables en `ca
 
 **El andamio pregunta por lo que el brief permite saber.** `compose scaffold` recibe sólo un brief: pregunta por
 las herramientas base (Notion y Microsoft 365) y por las de las tareas de la receta de cada perfil. Lo que el
-trabajo agrega se declara en `work[]`: tareas adicionales (`tasks`), herramientas de IA con su motivo
-(`aiToolIds`, `aiSelectionReason`) y, para un servicio, `serviceToolIds`. Se declara sólo lo que el negocio
+trabajo agrega se declara en `work[]`: tareas más allá de la receta del perfil (`tasks`, que el andamio deja vacío
+desde el cierre del 2026-10-11), herramientas de IA con su motivo (`aiToolIds`, `aiSelectionReason`) y, para un
+servicio, `serviceToolIds`. Se declara sólo lo que el negocio
 compromete. Una herramienta de créditos pide además su demanda (`work[].creditDemand`, créditos enteros por
 proveedor y mes) y su presupuesto (`creditBudgets`, uno por herramienta y mes, con fechas dentro del mes
 calendario de ese período contado desde la fecha de la cotización).
@@ -257,4 +259,55 @@ calendario de ese período contado desde la fecha de la cotización).
 trabajo —excluyendo con su motivo la tarea que la pide— y se dice en las condiciones del documento que la aporta el
 cliente.
 
+Paso a paso: [manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#paso-2--componer-la-demanda).
+
+## Evidencia de la asignación, precios utilizables y cuentas de asientos (2026-10-11, cierre)
+
+Tres agentes repitieron los mismos negocios con la documentación reescrita y sin abrir el código. Lo que todavía
+tropezó en la selección de herramientas es lo que sigue. Es aditivo: ninguna policy cambió y todas las cotizaciones
+congeladas se reproducen igual.
+
+**De dónde sale una asignación es un dato, no una frase.** Cada asignación de la demanda admite `evidence`
+(referencia, vigencia y estado): el plan contratado, sus asientos y la parte que carga la cuenta, y si eso está
+confirmado. No bloquea ni cambia ningún costo. `compose assess` levanta `ALLOCATION_EVIDENCE_REQUIRED` por cada
+herramienta cuya asignación no la declara, la declara sin confirmar o con una vigencia que no incluye la fecha de la
+cotización. Antes esa brecha dependía de que el `reason` contuviera ciertas palabras en inglés; ya no se lee lo que
+dice. Una hipótesis se declara `estimated` y la brecha lo informa; `confirmed` corresponde sólo con la factura o la
+consola del proveedor a la vista. Las herramientas que se compran en créditos no llevan asignación ni esta brecha.
+Ninguna demanda versionada de `data/pricing/v3-operating/` declara `evidence`: son anteriores al campo.
+
+**El andamio ofrece sólo los precios que sirven.** La pregunta de cada herramienta trae en `candidates` los precios
+que una asignación puede nombrar a la fecha de la cotización, y en `unavailablePrices` los demás, cada uno con el
+diagnóstico que daría nombrarlo y su motivo. No toda herramienta tiene un precio llamado `current`: Claude Team,
+Vercel, GCP, los créditos de Notion y el consumo de agentes sólo tienen precios con otro nombre.
+
+**Lo que escribe el andamio en `work[]`.** `tasks` viene vacío: la receta del perfil se aplica sola y sale en la
+pregunta de la línea (`profileTasks`); en `tasks` van sólo las tareas del trabajo más allá de la receta, y una tarea
+de la receta se quita sólo con `excludedProfileTasks`. `assigneeIds` trae un cupo por persona
+(`planned-<lineId>-<n>`), que se queda mientras nadie esté asignado y se reemplaza por un id anónimo estable sólo
+cuando hay una persona específica asignada. Los asientos se cuentan por id distinto.
+
+**Tres campos de una asignación que no estaban explicados.**
+
+| Campo | Cuándo se declara | Qué pasa si falta |
+| --- | --- | --- |
+| `seatCapacity` | Una herramienta nominativa con precio por paquete (`basis` `package`): Adobe, y también los precios `historical` de Notion o de Figma. Es cuántas personas sienta lo que se compra | `INSUFFICIENT_NAMED_SEAT_CAPACITY`; si supera los asientos incluidos del plan por la cantidad de paquetes, `PACKAGE_SEAT_CAPACITY_EXCEEDED` |
+| `contractSeatCount` | Un precio que se vende con un mínimo de asientos por contrato (`minimumContractSeats`: 2 en los planes de equipo de ChatGPT y de Claude). Es cuántos asientos tiene el contrato entero | `TEAM_CONTRACT_CAPACITY_REQUIRED`. No mueve el costo, que sigue siendo cantidad por precio por parte atribuida |
+| `driver` en horas | Una persona a tiempo parcial: `totalUnits` las horas de un mes a tiempo completo y `allocatedUnits` las de la cotización. `driver.unit` es un nombre libre | Nada: el cotizador sólo comprueba que `serviceShare` sea el cociente |
+
+**Los diagnósticos de asientos traen sus cuentas.** `INSUFFICIENT_NAMED_SEAT_CAPACITY` dice en `detail` cuántos
+asientos necesita el período y cuántos provee la demanda; `TEAM_CONTRACT_CAPACITY_REQUIRED`, el mínimo del plan, los
+asientos que la asignación sienta y el menor `contractSeatCount` que sirve.
+
+**Herramientas compartidas y del servicio.** Una herramienta compartida (SEMrush, HubSpot, Metricool) se declara con
+los paquetes que se pagan y la parte que carga la cotización. No hay regla para el denominador —cuentas, proyectos,
+usuarios o consumo—: es un supuesto que se escribe en `driver` y en `reason` y se informa. `serviceToolIds` nombra
+las herramientas que usa el servicio y no la tarea de una persona: entran en todas las líneas de la cotización y su
+costo se reparte entre ellas.
+
+**Una persona más sobre una suscripción de créditos que ya existe.** Su presupuesto declara cuántos créditos de la
+suscripción mensual quedan libres para la cotización y cuántos toma; el resto se compra en packs. Cuántos quedan
+libres no está medido: es una hipótesis que se informa como tal.
+
+Reglas y claves: [contrato](cotizador-v3-contrato-y-validacion.md#evidencia-de-una-asignación-allocationsevidence-2026-10-11-cierre).
 Paso a paso: [manual](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md#paso-2--componer-la-demanda).

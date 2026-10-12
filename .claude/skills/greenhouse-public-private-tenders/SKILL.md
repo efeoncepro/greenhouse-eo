@@ -259,16 +259,21 @@ servicio gestionado creativo (`creative-managed-service`, objetivo y piso 45%), 
 (`seo-aeo-managed-service`, objetivo 55%, piso 45%) y una persona vendida por dedicación (staff augmentation,
 `talent-assurance-staffing`, objetivo 30/35/40% por tier, piso 25%); elegir por práctica y unidad vendida, y la
 excepción de una cuenta nunca es referencia para otra.
-Si las bases piden un trabajo acotado con hitos, decláralo `engagementForm: "on_demand"`: es la forma del compromiso,
-no una cuarta oferta (+10% al precio sobre On-Going, mismo piso). **Una licitación cotiza un precio de programa:**
-declara ese precio como `agreed_total` (un neto por todo el plazo, todos los periodos juntos; `agreed_net` es por
-periodo y no sirve para esto) y en el documento imprime la línea como «1 programa» con `combine` y
-`cover.netLabel`; con impuesto exclusivo, cada hito de pago sale con su neto, su impuesto y su total. La unidad
-comercial la fija el catálogo (un servicio gestionado es `managed_service`). El presupuesto máximo del comprador y
-su fórmula de puntaje no están modelados. Pasos y ejemplo que cotiza:
+Si las bases piden un trabajo acotado (alcance, plazo y aceptación), decláralo `engagementForm: "on_demand"`: es la
+forma del compromiso, no una cuarta oferta (+10% al precio sobre On-Going, mismo piso). **Una licitación cotiza un
+precio de programa:** declara ese precio como `agreed_total` (un neto por todo el plazo, todos los periodos juntos;
+`agreed_net` y `agreed_total` con `per: "period"` son por periodo y no sirven para esto) y en el documento imprime
+la línea como «1 programa» con `combine` y `cover.netLabel`. **Los hitos de pago se declaran sólo si las bases los
+fijan**, con sus porcentajes y sus momentos (con impuesto exclusivo, cada uno sale con su neto, su impuesto y su
+total); si las bases no fijan cuotas, el documento no lleva calendario de pagos y la forma de pago va como condición,
+remitida a las bases: nunca inventar cuotas mensuales porque el programa dura varios meses. **Lo que las bases
+exigen que la oferta declare (plazo de ejecución, vigencia de la oferta, forma de pago) se declara en el documento
+como lo piden**; la regla de no escribir lo obvio sobre el inicio vale para una cotización comercial, no para un
+requisito de las bases. La unidad comercial la fija el catálogo (un servicio gestionado es `managed_service`). El
+presupuesto máximo del comprador y su fórmula de puntaje no están modelados. Pasos y ejemplo que cotiza:
 [procedimiento](../efeonce-pricing-operator/references/cotizador-v3-agent-workflow.md#73-un-programa-de-tres-meses-en-una-licitación--tender-programme). Antes de comprometer la oferta revisa `compose
-schedule` (calendario de pagos por hito) y `compose commitments` (compromisos con proveedores que sobreviven al
-encargo); `compose cash` no es margen ni decide precio. Una licitación con producción y medios ya se cotiza completa
+schedule` (calendario de pagos, cuando las bases fijan hitos) y `compose commitments` (compromisos con proveedores
+que sobreviven al encargo); `compose cash` no es margen ni decide precio. Una licitación con producción y medios ya se cotiza completa
 (contrato 1.4.0, 2026-10-11): cada costo que se compra y se refactura es una fila propia con la regla de su categoría
 (producción, talento e impresión: 10% de gestión con piso 5%; medios y licencias: al costo) y lo que el cliente paga
 directo es una nota sin total. 🔴 Con terceros el piso se lee sobre el margen del trabajo propio (`ownWork`), nunca

@@ -489,7 +489,7 @@ GCP/Vercel se atribuyen desde capacidad declarada, dejando interno/sin asignar v
 `managed_service` conserva funciones de diseño/dirección/cuenta como costos internos y preview agrega fee;
 no cambia la política de vender capacidad/lane ni SOW/rights/QA. **`compose assess` juzga cada línea contra el objetivo y el piso de su
 propia oferta (aquí 45%/45%); ya no compara contra un 40/35 genérico.** `assess` sólo reporta gaps, nunca aprueba excepción.
-Una excepción bajo el piso la decide sólo el CEO, caso a caso: SKY social care 2027 (40,26%) es una y nunca sirve
+Una excepción bajo el piso la decide sólo el CEO, caso a caso: SKY social care 2027 es una y nunca sirve
 de referencia para otra cuenta; donde se puede ganar más se sube el objetivo de esa oferta, no el piso.
 Staff augmentation (una persona vendida por dedicación, oferta `talent-assurance-staffing`) tiene su propio piso de
 25% (CEO, 2026-10-11): es otro producto y nunca se elige para bajar el piso de un servicio creativo gestionado.

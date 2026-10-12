@@ -119,7 +119,12 @@ Al revisar sus páginas, tres cosas son correctas y no un defecto: una línea «
 opcionales con su valor neto y su unidad; no entran en ningún total) y una nota tributaria que abre la página
 siguiente junto al bloque que le sigue, mientras los totales quedan bajo su tabla (una nota sola en una página sí es
 un defecto). También son correctos una línea «1 programa» o «1 proyecto» sin valor unitario (un precio por el trabajo
-completo, `combine`), un calendario de pagos con neto, impuesto y total por hito, y un encabezado interior sin unidad
-del cliente o un calendario sin nota (son textos opcionales: no pedir que se rellenen). Comprobar que el total no
-incluye las opciones.
+completo, `combine`), una sola línea «n meses» por un valor mensual que ya incluye la puesta en marcha (un valor
+mensual con todo incluido, `combine` con `per: "period"`: no falta una línea de puesta en marcha), un calendario de
+pagos con neto, impuesto y total por hito, un documento **sin** calendario de pagos (los hitos van sólo cuando el
+negocio los tiene: no pedir que se agreguen), una línea «Atención: …» bajo el nombre del cliente en la portada
+(`buyer.contact`), el cliente nombrado una sola vez en ese bloque, y un encabezado interior sin unidad del cliente o
+un calendario sin nota (son textos opcionales: no pedir que se rellenen). En una oferta de licitación, las
+condiciones que repiten lo que piden las bases (plazo de ejecución, vigencia, forma de pago) no son relleno.
+Comprobar que el total no incluye las opciones.
 Verificar pixels de todas las páginas del documento que se entregue.

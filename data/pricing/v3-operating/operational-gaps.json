@@ -188,6 +188,30 @@
       "owner": "Platform/Finance",
       "required": "The agreed next step: the Greenhouse quoter adopts this document design and provides what it lacks. Not started",
       "known": "As of 2026-10-11 the document produced by compose document is a draft: it has no quote number, versions, QR verification, signatures or approval, which exist only in the Greenhouse quoter. Related: CANONICAL_PROMOTION. Outside the quoter by the CEO’s decision of 2026-10-11, and not a pending item: the start date of the service and the length of the contract, because a quote is not a contract"
+    },
+    {
+      "code": "PROVISION_EVIDENCE_READ_FROM_LABEL",
+      "owner": "Platform/Finance",
+      "required": "A declared fact on the resource records of the catalog that says a provision is a test placeholder or is not measured, so that compose assess reads that fact instead of the words of a label",
+      "known": "Open as of 2026-10-11 (close). One free-text match remains in compose assess: PROVISION_COST_EVIDENCE_REQUIRED recognises the test provisions by their label («TEST ONLY», «NOT MEASURED», «trial»). The other one was closed the same day: ALLOCATION_EVIDENCE_REQUIRED reads the evidence an allocation declares (allocations[].evidence) and no longer the wording of its reason. A provision relabelled without those words would stop raising the gap while staying unmeasured. Closing it needs a new catalog version. Related: ASSURANCE_OPERATIONS_ONBOARDING_COSTS, MANAGED_SERVICE_PROVISIONS_UNMEASURED"
+    },
+    {
+      "code": "BLOCKERS_REPEATED_PER_PERIOD",
+      "owner": "Platform",
+      "required": "The blockers of a quote that did not calculate folded by period like the gaps of a calculated one: one entry with its periodIds",
+      "known": "Open as of 2026-10-11 (close). compose assess folds the gaps of a calculated quote that differ only in their period, and counts them before folding in gapOccurrences. A blocked quote still repeats the same diagnostic once per period, under the path the quote reported it with (<period>:<tool>), in the summary and in compose assess alike: a tool without an allocation in a twelve-month quote is twelve entries"
+    },
+    {
+      "code": "QUOTE_DOCUMENT_ALTERNATIVES_NOT_MODELLED",
+      "owner": "Commercial/Platform",
+      "required": "If one document is to present two alternatives of one offer: a block that prints each alternative with its own lines, net, tax and total, taken from its own frozen quote",
+      "known": "Not modelled as of 2026-10-11 (close). Two alternatives of one offer (for instance the same service sold On-Demand and On-Going, or two scopes) are two quotes and two documents. The options block of the document (--option, --increment) is for add-ons that are added to the quote: an option enters no line, net, tax or total, so it cannot stand for an alternative that replaces the quote"
+    },
+    {
+      "code": "ASSESSMENT_SNAPSHOTS_PREDATE_FOLDED_READING",
+      "owner": "Platform",
+      "required": "Nothing owed. If a committed reading is ever needed as a reference of today's shape, run compose assess on its artifact instead of reading the committed file",
+      "known": "As of 2026-10-11 (close). The committed derived readings (*.assessment.json of older examples of this folder and of one prospect folder) predate the folded assessment: one gap per period, paths <period>:<tool>, no gapOccurrences, and ALLOCATION_EVIDENCE_REQUIRED read from the wording of reason. They are dated snapshots and are not regenerated. No committed demand of this folder declares allocation evidence, so today's reading raises ALLOCATION_EVIDENCE_REQUIRED for every tool with an allocation of every example"
     }
   ]
 }

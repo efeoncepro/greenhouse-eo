@@ -77,7 +77,13 @@
         "totalUnits": "1",
         "allocatedUnits": "0.5"
       },
-      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant."
+      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-04-30",
+        "status": "estimated"
+      }
     },
     {
       "periodIds": [
@@ -97,7 +103,13 @@
         "totalUnits": "1",
         "allocatedUnits": "0.5"
       },
-      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant."
+      "reason": "Example: one named seat for the person; this account carries the half of it that matches the declared dedication (90 of 180 hours). Not a real portfolio or an access grant.",
+      "evidence": {
+        "reference": "example: plan, seats and share declared for this example; not checked against an invoice or a seat register",
+        "effectiveFrom": "2026-10-01",
+        "effectiveUntil": "2027-04-30",
+        "status": "estimated"
+      }
     }
   ],
   "creditBudgets": [],
