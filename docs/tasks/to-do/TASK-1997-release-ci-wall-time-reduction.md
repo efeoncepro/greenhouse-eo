@@ -1,5 +1,20 @@
 # TASK-1997 — Releases más cortos: un solo CI por árbol, CI en paralelo y smoke automático
 
+## Delta 2026-10-12
+
+- **El límite del paso Test ya se alcanzó, y se subió como medida temporal** — hecho en la sesión «Cotizador V3»
+  a pedido del operador. El CI de `develop` del 2026-10-12 (run `38251290729`) se cortó a los 14:00 con 1.879 de
+  ~2.121 archivos corridos y ninguna prueba fallida. Medido sobre los últimos 14 runs: la misma suite tarda 7,3 min
+  en unos runners y 13,0–13,2 min en otros (436 s contra 778–784 s según Vitest, todas las fases escaladas 1,8
+  veces: hardware más lento, no menos workers); a ~0,042 s por prueba en un runner lento, 20.595 pruebas son
+  ~14,4 min.
+- Límites nuevos: `ci.yml` Test 14 → 24 min y job 30 → 38; `ci-deep.yml` Coverage 21 → 32 min y job 25 → 40 (con
+  18.540 pruebas tardaba 17,2–18,1 min; a 20.595 son ~20,1 min, así que el próximo push a `main` en un runner lento
+  lo habría cruzado).
+- **Esto compra tiempo, no resuelve nada:** la suite se duplica cada tres meses (9,8k pruebas el 2026-07-18, 18,5k
+  el 2026-10-05, 20,6k el 2026-10-12). El Slice 5 (setup por entorno) y los shards de esta task siguen siendo la
+  cura. Los valores de «Already exists» más abajo quedan actualizados con los límites nuevos.
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -136,10 +151,11 @@ Reglas obligatorias:
 
 ### Already exists
 
-- `.github/workflows/ci.yml`: un job `quality` (`timeout-minutes: 30`) que corre en `pull_request` y en
-  `push` a `main` y `develop`, con Lint, Typecheck, Test (`timeout-minutes: 14`) y Build en serie.
-- `.github/workflows/ci-deep.yml`: job `coverage` (`timeout-minutes: 25`; paso `pnpm test:coverage` con
-  `timeout-minutes: 21` desde PR #252), sólo en `push` a `main`.
+- `.github/workflows/ci.yml`: un job `quality` (`timeout-minutes: 38` desde el 2026-10-12; antes 30) que corre en
+  `pull_request` y en `push` a `main` y `develop`, con Lint, Typecheck, Test (`timeout-minutes: 24`; antes 14) y
+  Build en serie.
+- `.github/workflows/ci-deep.yml`: job `coverage` (`timeout-minutes: 40`; antes 25; paso `pnpm test:coverage` con
+  `timeout-minutes: 32`, antes 21 desde PR #252), sólo en `push` a `main`.
 - `.github/workflows/playwright.yml`: `workflow_dispatch` + `push` a `develop` con filtro de paths.
 - Preflight: `src/lib/release/preflight/registry.ts` con `ci_green` (`checks/ci-green.ts`) y
   `playwright_smoke` (`checks/playwright-smoke.ts`).

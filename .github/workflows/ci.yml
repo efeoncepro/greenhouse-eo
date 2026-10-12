@@ -34,7 +34,10 @@ jobs:
   quality:
     name: Fast feedback and conditional build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # 2026-10-12: 30 → 38, raised together with the Test step limit (14 → 24). Everything
+    # around Test takes ~8 min (lint 3.5, typecheck 2.5, setup and gates ~2); on main and on
+    # pull requests the build runs after it.
+    timeout-minutes: 38
     env:
       CI: true
       NEXT_TELEMETRY_DISABLED: 1
@@ -240,13 +243,25 @@ jobs:
 
       - name: Test
         run: pnpm test:results
-        # The full unit suite keeps growing (~9.8k tests as of 2026-07-18) and a
-        # green run on the 2-core runner now takes ~7-8 minutes: the previous
-        # timeout of 8 killed two healthy runs mid-suite with no vitest summary
-        # (release 9f00a1715 — both deaths at exactly start+8:00). Keep it
-        # bounded but with real headroom; a hung run still dies well before the
-        # job-level limit.
-        timeout-minutes: 14
+        # The limit follows the size of the suite, and the suite doubles about every
+        # three months: ~9.8k tests on 2026-07-18, 18.5k on 2026-10-05, 20.6k on
+        # 2026-10-12.
+        #
+        # Measured on 2026-10-12 over the last 14 runs: the SAME suite takes 7.3 min on
+        # some runners and 13.0-13.2 min on others (vitest reports 436 s against
+        # 778-784 s, every phase scaled by the same 1.8x: slower hardware, not fewer
+        # workers). On a slow runner that is ~0.042 s per test, so 20.6k tests need
+        # ~14.4 min: run 38251290729 was cut at 14:00 with 1,879 of ~2,121 files done
+        # and no test failed. The previous limit of 8 died the same way (release
+        # 9f00a1715).
+        #
+        # 24 min holds ~34k tests on a slow runner. This buys time, it does not fix it:
+        # the cure is TASK-1997 (a setup per environment instead of loading jest-dom,
+        # Testing Library and MSW for every one of ~2,100 files, which is 43% of the
+        # worker time; and the suite split in shards). If a green run passes ~18 min
+        # before that task lands, do it instead of raising this again.
+        # A hung run still dies well before the job-level limit.
+        timeout-minutes: 24
 
       - name: Test observability summary
         if: always()
