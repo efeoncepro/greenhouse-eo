@@ -172,3 +172,41 @@ antes y el después.
   ganada o perdida con HubSpot. Todos los estados los aplica un agente sin aprobación. Aceptar una cotización vencida
   está permitido: impedirlo no protegía (el agente podía volver a emitir y aceptar) y borraba el dato de que se aceptó
   tarde. Un tope de antigüedad, si alguna vez se quiere, será una regla del catálogo decidida por el CEO.
+
+## Delta 2026-10-12 — Productos y el cotizador: una identidad, dos responsabilidades
+
+El CEO señaló lo que el plan no había resuelto: el catálogo de Productos (roles, herramientas, recargos y servicios,
+cada uno con su SKU, sincronizado con HubSpot) se creó para que las cotizaciones compusieran desde ahí, y su
+propósito es la inteligencia de negocios: qué producto o servicio compuesto se cotiza más, se vende más, es más
+rentable, o se cotiza y no se vende. Medido ese día: el catálogo de V3 ya usa los mismos códigos para sus 32 perfiles
+(`ECG-###`) y 26 herramientas (`ETG-###`) —ambos nacieron del mismo libro de precios—, pero nada lo declara ni lo
+comprueba; no existe cruce para los servicios; y el cotizador actual tampoco guardaba el producto en sus líneas.
+
+Decidido por el CEO:
+
+1. **Productos nombra lo que se vende** (SKU, nombre, descripción, vínculo con HubSpot). **V3 decide cuánto cuesta y
+   a qué precio** (costos, márgenes, pisos, factores, reglas). Los registros del catálogo de V3 referencian su SKU de
+   forma explícita y un control avisa si se desalinean. No hay dos listas de lo que Efeonce vende.
+2. **Prevalece la forma de cotizar de V3.** El precio de un producto no es un número fijo por hora: es el resultado
+   del motor para una dedicación, un país, una forma de compromiso y un plazo. El precio que muestre Productos es una
+   referencia a jornada completa calculada por V3; los precios sembrados en abril dejan de ser precio vigente.
+3. **Un servicio gestionado es un producto compuesto**, con SKU propio y fijo, formado por otros productos (roles y
+   herramientas). El SKU identifica el servicio, no la cotización: cotizar mañana el mismo servicio reutiliza el
+   mismo SKU, y cada cotización tiene su propio número. El compuesto aporta identidad y una receta por defecto; la
+   oferta de V3 aporta la regla de precio; la cotización guarda la composición real. Hay servicios compuestos con
+   nombre (lista corta y curada) y uno genérico por práctica para cuando ninguno calza. Un SKU nuevo nace sólo al
+   definir un servicio nuevo en el catálogo, nunca por cotizar.
+4. **Line item y custom item.** Line item: línea ligada a un producto con SKU. Custom item: línea sin producto, con
+   motivo y categoría de una lista cerrada. Una línea sin producto no detiene al agente: se emite y se reporta. Para
+   que no se abuse: la CLI propone los SKU que calzan, lo repetido tiene producto genérico (puesta en marcha, costos
+   de terceros por categoría), una cotización con mucho monto en custom items queda marcada para revisión, y un
+   reporte muestra los custom items que se repiten para convertirlos en producto.
+
+Consecuencias: una versión nueva del catálogo de V3 con el vínculo declarado (las ya emitidas no cambian y las
+cotizaciones congeladas siguen reproduciéndose idénticas); la cotización nombra el SKU del compuesto y cada línea el
+de su componente; el registro gana una lectura por línea, reconstruible desde la cotización congelada, con SKU, neto,
+costo, margen y dedicación, que es la base de la inteligencia de negocios; y los datos generales que usan contratos,
+ingresos y reportes (línea de negocio, totales recurrentes). Nada de esto toca las tablas inmutables ya aplicadas.
+**Ninguna cotización real se registra antes de que esto exista** (`TASK-2031`). El precio de referencia en Productos
+es `TASK-2032`. Pendiente de corregir: el código `ETG-017` nombra cosas distintas en uno y otro catálogo.
+
