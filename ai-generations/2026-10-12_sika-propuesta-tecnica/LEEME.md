@@ -76,3 +76,7 @@ de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo 
 11. Sika respondió nuestra pregunta el 09/10 (registro en el research INTERNO): sin manual en esta etapa, cierre 16/10 a las 16:00 de Ciudad de México (19:00 de Santiago), historias en Instagram y Facebook, reel con adaptación para TikTok. Moneda y facturación siguen sin respuesta.
 12. El reel: la ficha pide «1 video tipo reel no mayor a 30 seg» y el anexo lleva storyboard (admitido por Sika el 06/10). Existe un animatic MP4 de 25 s sin audio; decidir si se termina con locución y música y se adjunta.
 13. Propuesta económica desglosada: sin empezar.
+
+## Voz: se le habla a Sika (12/10)
+
+El operador marcó que varias láminas contaban a un tercero lo que Sika dijo («Sika pidió», «Sika indicó», «Sika confirmó»). El deck se entrega a Sika: todo va en segunda persona (ustedes, su brief, sus respuestas en Wherex, «Qué significa para ustedes»). «Sika» queda sólo como nombre de la marca (el triángulo de Sika, el logotipo de Sika). El anexo gráfico todavía tiene frases en tercera persona (por ejemplo, en Audiencias).

@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Capa de motion del reel v2 (1080×1920, 25 s, fondo transparente): tipografía de la campaña sobre los planos filmados.
+     Se renderiza cuadro a cuadro con overlay-render.mjs (window.seek(t)) y se compone con montaje.sh. -->
+<html lang="es"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;500;800&family=Barlow:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+html,body{margin:0;background:transparent}
+#st{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:'Barlow Condensed',sans-serif;color:#fff}
+.abs{position:absolute}
+.vig{inset:0;background:radial-gradient(ellipse at 50% 45%,rgba(0,0,0,0) 55%,rgba(0,0,0,.55) 100%)}
+.word{left:84px;bottom:330px;font-weight:800;font-size:250px;line-height:.86;letter-spacing:-.01em;color:#FCC500;text-shadow:0 8px 40px rgba(0,0,0,.55)}
+.rule{left:90px;bottom:590px;width:150px;height:10px;background:#FCC500;transform-origin:left center}
+.w3{font-size:176px}
+#card{inset:0;background:#000}
+#uno{left:84px;top:690px;font-weight:800;font-size:380px;line-height:.82;letter-spacing:-.015em}
+#uno span{display:block}
+.y{color:#FCC500}
+.wipe{left:-1500px;top:-400px;width:700px;height:2800px;background:#FCC500;transform:rotate(13deg)}
+#prod{left:84px;bottom:300px}
+#prod .k{font-family:'Barlow',sans-serif;font-weight:600;font-size:34px;letter-spacing:.22em;color:#FCC500}
+#prod .n{font-weight:800;font-size:150px;line-height:.9;margin-top:10px;text-shadow:0 8px 40px rgba(0,0,0,.6)}
+#prod .s{font-family:'Barlow',sans-serif;font-weight:400;font-size:38px;margin-top:14px;text-shadow:0 4px 20px rgba(0,0,0,.7)}
+#sello{left:84px;top:210px;background:#FCC500;color:#141414;padding:18px 30px 22px;transform-origin:left top}
+#sello .a{font-weight:800;font-size:150px;line-height:.86}
+#sello .b{font-family:'Barlow',sans-serif;font-weight:600;font-size:27px;letter-spacing:.12em;margin-top:8px}
+#claim{left:84px;bottom:250px;line-height:.9;text-shadow:0 8px 40px rgba(0,0,0,.65)}
+#claim .l{font-weight:300;font-size:120px}
+#claim .h{font-weight:800;font-size:158px;color:#FCC500}
+#fin{inset:0;background:#FCC500}
+</style></head><body>
+<div id="st">
+  <div class="abs vig" id="vig"></div>
+  <div class="abs rule" id="r1"></div><div class="abs word" id="w1">BAÑO.</div>
+  <div class="abs rule" id="r2"></div><div class="abs word" id="w2">COCINA.</div>
+  <div class="abs rule" id="r3"></div><div class="abs word w3" id="w3">CANCELERÍA.</div>
+  <div class="abs" id="card"><div class="abs" id="uno"><span id="u1">UNO</span><span id="u2" class="y">SOLO.</span></div></div>
+  <div class="abs" id="prod"><div class="k" id="pk">NUEVO</div><div class="n" id="pn">SikaSeal<sup style="font-size:.4em">®</sup>-170</div><div class="s" id="ps">Sanisil · silicona antihongos</div></div>
+  <div class="abs" id="sello"><div class="a">2 EN 1</div><div class="b">ANTIHONGOS + USO GENERAL</div></div>
+  <div class="abs" id="claim"><div class="l" id="c1">Innovar para</div><div class="h" id="c2">simplificar.</div></div>
+  <div class="abs" id="fin"></div>
+  <div class="abs wipe" id="wp1"></div><div class="abs wipe" id="wp2"></div><div class="abs wipe" id="wp3"></div>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+gsap.set(['#w1','#w2','#w3','#r1','#r2','#r3','#card','#prod','#sello','#claim','#fin','#wp1','#wp2','#wp3'], { autoAlpha: 0 });
+const word = (w, r, t0, t1) => {
+  tl.set([w, r], { autoAlpha: 1 }, t0)
+    .fromTo(r, { scaleX: 0 }, { scaleX: 1, duration: .32, ease: 'power3.out' }, t0 + .05)
+    .fromTo(w, { clipPath: 'inset(0 100% 0 0)', x: -40 }, { clipPath: 'inset(-20% -5% -20% 0)', x: 0, duration: .42, ease: 'expo.out' }, t0 + .12)
+    .to(w, { x: 14, duration: t1 - t0 - .6, ease: 'none' }, t0 + .54)
+    .set([w, r], { autoAlpha: 0 }, t1);
+};
+word('#w1', '#r1', 4.0, 6.0); word('#w2', '#r2', 6.0, 8.0); word('#w3', '#r3', 8.0, 10.0);
+// 10–12 · corte a negro: UNO SOLO.
+tl.set('#card', { autoAlpha: 1 }, 10.0)
+  .fromTo('#u1', { scale: 1.5, autoAlpha: 0, transformOrigin: 'left center' }, { scale: 1, autoAlpha: 1, duration: .28, ease: 'expo.out' }, 10.12)
+  .fromTo('#u2', { scale: 1.5, autoAlpha: 0, transformOrigin: 'left center' }, { scale: 1, autoAlpha: 1, duration: .28, ease: 'expo.out' }, 10.62)
+  .to('#uno', { scale: 1.04, transformOrigin: 'left center', duration: 1.2, ease: 'none' }, 10.7)
+  .set('#wp1', { autoAlpha: 1 }, 11.74).fromTo('#wp1', { x: 0 }, { x: 3400, duration: .46, ease: 'power2.inOut' }, 11.75).set('#wp1', { autoAlpha: 0 }, 12.22)
+  .set('#card', { autoAlpha: 0 }, 11.97);
+// 12–17 · aplicación: nombre del producto
+tl.set('#prod', { autoAlpha: 1 }, 12.7)
+  .fromTo('#pk', { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: .35, ease: 'power3.out' }, 12.7)
+  .fromTo('#pn', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(-20% -5% -20% 0)', duration: .5, ease: 'expo.out' }, 12.85)
+  .fromTo('#ps', { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power2.out' }, 13.2)
+  .to('#prod', { autoAlpha: 0, duration: .18 }, 16.7);
+// 17–21 · héroe: sello 2 en 1 y titular
+tl.set(['#sello', '#claim'], { autoAlpha: 1 }, 17.25)
+  .fromTo('#sello', { scale: 1.6, autoAlpha: 0, rotation: -6 }, { scale: 1, autoAlpha: 1, rotation: 0, duration: .32, ease: 'back.out(1.6)' }, 17.3)
+  .fromTo('#c1', { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: .4, ease: 'power3.out' }, 18.0)
+  .fromTo('#c2', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(-20% -5% -20% 0)', duration: .5, ease: 'expo.out' }, 18.25)
+  // 20.6–21 · barrido amarillo hacia la firma
+  .set(['#wp2', '#wp3'], { autoAlpha: 1 }, 20.48).fromTo('#wp2', { x: 0 }, { x: 3400, duration: .5, ease: 'power2.in' }, 20.5)
+  .fromTo('#wp3', { x: -900, scaleX: 3 }, { x: 2200, duration: .4, ease: 'power2.in' }, 20.6)
+  .set('#fin', { autoAlpha: 1 }, 20.97)
+  .set(['#sello', '#claim', '#vig', '#wp2', '#wp3'], { autoAlpha: 0 }, 20.97)
+  .set('#fin', { autoAlpha: 0 }, 21.0)
+  .to({}, { duration: 4 }, 21);
+window.seek = t => { tl.seek(t, false); };
+</script></body></html>

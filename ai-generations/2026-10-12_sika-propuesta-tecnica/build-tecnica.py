@@ -151,7 +151,7 @@ def frame(name, alt, left, top, width, height, cap=None, hero=False, fit='cover'
 
 def means(text, src='', top=856):
     return zone(f'<div style="display: grid; grid-template-columns: minmax(0, 1fr) 520px; column-gap: 60px; padding-top: 16px; border-top: 1px solid {RULE}">'
-                f'<div>{label("Qué significa para " + CLIENT, INK)}<div style="font-size: 21px; font-weight: 400; line-height: 1.4; color: {INK}; margin-top: 8px">{text}</div></div>'
+                f'<div>{label("Qué significa para ustedes", INK)}<div style="font-size: 21px; font-weight: 400; line-height: 1.4; color: {INK}; margin-top: 8px">{text}</div></div>'
                 f'<div style="padding-top: 22px; font-size: 15px; font-weight: 400; line-height: 1.5; color: {SOFT}">{src}</div></div>', 140, top, 1640)
 
 
@@ -209,7 +209,7 @@ def s_resumen():
 def s_idea():
     return page('Sika · La idea', halo(960, 520, None, op=0.3) +
                 zone(eyebrow('La propuesta · Master Graphic'), 200, 56, 900) +
-                zone(f'<div style="font-size: 18px; font-weight: 300; color: {SOFT}; text-align: right">La campaña de Sika, en una palabra</div>', 1120, 54, 600) +
+                zone(f'<div style="font-size: 18px; font-weight: 300; color: {SOFT}; text-align: right">Su campaña, en una palabra</div>', 1120, 54, 600) +
                 frame('master.jpg', 'Master Graphic de la campaña: Innovar es hacerlo POSIBLE, con SikaSeal-170 y Sikaflex-119. Innovar para construir con confianza.', 200, 104, 1520, 855, hero=True))
 
 
@@ -218,8 +218,8 @@ add('idea', 'La idea', s_idea)
 
 # ── Cumplimiento ───────────────────────────────────────────────────────────────────────────────────────────────
 def s_matriz():
-    rows = [('Metodología de trabajo', 'Cinco etapas de trabajo, con dos aprobaciones de Sika.', f'Láminas {ref("metodo")} y {ref("control")}'),
-            ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre los materiales de Sika: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
+    rows = [('Metodología de trabajo', 'Cinco etapas de trabajo, con dos aprobaciones suyas.', f'Láminas {ref("metodo")} y {ref("control")}'),
+            ('Desarrollo y evolución gráfica de la campaña', 'Un sistema de campaña construido sobre sus materiales: firma, fórmula de titular y pieza madre.', f'Láminas {ref("partida")} a {ref("alcance")}'),
             ('1 imagen para Facebook, 1 para Instagram y 1 video tipo reel', 'Las tres piezas, para SikaSeal®-170. El reel se entrega como video de 25 segundos, con locución y música.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17 · Archivo de video'),
             ('Tiempos de entrega', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
             ('Propuesta económica desglosada', 'Valor por pieza del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
@@ -230,7 +230,7 @@ def s_matriz():
                         f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 16px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
     return page('Sika · Cumplimiento', halo(1300, 470, None) + obj(head + body_rows, 820, 196, 960, True, '; padding: 30px 32px 22px') +
                 left('Cumplimiento', ['Cada punto', 'de la ficha', 'tiene su', 'respuesta'], 'La ficha de la licitación pide cinco contenidos. Esta tabla los toma con sus mismas palabras e indica dónde está cada uno.') +
-                means('El comité puede ir directamente al punto que evalúa.', 'Ficha de la licitación N.º 1164 en Wherex, apartado «Comentarios generales».'))
+                means('Pueden ir directamente al punto que evalúan.', 'Ficha de la licitación N.º 1164 en Wherex, apartado «Comentarios generales».'))
 
 
 add('matriz', 'Cumplimiento', s_matriz)
@@ -242,8 +242,8 @@ def s_partida():
     a = obj(okicker('La firma, en el material compartido') + f'<img src="{A("antes-firma.jpg")}" alt="Cuatro versiones de la firma de campaña en el material actual de Sika" style="display: block; width: 100%; height: 252px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 820, 196, 540, False)
     b = obj(okicker('Las piezas, en el material compartido') + f'<img src="{A("antes-sistema.jpg")}" alt="Piezas actuales de Sika para distintos productos, cada una con una composición distinta" style="display: block; width: 100%; height: 256px; object-fit: cover; border-radius: 10px; margin-top: 14px">', 1200, 496, 580, True)
     return page('Sika · Punto de partida', halo(1320, 480, None) + a + b +
-                left('La propuesta · Punto de partida', ['Partimos de', 'un concepto', 'que ya', 'funciona'], '«Innovar es hacerlo posible, innovar es hacerlo Sika» ya dice lo que Sika quiere decir. El brief pide que agrupe todos los lanzamientos con una identidad distintiva y reconocible. En el material compartido, cada producto aplica el concepto con su propia firma y composición: ahí está la oportunidad de evolucionarlo.') +
-                means('La evolución no reemplaza lo que Sika ya construyó: lo ordena para que se reconozca en cada lanzamiento.',
+                left('La propuesta · Punto de partida', ['Partimos de', 'un concepto', 'que ya', 'funciona'], '«Innovar es hacerlo posible, innovar es hacerlo Sika» ya dice lo que su marca quiere decir. Su brief pide que agrupe todos los lanzamientos con una identidad distintiva y reconocible. En el material compartido, cada producto aplica el concepto con su propia firma y composición: ahí está la oportunidad de evolucionarlo.') +
+                means('La evolución no reemplaza lo que ustedes ya construyeron: lo ordena para que se reconozca en cada lanzamiento.',
                       'Brief y material de referencia de la licitación N.º 1164. Comparación completa en el anexo gráfico, página 2.'), section=1)
 
 
@@ -258,7 +258,7 @@ def s_evolucion():
     return page('Sika · Evolución', halo(1300, 420, None) + keep + order +
                 frame('antes-firma.jpg', 'La firma de la campaña en el material compartido por Sika', 820, 654, 388, 176) + arrow +
                 frame('firma.jpg', 'La firma propuesta: Innovar es hacerlo POSIBLE, innovar es hacerlo Sika', 1338, 654, 270, 176, hero=True) +
-                left('La propuesta · Evolución', ['Se conserva', 'el concepto,', 'se ordena', 'la forma'], 'Sika pide desarrollar y evolucionar su línea gráfica, no cambiarla. La propuesta mantiene todo lo que identifica a la campaña y a la marca, y ordena la forma en que se aplica.') +
+                left('La propuesta · Evolución', ['Se conserva', 'el concepto,', 'se ordena', 'la forma'], 'Ustedes piden desarrollar y evolucionar su línea gráfica, no cambiarla. La propuesta mantiene todo lo que identifica a la campaña y a la marca, y ordena la forma en que se aplica.') +
                 means('Quien ya conoce la campaña la reconoce. Quien la ve por primera vez la recuerda.',
                       'Comparación completa, fila por fila, en el anexo gráfico, página 2.'), section=1)
 
@@ -277,7 +277,7 @@ def s_sistema():
     return page('Sika · El sistema', halo(1300, 430, None) + frame('master.jpg', 'Master Graphic de la campaña POSIBLE con SikaSeal-170 y Sikaflex-119', 860, 186, 880, 495, hero=True) +
                 zone(f'<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 24px">{row}</div>', 820, 714, 960) +
                 left('La propuesta · El sistema', ['Una firma,', 'una fórmula,', 'una pieza', 'madre'], 'La campaña se concentra en una palabra, POSIBLE. De ella salen una fórmula de titular y un Master Graphic que rige todas las piezas de un lanzamiento, digitales e impresas.') +
-                means('Cualquier equipo, de Sika o de agencia, puede producir un lanzamiento nuevo sin reinterpretar la campaña.',
+                means('Cualquier equipo, suyo o de agencia, puede producir un lanzamiento nuevo sin reinterpretar la campaña.',
                       'Anexo gráfico, páginas 4 a 14: Master Graphic y manual de identidad de la campaña.'), section=1)
 
 
@@ -293,11 +293,11 @@ def s_brief():
             ('Identidad distintiva y reconocible en todos los puntos de contacto', 'Firma, color y composición comunes, de la publicación en redes al anaquel.', f'Láminas {ref("alcance")} y {ref("entregables")}'),
             ('Tono innovador, confiable, cercano y profesional', 'Un solo aspecto, con el tono y el nivel de dato ajustados a cada audiencia.', f'Lámina {ref("audiencias")}')]
     tpl = 'display: grid; grid-template-columns: 300px minmax(0, 1fr) 210px; column-gap: 26px'
-    head = f'<div style="{tpl}; padding-bottom: 12px">{label("Lo que dice el brief")}{label("Cómo responde la propuesta")}{label("Dónde se ve")}</div>'
+    head = f'<div style="{tpl}; padding-bottom: 12px">{label("Lo que dice su brief")}{label("Cómo responde la propuesta")}{label("Dónde se ve")}</div>'
     body_rows = ''.join(f'<div style="{tpl}; align-items: start; padding: 14px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 20px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.16">{a}</div>'
                         f'<div style="font-size: 17px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 16px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
     return page('Sika · El brief, punto por punto', halo(1300, 470, None) + obj(head + body_rows, 820, 190, 960, True, '; padding: 28px 32px 18px') +
-                left('La propuesta · El brief', ['El brief,', 'punto por', 'punto'], 'La propuesta responde a lo que el brief define como factores diferenciadores, mensajes clave y tono de la campaña. Esta tabla cruza cada uno con la parte del sistema que lo resuelve.') +
+                left('La propuesta · El brief', ['El brief,', 'punto por', 'punto'], 'La propuesta responde a lo que su brief define como factores diferenciadores, mensajes clave y tono de la campaña. Esta tabla cruza cada uno con la parte del sistema que lo resuelve.') +
                 means('La evolución gráfica sirve a los objetivos de la campaña: reconocimiento y posicionamiento del concepto y de cada producto.',
                       'Brief «Innovar es hacerlo posible, innovar es hacerlo Sika», 9 de septiembre de 2026, secciones 2 y 6.'), section=1)
 
@@ -318,9 +318,9 @@ def s_audiencias():
                         f'<div style="font-family: {ID}; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; margin-top: 16px; padding-top: 16px; border-top: 1px solid {RULE}; min-height: 84px">{h}</div>' +
                         note('Tono.', tn) + note('Información.', inf), 820 + i * 330, 216, 300, i == 0, '; height: 520px; padding: 20px 22px 24px') for i, (im, t, w, h, tn, inf) in enumerate(aud))
     return page('Sika · Audiencias', halo(1300, 470, 772, 560, 40) + cards +
-                left('La propuesta · Abordaje', ['Una idea,', 'tres', 'audiencias'], 'Sika habla con quien arregla su casa, con quien aplica en obra y con quien especifica un proyecto. La firma, el color y la composición no cambian. Cambian la foto, el tono y la cantidad de dato técnico.') +
-                means('Un solo aspecto para toda la campaña, con ajustes por público, como Sika lo pidió en la ronda de preguntas.',
-                      'Anexo gráfico, página 13. Respuesta de Sika en Wherex del 6 de octubre de 2026.'), section=1)
+                left('La propuesta · Abordaje', ['Una idea,', 'tres', 'audiencias'], 'Su marca habla con quien arregla su casa, con quien aplica en obra y con quien especifica un proyecto. La firma, el color y la composición no cambian. Cambian la foto, el tono y la cantidad de dato técnico.') +
+                means('Un solo aspecto para toda la campaña, con ajustes por público, como lo pidieron en la ronda de preguntas.',
+                      'Anexo gráfico, página 13. Su respuesta en Wherex del 6 de octubre de 2026.'), section=1)
 
 
 add('audiencias', 'Audiencias', s_audiencias)
@@ -337,9 +337,9 @@ def s_muestras():
                 frame('ig.jpg', 'Muestra para Instagram, SikaSeal-170 Sanisil, formato 4:5', 1184, 190, 272, 340) +
                 zone(lst, 1486, 186, 294) +
                 frame('story.jpg', 'Storyboard del reel en siete cuadros', 820, 560, 960, 232) +
-                left('La propuesta · Muestras del concurso', ['Las tres', 'muestras ya', 'aplican el', 'sistema'], 'Las bases piden tres muestras. Las desarrollamos para SikaSeal®-170 Sanisil, uno de los dos productos que Sika indicó, y las tres salen de la misma pieza madre.') +
-                means('El comité puede revisar las tres piezas a tamaño completo en el anexo gráfico. Aquí van en miniatura.',
-                      'Respuestas de Sika en Wherex del 2, 5, 6 y 9 de octubre de 2026: un solo producto admitido, storyboard con locución admitido y trabajo sobre los elementos visuales de sus materiales.'), section=1)
+                left('La propuesta · Muestras del concurso', ['Las tres', 'muestras ya', 'aplican el', 'sistema'], 'Las bases piden tres muestras. Las desarrollamos para SikaSeal®-170 Sanisil, uno de los dos productos que ustedes indicaron, y las tres salen de la misma pieza madre.') +
+                means('Pueden revisar las tres piezas a tamaño completo en el anexo gráfico. Aquí van en miniatura.',
+                      'Sus respuestas en Wherex del 2, 5, 6 y 9 de octubre de 2026: un solo producto admitido, storyboard con locución admitido y trabajo sobre los elementos visuales de sus materiales.'), section=1)
 
 
 add('muestras', 'Muestras del concurso', s_muestras)
@@ -351,7 +351,7 @@ def s_alcance():
                 frame('sikaflex.jpg', 'Pieza para Sikaflex-119 High Tack', 820, 200, 265, 265, 'Sikaflex®-119 · consumo') +
                 frame('visco.jpg', 'Pieza para Sika ViscoCrete 45 HE', 1100, 200, 265, 265, 'Sika® ViscoCrete® · industria') +
                 frame('pdv.jpg', 'Colgante, cenefa y producto en un anaquel de tienda', 1380, 200, 400, 265, 'Punto de venta · colgante y cenefa', hero=True) +
-                frame('cenefa.jpg', 'Cenefa de anaquel para Sikaflex-119', 820, 560, 960, 168, 'Cenefa de anaquel, rehecha a partir del material actual de Sika') +
+                frame('cenefa.jpg', 'Cenefa de anaquel para Sikaflex-119', 820, 560, 960, 168, 'Cenefa de anaquel, rehecha a partir de su material actual') +
                 left('La propuesta · Alcance del sistema', ['El sistema', 'llega a otros', 'productos y', 'a la tienda'], 'Para comprobar que la identidad escala, la aplicamos a Sikaflex®-119, a un producto de la línea industrial y al punto de venta. Son piezas de demostración: no forman parte del alcance base.', 80) +
                 means('Consumo e industria comparten una misma identidad, de la publicación en redes al anaquel.',
                       'Anexo gráfico, páginas 3 y 18 a 20. Piezas adicionales, fuera de la oferta base.'), section=1)
@@ -369,11 +369,11 @@ STAGES = [('objetivo', 'Inmersión', 'Brief, ficha técnica y renders del produc
 
 
 def s_metodo():
-    cards = ''.join(obj(icon(g, 46) + f'<div style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: {SOFT}; margin-top: 14px">ETAPA {i + 1}</div>' + otitle(t, 26, '; margin-top: 4px') + otext(x, 16) + (tag('Aprueba Sika') if hero else ''),
+    cards = ''.join(obj(icon(g, 46) + f'<div style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: {SOFT}; margin-top: 14px">ETAPA {i + 1}</div>' + otitle(t, 26, '; margin-top: 4px') + otext(x, 16) + (tag('Ustedes aprueban') if hero else ''),
                         820 + i * 195, 232 if hero else 282, 180, hero, f'; height: {490 if hero else 390}px; padding: 22px 18px 22px') for i, (g, t, x, hero) in enumerate(STAGES))
     return page('Sika · Método', halo(1300, 470, 790, 560, 46) + cards +
-                left('La producción · Método', ['Cinco etapas', 'y dos', 'aprobaciones', 'de Sika'], 'Cada lanzamiento sigue el mismo recorrido. Sika aprueba en dos momentos: la pieza madre, antes de adaptar, y el conjunto completo, antes de la entrega.') +
-                means('Sika decide en dos momentos definidos y no revisa cada pieza desde cero.',
+                left('La producción · Método', ['Cinco etapas', 'y dos', 'aprobaciones', 'suyas'], 'Cada lanzamiento sigue el mismo recorrido. Ustedes aprueban en dos momentos: la pieza madre, antes de adaptar, y el conjunto completo, antes de la entrega.') +
+                means('Ustedes deciden en dos momentos definidos y no revisan cada pieza desde cero.',
                       'Método de trabajo de Efeonce Creative Studio. Una ronda es un conjunto consolidado de comentarios en un solo envío.'), section=2)
 
 
@@ -389,9 +389,9 @@ def s_entregables():
     dig = obj(okicker('Adaptaciones digitales') + f'<div style="margin-top: 16px">{rows([("5", "publicaciones para redes sociales"), ("1", "reel para Instagram, con adaptación para TikTok"), ("6", "historias: 3 para Instagram y 3 para Facebook")])}</div>', 1150, 280, 300, False, '; height: 420px')
     pdv = obj(okicker('Punto de venta e impresos') + f'<div style="margin-top: 16px">{rows([("1", "cartel tamaño tabloide"), ("1", "cenefa de anaquel"), ("1", "colgante"), ("1", "anuncio tamaño carta")])}</div>', 1480, 280, 300, False, '; height: 420px')
     return page('Sika · Lanzamiento tipo', halo(1300, 480, 800, 560, 46) + hero + dig + pdv +
-                left('La producción · Lanzamiento tipo', ['Una pieza', 'madre y sus', 'adaptaciones'], 'El alcance base de un lanzamiento es el que Sika definió en la ronda de preguntas: un Master Graphic y sus adaptaciones para redes sociales y para el punto de venta.') +
+                left('La producción · Lanzamiento tipo', ['Una pieza', 'madre y sus', 'adaptaciones'], 'El alcance base de un lanzamiento es el que ustedes definieron en la ronda de preguntas: un Master Graphic y sus adaptaciones para redes sociales y para el punto de venta.') +
                 means('La oferta económica valora este lanzamiento tipo. Las piezas adicionales se valoran por separado.',
-                      'Respuestas de Sika en Wherex del 5, 6 y 9 de octubre de 2026. Formatos y cantidades finales se ajustan con Sika al inicio.'), section=2)
+                      'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026. Formatos y cantidades finales se ajustan con ustedes al inicio.'), section=2)
 
 
 add('entregables', 'Lanzamiento tipo', s_entregables)
@@ -399,12 +399,12 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 
 # ── Reel ───────────────────────────────────────────────────────────────────────────────────────────────────────
 def s_reel():
-    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con aprobación de Sika", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram y adaptación para TikTok"])}</div>', 820, 456, 465, True, '; height: 364px')
+    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram y adaptación para TikTok"])}</div>', 820, 456, 465, True, '; height: 364px')
     extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva"], False)}</div>', 1315, 456, 465, False, '; height: 364px')
     return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
-                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Sika confirmó que el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.', extra=callout('El reel de muestra se entrega como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
-                means('Sika sabe qué incluye el reel base y qué se decide como producción adicional.',
-                      'Respuestas de Sika en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
+                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
+                means('Queda claro qué incluye el reel base y qué se decide como producción adicional.',
+                      'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)
 
 
 add('reel', 'Reel', s_reel)
@@ -413,12 +413,12 @@ add('reel', 'Reel', s_reel)
 # ── Piezas adicionales ─────────────────────────────────────────────────────────────────────────────────────────
 def s_adicionales():
     a = obj(okicker('Piezas adicionales') + otitle('Se piden por pieza', 30) + f'<div style="margin-top: 16px">{bullets(["Carruseles", "Stopper y otros materiales de punto de venta", "Banners y formatos para medios", "Historias y videos para otras redes"])}</div>', 820, 236, 300, True, '; height: 480px')
-    b = obj(okicker('Impresos') + otitle('Artes finales listos para imprenta', 26) + otext('En las medidas que Sika indique. Las muestras del concurso usan medidas estándar.'), 1150, 300, 300, False, '; height: 350px')
-    c = obj(okicker('Con el mismo método') + otitle('La misma pieza madre', 26) + otext('Cada pieza adicional sale del Master Graphic del lanzamiento y pasa por las mismas dos aprobaciones de Sika.'), 1480, 300, 300, False, '; height: 350px')
+    b = obj(okicker('Impresos') + otitle('Artes finales listos para imprenta', 26) + otext('En las medidas que ustedes indiquen. Las muestras del concurso usan medidas estándar.'), 1150, 300, 300, False, '; height: 350px')
+    c = obj(okicker('Con el mismo método') + otitle('La misma pieza madre', 26) + otext('Cada pieza adicional sale del Master Graphic del lanzamiento y pasa por sus mismas dos aprobaciones.'), 1480, 300, 300, False, '; height: 350px')
     return page('Sika · Piezas adicionales', halo(1300, 480, 760, 560, 46) + a + b + c +
-                left('La producción · Piezas adicionales', ['Lo adicional', 'se pide por', 'pieza'], 'Sika indicó que las piezas fuera del lanzamiento tipo son opcionales. Se solicitan por pieza, salen de la misma pieza madre y se valoran en la oferta económica.') +
+                left('La producción · Piezas adicionales', ['Lo adicional', 'se pide por', 'pieza'], 'Las piezas fuera del lanzamiento tipo son opcionales, como ustedes indicaron. Se solicitan por pieza, salen de la misma pieza madre y se valoran en la oferta económica.') +
                 means('El lanzamiento tipo tiene un alcance cerrado. Lo demás se decide caso a caso.',
-                      'Respuestas de Sika en Wherex del 5 y 6 de octubre de 2026: recursos existentes y producción adicional, por separado.'), section=2)
+                      'Sus respuestas en Wherex del 5 y 6 de octubre de 2026: recursos existentes y producción adicional, por separado.'), section=2)
 
 
 add('adicionales', 'Piezas adicionales', s_adicionales)
@@ -438,10 +438,10 @@ def s_plazo():
         rws += f'<div style="position: absolute; left: {LW + (a - 1) * DW + 4}px; top: {y}px; width: {(b - a + 1) * DW - 8}px; height: 42px; border-radius: 11px; background: linear-gradient(90deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.34)); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6)"></div>'
         if m:
             rws += f'<div style="position: absolute; left: {LW + m * DW - 15}px; top: {y + 6}px; width: 30px; height: 30px; border-radius: 50%; background: {ACC}; box-shadow: 0 0 0 5px {BG}, 0 0 26px rgba(255, 101, 0, 0.7)"></div>'
-    legend = (f'<div style="position: absolute; left: {LW}px; top: 498px; display: flex; align-items: center; gap: 10px; font-size: 15px; color: {SOFT}"><span style="width: 16px; height: 16px; border-radius: 50%; background: {ACC}"></span>Aprobación de Sika</div>')
+    legend = (f'<div style="position: absolute; left: {LW}px; top: 498px; display: flex; align-items: center; gap: 10px; font-size: 15px; color: {SOFT}"><span style="width: 16px; height: 16px; border-radius: 50%; background: {ACC}"></span>Su aprobación</div>')
     gantt = obj(f'<div style="position: relative; height: 524px">{weeks}{rws}{legend}</div>', 820, 200, 960, True, '; padding: 30px 26px 26px 30px')
     return page('Sika · Plazo', halo(1300, 470, None) + gantt +
-                left('La producción · Plazo', ['Diez días', 'hábiles por', 'lanzamiento'], 'El plazo corre desde que Sika entrega el brief, la ficha técnica y los renders del producto. La pieza madre llega a su aprobación el cuarto día. El tiempo de revisión de Sika se agrega al calendario.', extra=callout('Sika nombró dos productos, Sikaflex®-119 y SikaSeal®-170. El segundo lanzamiento parte con el sistema ya construido.')) +
+                left('La producción · Plazo', ['Diez días', 'hábiles por', 'lanzamiento'], 'El plazo corre desde que recibimos el brief, la ficha técnica y los renders del producto. La pieza madre llega a su aprobación el cuarto día. Su tiempo de revisión se agrega al calendario.', extra=callout('Con Sikaflex®-119 y SikaSeal®-170, el segundo lanzamiento parte con el sistema ya construido.')) +
                 means('El calendario definitivo se acuerda en la reunión de inicio, según el número de lanzamientos y sus fechas.',
                       'Plazo propuesto por Efeonce para un lanzamiento tipo, con hasta dos rondas de ajustes. Se confirma al inicio.'), section=2)
 
@@ -453,14 +453,14 @@ add('plazo', 'Plazo', s_plazo)
 def s_control():
     def card(g, t, x, l, tp, w, hero=False):
         return obj(icon(g, 44) + otitle(t, 26, '; margin-top: 12px') + otext(x, 16), l, tp, w, hero, '; height: 284px')
-    cards = (card('contrato', 'Aprobación', 'Una persona de Sika aprueba la pieza madre y el conjunto final. Ninguna pieza se publica sin ese visto bueno.', 820, 196, 300, True) +
+    cards = (card('contrato', 'Aprobación', 'Una persona de su equipo aprueba la pieza madre y el conjunto final. Ninguna pieza se publica sin ese visto bueno.', 820, 196, 300, True) +
              card('republicar', 'Rondas de ajuste', 'Hasta dos rondas consolidadas por pieza. Un cambio de dirección creativa se trata como un brief nuevo.', 1150, 196, 300) +
              card('seguridad', 'Contenido técnico', 'Cada beneficio se contrasta con la ficha técnica vigente del producto antes de diseñar.', 1480, 196, 300) +
-             card('ia', 'Imagen e inteligencia artificial', 'El envase es siempre el render oficial de Sika. En las muestras, las escenas se generaron con IA. En producción Sika elige entre IA, fotografía o ambas, y una persona revisa y aprueba cada pieza.', 820, 510, 630) +
-             card('assets', 'Derechos y archivos', 'Canales, territorio y plazo de uso se definen antes de producir. La entrega incluye los archivos finales en los formatos que Sika indique.', 1480, 510, 300))
+             card('ia', 'Imagen e inteligencia artificial', 'El envase es siempre su render oficial. En las muestras, las escenas se generaron con IA. En producción ustedes eligen entre IA, fotografía o ambas, y una persona revisa y aprueba cada pieza.', 820, 510, 630) +
+             card('assets', 'Derechos y archivos', 'Canales, territorio y plazo de uso se definen antes de producir. La entrega incluye los archivos finales en los formatos que ustedes indiquen.', 1480, 510, 300))
     return page('Sika · Control', halo(1300, 480, None) + cards +
-                left('La producción · Control', ['Nada sale', 'sin la', 'aprobación', 'de Sika'], 'La aprobación final y lo que se afirma de cada producto son decisión de Sika. Efeonce responde por la consistencia de la marca, la exactitud de los textos y el origen de cada imagen.') +
-                means('Sika conserva la decisión sobre su marca y sus productos en cada pieza.',
+                left('La producción · Control', ['Nada sale', 'sin su', 'aprobación'], 'La aprobación final y lo que se afirma de cada producto son decisión suya. Efeonce responde por la consistencia de la marca, la exactitud de los textos y el origen de cada imagen.') +
+                means('Ustedes conservan la decisión sobre su marca y sus productos en cada pieza.',
                       'Condiciones de trabajo propuestas por Efeonce. Se formalizan en el acuerdo de servicio.'), section=2)
 
 
@@ -470,7 +470,7 @@ add('control', 'Control', s_control)
 # ── 11 · Equipo ────────────────────────────────────────────────────────────────────────────────────────────────
 TEAM = [('andres', 'Andrés Carlosama', 'Senior Visual Designer', 'Diseño y adaptación de piezas', False),
         ('daniela', 'Daniela Ferreira', 'Creative Operations Lead', 'Dirección de arte y control de marca', False),
-        ('julio', 'Julio Reyes', 'Responsable de Cuenta', 'Interlocutor de Sika y dirección del proyecto', True),
+        ('julio', 'Julio Reyes', 'Responsable de Cuenta', 'Su interlocutor y dirección del proyecto', True),
         ('valentina', 'Valentina Hoyos', 'Content Lead', 'Titulares, guiones y textos', False),
         ('melkin', 'Melkin Hernandez', 'Senior Visual Designer', 'Diseño y adaptación de piezas', False)]
 
@@ -485,13 +485,13 @@ def s_equipo():
         return obj(ph + txt, 820 + i * 195, 226 if hero else 286, 180, hero, f'; height: {480 if hero else 384}px; padding: {"16px 16px 20px" if hero else "14px 14px 18px"}')
     cards = ''.join(card(i, *t) for i, t in enumerate(TEAM))
     return page('Sika · Equipo', halo(1300, 460, 790, 560, 46) + cards +
-                left('El equipo', ['Un equipo estable', 'y un solo', 'interlocutor'], 'Dirección de arte, diseño y contenido en un mismo equipo. Sika trata con un Responsable de Cuenta, que coordina el trabajo y responde por los plazos.', 66,
+                left('El equipo', ['Un equipo estable', 'y un solo', 'interlocutor'], 'Dirección de arte, diseño y contenido en un mismo equipo. Ustedes tratan con un Responsable de Cuenta, que coordina el trabajo y responde por los plazos.', 66,
                      # Cifra de la red, como en la lámina «Expertos multidisciplinarios» canonizada el 2026-10-10: «+85» con el «+» en el acento. La cifra viene del operador.
                      extra=f'<div style="display: flex; align-items: center; gap: 26px; margin-top: 40px; padding-top: 30px; border-top: 1px solid {RULE}">'
                            f'<div style="font-family: {ID}; font-size: 168px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.82; white-space: nowrap"><span style="color: {ACC}">+</span>85</div>'
                            f'<div><div style="font-family: {ID}; font-size: 34px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08">profesionales en toda Latinoamérica</div>'
                            f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 10px">La red de Efeonce detrás de su equipo.</div></div></div>') +
-                means('Sika sabe quién trabaja en su campaña y con qué función.',
+                means('Ustedes saben quién trabaja en su campaña y con qué función.',
                       'Equipo de Efeonce Creative Studio. La dedicación de cada persona se define con el calendario de lanzamientos.'), section=3)
 
 
@@ -503,12 +503,12 @@ def s_mexico():
     def card(g, t, x, l, tp, hero=False):
         return obj(icon(g, 44) + otitle(t, 28, '; margin-top: 12px') + otext(x, 17), l, tp, 465, hero, '; height: 262px')
     cards = (card('ubicacion', 'Equipo en dos países', 'Personas de Efeonce en Chile y en México trabajan sobre la misma campaña y comparten la mayor parte de la jornada.', 820, 196, True) +
-             card('contenido', 'El vocabulario de Sika', 'Los titulares y los textos usan los términos de las fichas técnicas de Sika y los del mercado mexicano: cancelería, anaquel, obra.', 1315, 196) +
-             card('reunion', 'Un solo interlocutor', 'El Responsable de Cuenta atiende a Sika y coordina al equipo. Los comentarios llegan por un solo canal.', 820, 488) +
+             card('contenido', 'Su vocabulario', 'Los titulares y los textos usan los términos de sus fichas técnicas y los del mercado mexicano: cancelería, anaquel, obra.', 1315, 196) +
+             card('reunion', 'Un solo interlocutor', 'El Responsable de Cuenta los atiende y coordina al equipo. Los comentarios llegan por un solo canal.', 820, 488) +
              card('integracion', 'Herramientas a la vista', 'Reuniones por Microsoft Teams, seguimiento del proyecto en Notion y revisión de las piezas en Frame.io.', 1315, 488))
     return page('Sika · Trabajo con México', halo(1300, 480, None) + cards +
-                left('El equipo · Trabajo con México', ['Un equipo', 'en Chile y', 'en México'], 'Efeonce atiende a Sika Mexicana con personas en Chile y en México, que trabajan sobre la misma campaña con un solo responsable.') +
-                means('Sika trabaja con un equipo cercano: personas en su país y una sola persona responsable.',
+                left('El equipo · Trabajo con México', ['Un equipo', 'en Chile y', 'en México'], 'Efeonce los atiende con personas en Chile y en México, que trabajan sobre la misma campaña con un solo responsable.') +
+                means('Trabajan con un equipo cercano: personas en su país y una sola persona responsable.',
                       'Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú.'), section=3)
 
 
@@ -537,12 +537,12 @@ add('experiencia', 'Caso de éxito · Sky', lambda: img_page('Sika · Caso de é
 
 # ── Continuidad ────────────────────────────────────────────────────────────────────────────────────────────────
 def s_continuidad():
-    cards = (obj(icon('calendario', 46) + okicker('Antes') + otitle('Calendario de lanzamientos', 28) + otext('Se acuerda al inicio y se revisa cada trimestre, con los productos y las fechas de Sika.'), 820, 300, 300, False, '; height: 340px') +
+    cards = (obj(icon('calendario', 46) + okicker('Antes') + otitle('Calendario de lanzamientos', 28) + otext('Se acuerda al inicio y se revisa cada trimestre, con sus productos y sus fechas.'), 820, 300, 300, False, '; height: 340px') +
              obj(icon('medicion', 46) + okicker('Al cierre de cada lanzamiento') + otitle('Un balance breve', 32) + otext('Entregas a tiempo, rondas de ajuste por pieza y lo aprendido para el siguiente producto.'), 1150, 250, 300, True, '; height: 420px') +
              obj(icon('presentacion', 46) + okicker('Siempre') + otitle('Un manual que crece', 28) + otext('El manual de identidad de la campaña se actualiza con cada producto nuevo y cada formato que se suma.'), 1480, 300, 300, False, '; height: 340px'))
     return page('Sika · Continuidad', halo(1300, 480, 740, 560, 46) + cards +
-                left('La continuidad', ['Una campaña', 'que llega', 'hasta 2027'], 'El brief fija la campaña para lo que queda de 2026 y todo 2027. Proponemos trabajar por calendario de lanzamientos y cerrar cada uno con un balance, para que el sistema mejore de un producto al siguiente.') +
-                means('Sika cuenta con un socio para toda la campaña, no con un proveedor para una pieza.',
+                left('La continuidad', ['Una campaña', 'que llega', 'hasta 2027'], 'Su brief fija la campaña para lo que queda de 2026 y todo 2027. Proponemos trabajar por calendario de lanzamientos y cerrar cada uno con un balance, para que el sistema mejore de un producto al siguiente.') +
+                means('Cuentan con un socio para toda la campaña, no con un proveedor para una pieza.',
                       'Brief, secciones 6.2 y 7.2: duración de la campaña, de 2026 a diciembre de 2027.'), section=4)
 
 
@@ -555,15 +555,15 @@ def s_inicio():
     needs = [('presentacion', 'Manual de marca vigente', 'Para reemplazar por los oficiales los colores, la tipografía y los logotipos provisionales del anexo.'),
              ('base-de-datos', 'Renders y fichas técnicas', 'Del producto de cada lanzamiento, en su versión vigente.'),
              ('calendario', 'Calendario de lanzamientos', 'Productos, fechas y redes sociales de cada uno.'),
-             ('reunion', 'Una contraparte que aprueba', 'Una persona que reúne los comentarios de Sika en cada ronda.'),
+             ('reunion', 'Una contraparte que aprueba', 'Una persona que reúne sus comentarios en cada ronda.'),
              ('informe', 'Validación del triángulo como acento', 'Confirmar que el manual permite usar el triángulo de Sika sobre la palabra POSIBLE.')]
     rows = ''.join(f'<div style="display: grid; grid-template-columns: 70px minmax(0, 1fr); column-gap: 20px; align-items: center; padding: 26px 0; border-top: 1px solid {RULE}">{icon(g, 50)}'
                    f'<div><div style="font-family: {ID}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1">{t}</div>'
                    f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 6px">{x}</div></div></div>' for g, t, x in needs)
     return page('Sika · Inicio', halo(1320, 470, None, op=0.18) + zone(rows, 820, 190, 960) +
-                left('El inicio', ['Cinco', 'insumos de', 'Sika para', 'empezar'], 'Con la adjudicación, una reunión de inicio fija el calendario de lanzamientos y la persona que aprueba. Estos son los insumos que necesitamos para producir el primero.', extra=callout('El manual de identidad de la campaña y la pieza madre de cada lanzamiento quedan a disposición de Sika, para que cualquier equipo los use.')) +
+                left('El inicio', ['Cinco', 'insumos', 'para', 'empezar'], 'Con la adjudicación, una reunión de inicio fija el calendario de lanzamientos y la persona que aprueba. Estos son los insumos que necesitamos para producir el primero.', extra=callout('El manual de identidad de la campaña y la pieza madre de cada lanzamiento quedan a su disposición, para que cualquier equipo los use.')) +
                 means('Los puntos por validar del anexo gráfico se resuelven en la primera semana, antes de producir.',
-                      'Puntos por validar con Sika declarados en el anexo gráfico.'), section=4)
+                      'Puntos por validar con ustedes, declarados en el anexo gráfico.'), section=4)
 
 
 add('inicio', 'Inicio', s_inicio)
