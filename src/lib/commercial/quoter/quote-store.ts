@@ -1,19 +1,18 @@
 import 'server-only'
 
-import { replayCatalogQuote } from '@/lib/finance/pricing-v3/adapters/catalog-local'
-import { replayPricingV3 } from '@/lib/finance/pricing-v3/adapters/local-snapshot'
-import { replayResourceComposition } from '@/lib/finance/pricing-v3/adapters/resource-composition'
+import { replayFrozenArtifact } from '@/lib/finance/pricing-v3/adapters/frozen-artifact'
 import { parseStoredText } from '@/lib/finance/pricing-v3/storage'
+import type { FrozenArtifactVerdict } from '@/lib/finance/pricing-v3/adapters/frozen-artifact'
 
 import { highest, readArtifactIndex } from './artifact-index'
 import { canonicalJson, textDigest } from './canonical-text'
 import { runQuoterQuery, toIso } from './db'
 import { QuoterError, withQuoterRejections } from './errors'
-import { QUOTER_INITIAL_ORIGIN, findQuoterTransition, isQuoterQuoteState } from './state-machine'
+import { QUOTER_EXPIRED, QUOTER_INITIAL_ORIGIN, findQuoterTransition, isQuoterQuoteState } from './state-machine'
 import { memberIdOf } from './types'
-import type { ArtifactIndex, ArtifactLane } from './artifact-index'
+import type { ArtifactIndex } from './artifact-index'
 import type { QuoterDbClient } from './db'
-import type { QuoterQuoteState, QuoterTransitionOrigin } from './state-machine'
+import type { QuoterEffectiveState, QuoterQuoteState, QuoterTransitionOrigin } from './state-machine'
 import type { QuoterActor, QuoterCommandContext, QuoterDataOrigin } from './types'
 
 /**
@@ -36,12 +35,6 @@ import type { QuoterActor, QuoterCommandContext, QuoterDataOrigin } from './type
 export type QuoteWriteContext = { actor: QuoterActor; command: QuoterCommandContext }
 
 export type VersionOrigin = 'platform' | 'local'
-
-const REPLAY: Record<ArtifactLane, (raw: unknown) => { replayDigest: string; calculationId: string }> = {
-  'pricing-v3-local-artifact/1': replayPricingV3,
-  'pricing-v3-selection-quote/1': replayCatalogQuote,
-  'pricing-v3-resource-composition/1': replayResourceComposition
-}
 
 // ── Locks ────────────────────────────────────────────────────────────────────────────────────────────────────
 
@@ -66,6 +59,11 @@ export type QuoteCurrent = {
   createdAt: string
   /** `null` only inside the transaction that is creating the quote. */
   state: QuoterQuoteState | null
+  /**
+   * The state a reader shows: the stored one, or `expired` when the quote is issued or under revision and the
+   * validity of its last issue has passed. The database derives it; nothing here applies that rule again.
+   */
+  effectiveState: QuoterEffectiveState | null
   /** Assigned by the database at the first issue. A draft has none. */
   quoteNumber: string | null
   clientOrganizationId: string | null
@@ -75,7 +73,10 @@ export type QuoteCurrent = {
   issuedVersionNumber: number | null
   issuedArtifactDigest: string | null
   issuedDocumentSeq: number | null
+  issuedDocumentDigest: string | null
   issuedAt: string | null
+  /** Until which day what was issued holds, as `YYYY-MM-DD`. Fixed by each issue. */
+  validUntil: string | null
 }
 
 type CurrentRow = {
@@ -85,6 +86,7 @@ type CurrentRow = {
   data_origin: QuoterDataOrigin
   created_at: Date
   state: string | null
+  effective_state: string | null
   quote_number: string | null
   client_organization_id: string | null
   latest_version_number: number | null
@@ -92,15 +94,18 @@ type CurrentRow = {
   issued_version_number: number | null
   issued_artifact_digest: string | null
   issued_document_seq: number | null
+  issued_document_digest: string | null
   issued_at: Date | null
+  valid_until: string | null
 }
 
 export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quoteId: string): Promise<QuoteCurrent | null> => {
   const rows = await runQuoterQuery<CurrentRow>(
     client,
-    `SELECT quote_id, owner_organization_id, data_origin, created_at, state, quote_number, client_organization_id,
-            latest_version_number, latest_below_floor, issued_version_number, issued_artifact_digest,
-            issued_document_seq, issued_at
+    `SELECT quote_id, owner_organization_id, data_origin, created_at, state, effective_state, quote_number,
+            client_organization_id, latest_version_number, latest_below_floor, issued_version_number,
+            issued_artifact_digest, issued_document_seq, issued_document_digest, issued_at,
+            valid_until::text AS valid_until
        FROM greenhouse_commercial.quoter_quote_current
       WHERE quote_id = $1`,
     [quoteId]
@@ -116,6 +121,7 @@ export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quote
     dataOrigin: row.data_origin,
     createdAt: toIso(row.created_at),
     state: isQuoterQuoteState(row.state) ? row.state : null,
+    effectiveState: row.effective_state === QUOTER_EXPIRED || isQuoterQuoteState(row.effective_state) ? row.effective_state : null,
     quoteNumber: row.quote_number,
     clientOrganizationId: row.client_organization_id,
     latestVersionNumber: row.latest_version_number,
@@ -123,7 +129,9 @@ export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quote
     issuedVersionNumber: row.issued_version_number,
     issuedArtifactDigest: row.issued_artifact_digest,
     issuedDocumentSeq: row.issued_document_seq,
-    issuedAt: row.issued_at ? toIso(row.issued_at) : null
+    issuedDocumentDigest: row.issued_document_digest,
+    issuedAt: row.issued_at ? toIso(row.issued_at) : null,
+    validUntil: row.valid_until
   }
 }
 
@@ -262,21 +270,24 @@ export const listQuoteVersionRefs = async (client: QuoterDbClient | undefined) =
   }))
 }
 
-type PreparedArtifact = { text: string; index: ArtifactIndex }
+type PreparedArtifact = { text: string; index: ArtifactIndex; verdict: FrozenArtifactVerdict }
 
-// What may become a version: an artifact that calculated, and that the engine still reproduces from the inputs it
-// carries. A quote that did not calculate is not a quote; one that does not reproduce is not this quote.
+// What may become a version: an artifact the engine still reproduces from the inputs it carries, and that
+// calculated. One that does not reproduce is not this quote; one that did not calculate is not a quote.
+//
+// Whether it calculated and whether it is below the floor are the engine's to say, and it says them about the
+// RECOMPUTED result (`replayFrozenArtifact`), never about the text received: the floor verdict stored with a version
+// decides whether issuing it needs the approval of a person.
 const prepareArtifact = (artifactText: string): PreparedArtifact => {
   const { value } = parseStoredText(artifactText)
-  const index = readArtifactIndex(value)
-
-  if (index.calculationStatus !== 'calculated')
-    throw new QuoterError('quote_not_calculated', { calculationStatus: index.calculationStatus })
 
   // Throws REPLAY_MISMATCH, a rejection of the engine, which passes through with its own code.
-  REPLAY[index.artifactVersion](value)
+  const verdict = replayFrozenArtifact(value)
 
-  return { text: artifactText, index }
+  if (verdict.calculationStatus !== 'calculated')
+    throw new QuoterError('quote_not_calculated', { calculationStatus: verdict.calculationStatus })
+
+  return { text: artifactText, index: readArtifactIndex(value), verdict }
 }
 
 // One calculation lives in one quote that is not withdrawn. Enforced here, under `lockCalculation`, and not by a
@@ -354,7 +365,7 @@ const insertVersion = async (
     context: QuoteWriteContext
   }
 ): Promise<StoredQuoteVersion> => {
-  const { index, text } = input.prepared
+  const { index, text, verdict } = input.prepared
   const ref = { quoteId: input.quoteId, versionNumber: input.versionNumber }
 
   const rows = await withQuoterRejections(
@@ -373,10 +384,10 @@ const insertVersion = async (
           input.ownerOrganizationId,
           text,
           textDigest(text),
-          index.replayDigest,
-          index.calculationId,
-          index.artifactVersion,
-          index.belowFloor,
+          verdict.replayDigest,
+          verdict.calculationId,
+          verdict.artifactVersion,
+          verdict.belowFloor,
           input.origin,
           input.context.actor.kind,
           memberIdOf(input.context.actor),
@@ -498,7 +509,8 @@ export const readExceptionApproval = async (
 
 // ── State changes ────────────────────────────────────────────────────────────────────────────────────────────
 
-type IssuedObject = { versionNumber: number; artifactDigest: string; documentSeq: number; documentDigest: string }
+/** What a change of state names: the version and the document of an issue, each with its digest. */
+type NamedObject = { versionNumber: number; artifactDigest: string; documentSeq: number; documentDigest: string }
 
 const insertTransition = async (
   client: QuoterDbClient,
@@ -507,32 +519,35 @@ const insertTransition = async (
     ownerOrganizationId: string
     from: QuoterTransitionOrigin
     to: QuoterQuoteState
-    /** What is issued. Present exactly when `to` is `issued`. */
-    issued?: IssuedObject
+    /** What is issued, or what the client answers about. Absent in every other change. */
+    object?: NamedObject
+    /** `YYYY-MM-DD`. Present exactly when `to` is `issued`. */
+    validUntil?: string
     reason: string
     context: QuoteWriteContext
   }
 ) => {
-  // `transition_seq` is assigned by the trigger, under the lock of the quote: the 0 sent here is never stored.
+  // `transition_seq` and `occurred_at` are assigned by the trigger, under the lock of the quote.
   const rows = await withQuoterRejections(
     () =>
       runQuoterQuery<{ transition_id: string; transition_seq: number; occurred_at: Date }>(
         client,
         `INSERT INTO greenhouse_commercial.quoter_state_transitions
            (quote_id, transition_seq, owner_organization_id, from_state, to_state, version_number, artifact_digest,
-            document_seq, document_digest, actor_kind, actor_member_id, actor_principal_id, reason,
+            document_seq, document_digest, valid_until, actor_kind, actor_member_id, actor_principal_id, reason,
             command_execution_id, request_hash)
-         VALUES ($1, 0, $2, $3, $4, $5::int, $6, $7::int, $8, $9, $10, $11, $12, $13, $14)
+         VALUES ($1, 0, $2, $3, $4, $5::int, $6, $7::int, $8, $9::date, $10, $11, $12, $13, $14, $15)
          RETURNING transition_id, transition_seq, occurred_at`,
         [
           input.quoteId,
           input.ownerOrganizationId,
           input.from,
           input.to,
-          input.issued?.versionNumber ?? null,
-          input.issued?.artifactDigest ?? null,
-          input.issued?.documentSeq ?? null,
-          input.issued?.documentDigest ?? null,
+          input.object?.versionNumber ?? null,
+          input.object?.artifactDigest ?? null,
+          input.object?.documentSeq ?? null,
+          input.object?.documentDigest ?? null,
+          input.validUntil ?? null,
           input.context.actor.kind,
           memberIdOf(input.context.actor),
           input.context.actor.principalId,
@@ -613,8 +628,8 @@ export const createQuote = async (client: QuoterDbClient, input: CreateQuoteInpu
   const prepared = prepareArtifact(input.artifactText)
   const context: QuoteWriteContext = { actor: input.actor, command: input.command }
 
-  await lockCalculation(client, prepared.index.replayDigest)
-  await assertNotRegistered(client, prepared.index.replayDigest)
+  await lockCalculation(client, prepared.verdict.replayDigest)
+  await assertNotRegistered(client, prepared.verdict.replayDigest)
 
   const created = await withQuoterRejections(() =>
     runQuoterQuery<{ quote_id: string }>(
@@ -667,15 +682,15 @@ export type AddQuoteVersionInput = QuoteWriteContext & {
 }
 
 /**
- * Adds version N+1, which replaces N. No earlier row changes. Over an issued quote it records `issued → revising`
- * FIRST and then the version: an issued quote takes no version, and what was issued stays what the client holds
- * until the new version is issued.
+ * Adds version N+1, which replaces N. No earlier row changes. Over a quote the client already has (issued, accepted
+ * or rejected) it records the change to `revising` FIRST and then the version: such a quote takes no version, and
+ * what was issued stays what the client holds until the new version is issued.
  */
 export const addQuoteVersion = async (client: QuoterDbClient, input: AddQuoteVersionInput) => {
   const prepared = prepareArtifact(input.artifactText)
   const context: QuoteWriteContext = { actor: input.actor, command: input.command }
 
-  await lockCalculation(client, prepared.index.replayDigest)
+  await lockCalculation(client, prepared.verdict.replayDigest)
   await lockQuote(client, input.quoteId)
 
   const current = await requireQuote(client, input.quoteId)
@@ -687,14 +702,15 @@ export const addQuoteVersion = async (client: QuoterDbClient, input: AddQuoteVer
   if (input.expectedVersion !== undefined && input.expectedVersion !== latest)
     throw new QuoterError('version_conflict', { latestVersionNumber: latest })
 
-  await assertNotRegistered(client, prepared.index.replayDigest)
+  await assertNotRegistered(client, prepared.verdict.replayDigest)
 
   const base = { quoteId: input.quoteId, ownerOrganizationId: current.ownerOrganizationId, context }
 
-  if (current.state === 'issued')
+  // A quote the client already has (issued, accepted or rejected) takes no version: a revision is opened first.
+  if (current.state === 'issued' || current.state === 'accepted' || current.state === 'rejected')
     await insertTransition(client, {
       ...base,
-      from: 'issued',
+      from: current.state,
       to: 'revising',
       reason: input.reason ?? 'Versión nueva sobre una cotización emitida.'
     })
@@ -708,10 +724,13 @@ export type RecordStateTransitionInput = QuoteWriteContext & {
   quoteId: string
   to: QuoterQuoteState
   /**
-   * Required when `to` is `issued`: the version being issued. It is the last one or, to go back to what the client
-   * already held, the last one issued.
+   * With `issued`, required: the version being issued. It is the last one or, to go back to what the client already
+   * held, the last one issued. With `accepted` or `rejected`, optional: the version the caller believes the client
+   * answered; when it is not the last one issued, `not_last_issued_version`.
    */
   versionNumber?: number
+  /** With `issued`, required: until which day what is issued holds, as `YYYY-MM-DD`. Not before today. */
+  validUntil?: string
   /** When given with `issued`: the recipient the caller saw. A different one in force is `recipient_conflict`. */
   expectedClientOrganizationId?: string
   /** When given with `issued`: the document the caller saw. A different one in force is `document_conflict`. */
@@ -719,12 +738,16 @@ export type RecordStateTransitionInput = QuoteWriteContext & {
   reason: string
 }
 
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/
+
 /**
  * Records a state change from the state in force. `invalid_transition` when the pair is not in the matrix.
  *
- * Issuing pins what is issued: the version with its digest and the document in force with its digest. It needs a
- * recipient, a document and, when the version is below the floor, an approval in force. Every one of those rules is
- * also a rule of the database: whoever reached the table by another way would be refused the same.
+ * Issuing pins what is issued: the version with its digest and the document in force with its digest, and until
+ * which day it holds. It needs a recipient, a document and, when the version is below the floor, an approval in
+ * force. Accepting and rejecting name the last thing issued, and an expired quote is not accepted: it is issued
+ * again with a new validity (and keeps its number). Every one of those rules is also a rule of the database: whoever
+ * reached the table by another way would be refused the same.
  *
  * The public number is assigned by the database when a quote is issued for the first time; it comes back here.
  */
@@ -738,7 +761,8 @@ export const recordStateTransition = async (client: QuoterDbClient, input: Recor
   if (!transition) throw new QuoterError('invalid_transition', { from, to: input.to })
   if (transition.humanGate && input.actor.kind !== 'member') throw new QuoterError('human_actor_required', { from, to: input.to })
 
-  let issued: IssuedObject | undefined
+  let object: NamedObject | undefined
+  let validUntil: string | undefined
 
   if (input.to === 'issued') {
     const ref = { quoteId: input.quoteId, versionNumber: input.versionNumber ?? -1 }
@@ -768,11 +792,38 @@ export const recordStateTransition = async (client: QuoterDbClient, input: Recor
     if (version.belowFloor && (await readExceptionApproval(client, ref))?.decision !== 'approved')
       throw new QuoterError('exception_approval_required', ref)
 
-    issued = {
+    // Whether the day already passed is for the database to say: it is the one that knows what day it is.
+    if (!input.validUntil || !ISO_DAY.test(input.validUntil)) throw new QuoterError('validity_required', ref)
+
+    validUntil = input.validUntil
+    object = {
       versionNumber: version.versionNumber,
       artifactDigest: version.artifactDigest,
       documentSeq: document.documentSeq,
       documentDigest: document.documentDigest
+    }
+  } else if (input.to === 'accepted' || input.to === 'rejected') {
+    // The matrix only lets a quote that was issued get here, so the last issue exists.
+    if (
+      current.issuedVersionNumber === null ||
+      current.issuedArtifactDigest === null ||
+      current.issuedDocumentSeq === null ||
+      current.issuedDocumentDigest === null
+    )
+      throw new QuoterError('invalid_transition', { from, to: input.to })
+
+    if (input.versionNumber !== undefined && input.versionNumber !== current.issuedVersionNumber)
+      throw new QuoterError('not_last_issued_version', { quoteId: input.quoteId, issuedVersionNumber: current.issuedVersionNumber })
+
+    // `effectiveState` is the database's reading of the validity date: the rule is not applied again here.
+    if (input.to === 'accepted' && current.effectiveState === QUOTER_EXPIRED)
+      throw new QuoterError('quote_expired', { quoteId: input.quoteId, validUntil: current.validUntil })
+
+    object = {
+      versionNumber: current.issuedVersionNumber,
+      artifactDigest: current.issuedArtifactDigest,
+      documentSeq: current.issuedDocumentSeq,
+      documentDigest: current.issuedDocumentDigest
     }
   }
 
@@ -781,14 +832,15 @@ export const recordStateTransition = async (client: QuoterDbClient, input: Recor
     ownerOrganizationId: current.ownerOrganizationId,
     from,
     to: input.to,
-    issued,
+    object,
+    validUntil,
     reason: input.reason,
     context: { actor: input.actor, command: input.command }
   })
 
-  const quoteNumber = input.to === 'issued' ? ((await requireQuote(client, input.quoteId)).quoteNumber ?? null) : current.quoteNumber
+  const after = input.to === 'issued' ? await requireQuote(client, input.quoteId) : current
 
-  return { ...recorded, issued: issued ?? null, quoteNumber }
+  return { ...recorded, object: object ?? null, quoteNumber: after.quoteNumber, validUntil: after.validUntil }
 }
 
 export type AssignRecipientInput = QuoteWriteContext & { quoteId: string; clientOrganizationId: string; reason: string }
@@ -814,6 +866,19 @@ export const assignRecipient = async (client: QuoterDbClient, input: AssignRecip
   })
 }
 
+const versionWasIssued = async (client: QuoterDbClient, ref: { quoteId: string; versionNumber: number }) => {
+  const rows = await runQuoterQuery<{ issued: boolean }>(
+    client,
+    `SELECT EXISTS (
+       SELECT 1 FROM greenhouse_commercial.quoter_state_transitions t
+        WHERE t.quote_id = $1 AND t.to_state = 'issued' AND t.version_number = $2::int
+     ) AS issued`,
+    [ref.quoteId, ref.versionNumber]
+  )
+
+  return rows[0].issued
+}
+
 export type DecideExceptionInput = QuoteWriteContext & {
   quoteId: string
   versionNumber: number
@@ -825,6 +890,7 @@ export type DecideExceptionInput = QuoteWriteContext & {
  * Records the approval of an exception below the floor, or its revocation, for one version and its digest. It is
  * not a state: it is an act the issue checks, and the last decision is the one in force. Only an identified person
  * decides; only a version the engine flagged below the floor takes a decision; a new version does not inherit one.
+ * An approval is revoked only while its version was never issued (`exception_revocation_locked` afterwards).
  */
 export const decideException = async (client: QuoterDbClient, input: DecideExceptionInput) => {
   if (input.actor.kind !== 'member') throw new QuoterError('human_actor_required', { act: 'decide_exception' })
@@ -843,6 +909,10 @@ export const decideException = async (client: QuoterDbClient, input: DecideExcep
   const inForce = (await readExceptionApproval(client, ref))?.decision ?? 'revoked'
 
   if (inForce === input.decision) throw new QuoterError('exception_decision_unchanged', { ...ref, decision: input.decision })
+
+  // Once a version was issued, revoking its approval would be a record that means nothing: the act is to withdraw.
+  if (input.decision === 'revoked' && (await versionWasIssued(client, ref)))
+    throw new QuoterError('exception_revocation_locked', ref)
 
   // `approval_seq` is assigned by the trigger, under the lock of the quote.
   const rows = await withQuoterRejections(

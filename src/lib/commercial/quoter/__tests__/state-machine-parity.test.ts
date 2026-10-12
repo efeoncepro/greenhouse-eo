@@ -32,6 +32,11 @@ describe('quoter state machine', () => {
     expect(seed().map(key).sort()).toEqual(QUOTER_TRANSITIONS.map(key).sort())
   })
 
+  it('no pair asks for a person: an agent records every change of state', () => {
+    expect(QUOTER_TRANSITIONS.filter(transition => transition.humanGate)).toEqual([])
+    expect(seed().filter(pair => pair.humanGate)).toEqual([])
+  })
+
   it('no pair is declared twice, and every pair moves between declared states', () => {
     const pairs = QUOTER_TRANSITIONS.map(transition => `${transition.from}>${transition.to}`)
 
@@ -50,8 +55,28 @@ describe('quoter state machine', () => {
     expect(findQuoterTransition('issued', 'draft')).toBeUndefined()
   })
 
-  it('every state that is not terminal can be withdrawn', () => {
-    for (const state of QUOTER_QUOTE_STATES.filter(candidate => !QUOTER_TERMINAL_STATES.includes(candidate)))
-      expect(findQuoterTransition(state, 'withdrawn'), state).toBeDefined()
+  it('only withdrawn is terminal: every other state has a way out, and withdrawn is reachable from all of them', () => {
+    expect(QUOTER_TERMINAL_STATES).toEqual(['withdrawn'])
+
+    const reaches = (from: string, seen = new Set<string>()): Set<string> => {
+      for (const transition of QUOTER_TRANSITIONS.filter(candidate => candidate.from === from && !seen.has(candidate.to))) {
+        seen.add(transition.to)
+        reaches(transition.to, seen)
+      }
+
+      return seen
+    }
+
+    for (const state of QUOTER_QUOTE_STATES.filter(candidate => candidate !== 'withdrawn')) {
+      expect(QUOTER_TRANSITIONS.some(transition => transition.from === state), `${state} has a way out`).toBe(true)
+      expect(reaches(state).has('withdrawn'), `${state} reaches withdrawn`).toBe(true)
+    }
+  })
+
+  it('a client answers what was issued, and an answer never closes the quote', () => {
+    for (const answer of ['accepted', 'rejected'] as const) {
+      expect(QUOTER_TRANSITIONS.filter(transition => transition.to === answer).map(transition => transition.from).sort()).toEqual(['issued', 'revising'])
+      expect(QUOTER_TRANSITIONS.filter(transition => transition.from === answer).map(transition => transition.to)).toEqual(['revising'])
+    }
   })
 })

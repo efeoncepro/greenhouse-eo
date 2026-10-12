@@ -8,6 +8,9 @@ import type { CurrentSourceRole } from '@/lib/finance/pricing-v3/adapters/curren
 /**
  * What a frozen artifact says about itself, read for the index columns of a stored version.
  *
+ * Whether an artifact calculated and whether it is below the floor are NOT read here: those are verdicts, and the
+ * engine gives them after recomputing the artifact (`replayFrozenArtifact`). This file only reads what a list shows.
+ *
  * These values are READ INDEXES: they let a list filter and sort without opening two megabytes of text. They are
  * never the source of a result. A reader that needs what a quote says parses the stored text or calls the engine;
  * nothing rebuilds a result from these fields. A test stores a version whose columns contradict its text on purpose
@@ -30,11 +33,6 @@ export type ArtifactIndex = {
   /** Every input contract its periods were written under. */
   contractVersions: string[]
   currency: string | null
-  /**
-   * The verdict of the engine: some row of some period is under its floor (`MARGIN_BELOW_FLOOR`). Frozen with the
-   * version, because issuing a version below the floor needs the approval of a person and the database checks it.
-   */
-  belowFloor: boolean
   /** The sources the artifact carries inside, by the identity a pointer would name them with. */
   sources: Partial<Record<CurrentSourceRole, ArtifactSourceIndex>>
 }
@@ -48,16 +46,9 @@ const list = (value: unknown): unknown[] => (Array.isArray(value) ? value : [])
 const text = (value: unknown): string | null => (typeof value === 'string' && value ? value : null)
 const distinct = (values: (string | null)[]) => [...new Set(values.filter((value): value is string => value !== null))].sort()
 
-const BELOW_FLOOR = 'MARGIN_BELOW_FLOOR'
-
-const flagsBelowFloor = (holder: Json | undefined) =>
-  list(holder?.diagnostics).some(diagnostic => object(diagnostic)?.code === BELOW_FLOOR)
-
 // The quote of a period-based lane: its status and totals, the engine of each period and the contract of each input.
 const quoteFacts = (quote: Json | undefined) => ({
   calculationStatus: text(quote?.calculationStatus),
-  belowFloor:
-    flagsBelowFloor(quote) || list(quote?.periods).some(period => flagsBelowFloor(object(object(period)?.result))),
   engineVersions: distinct(list(quote?.periods).map(period => text(object(object(period)?.result)?.engineVersion))),
   contractVersions: distinct(
     list(object(quote?.resolution)?.inputs).map(input =>
@@ -96,7 +87,6 @@ export const readArtifactIndex = (value: unknown): ArtifactIndex => {
       ...identity,
       artifactVersion: lane,
       calculationStatus: text(result?.calculationStatus),
-      belowFloor: flagsBelowFloor(result),
       engineVersions: distinct([text(semantic?.engineVersion)]),
       contractVersions: distinct([text(request?.schemaVersion)]),
       currency: text(request?.outputCurrency),

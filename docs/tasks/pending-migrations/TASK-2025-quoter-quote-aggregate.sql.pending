@@ -30,8 +30,13 @@
 --   - cada fila dice quién actuó (actor_principal_id): el registro de comandos caduca y no sirve de memoria;
 --   - una versión guarda sólo un artefacto calculado, y su texto da la huella que declara;
 --   - emitir nombra una versión real con su huella (la última o la última emitida), su documento en vigor, una
---     cotización con destinataria y, si la versión está bajo el piso, una aprobación vigente;
+--     cotización con destinataria, una fecha de vigencia y, si la versión está bajo el piso, una aprobación vigente;
+--   - aceptar y rechazar nombran lo último que se emitió, y una cotización vencida no se acepta: «vencida» no es un
+--     estado guardado, se deriva de la vigencia de la última emisión, en un solo lugar (quoter_quote_current);
 --   - la destinataria se reasigna sólo en `draft`; el número lo asigna la base en la primera emisión, sin huecos.
+--
+-- Agregar un estado al ciclo de vida más adelante no toca ninguna tabla con filas: los estados no están enumerados
+-- en restricciones. Es agregar filas a la matriz y reemplazar funciones y la vista (CREATE OR REPLACE).
 --
 -- Concurrencia: todo disparador que lee «lo vigente» de una cotización toma antes el mismo bloqueo transaccional,
 -- quoter_lock_quote(quote_id). El almacén toma ese mismo bloqueo antes de decidir.
@@ -160,9 +165,10 @@ COMMENT ON TABLE greenhouse_commercial.quoter_quote_version_index IS
 -- ── quoter_state_matrix ──────────────────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE greenhouse_commercial.quoter_state_matrix (
-  -- `none` es el origen centinela del estado inicial: no es un estado de una cotización.
-  from_state text NOT NULL CHECK (from_state IN ('none', 'draft', 'issued', 'revising')),
-  to_state text NOT NULL CHECK (to_state IN ('draft', 'issued', 'revising', 'withdrawn')),
+  -- `none` es el origen centinela del estado inicial: no es un estado de una cotización. Los estados no se enumeran
+  -- aquí: la matriz ES la lista. Un estado nuevo del ciclo de vida entra agregando filas, sin tocar una restricción.
+  from_state text NOT NULL CHECK (from_state ~ '^[a-z][a-z_]{1,39}$'),
+  to_state text NOT NULL CHECK (to_state ~ '^[a-z][a-z_]{1,39}$' AND to_state <> 'none'),
   requires_human_gate boolean NOT NULL DEFAULT false,
   CONSTRAINT quoter_state_matrix_pkey PRIMARY KEY (from_state, to_state)
 );
@@ -172,7 +178,8 @@ ALTER TABLE greenhouse_commercial.quoter_state_matrix OWNER TO greenhouse_ops;
 COMMENT ON TABLE greenhouse_commercial.quoter_state_matrix IS
   'Cotizador V3: los cambios de estado que existen. Un par nuevo entra por una migración que sólo agrega filas. Marcar un par con compuerta humana exige una decisión del CEO.';
 
--- Ningún par exige compuerta humana: emitir y retirar los hace también un agente (decisión 7, CEO 2026-10-12).
+-- Ningún par exige compuerta humana: emitir, retirar y registrar la respuesta del cliente los hace también un
+-- agente (decisión 7, CEO 2026-10-12). `withdrawn` es el único estado terminal; ningún otro es un callejón sin salida.
 -- La prueba de paridad con TypeScript lee este bloque: una tupla por línea y ningún punto y coma dentro.
 INSERT INTO greenhouse_commercial.quoter_state_matrix (from_state, to_state, requires_human_gate) VALUES
   ('none', 'draft', false),
@@ -181,7 +188,13 @@ INSERT INTO greenhouse_commercial.quoter_state_matrix (from_state, to_state, req
   ('issued', 'revising', false),
   ('revising', 'issued', false),
   ('issued', 'withdrawn', false),
-  ('revising', 'withdrawn', false)
+  ('revising', 'withdrawn', false),
+  ('issued', 'accepted', false),
+  ('issued', 'rejected', false),
+  ('revising', 'accepted', false),
+  ('revising', 'rejected', false),
+  ('accepted', 'revising', false),
+  ('rejected', 'revising', false)
 ON CONFLICT (from_state, to_state) DO UPDATE SET requires_human_gate = EXCLUDED.requires_human_gate;
 
 -- ── quoter_version_documents ─────────────────────────────────────────────────────────────────────────────────
@@ -259,19 +272,25 @@ CREATE TABLE greenhouse_commercial.quoter_state_transitions (
   owner_organization_id text NOT NULL REFERENCES greenhouse_core.organizations (organization_id),
   from_state text NOT NULL,
   to_state text NOT NULL,
-  -- Hacia `issued`: qué versión, qué huella y qué documento se emitió. En cualquier otro cambio, nulos.
+  -- Hacia `issued`: qué versión, qué huella y qué documento se emitió. Hacia `accepted` o `rejected`: lo último que
+  -- se emitió, que es a lo que el cliente responde. En cualquier otro cambio, nulos. Qué cambio nombra qué lo decide
+  -- el disparador; la tabla sólo exige que los cuatro vayan juntos.
   version_number integer,
   artifact_digest text CHECK (artifact_digest IS NULL OR artifact_digest ~ '^[0-9a-f]{64}$'),
   document_seq integer,
   document_digest text CHECK (document_digest IS NULL OR document_digest ~ '^[0-9a-f]{64}$'),
+  -- Hasta qué día vale lo emitido. Lo fija cada emisión; nulo en cualquier otro cambio.
+  valid_until date,
   -- Copiado de la matriz por el disparador; nunca lo da quien llama.
   requires_human_gate boolean NOT NULL DEFAULT false,
-  actor_kind text NOT NULL CHECK (actor_kind IN ('member', 'agent', 'service')),
+  -- Con nombre, para ampliar el dominio (un cliente que acepta por el enlace público) cambiando una restricción.
+  actor_kind text NOT NULL CONSTRAINT quoter_state_transitions_actor_kind CHECK (actor_kind IN ('member', 'agent', 'service')),
   actor_member_id text,
   actor_principal_id text NOT NULL CHECK (length(btrim(actor_principal_id)) > 0),
   reason text NOT NULL CHECK (length(btrim(reason)) >= 5),
   command_execution_id text NOT NULL CHECK (length(btrim(command_execution_id)) > 0),
   request_hash text CHECK (request_hash IS NULL OR request_hash ~ '^[0-9a-f]{64}$'),
+  -- La hora de la base, siempre: el disparador la fija y quien llama no puede declarar otra.
   occurred_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT quoter_state_transitions_pkey PRIMARY KEY (quote_id, transition_seq),
   CONSTRAINT quoter_state_transitions_id_unique UNIQUE (transition_id),
@@ -281,12 +300,8 @@ CREATE TABLE greenhouse_commercial.quoter_state_transitions (
     REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number, artifact_digest),
   CONSTRAINT quoter_state_transitions_document_fk FOREIGN KEY (quote_id, version_number, document_seq, document_digest)
     REFERENCES greenhouse_commercial.quoter_version_documents (quote_id, version_number, document_seq, document_digest),
-  CONSTRAINT quoter_state_transitions_issue_names_what_it_issues CHECK (
-    (to_state = 'issued' AND version_number IS NOT NULL AND artifact_digest IS NOT NULL
-       AND document_seq IS NOT NULL AND document_digest IS NOT NULL)
-    OR (to_state <> 'issued' AND version_number IS NULL AND artifact_digest IS NULL
-       AND document_seq IS NULL AND document_digest IS NULL)
-  ),
+  CONSTRAINT quoter_state_transitions_object_is_whole
+    CHECK (num_nonnulls(version_number, artifact_digest, document_seq, document_digest) IN (0, 4)),
   CONSTRAINT quoter_state_transitions_member_identified
     CHECK (actor_kind <> 'member' OR actor_member_id IS NOT NULL),
   CONSTRAINT quoter_state_transitions_human_gate_needs_member
@@ -297,6 +312,18 @@ ALTER TABLE greenhouse_commercial.quoter_state_transitions OWNER TO greenhouse_o
 
 COMMENT ON TABLE greenhouse_commercial.quoter_state_transitions IS
   'Cotizador V3: historial de estados de una cotización. Sólo agregar. El estado vigente es el de la fila de mayor transition_seq.';
+
+-- El día de hoy donde opera Efeonce. El ÚNICO lugar que dice qué día es para la vigencia de una cotización: lo usan
+-- el disparador de cambios de estado y la vista. Nunca CURRENT_DATE a secas, que depende de la zona de la sesión.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_today()
+RETURNS date
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT (pg_catalog.now() AT TIME ZONE 'America/Santiago')::date
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_today() OWNER TO greenhouse_ops;
 
 -- El estado vigente de una cotización, o NULL si todavía no tiene ninguno.
 CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_quote_state(p_quote_id text)
@@ -442,8 +469,8 @@ BEGIN
       USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_versions_text_digest';
   END IF;
 
-  -- Una versión entra a una cotización recién creada, en borrador o en revisión. Sobre una emitida, primero se
-  -- registra `issued → revising`; una retirada no recibe versiones.
+  -- Una versión entra a una cotización recién creada, en borrador o en revisión. Sobre una emitida, aceptada o
+  -- rechazada, primero se registra el cambio a `revising`; una retirada no recibe versiones.
   current_state := greenhouse_commercial.quoter_quote_state(NEW.quote_id);
 
   IF current_state IS NOT NULL AND current_state NOT IN ('draft', 'revising') THEN
@@ -541,6 +568,16 @@ BEGIN
       USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_exception_approvals_decision_changes_it';
   END IF;
 
+  -- Una versión ya emitida no pierde su aprobación: esa fila no significaría nada. El acto es retirar la cotización.
+  IF NEW.decision = 'revoked' AND EXISTS (
+    SELECT 1 FROM greenhouse_commercial.quoter_state_transitions t
+     WHERE t.quote_id = NEW.quote_id AND t.to_state = 'issued' AND t.version_number = NEW.version_number
+  ) THEN
+    RAISE EXCEPTION 'quoter_exception_approvals: la versión % de la cotización % ya se emitió; su aprobación no se revoca',
+      NEW.version_number, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_exception_approvals_revoke_before_issue';
+  END IF;
+
   NEW.approval_seq := COALESCE(last_seq, 0) + 1;
 
   RETURN NEW;
@@ -558,7 +595,7 @@ DECLARE
   current_state text;
   gate boolean;
   last_version integer;
-  last_issued_version integer;
+  last_issue record;
   version_below_floor boolean;
   document_in_force integer;
 BEGIN
@@ -588,18 +625,20 @@ BEGIN
       USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_pair_exists';
   END IF;
 
+  -- Lo último que se emitió: a eso responde el cliente, y a eso se puede volver desde una revisión.
+  SELECT e.version_number, e.artifact_digest, e.document_seq, e.document_digest, e.valid_until
+    INTO last_issue
+    FROM greenhouse_commercial.quoter_state_transitions e
+   WHERE e.quote_id = NEW.quote_id AND e.to_state = 'issued'
+   ORDER BY e.transition_seq DESC
+   LIMIT 1;
+
   IF NEW.to_state = 'issued' THEN
     -- Se emite la última versión o, para volver a lo que el cliente ya tenía, la última emitida.
     SELECT max(v.version_number) INTO last_version FROM greenhouse_commercial.quoter_quote_versions v WHERE v.quote_id = NEW.quote_id;
 
-    SELECT e.version_number INTO last_issued_version
-      FROM greenhouse_commercial.quoter_state_transitions e
-     WHERE e.quote_id = NEW.quote_id AND e.to_state = 'issued'
-     ORDER BY e.transition_seq DESC
-     LIMIT 1;
-
     IF NEW.version_number IS NULL
-       OR (NEW.version_number IS DISTINCT FROM last_version AND NEW.version_number IS DISTINCT FROM last_issued_version) THEN
+       OR (NEW.version_number IS DISTINCT FROM last_version AND NEW.version_number IS DISTINCT FROM last_issue.version_number) THEN
       RAISE EXCEPTION 'quoter_state_transitions: se emite la última versión o la última emitida (cotización %, versión %)',
         NEW.quote_id, NEW.version_number
         USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issues_last_or_issued_version';
@@ -636,10 +675,47 @@ BEGIN
         NEW.version_number, NEW.quote_id
         USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_needs_exception_approval';
     END IF;
+
+    -- Toda emisión dice hasta qué día vale, y no nace vencida. Una re-emisión fija la suya.
+    IF NEW.valid_until IS NULL THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la emisión de la cotización % no declara su vigencia', NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_names_its_validity';
+    END IF;
+
+    IF NEW.valid_until < greenhouse_commercial.quoter_today() THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la vigencia % de la cotización % ya pasó', NEW.valid_until, NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_validity_not_past';
+    END IF;
+  ELSIF NEW.to_state IN ('accepted', 'rejected') THEN
+    -- La respuesta del cliente es sobre lo último que se emitió: esa versión y ese documento, con sus huellas.
+    IF last_issue.version_number IS NULL
+       OR NEW.version_number IS DISTINCT FROM last_issue.version_number
+       OR NEW.artifact_digest IS DISTINCT FROM last_issue.artifact_digest
+       OR NEW.document_seq IS DISTINCT FROM last_issue.document_seq
+       OR NEW.document_digest IS DISTINCT FROM last_issue.document_digest THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la respuesta no nombra lo último que se emitió de la cotización %', NEW.quote_id
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_responds_to_last_issued';
+    END IF;
+
+    -- Una cotización vencida no se acepta: se vuelve a emitir con vigencia nueva. Rechazarla sí se puede.
+    IF NEW.to_state = 'accepted' AND last_issue.valid_until < greenhouse_commercial.quoter_today() THEN
+      RAISE EXCEPTION 'quoter_state_transitions: la cotización % venció el % y no se acepta', NEW.quote_id, last_issue.valid_until
+        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_expired';
+    END IF;
+  ELSIF num_nonnulls(NEW.version_number, NEW.artifact_digest, NEW.document_seq, NEW.document_digest) <> 0 THEN
+    RAISE EXCEPTION 'quoter_state_transitions: el cambio % → % no nombra una versión (cotización %)',
+      NEW.from_state, NEW.to_state, NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_names_its_object';
+  END IF;
+
+  IF NEW.to_state <> 'issued' AND NEW.valid_until IS NOT NULL THEN
+    RAISE EXCEPTION 'quoter_state_transitions: sólo una emisión declara vigencia (cotización %)', NEW.quote_id
+      USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_issue_names_its_validity';
   END IF;
 
   NEW.requires_human_gate := gate;
   NEW.transition_seq := COALESCE(last_seq, 0) + 1;
+  NEW.occurred_at := pg_catalog.now();
 
   RETURN NEW;
 END
@@ -825,6 +901,11 @@ CREATE VIEW greenhouse_commercial.quoter_quote_current AS
          q.data_origin,
          q.created_at,
          s.to_state AS state,
+         -- «Vencida» no se guarda: se deriva aquí y sólo aquí. Ningún lector vuelve a aplicar la regla.
+         CASE
+           WHEN s.to_state IN ('issued', 'revising') AND i.valid_until < greenhouse_commercial.quoter_today() THEN 'expired'
+           ELSE s.to_state
+         END AS effective_state,
          s.occurred_at AS state_since,
          n.quote_number,
          r.client_organization_id,
@@ -835,7 +916,9 @@ CREATE VIEW greenhouse_commercial.quoter_quote_current AS
          i.version_number AS issued_version_number,
          i.artifact_digest AS issued_artifact_digest,
          i.document_seq AS issued_document_seq,
-         i.occurred_at AS issued_at
+         i.document_digest AS issued_document_digest,
+         i.occurred_at AS issued_at,
+         i.valid_until
     FROM greenhouse_commercial.quoter_quotes q
     LEFT JOIN LATERAL (
       SELECT t.to_state, t.occurred_at
@@ -862,7 +945,7 @@ CREATE VIEW greenhouse_commercial.quoter_quote_current AS
     LEFT JOIN greenhouse_commercial.quoter_quote_version_index x
       ON x.quote_id = q.quote_id AND x.version_number = v.version_number
     LEFT JOIN LATERAL (
-      SELECT e.version_number, e.artifact_digest, e.document_seq, e.occurred_at
+      SELECT e.version_number, e.artifact_digest, e.document_seq, e.document_digest, e.occurred_at, e.valid_until
         FROM greenhouse_commercial.quoter_state_transitions e
        WHERE e.quote_id = q.quote_id AND e.to_state = 'issued'
        ORDER BY e.transition_seq DESC
@@ -902,6 +985,7 @@ GRANT SELECT ON greenhouse_commercial.quoter_state_matrix TO greenhouse_runtime;
 GRANT SELECT ON greenhouse_commercial.quoter_quote_current TO greenhouse_runtime;
 GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_lock_quote(text) TO greenhouse_runtime;
 GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_quote_state(text) TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_today() TO greenhouse_runtime;
 
 -- ── Verificación: aborta si algo de lo anterior no quedó creado ──────────────────────────────────────────────
 
@@ -920,8 +1004,17 @@ BEGIN
     IF to_regclass('greenhouse_commercial.' || relation) IS NULL THEN missing := missing || ' ' || relation; END IF;
   END LOOP;
 
-  IF (SELECT count(*) FROM greenhouse_commercial.quoter_state_matrix) <> 7 THEN
-    missing := missing || ' quoter_state_matrix_seed(!=7)';
+  IF (SELECT count(*) FROM greenhouse_commercial.quoter_state_matrix) <> 13 THEN
+    missing := missing || ' quoter_state_matrix_seed(!=13)';
+  END IF;
+
+  -- Sólo `withdrawn` es terminal: todo otro destino tiene salida.
+  IF EXISTS (
+    SELECT 1 FROM greenhouse_commercial.quoter_state_matrix m
+     WHERE m.to_state <> 'withdrawn'
+       AND NOT EXISTS (SELECT 1 FROM greenhouse_commercial.quoter_state_matrix n WHERE n.from_state = m.to_state)
+  ) THEN
+    missing := missing || ' quoter_state_matrix_dead_end';
   END IF;
 
   IF (SELECT count(*) FROM greenhouse_commercial.quoter_state_matrix WHERE requires_human_gate) <> 0 THEN
@@ -992,6 +1085,7 @@ DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_numbers;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_number_counters;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_recipients;
 DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_quote_state(text);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_today();
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_state_transitions;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_exception_approvals;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_version_documents;
