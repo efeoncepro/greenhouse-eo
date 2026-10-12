@@ -52,6 +52,9 @@ const parsers: Record<CurrentSourceRole, (raw: unknown) => { version: string }> 
   credits: raw => creditCatalogSchema.parse(raw)
 }
 
+/** A source document as the contract of its role parses it. What a digest is computed over, and what is used. */
+export const parseCurrentSource = (role: CurrentSourceRole, document: unknown) => parsers[role](document)
+
 /**
  * The identity of a source document: its version and the digest of the document as its own contract parses it.
  * A storage adapter that hands out a document by identity computes it here, so it can never disagree with the pointer.

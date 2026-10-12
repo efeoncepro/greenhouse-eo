@@ -115,6 +115,9 @@ let loaded: Corpus | undefined
 // Read once per test file, whatever the number of subjects: it is 38 MB of artifacts.
 const corpus = () => (loaded ??= loadCorpus())
 
+/** The repository corpus the battery runs over, for a test that needs the same artifacts and documents. */
+export const loadStorageCorpus = corpus
+
 const seed = async ({ storage, locator }: StorageUnderTest, held: Corpus) => {
   for (const document of held.documents)
     await storage.writeDocument({ role: document.role, text: document.text, locator: locator(document.path) })
