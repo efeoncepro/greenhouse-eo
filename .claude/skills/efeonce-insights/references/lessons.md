@@ -1,5 +1,17 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-12 · Subir `axis-brand-assets` sin regenerar lo que depende del paquete dejó tres tests rojos seis días.**
+  Síntoma: `pnpm test` con tres fallas ajenas a la task en curso (sello de Manzanitas, vocabulario de canales, sello de
+  los lockups del PDF del AI Visibility Report). Causa: `596bfab90` (TASK-1943, 2026-10-06) subió el pin de 0.4.15 a
+  0.4.25 para traer las marcas de HubSpot; entre esas versiones AXIS sumó Facebook y Threads (0.4.19) y X (0.4.21) a
+  `AXIS_PLATFORM_ASSETS` y redibujó los lockups de las submarcas con terminación concéntrica (AXIS `2651192`). El pin
+  estaba bien; faltó regenerar. Regla: todo cambio de versión de `@efeoncepro/axis-brand-assets` corre, antes del commit,
+  `pnpm manzanitas:tokens`, `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` y
+  `pnpm exec vitest run src/lib/efeonce-insights/contracts/channels.test.ts src/config/insights-channel-isotypes.test.ts`;
+  si AXIS sumó una plataforma, se agrega a `INSIGHT_CHANNEL_IDS`, a `GH_INSIGHTS.channels` y a `CHANNEL_ISOTYPES`, y se
+  copia su isotipo en color a los dos catálogos. Leer el mensaje del test con cuidado: decía «faltan facebook, threads,
+  x» y se leyó como que AXIS tenía MENOS plataformas; era la lista de Greenhouse la corta.
+
 - **2026-10-04 · Un `dead_letter` no tenía salida: el comando lo permitía y la base no.** Síntoma: tras corregir el
   mapper (release `7182af769`), re-encargar `report_pdf` de la edición de Berel respondió `500 internal_error`; hubo que
   `revise`. Causa: `requestInsightRender` trataba `dead_letter`/`cancelled` como «no vivos» y su comentario decía que se

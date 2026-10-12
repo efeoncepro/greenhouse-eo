@@ -24,7 +24,7 @@ describe('isotipos de canal de los catálogos de Insights = AXIS_PLATFORM_ASSETS
     expect(copy.equals(source)).toBe(true)
   })
 
-  it('los 19 isotipos de AXIS están en el catálogo (uno por canal de INSIGHT_CHANNEL_IDS)', async () => {
+  it('todos los isotipos de AXIS están en el catálogo (uno por canal de INSIGHT_CHANNEL_IDS)', async () => {
     const { INSIGHT_CHANNEL_IDS } = await import('@/lib/efeonce-insights/contracts/channels')
 
     expect(Object.keys(CHANNEL_ISOTYPES).sort()).toEqual([...INSIGHT_CHANNEL_IDS].sort())

@@ -15,8 +15,8 @@ import type { FieldEffect } from '../../resolver-contract'
 
 /**
  * Plataforma → isotipo relativo al catálogo. Cada archivo es una copia de `AXIS_PLATFORM_ASSETS`
- * (@efeoncepro/axis-brand-assets 0.4.15, `platforms/<id>-isotype.svg`), verificada por
- * `insights-shared/channels.test.ts`: nunca se edita a mano. AI Overview lleva su lupa con el degradado de la G (aprobada
+ * (@efeoncepro/axis-brand-assets 0.4.25, `platforms/<id>-isotype.svg`), verificada por
+ * `src/config/insights-channel-isotypes.test.ts`: nunca se edita a mano. AI Overview lleva su lupa con el degradado de la G (aprobada
  * el 2026-10-03), no la G de Google. Search Console, Google Analytics y Greenhouse son plataformas de la FUENTE de una
  * cifra (tarjeta de cifra, contrato AXIS `efeonce.insights-stat-card` 0.2.0), no `channelId`.
  */
@@ -41,7 +41,11 @@ export const CHANNEL_ISOTYPES: Readonly<Record<string, string>> = {
   instagram: 'assets/channels/instagram.svg',
   tiktok: 'assets/channels/tiktok.svg',
   meta: 'assets/channels/meta.svg',
-  frameio: 'assets/channels/frameio.svg'
+  frameio: 'assets/channels/frameio.svg',
+  // Facebook y Threads (axis-brand-assets 0.4.19) y X (0.4.21): la versión en color, como el resto.
+  facebook: 'assets/channels/facebook.svg',
+  threads: 'assets/channels/threads.svg',
+  x: 'assets/channels/x.svg'
 }
 
 /**

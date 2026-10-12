@@ -10,14 +10,15 @@
  */
 
 /**
- * TASK-1990 — las 19 plataformas del contrato AXIS `efeonce.insights-stat-card` 0.2.0, con los mismos ids que
- * `AXIS_PLATFORM_ASSETS[].platform` de `@efeoncepro/axis-brand-assets` (un test falla si las listas difieren). Que un id
- * esté acá no hace que un adapter lo emita: sólo lo vuelve un `channelId` válido cuando un productor lo selle.
+ * TASK-1990 — las plataformas de AXIS, con los mismos ids que `AXIS_PLATFORM_ASSETS[].platform` de
+ * `@efeoncepro/axis-brand-assets` (un test falla si las listas difieren). Son 22 desde el paquete 0.4.25: las 19 del
+ * contrato `efeonce.insights-stat-card` 0.2.0 más Facebook y Threads (0.4.19) y X (0.4.21). Que un id esté acá no hace
+ * que un adapter lo emita: sólo lo vuelve un `channelId` válido cuando un productor lo selle.
  */
 export const INSIGHT_CHANNEL_IDS = [
   'google', 'google_ai_overview', 'chatgpt', 'gemini', 'claude', 'perplexity',
   'google_search_console', 'google_analytics', 'google_ads', 'bing', 'youtube', 'reddit', 'wikipedia', 'linkedin',
-  'instagram', 'tiktok', 'meta', 'frameio', 'greenhouse'
+  'instagram', 'tiktok', 'meta', 'facebook', 'threads', 'x', 'frameio', 'greenhouse'
 ] as const
 export type InsightChannelId = (typeof INSIGHT_CHANNEL_IDS)[number]
 

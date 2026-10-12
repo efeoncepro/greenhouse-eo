@@ -221,6 +221,9 @@ export const GH_INSIGHTS = {
     instagram: 'Instagram',
     tiktok: 'TikTok',
     meta: 'Meta',
+    facebook: 'Facebook',
+    threads: 'Threads',
+    x: 'X',
     frameio: 'Frame.io',
     greenhouse: 'Greenhouse'
   } as Readonly<Record<string, string>>,

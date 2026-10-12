@@ -307,6 +307,15 @@ Rules for agents:
   `609353e83` (regenerated tokens, version stamp only). Since 2026-09-29 (TASK-1939) there is a THIRD set: also run
   `pnpm manzanitas:tokens` and `pnpm manzanitas:tokens --check` (the Marketing con Manzanitas catalog tokens and its
   per-line precoloured assets; `scripts/manzanitas/__tests__/manzanitas-tokens-sync.test.ts` fails on a stale stamp).
+- **An `axis-brand-assets` bump has its own three regenerations (lesson, 2026-10-12):** `596bfab90` moved the pin from
+  `0.4.15` to `0.4.25` for the HubSpot marks and regenerated nothing, so three tests stayed red for six days. After
+  pinning a new `@efeoncepro/axis-brand-assets`, run `pnpm manzanitas:tokens` (its JSON stamps the brand-assets version),
+  `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` (re-seals the lockups, engines and socials of
+  the AI Visibility Report PDF; only files whose source changed are rewritten) and the Insights channel drift tests
+  (`src/lib/efeonce-insights/contracts/channels.test.ts`, `src/config/insights-channel-isotypes.test.ts`): a platform
+  added to `AXIS_PLATFORM_ASSETS` must be added to `INSIGHT_CHANNEL_IDS`, its copy and `CHANNEL_ISOTYPES`, with its
+  colour isotype copied into both Insights catalogs. A re-sealed lockup is a visible change in a PDF that is in
+  production: look at the before and after and tell the operator.
 - **Signature rule (operator, 2026-09-26):** the Efeonce logo, centered. The URL bubble signs instead ONLY when the
   logo already appears in the image (`signature.brandInScene: true`), centered, luminosity-blended on the real pixels
   at opacity 1, ≥ 4.5:1 measured (passes only on very dark beds); never beside the logo. Footer uses keep the baked
