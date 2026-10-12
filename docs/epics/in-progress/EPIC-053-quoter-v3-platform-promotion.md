@@ -6,7 +6,7 @@
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
-- Status real: `Programa aprobado por el CEO el 2026-10-12. Fase 1 completa (TASK-2024, puerto de almacenamiento; cambio de repo sin runtime desplegado). 0 capacidades de plataforma implementadas, 0 migraciones aplicadas`
+- Status real: `Programa aprobado por el CEO el 2026-10-12. Fases 1 y 2 completas (TASK-2024, puerto de almacenamiento; TASK-2025, base de datos aplicada y vacía de cotizaciones). Ninguna ruta de plataforma publicada. Identidad de producto planificada (TASK-2031): va antes de la primera cotización real`
 - Rank: `TBD`
 - Domain: `cross-domain`
 - Owner: `CEO (precios, pisos, excepciones y orden del programa) · Commercial/Finance (catálogo y política) · Platform (contrato, API y datos)`
@@ -54,6 +54,9 @@ salida distintas.
 - Los agentes operan con autonomía: cotizan, registran, preparan el documento y emiten dentro de política. Sólo dos
   actos son de persona y quedan registrados: aprobar una excepción bajo el piso y mover el puntero del catálogo.
 - El cotizador actual queda de sólo lectura para autoría desde el principio y se retira con decisión propia al final.
+- Una sola identidad de lo que Efeonce vende: Productos nombra (SKU, nombre, vínculo con HubSpot) y V3 precia. Cada
+  cotización nombra el SKU de su servicio compuesto y el de cada línea, y el registro lo lee por línea para la
+  inteligencia de negocios.
 
 ## Architecture Alignment
 
@@ -106,10 +109,16 @@ Fijada por las tasks de datos para que todas coincidan. Cualquier cambio se hace
 | `TASK-2024` | 1 · cimientos | Puerto de almacenamiento con adaptador de archivos y en memoria; arnés de conformidad; línea base dorada de la CLI | nada |
 | `TASK-2025` | 2 · base de datos | Tablas `quoter_*` (catálogo por huella, puntero, cotización, versiones, estados, documento), capacidades y permisos, adaptador PostgreSQL, importador repo → base | `TASK-2024` sólo para el adaptador |
 | `TASK-2026` | 3 · API de cálculo | Catálogo, simulación y todas las lecturas de una cotización, sin persistir | `TASK-2024`, `TASK-2025` |
-| `TASK-2027` | 4 · API de registro | Crear cotización, agregar versión, registrar una hecha en local, textos del documento, ciclo de vida con actos humanos, número | `TASK-2025`, `TASK-2026` |
+| `TASK-2027` | 4 · API de registro | Crear cotización, agregar versión, registrar una hecha en local, textos del documento, ciclo de vida con actos humanos, número | `TASK-2025`, `TASK-2026`; `TASK-2031` antes de registrar una cotización real |
 | `TASK-2028` | 5 · CLI sobre la API | Capa de transporte comando por comando, diagnóstico de conexión, comando de paridad; al cierre, cambio único del modo por defecto | `TASK-2026`, `TASK-2027` |
 | `TASK-2029` | 6 · catálogo en la plataforma | Revisar, aplicar y mover el puntero por la API; exportación al repo | `TASK-2028` |
 | `TASK-2030` | 7 · MCP | Herramientas de lectura, simulación y registro (emitir sólo si se decide el permiso de escritura); aprobar una excepción y activar el catálogo no se exponen | `TASK-2028` |
+| `TASK-2031` | identidad de producto (antes de la fase 4) | El catálogo de V3 declara el SKU de cada perfil y herramienta en una versión nueva; servicio compuesto con SKU fijo, receta y oferta que lo precia; line item y custom item; control de conformidad con Productos; lecturas por línea reconstruibles para la inteligencia de negocios | `TASK-2025`; curación de su dueño |
+| `TASK-2032` | precio de referencia de Productos | Productos deja de tratar la semilla de abril como precio vigente y publica una referencia a jornada completa calculada por V3; ensayo en seco de lo que cambiaría en HubSpot | `TASK-2031` |
+
+Las lecturas nuevas de `TASK-2031` y `TASK-2032` nacen como lectores del agregado, con comando de operador y lectura
+local en la CLI. Sus rutas de plataforma las publican `TASK-2026` (lecturas de cálculo y de catálogo) y `TASK-2027`
+(lecturas del registro); si alguna cierra antes, la ruta queda como pendiente con dueño en la task que la originó.
 
 ### Unidades sin task todavía
 
@@ -128,6 +137,9 @@ flowchart TD
   F1[TASK-2024 Puerto] --> F3[TASK-2026 API de cálculo]
   F2[TASK-2025 Base de datos] --> F3
   F1 -.sólo el adaptador.-> F2
+  F2 --> P1[TASK-2031 Identidad de producto]
+  P1 -->|antes de la primera cotización real| F4
+  P1 --> P2[TASK-2032 Precio de referencia]
   F3 --> F4[TASK-2027 API de registro]
   F4 --> F5[TASK-2028 CLI sobre la API]
   F5 --> F6[TASK-2029 Catálogo en la plataforma]
@@ -143,7 +155,24 @@ Qué puede correr en paralelo, según el plan:
 - `TASK-2024` y `TASK-2025` se solapan: las tablas no dependen del puerto. Sólo el adaptador PostgreSQL espera el
   contrato del puerto.
 - `TASK-2029` y `TASK-2030` pueden ir a la vez una vez cerrada `TASK-2028`.
+- `TASK-2031` corre en paralelo con `TASK-2026`: toca el contrato del catálogo, lecturas del motor y tablas de
+  lectura, no las rutas. `TASK-2032` va después de `TASK-2031` y no bloquea cotizar.
 - El resto es secuencial: cálculo → registro → CLI. La interfaz va al final y el retiro después de ella.
+
+### Regla de secuencia — identidad de producto antes de la primera cotización real
+
+Decidida por el CEO el 2026-10-12. Una cotización registrada queda congelada para siempre: lo que no lleve dentro al
+congelarse no se le agrega después.
+
+- **Ninguna cotización real se registra antes de que `TASK-2031` cierre.** `TASK-2027` puede construirse y probarse
+  con cotizaciones sintéticas; su puerta de salida con cotizaciones reales espera a `TASK-2031`.
+- La regla tiene guarda en la base de código, no sólo en este documento: la puerta única de escritura rechaza una
+  versión de una cotización real cuyo artefacto no declara identidad de producto (`TASK-2031`, Slice 5).
+- La versión del catálogo que declara la identidad se activa como cualquier otra, por una persona. El código que
+  conoce sus clases de registro nuevas está en producción antes de que el puntero de la plataforma la nombre.
+- `TASK-2029` y `TASK-2026` leen las clases de registro del contrato del catálogo; no las enumeran.
+- Un SKU nace en Productos, en línea, por un acto del catálogo. Cotizar nunca acuña un SKU y una línea sin producto
+  nunca detiene a un agente: se emite y se reporta.
 
 ### Regla permanente — la CLI nunca deja de funcionar
 
@@ -176,7 +205,8 @@ reasigna desde esta épica; al ejecutar cada fase, la task que las afecta deja u
 - `TASK-2017` — economía de V3 (en curso, parcial): cierra el dato económico que el catálogo de la plataforma hereda.
 - `TASK-609` — orquestador agéntico de cotización de sólo lectura: V3 ya es «el agente interpreta, el dominio
   calcula», con costo objetivo en vez de costo vivo.
-- `TASK-608` — historial de precios del catálogo de productos: se solapa con las versiones inmutables por huella.
+- `TASK-608` — historial de precios del catálogo de productos: se solapa con las versiones inmutables por huella, y
+  con la referencia por huella de catálogo de `TASK-2032`.
 - `TASK-552` — seguimientos multimoneda de la cotización V2: se solapa con la política de tipo de cambio de V3.
 - `TASK-562` — seguimientos de impuesto explícito en la cotización V2: se solapa con el impuesto dentro del artefacto.
 
@@ -187,7 +217,9 @@ reasigna desde esta épica; al ejecutar cada fase, la task que las afecta deja u
 - `TASK-576` — contrato de publicación de cotizaciones en HubSpot: la contención detiene esa salida; falta decidir si
   V3 publica en HubSpot.
 - `TASK-620`, `TASK-620.1`, `TASK-620.3`, `TASK-620.5`, `TASK-620.7` — unificación del catálogo vendible relacional
-  que alimenta a V2: un solo catálogo debe mandar.
+  que alimenta a V2: un solo catálogo debe mandar. Resuelto por el CEO el 2026-10-12: Productos nombra lo que se
+  vende y V3 decide cuánto cuesta y a qué precio (`TASK-2031`, `TASK-2032`). Lo que esas tasks proponían sobre
+  precio por producto queda superado; lo que proponen sobre identidad y búsqueda se revisa contra esa decisión.
 - `TASK-622` — aprobación multinivel sobre el cotizador actual: la autoridad de aprobación de V3 es otra.
 - `TASK-1417` — autor de la lámina económica de una propuesta: hoy supone una simulación del motor V2; debe leer la
   proyección para el cliente de V3.
@@ -241,14 +273,23 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
       repo; la lectura de un artefacto con su misma huella está probada con los 47 artefactos calculados del repo en
       PostgreSQL 16 local (todavía no hay cotizaciones en la base). El build local no se verificó.
 - [ ] **Fase 3 (`TASK-2026`).** Paridad en staging: cada ejemplo del repo da la misma huella por la API.
+- [ ] **Identidad de producto (`TASK-2031`).** La versión vigente del catálogo declara el SKU de sus perfiles y
+      herramientas y sus servicios compuestos; ninguna cifra cambió y todos los artefactos congelados se recalculan
+      idénticos; el control de conformidad con Productos no deja errores sin dueño; las lecturas por línea responden,
+      con cotizaciones sintéticas, qué se cotiza más, qué se vende más, qué es más rentable y qué se cotiza y no se
+      vende, por producto y por compuesto; una cotización real sin identidad de producto es rechazada.
 - [ ] **Fase 4 (`TASK-2027`).** Cotizaciones de ejemplo registradas y verificadas recalculando desde la base; un acto
-      humano intentado por un agente es rechazado.
+      humano intentado por un agente es rechazado. Ninguna cotización real registrada antes del cierre de
+      `TASK-2031`.
 - [ ] **Fase 5 (`TASK-2028`).** Un agente nuevo, sólo con la skill, cotiza y registra un negocio real de punta a punta
       por la API; comando de paridad en verde; cambio del modo por defecto hecho una vez; modo local comprobado
       después del cambio.
 - [ ] **Fase 6 (`TASK-2029`).** Un cambio real de precio hecho por la API, con su copia en el repo; aplicar no activó.
 - [ ] **Fase 7 (`TASK-2030`).** Canario del gateway en verde; las herramientas actuales sobre V2 siguen respondiendo;
       aprobar una excepción y activar el catálogo no están expuestas.
+- [ ] **Precio de referencia (`TASK-2032`).** Productos entrega por producto una referencia a jornada completa
+      calculada por el motor, igual a cotizar su brief guardado; las cifras de abril siguen intactas y rotuladas como
+      históricas; nada se envió a HubSpot.
 - [ ] **Fase 8 (U1).** Puerta definida al abrir la fase, después de la decisión portal o Rooms.
 - [ ] **Fase 9 (U2).** Decisión propia de retiro aceptada, con plan de reversa, y ejecutada.
 - [ ] **Regla permanente.** En cada cierre de fase quedó evidencia de que el modo local de la CLI hace lo mismo que
@@ -277,6 +318,17 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 | Alcance de escritura por MCP para registrar cotizaciones | **Abierta.** Exige una clase de permiso nueva entre sistemas; `TASK-2030` puede cerrar sólo con lectura y simulación |
 | Si un agente puede aplicar un cambio de catálogo | **Abierta.** Ver `TASK-2029` |
 | Número y versión impresos en el documento | **Abierta.** La plantilla A4 no tiene esas claves; hace falta una versión nueva de sus datos, sin tarea dueña |
+| Productos y el cotizador | Resuelta 2026-10-12: una identidad, dos responsabilidades. Productos nombra lo que se vende (SKU, nombre, descripción, vínculo con HubSpot); V3 decide cuánto cuesta y a qué precio. Los registros del catálogo de V3 referencian su SKU de forma explícita y un control avisa si se desalinean → `TASK-2031` |
+| Qué precio muestra Productos | Resuelta 2026-10-12: prevalece la forma de cotizar de V3. El precio de un producto es una referencia a jornada completa calculada por V3; los precios sembrados en abril dejan de ser precio vigente y se conservan como historia → `TASK-2032` |
+| Qué es el producto de un servicio gestionado | Resuelta 2026-10-12: un producto compuesto con SKU propio y fijo, formado por roles y herramientas, con receta por defecto. El SKU identifica el servicio, no la cotización. La oferta de V3 aporta la regla de precio y la cotización guarda la composición real. Compuestos con nombre (lista corta y curada) y uno genérico por práctica. Un SKU nace sólo al definir un servicio en el catálogo → `TASK-2031` |
+| Line item y custom item | Resuelta 2026-10-12: line item es una línea con SKU; custom item, una línea sin producto, con categoría de una lista cerrada y motivo. Una línea sin producto no detiene al agente: se emite y se reporta. Guardas sin persona: se proponen los SKU que calzan, lo repetido tiene producto genérico, mucho monto en custom items marca la cotización para revisión y un reporte lista los que se repiten → `TASK-2031` |
+| Cuándo se registra la primera cotización real | Resuelta 2026-10-12: no antes de que exista la identidad de producto (`TASK-2031`) |
+| Lista de compuestos con nombre, genéricos por práctica y destino de los siete servicios existentes | **Abierta, la decide el CEO en la curación de `TASK-2031`.** Sólo tres de los siete tienen receta y varios no tienen hoy una oferta de V3 que los precie |
+| Umbral de monto en custom items que marca una cotización para revisión | **Abierta.** Valor de política del catálogo, del CEO; `TASK-2031` propone 0,20 como punto de partida sin confirmar |
+| Productos genéricos (puesta en marcha y terceros por categoría) y código `ETG-017` | **Abierta, en la curación de `TASK-2031`.** `ETG-017` se retira de V3 con ese identificador; en Productos el SKU conserva su significado |
+| Definición del precio de referencia | **Abierta, bloquea el Slice 2 de `TASK-2032`.** Oferta, forma, país, mercado, moneda y elecciones de kit que definen «jornada completa»; el motor no calcula una referencia sin que se declare |
+| Qué muestra HubSpot como precio de un producto | **Abierta.** Mantener abril, la referencia de V3 (cambia también la unidad, de hora a mes) o ninguno. Cualquier cambio en los productos de HubSpot es un acto aparte, autorizado de forma explícita y con ensayo en seco; `TASK-2032` entrega el ensayo y no envía nada |
+| Si una línea del documento del cliente muestra su SKU | **Abierta.** Recomendación de `TASK-2031`: no; si se quiere, entra con la versión nueva de los datos del documento |
 | Ciclo de vida después de emitir | Resuelta 2026-10-12: se suman aceptada y rechazada como estados y una fecha de vigencia fijada al emitir; vencida se deriva de esa fecha; una cotización vencida se puede aceptar y queda registrado que fue fuera de vigencia. Todos los estados los aplica un agente sin aprobación. Enviada y vista quedan para el envío y la interfaz; ganada y perdida, para la salida a HubSpot. Entra en `TASK-2025` (base) y `TASK-2027` (comandos) antes de aplicar las migraciones |
 
 ## Non-goals
@@ -289,6 +341,9 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
   emitida.
 - Fecha de inicio del servicio y duración de contrato dentro del cotizador; la nómina como base de costo.
 - Decidir aquí el hogar de la interfaz o el retiro del cotizador actual.
+- Enviar a HubSpot cotizaciones, líneas, precios o productos como efecto de este programa, o vincular una cotización
+  con un negocio de HubSpot: se decide en la unidad U2.
+- Otorgar madurez de Product Service por tener SKU, receta o precio de referencia.
 - Crear aplicaciones, paquetes, servicios o repositorios.
 - Ejecutar código, aplicar migraciones, cambiar flags o desplegar como efecto de registrar esta épica.
 
@@ -299,3 +354,18 @@ escribir los archivos. Las ocho tasks son planificación: ninguna está iniciada
 sin número. Próximo paso: `TASK-2023` y `TASK-2024` pueden tomarse de inmediato; `TASK-2025` puede empezar su esquema
 en paralelo y necesita el visto bueno del operador antes de aplicar cualquier migración, porque hay una sola base para
 desarrollo, staging y producción.
+
+## Delta 2026-10-12 — Productos y el cotizador
+
+El CEO señaló lo que el plan no había resuelto y decidió cómo se relacionan Productos y V3 (ver la
+[decisión](../../architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md), «Delta 2026-10-12 — Productos
+y el cotizador: una identidad, dos responsabilidades»). Se suman dos tasks hijas, sólo planificación:
+
+- `TASK-2031` — identidad de producto en el cotizador V3. Va antes de `TASK-2027` y de la primera cotización real.
+- `TASK-2032` — precio de referencia de Productos calculado por V3. Después de `TASK-2031`; no bloquea cotizar.
+
+Lo que cambia para las demás: `TASK-2027` no registra cotizaciones reales hasta el cierre de `TASK-2031` y hereda la
+guarda de identidad en la puerta de escritura; `TASK-2026` y `TASK-2029` leen del contrato tres clases de registro
+nuevas; `TASK-2028` y `TASK-2030` suman las lecturas nuevas a su corpus y a sus herramientas. Cada una recibe su
+`## Delta` cuando `TASK-2031` se ejecute. El vínculo con un negocio de HubSpot sigue abierto y no entra en ninguna de
+las dos tasks.
