@@ -1,0 +1,24 @@
+{
+ "contract": "efeonce.surface-composition",
+ "version": "0.1.2",
+ "surface": "deck",
+ "format": "16x9",
+ "theme": "dark",
+ "role": "cover",
+ "recipe": "cover-proposal",
+ "use": "proposal",
+ "layout": "dawn",
+ "line": "brand",
+ "voice": {
+  "eyebrow": "Propuesta técnica · Wherex N.º 1164",
+  "question": "Innovar es hacerlo posible",
+  "answer": [
+   "Así lo hacemos"
+  ]
+ },
+ "body": "Preparada para **Sika Mexicana** · Evolución de la campaña de lanzamientos · Octubre de 2026",
+ "clientLogo": {
+  "path": "ai-generations/2026-10-12_sika-propuesta-tecnica/logos-cliente/sika-triangulo.png",
+  "alt": "Sika"
+ }
+}
