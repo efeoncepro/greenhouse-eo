@@ -90,3 +90,14 @@ Captura de Wherex entregada por el operador el 12/10/2026. Respuesta del comprad
 La ficha («Comentarios generales») pide, textual: metodología de trabajo; propuesta de cómo abordarían el desarrollo y la evolución gráfica de la campaña tomando como base los materiales proporcionados, con 1 imagen para Facebook, 1 imagen para Instagram y 1 video tipo reel no mayor a 30 seg; tiempos de entrega; propuesta económica desglosada. Tipo: licitación de **una ronda** de servicios.
 
 Efecto en el deck técnico (12/10): la lámina de cumplimiento usa las palabras de la ficha; el lanzamiento tipo pasa a 6 historias (3 Instagram, 3 Facebook) y reel con adaptación para TikTok; la adaptación para TikTok entra en el reel base y sale de la producción adicional.
+
+## Económica · base interna del precio (12/10/2026)
+
+**Audiencia:** internal. No se entrega.
+
+- **Precio:** MXN 64.000 netos por lanzamiento tipo, decidido por el operador el 12/10/2026 («vamos con 64.000»).
+- **Cotizador V3** (`pnpm pricing:v3`, simulación, `requires_review`; oferta `creative-managed-service`, On-Demand, un período): escenario A MXN 63.700 (costo 32.191,88; margen sobre trabajo propio 50,26 %), B USD 3.320, C con 25 % más de horas MXN 76.700. Piso de margen 45 % ≈ MXN 57.650. A 64.000, el margen sobre el costo total del escenario A es ≈ 49,7 % (cálculo del agente, no del cotizador).
+- **Supuestos del agente en el costeo:** 134 h (Lead 28, diseño 44 + 36, contenido 14, cuenta 12), USD 60 de producción con IA, talento en Chile, FX de política USD→MXN 19,25, tratamiento «exportación sin IVA». Operations y Finance no los han validado.
+- **Desglose:** el reparto por línea (Master Graphic 14.200 · publicaciones 8.000 · historias 6.200 · reel 19.200 · cartel 4.600 · cenefa 3.800 · colgante 4.200 · anuncio 3.800) es una distribución proporcional hecha a mano; el cotizador entrega filas por rol, no por entregable.
+- **Por qué va por línea de entregable:** la ficha pide «propuesta económica desglosada» y la lámina 12 del deck técnico anuncia que la económica detalla el valor de cada pieza. Es la excepción de `pricing-garantias-finance.md` (formato exigido por las bases); internamente la unidad sigue siendo el lanzamiento. Riesgo: que Sika pida líneas sueltas; la condición «las adaptaciones consideran el Master Graphic del mismo lanzamiento» lo cubre.
+- **Riesgo de horas:** entre 64.000 y el piso hay ≈ MXN 6.350; un desvío cercano al 10 % de las horas lo consume.

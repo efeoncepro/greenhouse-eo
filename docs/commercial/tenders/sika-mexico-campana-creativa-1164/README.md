@@ -32,6 +32,6 @@ Las hipótesis de modalidad, plazo 15–20 días productivos y dos rondas perten
 - Nueva propuesta técnica y presentación pendientes de dirección del operador; releer respuestas/anuncios antes de congelar oferta.
 - Cerrar las dudas aún sin respuesta: manual corporativo, moneda/facturación transfronteriza, zona del cierre, historias por red y versión TikTok.
 - Confirmar productos/lanzamientos, originales/adaptaciones/formatos, equipo/capacidad, revisiones y fechas; validar claims, marcas/IA/licencias y el conflicto de interés interno señalado en el caso gráfico.
-- Costear y preparar económica desglosada; validar margen/condiciones y campos/anexos de Wherex. Comprobar necesidad de exportar muestras independientes. Borrador revisable no equivale a paquete listo para presentar ni a Proposal Studio verificado.
+- Económica desglosada en borrador (12/10): MXN 64.000 por lanzamiento tipo, [oferta-economica.md](oferta-economica.md); supuestos por confirmar listados ahí. Falta validar margen/condiciones y campos/anexos de Wherex. Comprobar necesidad de exportar muestras independientes. Borrador revisable no equivale a paquete listo para presentar ni a Proposal Studio verificado.
 
 Evidencia controlada: `/Users/jreye/Documents/Codex/2026-10-06-sika-mexico-1164/CRM-READBACK.json`, manifiesto de cuatro originales y `CRM-REGISTRO-INTERNO.md` en OneDrive. [Registro de licitaciones](../LICITATION_CRM_REGISTER.md) · [Registro comercial](../../CRM_DEAL_REGISTER.md).
