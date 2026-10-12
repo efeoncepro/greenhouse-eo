@@ -22,11 +22,28 @@ ni tasks, y no mueve código. Cada corte se ejecuta por su propia task y trae la
 
 ## Context
 
-El operador describe el paso a producción de Greenhouse, y el build mismo, como el punto de dolor: todo dominio viaja
-en un solo tren. El ADR de build units (2026-07-10) respondió con unidades de build dentro de un solo repositorio y
-su piloto (`TASK-1382`, Design System Labs) quedó sin sujeto cuando el Lab se fue al repositorio de AXIS.
+### Por qué se decide (razón del operador, confirmada el 2026-10-12)
 
-Medición del 2026-10-12 sobre el checkout de `develop` (método al final, en «Evidence»):
+Son dos razones y la primera manda:
+
+1. **Cada dominio vive en el producto al que pertenece.** Greenhouse nació como la plataforma operativa de la agencia
+   y terminó hospedando todo lo que se construyó después. Hoy existen productos con identidad propia, y cada dominio
+   encaja mejor donde están su usuario y su razón de ser: el design system con AXIS, que ya lo gobierna más y mejor;
+   Growth y Search Visibility 360 con Marketing Studio; lo comercial con la experiencia de venta. Greenhouse vuelve
+   a ser portal cliente y backoffice de la agencia.
+2. **El build y el paso a producción de Greenhouse son un dolor real**: todo dominio viaja en un solo tren.
+
+El criterio de destino es la pertenencia, no la métrica. Por eso Hiring se queda aunque es de lo que más cambia (es
+Talent de la agencia) y Commercial se irá aunque casi no cambia (su lugar es la experiencia de venta). Las
+mediciones de abajo **no justifican** la decisión: sirven para ordenar los cortes y saber qué esperar de cada uno.
+
+El ADR de build units (2026-07-10) respondió sólo a la segunda razón, con unidades de build dentro de un
+repositorio, y su piloto (`TASK-1382`, Design System Labs) quedó sin sujeto cuando el Lab se fue al repositorio de
+AXIS.
+
+### Medición
+
+Del 2026-10-12 sobre el checkout de `develop` (método al final, en «Evidence»):
 
 | Dominio | Páginas | Rutas API | LOC en `src/lib` | Commits de código en 60 días |
 | --- | --- | --- | --- | --- |
@@ -40,7 +57,7 @@ Medición del 2026-10-12 sobre el checkout de `develop` (método al final, en «
 | Finance | 36 | 160 | 91k | 41 |
 | **Total Greenhouse** | **303** | **1.199** | | **849** |
 
-Tres lecturas que sostienen la decisión:
+Tres lecturas que ordenan los cortes:
 
 1. **El 80 % de los entrypoints son rutas API.** Sacar sólo interfaces alivia poco el grafo; un corte vale cuando el
    dominio se va con su API.
@@ -78,6 +95,17 @@ operador pese a su frecuencia de cambio), Agencia, Personas, Organizaciones.
   de cuánto compra sacar páginas y reemplaza al piloto que `TASK-1382` ya no puede correr.
 - **Insights sale último** porque consume Growth, ICO y el compositor. Antes de los cortes 2c y 3 tendría que cruzar
   hacia Greenhouse para todo.
+
+### Knowledge: lo que Nexa consume de verdad (medido 2026-10-12)
+
+En código, sí: Nexa expone la tool `search_knowledge` (`src/lib/nexa/nexa-tools.ts`), con sus flags presentes en
+Vercel Production. En uso, casi nada es de personas. De 1.196 turnos que llamaron la tool desde el 2026-06-15,
+1.192 son del usuario `user-agent-e2e-001`, que repite nueve preguntas fijas unas diez veces al día desde el
+workflow `nexa-knowledge-qa-nightly.yml`. Las personas la usaron **cuatro veces en cuatro meses** (tres usuarios).
+El corpus tiene 113 documentos y 1.546 chunks, y no recibe una publicación desde el 2026-08-24.
+
+Consecuencia para el corte 1: retirar Knowledge incluye apagar ese workflow nocturno, que hoy es quien sostiene la
+apariencia de uso, y quitar la tool del catálogo de Nexa para que no ofrezca una capacidad sin respaldo.
 
 ### Prerrequisitos que ya se conocen
 
@@ -191,6 +219,10 @@ Medido el 2026-10-12 en el checkout compartido, rama `develop`:
 - Frecuencia: `git log --since="60 days ago"` filtrado por rutas, contando commits distintos; 849 tocan `src/` o
   `services/` de 3.200 totales.
 - Acoplamiento: imports `@/lib/<dominio>` y referencias `greenhouse_<schema>.` dentro de cada dominio.
+
+- Uso de Knowledge: `greenhouse_ai.nexa_turn_telemetry` (`tools_used`) cruzado con `nexa_messages` y
+  `greenhouse_knowledge.*`, leído con el perfil `runtime` sobre la instancia compartida. Esa instancia sirve a
+  desarrollo, staging y producción, y la telemetría no distingue el ambiente.
 
 No se midió: tiempo ni memoria de build por ruta, y si pesan más las páginas o las rutas API.
 
