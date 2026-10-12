@@ -1,7 +1,9 @@
 # Grupo comprador y acceso
 
-Investiga al objetivo y busca inicialmente **2–3 personas adicionales relevantes**, tenga o no tenga email.
-Son personas extra, no roles en total. Esta base de búsqueda nunca es techo ni prueba de grupo completo.
+En una cuenta en investigación comercial, investiga al objetivo y busca inicialmente **2–3 personas adicionales
+relevantes**, tenga o no tenga email. Son personas extra, no roles en total; las que ya vienen en los hechos o
+en el dossier cuentan para esa base. Es un piso de búsqueda: ni cuota, ni techo, ni prueba de grupo completo.
+No aplica a una cuenta descartada por estar fuera de ICP y, bajo HOLD o negativa, no es motivo para sumar gente.
 Amplía por funciones, decisiones, dependencias y riesgos; informa búsquedas, brechas y siguiente alternativa.
 
 ## Grupo, comité y oportunidad
@@ -60,7 +62,7 @@ del mismo departamento no justifican por sí solos más contactos ni prueban que
 | --- | --- |
 | Primera conversación | Hipótesis pertinente y ruta razonada; roles pendientes visibles. No exigir champion confirmado ni comité completo |
 | Discovery / evaluación | Identificar/contrastar problema, proceso, evaluadores, sponsor y autoridad; brechas críticas con owner y validación |
-| Propuesta / aprobación | Criterios, autoridad y dependencias contrastados al nivel de la decisión; acuerdos e incertidumbres explícitos |
+| Propuesta / aprobación | Criterios, autoridad y dependencias contrastados al nivel de la decisión; acuerdos e incertidumbres explícitos. Esta fila es la aprobación del comprador: si el pedido dice «aprobación» sin decir de quién, declara en una línea la lectura que tomas —por defecto, el visto bueno interno del operador para el siguiente paso— y responde esa, sin desarrollar las dos ramas |
 | Contratación | Compras, revisiones y firma con proceso/owner; consenso funcional no prueba aprobación contractual |
 | Adopción / expansión | Operadores/aceptación y nuevo alcance/presupuesto; revisar roles para esa nueva decisión |
 
@@ -76,6 +78,10 @@ Propón una ruta principal y una alternativa con motivo:
 2. Introducción real mediante persona que conoce a ambos, con permiso y texto reenviable.
 3. Acercamiento propio a adyacente pertinente, reconociendo el contexto sin inventar cercanía.
 4. Canal de proceso oficial cuando manda procurement/licitación.
+5. Mensaje manual que el propio operador envía desde su perfil en una red profesional (respuesta a una publicación
+   pública o a alguien que conoce): prepara borrador y motivo tras leer la publicación o el contexto original;
+   lo envía él, no es automatización ni envío masivo, y HOLD y negativas rigen igual que en el correo. Si ese
+   contexto no se pudo leer, el borrador va con el hueco marcado y esa lectura como condición previa.
 
 Ordenar rutas según evidencia y contexto; estos ejemplos no son una secuencia universal. Si el objetivo no
 tiene correo, no registrarlo vacío; contactos adicionales elegibles pueden proponerse/registrarse dentro del

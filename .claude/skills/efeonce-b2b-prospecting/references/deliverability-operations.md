@@ -21,8 +21,9 @@ carril o ante una incidencia, revisar el baseline y sus límites antes del tramo
 
 Usar **conocido**, **pendiente** y **bloqueado** en cada dimensión. Conocido exige resultado, fuente/fecha y
 alcance; puede ser favorable o adverso. Pendiente significa evidencia insuficiente, nunca aprobación tácita.
-Bloqueado indica restricción o fallo concreto que impide esa acción. Lo no aplicable lleva razón; no es un
-cuarto resultado técnico. El próximo chequeo tiene responsable y fecha/evento, sin crear otro scheduler.
+Bloqueado indica restricción o fallo concreto que impide esa acción; un defecto conocido y corregible (firma
+incompleta, CCO ausente) se decide «no listo: defecto conocido corregible». Lo no aplicable lleva razón; no
+es un cuarto resultado técnico. El próximo chequeo tiene responsable y fecha/evento, sin crear otro scheduler.
 
 | Dimensión | Evidencia mínima útil y lectura | Responsable / próximo chequeo |
 | --- | --- | --- |
@@ -36,11 +37,15 @@ cuarto resultado técnico. El próximo chequeo tiene responsable y fecha/evento,
 | Parada y seguimiento | Owner, condición de pausa, respuestas/bajas/rebotes visibles y mecanismo real de contención; configuración efectiva de secuencia si se usará | Commercial + HubSpot; comprobar antes de enrollment, sin activarlo como prueba |
 | Registro CRM | Carril de logging/asociación y readback previsto; no confundir BCC con actividad registrada | HubSpot; verificar actividad después del envío permitido |
 
-No exigir un dashboard de reputación inexistente para una respuesta puntual autorizada y sin indicios de
-problema; declarar lo que no se observa. Una restricción/baja, destinatario no elegible o incidente activo sí
-detiene su carril. Para una ola, si una brecha impide justificar seguridad/capacidad de ese volumen, dejarla
-pendiente de su owner y avanzar con investigación/borradores. Nunca convertir falta de telemetría en permiso
-para escalar. Cambios correctivos se entregan como propuesta concreta al owner con su autoridad propia.
+Un único primer mensaje individual exige atribución y empleo vigentes, supresión u opt-out efectivos
+consultados, autorización de envío, firma y CCO según la política vigente y salida desde la casilla
+corporativa normal. Como una respuesta puntual autorizada, sin indicios de problema no exige dashboards de
+reputación ni baseline de rebote; declarar lo que no se observa. Una restricción/baja, destinatario no
+elegible o incidente activo sí detiene su carril. Una ola exige volumen aprobado, baseline y alineación de
+autenticación; si una brecha impide justificarla, dejarla pendiente de su owner y avanzar con
+investigación/borradores. Si el pedido dice «campaña» y los hechos describen un solo contacto, declarar esa
+lectura y responderla. Nunca convertir falta de telemetría en permiso para escalar. Cambios correctivos se
+entregan como propuesta concreta al owner con su autoridad propia.
 
 ## Autenticación: qué verificar y qué no inferir
 
@@ -52,8 +57,9 @@ DMARC si no hay alineación. DNS/configuración y resultados de un mensaje son e
 
 La autenticación no acredita interés, permiso, entrega ni lectura. Los headers de un envío antiguo, otro
 dominio o transporte no validan el carril nuevo. No subir `p=none` a `quarantine/reject`, añadir un sender a
-SPF, configurar DKIM ni modificar filtros como efecto de una revisión de prospección. No usar rotación de
-dominios/remitentes, dominios parecidos, bot warm-up, listas compradas o allowlists para rodear restricciones.
+SPF, configurar DKIM ni modificar filtros como efecto de una revisión de prospección. No adoptar rotación de
+dominios/remitentes, dominios alternos o parecidos ni bots de warm-up, ni de forma preventiva ni para rodear
+restricciones; tampoco listas compradas o allowlists para rodearlas. Esa infraestructura la decide su owner.
 
 ## Reglas del proveedor: alcance antes que cifras
 
@@ -94,7 +100,7 @@ completos con PII/tokens en ejemplos del repo. Leer motivo y respuesta del servi
 | Evidencia | Decisión prudente y siguiente validación |
 | --- | --- |
 | Dirección inexistente o empleo/casilla desactualizados confirmados | Detener uso de esa dirección; refrescar identidad/empleo y obtener otra dirección atribuida/verificada dentro de permisos. No crear una por patrón, borrar historial ni reenviar para comprobar |
-| Hard bounce sin diagnóstico, filtro, autenticación o bloqueo de política | Pausar tramo afectado y diagnosticar con owner. Un hard bounce no prueba por sí solo que la persona/email no exista. No quitar supresión ni cambiar remitente para reintentar |
+| Hard bounce sin diagnóstico, filtro, autenticación o bloqueo de política; incluye un 5.7.x sin reporte completo | Un 5.7.x es permanente por clase y de política o seguridad por causa: como cualquier hard bounce, no prueba por sí solo que la persona/email no exista ni invalida el correo. Pausar tramo afectado —al menos los envíos a esa dirección por ese canal—, conseguir el NDR completo y diagnosticar con el owner del canal. Sin reenvío automático; no quitar supresión ni cambiar de dominio o remitente para pasar |
 | Soft/deferred, cuota o problema temporal | Conservar pendiente; revisar cola/reintentos del transporte antes de otro envío. Elegibilidad futura del provider no autoriza reintento manual automático; fijar condición/owner de recuperación |
 | Varios destinatarios fallan en mismo rail/ventana | Revisar causa común y contener tramo relacionado; no invalidar en masa correos individuales por un fallo del emisor |
 | Baja, queja o negativa | Respetar alcance de restricción y detener contactos dependientes. No tratarlo como falla técnica que resolver con enriquecimiento o contactos adyacentes |
@@ -122,8 +128,9 @@ Open/click tampoco certifican Inbox o interés. Si falta readback, reportar el e
 sin enviar un duplicado para completar la evidencia.
 
 Para Julio en Outlook se aplica la [política vigente](../../../../docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md):
-firma oficial por la vía aprobada y CCO `48713323@bcc.hubspot.com`, comprobados antes; Enviados y actividad
-CRM después cuando haya acceso. La política no se extiende a otro remitente ni concede autorización de envío.
+firma oficial por la vía aprobada y el CCO de registro que esa política define (el literal, sólo cuando el
+operador lo necesita para corregir o preparar ese envío), comprobados antes; Enviados y actividad CRM después
+cuando haya acceso. La política no se extiende a otro remitente ni concede autorización de envío.
 
 ## Fuentes, vigencia y límites
 

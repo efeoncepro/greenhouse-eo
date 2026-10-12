@@ -2,6 +2,9 @@
 
 **Admisión de un nuevo Contact/Lead:** correo corporativo individual atribuible a la persona, identidad y empleo
 vigentes y evidencia de verificación. Este contrato no borra registros históricos ni migra enums `no_email`.
+Un Contact existente que cambió de empleador y no tiene correo nuevo se conserva donde está, con el cambio
+anotado como pendiente (fuente y fecha): su correo anterior no se usa para contactar y la empresa nueva exige
+este mismo gate. Reasociarlo sigue el [handoff CRM](crm-and-commercial-handoff.md).
 Procedimiento CRM dueño: [prospección HubSpot](../../hubspot-as-a-service/references/prospecting-segmentation.md).
 
 ## Evaluar el correo sin confundir dimensiones

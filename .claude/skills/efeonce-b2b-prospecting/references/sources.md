@@ -44,9 +44,11 @@ capability real antes de declarar ausencia; usar evidencia equivalente proporcio
 En un trabajo de implementación/evaluación de skill, los docs/fixtures bastan: no consultar CRM/APIs para
 reproducir escenarios ficticios ni consumir créditos como prueba.
 
-`research-benchmark-operator` conserva método. `deep-research` no estaba disponible en el preflight: el modo
-degradado aprobado usa búsquedas/lecturas directas y síntesis fechada, delegación sólo autorizada, sin afirmar
-que ejecutó esa harness. Un trabajo que la exige específicamente se reporta con dependencia pendiente.
+`research-benchmark-operator` conserva método. La harness `deep-research` se comprueba en cada sesión: faltó
+en el preflight de Codex del 2026-10-11 y aparecía listada en una sesión de Claude el 2026-10-12. Si no
+está, el modo degradado aprobado usa búsquedas/lecturas directas y síntesis fechada, delegación sólo
+autorizada, sin afirmar que ejecutó esa harness; si está, usarla no amplía créditos ni permisos del pedido.
+Un trabajo que la exige específicamente y no la tiene se reporta con dependencia pendiente.
 Sales opcional se resuelve mediante catálogo/índice instalado del plugin, no una ruta cache universal. Leer
 workflow y reglas del provider en cada fase. Esta skill funciona con sus owners locales cuando falta Sales.
 

@@ -91,6 +91,9 @@ actualizan el método; la autorización para crearlas no inicia piloto, campaña
 | Reply/baja/OOO/bounce | Clasificar alcance y proponer parada/revisión; settings no se presumen sincronizados |
 | Falta Sales/provider/harness | Descubrir capability real, usar contexto equivalente o declarar carril pendiente; no fingir ejecución |
 | Opens sin respuesta | Diagnóstico limitado, no calidez; no repetir mensaje por un scanner |
+| La respuesta trae más de lo pedido | Pedir sólo la decisión y su brecha; la entrega completa es para dossier o handoff |
+| Se trabaja desde Claude | Radar HSP no disponible; créditos de Apollo según el módulo de sesión Claude; conectores se comprueban al iniciar |
+| «Registrar contactos» y la Company no existe | La Company y su nota se confirman aparte en la misma entrega; los contactos elegibles no se retienen |
 
 ## Verificar y mantener
 
@@ -101,3 +104,6 @@ Antes de completar: ¿entidad y fuente claras?, ¿objetivo + adicionales buscado
 Mantener método editando primero un bundle, sincronizar espejo y correr `pnpm skills:mirrors`, validación de
 frontmatter/rutas y eval offline sobre los escenarios afectados. Registrar decisiones/evidencia en documentación
 y correr cierre/contexto después de la última edición. No confundir evaluación de archivos con conversión live.
+Para medir un cambio, comparar a ciegas respuestas con y sin la skill sobre los mismos escenarios y mirar
+también la extensión: el [diferencial del 2026-10-12](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
+describe el procedimiento y sus límites.

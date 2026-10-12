@@ -31,8 +31,8 @@ lo no aplicable. Lo pendiente no concede permiso. Detener la acción dependiente
 | Owner/paradas y configuración real de secuencia si aplica | | | | | |
 | Firma/BCC Julio si corresponde y registro CRM previsto | | | | | |
 
-- Decisión: preparar / listo para acción ya autorizada / pendiente de chequeo / carril bloqueado:
-- Razón proporcional al pedido (respuesta puntual vs ola/cambio de rail/incidente):
+- Decisión: preparar / listo para acción ya autorizada / no listo: defecto conocido corregible (firma, CCO) / pendiente de chequeo (falta evidencia) / carril bloqueado (restricción o fallo):
+- Razón proporcional al pedido (respuesta puntual o primer mensaje individual vs ola/cambio de rail/incidente):
 - Intervenciones propuestas al owner, con alcance/autoridad propia; no ejecutadas:
 - Regla del proveedor aplicable: receptor/emisor, producto, tipo, ventana/agregación y URL/fecha:
 - Condición de pausa por persona/canal/cuenta/rail, owner y condición de revisión:

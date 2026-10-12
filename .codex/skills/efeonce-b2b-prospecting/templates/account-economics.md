@@ -11,8 +11,8 @@ Alcance y seguimiento posterior: <incluido, dependencias, responsable y revisió
 | --- | --- | --- | --- | --- | --- | --- |
 | Personas / tools / créditos / terceros | | | | | | |
 
-Totales: <misma moneda y base; confirmado/estimado/real separados>.
-Faltantes: <horas/tarifa/FX/disponibilidad; subtotal conocido no equivale a total>.
-Economía por resultado: <cohorte, ventana, denominador; indefinida si cero>.
+Totales: <misma moneda y base; estimado/comprometido/consumido separados; costo compartido a nivel de plan si falta criterio por cuenta>.
+Faltantes: <horas/tarifa/FX/disponibilidad/criterio de reparto; subtotal conocido no equivale a total>.
+Economía por resultado: <cohorte, ventana, denominador; indefinida si cero, sin denominadores hipotéticos>.
 Precio/margen: <sólo con evidencia y política Pricing; preventa sin doble conteo>.
-Decisión: <entradas que caben por todos los owners, alternativas y validaciones; no reserva implícita>.
+Decisión: <entradas que caben por todos los owners (techo condicionado y alternativa menor si la ventana siguiente no está confirmada), alternativas y validaciones; no reserva implícita>.

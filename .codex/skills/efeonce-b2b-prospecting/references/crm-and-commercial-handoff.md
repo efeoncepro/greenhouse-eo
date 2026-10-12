@@ -3,6 +3,10 @@
 La fase de enrichment entrega evidencia y propuesta; las mutaciones pertenecen a HubSpot y requieren el
 alcance autorizado. Sales enrichment no ejecuta CRM/outreach: cambiar de fase explícitamente con su owner.
 Approval vigente para un lote se reutiliza; no pedir confirmación por segunda vez para sus mismos cambios.
+Autorizar «registrar contactos» cubre crear el Contact y asociarlo a una Company que ya existe. Company nueva,
+nota de Company, Lead o Deal son escrituras aparte: listarlas en el changeset y pedir su confirmación en esa
+misma entrega, sin retener por ello el changeset de los contactos elegibles. Si no se sabe si la Company
+existe, declararlo como dependencia a verificar al leer CRM, en una línea y sin desarrollar las dos ramas.
 
 ## Registro o reutilización autorizado
 
@@ -27,7 +31,10 @@ Approval vigente para un lote se reutiliza; no pedir confirmación por segunda v
    antes de crear otro. Un Contact guardado o ACTIVE no demuestra entregabilidad ni calificación.
 
 Correcciones de Primary Company requieren evidencia de empleo/entidad y autorización vigente; un dominio
-distinto no implica que haya que cambiarla. No conservar ni eliminar asociaciones históricas sin analizar su función.
+distinto no implica que haya que cambiarla. Un Contact existente que cambió de empleador y no tiene correo nuevo
+se conserva donde está: anotar el cambio como pendiente con fuente y fecha, sin mover Primary Company, sin
+asociarlo a la Company nueva y sin usar el correo anterior para contactar; en la empresa nueva rige el gate
+normal de correo individual verificado y atribuible. No conservar ni eliminar asociaciones históricas sin analizar su función.
 
 Para selección target, fit ICP, roles o mapas por iniciativa, cargar el
 [adapter account-based de HubSpot](../../hubspot-as-a-service/references/account-based-prospecting.md).

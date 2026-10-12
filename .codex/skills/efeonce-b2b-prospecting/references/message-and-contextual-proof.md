@@ -30,7 +30,9 @@ no afirmar diagnóstico o resultados. Investigar a un contacto no autoriza envia
 Gong aporta evidencia observacional sobre CTA; no es mandato de evitar reuniones ni receta de conversión.
 No imponer seis toques, 15 minutos, teléfono o LinkedIn a todas las cuentas. Cadencia será hipótesis con alcance,
 intervalo, canal, motivo para cada contacto y paradas; usar conversación/consentimiento como evidencia dominante.
-No automatizar scraping, invitaciones o DMs por defecto ni simular un hilo o un referido.
+No automatizar scraping, invitaciones o DMs por defecto ni simular un hilo o un referido. Un mensaje manual que
+el operador envía desde su perfil (respuesta a una publicación pública, alguien que conoce) sí puede proponerse:
+preparar borrador y motivo tras leer el contexto original; lo envía él y respeta HOLD y negativas como el correo.
 
 ## Graduar la prueba contextual Efeonce
 

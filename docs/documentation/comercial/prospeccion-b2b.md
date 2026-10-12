@@ -87,3 +87,7 @@ ICP y estado propuesto del plan outbound tienen discrepancia visible; decisiones
 Una dependencia ausente afecta el carril concreto; no equivale a ausencia de demanda.
 Evaluación offline y espejos validan método/archivos; eficacia, deliverability y ejecución live requieren
 evidencia real de uso y, cuando corresponde, una autorización de acción distinta.
+
+Desde el 2026-10-12 la respuesta es proporcional al pedido: contesta primero lo que se preguntó y deja la
+entrega completa para dossier o handoff. Un [diferencial ciego bajo Claude](../../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md)
+mostró que la skill evita el alta de contactos sin correo, y que antes de la corrección respondía 74 % más largo.

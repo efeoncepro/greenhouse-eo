@@ -94,8 +94,12 @@ individual verificado. La [captura CRM](../../hubspot-as-a-service/references/pr
 evidencia/campos conocidos y desconocidos, sin deducir tipo de Lead, monto o etapa de estos playbooks.
 
 Siguiente paso debe tener owner, acción y condición/fecha de revisión. Separar sugerido de acordado con
-comprador, preparado de enviado y prueba candidata de aceptada. Si no hay problema pertinente o capacidad
-defendible, entregar investigación pendiente o no-fit con razón, sin fabricar una oferta para completar la tabla.
+comprador, preparado de enviado y prueba candidata de aceptada. Si no hay problema pertinente, entregar
+investigación pendiente o no-fit con razón; si lo que falta es capacidad defendible, la cuenta sigue y lo
+que queda bloqueado es la oferta hasta que la práctica dueña la confirme. No fabricar una oferta para
+completar la tabla. Si el operador pidió borrador para una cuenta descartada como no-fit, entregar primero el descarte con su
+evidencia y decir qué evidencia cambiaría el veredicto; redactar el acercamiento sólo si declara en la
+conversación una excepción para esa cuenta, sin generalizarla a otras; pedir el borrador no es declararla.
 
 Fuentes dueñas: [contrato operator-first](../../../../docs/strategy/EFEONCE_OPERATOR_FIRST_PRODUCT_AND_GROWTH_CONTRACT_V1.md),
 [Product Design](../../../../docs/architecture/EFEONCE_PRODUCT_DESIGN_360_DECISION_V1.md),

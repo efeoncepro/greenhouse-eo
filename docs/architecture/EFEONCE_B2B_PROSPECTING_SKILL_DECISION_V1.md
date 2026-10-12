@@ -116,6 +116,28 @@ Es extensión del método aprobado, sin nuevo runtime, scheduler, schema, oferta
 La aprobación autoriza los archivos/revisión delegada, sin iniciar piloto, DNS, créditos, CRM o comunicaciones.
 [Verificación y límites](../audits/commercial/2026-10-11-prospecting-routes-deliverability-update.md).
 
+### Delta 2026-10-12 — diferencial ciego bajo Claude y proporcionalidad
+
+El operador pidió medir la skill bajo Claude («lánzalo») y, con el veredicto, «corrige todo lo que
+corresponda y robustece la skill». En 10 escenarios con y sin skill, calificados a ciegas, la skill evitó
+el único fallo crítico (alta de un contacto sin correo) pero sus respuestas salían 74 % más largas y con
+carriles no pedidos. Se incorporan:
+
+- Proporcionalidad como parte del método: la respuesta contesta primero lo pedido; la entrega completa
+  aplica a dossier o handoff y el plan de captura CRM a pedidos de registro.
+- Veinte decisiones (D1–D20) que cierran ambigüedades halladas al aplicar el método, escritas en los módulos.
+  Las tomó el agente bajo el mandato general, con la lectura que no amplía su autoridad; D2 (investigación
+  bajo HOLD), D3 (alcance de «registrar contactos») y D6 (mensaje manual del operador) quedan a revisión
+  expresa del operador.
+- Módulo de sesión Claude: costos de los tools de Apollo según sus descripciones a esa fecha y radar personal
+  ausente fuera de Codex. El punto 8 se precisa: la harness `deep-research` se comprueba por sesión; faltó en
+  el preflight de Codex del 2026-10-11 y aparecía listada en Claude el 2026-10-12.
+- Evals versión 6: 48 escenarios y una comprobación de proporcionalidad; la extensión no es mérito.
+
+Tras corregir, la skill mantuvo 20 de 20 aprobadas sin fallos críticos, bajó el ruido de 1,55 a 0,60 y quedó
+8 % por debajo del brazo sin skill en extensión. Es extensión del método aprobado, sin runtime, schema,
+créditos, CRM ni envíos. [Evidencia, límites y pendientes](../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
+
 ## Alternatives Considered
 
 - **Ampliar sólo la skill personal:** no comparte método ni corrige routing/deriva entre agentes.

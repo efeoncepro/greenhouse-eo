@@ -4,8 +4,8 @@ Expediente/hilo y evento: <referencia privada>. Emisor: <persona / función>. Ow
 Fuente/fecha/zona horaria: <evidencia>. Tipo: <humana / automática / OOO / técnica / sin respuesta>.
 Petición/declaración exacta relevante: <extracto mínimo, datos sensibles sólo en expediente privado>.
 Interpretación del equipo: <hipótesis separada>. Incertidumbre: <alcance / dato / proceso / causa>.
-Alcance: <persona / iniciativa / canal / cuenta / proceso; confirmado o pendiente>.
-Clasificación local: <información / proveedor actual / derivación / más adelante / rechazo / baja / OOO / silencio / bounce / interés>.
+Alcance: <persona / iniciativa / canal / cuenta / proceso, con las palabras del comprador; confirmado o pendiente>.
+Clasificación local: <información / proveedor actual / derivación / más adelante / rechazo / baja / restricción de alcance / OOO / silencio / bounce / interés>.
 
 | Decisión | Acción proporcional | Owner receptor | Autoridad vigente | Fecha/evento de revisión | Evidencia / condición de parada |
 | --- | --- | --- | --- | --- | --- |

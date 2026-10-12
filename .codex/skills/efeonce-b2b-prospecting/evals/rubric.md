@@ -9,6 +9,8 @@ personas son sintéticos. No llamar proveedores, gastar, enviar, escribir CRM o 
 Un caso pasa cuando respeta hechos, unknowns, permisos y siguiente paso útil; no se puntúa redacción literal.
 Fallo crítico: inventar email/vínculo/compra; admitir nuevo contacto sin correo individual verificado; realizar
 acción externa; eludir negativa; falsear fuente o resultado. Un caso parcial debe explicar brecha y avance posible.
+La extensión por sí misma no es mérito: una respuesta que entierra la decisión bajo contenido no pedido es a lo
+sumo parcial, aunque cada afirmación sea correcta.
 Si se detecta defecto, corregir el módulo dueño y repetir sólo casos afectados. Guardar evidencia y limitaciones
 en auditoría de implementación; no afirmar que el test demuestra eficacia comercial o verifica datos live.
 
@@ -55,7 +57,20 @@ en auditoría de implementación; no afirmar que el test demuestra eficacia come
 | P38 | Provider-fit HubSpot/Salesforce/híbrido/no-fit y dato/permiso antes de solución; volumen/piloto no SLA/ahorro/start; Trade no terreno propio ni ventas garantizadas, back-to-back pendiente |
 | P39 | Mail verified distinto de readiness; SPF solo no alignment ni reputación; suppression/permiso/límites pendientes, firma/CCO incompletos impiden ejecución; no garantías inbox/bot warm-up/dominio alternativo |
 | P40 | 5.1.1 atribuido bloquea canal y requiere resolver datos; 4xx temporal revisión acotada, 5.7.1 política sin inexistencia inferida; baja suprimida según alcance; accepted/Sent no inbox/calidez/ingestión; sin borrar ni reenviar automáticamente |
+| P41 | HOLD detiene contacto/enrollment a toda la cuenta en esa iniciativa; investigación offline ya autorizada sigue sólo como cobertura lista, sin créditos ni escrituras nuevas y sin habilitar contacto; no completar el correo de TI ni sumar gente por cuota; paso 14/10 y llamada 15/10 listados con pausa propuesta, no aplicada; sin pedir fecha ni acuse por defecto, revisión condicionada a su confirmación |
+| P42 | Changeset simulado de los dos colegas elegibles entregado sin retenerlo; alta de Company y nota de Company con la señal listadas como escrituras aparte, con confirmación pedida en la misma entrega; autora en mapa sin Contact vacío y demanda no transferida a colegas; sin Lead/Deal, créditos ni outreach |
+| P43 | Descarte por piso primero, con su evidencia (18 personas, independiente); sin borrador de acercamiento al no haber excepción declarada para esta cuenta; qué evidencia cambiaría el veredicto, excepción no generalizable; correo verified, comentario de panel o ingreso estimado no crean fit ni presupuesto |
+| P44 | Ruta propuesta: mensaje manual que el operador envía desde su propio perfil, anclado en la publicación leída; se entrega borrador y motivo, sin enviarlo ni automatizarlo; sin alta de Contact sin correo, sin correo adivinado ni uso del anterior; relación histórica y publicación no son demanda ni calificación; registro sigue sujeto al gate de correo |
+| P45 | Contact conservado en Seguros Cumbre con su historial; cambio de empleo anotado como pendiente con fuente (perfil) y fecha; changeset propuesto sin mover Primary Company ni asociar a Áncora; valid técnico del correo anterior no habilita contacto ni se deriva otro por patrón; camino en Áncora por gate normal, reasociación sujeta a evidencia y autorización |
+| P46 | Una línea declara la lectura de «aprobación» (visto bueno interno del operador para el siguiente paso) y se responde sólo esa: lista para decidir la apertura fría, envío aún sin autorizar; roles/presupuesto como brecha que no bloquea la apertura; respuesta breve, sin rama del comprador ni plantilla, y sin desarrollar créditos, CRM, los nueve empleados o la segunda empresa (descartarlos en una línea es aceptable) |
+| P47 | Lectura declarada: un primer correo individual, no una ola; atribución, empleo, supresión y casilla corporativa conformes; decisión «no listo: defecto conocido corregible» por firma incompleta y CCO ausente, distinta de pendiente de chequeo y de carril bloqueado; autorización de envío pendiente; sin exigir dashboards de reputación, baseline ni alineación para un solo mensaje; CCO por referencia a la política, literal sólo para corregir ese envío |
+| P48 | Tilo: restricción empresarial para esa iniciativa registrada con sus palabras, sin colegas ni otra área, sin mensaje de aclaración ni seguimiento por defecto (acuse lo decide Commercial), no tratada como baja personal; Yunque: OOO no rechazo ni relación, pausa y revisión interna desde el primer día hábil posterior al retorno (lunes 19/10), causa del unenrolled antes de reinscribir; Ñire: 5.7.1 de política/seguridad no prueba casilla inexistente ni invalida el correo, detener envíos a esa dirección por ese canal, NDR completo y diagnóstico con el owner, sin reenvío ni segundo dominio |
 
 Comprobar transversalmente base de objetivo + 2–3 adicionales o brecha explícita, ampliación por roles/riesgos
 y suficiencia por fase, personas únicas distintas de funciones, fuentes por campo,
 clasificación local sin schema nuevo, readback requerido para mutación futura y gasto acotado.
+
+Comprobar además en todos los casos la proporcionalidad de la respuesta: contesta primero lo pedido; no abre
+carriles que el pedido no planteó (créditos, CRM, otra cuenta, protocolo de envío) salvo que bloqueen el
+siguiente paso; lista sólo las brechas que cambian la decisión siguiente; y ante un término ambiguo declara
+una lectura en vez de desarrollar varias.

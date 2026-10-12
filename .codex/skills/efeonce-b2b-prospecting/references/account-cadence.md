@@ -15,7 +15,9 @@ cuota universal de toques ni una secuencia nueva por cada contacto descubierto. 
    Mantener objetivo y base de adicionales investigados; tener correo no obliga a contactar a todos.
 4. Registrar acción, persona, canal, razón, condición previa, ventana/zona horaria, owner y condición de
    parada. Elegir intervalo y número máximo de acciones para este caso, según historia, hito, capacidad y
-   restricciones; justificar cambios. Una fecha de revisión habilita evaluar, no enviar automáticamente.
+   restricciones; justificar cambios. Si el pedido no fija tope, proponer el mínimo que el motivo justifique,
+   rotulado como propuesta que decide el operador o Commercial, con sus condiciones de parada: ningún número
+   es norma. Una fecha de revisión habilita evaluar, no enviar automáticamente.
 5. Resolver colisiones entre vendedores, prácticas, marketing, radar y otras iniciativas de la misma
    cuenta. Un mensaje de un rol debe conservar la tesis común y su propia relevancia, sin fingir que otro
    comprador pidió lo mismo. Cambiar canal no evita una baja o negativa.
@@ -35,14 +37,15 @@ sin correo corporativo individual verificado; un plan multicanal no modifica ese
 | Rol crítico sin acceso, otra persona pertinente accesible | Proponer pregunta de responsable o introducción con valor para esa persona; verificar restricciones y que la ruta no rodea una negativa | Owner | Tras derivación o validación de participación |
 | Varias personas requieren trabajo en paralelo | Documentar qué incertidumbre distinta resuelve cada una, owners, dependencias y ausencia de colisión; acordar coordinación, no bombardear al organigrama | Owner coordinador + Commercial/práctica | Antes de cada acción y al primer cambio de estado |
 | Silencio en un paso | Revisar calidad/canal y motivo de continuidad; siguiente paso sólo si sigue siendo pertinente, dentro del plan autorizado y sin restricciones | Owner | Ventana definida por el caso; no por aperturas |
-| Hito comprador o HOLD vigente | Retener acciones incompatibles; revisar sólo en el hito/alcance permitido. No reemplazar al interlocutor para acelerar el proceso | Owner + Commercial | Hito explícito; desconocido si no fue dado |
+| Hito comprador o HOLD vigente | Retener acciones incompatibles; revisar sólo en el hito/alcance permitido. Bajo HOLD se detienen contacto y enrollment hacia cualquier persona de la cuenta para esa iniciativa: listar lo ya programado y proponer su pausa. La investigación offline ya autorizada puede seguir sólo para tener la cobertura lista al levantarse el HOLD: sin créditos ni escrituras CRM nuevas motivadas por el HOLD, y sus hallazgos no autorizan contacto. No reemplazar al interlocutor para acelerar el proceso | Owner + Commercial, que decide si hay acuse breve al mismo interlocutor | Hito explícito o confirmación del comprador; desconocido si no fue dado, sin pedirle fecha para presionar |
 | Respuesta, reunión, negativa, OOO o bounce | Clasificar mediante [response-handling](response-handling.md), reconciliar pasos pendientes y decidir alcance de parada | Owner + operador del canal | Antes de cualquier siguiente acción afectada |
 | Fin del plan sin respuesta útil | Cerrar la cadencia como resultado desconocido/sin respuesta; documentar coste y evidencia. Una reactivación necesita nueva razón y revisión | Owner | Evento pertinente futuro, sin segundo scheduler |
 
 Una cuenta con varias iniciativas admite planes distintos cuando sus decisiones y personas difieren, pero
 comparte historial de contacto y revisión de colisiones. El owner de cuenta no puede interpretar una negativa
-ambigua como permiso para trasladar la conversación a otra iniciativa. Clarificar o mantener HOLD del alcance
-potencialmente afectado, sin convertir la duda en una exclusión definitiva de toda la organización.
+ambigua como permiso para trasladar la conversación a otra iniciativa. Mantener HOLD del alcance
+potencialmente afectado —pedirle una aclaración al comprador lo decide Commercial—, sin convertir la duda en
+una exclusión definitiva de toda la organización.
 
 ## Traducir el plan al canal real
 

@@ -34,9 +34,14 @@ Preserva desconocidos sobre sponsor, economic buyer, champion y proceso; entusia
 - Respuesta humana: revisar el estado de la cuenta y pausar la automatización afectada antes de nuevas acciones;
   una respuesta de un miembro no es consentimiento de todos. Confirmar configuración de cada plataforma.
 - Baja/negativa: registrar alcance personal, empresarial o del proceso. Respetarlo; no contactar colegas para
-  eludirlo. Una exclusión ambigua queda para aclaración, sin ampliar ni reducir su alcance automáticamente.
-- OOO: guardar retorno si consta y revisar manualmente; no confundir con rechazo ni con reunión aceptada.
-- Rebote: bloquear ese canal y revisar evidencia; no inventar otra dirección. HOLD: mantener la condición/hito.
+  eludirlo. Una exclusión ambigua se registra con las palabras de quien la puso, sin ampliar ni reducir su
+  alcance; por defecto no se le envía seguimiento ni mensaje de aclaración: acusar recibo lo decide Commercial.
+  «No contacten a nadie más de la empresa por esto» rige para la empresa en esa iniciativa, sin colegas ni
+  rutas alternativas, y no es baja personal de su autor salvo que lo diga.
+- OOO: guardar la fecha declarada si consta y revisar desde el primer día hábil posterior; no confundir con rechazo ni
+  con reunión aceptada.
+- Rebote: detener los envíos a esa dirección por ese canal y revisar evidencia; no inventar otra dirección. HOLD: mantener la condición/hito
+  sin pedir fecha para presionar. Detalle en [respuestas](response-handling.md) y [cadencia](account-cadence.md).
 
 No supongas sincronización de bajas entre Apollo y HubSpot. Un cambio en secuencias o futuras comunicaciones
 necesita autoridad y verificación del carril concreto; durante investigación entrega la parada propuesta.

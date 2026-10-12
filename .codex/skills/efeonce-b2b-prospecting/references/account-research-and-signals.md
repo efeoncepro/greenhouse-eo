@@ -55,4 +55,8 @@ geografía, expertise y partner/back-to-back para terreno/producción. No promet
 Colombia por encontrar una señal. RevOps & CRM puede ser HubSpot-first, Salesforce-first, híbrido o no-fit.
 No reutilizar casos, licencias, claims o hibernación como prueba de capacidad disponible hoy.
 
+«Fuera de ICP» habla del encaje de la cuenta: piso de tamaño, tipo de entidad, exclusiones. Capacidad o mercado
+Efeonce no acreditados para esa necesidad no descartan la cuenta: bloquean la oferta o el claim hasta que la
+práctica dueña lo confirme, y sus contactos elegibles pueden registrarse si hay autorización.
+
 Para convertir evidencia en validación/acción, cargar [señal→acción](signal-to-action.md): vigencia, prueba contraria y siguiente chequeo.
