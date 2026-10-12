@@ -35,10 +35,21 @@ almacén ya está escrito y probado en PostgreSQL 16 local; este documento se al
   almacén ofrece `decideException`. Sólo una versión bajo el piso recibe una decisión.
 - **Una cotización emitida o retirada no recibe versiones**: el almacén registra `issued → revising` antes de
   insertar la versión nueva.
+- **Después de emitir (CEO, 2026-10-12; ADR, decisión 5).** Estados nuevos `accepted` y `rejected`; cada emisión
+  fija `validUntil`; «vencida» se deriva (`effectiveState = expired` en los lectores, que lo toman de
+  `quoter_quote_current` y no reaplican la regla); una cotización vencida no se acepta y se emite de nuevo con
+  vigencia nueva. Operaciones nuevas 18 (aceptar) y 19 (rechazar), en los dos carriles, sin persona. Fuera de
+  alcance: enviada y vista, ganada y perdida, un proceso que marque vencidas, y que el documento imprima la
+  vigencia registrada.
+- **Un agente aplica todos los estados.** Ningún par de la matriz tiene compuerta humana. Que la puerta o un
+  disparador le nieguen un cambio de estado a un agente es un defecto. Lo único que no puede: decidir una excepción
+  bajo el piso y activar el catálogo.
+- **Una aprobación se revoca sólo mientras su versión no se haya emitido** (`exception_revocation_locked`).
 - **Códigos del almacén** (`src/lib/commercial/quoter/errors.ts`), que este documento traduce: `version_locked`,
   `version_not_issuable`, `state_conflict`, `recipient_required`, `recipient_conflict`, `recipient_locked`,
   `document_required`, `document_conflict`, `document_locked`, `exception_approval_required`,
-  `exception_not_applicable`, `exception_decision_unchanged`. Ya no existen `exception_already_approved`,
+  `exception_not_applicable`, `exception_decision_unchanged`, `exception_revocation_locked`, `validity_required`,
+  `validity_in_the_past`, `quote_expired`, `not_last_issued_version`. Ya no existen `exception_already_approved`,
   `number_already_assigned` ni la columna `supersedes_version_number`.
 - **Una sola puerta de escritura.** Todo comando escribe por las funciones de `quote-store.ts` de `TASK-2025`, que
   exigen `command_execution_id`.
@@ -503,16 +514,19 @@ lector. «Persona» significa compuerta humana: sólo la fila 7 la lleva. Capaci
 | 5 | Guardar documento | C | `POST /quotes/{quoteId}/versions/{n}/document` | app, ecosystem | `commercial.quoter.quote:update` | compone y agrega una fila a `quoter_version_documents`; no cambia el estado |
 | 6 | Retirar borrador | C | `POST /quotes/{quoteId}/withdraw-draft` | app, ecosystem | `commercial.quoter.quote:update` | `draft → withdrawn` |
 | 7 | Aprobar excepción bajo el piso | C | `POST /quotes/{quoteId}/versions/{n}/exception-approval` | **sólo app**, persona | `commercial.quoter.exception:approve` | agrega una fila a `quoter_exception_approvals`; no cambia el estado |
-| 8 | Emitir | C | `POST /quotes/{quoteId}/issue` | app, ecosystem | `commercial.quoter.issue:approve` | `draft → issued` o `revising → issued`; asigna el número en la primera emisión; bajo el piso exige la aprobación registrada |
-| 9 | Retirar lo emitido | C | `POST /quotes/{quoteId}/withdraw` | app, ecosystem | `commercial.quoter.issue:approve` | `issued → withdrawn` o `revising → withdrawn` |
+| 8 | Emitir | C | `POST /quotes/{quoteId}/issue` | app, ecosystem | `commercial.quoter.issue:approve` | `draft → issued` o `revising → issued`; fija `validUntil`; la base asigna el número en la primera emisión; bajo el piso exige la aprobación vigente |
+| 9 | Retirar lo emitido | C | `POST /quotes/{quoteId}/withdraw` | app, ecosystem | `commercial.quoter.issue:approve` | `issued → withdrawn` o `revising → withdrawn`; desde `accepted` o `rejected` se abre antes una revisión |
 | 10 | Listar cotizaciones | L | `GET /quotes` | app, ecosystem | `commercial.quoter.quote:read` | página por keyset sobre `quoter_quote_current` |
-| 11 | Leer cotización | L | `GET /quotes/{quoteId}` | app, ecosystem | `commercial.quoter.quote:read` | identidad, estado, número si lo tiene y lista de versiones |
+| 11 | Leer cotización | L | `GET /quotes/{quoteId}` | app, ecosystem | `commercial.quoter.quote:read` | identidad, `state`, `effectiveState`, `validUntil`, número si lo tiene y lista de versiones |
 | 12 | Leer versión | L | `GET /quotes/{quoteId}/versions/{n}` | app, ecosystem | `commercial.quoter.quote:read`, sólo alcance interno | resumen del kernel; con `include=artifact`, el texto guardado |
 | 13 | Reproducir versión | L | `GET /quotes/{quoteId}/versions/{n}/replay` | app, ecosystem | igual que 12 | `verified`, `calculationId`, huella y resumen, como `replay` de la CLI |
 | 14 | Vista previa apta para cliente | L | `GET /quotes/{quoteId}/versions/{n}/preview` | app, ecosystem | `commercial.quoter.quote:read` | `projectCompositionPreview` del artefacto guardado |
 | 15 | Datos del documento | L | `GET /quotes/{quoteId}/versions/{n}/document` | app, ecosystem | `commercial.quoter.quote:read` | documento guardado + hechos del registro |
 | 16 | Asignar destinataria | C | `POST /quotes/{quoteId}/recipient` | app, ecosystem | `commercial.quoter.quote:update` | agrega una fila a `quoter_quote_recipients`; sólo en `draft`; rige la última |
-| 16 | Historial | L | `GET /quotes/{quoteId}/history` | app, ecosystem | igual que 12 | cambios de estado y aprobaciones de excepción, con actor y motivo |
+| 17 | Historial | L | `GET /quotes/{quoteId}/history` | app, ecosystem | igual que 12 | cambios de estado y aprobaciones de excepción, con actor y motivo |
+| 18 | Aceptar | C | `POST /quotes/{quoteId}/accept` | app, ecosystem | `commercial.quoter.quote:update` | `issued → accepted` o `revising → accepted`, sobre la última versión emitida; rechazado si venció |
+| 19 | Rechazar | C | `POST /quotes/{quoteId}/reject` | app, ecosystem | `commercial.quoter.quote:update` | `issued → rejected` o `revising → rejected`, sobre la última versión emitida; permitido aunque haya vencido |
+| 20 | Reabrir | C | `POST /quotes/{quoteId}/reopen` | app, ecosystem | `commercial.quoter.quote:update` | `issued`, `accepted` o `rejected` → `revising`, sin versión nueva: para corregir el documento, renovar la vigencia o deshacer una respuesta mal registrada |
 
 ### Reglas por comando
 
@@ -592,8 +606,11 @@ descartar su borrador). Desde `issued` o `revising` responde 409 `quoter_invalid
   tabla ni un estado. Quien cotiza no «pide» por la API: la necesidad se lee del artefacto (lector 12 y lector 10).
   Un administrador que no aprueba no registra nada; la cotización sigue en su estado y se corrige con otra versión.
 
-**Emitir (8).** Cuerpo: `version`, `artifactDigest`, `reason` opcional, `expectedVersion`. Condiciones, todas en la
-transacción:
+**Emitir (8).** Cuerpo: `version`, `artifactDigest`, `validUntil` (obligatorio, `YYYY-MM-DD`), `reason` opcional,
+`expectedVersion`. Condiciones, todas en la transacción:
+
+- `validUntil` no es anterior a hoy en `America/Santiago` (lo decide la base); sin él o mal formado, 422
+  `validity_required`; ya pasado, 422 `validity_in_the_past`. Cada re-emisión fija la suya y el número no cambia;
 
 - identidad con `commercial.quoter.issue:approve`: una persona con uno de los tres roles o un agente (ver «Autoridad
   para emitir y retirar»). No exige persona;
@@ -618,6 +635,22 @@ transacción:
   versión. Una emisión que no confirma no consume número.
 - Respuesta 200: `{ quoteId, quoteNumber, version, artifactDigest, documentSeq, documentDigest, state, issuedAt }`.
 
+**Aceptar y rechazar (18, 19).** Cuerpo: `version` y `artifactDigest` (lo que quien llama cree que el cliente
+respondió), `reason` (en un rechazo, el motivo), `expectedVersion`. Identidad con `commercial.quoter.quote:update`,
+persona o agente. Desde `issued` o `revising`.
+
+- La respuesta es sobre la **última versión emitida**, con su documento: el almacén la fija por las mismas llaves
+  foráneas que la emisión. Si `version` no es esa, 409 `quoter_version_conflict` (`not_last_issued_version`).
+- Aceptar una cotización vencida responde 409 `quoter_quote_expired` (`quote_expired`): se emite de nuevo con
+  vigencia nueva (operación 20 y después 8, con la última versión emitida) y conserva su número. Rechazar una
+  vencida se permite.
+- Ninguna de las dos es terminal: una versión nueva (2, 4) o reabrir (20) las devuelve a `revising`. Es también la
+  salida de una respuesta registrada por error.
+- Respuesta 200: `{ quoteId, quoteNumber, version, artifactDigest, state, effectiveState }`.
+
+**Reabrir (20).** Cuerpo: `reason`, `expectedVersion`. Identidad con `commercial.quoter.quote:update`. Registra el
+cambio a `revising` sin crear una versión. Lo que el cliente tiene sigue siendo la última versión emitida.
+
 **Retirar lo emitido (9).** Cuerpo: `reason`, `expectedVersion`. Identidad con `commercial.quoter.issue:approve`,
 persona o agente: quien puede emitir puede retirar (mismo principio que la emisión; CEO, 2026-10-12). Desde `issued`
 o `revising`. `withdrawn` es terminal; el número, si existe, se conserva.
@@ -626,22 +659,27 @@ o `revising`. `withdrawn` es terminal; el número, si existe, se conserva.
 
 El estado es **de la cotización** y la matriz es la que siembra TASK-2025 en `quoter_state_matrix` (sección
 «`quoter_state_matrix` y `quoter_state_transitions`» de ese documento): `none → draft`, `draft → issued`,
-`draft → withdrawn`, `issued → revising`, `revising → issued`, `issued → withdrawn`, `revising → withdrawn`; ninguno
-exige compuerta humana. No se repite aquí para que no existan dos copias. Lo que agrega esta task es
+`draft → withdrawn`, `issued → revising`, `revising → issued`, `issued → withdrawn`, `revising → withdrawn`,
+`issued → accepted`, `issued → rejected`, `revising → accepted`, `revising → rejected`, `accepted → revising`,
+`rejected → revising`; ninguno exige compuerta humana y sólo `withdrawn` es terminal. No se repite aquí para que no existan dos copias. Lo que agrega esta task es
 qué comando dispara cada par:
 
 | Par | Comando | Persona |
 | --- | --- | --- |
 | `none → draft` | 1, 3 | no |
-| `issued → revising` | 2, 4 sobre una cotización emitida | no |
+| `issued → revising`, `accepted → revising`, `rejected → revising` | 2, 4 sobre una cotización emitida, aceptada o rechazada; 20 | no |
+| `issued → accepted`, `revising → accepted` | 18 | no |
+| `issued → rejected`, `revising → rejected` | 19 | no |
 | `draft → withdrawn` | 6 | no |
 | `draft → issued`, `revising → issued` | 8 | no |
 | `issued → withdrawn`, `revising → withdrawn` | 9 | no |
 
-- Las versiones no tienen ciclo de vida propio: son filas inmutables que se reemplazan por
-  `supersedes_version_number`. «Versión emitida vigente» es la del último cambio de estado a `issued`, que la vista
+- Las versiones no tienen ciclo de vida propio: son filas inmutables y la N+1 reemplaza a la N por su correlativo. «Versión emitida vigente» es la del último cambio de estado a `issued`, que la vista
   `quoter_quote_current` entrega.
 - En `revising`, lo que ve un cliente sigue siendo la última versión emitida; la nueva no se muestra hasta emitirse.
+- **Vencida no es un estado guardado.** Los lectores devuelven `state` (el guardado) y `effectiveState`, que vale
+  `expired` cuando la cotización está `issued` o `revising` y la vigencia de su última emisión pasó. Lo calcula
+  `quoter_quote_current`; ningún comando ni lector repite la regla. No hay proceso programado que marque vencidas.
 - La aprobación de una excepción **no es un estado**: es una fila de `quoter_exception_approvals` que la emisión
   comprueba. Es el único acto de persona de esta task y por eso no aparece en esta tabla.
 - Los comandos no deciden si un par existe ni si exige persona: insertan el cambio y traducen el rechazo de la base.
@@ -754,18 +792,22 @@ evento de solicitud ni de rechazo de excepción porque esos actos no existen. Es
 | La base no tiene una fuente que el artefacto nombra | 422 | `bad_request` | `source_version_not_held` |
 | El artefacto no reproduce su huella | 422 | `bad_request` | `REPLAY_MISMATCH` |
 | Emisión sin documento guardado | 422 | `bad_request` | `document_required` |
+| Emisión sin vigencia, con vigencia mal formada o ya pasada | 422 | `bad_request` | `validity_required` o `validity_in_the_past` |
+| Aceptar una cotización vencida | 409 | `quoter_quote_expired` | `quote_expired`, con `validUntil` |
+| Revocar la aprobación de una versión ya emitida | 409 | `quoter_invalid_transition` | `exception_revocation_locked` |
 | Emisión de una cotización sin organización destinataria (`recipient_required` en el almacén) | 422 | `bad_request` | `recipient_organization_required` |
 | Organización destinataria inexistente, inactiva, que es la entidad operativa o que no es cliente ni potencial cliente | 422 | `bad_request` | `recipient_organization_invalid` |
 | El mismo cálculo ya vive en una cotización no retirada | 409 | `quoter_artifact_already_registered` | `artifact_already_registered`, con la cotización y la versión existentes |
 | Asignar destinataria a una cotización que ya fue emitida | 409 | `quoter_invalid_transition` | `recipient_locked` |
-| La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict`, `state_conflict`, `recipient_conflict` o `document_conflict` |
+| La cotización avanzó desde lo que el llamador conoce | 409 | `quoter_version_conflict` | `version_conflict`, `state_conflict`, `recipient_conflict`, `document_conflict` o `not_last_issued_version` |
 | El estado no admite el acto | 409 | `quoter_invalid_transition` | `invalid_transition`, `version_locked`, `version_not_issuable`, `document_locked`, `exception_not_applicable` o `exception_decision_unchanged` |
 | Fila bajo el piso y no existe aprobación para esa versión y esa huella | 409 | `quoter_exception_approval_required` | `exception_approval_required` |
 | Misma clave de idempotencia, otro pedido | 409 | `idempotency_conflict` | — |
 | Bandera apagada | 503 | `service_unavailable` | `quoter_registry_disabled` |
 | Huella guardada que no coincide al leer | 500 | `internal_error` | — |
 
-Los tres 409 propios tienen acción distinta (recargar; nada que reintentar; conseguir la aprobación) y por eso
+Los 409 propios tienen acción distinta (recargar; nada que reintentar; conseguir la aprobación; emitir de nuevo con
+vigencia nueva) y por eso
 reciben código propio en `ApiPlatformErrorCode`, como exige la arquitectura de la API. Los códigos en minúsculas son
 del agregado (`src/lib/commercial/quoter/errors.ts`, lista cerrada); los de mayúsculas son del registro del motor,
 que no se amplía. Todo rechazo del motor dentro de un comando usa la tabla de TASK-2026 sin cambios.

@@ -58,6 +58,16 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
   10. `REVOKE` explícito al runtime (el esquema concede `UPDATE` y `DELETE` por defecto) y verificación por nombre.
   11. El puntero: sin único en `pointer_digest`; persona exigida sólo en `platform_activation`; un reflejo del repo
       nombra su commit. Los documentos importados nombran su archivo y su commit.
+- **Ciclo de vida después de emitir (aprobado por el CEO el 2026-10-12; ADR, decisión 5; commit `3cc560f52`).**
+  Se suman los estados `accepted` y `rejected` y una fecha de vigencia que fija cada emisión (`valid_until`).
+  «Vencida» no es un estado guardado: se deriva de esa fecha en un solo lugar (`quoter_quote_current.effective_state`)
+  y la base no deja aceptar una cotización vencida. Trece pares en la matriz, ninguno con compuerta humana: un agente
+  aplica todos los estados. Sólo `withdrawn` es terminal. Fuera de alcance: enviada y vista, ganada y perdida, un
+  proceso que marque vencidas, y que el documento imprima la vigencia registrada.
+- **Una sola lectura del veredicto del motor.** `replayFrozenArtifact` (`src/lib/finance/pricing-v3/adapters/
+  frozen-artifact.ts`) reproduce un artefacto de cualquier carril y dice, sobre el resultado **recalculado**, si
+  calculó y si alguna fila está bajo el piso. El almacén guarda eso; `artifact-index.ts` ya no lo lee del texto.
+- **Una aprobación se revoca sólo mientras su versión no se haya emitido**; después, el acto es retirar.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
@@ -80,7 +90,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Slices 1 a 3 escritos y verdes en PostgreSQL 16 local (2026-10-12); migraciones pendientes, ninguna aplicada; faltan Slices 4 a 6`
+- Status real: `Slices 1 a 4 escritos y verdes en PostgreSQL 16 local (2026-10-12), con el ciclo de vida ampliado; tres migraciones pendientes, ninguna aplicada; faltan Slices 5 y 6`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -327,7 +337,14 @@ Reglas obligatorias:
   - Emitir nombra una versión real con su huella (la última o la última emitida) y el documento que rige para ella
     con su huella; exige destinataria y, si la versión está bajo el piso, una aprobación vigente. Lo comprueba la
     base, no sólo el código.
-  - Una cotización emitida o retirada no recibe versiones; un documento se escribe en `draft` o en `revising`.
+  - Una cotización emitida, aceptada, rechazada o retirada no recibe versiones (se abre antes una revisión); un
+    documento se escribe en `draft` o en `revising`.
+  - Toda emisión declara hasta qué día vale y no nace vencida. Aceptar y rechazar nombran lo último que se emitió.
+    «Vencida» se deriva en un solo lugar y una cotización vencida no se acepta: se emite de nuevo, con el mismo
+    número. Sólo `withdrawn` es terminal.
+  - Si una versión calculó y si está bajo el piso lo dice el motor sobre el resultado recalculado, en una sola
+    función; nadie más reimplementa ese criterio.
+  - La hora de un cambio de estado es la del reloj de la base; quien llama no puede declarar otra.
   - Toda fila inmutable dice quién actuó (`*_principal_id`), sin depender del registro de comandos.
   - Cada regla que la base hace cumplir tiene nombre, y el código responde por ese nombre.
   - La organización dueña de toda cotización es la canónica de Efeonce; la destinataria, cuando existe, es una
@@ -735,7 +752,10 @@ potencial cliente.
   'pricing-v3-selection-quote/1','pricing-v3-resource-composition/1'))`
 - `calculation_status text NOT NULL CHECK (calculation_status = 'calculated')`
 - `below_floor boolean NOT NULL` — el veredicto del motor, congelado con la versión: alguna fila de algún período
-  trae el diagnóstico `MARGIN_BELOW_FLOOR`. No es un índice: la regla de la emisión lo lee
+  trae el diagnóstico `MARGIN_BELOW_FLOOR`. No es un índice: la regla de la emisión lo lee. Lo calcula **una sola
+  función del motor**, `replayFrozenArtifact`, sobre el resultado recalculado y no sobre el texto recibido; una
+  prueba del motor la mantiene igual, sobre todos los artefactos del repo, a los diagnósticos del kernel y a las
+  filas que dimensiona el resumen (`linesBelowPolicyFloor`)
 - `origin text NOT NULL CHECK (origin IN ('platform','local'))` — calculada por la API o hecha en local y registrada
   después de recalcularla
 - `registered_by_actor_kind`, `registered_by_member_id`, `registered_by_principal_id text NOT NULL`,
@@ -745,7 +765,8 @@ potencial cliente.
 - Disparador `BEFORE INSERT`, bajo el bloqueo de la cotización: `version_number` igual al máximo más uno
   (`quoter_quote_versions_next_number`), y el estado vigente admite versiones — sin estado todavía, `draft` o
   `revising` (`quoter_quote_versions_state_admits_version`). Sobre una cotización emitida el almacén registra
-  primero `issued → revising`; una retirada no recibe versiones.
+  primero `issued → revising` (y, sobre una aceptada o rechazada, su cambio a `revising`); una retirada no recibe
+  versiones.
 - **Un cálculo vive en una sola cotización no retirada.** Lo hace cumplir `quote-store.ts`, no una restricción: antes
   de insertar toma un bloqueo transaccional por `replay_digest` y rechaza con `artifact_already_registered` (con la
   cotización y la versión existentes) si esa huella ya está en una cotización cuyo estado vigente no es `withdrawn`.
@@ -805,16 +826,51 @@ par nuevo, entra por una migración que sólo agrega filas.
 | `none` | `draft` | no | crear la cotización con su versión 1 |
 | `draft` | `issued` | no | emitir |
 | `draft` | `withdrawn` | no | retirar un borrador |
-| `issued` | `revising` | no | agregar o registrar una versión sobre una cotización emitida |
-| `revising` | `issued` | no | emitir la versión nueva; la emitida anterior queda reemplazada |
+| `issued` | `revising` | no | agregar o registrar una versión sobre una cotización emitida; reabrir para corregir |
+| `revising` | `issued` | no | emitir la versión nueva, o volver a emitir la última emitida |
 | `issued` | `withdrawn` | no | retirar |
 | `revising` | `withdrawn` | no | retirar |
+| `issued` | `accepted` | no | el cliente aceptó lo emitido |
+| `issued` | `rejected` | no | el cliente rechazó lo emitido |
+| `revising` | `accepted` | no | el cliente aceptó la última versión emitida mientras se prepara otra |
+| `revising` | `rejected` | no | ídem, rechazó |
+| `accepted` | `revising` | no | abrir una versión nueva; también el camino para corregir un registro equivocado |
+| `rejected` | `revising` | no | ídem |
 
-`withdrawn` es terminal y no hay vuelta de `issued` a `draft`. Qué capacidad exige cada acto lo resuelve la puerta
-única, no la matriz.
+`withdrawn` es el único estado terminal y ningún otro es un callejón sin salida: desde `accepted` o `rejected` se
+vuelve a `revising`, y de ahí a emitir de nuevo o a retirar. No hay vuelta de `issued` a `draft`. Qué capacidad
+exige cada acto lo resuelve la puerta única, no la matriz.
+
+**Vigencia y «vencida».**
+
+- `valid_until date` en el historial: obligatoria cuando el destino es `issued` y nula en cualquier otro cambio
+  (`…_issue_names_its_validity`); no anterior a hoy (`…_validity_not_past`). Cada emisión fija la suya; el número no
+  cambia.
+- «Hoy» tiene un dueño: la función `quoter_today()`, el día en `America/Santiago`. La usan el disparador y la vista;
+  nunca `CURRENT_DATE`, que depende de la zona de la sesión.
+- «Vencida» no se guarda. `quoter_quote_current` expone `valid_until` de la última emisión y `effective_state`, que
+  vale `expired` cuando el estado guardado es `issued` o `revising` y esa fecha pasó. El último día de la vigencia
+  todavía cuenta. Es el único lugar que aplica la regla: el almacén lee `effective_state` y no la repite.
+- Una cotización vencida no se acepta (`quoter_quote_expired`), la acepte quien la acepte; rechazarla sí se puede.
+  Para aceptarla se emite de nuevo con vigencia nueva (`issued → revising → issued` con la última versión emitida).
+  Esa regla vive aislada en un solo `IF` del disparador y en una sola comprobación del almacén.
+- **Aceptar y rechazar** nombran lo último que se emitió —versión, huella, documento y huella— por las mismas
+  llaves foráneas compuestas que la emisión (`…_responds_to_last_issued`). El motivo va en `reason`. Sin tablas
+  nuevas. Capacidad: `commercial.quoter.quote:update`.
+- La tabla del historial no enumera estados: exige que los cuatro campos del objeto vayan juntos
+  (`…_object_is_whole`) y el disparador decide qué cambio nombra qué. La matriz tampoco los enumera en una
+  restricción: **la matriz es la lista**. Agregar un estado más adelante (enviada, vista, ganada, perdida) es agregar
+  filas a la matriz y reemplazar funciones y la vista; no toca una tabla con filas.
+- `actor_kind` lleva una restricción con nombre (`quoter_state_transitions_actor_kind`) para ampliar su dominio a un
+  tercero (`client`, cuando el cliente acepte por el enlace público) cambiando esa restricción. No se implementa
+  ahora.
+- `occurred_at` lo fija el disparador con el reloj de la base.
 
 Ningún par exige compuerta humana (decisión 7, enmendada por el CEO el 2026-10-12): un agente emite una versión que
-está dentro de política y, por el mismo principio, retira lo que puede emitir. Los dos actos de persona del
+está dentro de política, retira lo que puede emitir y registra lo que respondió el cliente. Que un agente no pueda
+aplicar un cambio de estado es un defecto, no una protección; lo único que no puede es decidir una excepción bajo el
+piso y activar el catálogo. Las dos reglas de negocio de la emisión y de la aceptación (aprobación vigente bajo el
+piso; vigencia en pie) son de la operación, para cualquiera, no del agente. Los dos actos de persona del
 cotizador no son cambios de estado y por eso no aparecen aquí: la aprobación de una excepción bajo el piso vive en
 `quoter_exception_approvals` (`actor_kind = 'member'`) y la activación del catálogo en `quoter_pointer_history`
 (persona obligatoria en `platform_activation`). La columna `requires_human_gate` y su restricción se conservan como
@@ -838,10 +894,11 @@ La aprobación de una excepción bajo el piso no es un estado: es un acto regist
 - `reason text NOT NULL CHECK (length(btrim(reason)) >= 10)`
 - `command_execution_id text NOT NULL`, `request_hash`, `decided_at`
 - Disparador `BEFORE INSERT`: sólo una versión con `below_floor = true` recibe una decisión
-  (`quoter_exception_approvals_version_is_below_floor`), y la decisión cambia la vigente
-  (`quoter_exception_approvals_decision_changes_it`): se aprueba lo que no está aprobado y se revoca lo que sí.
+  (`quoter_exception_approvals_version_is_below_floor`), la decisión cambia la vigente
+  (`quoter_exception_approvals_decision_changes_it`: se aprueba lo que no está aprobado y se revoca lo que sí), y
+  una aprobación se revoca sólo mientras su versión no se haya emitido
+  (`quoter_exception_approvals_revoke_before_issue`): después esa fila no significaría nada, y el acto es retirar.
 - Disparadores: rechazo de `UPDATE`, de `DELETE` y de `TRUNCATE`.
-- Revocar después de emitir no deshace la emisión: retirar la cotización es otro acto.
 
 ### `quoter_version_documents` (sólo agregar)
 
@@ -959,7 +1016,7 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
    con el de operaciones.
 5. **Puntero.** Guardar un documento no cambia `quoter_current_pointer`; una activación con huella previa equivocada
    falla; dos activaciones concurrentes dejan una sola fila nueva.
-6. **Estados y excepción.** Un par fuera de la matriz falla; un origen que no es el vigente falla; los siete pares
+6. **Estados y excepción.** Un par fuera de la matriz falla; un origen que no es el vigente falla; los trece pares
    sembrados tienen `requires_human_gate = false` y un actor `agent` emite y retira; el historial tiene
    `transition_seq` correlativo; emitir exige versión emitible, destinataria y documento, en ese orden; desde
    `revising` se vuelve a la última versión emitida y no a una anterior; una versión bajo el piso no se emite sin
@@ -992,9 +1049,22 @@ carril deriva de un binding `internal` un `TenantEntitlementSubject` máquina (`
 15. **Rechazos con nombre.** Cada regla se ejercita por el almacén (código) y por SQL directo (SQLSTATE y nombre);
     ninguna aserción lee el texto de un mensaje. `constraint-names.test.ts` exige que todo `RAISE` nombrado tenga su
     código y que ninguna entrada del mapa sobre.
+17. **Después de emitir.** Emitir sin vigencia, con formato inválido o con una fecha pasada falla; aceptar y
+    rechazar nombran la última emisión; una respuesta sobre una versión que no es la última emitida falla, por el
+    almacén y por SQL directo; ninguna respuesta es un callejón sin salida y el número se conserva en cada
+    re-emisión; con «hoy» movido en la base desechable, una cotización pasa a `expired` el día siguiente a su
+    vigencia (no el mismo día), no se acepta, sí se rechaza, y se acepta tras re-emitirla; «hoy» es el día de
+    Santiago con cualquier zona de sesión; la hora de un cambio es la del reloj de la base.
+18. **Un agente aplica todos los estados.** El sujeto máquina de un binding interno pasa la puerta y registra, sin
+    persona: crear, asignar destinataria, guardar documento, emitir, rechazar, reabrir, re-emitir, aceptar, agregar
+    versión, emitir, aceptar, reabrir y retirar. Ningún par de la matriz tiene compuerta. Lo único que no pasa:
+    decidir una excepción y activar el catálogo. (El carril de ecosistema no existe todavía: lo crea `TASK-2026`; la
+    misma prueba por HTTP es de `TASK-2027`.)
 16. **Falsificación.** Antes de dar una regla por probada se quita (en el SQL pendiente o en el almacén) y se
     confirma que la suite se pone roja; se restaura y vuelve a verde. Hecho el 2026-10-12 para el bloqueo del
-    disparador de estados, la regla del piso, la regla del documento y el bloqueo del almacén.
+    disparador de estados, la regla del piso, la regla del documento, el bloqueo del almacén, la aceptación de una
+    vencida, la respuesta sobre la última emisión, el borde del último día de vigencia, la revocación después de
+    emitir y la emisión que nace vencida.
 
 Las pruebas 1 a 8, 11, 12, 14, 15 y el lector de la dueña de la 10 corren contra el clúster PostgreSQL local. Una prueba omitida por
 falta de clúster no cuenta como verde: el cierre exige una corrida con el clúster arriba.
@@ -1122,7 +1192,7 @@ visto bueno y la importación del catálogo.
       Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; cuatro reglas quitadas de a una; la suite se puso roja cada vez y volvió a verde al restaurar.
 - [x] La matriz de estados en TypeScript y la sembrada en la migración son iguales (`state-machine-parity.test.ts`).
       Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; `state-machine-parity.test.ts` y la misma comparación contra las filas del clúster local.
-- [x] Ninguno de los siete pares sembrados exige compuerta humana: un actor `agent` registra una emisión y un retiro.
+- [x] Ninguno de los trece pares sembrados exige compuerta humana: un actor `agent` registra una emisión y un retiro.
       Una decisión sobre una excepción con un actor que no es una persona identificada falla en la base y exige la
       huella de su versión; una activación del puntero en la plataforma sin persona identificada falla.
       Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, como `greenhouse_runtime`, 64 pruebas verdes; un agente emite y retira; decisión de excepción por un agente rechazada; activación sin persona rechazada.
@@ -1134,6 +1204,14 @@ visto bueno y la importación del catálogo.
       filas.
 - [ ] `runStorageConformance` pasa contra el adaptador PostgreSQL en el clúster local.
 - [ ] Las pruebas con base de datos corrieron con el clúster local arriba (evidencia de corrida, no omitidas).
+- [x] Después de emitir: `accepted` y `rejected` como estados, vigencia fijada por cada emisión, `expired` derivado
+      en un solo lugar, una vencida no se acepta, y sólo `withdrawn` es terminal (pruebas 17 y 18).
+      Evidencia 2026-10-12: `pnpm quoter:test:local`, PostgreSQL 16.15, 85 pruebas verdes.
+- [x] Un agente (sujeto máquina de un binding interno) aplica todos los estados sin persona; lo único que no puede
+      es decidir una excepción bajo el piso y activar el catálogo (prueba 18 y `authz.test.ts`).
+      Evidencia 2026-10-12: la misma corrida.
+- [x] El veredicto «calculó» y «bajo el piso» sale de una sola función del motor sobre el resultado recalculado
+      (`pricing-v3-artifact-verdict.test.ts`, sobre los 48 artefactos del repo).
 - [ ] Las capacidades `commercial.quoter.catalog`, `commercial.quoter.catalog.activate`, `commercial.quoter.simulate`,
       `commercial.quoter.quote`, `commercial.quoter.issue` y `commercial.quoter.exception` existen en el
       registro, en `entitlements-catalog.ts` y otorgadas en `runtime.ts`; `commercial.quoter.exception:approve` sólo a
@@ -1142,8 +1220,9 @@ visto bueno y la importación del catálogo.
 - [ ] `capability-grant-coverage.test.ts` pasa y ve las llamadas `can()` de la puerta (escritas con literales). La
       prueba de paridad registro ↔ catálogo (`parity.live.test.ts`, contra la base real) pasa después de aplicar la
       migración 3; entre el commit del catálogo y esa aplicación queda en rojo, y así se reporta.
-- [ ] El sujeto máquina de un binding interno (rol `efeonce_account`) pasa la puerta única para emitir y retirar, y
+- [x] El sujeto máquina de un binding interno (rol `efeonce_account`) pasa la puerta única para emitir y retirar, y
       no la pasa para aprobar una excepción, activar el puntero ni guardar un documento de catálogo (probado).
+      Evidencia 2026-10-12: `src/lib/commercial/quoter/__tests__/authz.test.ts`.
 - [ ] La organización dueña de una cotización se resuelve en una sola función por el identificador público
       `EO-ORG-0007` y falla cerrado si la fila no es la entidad operativa activa; ningún archivo de
       `src/lib/commercial/quoter/` ni migración de esta task contiene un UUID de organización.
