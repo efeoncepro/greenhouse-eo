@@ -193,3 +193,59 @@ La tabla tiene cuatro columnas: el hito con su fecha o condición debajo (como e
 Lo que el barrido encontró y no es de este cambio: 13 de los documentos compuestos desbordan a 390 px, todos por el importe de la portada (millones de dólares o miles de millones de soles a 32 pt), con el rótulo fijo o con uno propio. El generador ya los rechaza en el render con «El documento desborda en móvil».
 
 Las reglas de recalibración de las secciones anteriores valen también para `template-lineas-hitos.css` y para el encabezado: `checks.interiorHeader` de cada manifiesto guarda las líneas estimadas, y `checks.layout[].headerGapPx`, el aire real bajo el encabezado.
+
+## Portada: el cliente una vez y la persona a quien se dirige · 11/10/2026
+
+Dos cambios en la portada de la versión 2. Sin logo, el nombre del cliente se imprimía dos veces: como titular del bloque «Preparado para» y otra vez en la línea pequeña de debajo; ahora queda sólo el titular. Y `buyer.contact`, opcional, añade al bloque una línea «Atención: …»: los agentes estaban escribiendo a la persona de contacto en `buyer.unit`, que es un área y va al encabezado interior. La versión 1 no cambia. Los renders de esta revisión se generaron en una carpeta de trabajo fuera del repositorio; `vista-previa/` no se regeneró.
+
+- **Versión 1 sin cambios.** `template.html` y `template.css` no se tocaron. El HTML de `ejemplo.json`, `ejemplo-pen.json` y `ejemplo-usd-pen.json` conserva su SHA-256 (`623988f8…`, `3bebc250…`, `d5ce5915…`), igual que el de `vista-previa/datos.json` y el de la cotización de precio único con logo ya entregada (`45c54f96…`). `ejemplo.json` se renderizó de principio a fin: cuatro páginas, mismo HTML. `buyer.contact` en la versión 1 se rechaza con mensaje, como `cover.netLabel`: no se imprimiría.
+- **Sin hoja de estilos nueva.** El bloque usa los elementos y las reglas que ya tenía (`.client-block`, `.client-name` y su párrafo a 9 pt). `template-lineas.html` deja el párrafo de datos del cliente en manos del generador (`{{buyer.detailsBlock}}`); ningún CSS cambió.
+- **Pruebas.** 41 pruebas Node PASS (37 del generador, 4 de dinero). La nueva cubre el bloque del cliente en sus cuatro casos (con y sin logo, con y sin contacto), que con logo y sin contacto es idéntico al de la versión 1 compuesto con el mismo cliente, la altura estimada de cada caso, el escape, que el contacto sólo aparece en la portada, que `null` equivale a omitirlo y cada rechazo (texto vacío, clave mal escrita, versión 1, palabra más ancha que el bloque, portada que no cabe).
+- **Ejemplo.** `ejemplo-lineas-proyecto.json` declara ahora `buyer.contact`. Es el único dato versionado que cambió.
+
+### Qué cambia en un documento que no usa nada nuevo
+
+Sólo el párrafo de datos del cliente de la portada, y sólo si el cliente no tiene logo: desaparecen el elemento `<span data-slot="buyer.name">` y su salto de línea. Medido sobre los catorce documentos de la versión 2 que existían antes del cambio, comparando el HTML del generador anterior con el nuevo: al quitar ese elemento del HTML anterior se obtiene, byte a byte, el HTML nuevo (58 bytes menos en los diez documentos de esta carpeta y del puente; 51 en los cuatro `datos.json` de una cotización entregada). Ninguno de los catorce tiene logo, así que los catorce cambian de SHA-256 por esa razón y sólo por ella. La portada de cada uno mide 19,8 px menos (una línea de 9 pt con interlineado 1,65).
+
+| Documento (datos anteriores al cambio) | Antes | Después |
+| --- | --- | --- |
+| `ejemplo-lineas.json` | `d92402cb…` | `44c45ffb…` |
+| `ejemplo-lineas-terceros.json` | `e7734761…` | `759e9654…` |
+| `ejemplo-lineas-opcionales.json` | `2163ad51…` | `ce0be0aa…` |
+| `ejemplo-lineas-proyecto.json` | `0ea4f307…` | `0b064943…` |
+| Puente: `designer-on-demand` | `db4717dd…` | `a053a357…` |
+| Puente: `designer-startup-courtesy` | `51f374a2…` | `85b9b743…` |
+| Puente: `designer-three-months-iva` | `8d41b79e…` | `78e37e79…` |
+| Puente: `managed-addon-increment` | `b4bea7bb…` | `44a5fa65…` |
+| Puente: `managed-addon-increment.programme-price` | `91beb6c9…` | `a49a3e39…` |
+| Puente: `managed-on-demand-third-party` | `b2d971e6…` | `733fa1c0…` |
+
+`ejemplo-lineas.json` y `ejemplo-lineas-terceros.json` quedan fijados como prueba permanente en sus valores nuevos. Después de medir eso, `ejemplo-lineas-proyecto.json` recibió su `buyer.contact`; con sus datos actuales su HTML es `82c4b57d…`. Los documentos emitidos por el puente no cambiaron: sus datos no declaran contacto. Las cotizaciones de la versión 2 ya entregadas conservan sus archivos; si se regeneran desde sus datos, saldrán con el nombre una sola vez.
+
+Un documento de la versión 2 **con** logo y sin contacto no cambia: ocho documentos compuestos para comprobarlo (los cuatro ejemplos con un logo, con y sin unidad del cliente) dan el mismo SHA-256 con el generador anterior y con el nuevo.
+
+### Qué se midió
+
+| Magnitud | Valor |
+| --- | --- |
+| Bloque del cliente sin logo ni contacto | 99,8 px (antes 119,6 px): rótulo, márgenes, titular a 22 pt y una línea de datos |
+| Con contacto de una línea | 119,6 px sin logo; con logo, una línea más que antes (19,8 px) |
+| Portada de los once documentos versionados, renderizados (estimación − medida) | entre 0,06 y 0,08 px; nunca por debajo. Alcance: 0,13–0,23 px; condiciones: 0,02–0,04 px |
+| Espacio libre mínimo en la portada de esos documentos | 54,8 px (dos documentos del puente); antes, 34,9 px |
+| Caso límite compuesto a propósito: nombre de dos líneas a 22 pt y contacto de dos líneas | 800,63 px medidos, 800,72 px estimados, de 802,75 px; se compone con 8,1 px sobre el pie |
+
+Los once documentos renderizados: `ejemplo.json`, los cuatro ejemplos de la versión 2 y los seis emitidos por el puente de Pricing V3. En el PDF de los diez de la versión 2, el texto extraído del bloque «Preparado para» lleva el nombre del cliente una vez (en el de la versión 1, dos, como siempre); a 390 px, ninguno desborda. Portadas leídas en captura del navegador: dos del puente (una con unidad del cliente y otra sin ella), `ejemplo-lineas-proyecto.json` con su contacto, también a 390 px, y seis variantes compuestas para esta revisión: con y sin logo, con y sin unidad, y con contacto corto y largo. En el PDF A4 etiquetado, «Atención: …» se extrae como texto bajo la identificación.
+
+### Barrido contra Chromium
+
+600 portadas aleatorias de la versión 2 (dos semillas): con logo de cuatro proporciones o sin él, nombre de 1 a 20 palabras, identificación corta o larga, contacto de 2 a 34 palabras en siete de cada diez y sin unidad del cliente en tres de cada diez.
+
+| Resultado | Valor |
+| --- | --- |
+| Compuestas | 447 portadas (257 con logo, 291 con contacto): 0 subestimadas, ni la portada ni el bloque del cliente |
+| Portada (estimado − medido) | 442 coinciden en menos de 0,5 px (0,05–0,09 px). Cinco cuentan una línea de más: cuatro una de 9 pt (19,8 px) y una el titular a 22 pt (44 px), todas por un texto que entraba en su ancho por menos de la holgura |
+| Nombre del cliente en la portada | Una vez en las 447 |
+| Aire mínimo sobre el pie | 14,9 px |
+| Rechazadas por el plan, con mensaje | 153, todas por una portada que no cabe |
+
+Las reglas de recalibración de las secciones anteriores valen también para este bloque: `checks.fixedPages` de cada manifiesto guarda la estimación y la medida de la portada.

@@ -15,6 +15,7 @@
   "buyer": {
     "name": "Cliente de ejemplo",
     "taxId": "Identificación del cliente por confirmar",
+    "contact": "Contacto de ejemplo, Gerencia de Marketing",
     "logo": null
   },
   "cover": {

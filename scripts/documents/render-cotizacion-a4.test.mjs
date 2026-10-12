@@ -158,9 +158,11 @@ test('las dos plantillas comparten portada, alcance y condiciones', async () => 
 
   const section = (html, id) => html.slice(html.indexOf(`<section id="${id}"`)).split('</section>')[0]
 
-  // La versión 2 deja en manos del generador dos elementos que en ella son opcionales o editables: el rótulo
-  // del valor neto de la portada (cover.netLabel) y la nota del calendario (schedule.note). Con los datos de
-  // siempre, el generador escribe exactamente el elemento de la versión 1.
+  // La versión 2 deja en manos del generador tres elementos que en ella son opcionales o editables: los datos
+  // del cliente bajo su marca (sin logo no repiten su nombre; buyer.contact añade una línea), el rótulo del
+  // valor neto de la portada (cover.netLabel) y la nota del calendario (schedule.note). Con los datos de la
+  // versión 1 (un cliente con logo y sin contacto, el rótulo fijo y una nota), el generador escribe exactamente
+  // el elemento de la versión 1: lo comprueba, sobre el HTML compuesto, la prueba de los datos del cliente.
   const same = (html, slot, element) => {
     assert.equal(html.split(slot).length, 2, slot)
 
@@ -169,9 +171,13 @@ test('las dos plantillas comparten portada, alcance y condiciones', async () => 
 
   assert.equal(
     same(
-      section(v2, 'pagina-1'),
-      '{{cover.netLabelBlock}}',
-      '<span class="label">Valor neto del servicio completo</span>'
+      same(
+        section(v2, 'pagina-1'),
+        '{{cover.netLabelBlock}}',
+        '<span class="label">Valor neto del servicio completo</span>'
+      ),
+      '{{buyer.detailsBlock}}',
+      '<p><span data-slot="buyer.name">{{buyer.name}}</span><br><span data-slot="buyer.taxId">{{buyer.taxId}}</span></p>'
     ),
     section(v1, 'pagina-1')
   )
@@ -636,10 +642,13 @@ test('versión 2: bloques opcionales, importes en su moneda y origen de datos fu
 // se midieron por separado. Uno, el encabezado de las páginas interiores de la versión 2: ya no deja un «·»
 // colgando tras el nombre de la sección; con los datos de entonces el HTML pasó a ad7f0005… y 7acecf16…, y la
 // única diferencia es el marcado del encabezado y sus estilos. Dos, los ejemplos dejaron de declarar la nota
-// «Desde el inicio acordado» y la condición «Plazo e inicio», que no decían nada: de ahí los valores de abajo.
+// «Desde el inicio acordado» y la condición «Plazo e inicio», que no decían nada: quedaron en d92402cb… y
+// e7734761…. Tres, la portada de un cliente sin logo dejó de repetir su nombre bajo el titular del bloque: la
+// única diferencia con esos dos valores es el elemento `<span data-slot="buyer.name">` y su salto de línea, que
+// desaparecen del párrafo de datos del cliente (58 bytes menos en cada uno). De ahí los valores de abajo.
 const V2_BASELINE = {
-  'ejemplo-lineas.json': 'd92402cb59ea914abb3bb216ad7b02dec5972c362b0038fc60f8726bda379a9e',
-  'ejemplo-lineas-terceros.json': 'e77347610645ec82c39f7737980810dd842171854430d17951d8cefafeede546'
+  'ejemplo-lineas.json': '44c45ffbe41d745742ae42aad89dd660077815f7b92316d0c766d2473e40056e',
+  'ejemplo-lineas-terceros.json': '759e965421dd74536a4d5e9a3323909f7805768d842373acbb81d64106abcf82'
 }
 
 const optionalExample = await load('ejemplo-lineas-opcionales.json')
@@ -937,27 +946,35 @@ const coverOf = result => result.fixedPages.find(page => page.name === 'portada'
 
 test('páginas fijas: los dos títulos de portada que sólo fallaban al renderizar se rechazan sin navegador', async () => {
   // Cada caso es la portada que falló: el título largo con la bajada de su documento. En Chromium ocupaban
-  // 860,9 px y 829,8 px de los 802,75 px que admite la portada.
+  // 860,9 px y 829,8 px de los 802,75 px que admite la portada. Desde que la versión 2 no repite el nombre del
+  // cliente bajo el titular de su bloque, la misma portada ocupa allí una línea de 9 pt menos (19,8 px): sigue
+  // sin caber, y cada versión dice su propia altura.
   const failures = [
     {
       title: ['Contenidos y comunidad,', 'gestionados de punta', 'a punta.'],
       subtitle:
         'Un servicio gestionado de un mes para Cliente de ejemplo, con la producción y los medios de su campaña.',
-      message:
-        /Contenido fuera del A4\. El título de portada no cabe: «Contenidos y comunidad,» no entra en una línea a su tamaño y el título ocupa 5 líneas\. Acórtalo \(cover\.title\)\. La portada ocupa 861 px y la página admite 803 px\./,
+      message: px =>
+        new RegExp(
+          `Contenido fuera del A4\\. El título de portada no cabe: «Contenidos y comunidad,» no entra en una línea a su tamaño y el título ocupa 5 líneas\\. Acórtalo \\(cover\\.title\\)\\. La portada ocupa ${px} px y la página admite 803 px\\.`
+        ),
+      px: { 1: 861, 2: 842 },
       fixed: ['Contenidos y', 'comunidad', 'gestionados.']
     },
     {
       title: ['Atención en redes', 'como servicio gestionado,', 'con una opción.'],
       subtitle:
         'Un servicio gestionado de atención en redes sociales durante tres meses para Cliente de ejemplo, con un fee mensual único y un servicio opcional que amplía su capacidad.',
-      message:
-        /Contenido fuera del A4\. El título de portada no cabe: «como servicio gestionado,» no entra en una línea a su tamaño y el título ocupa 4 líneas\. Acórtalo \(cover\.title\)\. La portada ocupa 830 px y la página admite 803 px\./,
+      message: px =>
+        new RegExp(
+          `Contenido fuera del A4\\. El título de portada no cabe: «como servicio gestionado,» no entra en una línea a su tamaño y el título ocupa 4 líneas\\. Acórtalo \\(cover\\.title\\)\\. La portada ocupa ${px} px y la página admite 803 px\\.`
+        ),
+      px: { 1: 830, 2: 811 },
       fixed: ['Atención en', 'redes sociales', 'gestionada.']
     }
   ]
 
-  for (const { title, subtitle, message, fixed } of failures) {
+  for (const { title, subtitle, message, px, fixed } of failures) {
     for (const [base, name] of [
       [linesExample, 'ejemplo-lineas.json'],
       [example, 'ejemplo.json']
@@ -965,7 +982,7 @@ test('páginas fijas: los dos títulos de portada que sólo fallaban al renderiz
       const q = structuredClone(base)
 
       q.cover = { ...q.cover, title, subtitle }
-      await assert.rejects(buildHtml(q, templatePath(name)), message)
+      await assert.rejects(buildHtml(q, templatePath(name)), message(px[q.version]))
       // El título con el que cada documento quedó versionado sí cabe, en la misma portada.
       q.cover.title = fixed
       const cover = coverOf(await buildHtml(q, templatePath(name)))
@@ -1016,10 +1033,11 @@ test('páginas fijas: cada página estima sus bloques y dice qué acortar cuando
       [4, 'condiciones', 882.56, ['overline', 'title', 'rows', 'contact']]
     ]
   )
-  // Medido en Chromium para este ejemplo: 705,92 px, 670,38 px y 697,88 px. La estimación no baja de la medida.
+  // Medido en Chromium para este ejemplo: 686,13 px, 670,38 px y 697,88 px. La estimación no baja de la medida.
+  // La portada mide una línea de 9 pt (19,8 px) menos que cuando repetía el nombre del cliente: eran 705,92 px.
   assert.deepEqual(
     fixedPages.map(page => page.estimatedPx),
-    [705.99, 670.54, 697.91]
+    [686.19, 670.54, 697.91]
   )
 
   const rejects = async (mutate, pattern, base = linesExample, name = 'ejemplo-lineas.json') => {
@@ -1080,7 +1098,7 @@ test('páginas fijas: cada página estima sus bloques y dice qué acortar cuando
   const longEmail = structuredClone(linesExample)
 
   longEmail.supplier.email = 'equipo.comercial.de.cuentas.estrategicas@efeoncepro.com'
-  assert.ok(coverOf(await build(longEmail)).estimatedPx >= 705.99)
+  assert.ok(coverOf(await build(longEmail)).estimatedPx >= 686.19)
 })
 
 test('páginas fijas: el logo del cliente entra en la estimación por su proporción', async () => {
@@ -1256,7 +1274,8 @@ test('versión 2: el encabezado interior apila unidad, sección y referencia, si
   assert.ok(long.pagination.length > 1)
   assert.equal(count(long.html, '<span class="header-section">Detalle de la cotización</span>'), long.pagination.length)
 
-  // Sin unidad del cliente: dos líneas, sin elemento vacío y sin repetir el nombre del cliente.
+  // Sin unidad del cliente: dos líneas, sin elemento vacío y sin poner el nombre del cliente en su lugar. El
+  // documento lo imprime una vez, como titular del bloque del cliente en la portada.
   const noUnit = structuredClone(linesExample)
 
   delete noUnit.buyer.unit
@@ -1264,7 +1283,8 @@ test('versión 2: el encabezado interior apila unidad, sección y referencia, si
 
   assert.equal(count(withoutUnit.html, headerOf(null, 'Alcance y calendario', reference)), 1)
   assert.ok(!withoutUnit.html.includes('data-slot="buyer.unit"') && !withoutUnit.html.includes('header-unit"'))
-  assert.equal(count(withoutUnit.html, '<span data-slot="buyer.name">Cliente de ejemplo</span>'), 1)
+  assert.equal(count(withoutUnit.html, 'data-slot="buyer.name"'), 1)
+  assert.equal(count(withoutUnit.html, '<div class="client-name" data-slot="buyer.name">Cliente de ejemplo</div>'), 1)
   assert.deepEqual(withoutUnit.interiorHeader, { unit: 0, section: 1, reference: 1, limit: 3 })
 
   // El encabezado admite tres líneas. Una referencia de dos cabe sin unidad y no cabe con ella: antes pasaba
@@ -1338,7 +1358,7 @@ test('versión 2: buyer.unit, schedule.note y cover.netLabel son opcionales; una
   // Con claves opcionales, una mal escrita se omitiría en silencio: se rechaza con su nombre.
   rejects(
     q => (q.buyer.unidad = 'Gerencia'),
-    /buyer: campos no reconocidos \(unidad\)\. Se admiten: name, unit, taxId, logo/
+    /buyer: campos no reconocidos \(unidad\)\. Se admiten: name, unit, contact, taxId, logo/
   )
   rejects(q => (q.cover.netLable = 'Valor'), /cover: campos no reconocidos \(netLable\)/)
   rejects(q => (q.schedule.nota = 'Nota'), /schedule: campos no reconocidos \(nota\)/)
@@ -1416,6 +1436,121 @@ test('versión 2: buyer.unit, schedule.note y cover.netLabel son opcionales; una
 
     assert.equal(await alt({ ...bare, buyer: { ...bare.buyer, logo } }), 'Cliente de ejemplo')
     assert.equal(await alt({ ...linesExample, buyer: { ...linesExample.buyer, logo } }), 'Equipo de producto digital')
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true })
+  }
+})
+
+test('versión 2: la portada nombra al cliente una vez y, si se declara, a quién se dirige', async () => {
+  // Bloque «Preparado para» de la portada, tal como queda compuesto; la imagen del logo, sin sus bytes.
+  const clientBlock = result =>
+    result.html
+      .split('<div class="client-block">')[1]
+      .split('</div>\n')[0]
+      .replace(/ src="data:[^"]+"/, ' src="…"')
+
+  const clientHeight = result => coverOf(result).blocks.find(block => block.key === 'client').heightPx
+  const taxId = '<span data-slot="buyer.taxId">Identificación del cliente por confirmar</span>'
+  const heading = '<span class="label">Preparado para</span><div class="client-name" data-slot="buyer.name">'
+
+  // Sin logo, el nombre del cliente es el titular del bloque y no se repite en la línea pequeña de debajo.
+  const plain = await build(linesExample)
+
+  assert.equal(linesExample.buyer.logo, null)
+  assert.equal(clientBlock(plain), `${heading}Cliente de ejemplo</div><p>${taxId}</p>`)
+  assert.equal(count(plain.html, 'data-slot="buyer.name"'), 1)
+  // Rótulo, márgenes, titular a 22 pt y una línea de datos a 9 pt (antes dos: 119,6 px).
+  assert.equal(clientHeight(plain), 99.8)
+
+  // buyer.contact: la persona a quien se dirige el documento cierra el bloque, escapada y con su slot.
+  const addressed = structuredClone(linesExample)
+
+  addressed.buyer.contact = 'María Pérez <Marketing & Marca>'
+  const withContact = await build(addressed)
+
+  assert.equal(
+    clientBlock(withContact),
+    `${heading}Cliente de ejemplo</div><p>${taxId}<br>Atención: <span data-slot="buyer.contact">María Pérez &lt;Marketing &amp; Marca&gt;</span></p>`
+  )
+  assert.equal(clientHeight(withContact), 119.6)
+  // Sólo en la portada: el encabezado interior sigue llevando la unidad, nunca el contacto.
+  assert.equal(count(withContact.html, 'data-slot="buyer.contact"'), 1)
+  assert.deepEqual(withContact.interiorHeader, plain.interiorHeader)
+  // Fuera del bloque del cliente, el documento es el mismo.
+  assert.equal(withContact.html.replace(clientBlock(withContact), ''), plain.html.replace(clientBlock(plain), ''))
+
+  // Un contacto largo se parte y cada línea suma su altura a la portada (9 pt × 1,65 = 19,8 px).
+  addressed.buyer.contact =
+    'María Fernanda Pérez de la Fuente, Gerenta Corporativa de Marketing, Comunicaciones y Experiencia de Clientes para Latinoamérica'
+  assert.equal(clientHeight(await build(addressed)), 139.4)
+
+  // Es opcional como buyer.unit: null equivale a omitirlo, y presente debe ser texto no vacío.
+  assert.equal((await build({ ...linesExample, buyer: { ...linesExample.buyer, contact: null } })).html, plain.html)
+  for (const value of ['', '  ', 7, ['María Pérez']])
+    assert.throws(
+      () => validateQuote({ ...linesExample, buyer: { ...linesExample.buyer, contact: value } }),
+      /buyer\.contact debe ser texto no vacío/
+    )
+  assert.throws(
+    () => validateQuote({ ...linesExample, buyer: { ...linesExample.buyer, contacto: 'María Pérez' } }),
+    /buyer: campos no reconocidos \(contacto\)\. Se admiten: name, unit, contact, taxId, logo/
+  )
+  // La versión 1 no lo imprimiría: lo rechaza en vez de omitirlo en silencio.
+  assert.throws(
+    () => validateQuote({ ...example, buyer: { ...example.buyer, contact: 'María Pérez' } }),
+    /buyer\.contact sólo existe en la versión 2/
+  )
+
+  // Estas páginas no parten palabras: un contacto que no cabe en el ancho se nombra, como cualquier otro texto.
+  addressed.buyer.contact = `María ${'Pérez'.repeat(40)}`
+  await assert.rejects(
+    build(addressed),
+    /Contenido fuera del A4\. «(Pérez){40}» \(buyer\.contact\) es más ancho que su bloque y no puede partirse/
+  )
+  // Y si la portada no cabe, la causa nombra los datos del cliente que ocupan más de una línea.
+  addressed.buyer.contact = 'Gerencia corporativa de marketing, comunicaciones y experiencia de clientes. '.repeat(8)
+  addressed.buyer.name = 'Sociedad Comercial e Industrial de Ejemplo y Compañía Limitada de Responsabilidad'
+  await assert.rejects(
+    build(addressed),
+    /La portada no cabe: .* También ocupan más de una línea: buyer\.name \(2 líneas\), buyer\.contact \(\d líneas\)\./
+  )
+
+  // Con logo, el nombre sí acompaña a la imagen. Sin contacto, el bloque es byte a byte el de la versión 1: lo
+  // prueba el mismo cliente compuesto con las dos plantillas.
+  const dir = await fs.mkdtemp(path.join((await import('node:os')).tmpdir(), 'cotizacion-contacto-'))
+
+  try {
+    const bytes = Buffer.alloc(33)
+
+    Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52]).copy(bytes)
+    bytes.writeUInt32BE(400, 16)
+    bytes.writeUInt32BE(100, 20)
+    await fs.writeFile(path.join(dir, 'logo.png'), bytes)
+
+    const buyer = {
+      ...linesExample.buyer,
+      logo: { path: path.join(dir, 'logo.png'), source: 'https://example.com/logo' }
+    }
+
+    const image =
+      '<span class="label">Preparado para</span><img data-slot="buyer.logo" src="…" alt="Equipo de producto digital">'
+
+    const name = '<span data-slot="buyer.name">Cliente de ejemplo</span>'
+    const withLogo = await build({ ...linesExample, buyer })
+
+    assert.equal(clientBlock(withLogo), `${image}<p>${name}<br>${taxId}</p>`)
+    assert.equal(clientBlock(withLogo), clientBlock(await buildHtml({ ...example, buyer }, dataPath.pathname)))
+    assert.equal(count(withLogo.html, 'data-slot="buyer.name"'), 1)
+    // Rótulo, márgenes, logo de 400 × 100 a 205 px de ancho (51,25 px) y dos líneas de datos.
+    assert.equal(clientHeight(withLogo), 126.85)
+
+    const both = await build({ ...linesExample, buyer: { ...buyer, contact: 'María Pérez' } })
+
+    assert.equal(
+      clientBlock(both),
+      `${image}<p>${name}<br>${taxId}<br>Atención: <span data-slot="buyer.contact">María Pérez</span></p>`
+    )
+    assert.equal(clientHeight(both), 146.65)
   } finally {
     await fs.rm(dir, { recursive: true, force: true })
   }

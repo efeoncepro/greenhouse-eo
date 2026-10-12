@@ -78,9 +78,9 @@ const V2_KEYS = new Set([
 const V2_LIMITS = { lines: 40, quantity: 9999, clientPaidDirectly: 8, milestones: 12, options: 8, taxPeriods: 120 }
 
 // Registros comunes a las dos versiones que en la versión 2 tienen claves opcionales (buyer.unit,
-// cover.netLabel, schedule.note): ahí también se rechazan las claves que el contrato no define.
+// buyer.contact, cover.netLabel, schedule.note): ahí también se rechazan las claves que el contrato no define.
 const V2_RECORDS = {
-  buyer: ['name', 'unit', 'taxId', 'logo'],
+  buyer: ['name', 'unit', 'contact', 'taxId', 'logo'],
   cover: ['label', 'title', 'subtitle', 'netLabel'],
   schedule: ['title', 'note', 'phases']
 }
@@ -414,6 +414,8 @@ export function validateQuote(q) {
     fail('options sólo existe en la versión 2; en la versión 1 el bloque no se imprimiría. Usa version: 2 con lines.')
   if (!v2 && q.cover?.netLabel != null)
     fail('cover.netLabel sólo existe en la versión 2; en la versión 1 el rótulo de la portada es fijo.')
+  if (!v2 && q.buyer?.contact != null)
+    fail('buyer.contact sólo existe en la versión 2; en la versión 1 la portada no lo imprimiría.')
   if (q.vatRate !== null) taxMinor(netMinor, q.vatRate)
   if (v2) assertMilestoneTax(q, netMinor, taxOf(q, netMinor))
   if (
@@ -439,6 +441,8 @@ export function validateQuote(q) {
   // Versión 2: la unidad del cliente es opcional; sin ella el encabezado interior no la imprime.
   for (const key of v2 ? ['name', 'taxId'] : ['name', 'unit', 'taxId']) string(q.buyer?.[key], `buyer.${key}`)
   if (v2 && q.buyer.unit != null) string(q.buyer.unit, 'buyer.unit')
+  // Versión 2: la persona a quien se dirige el documento es opcional; la portada la imprime tras «Atención:».
+  if (v2 && q.buyer.contact != null) string(q.buyer.contact, 'buyer.contact')
 
   if (q.buyer.logo != null) {
     string(q.buyer.logo.path, 'buyer.logo.path')
@@ -1008,6 +1012,9 @@ const FIXED = {
 
 const COVER_NET_LABEL = 'Valor neto del servicio completo'
 
+// Versión 2: rótulo que precede en la portada a la persona a quien se dirige el documento (buyer.contact).
+const BUYER_CONTACT_LABEL = 'Atención'
+
 // Ancho mínimo que el navegador puede dar a cada elemento de una fila flexible. Si la fila cabe, cada uno
 // conserva su ancho natural. Si no, cada uno conserva al menos lo que dejan los demás sin ceder nada, y nunca
 // menos que su palabra más larga: es una cota inferior del reparto de flex-shrink, así que el texto nunca se
@@ -1116,11 +1123,20 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
   const coverCapacity =
     FIXED.cover - (headerLines.overline - 1) * pt(8.5) * 1.5 - (headerLines.reference - 1) * pt(9) * 1.5
 
-  const buyerLines = lines(q.buyer.name, W, body(9), 'buyer.name') + lines(q.buyer.taxId, W, body(9), 'buyer.taxId')
+  // Datos del cliente bajo su marca, a 9 pt, una línea por dato. Versión 1: nombre e identificación, siempre.
+  // Versión 2: el nombre sólo acompaña al logo (sin logo ya es el titular del bloque y no se repite) y, si se
+  // declara, la persona a quien se dirige el documento cierra el bloque.
+  const buyerData = [
+    ...(strict && q.buyer.logo == null ? [] : [['buyer.name', q.buyer.name]]),
+    ['buyer.taxId', q.buyer.taxId],
+    ...(strict && q.buyer.contact != null ? [['buyer.contact', `${BUYER_CONTACT_LABEL}: ${q.buyer.contact}`]] : [])
+  ].map(([field, value]) => ({ field, lines: lines(value, W, body(9), field) }))
+
+  const buyerLines = sum(buyerData.map(entry => entry.lines))
 
   // Sin logo, el nombre del cliente a 22 pt; con logo, su imagen a 205 px de ancho.
-  const clientMark =
-    q.buyer.logo == null ? lines(q.buyer.name, W, displayFont(22, 600), 'buyer.name') * pt(22) * 1.5 : 205 * logoRatio
+  const clientNameLines = q.buyer.logo == null ? lines(q.buyer.name, W, displayFont(22, 600), 'buyer.name') : 0
+  const clientMark = q.buyer.logo == null ? clientNameLines * pt(22) * 1.5 : 205 * logoRatio
 
   // Líneas de un texto dentro de una fila flexible o de una pista de rejilla, cuyo ancho ya es una cota: una
   // sola si conserva su ancho natural; si no, las que resulten en el ancho que le queda. No anota desbordes:
@@ -1365,11 +1381,14 @@ async function planFixedPages(q, { coverOverline, netText, totalLabel, totalText
     const split = coverTitle.find(entry => entry.lines > 1)
     const titleLines = sum(coverTitle.map(entry => entry.lines))
 
-    // Otros textos de la portada que ocupan más de una línea: también suman altura.
+    // Otros textos de la portada que ocupan más de una línea: también suman altura. La versión 2 nombra cada
+    // dato del cliente por separado, y el nombre también cuando es el titular del bloque.
     const others = [
       ['cover.label', cover[0].height / (pt(8) * 1.5)],
       ['reference', headerLines.reference],
-      ['buyer.name y buyer.taxId', buyerLines - 1],
+      ...(strict
+        ? [['buyer.name', clientNameLines], ...buyerData.map(entry => [entry.field, entry.lines])]
+        : [['buyer.name y buyer.taxId', buyerLines - 1]]),
       ['pricing.summary', summaryLines]
     ]
       .filter(([, count]) => count > 1)
@@ -2207,6 +2226,16 @@ export async function buildHtml(q, dataPath) {
       q.cover.netLabel == null
         ? `<span class="label">${COVER_NET_LABEL}</span>`
         : `<span class="label" data-slot="cover.netLabel">${esc(q.cover.netLabel)}</span>`
+    // Datos del cliente bajo su marca, uno por línea. Con logo y sin contacto es el párrafo de la versión 1.
+    // Sin logo, el nombre ya es el titular del bloque (`.client-name`) y no se repite debajo. La persona a quien
+    // se dirige el documento, si se declara, cierra el bloque tras su rótulo.
+    slots['buyer.detailsBlock'] = `<p>${[
+      ...(q.buyer.logo == null ? [] : [`<span data-slot="buyer.name">${slots['buyer.name']}</span>`]),
+      `<span data-slot="buyer.taxId">${slots['buyer.taxId']}</span>`,
+      ...(q.buyer.contact == null
+        ? []
+        : [`${BUYER_CONTACT_LABEL}: <span data-slot="buyer.contact">${esc(q.buyer.contact)}</span>`])
+    ].join('<br>')}</p>`
     // Nota del calendario: sin ella no se imprime su elemento y el título ocupa la fila.
     slots['schedule.noteBlock'] =
       q.schedule.note == null ? '' : `<span data-slot="schedule.note">${slots['schedule.note']}</span>`

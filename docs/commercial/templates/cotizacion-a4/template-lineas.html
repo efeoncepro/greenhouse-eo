@@ -17,7 +17,7 @@
         <p class="overline" data-slot="cover.label">{{cover.label}}</p>
         <h1 data-slot="cover.title">{{cover.title}}</h1>
         <p class="cover-deck" data-slot="cover.subtitle">{{cover.subtitle}}</p>
-        <div class="client-block"><span class="label">Preparado para</span>{{buyer.logo}}<p><span data-slot="buyer.name">{{buyer.name}}</span><br><span data-slot="buyer.taxId">{{buyer.taxId}}</span></p></div>
+        <div class="client-block"><span class="label">Preparado para</span>{{buyer.logo}}{{buyer.detailsBlock}}</div>
         <div class="cover-investment"><div>{{cover.netLabelBlock}}<strong data-slot="amount.net">{{amount.net}}</strong><span data-slot="pricing.summary">{{pricing.summary}}</span></div><div class="cover-total"><span class="label">{{tax.totalLabel}}</span><b data-slot="amount.total">{{amount.total}}</b></div></div>
         <div class="cover-supplier"><div><span class="label">Oferente</span><b data-slot="supplier.name">{{supplier.name}}</b><span data-slot="supplier.taxId">{{supplier.taxId}}</span></div><div><span class="label">Responsable</span><b data-slot="supplier.contact">{{supplier.contact}}</b><a href="{{supplier.emailHref}}" data-slot="supplier.email">{{supplier.email}}</a></div></div>
       </div>{{footer.1}}
