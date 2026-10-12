@@ -193,4 +193,12 @@ se mueve o cambia; verificar márgenes inicial/final y no desplazar el foley int
 LUFS, true peak, ASR y hashes son evidencia técnica específica, nunca sustitutos de naturalidad o impacto.
 El template compartido de Motion es `templates/video-postproduction-review.md` en esa skill.
 
+## Locución comercial y música para un video corto (2026-10-12)
+
+Locución para un mercado: voz **de ese país** y en registro de locutor, no coloquial; por el conector de claude.ai el
+motor es `eleven_v4` (indicación del operador del 2026-10-12, que matiza el «v3» de §4 y §6 para este uso). Música para
+un video corto: **un tramo continuo**, nunca reeditada en trozos; los cortes se refuerzan con golpes sintetizados.
+Estado de herramientas (fechado, puede cambiar) y mezcla en `efeonce/STUDIO_TOOLING.md`, delta 2026-10-12; el tramo en
+`efeonce/APPROVED_MUSIC_CONTINUITY.md` §«Pista generada más larga que el video».
+
 Descripción extendida de oficio y términos de búsqueda conservados en `efeonce/EXTENDED_DESCRIPTION.md`.

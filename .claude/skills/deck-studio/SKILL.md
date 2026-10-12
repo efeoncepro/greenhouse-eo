@@ -933,6 +933,10 @@ README del catálogo de recetas.
 
 Para una licitación o propuesta técnica SEO/AEO que el cliente lee sin nosotros, hay un estilo aprobado como **alternativa** (caso Pibank 2027, 44 láminas; segundo caso UTEM Compra Ágil, 2026-10-08, 35 láminas): canvas Design con láminas HTML de tokens para los datos del cliente, láminas del compositor para lo que tiene receta, cinco capítulos con pregunta, franja «Qué significa para…» en cada lámina con datos, cadena búsqueda → cuenta con SEO/AEO equilibrado frente al negocio, anexo de supuestos y PDF 16:9. **No reemplaza** el brochure ni la propuesta de recetas: para brochure manda el set aprobado. Método, reglas y rechazos: [references/propuesta-tecnica-seo-sin-presentador.md](references/propuesta-tecnica-seo-sin-presentador.md). Delta 2026-10-09 (Pibank v12): lámina «Muestra X-Ray» con mockup dibujado, QR y enlace leídos fuera de git; enlaces clicables en el PDF; logo blanco del cliente sin recuadro sobre fondos oscuros. Delta 2026-10-09 (Pibank v13, enviada): inversión que se explica sola (valor del mes + módulos con precio y cuándo entran + suma anual rotulada), «Cómo empezar» con compromiso inicial ≥ plazo de las primeras señales, retorno en barras de la métrica que crece (nunca ROI con depósitos), stack con `content-stack`, USD con soles para Perú.
 
+### Propuesta técnica de campaña creativa para leer sin presentador (2026-10-12)
+
+Para una licitación de servicio creativo (evolución de línea gráfica, concepto, piezas de muestra y método de producción) existe el molde hermano, con la misma técnica y otro argumento: el deck abre con el trabajo, sigue con una lámina de cumplimiento en las palabras de la ficha y recorre propuesta → producción → equipo → continuidad e inicio. Caso fuente: Sika Mexicana, Wherex N.º 1164, 21 láminas, línea Brand (paquete terminado; resultado desconocido). Orden, las nueve correcciones del operador, cómo se enlaza un video (QR + enlace clicable), mecánica, trampas medidas y lista de control: [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md). Difiere del molde SEO/AEO en dos cosas que no se mezclan: títulos directos sin pregunta y respuesta, y el rótulo «Qué significa para ustedes». Las láminas HTML a mano de ambos moldes son sólo para datos del cliente sin receta; lo que tiene lámina aprobada (portada, cierre, caso) sale del compositor.
+
 ## ⚠️ Antes de nada: las 3 preguntas que decides ANTES de abrir nada
 
 Casi todo el mal deck del mundo nace de saltarse una de estas. **Contéstalas en voz alta.**
@@ -1068,6 +1072,13 @@ garantía, un plan de salida, una referencia verificable.
 **Traducción a láminas:** por cada lámina de "por qué esto", debe haber una de **"por qué es
 seguro"**. Riesgos nombrados con su mitigación. El plan de arranque. Qué pasa si sale mal.
 
+**Seguro no es defensivo.** La seguridad se le da al comprador con lo que **él** gana: quién aprueba y
+cuándo, un plazo, un equipo con nombre, un caso medido, un primer paso. Lo que **nos** protege a
+nosotros (exclusiones, «fuera del servicio», tarifas de extras, bloques «no se garantiza», riesgos
+que nadie planteó) no reduce su indecisión y el operador lo ha retirado en tres propuestas (Pibank,
+UTEM, Sika 2026-10-12: «¿Es realmente necesario decir esto? ¿Para qué?»). Un riesgo entra cuando el
+comprador lo nombró o cuando callarlo sería engañar; entonces va con su mitigación.
+
 ### 2. El problema no es falta de información — es EXCESO
 
 **Gartner (2019, n > 1.000 compradores B2B):** el **89% dijo que la información que encontró era de
@@ -1187,6 +1198,8 @@ Derechos de stock, talento, música, likeness y licencias se cotizan aparte. Can
 ├─ QUÉ puede afirmar: evidencia trazable, anti-
 │  fabricación, accesibilidad, entrega que no se rompe . evidence-integrity.md
 ├─ GRÁFICOS en un deck (≠ dashboard) .................. data-storytelling.md
+├─ PROPUESTA TÉCNICA que se lee sin presentador:
+│  SEO/AEO · campaña creativa .......................... references/propuesta-tecnica-*.md
 └─ FUENTES verificadas + LOS MITOS QUE NO SE CITAN .... SOURCES.md
 ```
 
@@ -1224,6 +1237,14 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   se reemplaza por una tabla improvisada ni por texto de otra plantilla.
 - **Haz visibles los valores fiscales.** Cada monto client-facing debe declarar explícitamente si es
   neto y si el IVA está excluido o incluido. La condición no puede quedar solo en una nota escondida.
+- **Cumplimiento con las palabras del comprador.** La lámina de cumplimiento copia el texto literal de
+  la ficha o las bases, responde con un hecho y dice en qué lámina, página de anexo o archivo está
+  cada punto; va al principio del deck. Antes de congelarla, relee la ficha y **todas** las
+  respuestas del portal, también las dadas a otros proveedores (Sika 2026-10-12: una exigencia de SLA
+  por niveles de complejidad se leyó tarde y el deck no la cubre).
+- **Si las bases piden un formato, se entrega ese formato.** Un video pedido se entrega como video,
+  con QR y enlace clicable desde la lámina, no sólo como storyboard (detalle en
+  [references/propuesta-tecnica-campana-creativa.md](references/propuesta-tecnica-campana-creativa.md)).
 - **Conserva outputs y planes separados.** Cada licitación y cada deck tiene su propio `deck-plan`,
   output, manifest y carpeta de captura; nunca se reutilizan ni se sobrescriben artefactos de otra
   licitación.
@@ -1269,8 +1290,19 @@ está en el catálogo → lane de Adobe / `design-studio`. **No se mezclan.**
   **pasaban los 92 tests** del composer. Los encontró una revisión visual.
 - **SIEMPRE** una lámina de *"por qué es seguro"* por cada lámina de *"por qué esto"*. **Tu competidor
   es la indecisión** (JOLT), no el otro oferente.
+- **NUNCA** confundas seguro con defensivo: en un deck para el cliente no van exclusiones, «fuera del
+  servicio», tarifas de extras, condiciones de pago ni advertencias **que el comprador no pidió**. Si
+  una lámina o una línea no le aporta a quien decide, sale entera (§«Tu competidor real es la
+  indecisión»).
 - **SIEMPRE** en material client-facing: **registro formal de usted**. Un documento contractual que
   evalúa un comité no es un blog.
+- **SIEMPRE** el deck que se entrega al cliente **le habla a quien lo recibe**: segunda persona
+  (ustedes, su brief, sus respuestas). **NUNCA** narres al cliente en tercera persona («<Cliente>
+  pidió / indicó / confirmó»); su nombre queda sólo como nombre de marca. Cuando el operador corrige
+  un tono, se barre **todo** el documento y sus anexos, con grep sobre la salida (operador, Sika
+  2026-10-12: cerca de 60 frases).
+- **SIEMPRE** lo aprobado se reutiliza **desde su generador** (lámina de caso, sello, firma, portada):
+  redibujarlo a mano o inventar una variante se rechaza aunque se parezca.
 - **SIEMPRE** cita la **dirección**, no los decimales. Y cuando exista fuente **peer-reviewed sin
   interés comercial**, cítala a ella en vez del vendor.
 

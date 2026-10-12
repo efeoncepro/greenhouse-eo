@@ -1,6 +1,6 @@
 # Producción y posproducción de video: aprendizajes y modos de falla
 
-**Corte de evidencia: 2026-09-24; delta 2026-10-03 (§11, spot animado 2D «Sparks × Efeonce AEO»); delta 2026-10-09 (§12, reel X-Ray Pibank).** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
+**Corte de evidencia: 2026-09-24; delta 2026-10-03 (§11, spot animado 2D «Sparks × Efeonce AEO»); delta 2026-10-09 (§12, reel X-Ray Pibank); delta 2026-10-12 (§13, reel de muestra para Sika Mexicana).** Companion de `motion-design-studio`, derivado de CMP-003 SKY hasta V17. Se carga al auditar una iteración, decidir una reparación o preparar una nueva producción con continuidad, marca, tipografía y sonido exigentes. Complementa los workflows; no sustituye el contrato del encargo, el presupuesto ni la revisión humana.
 
 **Estado del caso:** V17 exportado y revisado visual/técnicamente; aprobación final del operador y escucha perceptual del agente no acreditadas. Punch-v3 sí tiene aprobación registrada. El pedido de documentar el proceso no convierte todo el video en aprobado. No se hicieron nuevas llamadas pagadas para esta sistematización.
 
@@ -426,3 +426,84 @@ expediente fuera de git (`09-XRay-Pibank/video/`). Costo aproximado: US$1,9 imag
   voz. Un ASR vacío no reemplaza la escucha del operador.
 - **Nivel por destino:** el destino entregado es el reproductor de la muestra web; se mezcló a −16 LUFS (medido
   −15,5) con fades. Si luego se publica en redes, re-masterizar según F28.
+
+## 13. Delta 2026-10-12 — reel de muestra de 25 s para una marca que pauta en TV
+
+**Estado del caso:** v2.2 aprobada por el operador el 2026-10-12 («Bien, vamos con ese») como muestra para la propuesta
+a Sika Mexicana (Wherex N.º 1164); la v1 fue rechazada. Al corte nada se había presentado al comprador. El agente no
+oye: voz, golpes y música las juzgó el operador. Receta en
+[cuadros fijos → planos → capa de motion de campaña](../workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md);
+fuentes en `ai-generations/2026-10-12_sika-propuesta-tecnica/` (`LEEME.md` y `reel/v2/`).
+
+### Aciertos
+
+| Acierto observado | Por qué ayudó | Prueba |
+| --- | --- | --- |
+| Idea con antagonista y cortes fijados antes de generar | Cada plano nació con función y duración; locución y golpes se amarraron a los cortes | Estructura 4 · 6 · 8 · 10 · 12 · 17 · 21 s en `montaje.sh` |
+| Bloque de look compartido en todos los cuadros fijos | Los planos se leen como una sola película | `stills.batch.json` |
+| Envase generado con el render oficial del cliente como referencia | La etiqueta salió exacta y se sostuvo en movimiento en este caso | Revisión al 100 % del cuadro y del plano |
+| Sello tomado del generador del manual de campaña | Marca exacta sin redibujar | `build-overlay.py` importa `gen.sello_lanz` |
+| Montaje por segmentos y mezcla rehacible aparte | Se corrigió música y gota sin rehacer todo | `SOLO_AUDIO=1 bash montaje.sh` |
+
+### F33 — Animatic con fondo plano presentado a una marca de TV
+
+- **Síntoma:** la v1 (animatic con cortina de fondo + audio) fue rechazada: «no se ve cinemático y profesional como
+  requiere Sika… es una marca gigante de México que pauta en TV y medios programáticos, debe ser de impacto».
+- **Capa responsable:** dirección; se eligió el nivel de producción por lo que el comprador admitía (storyboard o
+  animatic), no por la vara de la marca.
+- **Prevención:** antes de elegir el nivel, preguntar dónde pauta la marca. Si es TV, la muestra se dirige como
+  comercial: idea con antagonista, planos generados, luz y cámara declaradas. Lo admitido por las bases es el piso.
+- **Recuperación:** replanteo completo aprobado («El agua siempre busca una entrada»); la firma de la v1 se conservó.
+- **Detenerse si:** se va a entregar como «video» un animatic con audio sin haberlo dicho.
+
+### F34 — Capa gráfica que no sigue la línea de la campaña
+
+- **Síntoma:** «¿Sientes que el video sigue la línea gráfica que se armó?» (operador). No la seguía.
+- **Causa confirmada:** la capa de motion se diseñó sin abrir el manual de identidad de la campaña; usaba su tipografía
+  pero no su sistema.
+- **Prevención:** antes de animar, listar del manual los elementos, sus colores y **sus usos reservados** (aquí, el
+  triángulo rojo es sólo de la firma y el logo, y no se usó suelto). La capa de motion es una aplicación del manual.
+- **Recuperación:** capa rehecha: etiquetas de lugar en caja amarilla con texto negro y corte a 13°, campo amarillo con
+  cortes negros, sello aprobado y titulares sobre panel amarillo (v2.2).
+
+### F35 — Elemento de marca inventado en vez del aprobado
+
+- **Síntoma:** el agente dibujó una caja «2 EN 1» propia donde el manual ya tenía un sello de lanzamiento aprobado.
+- **Causa confirmada:** se redibujó en lugar de reutilizar. Redibujar o inventar una variante fue rechazado dos veces en
+  el mismo encargo.
+- **Prevención:** lo aprobado se **importa desde su generador** (aquí `gen.sello_lanz` del manual), no se copia a mano
+  ni se aproxima. Si el generador no existe o no alcanza, se pregunta al operador. Mismo principio que F14.
+- **Recuperación:** la caja inventada se reemplazó por el sello aprobado.
+
+### F36 — Cámara lenta por estiramiento
+
+- **Síntoma:** la gota «cae muy lento… es extraña la lentitud» (operador).
+- **Causa confirmada:** el plano sólo servía hasta el segundo 2,85 (después la junta se deformaba) y se estiró para
+  llenar los 4 s del gancho. Estirar un plano para cubrir su tiempo se nota.
+- **Prevención:** la cámara lenta se pide en el plano, no se fabrica en el montaje; anotar hasta qué segundo sirve cada
+  plano antes de asignarle duración. Si no alcanza, se regenera o se acorta el tramo.
+- **Recuperación:** plano regenerado con caída a velocidad real y cámara lenta sólo desde el impacto, y la junta
+  declarada rígida en el prompt; entra sin retime.
+- **Detenerse si:** un tramo necesita un retime para llegar al corte y nadie miró el resultado a velocidad normal.
+
+### F37 — Música reeditada en trozos
+
+- **Síntoma:** «La música la cortaste súper extraño… se nota muchísimo» (operador).
+- **Causa confirmada:** la pista generada salió de 43 s para un video de 25 s y se reeditó en cinco trozos para calzar
+  los cortes. Es la misma clase que F10, ahora con una pista más larga que la pieza.
+- **Prevención:** elegir **un tramo continuo** del largo del video cuyos acentos caigan cerca de los cortes; reforzar
+  los cortes con golpes sintetizados, no con ediciones de la música.
+- **Recuperación:** tramo 17,45–42,45 de la pista, sin cortes internos, con golpes graves en 10,0 y 21,0 s. Detalle en
+  `audio-studio/efeonce/APPROVED_MUSIC_CONTINUITY.md`.
+
+### F38 — Trampas de herramienta que se repiten
+
+- **ffmpeg detenido:** un solo ffmpeg con ocho entradas y `concat` se quedó detenido dos veces en segundo plano (misma
+  clase que F29). Por segmentos y con `-nostdin`.
+- **Conectores locales de ElevenLabs:** seguían fallando el 2026-10-12 (`invalid_api_key`; misma causa que F30). Salió
+  por el conector de claude.ai.
+- **Render de la capa:** `window.seek` no debe devolver la línea de tiempo (Playwright la serializa y cierra la página).
+- **Shell y mezcla:** `bc` imprime `.70` y rompe `afade st=`; `amix` deja mono sin `aformat=channel_layouts=stereo`.
+- **Entrega:** la carga por lote de activos del lienzo rechaza archivos de más de 20 MB; se sube una copia web.
+
+Comandos exactos y forma correcta de cada uno: workflow, §«Qué NO hacer / gotchas».

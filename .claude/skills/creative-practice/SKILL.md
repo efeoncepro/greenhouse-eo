@@ -310,6 +310,9 @@ Dos cosas que el SEO no tiene y el creativo sí, y que **ninguna** de nuestras s
 3. 🔴 **NUNCA publiques un precio unitario por pieza.** *(Ni "por post", ni "por artículo", ni "por spot".)*
    🎯 **Es entregarle al cliente la calculadora para comoditizarte.** *(Ya lo hicimos en la oferta original del blog de SKY:
    "artículo adicional CLP 260.000". Lo adjudicado el 2026-09-23 ya va sin precio unitario, pero la cifra se vio.)*
+   Si el comprador exige «propuesta económica desglosada», el desglose va **por componente de valor** (evolución de
+   la línea gráfica → conceptualización y pieza madre → entregables agrupados), no por pieza; y no se le agrega un
+   tarifario de extras que no pidió. → `modules/04_PRICING.md` §7 (b.1) · `modules/10_PITCH.md` §5.1.
 4. 🔴 **NUNCA el ad-hoc más barato que el marginal del plan.** Rompe la planificación y consume coordinación:
    **tiene que costar MÁS.** *(Hoy hacemos lo contrario.)* → `ANTIPATTERNS.md` 🩸
 5. 🔴 **NUNCA cierres bajo el 45% de margen bruto.** **Piso aprobado por el dueño (2026-07-13).**

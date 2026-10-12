@@ -3,6 +3,10 @@
 > Delta mate uniforme verificado contra: petición y aprobación del operador, AXIS `de34866` y catálogo live
 > de 134 entradas — 2026-10-12; comparación local, sin publicación de paquetes ni incorporación al catálogo.
 
+> Delta propuesta técnica y página de muestra (Sika, Wherex N.º 1164) verificado contra: taller
+> `ai-generations/2026-10-12_sika-propuesta-tecnica/` (LEEME e intents del compositor) y Think `main` en `9a36dac` —
+> 2026-10-12; sin cambios en AXIS ni en recetas.
+
 > Delta familia H3 (Wave, Reach, Globe) verificado contra: ADR `docs/architecture/brand/EFEONCE_PRODUCT_FAMILY_H3_DECISION_V1.md` y AXIS `main` en `7c96680` (`axis-brand-assets` 0.4.28; tag `v0.4.28` publicado sobre `5346761`, que suma los isotipos todo en blanco sobre oscuro) — 2026-10-09.
 
 > Delta marca Rooms verificado contra: AXIS `main` en `f249e82` (paquete 0.4.27; tag `v0.4.27` publicado) — 2026-10-08.
@@ -794,6 +798,34 @@ en blanco sobre oscuro). En 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice de
 - Contraportada: `close-brochure-orbit` en línea brand; las `close-proposal` se descartaron porque sus fotos son de la
   línea Growth.
 - Caso: `docs/commercial/tenders/sika-mexico-campana-creativa-1164/propuesta-grafica-creativa.md`.
+
+### 2026-10-12 — Propuesta técnica y reel para un cliente (Sika, Wherex N.º 1164): deck, caso, motion y página de muestra
+
+Sigue a la entrada del 2026-10-07 (mismo proceso; «LIC-1164» allá). Al corte del 2026-10-12 nada se había cargado en
+Wherex; el resultado no se conoce. Taller y procedimiento: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
+
+- **Dos documentos, no uno** (operador): el deck técnico va separado del anexo gráfico «POSIBLE» del 07/10.
+- **Deck técnico:** 21 láminas 16:9, línea Brand (Efeonce Creative Studio), con generador propio. Del compositor sólo
+  portada (`cover-proposal`, layout `dawn`, brand), cierre (`close-proposal`, brand, plate `BR4-contra-amanecer`) y
+  caso (`decision-case`); navegación e íconos Trazo, de `@efeoncepro/axis-graphic-line`. La entrada del 07/10 descartó
+  `close-proposal` en el anexo gráfico («sus fotos son de la línea Growth»); este deck sí cierra con ella, en línea
+  brand y con ese plate. No hay decisión registrada que reconcilie los dos usos: no generalizar ninguno.
+- **Decisión del operador: el caso de éxito es la lámina aprobada, no una hecha a mano.** Rechazó la lámina propia del
+  generador; va `decision-case` con la foto del caso (el avión de Sky), compuesta en claro y en línea `growth` porque el
+  contrato rechaza Brand en claro. La autorización de Sky para citar el caso fuera sigue sin verificar.
+- **Equipo con nombre y tamaño** (operador): fotos reales del squad y «+85 profesionales en toda Latinoamérica»,
+  cifra del operador sin fuente en el repo. Esa lámina se armó en el generador (la del compositor truncaba nombres).
+- **Motion del reel de la campaña del cliente** (operador: «¿Sientes que el video sigue la línea gráfica que se
+  armó?»): la capa de motion se rehízo con el manual de la campaña; el sello de lanzamiento aprobado se tomó de su
+  generador y el triángulo rojo suelto no se usó, porque el manual lo reserva para la firma y el logo. Reel v2.2
+  aprobado: «Bien, vamos con ese».
+- **Página de muestra en Think** (operador: «una página en Think con el reproductor canónico de Efeonce… premium, con
+  el logo de la campaña… y en la propuesta un QR y el enlace»): `https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c`,
+  Think `9a36dac`, en producción desde el 2026-10-12 con push autorizado. Primer uso del reproductor con el medio de
+  una propuesta; sin release ni cambios en AXIS. Modelo y reglas: [video-player.md](video-player.md#página-suelta-de-muestra-en-think-2026-10-12).
+- **Sin decidir, no resolver por cuenta propia:** la selección opcional en `cover-proposal` (se sigue borrando en
+  post), el uso de la marca del cliente en la portada (TASK-1937) y el escaneo del QR con un teléfono real.
+- Trampas medidas: [lessons.md](lessons.md), entrada del 2026-10-12.
 
 
 

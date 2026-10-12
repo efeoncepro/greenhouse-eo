@@ -53,7 +53,8 @@ Antes de preparar o enviar correos desde `jreyes@efeoncepro.com`, cargar la [pol
 ├─ Precio, garantías (boleta/póliza), cashflow, factoring ...... pricing-garantias-finance.md
 ├─ Armar la oferta técnica/económica/administrativa ............ propuesta-tecnica-economica.md
 ├─ Plataformas, contacto, originales, OneDrive y anexos ........ platform-bids-and-administrative-package.md
-├─ Oferta económica urgente de licitación, HTML→PDF A4 ........ docs/commercial/templates/cotizacion-a4/README.md
+├─ Oferta económica que ve el comprador: plantilla A4 (por
+│  defecto; Excel sólo si las bases exigen planilla) .......... propuesta-tecnica-economica.md + docs/commercial/templates/cotizacion-a4/README.md
 ├─ Producir el DECK de la propuesta: catálogo de plantillas,
 │  molde visual, selector, 3D icons, fotos del equipo ......... deck-visual-system.md
 ├─ Otro país LATAM (portal, registro, umbrales) ............... latam-portales-matriz.md
@@ -164,6 +165,8 @@ En una licitación de contenidos **todas las ofertas dicen lo mismo** ("optimiza
     y consistencia. Los tests técnicos no bastan para declarar la oferta lista.
 
 ### Oferta económica documental rápida para licitación
+
+**Delta 2026-10-12 — es la vía por defecto, no sólo la urgente.** La oferta económica que ve el comprador se compone con esta plantilla; `pnpm economica:build` (Excel) se usa sólo cuando las bases exigen una planilla. Caso fuente: Sika 1164, donde el agente la armó en Excel por precedente y el operador la devolvió a «un render de Efeonce armado que funciona bien y tiene todo de Efeonce». Cómo se desglosa una oferta creativa (evolución de marca → conceptualización → entregables, no por pieza suelta), el riesgo del componente de pago único y lo que no se inventa (forma de pago, condiciones pospuestas): `propuesta-tecnica-economica.md` → «Oferta económica». Lo aprendido del portal (pasos, moneda, «NO considera IVA», datos fiscales del comprador, hora de cierre, Centro de mensajes completo): `wherex-radar-chrome-playwright.md` → «Anatomía de la oferta en el portal».
 
 Ante una licitación o Compra Ágil urgente que requiere HTML para PDF, con **alcance, precio y condiciones ya aprobados para ese proceso**, usar la [plantilla A4 y su manual](../../../docs/commercial/templates/cotizacion-a4/README.md). Produce una oferta económica formal para incorporar al paquete de presentación; sólo el ejemplo carece de validez comercial. Su origen es la cotización UTEM aprobada, no una nueva modalidad de pricing. Tiene dos versiones de datos: la **1** cotiza un único precio en cuatro páginas; la **2** cotiza varias líneas con precio (perfiles, servicio con puesta en marcha, costos de terceros) y pagina su sección de inversión según el contenido, sin reducir la tipografía.
 

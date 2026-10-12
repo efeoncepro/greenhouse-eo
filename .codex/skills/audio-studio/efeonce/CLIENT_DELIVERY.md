@@ -26,6 +26,9 @@
 - **NUNCA** uses música/voz IA sin **licencia comercial clara** para un entregable de cliente (música →
   ElevenLabs Music; verifica términos de cualquier otro modelo).
 - **NUNCA** clones una voz (talento, ejecutivo, celebridad) sin **consentimiento explícito y documentado**.
+- **SIEMPRE** elige la voz de la locución por el **país del público** del cliente y en registro profesional. Caso
+  2026-10-12 (marca mexicana que pauta en TV), operador: «tiene que ser de un mexicano (no coloquial)». Voz y motor
+  usados: `STUDIO_TOOLING.md` §ElevenLabs.
 - **SIEMPRE** estima, reserva y obtiene approval por operación/segundos/idioma/tier/attempt antes de volumen
   (dubbing multi-idioma puede escalar rápido).
 - **NUNCA** cobres credits por pieza/hora, edición, mix/master, loudness, stems/export o retry técnico.

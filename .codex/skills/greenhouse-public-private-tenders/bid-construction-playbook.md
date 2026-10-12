@@ -98,13 +98,16 @@ Uso correcto:
 ### Fase 7 — Redacción (con pase de copywriting)
 - Redacta la **oferta técnica** modelada hacia lo que evalúan las bases (no genérica). Luego **pase de craft**: anti-humo (claim → mecanismo), beneficios antes que siglas, prueba > hype, es-CL profesional sin voseo, corte de AI-slop.
 - **Registro formal, NO tuteo (regla dura).** Una oferta de licitación es un documento contractual que evalúa un comité y que pasa a formar parte del contrato: el género pide **trato formal ("de usted") + institucional (SKY/el cliente en 3ª persona)**, nunca tuteo. El tuteo es correcto para blog/landing/producto (contextos cercanos), no para un deliverable que evalúa procurement. Formal ≠ frío: el contenido sigue cálido en las ideas; lo que sube es el registro gramatical. Aplica **solo a los documentos client-facing** (técnica + económica); los internos (diagnóstico, squad, matriz) dan igual. `tu blog`→`su blog`/`el blog del cliente`; `puedes ver`→`puede ver`; `te menciona`→`menciona al cliente`. Caso fuente: SKY 2026-07-11.
+  - **Delta 2026-10-12 (operador, Sika 1164): al cliente se le habla, no se le narra.** En el deck técnico que se entrega al comprador, la corrección fue usar **segunda persona formal** («ustedes», «su brief», «sus respuestas») y nunca contar «Sika pidió / indicó / confirmó» como si se le hablara a un tercero. Se mantiene lo esencial de la regla de arriba (formal, jamás tuteo); lo que esta instrucción más reciente corrige es la tercera persona en un documento dirigido al comprador. Al recibir una corrección de tono, se barre **todo** el documento, no sólo la lámina comentada (en el caso, unas 60 frases).
 - **Output:** oferta técnica final redactada.
 - *Skill:* `copywriting` (craft); tono es-CL / tokenización de copy de producto → `greenhouse-ux-writing` cuando aplique.
 
 ### Fase 8 — Oferta económica formal
-- Arma la **planilla económica** en el formato exigido. Si la plataforma no entrega planilla, Efeonce diseña una limpia (ítems, condiciones de pago, notas). Coherencia aritmética total.
-- **Output:** planilla económica lista.
-- *Companion:* `propuesta-tecnica-economica.md` (§económica).
+- Antes de escribirla, **relee la ficha y el Centro de mensajes completo** (también las respuestas a otros proveedores) y mira el paso del portal donde se ingresa el precio: estructura de ítems, moneda y base fiscal.
+- Si las bases exigen su planilla o formato, usa ese. **Si no, la económica que ve el comprador se compone con la plantilla A4 de Efeonce** (`node scripts/documents/render-cotizacion-a4.mjs`, versión 2 para varias líneas), no con una planilla diseñada a mano ni con el Excel de `economica:build`, que queda para cuando las bases piden planilla (corrección del operador, 12/10/2026, Sika 1164).
+- En una oferta creativa, desglosa por componente de valor (evolución de marca → conceptualización → entregables), no por pieza suelta. No inventes forma de pago ni condiciones que el comprador pospuso. Coherencia aritmética total, y el total igual al monto que se ingresa en el portal.
+- **Output:** oferta económica en PDF (o la planilla exigida), con su fuente y sus supuestos en el expediente.
+- *Companion:* `propuesta-tecnica-economica.md` (§Oferta económica).
 
 ### Fase 9 — Empaquetado, matriz final y export
 - Re-corre la **matriz de cumplimiento** (todos los excluyentes ✅). Maqueta y **exporta a PDF** (formato Wherex). Reúne anexos y declaraciones.

@@ -35,6 +35,7 @@ La diferencia con otras capas de documentacion:
 - [Compositor de piezas con CTA — manual de uso](creative/compositor-piezas-cta.md) — plan mínimo con lo que exige
   el gate, componer, certificar (también con `--reproducir`), reporte de accesibilidad, códigos 0/1/2/3, excepciones con
   sha256 del plate y `hasta`, firma externa, decisiones pendientes y problemas comunes (mensaje → causa → solución).
+- [Propuesta gráfica creativa para un cliente](creative/propuesta-grafica-creativa-para-cliente.md) — el anexo gráfico y cómo encaja con el deck técnico, el reel, su página y la económica; de punta a punta, el [playbook de propuesta de campaña creativa](../operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md).
 - [Usar la línea gráfica de Efeonce](creative/usar-linea-grafica-efeonce.md) — hacer una pieza con la órbita
   (qué trabajo hace, color, ubicación del texto, foto de la lente, voz, firma con el logo centrado o burbuja URL sólo
   con el logo en la imagen), componer con un agente, usar las animaciones de marca (la órbita y las animaciones del

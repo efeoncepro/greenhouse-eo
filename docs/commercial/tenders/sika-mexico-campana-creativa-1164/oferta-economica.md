@@ -41,8 +41,8 @@ Estrategia y concepto: 30.000. Entregables: 34.000.
 
 ## Supuestos por confirmar antes de presentar
 
-1. **Reparto de los 64.000.** Lo hizo el agente; el cotizador entrega filas por rol, no por componente.
-2. **Evolución gráfica en cada lanzamiento.** El documento la cobra como parte del lanzamiento tipo, no como pago único. Si fuera único, los lanzamientos siguientes quedarían en 48.000, bajo el piso de margen (≈ 57.650) calculado para un lanzamiento.
+1. **Reparto de los 64.000.** Lo hizo el agente a mano. La base del precio (cotizador, supuestos y piso) está en [`research/2026-10-07-propuesta-tecnica-INTERNO.md`](research/2026-10-07-propuesta-tecnica-INTERNO.md) y no se entrega.
+2. **Evolución gráfica en cada lanzamiento.** El documento la cobra como parte del lanzamiento tipo, no como pago único. Si fuera único, los lanzamientos siguientes quedarían en 48.000; el efecto sobre el margen está en el registro interno.
 3. **IVA.** «No aplica» supone factura de exportación de servicios desde Chile. Finance decide; se cambia `vatRate`/`taxStatus` en el JSON y se vuelve a emitir.
 4. **Validez (60 días).** Propuesta por el agente.
 5. **Tarifario de piezas extraordinarias.** Sika lo admite como opcional; no se incluyó.

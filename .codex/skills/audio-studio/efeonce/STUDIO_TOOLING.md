@@ -36,6 +36,14 @@
   pedir **2** tomas por línea. `estimate_only` dio 71 créditos por toma corta (~USD 0,016), pero el run **reportó 0
   créditos**: anotar los dos números y no prometer el costo. Sin ASR local, el texto dicho no se verifica solo: la
   escucha del operador es el control. Es out-of-band (sin presupuesto gobernado ni manifiesto).
+- **Locución comercial para un mercado: voz de ese país, registro de locutor [operador, 2026-10-12].** Para el reel
+  de muestra de una marca mexicana que pauta en TV: «tiene que ser de un mexicano (no coloquial) y… el motor más
+  avanzado de Eleven Labs que es el V4». Regla: la voz se elige **por país del público** y en registro **profesional,
+  no coloquial**; el motor por defecto para locución comercial por este conector es `eleven_v4`. Voz usada: **«Marco»**
+  (locutor mexicano), id `fjL3LsPhPx7Isgj2S7NE`; siempre por **ID**. Se generó una toma y el montaje la cortó por frases
+  (`vo.mp3`: 18 s, mono, 44,1 kHz [medido]). «El más avanzado» es la indicación del operador a esa fecha: reverificar
+  el catálogo antes de repetirlo como hecho. El agente no oyó la toma: acento, registro y pronunciación los aprobó el
+  operador al aprobar el reel.
 
 ## Higgsfield audio (MCP conectado)
 
@@ -80,6 +88,22 @@ que leen, no: si faltan en disco, `pnpm ai-gen:pull ai-generations/2026-09-26_br
   probar los demás conectores del mismo servicio. **Ausencia de voz:** verificada con `whisper-cli` local (modelos en
   `~/.cache/hyperframes/whisper/models/`); es señal ASR, no escucha. Mezcla a −16 LUFS (medido −15,5) para el
   reproductor web de la muestra. Receta: `motion-design-studio/workflows/approved-photos-to-vertical-reel-with-logo-transition.md`.
+- **Delta 2026-10-12 (reel de muestra Sika, 25 s) — estado de herramientas a esa fecha; puede cambiar:**
+  - Los **dos servidores MCP locales** de ElevenLabs (`elevenlabs` y «ElevenLabs Player») fallan con `invalid_api_key`:
+    tienen cargado el id de la clave, no la `sk_…`. Es la misma causa ya registrada el 2026-10-03 y el 2026-10-09
+    (entonces el error se anotó como `api_key_id_used_as_api_key`).
+  - **Funciona el conector de claude.ai:** voz con `creative_generate_speech` (modelo `eleven_v4`); música con
+    `creative_generate_in_flow`, nodo `music`, modelo `eleven_music_v2_5` (instrumental); el avance se sondea con
+    `creative_get_flow_run_status` hasta que termina. Es out-of-band: sin presupuesto gobernado; costo no registrado.
+  - La música pedida para 25 s **salió de 43 s**: se usa un tramo continuo, no se reedita
+    (`APPROVED_MUSIC_CONTINUITY.md` §«Pista generada más larga que el video»).
+  - **Mezcla en ffmpeg:** `amix` deja la salida en **mono** si la voz es mono: poner
+    `aformat=channel_layouts=stereo` después de cada `amix`. Cierre con `loudnorm` y `aresample=48000`. El caso usó
+    `loudnorm=I=-15:TP=-1.5:LRA=11` en una pasada: es el parámetro que usó el caso, no un target ni una medición del resultado; para video y redes la
+    norma pide −14 LUFS y `master.sh` lo hace en dos pasadas. `bc` imprime `.70` y rompe `afade st=`: calcular con
+    `awk 'BEGIN{printf "%.2f", …}'`.
+  - **Sin escucha propia:** sincronía de voz, golpes y música las juzgó el operador. Receta completa:
+    `motion-design-studio/workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md`.
 - **Método «maqueta propia → re-grabación IA → sello propio encima»:** la estructura y el tiempo salen de una
   maqueta determinística propia (`rock.mjs`, `composer.mjs`, `dsp.mjs`); Stable Audio 2.5 audio-to-audio la
   re-graba (intensidad 0,7) conservando el tiempo; la esfera propia (campana La + golpe grave) se monta encima
@@ -122,7 +146,9 @@ descargando del bucket. Cómo suena lo aprueba siempre el operador. Reglas en `E
 
 ## Router de producción (elige la mano correcta)
 
-- **VO/narración de producción** → ElevenLabs v3 (o humano si es marca premium con emoción).
+- **VO/narración de producción** → ElevenLabs v3 (o humano si es marca premium con emoción). **Locución comercial por
+  el conector de claude.ai** → `eleven_v4`, por indicación del operador del 2026-10-12 (arriba); v3 sigue siendo la
+  ruta medida por fal.
 - **Voz en tiempo real / agente** → ElevenLabs Flash v2.5.
 - **Escena de audio completa / multi-voz rápida** → Seed Audio 1.0.
 - **Música comercial/cliente** → **ElevenLabs Music** (licencia limpia). **Música interna/calidad** → Suno/Udio.

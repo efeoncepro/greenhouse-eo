@@ -166,7 +166,9 @@ Lo que hay que saber antes de abrirlo:
    demanda que la contradice no calcula. La forma (`engagementForm`) se declara siempre: `on_demand` para un
    trabajo con alcance, inicio, término y aceptación (+10 % y, en un servicio gestionado, la reserva de
    contingencia); `on_going` para un servicio mensual continuo. No existe una oferta para proyectos únicos: hoy van
-   con la oferta gestionada de su práctica, On-Demand y a un precio.
+   con la oferta gestionada de su práctica, On-Demand y a un precio. Si el comprador exige ese precio desglosado, el
+   reparto por componente es manual y se declara:
+   [patrón medido](references/general-pricing-patterns.md#patrón-medido-proyecto-creativo-de-una-vez-con-desglose-exigido).
 3. **El precio acordado se declara y se vuelve a cotizar; nunca se calcula una tasa a mano.** Hay tres maneras, y
    se elige por cómo se acordó: un precio por el trabajo completo (programa, proyecto) es `agreed_total`, un neto
    por todo el plazo, que el documento imprime como «1 programa» o «1 proyecto» con `combine`; un valor mensual con

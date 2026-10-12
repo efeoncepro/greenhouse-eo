@@ -111,6 +111,32 @@ Audio 2.5 audio-to-audio (receta en `STUDIO_TOOLING.md`, fila «Cambio de estilo
   entra el reveal; no se estira el tempo por tramos.
 - Usarla bajo locución es una excepción de la norma sonora decidida por el operador, no un precedente.
 
+## Pista generada más larga que el video: un tramo continuo
+
+**Caso reel de muestra Sika, 2026-10-12** (25 s, 9:16). La música se pidió para el reel y **salió de 43 s**
+(ElevenLabs Music v2.5, instrumental, por el conector de claude.ai). La primera mezcla la reeditó en cinco trozos para
+calzar los cortes del video. El operador: «La música la cortaste súper extraño… se nota muchísimo».
+
+- **Regla:** en un video corto la música va en **un solo tramo continuo** del largo de la pieza. No se reedita en trozos
+  ni se cambia el tempo por tramos (misma clase que el caso SKY de arriba y F10/F37 del companion de lecciones de Motion).
+- **Cómo se elige el tramo:** ubicar los acentos de la pista y buscar la ventana cuyo golpe, acento y final natural
+  caigan en los cortes. Aquí, del segundo **17,45 al 42,45**: su golpe del 21,55 cae cerca del segundo 4 del video, su acento
+  del 29,45 en el 12 y su final natural en el 25. Sólo lleva un fundido de entrada de 0,7 s.
+- **Lo que la música no marca, lo marcan golpes sintetizados**, no una edición de la pista: seno de 48 Hz con caída
+  (0,9 s) en los cortes que lo piden (aquí 10,0 y 21,0 s), como bus aparte.
+- **Clasificación** (paso 2 de «Cambio de duración»): `arreglo editado` por recorte de inicio; sin cortes internos ni
+  cambio de tempo. No decir «la pista completa».
+- **Límite:** los tiempos de los acentos salieron del script de montaje; el agente no oyó la mezcla. La naturalidad del
+  tramo la aprobó el operador al aprobar el reel.
+
+```bash
+ffmpeg -nostdin -v error -y -i musica-43.mp3 \
+  -af "atrim=17.45:42.45,asetpts=PTS-STARTPTS,afade=t=in:d=0.7" -t 25 musica.mp3
+```
+
+Fuente: `ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/montaje.sh`. Estado de herramientas y mezcla:
+`STUDIO_TOOLING.md`, delta 2026-10-12.
+
 ## Estados y autorizaciones independientes
 
 Aprobación del **carácter musical**, aprobación de **pista**, aprobación de **mezcla sincronizada** y

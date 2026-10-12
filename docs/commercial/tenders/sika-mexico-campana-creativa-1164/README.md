@@ -1,6 +1,6 @@
 # Sika México — LIC-1164 — Campaña creativa de lanzamientos
 
-**Estado:** en desarrollo, participación confirmada por el operador el 06-10-2026. No demuestra oferta enviada ni adjudicación. **Owner:** Julio Reyes. **Origen:** private_rfp / Wherex.
+**Estado:** paquete terminado el 12-10-2026 (anexo gráfico v2, deck técnico de 21 láminas, reel de muestra con su página y QR, oferta económica); pendiente de la revisión final del operador y de sus decisiones abiertas. No presentado en Wherex: no demuestra oferta enviada ni adjudicación. Cierre 16-10-2026 16:00 de Ciudad de México (19:00 de Santiago). Aprendizajes generalizados en el [playbook de propuesta de campaña creativa](../../../operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md). **Owner:** Julio Reyes. **Origen:** private_rfp / Wherex.
 
 ## Estado CRM verificado
 
@@ -26,6 +26,10 @@ La [propuesta técnica de Codex](oferta-tecnica.md) fue descartada y eliminada p
 Wherex vivo revisado: seis preguntas, cuatro respuestas, dos pendientes y un anuncio. Comprador confirma Master Graphic + lanzamiento tipo para cotizar, muestras de un solo producto y storyboard/animatic admitido para reel. Anuncio 06/10 13:48 informa renders cargados. [Fuentes, reconciliación y QA internos](research/2026-10-07-propuesta-tecnica-INTERNO.md).
 
 Las hipótesis de modalidad, plazo 15–20 días productivos y dos rondas pertenecían al borrador descartado; no son términos aprobados. El horizonte 2026–diciembre 2027 no acredita retainer. Los cinco posts y tres historias/red no se multiplican por plataformas sin confirmación. `proposal-studio.json` conserva `workshop_only`; `economica.json` sigue siendo plantilla sin cotización aprobada.
+
+## Corte 12/10/2026
+
+Las secciones anteriores conservan el corte del 07/10 y quedan como historial. Vigente al 12/10: Sika respondió la pregunta de Efeonce el 09/10 (cierre a las 16:00 de Ciudad de México, historias en Instagram y Facebook, reel con adaptación para TikTok; sin manual en esta etapa); el paquete está completo: [propuesta técnica](oferta-tecnica.md) (deck de 21 láminas), [anexo gráfico](propuesta-grafica-creativa.md) v2, reel de 25 s con su página y QR, y [oferta económica](oferta-economica.md) (MXN 64.000 por lanzamiento tipo, por componente). La ficha de Wherex se releyó el 12/10 en modo lectura: un servicio, un monto total, MXN, total sin IVA. Nada se cargó ni se envió. Decisiones abiertas del operador: tratamiento del IVA, validez, evolución gráfica por lanzamiento o pago único, SLA por niveles de complejidad y el texto de alcance de la lámina 10.
 
 ## Próximo gate
 

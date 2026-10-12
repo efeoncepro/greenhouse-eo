@@ -6,7 +6,7 @@
 - 21 láminas, línea Brand (el 12/10 salió «Piezas adicionales» y todo lo que limitaba alcance: el operador no le vio aporte) (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
 - Títulos directos, sin pregunta y respuesta (instrucción del operador del 07/10). Registro formal, de usted.
 - Lienzo (privado): https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5 → página «3 · Propuesta técnica (documento aparte)».
-- PDF: OneDrive `Alineación/4. Comercial/Licitaciones/Sika/2. Campaña Creativa/Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf`.
+- PDF: OneDrive `Alineación/4. Comercial/Licitaciones/Sika/2. Campaña Creativa/Efeonce-Propuesta-Tecnica-Sika-1164.pdf` (reexportado el 12/10 por la noche; ver «Cierre del 12/10»).
 
 ## Cómo se produce
 
@@ -30,8 +30,8 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 
 1 portada · 2 la idea (Master Graphic a página completa) · 3 cumplimiento · 4 punto de partida · 5 evolución (qué se conserva y
 qué se ordena) · 6 el sistema · 7 el brief, punto por punto · 8 audiencias · 9 muestras · 10 alcance · 11 método ·
-12 lanzamiento tipo · 13 reel · 14 piezas adicionales · 15 plazo · 16 control · 17 equipo · 18 trabajo con México ·
-19 caso Sky · 20 continuidad · 21 inicio · 22 cierre. **Las tablas de abajo conservan la numeración de la v2 (19 láminas).**
+12 lanzamiento tipo · 13 reel · 14 plazo · 15 control · 16 equipo · 17 trabajo con México · 18 caso Sky · 19 continuidad ·
+20 inicio · 21 cierre. «Piezas adicionales» salió el 12/10. **Las tablas de abajo conservan la numeración de la v2 (19 láminas).**
 
 Cambios de la v3, pedidos por el operador tras revisar la narrativa contra la ficha: salió el resumen de «tres
 documentos»; el deck abre con el trabajo; la lámina 4 dejó el tono de diagnóstico; se sumaron evolución, el cruce con el
@@ -74,8 +74,8 @@ de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo 
 9. Lámina 14: qué quiso decir Sika con «no AI/PSD» en su respuesta del 06/10. Hoy la lámina no promete archivos editables.
 10. Berel no se menciona: conflicto de interés sin decidir.
 11. Sika respondió nuestra pregunta el 09/10 (registro en el research INTERNO): sin manual en esta etapa, cierre 16/10 a las 16:00 de Ciudad de México (19:00 de Santiago), historias en Instagram y Facebook, reel con adaptación para TikTok. Moneda y facturación siguen sin respuesta.
-12. El reel: la ficha pide «1 video tipo reel no mayor a 30 seg» y el anexo lleva storyboard (admitido por Sika el 06/10). Existe un animatic MP4 de 25 s sin audio; decidir si se termina con locución y música y se adjunta.
-13. Propuesta económica desglosada: sin empezar.
+12. (Resuelto el 12/10: el reel se entrega como video de 25 s con locución y música, con su página y QR.)
+13. (Resuelto el 12/10: económica en `docs/commercial/tenders/sika-mexico-campana-creativa-1164/cotizacion/v2/`.)
 
 ## Voz: se le habla a Sika (12/10)
 
@@ -125,3 +125,11 @@ En OneDrive, carpeta de la licitación:
 - El token de la URL es discreción, no seguridad: el MP4 queda público por URL directa.
 - QR: `img/qr-reel.png` (`qrcode`, nivel M). Va en la lámina 13 del deck y en el storyboard del anexo (página 17); ambos PDF llevan además un enlace clicable sobre el QR.
 - Caso Sky (lámina 18): recompuesto con la foto del avión de Sky (`ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png`).
+
+## Cierre del 12/10 (noche)
+
+- La económica quedó desglosada por componente (evolución gráfica, conceptualización y entregables), no por pieza. Por eso las láminas 3 y 12 cambiaron una frase: «Valor de un lanzamiento tipo, por componente» y «La oferta económica detalla el valor de este lanzamiento tipo, por componente». PDF reexportado (sha256 `9532dc5ec71c5797…`), copia en OneDrive reemplazada y tableros `Tec-03` y `Tec-12` republicados en el lienzo.
+- Sin tocar, para decisión del operador: la lámina 10 dice «Son piezas de demostración: no forman parte del alcance base» y su fuente «Piezas adicionales, fuera de la oferta base».
+- Sin cubrir: Sika espera una propuesta de SLA por niveles de complejidad (respuesta del 09/10 a otro proveedor); el deck sólo trae diez días hábiles por lanzamiento.
+- `pdf.mjs` ata el enlace del QR a `13.png` con un rectángulo fijo: si cambia el orden de las láminas, hay que mover `LINK`.
+- Aprendizajes generalizados: `docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md`.

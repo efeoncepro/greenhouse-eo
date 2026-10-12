@@ -101,7 +101,9 @@ Carga sólo la etapa necesaria: [preproducción y producción](companions/video-
 Incluye construcción de piezas, vistas del sujeto y cobertura de cámaras antes de generar; conserva las
 aprobaciones y fuentes de otros agentes. Tres cámaras y el montaje SKY son un caso, no un preset universal.
 El **orden de preproducción común a todo video** está en el companion de preproducción §12; para un **spot animado 2D**
-con mascotas/logos compuestos, usa `workflows/animated-2d-spot-composed-brand-assets.md`.
+con mascotas/logos compuestos, usa `workflows/animated-2d-spot-composed-brand-assets.md`. Para un **reel de muestra para
+un cliente** (cuadros fijos → planos Seedance 2.5 → capa de motion con los elementos aprobados de su campaña → voz y
+música), usa `workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md` (validado 2026-10-12).
 
 
 Para **cinematic ads, video de performance o híbridos foto-video**, carga

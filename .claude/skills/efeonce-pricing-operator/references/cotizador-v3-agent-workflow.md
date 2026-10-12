@@ -1205,6 +1205,11 @@ assess` sobre un artefacto.
 Dilo cuando el negocio lo toca; no lo presentes como existente ni lo resuelvas dentro de una cotización.
 
 - **Una oferta dedicada a proyectos únicos.** Hoy: oferta gestionada + `on_demand` + un precio.
+- **Un desglose del precio por componente de valor o por entregable.** El cotizador costea por rol y el documento
+  imprime un fee o «1 proyecto». Si el comprador exige «propuesta económica desglosada», el reparto del total es
+  manual, se declara como tal, lo confirma el operador y va en un documento versión 2 con líneas digitadas, fuera de
+  `compose document`
+  ([patrón medido](general-pricing-patterns.md#patrón-medido-proyecto-creativo-de-una-vez-con-desglose-exigido)).
 - **La puesta en marcha de un servicio gestionado**: `managed-service-core` no la costea.
 - **Si el fee de plataforma se prorratea por dedicación**: decisión del CEO pendiente. Hoy se cobra entero por
   persona.

@@ -282,6 +282,19 @@ regalo:
 
 **Template:** `templates/sow-creativo.md`
 
+### Dónde se escribe el borde: en el SOW, no en la propuesta
+
+Este checklist es del **SOW**, el documento que se firma. En lo que se le entrega a un comprador para que evalúe
+—deck técnico y oferta económica, sobre todo en una licitación— el borde se escribe **en positivo**: entregables
+contados y descritos, aprobaciones y rondas como método de control, derechos que «se definen antes de producir» y
+cómo se ajusta el valor si cambian formatos o cantidades. No lleva tarjeta «Fuera del servicio», lámina de piezas
+adicionales ni tarifario de extras que nadie pidió: el operador los quitó del deck de Sika 1164 (2026-10-12; «¿Es
+realmente necesario decir esto? ¿Para qué?»). En una propuesta se leen como defensa y limitan el alcance antes de
+que alguien pregunte. → `modules/10_PITCH.md` §5.1.
+
+La corrección del operador fue sobre la propuesta, no sobre el contrato: la sección «Qué NO incluye» y el change
+order siguen siendo obligatorios al formalizar. Mientras él no diga otra cosa, ésa es la lectura de esta skill.
+
 ## 8. Aplicación a Social Media y Run & Gun
 
 En Social Media, el SOW debe separar explícitamente:

@@ -63,7 +63,10 @@ Es un híbrido sobre un canvas Design, con la línea de servicio de la propuesta
 - **Responsabilidades con logos:** en láminas de quién hace qué, los logos de Efeonce y del cliente en vez de sus
   nombres.
 - **Cada título afirma su conclusión.** Cada lámina con datos cierra con una franja «Qué significa para <cliente>» y
-  su fuente.
+  su fuente. **Delta 2026-10-12 (operador, caso Sika):** en un deck que se entrega al cliente, el rótulo es «Qué
+  significa para ustedes» y el texto le habla en segunda persona; el nombre del cliente queda sólo como marca. Regla
+  general en [SKILL.md](../SKILL.md) §«Hard rules»; molde creativo, con títulos directos sin pregunta y respuesta, en
+  [propuesta-tecnica-campana-creativa.md](propuesta-tecnica-campana-creativa.md).
 - **Equilibrio SEO/AEO ↔ negocio (regla del operador).** SEO y AEO valen por sí mismos y además conectan con el
   negocio. Patrón: la **cadena búsqueda → cuenta** (Aparecer → Ser elegido → Convencer → Convertir/abrir), donde SEO y
   AEO trabajan los primeros eslabones con **su métrica propia**, y la meta de negocio aparece **al final de la

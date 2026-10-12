@@ -48,6 +48,7 @@ Las recetas siguientes son aplicaciones con límites propios; no todas están ap
 | **Key visual estático → loop de social** ⭐ | llevar una pieza estática aprobada a movimiento sin inventar un lenguaje paralelo: referencias, arco entrada→sostén→fade, sonido por sustracción y QA del loop | **validado** 2026-09-22 | `static-key-visual-to-looping-social-motion.md` |
 | **Spot animado 2D con assets de marca compuestos** | explainer/spot 2D cel-shaded: elenco 2D + mascotas desde SVG con mirada del rig, cuadros clave GPT Image, H3 i2v inicio/fin, placas vectoriales, cierre animado sin voz en el logo, audio y subtítulos PNG | **validado** 2026-10-03 (v2 aprobada) | `animated-2d-spot-composed-brand-assets.md` |
 | **Fotos aprobadas → reel vertical con transición punto → logo** | reel 9:16 corto desde fotos aprobadas: cuadros clave GPT Image, Omni image-to-video 1080p, capa gráfica HTML con `seek(t)` a PNG alfa, punto del logo medido con `getBoundingClientRect`, montaje ffmpeg por segmentos, Eleven Music por conector remoto y verificación sin voz con `whisper-cli` | **validado** 2026-10-09 (publicado en la muestra X-Ray Pibank) | `approved-photos-to-vertical-reel-with-logo-transition.md` |
+| **Reel de muestra para un cliente: cuadros fijos → planos → motion de campaña** | reel 9:16 de 25 s con locución y música para una marca que pauta en TV: idea con antagonista y cortes fijados, cuadros GPT Image 2.5 Sunburst (envase con el render oficial como referencia), planos Seedance 2.5 por BytePlus desde el primer cuadro, capa HTML + GSAP con los elementos aprobados del manual de campaña a PNG alfa, montaje ffmpeg por segmentos, música en un tramo continuo y copia web | **validado** 2026-10-12 (v2.2 aprobada por el operador; escucha y sincronía juzgadas por él, no por el agente) | `client-sample-reel-stills-to-clips-with-brand-motion-overlay.md` |
 
 ## Estructura estándar de un workflow
 
@@ -101,3 +102,11 @@ no en el workflow.
 [Película generativa → cartelas aprobadas → sonido separado](generative-film-with-approved-title-overlays.md):
 CMP-003 SKY, 2026-09-24. Cartelas punch-v3 y cierre aprobados; alpha/Luminosidad verificados localmente.
 V17 integra cielo generado, sonido separado y cierre corregido: 29,5 s/708 cuadros, 4K restaurado y1080p. QA técnica/visual documentada; escucha y aprobación final pendientes, no validación creativa integral.
+
+## Reel de muestra para un cliente que pauta en TV
+
+[Cuadros fijos → planos → capa de motion con los elementos aprobados de la campaña](client-sample-reel-stills-to-clips-with-brand-motion-overlay.md):
+validado 2026-10-12 (muestra de 25 s para la propuesta a Sika Mexicana; v1 rechazada por verse como animatic, v2.2
+aprobada tras tres correcciones). Trae esas tres correcciones como regla: un plano estirado se ve lento, la música no se
+reedita en trozos y la capa gráfica usa el sello aprobado **desde el generador del manual**, nunca redibujado. La mezcla
+la juzgó el operador: el agente no oye.

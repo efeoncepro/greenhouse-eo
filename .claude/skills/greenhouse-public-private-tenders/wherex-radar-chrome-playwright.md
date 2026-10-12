@@ -82,16 +82,51 @@ Centro de mensajes que la interfaz muestra de forma diferida. Si no hay evidenci
 revísalas en la UI autenticada antes de cerrar el dictamen. Esta lectura sigue siendo read-only: no pulses
 `Nueva pregunta`, no respondas ni envíes mensajes sin instrucción explícita y confirmación humana.
 
+**El Centro de mensajes muestra las preguntas de todos los proveedores y sus respuestas, no sólo las propias.**
+Léelo entero y vuelve a leerlo **antes de congelar cada documento** (técnica, anexos, económica): las respuestas
+llegan en tandas (en el caso, el 05, el 06 y el 09/10). Caso fuente, licitación 1164 (medido el 12/10/2026): respuestas dadas a otros
+proveedores definieron el alcance a cotizar, que la muestra de video podía ser storyboard o animatic, que para
+punto de venta sólo se pedía el diseño, que la volumetría era una referencia para comparar ofertas y que las
+condiciones de pago se revisarían con quienes avanzaran. Una de ellas pedía además una propuesta de SLA por
+niveles de complejidad; se leyó el 12/10, con el deck técnico ya cerrado, y quedó como pendiente sin cubrir.
+Cada requisito que nace en una respuesta se anota con fecha y hora y entra a la matriz de cumplimiento
+(`propuesta-tecnica-economica.md`).
+
+## Anatomía de la oferta en el portal (medido el 12/10/2026, licitación 1164)
+
+La interfaz cambia entre licitaciones; esto es lo observado en una y sirve para saber dónde mirar, no como
+contrato del portal.
+
+- **Pasos:** «Información y preguntas» → «1. Servicio licitado» → «2. Condiciones y archivos adjuntos» →
+  «3. Resumen y enviar oferta». El clic sobre el rótulo de un paso no navega; se avanza con «Siguiente »».
+  Recorrerlos para leer, sin completar campos, no modificó nada: la licitación ya estaba en «Editando» antes.
+  Si un paso exige completar o guardar algo para avanzar, detente y pide instrucción.
+- **«1. Servicio licitado» puede traer un solo servicio** (cantidad 1) con **un monto total**, un **selector de
+  moneda** (USD, EUR, MXN, CLP, PEN, COP; estaba en MXN) y la leyenda **«NO considera IVA»**. Consecuencias: la
+  moneda de la oferta puede resolverse aquí aunque la pregunta no se haya respondido por mensaje; el monto es
+  neto; y el desglose no cabe en el portal, vive en la oferta económica adjunta, cuyo total debe ser ese monto.
+- **La pestaña «Información»** trae los datos de facturación del comprador (razón social, identificador fiscal y
+  dirección) y las condiciones de pago, que en el caso decían «Por definir». Wherex rotula el identificador como
+  «RUT» aunque el comprador sea de otro país (en el caso era un RFC mexicano): cópialo con su etiqueta real. De
+  ahí sale `buyer.taxId` de la plantilla A4.
+- **La hora de cierre se muestra en la hora local del usuario**, sin zona visible: 19:00 en Santiago era 16:00 en
+  Ciudad de México. Se confirmó preguntando. Registra el cierre con las dos zonas y nunca asumas que la hora
+  visible es la del comprador.
+- **Adjuntos:** el límite de peso por archivo no quedó verificado en el caso (el reel pesaba 23 MB y se preparó
+  una copia de 9 MB). Compruébalo en el paso 2 antes de exportar los finales.
+
 ## De propuesta preparada a postulación en Wherex
 
 Esta etapa empieza sólo cuando el operador instruye explícitamente preparar o presentar una oferta. La interfaz y
 los requisitos varían por licitación: verifica los campos y adjuntos de la ficha vigente, no reutilices una lista
-de otro proceso como si fuera una condición contractual.
+de otro proceso como si fuera una condición contractual. Regla del operador: presentar, cargar archivos o enviar
+mensajes en Wherex sólo con su confirmación expresa **en ese momento**.
 
-1. En **Servicio licitado**, abre cada ítem con `Ofertar` y completa cantidad, precio unitario y moneda sólo desde
-   la cotización aprobada. Revisa el total y su base fiscal; Wherex puede declarar que los valores no consideran
-   IVA. Nunca uses el máximo presupuestario como precio automático ni confundas un valor mensual con el total del
-   contrato.
+1. En **Servicio licitado**, mira primero la estructura que pide esa ficha: varios ítems con `Ofertar`, cantidad y
+   precio unitario, o un solo servicio con un monto total. Completa sólo desde la cotización aprobada y en la
+   moneda del selector. Revisa el total y su base fiscal; Wherex puede declarar que los valores no consideran
+   IVA. Con un solo monto, compáralo con el total de la oferta económica adjunta: deben ser iguales. Nunca uses
+   el máximo presupuestario como precio automático ni confundas un valor mensual con el total del contrato.
 2. En **Condiciones y archivos adjuntos**, confirma entrega, plazo de pago, vigencia y comentario general. No
    aceptes ni sustituyas una condición comercial sin aprobación de Comercial/Finance. Carga cada documento
    obligatorio exactamente en su campo y respeta el límite de tamaño/formato; una cotización y una presentación

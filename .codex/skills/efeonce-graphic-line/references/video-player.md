@@ -1,6 +1,9 @@
 # Reproductor de video Efeonce en AXIS
 
 > Verificado contra: AXIS release `88f1ecc9c529d1d2cbeb3b24efb5f41199740f2d`, main documental `d33ed9a`; Think `474250195059ad0db42ec3aa3f2d24ad60f3e7fc` — 2026-10-07.
+>
+> Delta «página suelta de muestra en Think» verificado contra: Think `main` en `9a36dac`
+> (`src/pages/muestras/sika-posible-dde148ea051c.astro`, en producción) — 2026-10-12; sin cambios en AXIS.
 
 ## Última actualización — 0.6.6
 
@@ -22,6 +25,7 @@ El número del paquete, el contrato `efeonce.video-player` 0.5.0 (`candidate`) y
 | --- | --- |
 | [AXIS Lab](https://axis.efeonce.org/references/video-player/) | `main`, Vercel Production Ready; demuestra el renderer del paquete |
 | [Think](https://think.efeoncepro.com/preview/video-player) | `main`, Vercel Production Ready; adapter Astro, pin exacto 0.6.5 y lockfile desde registry privado, sin `link:` ni copia del reproductor |
+| Think · [página suelta de muestra](#página-suelta-de-muestra-en-think-2026-10-12) | `main` `9a36dac`, en producción desde 2026-10-12; primer uso con el medio de una propuesta (reel 9:16, Cinema embedded, línea Brand, subtítulos VTT) |
 | WordPress | Bloque Gutenberg candidato y prueba con copia del artículo 251941; sin activación ni modificación del artículo público |
 | Otros productos | Sin adopción implícita; cada consumidor valida su integración antes de actualizar |
 
@@ -119,6 +123,52 @@ Ejecutar la paridad focal de consumidores de AXIS; verificar datos de entrada an
 miniaturas cargadas, captions activos, capítulos navegables y replay orbital en cada skin/superficie.
 No ampliar a un release o CI completo cuando sólo cambia la conexión del consumidor.
 La colisión con `button.css` mostró otra limitación: un SVG presente puede estar oculto. Exigir órbita, anillo y esfera visibles en píxeles, cargando ambas hojas en ambos órdenes; la corrección CSS se distribuye en 0.6.5 (0.6.4 no publicó).
+
+## Página suelta de muestra en Think (2026-10-12)
+
+Uso: una página sin índice para **ver un video de muestra de una propuesta**; se llega por el enlace o el QR del
+documento. Caso fuente: reel 9:16 de 25 s de una campaña de cliente (Sika Mexicana, Wherex N.º 1164),
+`https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c`. El operador pidió «una página en Think con el
+reproductor canónico de Efeonce… con el video al centro… premium, con el logo de la campaña». La ruta, el layout, el
+retiro y el despliegue están en la skill `astro` →
+[efeonce-overlay.md](../../astro/efeonce-overlay.md#página-suelta-de-video-de-muestra-2026-10-12); aquí va sólo el
+reproductor.
+
+```ts
+const model: VideoPlayerModel = {
+  id: 'sika-posible-reel',
+  title: 'SikaSeal-170 · El agua siempre busca una entrada', // nombre accesible; embedded no lo pinta
+  src: `${media}/reel.mp4`,
+  poster: `${media}/poster.webp`,
+  skin: 'cinema', presentation: 'embedded', surface: 'dark', line: 'brand',
+  locale: 'es', aspectRatio: '9:16', preload: 'metadata', duration: 25,
+  tracks: [{ src: `${media}/reel.es.vtt`, language: 'es', label: 'Español', kind: 'subtitles' }],
+}
+// <AxisVideoPlayer model={model} options={{ loading: 'eager', doubleTapSeek: true }} />
+```
+
+- **`line` y `aspectRatio` se declaran siempre.** Sin ellos el modelo cae en `growth` y `16:9` (leído en AXIS
+  `packages/primitives/src/video-player.ts`, 2026-10-12). `line: 'brand'` es la línea de quien firma la muestra
+  (Efeonce Creative Studio), no un color del cliente. `skin`, `presentation` y `surface` coinciden con el default de
+  Cinema; la página los escribe igual.
+- **9:16: el ancho del marco sale del alto de la ventana.** El contenedor usa `width: min(78dvh * 9 / 16, 26rem)` para
+  que el video vertical entre completo sin scroll; bajo 60rem la página pasa a una columna y el marco a
+  `min(100%, 24rem)`. El reproductor responde al ancho de ese contenedor, no al viewport.
+- **Subtítulos:** un track `subtitles` en VTT, servido junto al MP4, con el texto de la locución. `duration` lleva el
+  dato real (25 s). El readback confirmó VTT y póster en 200 y la reproducción en navegador a tamaño de teléfono; no
+  quedó registrado que se mirara el subtítulo activo en pantalla: comprobarlo como pide «QA al continuar».
+- **Póster:** WebP en la misma carpeta; con `preload: 'metadata'` es lo que se ve antes de reproducir y lo que
+  reaparece al terminar (replay).
+- **Los colores de la campaña del cliente son constantes locales comentadas, no tokens de Efeonce.** En el frontmatter:
+  `// Colores de la campaña del cliente (manual de identidad POSIBLE); no son tokens de Efeonce.` y
+  `const campaign = { yellow: '#FCC500', ink: '#0b0b0c' }`, pasadas a la página como propiedades locales (`--y`,
+  `--ink`). Porqué: AXIS posee los valores de Efeonce; un color de la marca de otro no entra a AXIS ni se disfraza de
+  token. Esos colores visten la página (fondo, kicker, resplandor del marco); el reproductor queda en su línea.
+- **Marca fuera del fotograma.** La firma de la campaña (render del generador del manual, `gen.firma(200, 'negro')`,
+  no redibujada) y el logo de Efeonce Creative Studio van en el encabezado y a un costado del marco; nada se superpone
+  al video («Criterio de marca e interacción»).
+- **No certifica:** el escaneo del QR con un teléfono real no se hizo; el incidente de imagen azul, AT y dispositivos
+  físicos siguen como arriba. El agente no oye: la sincronía de voz y música la juzgó el operador.
 
 ## QA al continuar
 

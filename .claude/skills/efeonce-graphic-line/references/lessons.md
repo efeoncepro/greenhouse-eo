@@ -728,3 +728,45 @@ Es un artefacto documental local: no crea `quoteId`, costea/valida margen, aprue
   visual, se corrige la **receta** del compositor, no se atenúa el síntoma en la imagen: el primer intento (difuminar
   el borde a mano) fue rechazado por el operador porque «no se ve que se resolvió, solo atenuaste»; además dejaba el
   defecto vivo para la próxima composición.
+
+## 2026-10-12 — Deck técnico para un cliente en línea Brand, con generador propio, y el motion de su campaña (Sika, Wherex N.º 1164)
+
+Mismo cliente que la entrada del 2026-10-07 («LIC-1164» allá); aquélla es el anexo gráfico, ésta el deck técnico (21
+láminas 16:9, Efeonce Creative Studio) y el reel de muestra. Fuente: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
+
+- **Qué sale del compositor y qué no.** El deck lo arma un generador propio (`build-tecnica.py`, molde «propuesta para
+  leer sin presentador»): un solo script produce el HTML local (PNG y PDF) y los tableros del lienzo. Del compositor
+  (`pnpm brand:compose`) salen **sólo** tres láminas: portada (`cover-proposal`, layout `dawn`, línea `brand`), cierre
+  (`close-proposal`, línea `brand`) y caso (`decision-case`). De `@efeoncepro/axis-graphic-line` salen la navegación en
+  anillo y los íconos Trazo (`deckSlideHtml`, `resolveIcon`, `auditIconGroup`; `axis-assets.mjs`). Regla: lo que ya
+  existe aprobado se toma de su fuente; el generador propio cubre lo que el catálogo no tiene, no lo que sí tiene.
+- **La selección «Cliente» de `cover-proposal` · `dawn` tampoco se apaga desde el intent.** Es el mismo pendiente de la
+  entrada del 2026-10-07 (Pibank v10), en el layout `dawn`. Se quitó con `quitar-seleccion-dawn.mjs` (en la carpeta del
+  taller): `dawn` es simétrica en x = 960, así que la etiqueta y el cursor se reponen con el espejo del lado izquierdo;
+  el recuadro se rellena interpolando en vertical y los píxeles del logo del cliente se devuelven intactos. Sus cajas
+  están en coordenadas de 1920 px de ancho y medidas sobre esa portada. Regla: mirar al 100 % después de borrar; la
+  receta sigue pendiente.
+- **Una respuesta de dos líneas en esa portada se monta sobre la burbuja URL.** Regla: respuesta de una línea (la
+  portada quedó con «Así lo hacemos»).
+- **`decision-case` sólo compone en claro y en la línea `growth`.** Con línea Brand en claro falla el contrato
+  `line-piece-keeps-efeonce-dark` (una pieza de línea es oscura). En un deck Brand entra como lámina clara de Efeonce
+  en `growth`, a página completa, tal como la entrega el compositor. Ya estaba en la
+  [norma](../../../../docs/operations/brand-graphic-line/EFEONCE_SURFACE_COMPOSITION_V1.md) («Recetas sólo claras»);
+  aquí se volvió a medir con Brand.
+- **El caso de éxito es la lámina aprobada, no una hecha a mano** (regla del operador, 2026-10-12). El generador traía
+  una lámina de caso propia y el operador la rechazó: va `decision-case` con la foto correcta del caso (pidió el avión
+  de Sky en lugar del ala al amanecer). Es la misma disciplina del sello y la firma de más abajo: lo aprobado se
+  reutiliza desde su generador.
+- **La lámina de equipo del compositor truncaba los nombres completos** y traía la selección «Cliente». Aquí se armó en
+  el generador con las fotos reales del squad (`src/lib/artifact-composer/catalogs/deck-axis/assets/squad/`). Queda
+  como hecho del caso, no como regla: choca con la anterior («lo aprobado se reutiliza») y la corrección de fondo es
+  de la receta.
+- **En la capa de motion de un video de campaña del cliente manda el manual de esa campaña.** Síntoma: el operador
+  preguntó «¿Sientes que el video sigue la línea gráfica que se armó?»; no la seguía, y el agente había inventado una
+  caja «2 EN 1». Regla: el elemento aprobado se **reutiliza desde su generador** (el sello de lanzamiento salió de
+  `gen.sello_lanz` del manual, no se redibujó), nunca se inventa una variante; y **no se usa un elemento que el manual
+  reserva** (el triángulo rojo suelto queda para la firma y el logo). Lo mismo en la página del reel: la firma de la
+  campaña es el render de `gen.firma`. Inventar o redibujar lo aprobado fue rechazado dos veces en este caso.
+- **El generador en modo lienzo fallaba en silencio** cuando una imagen nueva no tenía su blob en `blobs.json`: al
+  sumar una imagen, revisar primero esa entrada.
+- Página del reel y su reproductor: [video-player.md](video-player.md#página-suelta-de-muestra-en-think-2026-10-12).

@@ -240,6 +240,9 @@ es una ventaja competitiva que se protege callándola.**
 | **Cotizar sin pasar por el cotizador** | Un precio sin loaded cost es una corazonada con decimales |
 | **Vender horas o "bolsa de horas"** | Pones tu costo en la factura para que te lo negocien. Y la IA lo desploma |
 | **Publicar precio por pieza o por rol** | Le entregas la calculadora para comoditizarte |
+| **Responder a un «desglose económico» con una línea por pieza** | El monto se lee como suma de artes y el concepto queda sin precio. Va por componente de valor → `modules/04_PRICING.md` §7 (b.1) |
+| **Presentar un componente como pago único sin decisión del operador** | Los encargos siguientes caen al total menos esa línea, bajo el piso calculado |
+| **Agregar a la oferta tarifario de extras, forma de pago o «fuera del servicio» que el comprador no pidió** | Limita el alcance y abre una negociación que nadie había abierto → `modules/10_PITCH.md` §5.1 |
 | **Descontar la capa de gobierno sin bajar alcance/SLA** *(workspace, policy, ledger, observabilidad, soporte base)* | Tiene costo operativo asignado y sostiene control/transparencia. Descontarla sin rediseñar el servicio erosiona margen y devalúa el moat |
 | **Cerrar bajo el 45%** | No es voluntad: **es aritmética**. Un cliente bajo el piso es una deuda con tu equipo |
 | **Decir "déjame ver qué puedo hacer"** ante un pedido de descuento | Enseña que el precio era negociable desde el inicio. A partir de ahí, **todo lo que digas vale menos** |

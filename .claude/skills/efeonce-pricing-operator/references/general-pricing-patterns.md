@@ -70,6 +70,55 @@ Registrar descuento, motivo, aprobador, vigencia, margen y renovación. Definir 
 rate cards, tiers, credits, limits, provider/model, FX, effective date y contrato; usar quote snapshots y grandfathering
 aprobado. Mostrar precio total, mínimos, overage, impuestos, renovación, cancelación y reembolso.
 
+## Patrón medido: proyecto creativo de una vez con desglose exigido
+
+Medido el 2026-10-12 en una licitación privada (Sika Mexicana, Wherex N.º 1164: un «lanzamiento tipo» de campaña con
+canasta definida por el comprador y «propuesta económica desglosada»). Estado del caso: paquete terminado, no
+presentado, resultado desconocido. Las cifras son ejemplo interno: no son tarifa, mínimo ni referencia para otro
+cliente.
+
+**Forma.** En el Cotizador V3 va como `creative-managed-service`, `managed_service`, `on_demand`, `periods: 1`
+([tabla por tipo de negocio](cotizador-v3-agent-workflow.md#21-tabla-por-tipo-de-negocio); ejemplo
+`fixed-scope-project`). No existe una oferta de proyectos.
+
+**Tres escenarios y el piso, juntos.** Al operador se le lleva el rango, no un número:
+
+| Escenario | Caso (neto) |
+| --- | --- |
+| A · en la moneda del comprador | MXN 63.700 (costo 32.191,88; margen sobre trabajo propio 50,26 %) |
+| B · en USD | USD 3.320 |
+| C · con 25 % más de horas (sensibilidad de la estimación) | MXN 76.700 |
+| Piso de la oferta (45 %) | ≈ MXN 57.650 |
+
+Cada moneda es su propia cotización; no se convierte a mano.
+
+**Los supuestos del agente se marcan como supuestos.** En el caso: 134 h (Lead 28, diseño 44 + 36, contenido 14,
+cuenta 12), USD 60 de producción con IA, talento en Chile, FX de política USD→MXN 19,25 (política, no mercado) y
+tratamiento «exportación sin IVA». Operations y Finance no los validaron. Las horas son estimadas y así se informan.
+
+**El resultado es una simulación** (`requires_review`, `binding: false`), no una Quote. **El precio final lo decide
+el operador**: fijó MXN 64.000 por lanzamiento tipo; el agente había recomendado 70.000. Entre 64.000 y el piso hay
+≈ MXN 6.350, que un desvío cercano al 10 % de las horas consume. El margen a 64.000 (≈ 49,7 %) lo calculó el agente a
+mano: el camino correcto es declarar el precio como `agreed_total` y volver a cotizar
+([3.9](cotizador-v3-agent-workflow.md#39-el-precio-acordado)); mientras no se haga, esa cifra se cita como cálculo
+del agente, no del cotizador.
+
+**El desglose no sale del cotizador.** El motor costea por rol y su documento imprime un fee o «1 proyecto». Un
+desglose por componente o por entregable es un **reparto manual** del total aprobado:
+
+- se declara como reparto manual en el expediente y lo confirma el operador;
+- va en un documento de la plantilla A4 versión 2 con las líneas digitadas (precio aprobado fuera de V3), no en
+  `compose document`; el generador sólo comprueba que sumen;
+- no es rate card: de una línea no se deriva un precio por pieza, y si cambia la canasta se vuelve a costear.
+
+En el caso, mismo total: evolución gráfica 16.000 · conceptualización y Master Graphic 14.000 · redes 11.000 · reel
+14.000 · punto de venta e impresos 9.000. Cómo se diseña ese desglose en la práctica creativa (por componente de
+valor, no por pieza) lo manda `creative-practice`, `modules/04_PRICING.md` §7 (b.1).
+
+**Riesgo a avisar: un componente como pago único.** Si una línea (aquí, la evolución gráfica) se presenta como pago
+único, los encargos siguientes quedan en el total menos esa línea (48.000), bajo el piso calculado para un
+lanzamiento. Ningún escenario costeó un lanzamiento sin ese componente. La decisión es del operador.
+
 ## Fuentes consultadas (2026-07-26)
 
 [FAR fixed-price](https://www.acquisition.gov/far/subpart-16.2), [FAR T&M](https://www.acquisition.gov/far/subpart-16.6),
