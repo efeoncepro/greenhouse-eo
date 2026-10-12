@@ -1020,7 +1020,7 @@ Rutas relativas a `ai-generations/`. Las placas son locales (gitignoreadas); lo 
 
 | Línea (token) | Acento | Voz | Placa | Ruta |
 |---|---|---|---|---|
-| Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | ¿Lo medimos? **Siempre.** | `HW1` | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
+| Growth Strategy & Measurement (`growth`) | teal `#36c8bf` | ¿Lo medimos? **Siempre.** | `HW1` | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png` |
 | Creative Services (`brand`) | naranja `#ff6500` | ¿Quién crea mi contenido? **Tu squad.** | `CR4` (nueva, §16.7) | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
 | Digital Services & Engineering (`engine`) | azul `#0375db` | ¿Te encuentra la IA? **Visible.** | `WB1c` | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
 | Media & Distribution (`voice`) | rojo anaranjado `#f83902` | ¿Dónde invierto? **Donde rinde.** | `LN4` (nueva, §16.4) | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |
@@ -1030,6 +1030,8 @@ Rutas relativas a `ai-generations/`. Las placas son locales (gitignoreadas); lo 
 Services lo compartía, y en un brochure con las dos `validateDeckPlan` marcaba `plate-repeated` (correcto: un plate no
 se repite en un deck). Ahora la portada tiene el suyo, `CR4` (§16.7), y ese brochure ya no marca el aviso **[medido en
 el test del validador, TASK-1934]**.
+
+**Delta 2026-10-12 — `HW1` sin lanyard.** El operador rechazó la portada Growth del brochure 360 porque el lanyard de `HW1` quedaba montado sobre el antebrazo, con el carrete y la tarjeta colgando del brazo. Se borró con `pnpm ai:inpaint erase` (máscara de polígonos sobre las dos cintas, el carrete y la tarjeta; zona protegida idéntica bit a bit; run `ai-generations/2026-10-12_brochure-efeonce-360/growth-plate/inpaint/de3eff6c887a`) y el plate aprobado pasa a ser `HW1-mismo-trabajo-sin-lanyard.png`, en la misma carpeta. `HW1-mismo-trabajo.png` se conserva como historia y no se vuelve a componer. Reemplazado en el catálogo (`cover-brochure-line-growth`, `method-hybrid-workforce-scene` y sus referencias), en los ejemplos del compositor, en la lámina 09 de la página «v1 · Servicios Creativos» del canvas Agencia Creativa y en la portada Growth del brochure 360.
 
 ⚠️ **`HW1` no es cine [medido en su ficha]:** es la toma documental de §2 (*«nobody looks at the lens»*, reserva
 *«the calm, evenly shadowed bare dark wall on the left half»*, sin isotipo compuesto). El operador la aprobó igual como

@@ -1,0 +1,52 @@
+{
+  "tenderId": "a01-portada",
+  "slides": [
+    {
+      "slideId": "deck-cover-brochure",
+      "contentType": "deck.cover-brochure",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "logoLeft": "--gl-logo-left=140px",
+          "logoTop": "--gl-logo-top=300px",
+          "eyebrowTop": 490,
+          "questionTop": 538,
+          "answerTop": 600,
+          "answerPx": 124,
+          "answerInset": "--gl-answer-inset=-4px",
+          "bodyTop": 752,
+          "bodyPx": 28,
+          "bodyWidth": 724,
+          "bodyLeading": "--gl-body-leading=1.3",
+          "bodyWeight": "--gl-body-wght=400",
+          "bodyStrongWeight": "--gl-body-strong-wght=600",
+          "bodyColor": "--gl-body-color=#ffffff",
+          "eyebrowPx": "--gl-eyebrow-px=22px",
+          "eyebrowWeight": "--gl-eyebrow-wght=500",
+          "eyebrowLeading": "--gl-eyebrow-leading=1.2",
+          "eyebrowTracking": "--gl-eyebrow-tracking=0.24em",
+          "eyebrowColor": "--gl-eyebrow-color=#e2e2e2",
+          "questionPx": "--gl-question-px=40px",
+          "questionLeading": "--gl-question-leading=1.2",
+          "questionColor": "--gl-question-color=#ffffff",
+          "answerLeading": "--gl-answer-leading=0.95",
+          "answerTracking": "--gl-answer-tracking=-0.035em",
+          "answerColor": "--gl-answer-color=#ffffff",
+          "logoWidth": "--gl-logo-width=500px"
+        },
+        "backdrop": {
+          "src": "asset-ref:plate:BR1b-portada-orbita-isotipo",
+          "alt": "Nexa, con la chaqueta de Efeonce, mira a cámara frente a una órbita de luz teal gigante con una sola esfera"
+        },
+        "voice": {
+          "question": "¿Qué gano con Efeonce?",
+          "answer": "Crecimiento",
+          "eyebrow": "Brochure · Agencia de Marketing 360°"
+        },
+        "evidence": "<strong>Cinco</strong> líneas de servicio:<br>Growth · Brand · Engine · Voice · Revenue"
+      },
+      "template": "CoverBrochure"
+    }
+  ]
+}

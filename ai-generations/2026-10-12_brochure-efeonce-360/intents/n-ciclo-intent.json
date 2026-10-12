@@ -1,0 +1,46 @@
+{
+  "contract": "efeonce.surface-composition",
+  "version": "0.1.2",
+  "surface": "deck",
+  "format": "16x9",
+  "use": "brochure",
+  "line": "growth",
+  "theme": "dark",
+  "role": "method",
+  "recipe": "method-surround-cycle",
+  "voice": {
+    "eyebrow": "La idea",
+    "question": "¿Cómo se crece hoy?",
+    "answer": [
+      "En ciclo"
+    ]
+  },
+  "body": "Tu cliente ya no baja por un embudo: da vueltas alrededor de tu marca. Nosotros operamos la vuelta **completa**.",
+  "startLabel": "Empieza aquí",
+  "stations": [
+    {
+      "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/medir.png",
+      "title": "Medir",
+      "description": "Dónde te encuentran, qué te creen y cuánto te compran: una sola línea base para todas las líneas."
+    },
+    {
+      "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/crear.png",
+      "title": "Crear",
+      "description": "Marca, contenido y web que personas, buscadores y agentes de IA entienden."
+    },
+    {
+      "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/distribuir.png",
+      "title": "Distribuir",
+      "description": "Medios, social y CRM: el mensaje llega a quien compra y vuelve."
+    },
+    {
+      "icon": "ai-generations/2026-10-07_pibank-propuesta/iconos-ciclo-v3/optimizar.png",
+      "title": "Optimizar",
+      "description": "Cada vuelta aprende de la anterior: estrategia, presupuesto y agentes se ajustan con el dato."
+    }
+  ],
+  "core": {
+    "title": "Tu cliente",
+    "caption": "al centro de la vuelta"
+  }
+}

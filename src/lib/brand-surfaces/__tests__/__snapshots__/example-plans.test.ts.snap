@@ -7338,8 +7338,8 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-growth-inte
         "width": 1920,
       },
       "kind": "plate",
-      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
-      "ref": "asset-ref:plate:HW1-mismo-trabajo",
+      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
+      "ref": "asset-ref:plate:HW1-mismo-trabajo-sin-lanyard",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -7353,7 +7353,7 @@ exports[`planes de los intents de ejemplo > deck-cover-brochure-line-growth-inte
         "slots": {
           "backdrop": {
             "alt": "Una estratega de Efeonce con polo y lanyard revisa un tablero de resultados en un monitor, de noche",
-            "src": "asset-ref:plate:HW1-mismo-trabajo",
+            "src": "asset-ref:plate:HW1-mismo-trabajo-sin-lanyard",
           },
           "evidence": "<strong>Seis</strong> capacidades:<br>Estrategia · GTM · Revenue enablement<br>Analítica · Medición · Orquestación",
           "frame": {
@@ -11735,8 +11735,8 @@ exports[`planes de los intents de ejemplo > deck-method-hybrid-workforce-scene-i
         "width": 1920,
       },
       "kind": "plate",
-      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
-      "ref": "asset-ref:plate:HW1-mismo-trabajo",
+      "path": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
+      "ref": "asset-ref:plate:HW1-mismo-trabajo-sin-lanyard",
     },
   ],
   "catalog": "graphic-line-deck",
@@ -11762,7 +11762,7 @@ exports[`planes de los intents de ejemplo > deck-method-hybrid-workforce-scene-i
           },
           "photo": {
             "alt": "Una estratega de Efeonce con polo y lanyard señala el gráfico en un monitor grande mientras un agente trabaja las imágenes de la misma pieza",
-            "src": "asset-ref:plate:HW1-mismo-trabajo",
+            "src": "asset-ref:plate:HW1-mismo-trabajo-sin-lanyard",
           },
           "selection": {
             "overlay": "none",

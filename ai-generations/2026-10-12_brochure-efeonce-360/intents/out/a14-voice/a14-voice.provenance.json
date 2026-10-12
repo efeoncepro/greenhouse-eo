@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "4cd3696151d63ef4295ff21fd76212276c7e98fbcca29d1a1d7a5b396b54a8c4",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.proposal-cinematic",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:LN4-voice-distribucion",
+      "path": "ai-generations/2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png",
+      "sha256": "4a95df8bd363a9f4f1d49955092c8611411a83830eec8bbd2e03f5db0a789435"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

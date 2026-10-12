@@ -1,0 +1,76 @@
+{
+  "tenderId": "a14-voice",
+  "slides": [
+    {
+      "slideId": "deck-proposal-cinematic",
+      "contentType": "deck.proposal-cinematic",
+      "slots": {
+        "frame": {
+          "line": "voice",
+          "stepsLayout": "columns",
+          "margin": 140,
+          "eyebrowTop": 120,
+          "questionTop": 186,
+          "answerTop": 318,
+          "answerPx": 140,
+          "bodyTop": 500,
+          "bodyPx": 26,
+          "bodyWidth": 570,
+          "proofTop": 740,
+          "stepsTop": 800,
+          "stepsGap": 176,
+          "stepWidth": 170,
+          "iconPx": 44,
+          "kickerPx": 12,
+          "stepNamePx": 21,
+          "noteLeft": "--gl-pc-note-left=460px",
+          "noteTop": "--gl-pc-note-top=1000px",
+          "notePx": "--gl-pc-note-px=16px"
+        },
+        "photo": {
+          "src": "asset-ref:plate:LN4-voice-distribucion",
+          "alt": "Una líder de medios de Efeonce frente a haces de luz naranja que se reparten en muchas pantallas"
+        },
+        "voice": {
+          "question": "¿Dónde invierto?",
+          "answer": "Donde rinde",
+          "eyebrow": "Voice · Medios y distribución"
+        },
+        "body": "Estrategia de distribución, performance, influencia y earned, y medios gestionados: un mensaje que llega a muchas audiencias desde una sola operación.",
+        "steps": [
+          {
+            "icon": "asset-ref:icon:busqueda-voice-dark-44",
+            "kicker": "Empieza aquí",
+            "name": "Auditoría de medios"
+          },
+          {
+            "icon": "asset-ref:icon:embudo-voice-dark-44",
+            "kicker": "Plan",
+            "name": "Distribución"
+          },
+          {
+            "icon": "asset-ref:icon:rayo-voice-dark-44",
+            "kicker": "Performance",
+            "name": "Paid y social"
+          },
+          {
+            "icon": "asset-ref:icon:medicion-voice-dark-44",
+            "kicker": "On-going",
+            "name": "Managed Media"
+          }
+        ],
+        "proof": {
+          "text": "Lo orgánico prueba y la pauta escala, cada peso medido",
+          "source": "Método Efeonce, deck Marketing de Contenidos 2026"
+        },
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-end",
+          "participantKind": "department",
+          "scale": 1.2
+        }
+      },
+      "template": "ProposalCinematic"
+    }
+  ]
+}

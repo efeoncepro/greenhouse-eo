@@ -387,7 +387,7 @@ la evidencia en 2–3 líneas.
 
   | Línea (token) | Par | Plate |
   |---|---|---|
-  | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png` |
+  | Growth Strategy & Measurement (`growth`) | ¿Lo medimos? **Siempre.** | `2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png` |
   | Creative Services (`brand`) | ¿Quién crea mi contenido? **Tu squad.** | `2026-09-28_portada-creativa/plates/CR4-el-squad-te-la-entrega-v2.png` |
   | Digital Services & Engineering (`engine`) | ¿Te encuentra la IA? **Visible.** | `2026-09-26_deck-web/plates/WB1c-web-para-todos-bordado.png` |
   | Media & Distribution (`voice`) | ¿Dónde invierto? **Donde rinde.** | `2026-09-27_portadas-lineas/plates/LN4-voice-distribucion.png` |

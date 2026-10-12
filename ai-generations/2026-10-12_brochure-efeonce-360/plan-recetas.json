@@ -1,0 +1,118 @@
+{
+ "document": "brochure",
+ "line": "growth",
+ "slides": [
+  {
+   "recipeId": "cover-brochure-cine-orbit",
+   "plateRef": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png"
+  },
+  {
+   "recipeId": "decision-ai-market"
+  },
+  {
+   "recipeId": "decision-difference"
+  },
+  {
+   "recipeId": "method-surround-cycle"
+  },
+  {
+   "recipeId": "proposal-cinematic-nexa-lines",
+   "plateRef": "ai-generations/2026-09-26_deck-nexa/plates/NX6b-nexa-cinco-orbitas-isotipo.png"
+  },
+  {
+   "recipeId": "section-classic"
+  },
+  {
+   "recipeId": "content-service-lanes"
+  },
+  {
+   "recipeId": "proposal-cinematic-seo",
+   "plateRef": "ai-generations/2026-09-28_deck-seo-aeo/plates/SE1-te-encuentran-isotipo.png"
+  },
+  {
+   "recipeId": "section-classic"
+  },
+  {
+   "recipeId": "proposal-cinematic-creative",
+   "plateRef": "ai-generations/2026-09-26_deck-creativo/plates/CR2b-constelacion-isotipo.png"
+  },
+  {
+   "recipeId": "content-bullets"
+  },
+  {
+   "recipeId": "section-classic"
+  },
+  {
+   "recipeId": "section-classic"
+  },
+  {
+   "recipeId": "decision-provider-fit"
+  },
+  {
+   "recipeId": "content-service-lanes"
+  },
+  {
+   "recipeId": "method-agent-supervisor"
+  },
+  {
+   "recipeId": "section-classic"
+  },
+  {
+   "recipeId": "content-measure-formulas"
+  },
+  {
+   "recipeId": "content-day-live-results"
+  },
+  {
+   "recipeId": "section-cine-about",
+   "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS1b-un-solo-equipo.png"
+  },
+  {
+   "recipeId": "method-hybrid-workforce"
+  },
+  {
+   "recipeId": "triptych",
+   "plateRef": "ai-generations/2026-09-26_deck-triptico-v2/plates/T1-escucha.png"
+  },
+  {
+   "recipeId": "content-day-tools"
+  },
+  {
+   "recipeId": "section-cine-team",
+   "plateRef": "ai-generations/2026-09-27_brochure/plates/BR2b-portada-equipo-isotipo.png"
+  },
+  {
+   "recipeId": "content-team"
+  },
+  {
+   "recipeId": "content-clients"
+  },
+  {
+   "recipeId": "content-partners"
+  },
+  {
+   "recipeId": "decision-case",
+   "purpose": "caso Sky, lámina a mano del brochure Agencia Creativa (foto propia del caso)"
+  },
+  {
+   "recipeId": "decision-case",
+   "plateRef": "ai-generations/2026-09-29_deck-seo-aeo-documentos/plates/CS3b-berel-squad.png"
+  },
+  {
+   "recipeId": "content-markets"
+  },
+  {
+   "recipeId": "section-cine-purpose",
+   "plateRef": "ai-generations/2026-09-27_quienes-somos/plates/QS2-contigo.png"
+  },
+  {
+   "recipeId": "decision-risk"
+  },
+  {
+   "recipeId": "decision-next-steps"
+  },
+  {
+   "recipeId": "close-brochure-orbit"
+  }
+ ]
+}

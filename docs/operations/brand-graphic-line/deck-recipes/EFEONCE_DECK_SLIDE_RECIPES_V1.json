@@ -688,7 +688,7 @@
           "name": "photo",
           "type": "image",
           "required": true,
-          "example": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+          "example": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
           "notes": "Plate aprobado de la línea: una estratega con polo y lanyard revisando un tablero en un monitor (no mira al lente). Una portada de línea nueva parte de la ficha LN4 cambiando rol, casting, prenda del kit y el fenómeno de luz con el color de la línea."
         }
       ],
@@ -708,7 +708,7 @@
       "photo": {
         "uses": true,
         "register": "documental",
-        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
         "ficha": "ai-generations/2026-09-26_deck-hibrido/fichas/HW1-mismo-trabajo.json",
         "prompt": "ai-generations/2026-09-26_deck-hibrido/prompts/HW1-mismo-trabajo.txt",
         "postprocess": [
@@ -7365,7 +7365,7 @@
           "name": "photo",
           "type": "image",
           "required": true,
-          "example": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+          "example": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
           "notes": "Toma a sangre con la persona y la pantalla en la mitad derecha y la mitad izquierda calma."
         },
         {
@@ -7402,12 +7402,12 @@
       "photo": {
         "uses": true,
         "register": "documental",
-        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png",
+        "plate": "ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png",
         "ficha": "ai-generations/2026-09-26_deck-hibrido/fichas/HW1-mismo-trabajo.json",
         "prompt": "ai-generations/2026-09-26_deck-hibrido/prompts/HW1-mismo-trabajo.txt",
         "postprocess": [
-          "pnpm foto:validar ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png --zona-texto",
-          "pnpm foto:emblema ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo.png → si el emblema del polo difiere del oficial, pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda oscura (caja medida en el plate)"
+          "pnpm foto:validar ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png --zona-texto",
+          "pnpm foto:emblema ai-generations/2026-09-26_deck-hibrido/plates/HW1-mismo-trabajo-sin-lanyard.png → si el emblema del polo difiere del oficial, pnpm foto:isotipo <plate> --centro x,y --ancho w --prenda oscura (caja medida en el plate)"
         ],
         "replaceable": "La persona y la pieza en pantalla pueden cambiar por otra toma del oficio con la misma reserva (mitad izquierda calma); el monitor debe tener dos regiones distinguibles para las dos selecciones"
       },

@@ -1,0 +1,20 @@
+{
+  "schema": "efeonce.brand-surface-piece.provenance.v1",
+  "intentSha256": "769cc319d22b51b8edd7ad4928fc01b81dace96b9e8e225f91112dff4a1f9e2f",
+  "catalog": "graphic-line-deck",
+  "contentType": "deck.cover-brochure",
+  "plates": [
+    {
+      "ref": "asset-ref:plate:BR1b-portada-orbita-isotipo",
+      "path": "ai-generations/2026-09-27_brochure/plates/BR1b-portada-orbita-isotipo.png",
+      "sha256": "e9d99fbe6a8d04be3418a2a3d0ed4ade115afd8260ca14a53e74dc34908308a0"
+    }
+  ],
+  "files": [],
+  "axis": {
+    "@efeoncepro/axis-ui-contracts": "0.3.40",
+    "@efeoncepro/axis-tokens": "0.3.41",
+    "@efeoncepro/axis-graphic-line": "0.11.0",
+    "@efeoncepro/axis-brand-assets": "0.4.25"
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "tenderId": "a29-riesgo",
+  "slides": [
+    {
+      "slideId": "deck-decision-risk",
+      "contentType": "deck.decision-risk",
+      "slots": {
+        "frame": {
+          "line": "growth",
+          "margin": 140,
+          "eyebrowTop": 110,
+          "questionTop": 200,
+          "answerTop": 270,
+          "answerPx": 132,
+          "bodyTop": 560,
+          "bodyPx": 26,
+          "bodyWidth": 520,
+          "headersTop": "--gl-dr-headers-top=200px",
+          "headerPx": "--gl-dr-header-px=16px",
+          "secondColumn": "--gl-dr-second-column=1140px",
+          "tableLeft": "--gl-dr-table-left=800px",
+          "tableTop": "--gl-dr-table-top=250px",
+          "tableWidth": "--gl-dr-table-width=980px",
+          "rowHeight": "--gl-dr-row-height=150px",
+          "rowGap": "--gl-dr-row-gap=20px",
+          "riskWidth": "--gl-dr-risk-width=300px",
+          "columnGap": "--gl-dr-column-gap=40px",
+          "ruleStroke": "--gl-dr-rule=2px",
+          "rowPadTop": "--gl-dr-row-pad-top=22px",
+          "riskPx": "--gl-dr-risk-px=26px",
+          "namePx": "--gl-dr-name-px=44px",
+          "nameTracking": "--gl-dr-name-tracking=-0.02em",
+          "howPx": "--gl-dr-how-px=22px",
+          "howGap": "--gl-dr-how-gap=10px"
+        },
+        "indicator": {
+          "src": "asset-ref:layer:gl-dr-progress-6-of-7-growth"
+        },
+        "voice": {
+          "question": "¿Y si no funciona?",
+          "answer": "chico",
+          "eyebrow": "Riesgo controlado",
+          "answerLead": "Empiezas"
+        },
+        "body": "Cada riesgo tiene su cobertura escrita. Y el primer paso es un piloto, no un contrato largo.",
+        "headers": {
+          "risk": "El riesgo",
+          "how": "Cómo lo cubrimos"
+        },
+        "risks": [
+          {
+            "risk": "Que no encajemos",
+            "name": "Sample Sprint",
+            "how": "Un piloto pagado, acotado y gobernado, con informe de cierre y una decisión clara."
+          },
+          {
+            "risk": "Que se atrase",
+            "name": "Métricas con umbral",
+            "how": "OTD ≥ 90 % y FTR ≥ 80 %, medidos cada semana y visibles en tu portal."
+          },
+          {
+            "risk": "Depender de una persona",
+            "name": "Traspaso documentado",
+            "how": "Reemplazo formal del equipo, con el contexto escrito y sin perder memoria."
+          },
+          {
+            "risk": "No ver qué pasa",
+            "name": "Transparencia radical",
+            "how": "La operación en vivo en Greenhouse: lo que pedimos, lo que entregamos y cuánto demora."
+          }
+        ],
+        "selection": {
+          "label": "Cliente",
+          "anchor": "top-start",
+          "participantKind": "department",
+          "scale": 1.15,
+          "targetKind": "object",
+          "variant": "eight-handles",
+          "padding": "standard",
+          "overlay": "none",
+          "item": 1
+        }
+      },
+      "template": "DecisionRisk"
+    }
+  ]
+}
