@@ -11,7 +11,7 @@
 - Confidence: `high` en la dirección; `medium` en el beneficio medible de build (no se corrió ningún build para esta
   decisión)
 - Validated as of: `2026-10-12`
-- Epic: `EPIC-027`
+- Epic: `EPIC-054` (ejecución de los cortes) · `EPIC-027` (costo de build)
 - Enmienda a: [`GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md`](GREENHOUSE_BUILD_UNIT_DECOMPOSITION_DECISION_V1.md)
   (cláusula «retaining one repository»)
 
@@ -122,6 +122,9 @@ repositorio no se refresca solo.
 
 ### Prerrequisitos que ya se conocen
 
+- **2a**: el Lab existe y está desplegado en AXIS, pero `TASK-1590` (`in-progress`) declara que su paridad con
+  `/design-system` está lejos de completa y que ninguna ruta de Greenhouse se retira ni se redirige sin paridad
+  ruta por ruta. El retiro es página por página, no un corte único; la medición de build se hace al final.
 - **2b/2c**: el compositor y `brand-surfaces` se importan mutuamente (3 y 42 imports) y un test del motor importa de
   Insights. Se corta antes de mover. El motor resuelve catálogos por ruta de archivo en cinco módulos; el paquete
   necesita recibir el catálogo como entrada.

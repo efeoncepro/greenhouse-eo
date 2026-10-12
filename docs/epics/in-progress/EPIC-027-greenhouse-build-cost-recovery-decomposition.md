@@ -56,8 +56,9 @@ forma del programa, no su objetivo:
 - Orden aprobado: Design System Lab a AXIS → catálogos de marca y `brand-surfaces` a AXIS →
   motor del compositor como paquete de AXIS → Growth y Search Visibility 360 a Marketing Studio → Insights como
   dominio propio. Commercial queda diferido; Knowledge y Hiring se quedan.
-- **Ningún corte tiene task todavía.** Cada uno se registra como hija de esta épica al prepararlo y trae la
-  evidencia de siempre: costo, routing/auth, rollback y ownership del runtime.
+- **Ningún corte tiene task todavía.** Los coordina [`EPIC-054`](../to-do/EPIC-054-greenhouse-product-domain-decoupling.md), no esta épica; cada uno
+  trae la evidencia de siempre: costo, routing/auth, rollback y ownership del runtime. Esta épica conserva la
+  medición de costo de build y las fronteras por excepción.
 - `TASK-1382` sigue sin sujeto formal. Lo que la reemplaza en la práctica es medir el build del portal antes y
   después de retirar las rutas de `/design-system`; el primer exit criterion («Labs-only changes do not build
   Portal») se cumple por construcción cuando el Lab ya no vive en este repositorio.

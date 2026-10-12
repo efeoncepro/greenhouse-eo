@@ -12,6 +12,7 @@ AXIS (`artifact-worker` se queda y consume el paquete); Growth y Search Visibili
 Studio; Insights pasa a dominio propio y sale último; Commercial queda diferido con su API aquí; Hiring se queda. **Knowledge
 se queda en Greenhouse** por decisión del operador, aun con poco uso (4 llamadas de personas en 4 meses; el resto es
 el QA nocturno).
+Lo ejecuta [`EPIC-054`](docs/epics/to-do/EPIC-054-greenhouse-product-domain-decoupling.md), diez unidades D01–D10 sin task registrada.
 Enmienda la cláusula «un repositorio» del ADR de build units. **Sólo documentos**: no hay tasks, repositorios ni
 código movido, y el trabajo nuevo sigue naciendo donde vive hoy su dominio. Para quien toque esos dominios: un
 dominio se mueve con su API y sus procesos asíncronos o no se mueve, y no se agregan lecturas SQL cruzadas (Insights
