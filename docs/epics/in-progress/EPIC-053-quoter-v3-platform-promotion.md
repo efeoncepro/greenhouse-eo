@@ -274,6 +274,7 @@ Una casilla por puerta de salida de fase. Se marca con evidencia; documentos esc
 | Alcance de escritura por MCP para registrar cotizaciones | **Abierta.** Exige una clase de permiso nueva entre sistemas; `TASK-2030` puede cerrar sólo con lectura y simulación |
 | Si un agente puede aplicar un cambio de catálogo | **Abierta.** Ver `TASK-2029` |
 | Número y versión impresos en el documento | **Abierta.** La plantilla A4 no tiene esas claves; hace falta una versión nueva de sus datos, sin tarea dueña |
+| Ciclo de vida después de emitir | Resuelta 2026-10-12: se suman aceptada y rechazada como estados y una fecha de vigencia fijada al emitir; vencida se deriva de esa fecha y la base impide aceptar una cotización vencida. Enviada y vista quedan para el envío y la interfaz; ganada y perdida, para la salida a HubSpot. Entra en `TASK-2025` (base) y `TASK-2027` (comandos) antes de aplicar las migraciones |
 
 ## Non-goals
 

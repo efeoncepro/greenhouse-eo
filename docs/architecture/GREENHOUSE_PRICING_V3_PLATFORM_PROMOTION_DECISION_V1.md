@@ -44,6 +44,14 @@ API → MCP → interfaz**, y con una regla que manda sobre las demás: **la CLI
 5. **Historial de sólo agregar**, con guardas en la base. Corregir es crear una versión que reemplaza a la anterior. El
    número público sale de una secuencia, se asigna en la primera emisión, lleva el prefijo `EO-QTE-` y la serie real
    empieza en 15001: la primera cotización real es `EO-QTE-15001` y sigue correlativa (`EO-QTE-15002`…). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.
+   **Ciclo de vida de una cotización** (decidido por el CEO el 2026-10-12): `borrador → emitida → aceptada | rechazada`,
+   con `en revisión` cuando se prepara una versión nueva y `retirada` como salida. Al emitir se fija una **fecha de
+   vigencia**. **Vencida** no es un estado guardado: se deriva de esa fecha, en un único lugar de lectura, y la base
+   impide aceptar una cotización vencida (se vuelve a emitir con vigencia nueva y conserva su número). Aceptada y
+   rechazada nombran la versión emitida a la que se refieren y las registra un agente o una persona, sin aprobación.
+   Ningún estado es un callejón sin salida salvo `retirada`: desde aceptada o rechazada se puede abrir una versión
+   nueva. *Enviada* y *vista* son hechos que se registrarán con el envío y la interfaz; *ganada* y *perdida*
+   dependen del negocio y se deciden con la salida a HubSpot.
 6. **El catálogo cambia de autoridad en dos pasos**: primero la base refleja el repo por huella (el repo manda);
    después los cambios se hacen por la API con las mismas huellas de confirmación y el repo recibe una copia. Aplicar
    nunca activa: mover el puntero es un acto aparte.
@@ -137,6 +145,8 @@ crean aplicaciones, paquetes ni servicios nuevos. Cada tarea declara su contrato
   HubSpot.
 - Quién ve costo y margen por MCP (se decide al abrir la tarea de MCP).
 - Firmas, cobro, facturación y cierre de negocio.
+- Enviada y vista (hechos del envío) y ganada o perdida (resultado del negocio).
+- Que el documento del cliente imprima la fecha de vigencia registrada: hoy la validez va como texto de condiciones.
 - Las decisiones de negocio abiertas del catálogo (prorrateo del fee de plataforma, costo de puesta en marcha de un
   servicio gestionado).
 
@@ -156,3 +166,6 @@ antes y el después.
   comienzo del número.)
 - **Propuestas de licitación.** El flujo que exige una cotización del cotizador actual no se usa: la contención no
   tiene ese bloqueo.
+- **Ciclo de vida.** La primera versión del diseño terminaba en «emitida». El CEO preguntó por el ciclo completo y
+  aprobó sumar aceptada, rechazada y vencida con una fecha de vigencia fijada al emitir; enviada y vista después, y
+  ganada o perdida con HubSpot.
