@@ -37,6 +37,7 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 | 13 | Diez días hábiles, hasta dos rondas (el operador rechazó 15 a 20 el 12/10: «demasiado tiempo para un cliente de este tipo») | **Propuesta propia, sin validar por operaciones** |
 | 14 | Rondas, aprobación, IA, derechos | Modelo operativo de servicios creativos y brochure «Agencia Creativa» aprobado, pasados a usted |
 | 15 | Nombres y cargos | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; fotos reales del catálogo del compositor |
+| 15 | «+85 profesionales en toda Latinoamérica» | Cifra del operador (comentario del 12/10), con el tratamiento de la lámina «Expertos multidisciplinarios» canonizada el 10/10; sin fuente en el repo |
 | 16 | Personas en Chile y en México; Teams, Notion y Frame.io | Indicación del operador del 12/10 (pidió quitar «desde Chile» y las horas en común: «nos puede jugar en contra»); herramientas del brochure «Agencia Creativa» |
 | 17 | Caso Sky: +2.000 piezas, 39 campañas, 88 %, −25 % | Lámina aprobada `decision-case` del compositor (`composer/caso.json`, foto `SK1-vuelo-amanecer` del brochure «Agencia Creativa»; se compone como lámina clara de Efeonce, línea growth: el contrato rechaza Brand en claro). El operador rechazó la lámina hecha a mano el 12/10. Autorización de Sky para citarlo fuera, sin verificar |
 

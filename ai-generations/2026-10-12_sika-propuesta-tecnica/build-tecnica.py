@@ -439,7 +439,12 @@ def s_equipo():
         return obj(ph + txt, 820 + i * 195, 226 if hero else 286, 180, hero, f'; height: {480 if hero else 384}px; padding: {"16px 16px 20px" if hero else "14px 14px 18px"}')
     cards = ''.join(card(i, *t) for i, t in enumerate(TEAM))
     return page('Sika · Equipo', halo(1300, 460, 790, 560, 46) + cards +
-                left('El equipo', ['Un equipo', 'estable y', 'un solo', 'interlocutor'], 'Dirección de arte, diseño y contenido trabajan en un mismo equipo. Sika trata con un Responsable de Cuenta, que coordina el trabajo y responde por los plazos.') +
+                left('El equipo', ['Un equipo estable', 'y un solo', 'interlocutor'], 'Dirección de arte, diseño y contenido en un mismo equipo. Sika trata con un Responsable de Cuenta, que coordina el trabajo y responde por los plazos.', 66,
+                     # Cifra de la red, como en la lámina «Expertos multidisciplinarios» canonizada el 2026-10-10: «+85» con el «+» en el acento. La cifra viene del operador.
+                     extra=f'<div style="display: flex; align-items: center; gap: 26px; margin-top: 40px; padding-top: 30px; border-top: 1px solid {RULE}">'
+                           f'<div style="font-family: {ID}; font-size: 168px; font-weight: 760; letter-spacing: -0.05em; line-height: 0.82; white-space: nowrap"><span style="color: {ACC}">+</span>85</div>'
+                           f'<div><div style="font-family: {ID}; font-size: 34px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.08">profesionales en toda Latinoamérica</div>'
+                           f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 10px">La red de Efeonce detrás de su equipo.</div></div></div>') +
                 means('Sika sabe quién trabaja en su campaña y con qué función.',
                       'Equipo de Efeonce Creative Studio. La dedicación de cada persona se define con el calendario de lanzamientos.'), section=3)
 
