@@ -67,7 +67,7 @@ de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo 
 2. Equipo con nombre (lámina 15): revierte el criterio del borrador anterior («sin capacidad nominada»); lo pidió el operador el 12/10.
 3. Caso SKY (lámina 17): autorización de SKY para citar las cifras en una licitación.
 4. Reel base con locución y música incluidas; rodaje, talento y voz exclusiva, aparte (lámina 11): depende de la económica.
-5. Impresión, instalación y pauta fuera del servicio (lámina 12).
+5. (Retirado el 12/10: el operador pidió quitar la tarjeta «Fuera del servicio» de la lámina de piezas adicionales.)
 6. «Personas en Chile y en México» (lámina 16): lo indicó el operador; el repo no dice quiénes están en México. Herramientas con nombre.
 7. «El manual y la pieza madre quedan a disposición de Sika» (lámina 18): revisar contra la cláusula de derechos.
 8. Logo de Sika en la portada y miniaturas de su material (lámina 4): uso de marca de terceros (TASK-1937).

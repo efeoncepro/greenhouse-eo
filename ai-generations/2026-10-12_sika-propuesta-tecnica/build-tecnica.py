@@ -414,7 +414,7 @@ add('reel', 'Reel', s_reel)
 def s_adicionales():
     a = obj(okicker('Piezas adicionales') + otitle('Se piden por pieza', 30) + f'<div style="margin-top: 16px">{bullets(["Carruseles", "Stopper y otros materiales de punto de venta", "Banners y formatos para medios", "Historias y videos para otras redes"])}</div>', 820, 236, 300, True, '; height: 480px')
     b = obj(okicker('Impresos') + otitle('Artes finales listos para imprenta', 26) + otext('En las medidas que Sika indique. Las muestras del concurso usan medidas estándar.'), 1150, 300, 300, False, '; height: 350px')
-    c = obj(okicker('Fuera del servicio') + f'<div style="margin-top: 14px">{bullets(["Impresión, producción e instalación de materiales", "Pauta y compra de medios"], False)}</div>', 1480, 300, 300, False, '; height: 350px')
+    c = obj(okicker('Con el mismo método') + otitle('La misma pieza madre', 26) + otext('Cada pieza adicional sale del Master Graphic del lanzamiento y pasa por las mismas dos aprobaciones de Sika.'), 1480, 300, 300, False, '; height: 350px')
     return page('Sika · Piezas adicionales', halo(1300, 480, 760, 560, 46) + a + b + c +
                 left('La producción · Piezas adicionales', ['Lo adicional', 'se pide por', 'pieza'], 'Sika indicó que las piezas fuera del lanzamiento tipo son opcionales. Se solicitan por pieza, salen de la misma pieza madre y se valoran en la oferta económica.') +
                 means('El lanzamiento tipo tiene un alcance cerrado. Lo demás se decide caso a caso.',
