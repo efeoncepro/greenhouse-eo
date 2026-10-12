@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce · **Product brand habilitadora:** Reach, cuando aporte método o tooling
 > **Estado:** `Proposed` — la solución sigue `Approved for validation` en el catálogo de la línea; esta ficha propone su
 > estructura V1 y no autoriza precios públicos, claims ni venta general
-> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
+> **Fecha:** 2026-09-10 · **Última actualización:** 2026-10-12 (composición integral y operación DSP acompañada en evaluación; tarifas sin cambio) · 2026-10-10 (paid social en el deck «Marketing de Contenidos»; estado sin cambio) · 2026-10-09 (programmatic: Basis y Real Audiences seleccionados) · **Revisión:** después de cada piloto pagado y, como mínimo, trimestral
 > **Decisión:** [`EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1`](../../architecture/EFEONCE_PERFORMANCE_COMMERCE_DISTRIBUTION_DECISION_V1.md)
 > **Pricing:** [`Pricing Integrity Pack V1`](../../business-models/media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md)
 > **Catálogo de la línea:** [`Media & Distribution`](README.md)
@@ -44,7 +44,7 @@ de asignación para el siguiente ciclo.
 | 2 | **Growth Activation Sprint** | señal remediada, cuentas reestructuradas o tomadas, primera matriz creativa, línea base | 8–12 semanas, precio fijo | `Proposed` |
 | 3 | **Managed Performance** | operación mensual de los canales del motion, testing, reporting y gobierno trimestral | mensual por nivel, mínimo 3 meses | `Proposed` |
 | 4 | **Incrementality & Media Investment Architecture** | experimentos y MMM para una pregunta de asignación | por estudio | `Proposed`, sólo con madurez |
-| 5 | **Programmatic vía partner DSP** (Basis y Real Audiences seleccionados) | display, video, audio, pDOOH y push dentro del mix | campaña o mensual, managed inicialmente; autogestión con gate | servicio/tarifa/cobro aprobados 2026-10-09; activación por caso |
+| 5 | **Programmatic con DSP habilitante** (Basis y Real Audiences seleccionados) | display, native, video, CTV, audio y pDOOH; push selectivo | campaña o mensual; managed externo o directa acompañada en evaluación; autonomía con gate | servicio/tarifa/cobro aprobados 2026-10-09; composición integral 12-10; activación por caso |
 | 6 | **ChatGPT Ads** | campañas donde OpenAI lo habilita (MX, BR, EE.UU., España…) | canal selectivo dentro de 3 | `Proposed` |
 | 7 | **Preparación para anuncios en IA** | intents, landings y medición listos para cuando ChatGPT Ads llegue a Chile | dentro de 1 o con Search Visibility 360 | `Proposed` |
 | 8 | **Staff Augmentation** | perfil de performance dirigido por el cliente | tarifa de rol del catálogo | vigente en catálogo |
@@ -166,9 +166,11 @@ según canal; controles auditables de brand safety, fraude y MFA; derechos de ac
 información del cliente explícitos. En pDOOH, proof of play y método de audiencia. No confundir reporte disponible
 con garantía de métricas causales o de datos personales portables.
 
-**Operación recomendada:** primeras campañas managed con Efeonce definiendo y auditando; autogestión sólo después
-de dos campañas auditadas en ese proveedor, capacitación/trader con backup, permisos, soporte y economics del seat
-validados. Un seat del proveedor no equivale automáticamente a una cuenta propiedad del cliente.
+**Operación por ruta:** managed externo con Efeonce definiendo/auditando como inicio recomendado; operación directa
+acompañada por el proveedor como alternativa a evaluar desde el 12-10. Antes de operación directa, formación,
+trader/backup, permisos, soporte, RACI y economía/caja comprobados; antes de autonomía, dos campañas managed o
+acompañadas auditadas en ese proveedor. No hay habilitación por asistir a la demo. Un seat del proveedor no equivale
+automáticamente a una cuenta propiedad del cliente. Canon: modelo programático §12.3.
 
 ### Lo que Real Audiences declaró por escrito — 2026-09-19
 
@@ -229,6 +231,20 @@ tres modos de operación, incluido managed (p. 27). Presencia no es inventario c
 entidad, soporte y derechos siguen pendientes; brand lift/footfall se presentan vía partners (p. 24).
 
 Fuentes, páginas y condiciones en el [ledger fechado](../../audits/commercial/PROGRAMMATIC_PROVIDER_EVIDENCE_2026-10-09.md).
+
+### Estado vigente — 2026-10-12: composición integral y ruta acompañada
+
+La reunión Basis se realizó y se leyó completa su transcripción HubSpot. Se registró demo con el equipo para
+21-10 18:00–19:00 Chile, entrenamiento/acompañamiento declarados y evaluación de acceso directo; fees y crédito
+siguen sin oferta aprobada. Los porcentajes utilizados son ejemplos. El snapshot 09-10 anterior es histórico;
+[evidencia vigente](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
+
+Programmatic consolida la [oferta integral de medios Efeonce](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+con estrategia, operación, creatividad, medición y gestión de inversión. Esta composición no aprueba automáticamente
+las otras lanes ni convierte los canales en productos. Costear alcance y fee conjunto, sólo incremental a un retainer
+existente, y mantener owners Creative/Wave/RevOps. La ruta directa acompañada requiere RACI y
+[habilitación operativa](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#123-evolución-de-la-operación);
+no presume trading gratuito, autonomía ni licencia del cliente. Tarifario programático sin cambio.
 Otras alternativas sólo se reabren si ambos no pueden cumplir el brief o los términos; estado vigente en el
 [Partnership Registry](../../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).
 

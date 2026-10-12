@@ -128,3 +128,11 @@ el que muestra V3 y no se propone conectar payroll); los factores de país (tale
 CEO como valores de política confirmados desde el 2026-10-12, no como estimaciones pendientes. Preview es simulación y readiness no autoriza precio. V3 local no reemplaza canonical
 quote lifecycle ni integración API/UI/MCP; el [handoff de promoción](../../../docs/documentation/finance/cotizador-v3-promocion-canonica.md)
 conserva esos gates. No presentar los ejemplos o propuestas de margen como oferta aprobada.
+
+## Oferta integral de medios y programmatic
+
+Para esta composición, cargar el [modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md). Efeonce integra cinco
+frentes de responsabilidad dentro de las tres soluciones existentes. Programmatic tiene servicio/tarifa/cobro
+aprobados; operación DSP directa acompañada se evalúa con RACI, formación, backup y economía por caso. El portfolio
+amplio conserva sus estados; cuenta integral requiere fee conjunto y alcance incremental, sin duplicar tareas.

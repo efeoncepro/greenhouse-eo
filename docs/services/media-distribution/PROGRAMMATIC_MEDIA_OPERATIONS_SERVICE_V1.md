@@ -1,7 +1,7 @@
 # Publicidad programática — ficha comercial V1
 
 > **Estado:** `Commercially approved` por el operador el 2026-10-09 — servicio, tarifario base y condiciones estándar
-> **Revisión:** 2026-10-09 — modelo V1.4; aprobación comercial, valores y cobro
+> **Revisión:** 2026-10-12 — modelo V1.5; composición integral y operación directa acompañada en evaluación; valores/cobro sin cambio
 > **Habilitación operativa:** acuerdos externos, costo real, capacidad y autorización de compra por campaña
 > **Línea / solución:** Media & Distribution / Performance & Commerce Distribution
 > **Responsable frente al cliente:** Efeonce
@@ -12,7 +12,12 @@
 
 Planificación y operación de campañas para llegar a audiencias en medios digitales y pantallas relevantes para su
 objetivo, con control de inversión, calidad de inventario y lectura de resultados junto al resto del mix.
-Efeonce define el plan, coordina al proveedor, supervisa entrega y presupuesto y propone la siguiente decisión.
+Efeonce define el plan, opera o coordina la ejecución habilitada, supervisa entrega y presupuesto y propone la siguiente decisión.
+
+Puede contratarse como campaña/operación propia o incorporarse a la
+[oferta integral de medios](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios):
+estrategia, compra/operación, creatividad, medición y gestión de inversión bajo una responsabilidad Efeonce. Search,
+social y programmatic se articulan por objetivo; producción, señal y CRM mantienen alcance y responsables definidos.
 
 **Texto recomendado para presentar el servicio:**
 
@@ -68,6 +73,11 @@ Parámetros comerciales: margen mínimo/objetivo 45%/55% sobre honorarios; marku
 automático 0%; comisión cero en el caso base; propuesta válida 15 días corridos o vigencia externa/FX más corta.
 Estos son estándares aprobados de Efeonce que cada SOW formaliza; no acreditan aceptación de terceros.
 
+El tarifario es base comercial, con costo/margen y aceptación por comprobar en cada alcance. En una cuenta integral
+se costea la gestión conjunta y se cobra sólo capacidad adicional a lo ya contratado; no se suman fees completos
+por canal ni se repiten planificación, setup, coordinación o reportes. Ver
+[calibración y composición](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral).
+
 ## Incluye
 
 - Brief y plan de campaña: objetivo primario, mercados, formatos, audiencias/contextos, flight y KPI.
@@ -98,8 +108,11 @@ desviaciones y decisión de continuidad documentadas. KPI de éxito y tratamient
 
 ## Responsabilidades y términos de propuesta
 
-Cliente: presupuesto, objetivo, aprobador, datos y derechos/materiales; Efeonce: plan, coordinación, QA y rendición
-de cuentas; proveedor: trading/entrega/reportes conforme a contrato. Creatividad, medición y CRM conservan sus owners.
+Cliente: presupuesto, objetivo, aprobador, datos y derechos/materiales; Efeonce: plan, operación/coordinación, QA y
+rendición de cuentas. En managed externo, el proveedor realiza trading según contrato; en operación directa
+acompañada, el equipo Efeonce opera y el proveedor aporta tecnología/formación/soporte acordados. Esta segunda ruta
+está en evaluación, sujeta al [gate operativo](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#123-evolución-de-la-operación).
+Creatividad, medición y CRM conservan sus owners. La oferta del cliente sigue siendo gestionada por Efeonce.
 
 Cada propuesta identifica campaña, scope, presupuesto de medios, fee Efeonce, costos externos, impuestos,
 moneda/FX, vigencia, fechas, aprobación de gasto, pagos, cancelación, remanentes, acceso/datos y propiedad/exportación.

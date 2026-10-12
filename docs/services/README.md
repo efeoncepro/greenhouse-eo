@@ -76,6 +76,8 @@ modelo `Approved for validation`, sin precio público ni capacidad runtime nueva
   paid media con dos motions (Demand & Commerce · B2B Pipeline), canales como cobertura y programmatic vía partner.
   [Publicidad programática](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md): servicio, tarifa base y
   cobro `Commercially approved` el 2026-10-09; Basis + Real Audiences seleccionados, habilitación externa por campaña.
+  Dirección 12-10: [oferta integral de medios](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios);
+  programa de operación DSP acompañada a evaluar, tarifa sin cambio y fee incremental en cuenta ya contratada.
 - [Channel & Commerce](channel-commerce/README.md) — trade marketing y BTL: 23 servicios en dos familias
   (13 trade + 9 BTL + 1 transversal) con `Managed Channel Operations` como modalidad que opera todos. Estado
   `Proposed`, mercado inicial Chile. ADR: [`EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1`](../architecture/EFEONCE_CHANNEL_COMMERCE_LINE_DECISION_V1.md).

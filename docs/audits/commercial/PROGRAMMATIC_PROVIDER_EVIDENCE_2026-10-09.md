@@ -4,6 +4,10 @@
 > **Corte:** 2026-10-09 · **Estado:** selección de ambos aceptada por el operador; contratación/activación pendientes
 > **Uso:** fuente interna; declaraciones comerciales no equivalen a términos contratados o evidencia de performance
 
+> **Snapshot histórico del 09-10.** La reunión Basis del 12-10 ya se realizó; su transcripción completa, demo
+> registrada, operación acompañada a evaluar y dirección de oferta integral viven en la
+> [evidencia 2026-10-12](BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md). Este archivo conserva el corte anterior.
+
 ## 1. Decisión humana
 
 En esta conversación el operador instruye documentar que Efeonce ofrecerá el servicio a sus clientes y decide:

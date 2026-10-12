@@ -58,8 +58,15 @@ Complementa con **consent management** (Consent Mode v2) y **modeled/aggregated*
 | **LinkedIn Ads** | B2B, ABM, targeting por cargo/empresa | caro; usar con contenido de valor + ABM (`07`) |
 | **TikTok Ads** | awareness/alcance, audiencias jóvenes, video nativo | creative-first; estética nativa |
 | **YouTube / CTV** | awareness con video, storytelling | reach + frequency de brand |
-| **Programmatic / display** | awareness, retargeting, alcance barato | cuidado con placements/brand safety |
+| **Programmatic** | distribución digital, video/CTV, audio y pDOOH según objetivo e inventario | costo, calidad, permisos y método por caso; no presumir alcance barato |
 | **Retail media / otros** | según vertical | evaluar por audiencia + economía |
+
+### 5.1 Operación programática en la oferta integral Efeonce
+
+Cargar [método y contratos](../references/programmatic-media-operations.md): mix por objetivo, managed externo o
+DSP operado por el equipo con acompañamiento, RACI/formación/backup, costos propios y externos, fee incremental
+en cuenta integral y medición por unidad. Display/native/video/CTV/audio/pDOOH/in-game son coberturas condicionadas,
+no paquetes de plataforma ni inventario garantizado. Efeonce mantiene la responsabilidad frente al cliente.
 
 ## 6. Creatividad = la palanca de performance (ver `05`)
 

@@ -1,6 +1,6 @@
 # Cómo ofrecer y preparar una campaña programática
 
-> **Fecha:** 2026-10-09 · **Owner:** Commercial + Media & Distribution
+> **Fecha:** 2026-10-12 · **Owner:** Commercial + Media & Distribution
 > **Modelo canónico:** [publicidad programática](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md)
 > **Alcance:** preparación comercial y handoff; no implementa una integración DSP en Greenhouse
 > **Estado comercial:** servicio, valores base y condiciones estándar aprobados por el operador el 2026-10-09
@@ -11,6 +11,12 @@ En la cartera actual, identificar lanzamiento, expansión territorial, cobertura
 fragmentados. Presentar el servicio con la marca Efeonce y hablar del objetivo del cliente, sin nombrar los
 proveedores tecnológicos en el pitch o la propuesta comercial estándar. Utilizar la
 [ficha comercial](../../services/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md) y su texto de presentación.
+
+En una oportunidad integral, partir por el problema de inversión/mix de la cuenta y componer estrategia,
+compra/operación, creatividad, medición y gestión bajo Efeonce. Usar el
+[modelo de línea §1.1](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+Registrar search/social/programmatic y otras coberturas pertinentes con sus owners, accesos y estados; no vender
+una lista de formatos o asumir que todos los canales están habilitados. Mantener fee y externos separados.
 
 Registrar objetivo, audiencia/contexto, territorio, calendario, inversión disponible, mix actual, materiales,
 señal de medición, operador y aprobador. Confirmar qué decisión debe resolver el piloto y con qué evidencia.
@@ -30,6 +36,12 @@ Para Real Audiences: aclarar base y liquidación del 10% hasta diciembre; obtene
 también en primera campaña. Para Basis: definir modalidad, costos/mínimos y negociar la caja; su deck ya muestra
 mercados regionales, preguntar disponibilidad específica, no si LATAM aparece en la presentación.
 
+La [reunión Basis 12-10 y demo 21-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) añaden una
+evaluación de acceso directo con entrenamiento/acompañamiento. En la demo, comprobar inventario útil —pantallas Chile
+incluidas—, reporte, permisos y quién configura/optimiza/pausa. Solicitar por escrito tarifa y base, mínimos,
+compromisos, costos de tecnología/datos/trading, soporte/formación incluidos, titularidad/exportación y línea de
+crédito con vencimientos y anticipo. Los ejemplos 6–10% no son oferta. La demo no autoriza contratar ni enviar briefs.
+
 ## 3. Elegir la ejecución y costear
 
 Aplicar elegibilidad → inventario/calidad → medición → costo total → operación/soporte. Documentar proveedor elegido
@@ -40,6 +52,12 @@ Costear el trabajo propio y el costo externo con el
 [Pricing Integrity Pack](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md).
 Revisar fee incremental si ya hay retainer. Finance valida margen, impuestos y exposición de caja; Legal valida
 SOW, datos y contrato. No utilizar el rebate futuro para rescatar un fee insuficiente.
+
+Comparar managed externo y operación directa acompañada con el mismo brief/RACI: registrar costo externo y
+dedicación propia, incluida formación, QA, backup y análisis. Un menor cargo externo no demuestra menor costo total.
+Antes de operar directamente aplicar el [gate §12.3](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#123-evolución-de-la-operación).
+Para la cuenta integral, preparar matriz de tareas ya cubiertas, incrementales y externas; costear fee conjunto
+sin sumar tarifas completas por canal. Usar el [pack §2.3](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral).
 
 Aplicar los mínimos registrados del pack §1.1: USD 750 por diseño; USD 1.500 por campaña de hasta 30 días;
 mensual focal/ampliada/regional USD 1.500 / 2.500 / 4.000, con medios USD 5.000 / 10.000 / 20.000 por período.

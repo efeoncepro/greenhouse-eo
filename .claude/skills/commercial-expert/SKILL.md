@@ -291,3 +291,12 @@ Ad-hoc deal reviews / MEDDPICC cards / forecasts: discutir vía conversation, no
 V1.0 prioriza los 5 archivos arriba. V1.1 agrega los 2 que faltan según necesidad.
 
 **Nota (2026-07-13):** el antiguo pendiente `hubspot-portal-operations.md` quedó **resuelto fuera de este overlay**: el negocio HubSpot (vender/implementar/retener como Solutions Partner) vive ahora en la skill **`hubspot-solutions-partner`**, y la operación técnica del portal en `hubspot-ops`.
+
+## Ofrecer medios de forma integral
+
+Cargar el [manual programático](../../../docs/manual-de-uso/comercial/ofrecer-publicidad-programatica.md) y el
+[método compartido](../digital-marketing/references/programmatic-media-operations.md). Partir del problema de
+mix/inversión y presentar una responsabilidad Efeonce con alcance, owners, honorarios y externos claros. Proveedores
+permanecen en el expediente interno. Una demo, entrenamiento declarado o ejemplo de fee no prueba licencia,
+crédito, ahorro ni capacidad activa. Mapear retainer y cotizar sólo alcance incremental; no duplicar planificación,
+setup, coordinación o reportes ni sumar fees completos por canal. Preservar la aprobación acotada del servicio.

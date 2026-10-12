@@ -198,3 +198,13 @@ acordó el operador o los fijan las bases); el documento lleva la fecha de la co
 PDF se entrega como borrador mientras el operador no apruebe el precio: no es `quotation_id`, precio aprobado ni
 cotización emitida. Opciones, incrementos, cortesías, hitos con su impuesto y lo que queda como texto de
 condiciones: [sección 6 del procedimiento](references/cotizador-v3-agent-workflow.md#6-el-documento-para-el-cliente).
+
+## Programmatic dentro de la oferta integral de medios
+
+Cargar el [pack programático vigente](../../../docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md). Su tarifario está aprobado;
+costo/margen y aceptación por caso siguen por comprobar. Comparar cargos externos con dedicación propia en managed
+externo y operación DSP acompañada. Porcentajes ilustrativos no son oferta. En cuenta integral costear gestión
+conjunta, tareas ya cubiertas/incrementales/externas y no sumar fees completos por canal; excepciones del operador.
+Conservar medios separados al costo, setup único y diferencia entre fórmula de piso 45% y objetivo 55% del pack.
+No trasladar automáticamente recargos o markups genéricos de un simulador a esta política aprobada.

@@ -94,6 +94,11 @@ Al 2026-09-10 la solución tenía cinco huecos:
    markup no declarado. Un seat en otro DSP sólo se evalúa si Real Audiences no cubre una necesidad —CTV o ABM B2B— con
    volumen que lo justifique. MiQ y TenX quedan como alternativas.
 
+   **Estado vigente 2026-10-12:** la reunión Basis añade la ruta de equipo Efeonce operando con entrenamiento y
+   acompañamiento, todavía por habilitar. El gate admite campañas auditadas managed o acompañadas antes de autonomía;
+   no exige que toda ruta futura sea managed externo. Los puntos 6–8 de la [decisión dual](EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md)
+   gobiernan composición integral, RACI y economía. El párrafo anterior conserva la decisión histórica, no proveedor único vigente.
+
 7. **Los partnerships de plataforma habilitan la ejecución; no son el diferencial.** Se persiguen cuando existe volumen
    gestionado y owner que cumpla los requisitos de cada programa. Ningún badge se comunica antes de verificarlo en el
    portal del programa. Estado y requisitos viven en el [Partnership Registry](../operations/EFEONCE_PARTNERSHIP_REGISTRY_V1.md).

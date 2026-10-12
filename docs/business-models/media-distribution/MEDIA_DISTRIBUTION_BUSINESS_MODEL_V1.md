@@ -6,7 +6,7 @@
 > **Date:** 2026-07-26
 > **Validated as of:** 2026-07-26
 > **Review cadence:** después de cada piloto pagado y, como mínimo, trimestral
-> **Último delta:** 2026-10-10 — incorporaciones del deck «Marketing de Contenidos» y decisiones abiertas `DA-01`…`DA-15` (§10); el estado no cambia
+> **Última actualización:** 2026-10-12 — dirección de oferta integral de medios y operación programática acompañada; conserva estados y decisiones abiertas del deck 10-10 (§10)
 > **Related service:** [`Media & Distribution — catálogo de servicios`](../../services/media-distribution/README.md)
 > **Related architecture:** [`Efeonce Portfolio, Brand and Business Line Architecture V1`](../../architecture/EFEONCE_PORTFOLIO_BRAND_BUSINESS_LINE_ARCHITECTURE_V1.md)
 
@@ -33,6 +33,40 @@ El modelo no está aprobado para venta general. `Approved for validation` permit
 validan demanda, cost-to-serve, rights management, proveedores, pricing, evidencia y repetibilidad.
 La [oferta programática](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) tiene aprobación comercial acotada
 del operador el 2026-10-09 para servicio, tarifario y cobro; no promueve automáticamente el resto de esta línea.
+
+### 1.1 Oferta integral como agencia de medios
+
+El operador confirma el 2026-10-12 que programmatic ayuda a consolidar la **oferta integral de Efeonce como agencia
+de medios**. El cliente puede contratar una responsabilidad integrada para conectar objetivos, audiencias,
+creatividad, inversión y decisiones. Se compone con las tres soluciones existentes; no añade una cuarta oferta,
+una nueva marca o una aprobación general de todas las capacidades del catálogo.
+
+| Frente de responsabilidad | Qué compra el cliente | Owner / composición |
+|---|---|---|
+| Estrategia y planificación | Objetivo, audiencias, mercados, mix, presupuesto, calendario y método de medición | Media & Distribution / Distribution Strategy |
+| Compra y operación | Activación, pacing, optimización y control de inventario en canales pertinentes y habilitados | Media / Performance & Commerce; proveedores especializados según RACI |
+| Creatividad para medios | Mensajes y adaptaciones por entorno; pruebas y aprendizaje de piezas | Creative Services produce; Media define requisitos y lee la respuesta |
+| Medición y optimización | Entrega, calidad, respuesta y conversiones; decisiones según método y señal disponible | Media interpreta; Wave instrumenta; RevOps gobierna CRM; estudios por alcance |
+| Gestión de inversión | Coordinación, presupuesto, costos, conciliación y recomendación de asignación | Media + Commercial + Finance; un responsable frente al cliente |
+
+Search, social y programmatic se articulan según objetivo. Display, native, video, CTV, audio y pDOOH amplían
+opciones donde inventario, creatividad y medición lo permiten; su disponibilidad no nace de esta dirección.
+Creadores, earned, retail media y alianzas se componen cuando el caso los necesita. Una operación integrada no
+deduplica automáticamente personas ni conversiones y no garantiza ventas, ROAS ni impacto incremental.
+
+**Presentación recomendada:** «En Efeonce conectamos estrategia, creatividad y medios para planificar, ejecutar y
+optimizar la inversión publicitaria de tu marca, con una gestión integrada y transparente».
+
+La reunión [Basis 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) añade evidencia para
+evaluar operación del DSP por el equipo Efeonce con formación y acompañamiento. Sigue pendiente acceso, términos,
+crédito y capacidad; los dos proveedores seleccionados se comparan por caso. Ver el
+[submodelo programático §12.3](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md#123-evolución-de-la-operación).
+
+**Economía de la cuenta integral:** definir un alcance/RACI y costear la gestión conjunta; separar honorarios de
+medios y externos. Si hay retainer, identificar cobertura y cobrar sólo capacidad incremental, evitando duplicar
+planificación, coordinación, setup y reporting. El tarifario programático aprobado rige su servicio standalone;
+no constituye precio universal de la agencia integral ni suma automática de fees por canal. Las demás bandas y
+capacidades conservan sus estados, con excepciones decididas por el operador y costo/margen declarados.
 
 ## 2. Problema, ICP, buyer y JTBD
 

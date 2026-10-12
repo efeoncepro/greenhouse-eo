@@ -259,6 +259,8 @@ Todo business model debe separar al menos estas dimensiones:
   habilitadora. No autoriza pricing público ni venta general.
   Delta 2026-10-10: incorpora lo que trae el deck «Marketing de Contenidos» en creadores, UGC y paid social; estado
   sin cambio; decisiones abiertas `DA-01`…`DA-15` en su §10.
+  Dirección 12-10: [oferta integral como agencia de medios](media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios),
+  con cinco frentes de responsabilidad compuestos, sin nueva solución ni promoción general de estados.
 - [Performance & Commerce Pricing Integrity Pack V1](media-distribution/PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md) —
   `hypothesis_only`; fee mensual por tres niveles de complejidad con piso de 45%, Diagnostic y Sprint de precio fijo,
   híbrido porcentual sólo como alternativa con piso, programmatic sin markup y regla de no doble cobro. Decisión:
@@ -266,6 +268,8 @@ Todo business model debe separar al menos estas dimensiones:
 - [Publicidad programática — Business Model V1](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) —
   `Commercially approved` por el operador 2026-10-09 para servicio, tarifario base y condiciones estándar.
   Fee propio, setup y medios separados; dos proveedores seleccionados, habilitación externa por campaña.
+  V1.5 (12-10): reunión leída, ruta directa acompañada en evaluación y composición integral; tarifario sin cambio,
+  calibración de costo/margen y no doble cobro en cuenta integral. [Evidencia](../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
   [Pricing Integrity Pack](media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md) y
   [guía comercial](../manual-de-uso/comercial/ofrecer-publicidad-programatica.md).
 - [Creator Influence & Content Business Model V1](media-distribution/CREATOR_INFLUENCE_CONTENT_BUSINESS_MODEL_V1.md) —

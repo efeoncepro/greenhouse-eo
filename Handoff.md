@@ -1,5 +1,14 @@
 # Handoff
 
+## 2026-10-12 — Medios: oferta integral y evaluación DSP acompañada
+
+Programmatic consolida la [oferta integral de medios Efeonce](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+[Modelo V1.5](docs/business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) y pricing V1.4:
+tarifario aprobado sin cambio, gestión conjunta/incremental y gate de operación directa acompañada. Docs y skills
+Codex/Claude sincronizados; alcance documental, sin integración ni publicación. [Reunión Basis leída completa](docs/audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md):
+demo registrada **21-10 18:00–19:00 Chile**; porcentajes ilustrativos, formación/soporte declarados. Pendientes a cargo
+de Julio, Media y Finance/Legal: demo, oferta formal, RACI/capacidad, acceso, inventario Chile y crédito; sin gasto autorizado.
+
 [V3](data/pricing/README.md): local.
 Outlook: [firma + CCO](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](Handoff.archive.md).

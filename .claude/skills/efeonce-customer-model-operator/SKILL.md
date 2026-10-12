@@ -102,3 +102,12 @@ Las tareas permiten seleccionar recursos (SEO→SEMrush, diseño→Adobe, IA por
 El agente interpreta demanda; pricing calcula. Tools del cliente exigen evidencia de acceso y vigencia; no
 asumirlas por nombre/partner. Base Notion/M365 sigue del equipo. Simulación, capacity declared y preview redactado
 no prueban roster real, presupuesto, aprobación comercial o contrato; conservar gaps/owner y validación del caso.
+
+## Cuenta integral de medios
+
+Cargar el [método compartido](../digital-marketing/references/programmatic-media-operations.md) y el
+[modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+Calificar objetivo, mix, inversión, acceso a señal, alcance ya contratado, operador del cliente y buying group.
+Separar adopción del cliente de formación del equipo Efeonce que opera el DSP. Una reunión de proveedor y pedidos
+regionales declarados no prueban compra, presupuesto ni demanda pagada. Integrar expansión con capacidad incremental
+costeada; conservar decisión de mix, aceptación, renovación y aprendizaje como evidencia del cliente.

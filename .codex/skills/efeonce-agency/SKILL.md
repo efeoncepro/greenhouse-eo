@@ -291,3 +291,12 @@ El copy es producto: un microcopy genérico rompe la marca tanto como un bug rom
 ---
 
 *Fuente: `docs/context/` (00–14), context pack de Efeonce Group v5.3 / GTM 2026 / Product Ecosystem v1.0. Propiedad intelectual de Efeonce Group SpA — uso interno. Esta skill es un índice destilado; ante conflicto manda el doc canónico y, sobre runtime, el contrato técnico verificado.*
+
+## Composición integral como agencia de medios
+
+Efeonce articula planificación, compra/operación, creatividad, medición y gestión de inversión dentro de Media &
+Distribution. Programmatic amplía el mix; proveedores no sustituyen la marca ni el criterio de la agencia. Esta
+composición no reclasifica a Efeonce, crea una cuarta solución ni aprueba todo el catálogo. Cargar el
+[modelo de línea §1.1](../../../docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios)
+y el [método compartido](../digital-marketing/references/programmatic-media-operations.md) para pitch, alcance,
+rutas de operación y fee incremental. Precios programáticos conservan su aprobación y requieren costeo por caso.

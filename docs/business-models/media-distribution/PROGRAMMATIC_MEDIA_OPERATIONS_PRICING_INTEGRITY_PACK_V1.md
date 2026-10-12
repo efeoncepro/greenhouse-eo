@@ -1,7 +1,7 @@
-# Publicidad programática — Pricing Integrity Pack V1.3
+# Publicidad programática — Pricing Integrity Pack V1.4
 
 > **Estado:** `commercially_approved` — tarifario base y condiciones estándar aprobados por el operador
-> **Fecha / revisión:** V1.3 · 2026-10-09; aprobación comercial explícita del servicio y establecimiento de valores
+> **Fecha / revisión:** V1.4 · 2026-10-12; calibración, operación directa acompañada y composición integral; tarifario aprobado 09-10 sin cambio
 > **Alcance:** política comercial Efeonce; costos/margen observados, acuerdos externos y compra se comprueban por oportunidad
 > **Owner:** Media & Distribution + Commercial + Finance
 > **Modelo:** [Programmatic Media Operations](PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md)
@@ -136,6 +136,38 @@ una mensualidad bajo piso, ni llenar las horas/costos desconocidos con estos pre
 Separar pass-through de rentabilidad del servicio; no asumir tratamiento contable bruto/neto desde esta fórmula.
 La propuesta muestra precio neto, impuestos aplicables y total por separado; Finance define jurisdicción y tributos.
 Si convierte moneda, congelar par, tasa, fecha, fuente y vigencia. No reutilizar FX histórico del otro pack.
+
+### 2.3 Calibración del tarifario y composición integral
+
+Los mínimos están aprobados para comercializar el servicio completo; no están comprobados como costo de servir,
+aceptación de mercado o margen realizado. Evaluar el peso total de honorarios y cargos externos sobre el presupuesto:
+
+| Nivel standalone | Fee propio USD | Medios mínimos USD | Fee / medios, sólo diagnóstico | Primer período: setup + fee / medios |
+|---|---:|---:|---:|---:|
+| Focal | 1.500 | 5.000 | 30% | 40% |
+| Ampliado | 2.500 | 10.000 | 25% | 32,5% |
+| Regional | 4.000 | 20.000 | 20% | 25% |
+
+La relación es aritmética, no porcentaje de cobro ni benchmark chileno. El nivel focal requiere especial revisión
+de valor y dedicación: el fee remunera estrategia, controles, decisiones y operación propias; transmitir instrucciones
+y reenviar reportes de terceros no demuestra por sí solo ese alcance. Setup básico incluye configuración/coordinación
+y QA; desarrollos de medición, feeds o integraciones se costean aparte. Evitar pagar o cobrar dos veces el mismo trabajo.
+
+La [reunión del 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) propone acceso directo con
+acompañamiento. Menor intermediación externa puede reducir costos externos; operación interna, entrenamiento y
+backup pueden aumentar costo propio. Comparar ambas rutas con la misma campaña y responsabilidades; no presumir
+un ahorro ni usar los porcentajes ilustrativos del proveedor como tarifa aceptada. El tarifario sigue vigente.
+
+Para una cuenta integral de medios, preparar matriz `ya contratado / incremental / externo`, responsables y fee
+de gestión conjunta. No acumular automáticamente fees completos de search, social y programmatic ni repetir
+setup, planificación, QA o reporting cubiertos por otro alcance. El mínimo standalone no es un recargo obligatorio
+a un retainer; una excepción al piso se documenta y la decide el operador con costeo y margen explícitos.
+Producción creativa, implementación de señal y CRM conservan sus owners, alcance y costos.
+
+La fórmula de piso `C / 0,55` alcanza **45% de margen**; para el objetivo de **55%**, el precio deseado es
+`C / 0,45`, ambos contrastados con el mínimo comercial y redondeados hacia arriba. No presentar el objetivo como
+resultado de aplicar la fórmula de piso. Costear cada componente y medir después de servirlo; no compensar operación
+bajo piso con setup, mayor gasto de medios o rebate. Revisión tras dos campañas pagadas o 90 días conserva vigencia.
 
 ## 3. Estructura de una propuesta
 

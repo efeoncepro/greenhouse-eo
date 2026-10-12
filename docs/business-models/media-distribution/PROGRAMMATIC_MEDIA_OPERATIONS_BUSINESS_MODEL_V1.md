@@ -1,6 +1,6 @@
 # Publicidad programática de Efeonce — modelo de negocio completo
 
-> **Versión:** V1.4 · 2026-10-09 · servicio, tarifario base y condiciones estándar aprobados
+> **Versión:** V1.5 · 2026-10-12 · composición integral de medios y evaluación de operación directa acompañada; tarifario aprobado sin cambio
 > **Estado:** `Commercially approved` — aprobación del operador para la oferta, valores base y política de cobro
 > **Alcance de aprobación:** venta del servicio Efeonce; contratación externa, costo real, capacidad y autorización de compra se verifican por campaña
 > **Audiencia:** documento interno de trabajo; la presentación comercial utiliza únicamente la marca Efeonce
@@ -36,6 +36,13 @@ del servicio. La aprobación sustituye el estado previo de validación de la ofe
 clientes contratados ni condiciones aceptadas por terceros. Commercial puede preparar y vender alcances dentro
 de esta política, con habilitación operativa de cada campaña antes de comprar medios.
 
+**Dirección 2026-10-12:** programmatic contribuye a consolidar la oferta integral de Efeonce como agencia de medios.
+Conecta planificación, compra/operación, creatividad, medición y gestión de inversión dentro del
+[modelo de la línea](MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
+La reunión de proveedor añade una ruta a evaluar: equipo Efeonce operando el DSP con entrenamiento y acompañamiento.
+La [evidencia del 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) registra la reunión,
+demo y condiciones pendientes; no acredita acceso, precio externo, crédito ni campañas activas.
+
 ## 2. Qué problema resolvemos y por qué nos contratarían
 
 | Problema del cliente | Capacidad que aportamos | Evidencia del valor |
@@ -65,7 +72,7 @@ no de retener su información o hacer inexplicable la operación.
 | Capacidad | Planificación y operación programática |
 | Oferta al cliente | Publicidad programática de Efeonce, con alcance por objetivo |
 | Forma de contratación | On-Demand por campaña o On-Going mensual |
-| Forma de delivery inicial | Efeonce gestiona el servicio; el trading se ejecuta con capacidad externa contratada |
+| Forma de delivery | Efeonce gestiona el servicio; ejecución externa managed como inicio recomendado o operación directa acompañada sujeta a habilitación de §12.3 |
 | Proyecto/campaña | Brief, presupuesto, mercados, formatos y período de ejecución; no sustituye el contrato |
 | Entregables | Plan, activación aprobada, controles, reportes, conciliación y siguiente decisión |
 | Madurez inicial | Servicio estructurado con método y evidencias; aún sin repetibilidad comercial demostrada |
@@ -424,6 +431,13 @@ permanencia de tres meses, compra automática o intereses nuevos por este modelo
 Los hitos remuneran trabajo y entregables aceptados; el cobro no queda condicionado a una garantía de ventas o ROAS.
 Un retainer existente cubre lo ya contratado: presentar sólo el alcance incremental, sin duplicar gestión, setup o creatividad.
 
+**Composición integral:** cuando programmatic se incorpora a una cuenta de medios, elaborar un alcance y fee
+coherentes para la gestión conjunta. Mapear lo ya contratado, el trabajo adicional y los owners; no sumar
+automáticamente el fee programático completo al retainer ni cobrar otra vez planificación, coordinación o reporte.
+El piso standalone conserva su vigencia; una excepción de composición lleva costeo, margen y decisión del operador.
+Medios y cargos externos permanecen identificables. Los ejemplos porcentuales de un proveedor no cambian los
+valores aprobados ni acreditan ahorro; calibración en el [pack §2.3](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral).
+
 ### 10.5 Economía de una campaña y de la continuidad
 
 Ejemplos **USD netos**, con comisión cero, sin extensiones ni costos externos adicionales. Si existe un costo externo
@@ -522,9 +536,18 @@ y proteger otras cuentas. La ejecución requiere backup; nadie queda supuesto co
 
 ### 12.3 Evolución de la operación
 
-Inicio recomendado: operación externa managed con Efeonce definiendo, coordinando y auditando. La autogestión
-es una decisión posterior de capacidad interna: dos campañas auditadas en esa ruta, formación específica, trader
-con backup, permisos, soporte y economía del seat comprobados. No es una oferta de self-service al cliente por defecto.
+| Ruta interna de ejecución | Responsabilidades | Estado |
+|---|---|---|
+| Externa managed | Proveedor realiza trading/configuración según contrato; Efeonce define, coordina, audita y responde al cliente | Inicio recomendado, sujeto a homologación y habilitación por campaña |
+| Directa acompañada | Equipo Efeonce opera el DSP; proveedor aporta tecnología, entrenamiento y guía/soporte acordados | Ruta a evaluar desde la reunión del 12-10; sin licencia, trader ni crédito habilitados por esa reunión |
+| Autónoma | Equipo Efeonce opera con capacidad interna y respaldo propios, dentro de permisos y soporte contratados | Decisión posterior; no activada |
+
+La dirección de avanzar y ver la demo con el equipo permite preparar la evaluación. No sustituye el gate de
+operación directa: formación específica, trader con backup, permisos, soporte, costos de acceso y economía/caja
+comprobados; dos campañas auditadas en esa ruta con ejecución managed o acompañada antes de autonomía. El soporte
+de formación no es trading incluido por defecto ni prueba de certificación. El RACI identifica quién configura,
+optimiza, pausa, controla calidad y concilia, por proveedor/campaña. La oferta al cliente sigue siendo gestionada
+por Efeonce; quién opera el DSP internamente no la convierte en self-service ni en licencia vendida al cliente.
 
 ## 13. Uso de las dos rutas y selección de inventario
 
@@ -578,6 +601,10 @@ El interés de un cliente en pantallas no justifica agregar CTV, audio o datos d
 
 Ruta comercial: necesidad identificada → evaluación de encaje → brief → propuesta de alcance/costos → decisión y
 contratación → activación. Registrar objeciones, disposición a pagar y esfuerzo real para mejorar el modelo.
+
+Cuando la necesidad sea una operación integral, partir del mix/inversión de la cuenta y presentar la composición
+de la línea, con un alcance y responsables conjuntos. Programmatic amplía esa operación; el fee adicional se costea
+contra cobertura existente e incremento real, no por añadir el nombre de un canal.
 
 ### 15.2 Presentación recomendada
 
@@ -641,10 +668,12 @@ seguridad absoluta, presencia física regional ni acceso a todo publisher desde 
 
 ## 18. Validación y plan de habilitación
 
-| Paso | Evidencia necesaria | Estado al 2026-10-09 |
+| Paso | Evidencia necesaria | Estado documental al 2026-10-12 |
 |---|---|---|
 | Dirección y marca | Decisión de ofrecer el servicio y no nombrar proveedores en el pitch | Aceptada por el operador |
 | Servicio, tarifa y cobro | Instrucción directa del operador; §8.1 y §10 | Comercialmente aprobados; preparación y venta habilitadas |
+| Composición integral | Dirección del operador y modelo de línea §1.1 | Adoptada documentalmente; no promueve todo el portfolio |
+| Evaluación DSP acompañada | Demo con equipo, RACI, formación/backup y condiciones escritas | Reunión leída y demo registrada para 21-10; acceso/capacidad pendientes |
 | Homologación de cada ruta | Contrato, transparencia, costos, soporte, crédito y datos | Pendiente |
 | Demanda | Dos oportunidades de clientes actuales con problema, presupuesto y proceso de compra | Por validar; no clientes comprometidos en este modelo |
 | Primeras campañas | Dos campañas pagadas/auditadas en total; validar ambas rutas cuando exista encaje | Pendiente; no forzar compras sólo para probar proveedores |
@@ -652,7 +681,8 @@ seguridad absoluta, presencia física regional ni acceso a todo publisher desde 
 | Adopción | Operador usa el plan y la evidencia para decidir; tiempo/capacidad medidos | Pendiente |
 | Escala | Ejecución repetible, backup, continuidad y condiciones sanas | Sin evidencia aún |
 
-**Pendientes concretos:** Commercial / Julio cerrar condiciones externas; Media definir brief/checklist y capacidad;
+**Pendientes concretos:** Commercial / Julio y equipo Media evaluar la demo y obtener condiciones externas escritas;
+Media definir RACI, formación/backup, brief/checklist y capacidad;
 Finance costear y resolver crédito/caja; Legal validar contrato/datos; Commercial calificar oportunidades con los
 responsables de cuenta. Designar personas de delivery cuando exista el primer alcance; no inventar capacidad asignada.
 
@@ -661,10 +691,14 @@ si no existe disposición a pagar, el esfuerzo supera el fee, la calidad/reporti
 
 ## 19. Decisiones tomadas y decisiones todavía abiertas
 
-**Tomadas y aprobadas:** servicio de publicidad programática; una marca Efeonce frente al cliente; dos rutas de
-ejecución internas; ubicación en Media & Distribution; tarifario base de §8.1; setup único, fee fijo y externos al
+**Tomadas y aprobadas:** servicio de publicidad programática; una marca Efeonce frente al cliente; dos proveedores
+habilitantes seleccionados; ubicación en Media & Distribution; tarifario base de §8.1; setup único, fee fijo y externos al
 costo; facturación por hitos/períodos y vencimientos de §10.4; piso/objetivo de margen 45%/55%; parámetros de §10.6.
 El documento de trabajo y aprobación sigue siendo Markdown.
+
+**Dirección adoptada 12-10:** composición integral como agencia de medios; evaluar ejecución DSP directa acompañada,
+con RACI/capacidad y economía por caso, conservando el tarifario y los estados del portfolio. Reunión y demo no son
+licencia, crédito, contratación ni autonomía. La calibración de costos y aceptación sigue abierta.
 
 **Recomendaciones del modelo:** comenzar por clientes actuales; vender campaña acotada y continuidad mensual;
 fee por alcance/complejidad separado de medios; operación managed inicial; extensiones cotizadas; margen sin rebate.
@@ -679,6 +713,7 @@ No se interpreta la selección de ambos proveedores como aceptación de sus cond
 
 - [Decisión de dirección y abastecimiento](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
 - [Evidencia interna de proveedores, correos y deck al 2026-10-09](../../audits/commercial/PROGRAMMATIC_PROVIDER_EVIDENCE_2026-10-09.md).
+- [Reunión Basis, transcripción HubSpot y composición integral al 2026-10-12](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
 - [Modelo de la línea](MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md) y [pricing Performance](PERFORMANCE_COMMERCE_PRICING_INTEGRITY_PACK_V1.md).
 - [Modelo transversal de proveedores](../EFEONCE_PARTNER_PROVIDER_LAYER_OPERATING_MODEL_V1.md).
 - [Ficha comercial](../../services/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md).

@@ -342,3 +342,11 @@ objetivo de conversión y evento). Medido planificando CMP-001, 2026-09-22.
   vende; (b) que ofrezca **una acción de mayor compromiso que la etapa anterior**. Si ofrece dos de etapas
   distintas y cierra con la de arriba del embudo, muchas veces no falta la acción: **falta dirigir a ella**, y se
   resuelve nombrándola en el CTA del anuncio, sin tocar la página.
+
+## Programmatic y operación integral de medios Efeonce
+
+Para diseñar o evaluar esta cobertura, cargar [programmatic-media-operations](references/programmatic-media-operations.md)
+junto a `modules/03_PAID_MEDIA.md`. La oferta integra planificación, compra/operación, creatividad, medición y gestión
+con owners de práctica. Managed externo, directa acompañada y autonomía son rutas internas distintas; formación,
+backup, RACI y habilitación preceden operación. Inventario, precios externos y resultados se verifican por caso.
+No convertir el alcance del servicio en canales runtime de Studio ni en permiso para conectar o activar cuentas.

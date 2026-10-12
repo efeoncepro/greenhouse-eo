@@ -135,9 +135,17 @@ escala: 12% hasta USD 30 mil · 9% sobre el tramo 30–100 mil · 6% sobre el ex
   aprobado. **Basis:** deck y modalidades recibidos; costos, mínimos, entidad y crédito por negociar.
 - **Rebates/comisiones:** no reemplazan el fee ni sostienen el margen base. Se trasladan al cliente o se declaran
   como remuneración Efeonce en propuesta/contrato; nunca retención oculta. Finance valida liquidación y tributos.
-- **Autogestión:** gate por proveedor, con dos campañas managed auditadas, capacitación específica, trader con backup,
+- **Autogestión:** gate por proveedor, con dos campañas managed o acompañadas auditadas, capacitación específica, trader con backup,
   permisos, soporte y costo de seat comprobados. La restricción histórica de otro DSP sólo por carencias de Real
   Audiences queda reemplazada por la [decisión dual](../../architecture/EFEONCE_PROGRAMMATIC_DUAL_PROVIDER_DECISION_V1.md).
+
+- **Actualización 12-10:** reunión y demo registradas; operación directa Efeonce con formación/soporte como ruta a
+  evaluar, no capacidad activa. Porcentajes ilustrativos no son tarifas ni acreditan ahorro. Ver
+  [evidencia](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md).
+- **Cuenta integral de medios:** costear alcance y gestión conjunta, sin sumar fees completos de canales ni repetir
+  tareas cubiertas por retainer. El [pack programático §2.3](PROGRAMMATIC_MEDIA_OPERATIONS_PRICING_INTEGRITY_PACK_V1.md#23-calibración-del-tarifario-y-composición-integral)
+  mantiene tarifa aprobada y distingue piso de margen, objetivo, costos externos y trabajo incremental; estas bandas
+  de Performance conservan `hypothesis_only`.
 
 ### 7.1 Canales emergentes y bajo pedido
 

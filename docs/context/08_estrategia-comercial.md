@@ -162,3 +162,11 @@ Lo que el corpus comercial declara que Greenhouse necesita tener operativo (= tu
 ---
 
 *Fuente: Estrategia Comercial Efeonce Q2–Q3 2026 v1.3. Documentos relacionados: Sistema Comercial Pipeline Core, Anatomía Core Pipeline v1.1, Arquitectura Bow-tie v1.1, BDR Prospecting Playbook 2026. Última verificación de drift contra runtime: 2026-06-09 (TASK-1064).*
+
+## Composición integral de medios
+
+Desde la dirección del operador del 12-10, programmatic fortalece la oferta integral como agencia de medios de
+Efeonce. En expansión de cuenta, calificar el problema de mix/inversión y presentar alcance y responsabilidad
+conjuntos; fee adicional sólo por capacidad incremental a lo contratado, con medios/externos separados. Formación
+y acceso DSP acompañados se evalúan sin inferir licencia, crédito ni autonomía. Canon de composición y estados:
+[modelo de Media & Distribution §1.1](../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).

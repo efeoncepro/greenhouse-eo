@@ -7,6 +7,16 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-12 — Medios: composición integral y operación programática acompañada
+
+- [Modelo de línea §1.1](docs/business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios):
+  estrategia, compra/operación, creatividad, medición y gestión de inversión bajo Efeonce; taxonomía/estados conservados.
+- Modelo programático V1.5 y pricing V1.4: ruta DSP directa acompañada en evaluación, RACI/gate, calibración y fee
+  incremental en cuenta integral; tarifa aprobada sin cambio, medios/externos separados y sin doble cobro.
+- [Evidencia HubSpot 12-10](docs/audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md): transcripción completa,
+  demo 21-10 registrada; ejemplos de fees no son cotización ni crédito. Catálogos, ADR/índices, manual/contexto y
+  skills Codex/Claude sincronizados. Sólo documentación: sin contrato, compra, integración, envío o publicación.
+
 ## 2026-10-12 — Insights: el informe SEO puede medir sólo el contenido que Efeonce trabaja
 
 - Nuevo en `greenhouse_growth`: `seo_content_scope_versions`, el alcance de contenido de una organización (reglas de
@@ -513,7 +523,3 @@ CMP-004 pasa de cuatro conceptos a un ad por servicio de Creative Services (S01�
 ## 2026-10-02 — Registro cine: siete decisiones del operador, segunda prueba ciega y barra de luz recalibrada (TASK-1926)
 
 El operador aceptó siete decisiones (aros de Nexa dorados, destacado «Agents» intacto, escala vertical por encuadre, mirada al panel en la sección partida, vestuario por persona real o por rol, luces prácticas como bokeh frío en cine, una sección partida por deck vía el validador del plan); `foto:prompt` aplica en cine las tres de toma. Segunda prueba ciega: tres sesiones nuevas llegaron solas usando `cine-reviewer`. Un experimento de luz mostró que las fotos aprobadas también llevan luz suave de frente: la barra del revisor quedó calibrada contra el plate de la receta. Además: hoodie royal en cine, restos documentales fuera, `__revisar` en `foto:cine:nueva` y revisor más barato. Demás registros sin cambio.
-
-## 2026-10-02 — El registro cine se opera sin consultor (TASK-1926, delta b)
-
-Ninguna sesión llegaba sola a una foto cine aprobable. La ficha cine gana cinco campos propios (`llave`, `primerPlano`, `fondo`, `fenomeno`, `alcance`) que `foto:prompt` compila y avisa cuando faltan; `pnpm foto:cine:nueva` parte de una de las diez fotos aprobadas (`scripts/foto/cine-recetas.json`) y `foto:generar` no gasta con la escena de la receta; `pnpm foto:validar:cine` mide sombra y reserva vertical (calibrado: stickers, relleno y azul rey bajo luz azul no se separan en píxeles y los revisa el agente `cine-reviewer`); casebook, manual y punteros en canon, regla y skills. Los demás registros no cambian: `scripts/foto/regresion-prompt.mjs` compara todas las fichas en disco (0 no cine cambiadas). AXIS: sección «Registro cine» en el banco fotográfico (commit local).

@@ -35,3 +35,12 @@ sin convertir método en autorización de envío, enrollment, cambios DNS o paus
 
 No cargar recursivamente ambos entrypoints: cada owner conserva su fase. Una oportunidad/etapa o una
 invocación comercial no autoriza precio, contrato, consumo pagado, CRM ni envío adicionales al pedido.
+
+## Ofrecer medios de forma integral
+
+Cargar el [manual programático](../../../docs/manual-de-uso/comercial/ofrecer-publicidad-programatica.md) y el
+[método compartido](../digital-marketing/references/programmatic-media-operations.md). Partir del problema de
+mix/inversión y presentar una responsabilidad Efeonce con alcance, owners, honorarios y externos claros. Proveedores
+permanecen en el expediente interno. Una demo, entrenamiento declarado o ejemplo de fee no prueba licencia,
+crédito, ahorro ni capacidad activa. Mapear retainer y cotizar sólo alcance incremental; no duplicar planificación,
+setup, coordinación o reportes ni sumar fees completos por canal. Preservar la aprobación acotada del servicio.

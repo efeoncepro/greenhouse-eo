@@ -4,7 +4,7 @@
 > **Marca contractual:** Efeonce
 > **Product brand habilitadora:** Reach, cuando aporte tecnología, método o diferenciación
 > **Estado:** `Approved for validation`
-> **Última actualización:** 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social) · 2026-10-09 (programmatic: Basis + Real Audiences, submodelo y guía)
+> **Última actualización:** 2026-10-12 (oferta integral de medios; reunión y ruta DSP acompañada) · 2026-10-10 (deck «Marketing de Contenidos»: creadores, UGC y paid social)
 
 ## Propósito
 
@@ -30,6 +30,12 @@ No se vende simplemente “compra de medios”. La propuesta debe explicar el pr
 el mix elegido, el mecanismo de optimización, los derechos y la forma en que se medirá el impacto.
 
 ## Arquitectura comercial
+
+**Dirección de composición 2026-10-12:** Efeonce consolida su oferta integral como agencia de medios conectando
+estrategia/planificación, compra/operación, creatividad, medición y gestión de inversión. Programmatic amplía el mix
+con formatos habilitados por caso y permite evaluar mayor control de compra. Estos frentes componen las soluciones
+existentes; no crean una cuarta oferta ni cambian los estados del catálogo. Canon de valor, owners y economía:
+[modelo de la línea §1.1](../../business-models/media-distribution/MEDIA_DISTRIBUTION_BUSINESS_MODEL_V1.md#11-oferta-integral-como-agencia-de-medios).
 
 Las siete familias del brochure son capacidades internas. Para evitar una oferta dispersa, Efeonce las presenta
 comercialmente mediante tres soluciones y una capa de operación:
@@ -99,6 +105,12 @@ Es capacidad dentro de Performance & Commerce, con campaña acotada u operación
 coordinación y accountability. Fee propio y medios/costos externos separados, sin depender de rebates.
 Honorarios USD netos: diseño 750; campaña/mensual focal 1.500; mensual ampliada 2.500 y regional 4.000; setup
 500 / 750 / 1.000 si aplica. Activación por caso; términos, crédito y costos de proveedores siguen pendientes.
+
+La [reunión del 12-10](../../audits/commercial/BASIS_DISCOVERY_AND_MEDIA_OFFER_2026-10-12.md) añade la evaluación de
+operación directa por el equipo Efeonce con formación/acompañamiento; managed externo permanece disponible como
+ruta inicial sujeta a habilitación. No hay acceso ni crédito otorgados por la reunión. En cuenta integral, costear
+gestión conjunta y cobrar sólo capacidad incremental a lo ya contratado; tarifas y márgenes aún requieren costeo
+por alcance. No sumar fees completos por canal ni convertir ejemplos de fees externos en precios aprobados.
 
 [Ficha comercial](PROGRAMMATIC_MEDIA_OPERATIONS_SERVICE_V1.md) ·
 [Modelo de negocio](../../business-models/media-distribution/PROGRAMMATIC_MEDIA_OPERATIONS_BUSINESS_MODEL_V1.md) ·
