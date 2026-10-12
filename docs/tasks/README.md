@@ -1,5 +1,6 @@
 # Task Index
 
+- `TASK-2033` — [Efeonce Insights: alcance de contenido por organización](to-do/TASK-2033-efeonce-insights-content-scope-measurement.md), to-do; `EPIC-045`.
 - `TASK-2032` — [Product reference prices computed by Pricing V3](to-do/TASK-2032-product-reference-prices-from-pricing-v3.md), to-do; `EPIC-053`.
 - `TASK-2031` — [Quoter V3 product identity: SKU binding, composite services and line versus custom items](to-do/TASK-2031-quoter-v3-product-identity.md), to-do; `EPIC-053`.
 - `TASK-2030` — [Quoter V3 MCP tools and gateway federation](to-do/TASK-2030-quoter-v3-mcp-tools.md), to-do; `EPIC-053`.
