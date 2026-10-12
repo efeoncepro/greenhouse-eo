@@ -388,12 +388,32 @@ const isDriverFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith
 /** TASK-1962 — clics por bloque de 7 días: su propia figura de línea, no hallazgos sueltos ni filas de la tabla general. */
 const isWeeklyFact = (fact: EvidenceFactV1): boolean => fact.metricId.startsWith('clicks_week.')
 
+const isFullWeek = (fact: EvidenceFactV1): boolean => {
+  const from = fact.dimension?.from
+  const to = fact.dimension?.to
+
+  return Boolean(from && to) && Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) >= 7
+}
+
+const weeklyBlocksOf = (facts: EvidenceFactV1[]): EvidenceFactV1[] =>
+  facts.filter(isWeeklyFact).sort((a, b) => Number(a.dimension?.block ?? 0) - Number(b.dimension?.block ?? 0))
+
 /**
  * TASK-1962 — evolución semanal de clics (familia `line`, con página PDF de tendencia): este período contra el mismo
  * bloque del anterior. Sólo con ≥ 3 bloques medidos y todos con su par; si falta uno, una sola serie.
+ *
+ * TASK-2033 — la línea dibuja SÓLO semanas completas. El último bloque del mes tiene 2 o 3 días, y su total al lado
+ * del de una semana entera se veía como caída (Berel, septiembre de 2026: 62 clics en 2 días junto a 210 en 7, cuando
+ * por día no había bajado) mientras el titular decía «subieron». El bloque corto no se dibuja; la lectura dice cuál
+ * quedó fuera (`weeklyReading`).
  */
 const weeklyLineChart = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId: Map<string, EvidenceFactV1>): ChartSpecV1 | null => {
-  const blocks = facts.filter(isWeeklyFact).sort((a, b) => Number(a.dimension?.block ?? 0) - Number(b.dimension?.block ?? 0))
+  const measured = weeklyBlocksOf(facts)
+
+  // Un bloque sin medir invalida la serie entera (como antes); después se dibujan sólo los completos.
+  if (measured.some(fact => fact.value === null)) return null
+
+  const blocks = measured.filter(isFullWeek)
 
   if (blocks.length < LINE_MIN_POINTS || blocks.some(fact => fact.value === null) || !canProduceFamily('line', moduleKey)) return null
 
@@ -423,19 +443,15 @@ const weeklyLineChart = (moduleKey: InsightModule, facts: EvidenceFactV1[], byId
   }
 }
 
-const isFullWeek = (fact: EvidenceFactV1): boolean => {
-  const from = fact.dimension?.from
-  const to = fact.dimension?.to
-
-  return Boolean(from && to) && Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000) >= 7
-}
-
-/** TASK-1962 — lectura propia de la línea semanal (la genérica nombraba la semana como sujeto: «1–7 sept: de…»). */
-const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string): PlanFigureReadingV1 | null => {
+/**
+ * TASK-1962 — lectura propia de la línea semanal (la genérica nombraba la semana como sujeto: «1–7 sept: de…»).
+ * TASK-2033 — `outside`: los bloques que la figura no dibuja por no completar una semana; la lectura los nombra.
+ */
+const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, locale: string, outside: EvidenceFactV1[] = []): PlanFigureReadingV1 | null => {
   const [current, previous] = chart.series.map(series => series.factIds.map(id => byId.get(id)!))
   // Los extremos de la lectura son bloques COMPLETOS de 7 días: el último bloque del mes puede ser de 2 o 3 días, y
   // compararlo con una semana entera se leía como caída («de 3.717 (1–7 sept) a 552 (29–30 sept)», Berel 2026-10-02).
-  // La figura sigue mostrando el bloque corto con su etiqueta; sólo la frase lo deja fuera.
+  // Desde TASK-2033 la figura tampoco lo dibuja; la lectura dice cuál quedó fuera.
   const fullIndexes = (current ?? []).map((fact, index) => (isFullWeek(fact) ? index : -1)).filter(index => index >= 0)
   const firstIndex = fullIndexes[0]
   const lastIndex = fullIndexes.at(-1)
@@ -453,7 +469,12 @@ const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
   const conclusion = `${GH_INSIGHTS.figures.weeklyLead} ${verb} ${R.from} ${n(first)} (${first.label}) ${R.lineTo} ${n(last)} (${last.label}).`
   const before = previous?.[firstIndex]
   const after = previous?.[lastIndex]
-  const meaning = before && after && before.value !== null && after.value !== null ? `${GH_INSIGHTS.figures.weeklyPrevious} ${n(before)} (${before.label}) ${R.lineTo} ${n(after)} (${after.label}).` : null
+  const previousText = before && after && before.value !== null && after.value !== null ? `${GH_INSIGHTS.figures.weeklyPrevious} ${n(before)} (${before.label}) ${R.lineTo} ${n(after)} (${after.label}).` : null
+  // El bloque corto se nombra por su etiqueta («29–30 sept»): es identidad del hecho citado, no una cifra nueva.
+  const outsideText = outside.length > 0 ? GH_INSIGHTS.figures.weeklyOutside(outside.map(fact => fact.label).join(', ')) : null
+  const meaningFacts = [...(previousText ? [before!.factId, after!.factId] : []), ...outside.map(fact => fact.factId)]
+  // Primero las dos frases; si no caben juntas, la del período anterior sola (como antes) o la del bloque fuera.
+  const meaning = [[previousText, outsideText].filter(Boolean).join(' '), previousText, outsideText].find((text): text is string => Boolean(text) && text!.length <= PLAN_TEXT_LIMITS.meaning) ?? null
 
   if (conclusion.length > PLAN_TEXT_LIMITS.conclusion) return null
 
@@ -461,7 +482,7 @@ const weeklyReading = (chart: ChartSpecV1, byId: Map<string, EvidenceFactV1>, lo
     chartId: chart.chartId,
     keyFigure: { factId: last.factId, value: n(last), caption: { claimId: `caption.${chart.chartId}`, text: last.label, factIds: [last.factId] } },
     conclusion: { claimId: `conclusion.${chart.chartId}`, text: conclusion, factIds: [first.factId, last.factId] },
-    ...(meaning && meaning.length <= PLAN_TEXT_LIMITS.meaning ? { meaning: { claimId: `meaning.${chart.chartId}`, text: meaning, factIds: [before!.factId, after!.factId] } } : {}),
+    ...(meaning ? { meaning: { claimId: `meaning.${chart.chartId}`, text: meaning, factIds: meaning === previousText ? [before!.factId, after!.factId] : meaning === outsideText ? outside.map(fact => fact.factId) : meaningFacts } } : {}),
     nextStep: null
   }
 }
@@ -962,7 +983,7 @@ export const buildDeterministicPlan = (snapshot: EvidenceSnapshotContentV1, inpu
         ...(drivers?.tables ?? [])
       ],
       limits: limitsFor(rejections),
-      ...(editorialV2 ? { opening: openingFor(moduleKey, contentScope), readings: [...statReadings, ...withDriverReadings(readingsFor(ordered, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(ordered, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale) : null))])] } : {})
+      ...(editorialV2 ? { opening: openingFor(moduleKey, contentScope), readings: [...statReadings, ...withDriverReadings(readingsFor(ordered, byId, input.locale), [...(drivers?.readings ?? []), ...(moduleKey === 'aeo' ? aeoReadings(ordered, claims, byId, input.locale) : []), ...((reading => (reading ? [reading] : []))(weekly ? weeklyReading(weekly, byId, input.locale, weeklyBlocksOf(moduleFacts).filter(fact => !isFullWeek(fact))) : null))])] } : {})
     })
   }
 

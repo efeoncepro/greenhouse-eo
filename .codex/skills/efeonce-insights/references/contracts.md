@@ -627,6 +627,13 @@ de metas).
 (`…/tramo`); si tampoco cabe, por el comienzo y los últimos 12 caracteres del tramo con la elipsis a la vista
 (`…/como-elegir-la-pintura-co…clima-humedo`). `uniquePageLabels` distingue dos nombres abreviados iguales (` ·2`).
 
+**Línea semanal de clics (cambia para toda organización).** `chart.seo.line.clicks-week` dibuja SÓLO bloques
+completos de 7 días. El último bloque del mes tiene 2 o 3 días y su total junto al de una semana entera se veía como
+caída mientras el titular decía «subieron» (Berel, septiembre de 2026: 62 clics en 2 días al lado de 210 en 7). El
+bloque corto no se dibuja ni entra al equivalente tabular; la lectura lo nombra en «Lo que significa» («Fuera de la
+figura: 29–30 sept, que no completa una semana.») citando su hecho, que sigue en el snapshot y en el total del mes.
+Con menos de tres semanas completas no hay línea.
+
 **Textos de GA4.** «Visitas orgánicas» (antes «Visitas orgánicas al sitio»), «Visitas desde buscadores» y «Visitas
 orgánicas, con y sin interacción»: valen con y sin alcance. Cambian para toda organización.
 

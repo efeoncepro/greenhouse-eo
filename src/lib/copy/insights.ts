@@ -305,7 +305,9 @@ export const GH_INSIGHTS = {
     currentTotal: 'Este período',
     weeklyTitle: 'Clics orgánicos por semana',
     weeklyLead: 'Los clics por semana',
-    weeklyPrevious: 'En el período anterior, de'
+    weeklyPrevious: 'En el período anterior, de',
+    /** TASK-2033 — el bloque del mes que no completa una semana y por eso la línea no dibuja («29–30 sept»). */
+    weeklyOutside: (labels: string) => `Fuera de la figura: ${labels}, que no completa una semana.`
   },
 
   /**

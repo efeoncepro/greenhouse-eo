@@ -627,12 +627,14 @@ describe('TASK-1962 — más familias con evidencia: cascada de consultas y lín
     const plan = v2(snapshot, ['seo'])
     const line = plan.chapters[0]!.charts.find(chart => chart.chartId === 'chart.seo.line.clicks-week')!
 
-    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept', '29–30 sept'] })
+    // TASK-2033 — sólo semanas completas: el bloque «29–30 sept» (2 días) no se dibuja; la lectura lo nombra.
+    expect(line).toMatchObject({ family: 'line', relation: 'trend', dimensionLabels: ['1–7 sept', '8–14 sept', '15–21 sept', '22–28 sept'] })
+    expect(line.series.every(series => series.factIds.length === 4)).toBe(true)
     expect(line.series.map(series => series.label)).toEqual(['Período', 'Período anterior'])
     expect(plan.chapters[0]!.claims.some(claim => claim.factIds.some(id => id.includes('clicks_week')))).toBe(false)
     expect(plan.chapters[0]!.readings!.find(reading => reading.chartId === 'chart.seo.line.clicks-week')).toMatchObject({
       conclusion: { text: 'Los clics por semana subieron de 2.310 (1–7 sept) a 2.340 (22–28 sept).' },
-      meaning: { text: 'En el período anterior, de 2.610 (1–7 ago) a 2.640 (22–28 ago).' }
+      meaning: { text: 'En el período anterior, de 2.610 (1–7 ago) a 2.640 (22–28 ago). Fuera de la figura: 29–30 sept, que no completa una semana.' }
     })
     expect(validateEditorialPlan(plan, snapshot)).toEqual([])
   })
