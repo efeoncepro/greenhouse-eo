@@ -71,6 +71,22 @@ $$;
 
 -- Down Migration
 
+-- Guarda: con una cotización real registrada esta bajada no corre. Un comentario no protege una tabla de la que nada
+-- se borra; esto sí. El carril local sólo crea cotizaciones sintéticas y sigue pudiendo bajar y subir.
+DO $$
+DECLARE
+  real_quotes bigint := 0;
+BEGIN
+  IF to_regclass('greenhouse_commercial.quoter_quotes') IS NOT NULL THEN
+    EXECUTE 'SELECT count(*) FROM greenhouse_commercial.quoter_quotes WHERE data_origin = ''real''' INTO real_quotes;
+  END IF;
+
+  IF real_quotes > 0 THEN
+    RAISE EXCEPTION 'TASK-2025: hay % cotización(es) real(es) registrada(s); esta migración no se baja. La corrección es una migración nueva hacia adelante.', real_quotes;
+  END IF;
+END
+$$;
+
 -- SÓLO deshacer. El registro no borra: retira. Bajar esto sin revertir antes el catálogo de TypeScript deja la
 -- paridad en rojo en el otro sentido (capacidad en el código, retirada en la base).
 UPDATE greenhouse_core.capabilities_registry

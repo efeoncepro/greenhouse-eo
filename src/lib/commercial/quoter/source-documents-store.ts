@@ -2,7 +2,7 @@ import 'server-only'
 
 import type { CurrentSourceRole } from '@/lib/finance/pricing-v3/adapters/current-versions'
 
-import { canonicalSourceDocument, textDigest } from './canonical-text'
+import { identifySourceDocument, textDigest } from './canonical-text'
 import { runQuoterQuery, toIso } from './db'
 import { QuoterError, withQuoterRejections } from './errors'
 import { publishQuoterSourceDocumentStored } from './events'
@@ -13,8 +13,10 @@ import type { QuoterActor, QuoterCommandContext } from './types'
 /**
  * Catalog, resource policy and credit catalog, stored by role, version and digest (TASK-2025).
  *
- * A document is stored as the text of the value its own contract validates, so the sha256 of what is stored IS the
- * digest a pointer names. Storing never activates: only `pointer-store.ts` adds to the pointer history.
+ * A document is stored as the text that was received, never re-serialized: a quote calculated with it carries it
+ * inside, and only the same bytes give on the platform the artifact the CLI gives from the file. Two digests: the
+ * one of the text, which the database checks, and the one of identity, which its contract defines and a pointer
+ * names. Storing never activates: only `pointer-store.ts` adds to the pointer history.
  *
  * Nothing is ever replaced. A second document under a role and version already held is `source_document_exists`,
  * whether its content is the same or not; whoever needs an idempotent write asks first with `findSourceDocument`.
@@ -24,8 +26,9 @@ export type SourceDocumentOrigin = 'repo_import' | 'artifact_embedded' | 'platfo
 export type StoredSourceDocument = {
   role: CurrentSourceRole
   version: string
+  /** The digest of identity: the one a pointer names this document with. */
   digest: string
-  /** The canonical text, exactly as stored. */
+  /** The document, exactly as it was received and stored. */
   text: string
   schemaVersion: string | null
   parentDigest: string | null
@@ -41,7 +44,8 @@ type Row = {
   role: CurrentSourceRole
   version: string
   document_digest: string
-  canonical_text: string
+  document_text: string
+  document_text_digest: string
   schema_version: string | null
   parent_digest: string | null
   origin: SourceDocumentOrigin
@@ -50,7 +54,7 @@ type Row = {
   stored_at: Date
 }
 
-const COLUMNS = `role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path,
+const COLUMNS = `role, version, document_digest, document_text, document_text_digest, schema_version, parent_digest, origin, source_path,
   source_commit_sha, stored_at`
 
 // What is read is believed only after the sha256 of its text is recomputed: a row whose text no longer gives its
@@ -59,14 +63,14 @@ const COLUMNS = `role, version, document_digest, canonical_text, schema_version,
 // long as an artifact names it. Identity is matched by the columns (role, version, digest), which were derived from
 // the validated value when the row was written.
 const verified = (row: Row): StoredSourceDocument => {
-  if (textDigest(row.canonical_text) !== row.document_digest)
+  if (textDigest(row.document_text) !== row.document_text_digest)
     throw new QuoterError('stored_digest_mismatch', { object: 'source_document', role: row.role, version: row.version })
 
   return {
     role: row.role,
     version: row.version,
     digest: row.document_digest,
-    text: row.canonical_text,
+    text: row.document_text,
     schemaVersion: row.schema_version,
     parentDigest: row.parent_digest,
     origin: row.origin,
@@ -102,7 +106,7 @@ export const findSourceDocument = async (
 
 /** Every document held, newest first within its role. Identity and provenance only: never the text. */
 export const listSourceDocuments = async (client: QuoterDbClient | undefined) => {
-  const rows = await runQuoterQuery<Omit<Row, 'canonical_text'>>(
+  const rows = await runQuoterQuery<Omit<Row, 'document_text' | 'document_text_digest'>>(
     client,
     `SELECT role, version, document_digest, schema_version, parent_digest, origin, source_path, source_commit_sha,
             stored_at
@@ -125,8 +129,8 @@ export const listSourceDocuments = async (client: QuoterDbClient | undefined) =>
 
 export type StoreSourceDocumentInput = {
   role: CurrentSourceRole
-  /** The document as received. It is validated by the contract of its role and stored as its canonical text. */
-  document: unknown
+  /** The document as received, as text. It is validated by the contract of its role and stored as it is. */
+  text: string
   origin: SourceDocumentOrigin
   /** Where the file lives in the repository, and the commit it was read at. Required unless `platform_apply`. */
   sourcePath?: string | null
@@ -145,7 +149,7 @@ export const storeSourceDocument = async (
   client: QuoterDbClient,
   input: StoreSourceDocumentInput
 ): Promise<StoredSourceDocument> => {
-  const canonical = canonicalSourceDocument(input.role, input.document)
+  const canonical = identifySourceDocument(input.role, input.text)
 
   if (input.origin !== 'platform_apply' && !(input.sourcePath && input.sourceCommitSha))
     throw new QuoterError('source_commit_required', { role: input.role, version: canonical.version, origin: input.origin })
@@ -155,16 +159,17 @@ export const storeSourceDocument = async (
       runQuoterQuery<Row>(
         client,
         `INSERT INTO greenhouse_commercial.quoter_source_documents
-           (role, version, document_digest, canonical_text, schema_version, parent_digest, origin, source_path,
-            source_commit_sha, stored_by_actor_kind, stored_by_member_id, stored_by_principal_id, reason,
-            command_execution_id, request_hash)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+           (role, version, document_digest, document_text, document_text_digest, schema_version, parent_digest,
+            origin, source_path, source_commit_sha, stored_by_actor_kind, stored_by_member_id,
+            stored_by_principal_id, reason, command_execution_id, request_hash)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
          RETURNING ${COLUMNS}`,
         [
           input.role,
           canonical.version,
           canonical.digest,
           canonical.text,
+          canonical.textDigest,
           canonical.schemaVersion,
           input.parentDigest ?? null,
           input.origin,

@@ -22,6 +22,8 @@ CREATE SCHEMA greenhouse_commercial AUTHORIZATION greenhouse_ops;
 ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_commercial
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO greenhouse_runtime;
 ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_commercial
+  GRANT ALL ON TABLES TO greenhouse_migrator;
+ALTER DEFAULT PRIVILEGES FOR ROLE greenhouse_ops IN SCHEMA greenhouse_commercial
   GRANT SELECT ON TABLES TO greenhouse_app;
 
 SET ROLE greenhouse_ops;
@@ -92,7 +94,7 @@ CREATE TABLE greenhouse_sync.outbox_events (
   published_at timestamptz
 );
 
-GRANT USAGE ON SCHEMA greenhouse_core, greenhouse_sync, greenhouse_commercial TO greenhouse_runtime;
+GRANT USAGE ON SCHEMA greenhouse_core, greenhouse_sync, greenhouse_commercial TO greenhouse_runtime, greenhouse_migrator;
 GRANT SELECT ON greenhouse_core.organizations, greenhouse_core.capabilities_registry TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE, DELETE ON greenhouse_core.api_platform_command_executions TO greenhouse_runtime;
 GRANT SELECT, INSERT, UPDATE ON greenhouse_sync.outbox_events TO greenhouse_runtime;

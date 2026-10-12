@@ -38,8 +38,12 @@ export type VersionOrigin = 'platform' | 'local'
 
 // ── Locks ────────────────────────────────────────────────────────────────────────────────────────────────────
 
+// One transaction writes ONE quote. A transaction that touched two could cross another one taking them in the
+// opposite order (the lock of each quote, and the row of the number counter) and PostgreSQL would abort one of the
+// two. A batch, if there is ever one, sorts the ids before locking. The lock also refuses any isolation level other
+// than READ COMMITTED (`isolation_not_supported`): under a snapshot, what is read after the lock is stale.
 const lockQuote = (client: QuoterDbClient, quoteId: string) =>
-  runQuoterQuery(client, `SELECT greenhouse_commercial.quoter_lock_quote($1::text)`, [quoteId])
+  withQuoterRejections(() => runQuoterQuery(client, `SELECT greenhouse_commercial.quoter_lock_quote($1::text)`, [quoteId]), { quoteId })
 
 // One calculation is registered by one transaction at a time. Always taken BEFORE the lock of a quote, so two
 // writers of the same calculation over different quotes cannot wait on each other. Two keys: a space of its own.
@@ -77,6 +81,12 @@ export type QuoteCurrent = {
   issuedAt: string | null
   /** Until which day what was issued holds, as `YYYY-MM-DD`. Fixed by each issue. */
   validUntil: string | null
+  /**
+   * The acceptance in force, read against the validity of the issue it answered. Present only while the quote is
+   * `accepted`. Accepting after the validity passed is allowed; that it was late, and by how many days, is read
+   * here. Derived by the database: it is not a stored fact and nothing else computes it.
+   */
+  acceptance: { acceptedAt: string; validUntil: string; afterValidity: boolean; daysAfterValidity: number } | null
 }
 
 type CurrentRow = {
@@ -97,6 +107,10 @@ type CurrentRow = {
   issued_document_digest: string | null
   issued_at: Date | null
   valid_until: string | null
+  accepted_at: Date | null
+  accepted_valid_until: string | null
+  accepted_after_validity: boolean | null
+  accepted_days_after_validity: number | null
 }
 
 export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quoteId: string): Promise<QuoteCurrent | null> => {
@@ -105,7 +119,8 @@ export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quote
     `SELECT quote_id, owner_organization_id, data_origin, created_at, state, effective_state, quote_number,
             client_organization_id, latest_version_number, latest_below_floor, issued_version_number,
             issued_artifact_digest, issued_document_seq, issued_document_digest, issued_at,
-            valid_until::text AS valid_until
+            valid_until::text AS valid_until, accepted_at, accepted_valid_until::text AS accepted_valid_until,
+            accepted_after_validity, accepted_days_after_validity
        FROM greenhouse_commercial.quoter_quote_current
       WHERE quote_id = $1`,
     [quoteId]
@@ -131,7 +146,16 @@ export const readQuoteCurrent = async (client: QuoterDbClient | undefined, quote
     issuedDocumentSeq: row.issued_document_seq,
     issuedDocumentDigest: row.issued_document_digest,
     issuedAt: row.issued_at ? toIso(row.issued_at) : null,
-    validUntil: row.valid_until
+    validUntil: row.valid_until,
+    acceptance:
+      row.accepted_at && row.accepted_valid_until !== null
+        ? {
+            acceptedAt: toIso(row.accepted_at),
+            validUntil: row.accepted_valid_until,
+            afterValidity: row.accepted_after_validity === true,
+            daysAfterValidity: row.accepted_days_after_validity ?? 0
+          }
+        : null
   }
 }
 
@@ -745,9 +769,10 @@ const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/
  *
  * Issuing pins what is issued: the version with its digest and the document in force with its digest, and until
  * which day it holds. It needs a recipient, a document and, when the version is below the floor, an approval in
- * force. Accepting and rejecting name the last thing issued, and an expired quote is not accepted: it is issued
- * again with a new validity (and keeps its number). Every one of those rules is also a rule of the database: whoever
- * reached the table by another way would be refused the same.
+ * force. Accepting and rejecting name the last thing issued. Answering after the validity passed is allowed (CEO,
+ * 2026-10-12): refusing it protected nothing and erased the fact; that an acceptance was late is read from
+ * `QuoteCurrent.acceptance`. Every one of those rules is also a rule of the database: whoever reached the table by
+ * another way would be refused the same.
  *
  * The public number is assigned by the database when a quote is issued for the first time; it comes back here.
  */
@@ -814,10 +839,6 @@ export const recordStateTransition = async (client: QuoterDbClient, input: Recor
 
     if (input.versionNumber !== undefined && input.versionNumber !== current.issuedVersionNumber)
       throw new QuoterError('not_last_issued_version', { quoteId: input.quoteId, issuedVersionNumber: current.issuedVersionNumber })
-
-    // `effectiveState` is the database's reading of the validity date: the rule is not applied again here.
-    if (input.to === 'accepted' && current.effectiveState === QUOTER_EXPIRED)
-      throw new QuoterError('quote_expired', { quoteId: input.quoteId, validUntil: current.validUntil })
 
     object = {
       versionNumber: current.issuedVersionNumber,

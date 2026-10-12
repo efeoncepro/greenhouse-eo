@@ -36,6 +36,7 @@ import {
 import { QUOTER_TRANSITIONS } from '../state-machine'
 
 import { createLocalDatabase, inTransaction, localPgEnabled, rejectionOf } from './local-pg'
+import { readQuoterMigrationDown } from './migration-sql'
 import type { LocalDatabase } from './local-pg'
 import type { QuoterNeed } from '../authz'
 import type { QuoterActor, QuoterDataOrigin } from '../types'
@@ -1040,9 +1041,8 @@ describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as gree
       expect(['accepted', 'revising']).toContain(current.state)
     })
 
-    it('expired is derived from the validity of the last issue, and an expired quote is not accepted', async () => {
-      const toAccept = await issuedQuote('2090-01-01')
-      const toReject = await issuedQuote('2090-01-01')
+    it('expired is derived from the validity of the last issue, in one place, and only for what is still open', async () => {
+      const stillOpen = await issuedQuote('2090-01-01')
       const revising = await issuedQuote('2090-01-01')
       const laterValidity = await issuedQuote('2090-12-31')
       const answered = await issuedQuote('2090-01-01')
@@ -1053,53 +1053,83 @@ describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as gree
       try {
         // The last day of the validity still counts.
         await setToday('2090-01-01')
-        expect((await readQuoteCurrent(runtime, toAccept.quoteId))?.effectiveState).toBe('issued')
+        expect((await readQuoteCurrent(runtime, stillOpen.quoteId))?.effectiveState).toBe('issued')
 
         await setToday('2090-01-02')
 
-        expect(await readQuoteCurrent(runtime, toAccept.quoteId)).toMatchObject({ state: 'issued', effectiveState: 'expired', validUntil: '2090-01-01' })
+        expect(await readQuoteCurrent(runtime, stillOpen.quoteId)).toMatchObject({ state: 'issued', effectiveState: 'expired', validUntil: '2090-01-01' })
         expect(await readQuoteCurrent(runtime, revising.quoteId)).toMatchObject({ state: 'revising', effectiveState: 'expired' })
         expect((await readQuoteCurrent(runtime, laterValidity.quoteId))?.effectiveState).toBe('issued')
-        // What was answered in time stays answered: only an issued or revising quote expires.
+        // What was answered stays answered: only an issued or revising quote expires.
         expect((await readQuoteCurrent(runtime, answered.quoteId))?.effectiveState).toBe('accepted')
 
-        // Accepting it is refused, by the store and by the table.
-        expect(await quoterCode(move(runtime, toAccept.quoteId, 'accepted'))).toBe('quote_expired')
+        // An expired quote is issued again with a new validity, and is open again; a validity already past is refused.
+        await move(runtime, stillOpen.quoteId, 'revising')
+        expect(await quoterCode(move(runtime, stillOpen.quoteId, 'issued', { versionNumber: 1, validUntil: '2090-01-01' }))).toBe('validity_in_the_past')
 
-        const issue = (await transitionsOf(toAccept.quoteId)).find(row => row.to_state === 'issued')!
-        const version = (await readQuoteVersion(runtime, { quoteId: toAccept.quoteId, versionNumber: 1 }))!
-        const document = (await readVersionDocument(runtime, { quoteId: toAccept.quoteId, versionNumber: 1 }))!
+        const again = await move(runtime, stillOpen.quoteId, 'issued', { versionNumber: 1, validUntil: '2090-03-31' })
 
-        const raw = runtime.query(
-          `INSERT INTO ${SCHEMA}.quoter_state_transitions
-             (quote_id, transition_seq, owner_organization_id, from_state, to_state, version_number, artifact_digest,
-              document_seq, document_digest, actor_kind, actor_principal_id, reason, command_execution_id)
-           VALUES ($1, 0, $2, 'issued', 'accepted', $3::int, $4, $5::int, $6, 'agent', 'raw', 'raw acceptance of an expired quote', 'cmd-raw')`,
-          [toAccept.quoteId, OWNER, issue.version_number, version.artifactDigest, issue.document_seq, document.documentDigest]
-        )
-
-        expect(await rejectionOf(raw)).toMatchObject({ code: '23514', constraint: 'quoter_quote_expired' })
-
-        // Rejecting an expired quote is allowed.
-        await move(runtime, toReject.quoteId, 'rejected')
-        expect((await readQuoteCurrent(runtime, toReject.quoteId))?.state).toBe('rejected')
-
-        // To accept it, it is issued again with a new validity: same version, same number.
-        await move(runtime, toAccept.quoteId, 'revising')
-        expect(await quoterCode(move(runtime, toAccept.quoteId, 'issued', { versionNumber: 1, validUntil: '2090-01-01' }))).toBe('validity_in_the_past')
-
-        const again = await move(runtime, toAccept.quoteId, 'issued', { versionNumber: 1, validUntil: '2090-03-31' })
-
-        expect(again.quoteNumber).toBe(toAccept.quoteNumber)
-        expect((await readQuoteCurrent(runtime, toAccept.quoteId))?.effectiveState).toBe('issued')
-        await move(runtime, toAccept.quoteId, 'accepted')
-        expect(await readQuoteCurrent(runtime, toAccept.quoteId)).toMatchObject({ state: 'accepted', quoteNumber: toAccept.quoteNumber, validUntil: '2090-03-31' })
+        expect(again.quoteNumber).toBe(stillOpen.quoteNumber)
+        expect((await readQuoteCurrent(runtime, stillOpen.quoteId))?.effectiveState).toBe('issued')
       } finally {
         await setToday(null)
       }
 
       // With the real clock back, nothing here is expired.
       expect((await readQuoteCurrent(runtime, laterValidity.quoteId))?.effectiveState).toBe('issued')
+    })
+
+    it('an expired quote can be accepted or rejected; that the acceptance was late, and by how many days, stays readable', async () => {
+      const today = (await runtime.query<{ today: string }>(`SELECT ${SCHEMA}.quoter_today()::text AS today`)).rows[0].today
+      const daysSince = (day: string) => Math.round((Date.parse(`${today}T00:00:00Z`) - Date.parse(`${day}T00:00:00Z`)) / 86_400_000)
+
+      // In time, and on the very last day of the validity: neither is late.
+      const inTime = await issuedQuote(VALID_UNTIL)
+      const lastDay = await issuedQuote(today)
+
+      await move(runtime, inTime.quoteId, 'accepted')
+      await move(runtime, lastDay.quoteId, 'accepted')
+
+      expect((await readQuoteCurrent(runtime, inTime.quoteId))?.acceptance).toMatchObject({ validUntil: VALID_UNTIL, afterValidity: false, daysAfterValidity: 0 })
+      expect((await readQuoteCurrent(runtime, lastDay.quoteId))?.acceptance).toMatchObject({ validUntil: today, afterValidity: false, daysAfterValidity: 0 })
+
+      // Two quotes whose validity is long past: "today" is moved back only to issue them.
+      await setToday('2020-01-01')
+
+      let late: Awaited<ReturnType<typeof issuedQuote>>
+      let lateRejected: Awaited<ReturnType<typeof issuedQuote>>
+
+      try {
+        late = await issuedQuote('2020-01-10')
+        lateRejected = await issuedQuote('2020-01-10')
+      } finally {
+        await setToday(null)
+      }
+
+      expect((await readQuoteCurrent(runtime, late.quoteId))?.effectiveState).toBe('expired')
+      expect((await readQuoteCurrent(runtime, late.quoteId))?.acceptance).toBeNull()
+
+      // Accepting it is allowed, by an agent too, and the record says it was late.
+      await move(runtime, late.quoteId, 'accepted', { actor: AGENT })
+
+      expect(await readQuoteCurrent(runtime, late.quoteId)).toMatchObject({
+        state: 'accepted',
+        effectiveState: 'accepted',
+        quoteNumber: late.quoteNumber,
+        acceptance: { validUntil: '2020-01-10', afterValidity: true, daysAfterValidity: daysSince('2020-01-10') }
+      })
+      expect(daysSince('2020-01-10')).toBeGreaterThan(2000)
+
+      await move(runtime, lateRejected.quoteId, 'rejected')
+      expect(await readQuoteCurrent(runtime, lateRejected.quoteId)).toMatchObject({ state: 'rejected', acceptance: null })
+
+      // The reading follows the state: reopened, there is no acceptance in force; issued and accepted again in time,
+      // it is not late any more, and it answers the new issue.
+      await move(runtime, late.quoteId, 'revising')
+      expect((await readQuoteCurrent(runtime, late.quoteId))?.acceptance).toBeNull()
+      await move(runtime, late.quoteId, 'issued', { versionNumber: 1, validUntil: VALID_UNTIL })
+      await move(runtime, late.quoteId, 'accepted')
+      expect((await readQuoteCurrent(runtime, late.quoteId))?.acceptance).toMatchObject({ validUntil: VALID_UNTIL, afterValidity: false, daysAfterValidity: 0 })
     })
 
     it('an agent runs the whole life of a quote: every state, no person, no approval', async () => {
@@ -1205,6 +1235,150 @@ describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as gree
       } finally {
         await runtime.query('RESET TIME ZONE')
       }
+    })
+  })
+
+  describe('what the database holds on its own, whoever connects', () => {
+    let database: LocalDatabase
+    let runtime: Client
+    let ops: Client
+
+    beforeAll(async () => {
+      ;({ database, runtime, ops } = await open())
+    }, TIMEOUT)
+
+    it('these tables are written under READ COMMITTED only: a snapshot would read what is in force before the lock', async () => {
+      const artifact = fresh()
+
+      for (const level of ['REPEATABLE READ', 'SERIALIZABLE']) {
+        await runtime.query(`BEGIN ISOLATION LEVEL ${level}`)
+
+        try {
+          expect(
+            await quoterCode(
+              createQuote(runtime, { ...by(AGENT), ownerOrganizationId: OWNER, dataOrigin: 'synthetic', artifactText: artifact.text, origin: 'local' })
+            ),
+            level
+          ).toBe('isolation_not_supported')
+        } finally {
+          await runtime.query('ROLLBACK')
+        }
+
+        await runtime.query(`BEGIN ISOLATION LEVEL ${level}`)
+
+        try {
+          expect(await rejectionOf(runtime.query(`SELECT ${SCHEMA}.quoter_lock_quote('qtr-anything')`)), level).toMatchObject({
+            code: '23514',
+            constraint: 'quoter_requires_read_committed'
+          })
+        } finally {
+          await runtime.query('ROLLBACK')
+        }
+      }
+
+      // The default level goes through.
+      expect((await create(runtime, artifact, { origin: 'synthetic' })).version.versionNumber).toBe(1)
+    })
+
+    it('the time of every row is the database clock, whatever the caller declares', async () => {
+      const { rows } = await runtime.query<{ recent: boolean }>(
+        `INSERT INTO ${SCHEMA}.quoter_quotes
+           (owner_organization_id, data_origin, created_by_actor_kind, created_by_principal_id, command_execution_id, created_at)
+         VALUES ($1, 'synthetic', 'agent', 'raw', 'cmd-raw', '2001-01-01T00:00:00Z')
+         RETURNING created_at > now() - interval '5 minutes' AS recent`,
+        [OWNER]
+      )
+
+      expect(rows).toEqual([{ recent: true }])
+
+      const { quoteId } = await create(runtime, fresh(), { origin: 'synthetic', recipient: CLIENT })
+
+      await writeDocument(runtime, quoteId, 1)
+
+      const stamps = await runtime.query<{ versions: boolean; recipients: boolean; documents: boolean }>(
+        `SELECT (SELECT bool_and(registered_at > now() - interval '5 minutes') FROM ${SCHEMA}.quoter_quote_versions WHERE quote_id = $1) AS versions,
+                (SELECT bool_and(assigned_at > now() - interval '5 minutes') FROM ${SCHEMA}.quoter_quote_recipients WHERE quote_id = $1) AS recipients,
+                (SELECT bool_and(stored_at > now() - interval '5 minutes') FROM ${SCHEMA}.quoter_version_documents WHERE quote_id = $1) AS documents`,
+        [quoteId]
+      )
+
+      expect(stamps.rows).toEqual([{ versions: true, recipients: true, documents: true }])
+
+      // A raw insert that declares another time is stamped all the same.
+      const backdated = await runtime.query<{ recent: boolean }>(
+        `INSERT INTO ${SCHEMA}.quoter_quote_recipients
+           (quote_id, assignment_seq, owner_organization_id, client_organization_id, assigned_by_actor_kind,
+            assigned_by_principal_id, reason, command_execution_id, assigned_at)
+         VALUES ($1, 0, $2, $3, 'agent', 'raw', 'raw backdated recipient', 'cmd-raw', '2001-01-01T00:00:00Z')
+         RETURNING assigned_at > now() - interval '5 minutes' AS recent`,
+        [quoteId, OWNER, OTHER_CLIENT]
+      )
+
+      expect(backdated.rows).toEqual([{ recent: true }])
+    })
+
+    it('a member is named, not an empty text', async () => {
+      const quote = (member: string | null) =>
+        runtime.query(
+          `INSERT INTO ${SCHEMA}.quoter_quotes
+             (owner_organization_id, data_origin, created_by_actor_kind, created_by_member_id, created_by_principal_id, command_execution_id)
+           VALUES ($1, 'synthetic', 'member', $2, 'raw', 'cmd-raw')`,
+          [OWNER, member]
+        )
+
+      for (const member of [null, '', '   '])
+        expect(await rejectionOf(quote(member)), JSON.stringify(member)).toMatchObject({ code: '23514', constraint: 'quoter_quotes_member_identified' })
+
+      expect(await rejectionOf(quote('member-raw'))).toBeNull()
+    })
+
+    it('the migrations role writes no row here: it cannot hand a number to a draft, move the counter or add a pair', async () => {
+      const migrator = await database.connect('greenhouse_migrator')
+      const { quoteId } = await create(runtime, fresh(), { origin: 'synthetic' })
+
+      for (const statement of [
+        `INSERT INTO ${SCHEMA}.quoter_quote_numbers (quote_id, quote_number, issued_transition_seq) VALUES ('${quoteId}', 'EO-QTE-15001', 1)`,
+        `UPDATE ${SCHEMA}.quoter_quote_number_counters SET next_value = next_value + 1`,
+        `INSERT INTO ${SCHEMA}.quoter_state_matrix (from_state, to_state, requires_human_gate) VALUES ('withdrawn', 'draft', false)`,
+        `INSERT INTO ${SCHEMA}.quoter_quotes (owner_organization_id, data_origin, created_by_actor_kind, created_by_principal_id, command_execution_id)
+         VALUES ('${OWNER}', 'real', 'service', 'raw', 'cmd-raw')`,
+        `DELETE FROM ${SCHEMA}.quoter_source_documents`,
+        `SELECT ${SCHEMA}.quoter_assign_number_on_first_issue()`
+      ])
+        expect((await rejectionOf(migrator.query(statement)))?.code, statement).toBe('42501')
+
+      // It can still read, which is what a migration that checks its own work needs.
+      expect((await migrator.query(`SELECT count(*)::int AS pairs FROM ${SCHEMA}.quoter_state_matrix`)).rows[0].pairs).toBeGreaterThan(0)
+    })
+
+    it('with a real quote registered the migration does not come down; with synthetic ones only, it does', async () => {
+      const down = readQuoterMigrationDown('quoter-quote-aggregate')!
+
+      const relations = async (client: Client) =>
+        (await client.query<{ relations: number }>(
+          `SELECT count(*)::int AS relations FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+            WHERE n.nspname = '${SCHEMA}' AND c.relname LIKE 'quoter_quote%'`
+        )).rows[0].relations
+
+      // This database holds synthetic quotes only (the ones above): give it a real one.
+      await create(runtime, fresh(), { origin: 'real' })
+
+      const before = await relations(ops)
+
+      expect(before).toBeGreaterThan(0)
+      await ops.query('BEGIN')
+      expect((await rejectionOf(ops.query(down)))?.code).toBe('P0001')
+      await ops.query('ROLLBACK')
+      expect(await relations(ops)).toBe(before)
+
+      // Another database, with a synthetic quote only: the same Down runs to the end.
+      const synthetic = await open()
+
+      await create(synthetic.runtime, fresh(), { origin: 'synthetic' })
+      await synthetic.ops.query('BEGIN')
+      await synthetic.ops.query(down)
+      await synthetic.ops.query('COMMIT')
+      expect(await relations(synthetic.ops)).toBe(0)
     })
   })
 

@@ -30,6 +30,7 @@ import {
   readCurrentVersions,
   verifyPointedSources
 } from '../storage'
+import { replayFrozenArtifact } from '../adapters/frozen-artifact'
 import type { PricingV3Storage, SourceRole } from '../storage'
 
 /** A storage to test, and how it addresses what the repository holds at `path`. `undefined`: it needs no address. */
@@ -47,6 +48,17 @@ export type StorageSubject = {
    * battery seeds an empty storage through the port, which is how every other adapter comes to hold anything.
    */
   corpus?: () => StorageUnderTest | Promise<StorageUnderTest>
+  /**
+   * The storage holds only artifacts that calculated (a registry of quotes: one that did not calculate is not a
+   * quote). The battery then stores and reads the calculated ones, and requires the others to be REFUSED.
+   */
+  acceptsOnlyCalculated?: boolean
+  /**
+   * A pointer enters only when the three documents it names are already held, and one that names a document that is
+   * not held is refused with `CURRENT_VERSIONS_MISMATCH`. An adapter without this stores the pointer and lets the
+   * verdict (`verifyPointedSources`) say that it drifted.
+   */
+  pointerNamesOnlyHeldDocuments?: boolean
 }
 
 // ── The corpus ───────────────────────────────────────────────────────────────────────────────────────────────────
@@ -118,11 +130,15 @@ const corpus = () => (loaded ??= loadCorpus())
 /** The repository corpus the battery runs over, for a test that needs the same artifacts and documents. */
 export const loadStorageCorpus = corpus
 
-const seed = async ({ storage, locator }: StorageUnderTest, held: Corpus) => {
+type CorpusArtifact = Corpus['artifacts'][number]
+
+const calculated = (artifact: CorpusArtifact) => replayFrozenArtifact(JSON.parse(artifact.text)).calculationStatus === 'calculated'
+
+const seed = async ({ storage, locator }: StorageUnderTest, held: Corpus, artifacts: CorpusArtifact[]) => {
   for (const document of held.documents)
     await storage.writeDocument({ role: document.role, text: document.text, locator: locator(document.path) })
 
-  for (const artifact of held.artifacts)
+  for (const artifact of artifacts)
     await storage.writeArtifact({ text: artifact.text, locator: locator(artifact.path) })
 
   await storage.replacePointer({ text: held.pointerText, confirmDigest: null })
@@ -174,13 +190,17 @@ const withOtherContent = (role: SourceRole, text: string) => {
 export function runStorageConformance(subject: StorageSubject) {
   describe(`Pricing V3 storage conformance: ${subject.name}`, () => {
     const held = corpus()
+    // The artifacts this storage takes: all of them, or the calculated ones for a registry of quotes.
+    let artifacts: CorpusArtifact[] = held.artifacts
     let under: StorageUnderTest
 
     beforeAll(async () => {
+      if (subject.acceptsOnlyCalculated) artifacts = held.artifacts.filter(calculated)
+
       if (subject.corpus) under = await subject.corpus()
       else {
         under = await subject.empty()
-        await seed(under, held)
+        await seed(under, held, artifacts)
       }
     }, TIMEOUT)
 
@@ -198,7 +218,7 @@ export function runStorageConformance(subject: StorageSubject) {
     it(
       '1. every frozen artifact is read byte for byte, and the replay of its lane verifies what was read',
       async () => {
-        for (const artifact of held.artifacts) {
+        for (const artifact of artifacts) {
           const stored = await under.storage.readArtifact({
             locator: under.locator(artifact.path),
             replayDigest: artifact.replayDigest
@@ -218,7 +238,7 @@ export function runStorageConformance(subject: StorageSubject) {
     it('1b. the storage lists every artifact it holds, with its lane', async () => {
       const listed = await under.storage.listArtifacts()
 
-      expect(listed.length).toBeGreaterThanOrEqual(held.artifacts.length)
+      expect(listed.length).toBeGreaterThanOrEqual(artifacts.length)
       expect([...new Set(listed.map(entry => entry.artifactVersion))].sort()).toEqual([...ARTIFACT_VERSIONS].sort())
     })
 
@@ -227,7 +247,7 @@ export function runStorageConformance(subject: StorageSubject) {
       async () => {
         const fresh = await subject.empty()
 
-        for (const artifact of held.artifacts) {
+        for (const artifact of artifacts) {
           const locator = fresh.locator(artifact.path)
           const identity = await fresh.storage.writeArtifact({ text: artifact.text, locator })
 
@@ -245,11 +265,35 @@ export function runStorageConformance(subject: StorageSubject) {
       TIMEOUT
     )
 
+    it.runIf(subject.acceptsOnlyCalculated)(
+      '2b. an artifact that did not calculate is refused, and nothing of it is held',
+      async () => {
+        const refused = held.artifacts.filter(artifact => !calculated(artifact))
+
+        // Without one in the corpus this case would prove nothing.
+        expect(refused.length).toBeGreaterThanOrEqual(1)
+
+        const fresh = await subject.empty()
+
+        for (const artifact of refused) {
+          expect(await rejection(fresh.storage.writeArtifact({ text: artifact.text, locator: fresh.locator(artifact.path) }))).not.toBe('resolved')
+          expect(await rejection(fresh.storage.readArtifact({ replayDigest: artifact.replayDigest }))).toBe('INPUT_NOT_FOUND')
+        }
+
+        expect(await fresh.storage.listArtifacts()).toEqual([])
+      },
+      TIMEOUT
+    )
+
     it(
       '3. canonical text: it is a fixed point, and what it parses to reproduces with the same digest',
       async () => {
-        for (const artifact of held.artifacts) {
-          const { value } = await under.storage.readArtifact({ locator: under.locator(artifact.path) })
+        for (const artifact of artifacts) {
+          const { value } = await under.storage.readArtifact({
+            locator: under.locator(artifact.path),
+            replayDigest: artifact.replayDigest
+          })
+
           const canonical = canonicalText(value)
           const fromCanonical = JSON.parse(canonical)
 
@@ -321,7 +365,7 @@ export function runStorageConformance(subject: StorageSubject) {
         })
       ).toBeUndefined()
 
-      const artifact = held.artifacts[0]
+      const artifact = artifacts[0]
 
       expect(
         await rejection(
@@ -370,6 +414,14 @@ export function runStorageConformance(subject: StorageSubject) {
 
       const second = `${JSON.stringify({ ...JSON.parse(first), reason: 'Conformance: a second pointer.' }, null, 2)}\n`
 
+      // A storage that takes a pointer only over held documents holds them before the pointer is tried.
+      if (subject.pointerNamesOnlyHeldDocuments)
+        for (const role of SOURCE_ROLES) {
+          const document = held.documents.find(candidate => candidate.digest === held.pointer[role].digest)!
+
+          await fresh.storage.writeDocument({ role, text: document.text, locator: fresh.locator(document.path) })
+        }
+
       expect(await fresh.storage.readPointer()).toBeNull()
       // A digest offered for a pointer that does not exist means the caller expected one that is gone.
       expect(await rejection(fresh.storage.replacePointer({ text: first, confirmDigest: firstDigest }))).toBe(
@@ -413,8 +465,17 @@ export function runStorageConformance(subject: StorageSubject) {
       }
 
       const drifted = { ...held.pointer, policy: { ...held.pointer.policy, digest: '0'.repeat(64) } }
+      const driftedText = `${JSON.stringify(drifted, null, 2)}\n`
 
-      await fresh.storage.replacePointer({ text: `${JSON.stringify(drifted, null, 2)}\n`, confirmDigest: null })
+      // A storage that takes a pointer only over held documents never holds a drifted one: it refuses it.
+      if (subject.pointerNamesOnlyHeldDocuments) {
+        expect(await rejection(fresh.storage.replacePointer({ text: driftedText, confirmDigest: null }))).toBe('CURRENT_VERSIONS_MISMATCH')
+        expect(await fresh.storage.readPointer()).toBeNull()
+
+        return
+      }
+
+      await fresh.storage.replacePointer({ text: driftedText, confirmDigest: null })
 
       const verdict = await verifyPointedSources(fresh.storage, await readCurrentVersions(fresh.storage, 'current'))
       const follow = createCurrentSourceResolver(fresh.storage)
@@ -432,7 +493,7 @@ export function runStorageConformance(subject: StorageSubject) {
         // Every example of the repository with the artifact it is expected to give: `<name>.demand.json` next to
         // `<name>.artifact.json`. The storage holds, under a pointer, the sources each artifact was frozen with; the
         // demand is the file as committed. What comes out must carry the digest the repository froze.
-        const pairs = held.artifacts
+        const pairs = artifacts
           .filter(artifact => artifact.artifactVersion === 'pricing-v3-resource-composition/1')
           .flatMap(artifact => {
             const demandPath = artifact.path.replace(/\.artifact\.json$/, '.demand.json')

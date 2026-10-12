@@ -17,7 +17,7 @@ import { replayResourceComposition } from '@/lib/finance/pricing-v3/adapters/res
 import { loadStorageCorpus } from '@/lib/finance/pricing-v3/__tests__/storage-conformance'
 
 import { highest, readArtifactIndex } from '../artifact-index'
-import { canonicalSourceDocument, textDigest } from '../canonical-text'
+import { identifySourceDocument, textDigest } from '../canonical-text'
 
 import { createLocalDatabase, localPgEnabled } from './local-pg'
 import type { LocalDatabase } from './local-pg'
@@ -89,15 +89,15 @@ describe.skipIf(!localPgEnabled)('PostgreSQL keeps a stored text and its digest 
   )
 
   it(
-    'every source document, stored as the text of its validated value, has one digest: the one a pointer names',
+    'every source document, stored as it was written, reads back byte for byte and keeps the identity a pointer names',
     async () => {
       const client = await database.connect('greenhouse_ops')
 
       for (const document of corpus.documents) {
-        const canonical = canonicalSourceDocument(document.role, JSON.parse(document.text))
+        const identified = identifySourceDocument(document.role, document.text)
         const id = `${document.role}:${document.version}`
 
-        await client.query(`INSERT INTO greenhouse_commercial.roundtrip_probe (id, body) VALUES ($1, $2)`, [id, canonical.text])
+        await client.query(`INSERT INTO greenhouse_commercial.roundtrip_probe (id, body) VALUES ($1, $2)`, [id, document.text])
 
         const { rows } = await client.query<{ body: string; digest: string }>(
           `SELECT body, encode(sha256(convert_to(body, 'UTF8')), 'hex') AS digest
@@ -105,11 +105,15 @@ describe.skipIf(!localPgEnabled)('PostgreSQL keeps a stored text and its digest 
           [id]
         )
 
-        expect(rows[0].body === canonical.text, document.path).toBe(true)
-        // The digest of the text and the digest of identity are the same one for a source document.
-        expect(rows[0].digest, document.path).toBe(document.digest)
-        expect(canonical.digest, document.path).toBe(document.digest)
-        // The raw file, with its indentation and the key order of whoever wrote it, does NOT give that digest.
+        expect(rows[0].body === document.text, document.path).toBe(true)
+        // The database computes over those bytes the digest Node computes.
+        expect(rows[0].digest, document.path).toBe(identified.textDigest)
+        // What was read still has the identity the repository gives it: the version and the digest a pointer names.
+        expect(identifySourceDocument(document.role, rows[0].body), document.path).toMatchObject({
+          version: document.version,
+          digest: document.digest
+        })
+        // Two digests, two jobs: the one of the text is not the one of identity.
         expect(textDigest(document.text), document.path).not.toBe(document.digest)
       }
     },

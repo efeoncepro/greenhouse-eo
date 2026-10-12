@@ -344,6 +344,7 @@
     "pricing:v3": "tsx scripts/commercial/pricing-v3.ts",
     "pricing:v3:test": "vitest run src/lib/finance/pricing-v3/__tests__",
     "quoter:test:local": "node scripts/commercial/quoter-local-pg.mjs test",
+    "quoter:import": "tsx --require ./scripts/lib/server-only-shim.cjs scripts/commercial/quoter-import.ts",
     "pricing:workbook": "node scripts/commercial/pricing-workbook.mjs",
     "pricing:workbook:test": "node --test scripts/commercial/__tests__/pricing-workbook.test.mjs",
     "economica:build": "node scripts/commercial/build-economic-offer-xlsx.mjs",

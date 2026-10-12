@@ -35,6 +35,20 @@ export const readQuoterMigrationUp = (slug: QuoterMigrationSlug): string | null 
   return sql.slice(up, down)
 }
 
+/** The `-- Down Migration` section of a quoter migration, or `null` while that migration does not exist yet. */
+export const readQuoterMigrationDown = (slug: QuoterMigrationSlug): string | null => {
+  const path = pathOf(slug)
+
+  if (!path) return null
+
+  const sql = readFileSync(path, 'utf8')
+  const down = sql.indexOf('-- Down Migration')
+
+  if (down < 0) throw new Error(`${path} has no Down marker`)
+
+  return sql.slice(down)
+}
+
 /** The Up sections of every quoter migration that exists, in order. */
 export const readQuoterMigrations = () =>
   QUOTER_MIGRATION_SLUGS.map(slug => readQuoterMigrationUp(slug)).filter((sql): sql is string => sql !== null)

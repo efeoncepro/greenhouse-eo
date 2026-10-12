@@ -31,15 +31,19 @@
 --   - una versión guarda sólo un artefacto calculado, y su texto da la huella que declara;
 --   - emitir nombra una versión real con su huella (la última o la última emitida), su documento en vigor, una
 --     cotización con destinataria, una fecha de vigencia y, si la versión está bajo el piso, una aprobación vigente;
---   - aceptar y rechazar nombran lo último que se emitió, y una cotización vencida no se acepta: «vencida» no es un
---     estado guardado, se deriva de la vigencia de la última emisión, en un solo lugar (quoter_quote_current);
+--   - aceptar y rechazar nombran lo último que se emitió. «Vencida» no es un estado guardado: se deriva de la
+--     vigencia de la última emisión, en un solo lugar (quoter_quote_current). Aceptar una vencida se permite, y que
+--     fue fuera de vigencia queda legible ahí mismo (accepted_after_validity);
 --   - la destinataria se reasigna sólo en `draft`; el número lo asigna la base en la primera emisión, sin huecos.
 --
 -- Agregar un estado al ciclo de vida más adelante no toca ninguna tabla con filas: los estados no están enumerados
 -- en restricciones. Es agregar filas a la matriz y reemplazar funciones y la vista (CREATE OR REPLACE).
 --
 -- Concurrencia: todo disparador que lee «lo vigente» de una cotización toma antes el mismo bloqueo transaccional,
--- quoter_lock_quote(quote_id). El almacén toma ese mismo bloqueo antes de decidir.
+-- quoter_lock_quote(quote_id). El almacén toma ese mismo bloqueo antes de decidir. Una transacción escribe UNA
+-- cotización: una que tocara dos podría cruzarse con otra en orden inverso (bloqueo por cotización y fila del
+-- contador) y PostgreSQL abortaría una de las dos (40P01); un lote futuro ordena los identificadores antes de
+-- bloquear. Toda emisión real espera a la anterior en la fila del contador: correcto a este volumen.
 --
 -- Rechazos con nombre: cada RAISE lleva `CONSTRAINT = '<nombre>'`. El código lo lee de ahí
 -- (src/lib/commercial/quoter/errors.ts) y nunca interpreta el texto del mensaje.
@@ -54,6 +58,8 @@ RETURNS void
 LANGUAGE plpgsql
 AS $fn$
 BEGIN
+  -- Leer lo vigente y después escribir sólo es correcto bajo READ COMMITTED: se rechaza cualquier otro aislamiento.
+  PERFORM greenhouse_commercial.quoter_assert_read_committed();
   PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtext('greenhouse_commercial.quoter_quote'), pg_catalog.hashtext(p_quote_id));
 END
 $fn$;
@@ -81,7 +87,7 @@ CREATE TABLE greenhouse_commercial.quoter_quotes (
   CONSTRAINT quoter_quotes_pkey PRIMARY KEY (quote_id),
   CONSTRAINT quoter_quotes_owner_fk FOREIGN KEY (owner_organization_id)
     REFERENCES greenhouse_core.organizations (organization_id),
-  CONSTRAINT quoter_quotes_member_identified CHECK (created_by_actor_kind <> 'member' OR created_by_member_id IS NOT NULL)
+  CONSTRAINT quoter_quotes_member_identified CHECK (created_by_actor_kind <> 'member' OR (created_by_member_id IS NOT NULL AND length(btrim(created_by_member_id)) > 0))
 );
 
 ALTER TABLE greenhouse_commercial.quoter_quotes OWNER TO greenhouse_ops;
@@ -122,7 +128,7 @@ CREATE TABLE greenhouse_commercial.quoter_quote_versions (
   -- Para que un cambio de estado y una aprobación nombren una versión real CON su huella, por llave foránea.
   CONSTRAINT quoter_quote_versions_identity_with_digest UNIQUE (quote_id, version_number, artifact_digest),
   CONSTRAINT quoter_quote_versions_member_identified
-    CHECK (registered_by_actor_kind <> 'member' OR registered_by_member_id IS NOT NULL)
+    CHECK (registered_by_actor_kind <> 'member' OR (registered_by_member_id IS NOT NULL AND length(btrim(registered_by_member_id)) > 0))
 );
 
 ALTER TABLE greenhouse_commercial.quoter_quote_versions OWNER TO greenhouse_ops;
@@ -224,7 +230,7 @@ CREATE TABLE greenhouse_commercial.quoter_version_documents (
   CONSTRAINT quoter_version_documents_version_fk FOREIGN KEY (quote_id, version_number)
     REFERENCES greenhouse_commercial.quoter_quote_versions (quote_id, version_number),
   CONSTRAINT quoter_version_documents_member_identified
-    CHECK (stored_by_actor_kind <> 'member' OR stored_by_member_id IS NOT NULL)
+    CHECK (stored_by_actor_kind <> 'member' OR (stored_by_member_id IS NOT NULL AND length(btrim(stored_by_member_id)) > 0))
 );
 
 ALTER TABLE greenhouse_commercial.quoter_version_documents OWNER TO greenhouse_ops;
@@ -303,9 +309,9 @@ CREATE TABLE greenhouse_commercial.quoter_state_transitions (
   CONSTRAINT quoter_state_transitions_object_is_whole
     CHECK (num_nonnulls(version_number, artifact_digest, document_seq, document_digest) IN (0, 4)),
   CONSTRAINT quoter_state_transitions_member_identified
-    CHECK (actor_kind <> 'member' OR actor_member_id IS NOT NULL),
+    CHECK (actor_kind <> 'member' OR (actor_member_id IS NOT NULL AND length(btrim(actor_member_id)) > 0)),
   CONSTRAINT quoter_state_transitions_human_gate_needs_member
-    CHECK (requires_human_gate = false OR (actor_kind = 'member' AND actor_member_id IS NOT NULL))
+    CHECK (requires_human_gate = false OR (actor_kind = 'member' AND actor_member_id IS NOT NULL AND length(btrim(actor_member_id)) > 0))
 );
 
 ALTER TABLE greenhouse_commercial.quoter_state_transitions OWNER TO greenhouse_ops;
@@ -324,6 +330,17 @@ AS $fn$
 $fn$;
 
 ALTER FUNCTION greenhouse_commercial.quoter_today() OWNER TO greenhouse_ops;
+
+-- El día, en la misma zona, en que ocurrió algo que la base ya registró.
+CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_local_day(p_at timestamptz)
+RETURNS date
+LANGUAGE sql
+STABLE
+AS $fn$
+  SELECT (p_at AT TIME ZONE 'America/Santiago')::date
+$fn$;
+
+ALTER FUNCTION greenhouse_commercial.quoter_local_day(timestamptz) OWNER TO greenhouse_ops;
 
 -- El estado vigente de una cotización, o NULL si todavía no tiene ninguno.
 CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_quote_state(p_quote_id text)
@@ -361,7 +378,7 @@ CREATE TABLE greenhouse_commercial.quoter_quote_recipients (
     REFERENCES greenhouse_core.organizations (organization_id),
   CONSTRAINT quoter_quote_recipients_not_the_owner CHECK (client_organization_id <> owner_organization_id),
   CONSTRAINT quoter_quote_recipients_member_identified
-    CHECK (assigned_by_actor_kind <> 'member' OR assigned_by_member_id IS NOT NULL)
+    CHECK (assigned_by_actor_kind <> 'member' OR (assigned_by_member_id IS NOT NULL AND length(btrim(assigned_by_member_id)) > 0))
 );
 
 ALTER TABLE greenhouse_commercial.quoter_quote_recipients OWNER TO greenhouse_ops;
@@ -447,6 +464,9 @@ BEGIN
       USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quotes_owner_is_operating_entity';
   END IF;
 
+  -- La hora es la del reloj de la base: quien inserta no declara otra. Vale para toda fila del agregado.
+  NEW.created_at := pg_catalog.now();
+
   RETURN NEW;
 END
 $fn$;
@@ -485,6 +505,8 @@ BEGIN
       NEW.version_number, NEW.quote_id, COALESCE(last_version, 0)
       USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_versions_next_number';
   END IF;
+
+  NEW.registered_at := pg_catalog.now();
 
   RETURN NEW;
 END
@@ -525,6 +547,7 @@ BEGIN
    WHERE d.quote_id = NEW.quote_id AND d.version_number = NEW.version_number;
 
   NEW.document_seq := COALESCE(last_seq, 0) + 1;
+  NEW.stored_at := pg_catalog.now();
 
   RETURN NEW;
 END
@@ -579,6 +602,7 @@ BEGIN
   END IF;
 
   NEW.approval_seq := COALESCE(last_seq, 0) + 1;
+  NEW.decided_at := pg_catalog.now();
 
   RETURN NEW;
 END
@@ -697,11 +721,8 @@ BEGIN
         USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_state_transitions_responds_to_last_issued';
     END IF;
 
-    -- Una cotización vencida no se acepta: se vuelve a emitir con vigencia nueva. Rechazarla sí se puede.
-    IF NEW.to_state = 'accepted' AND last_issue.valid_until < greenhouse_commercial.quoter_today() THEN
-      RAISE EXCEPTION 'quoter_state_transitions: la cotización % venció el % y no se acepta', NEW.quote_id, last_issue.valid_until
-        USING ERRCODE = 'check_violation', CONSTRAINT = 'quoter_quote_expired';
-    END IF;
+    -- Aceptar o rechazar después de vencida la vigencia se permite: una regla que lo impidiera no protegía (bastaba
+    -- re-emitir y aceptar) y borraba el dato. Que fue fuera de vigencia se lee derivado en quoter_quote_current.
   ELSIF num_nonnulls(NEW.version_number, NEW.artifact_digest, NEW.document_seq, NEW.document_digest) <> 0 THEN
     RAISE EXCEPTION 'quoter_state_transitions: el cambio % → % no nombra una versión (cotización %)',
       NEW.from_state, NEW.to_state, NEW.quote_id
@@ -730,7 +751,7 @@ CREATE OR REPLACE FUNCTION greenhouse_commercial.quoter_assign_number_on_first_i
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
-SET search_path = pg_catalog
+SET search_path = pg_catalog, pg_temp
 AS $fn$
 DECLARE
   quote_series text;
@@ -795,6 +816,7 @@ BEGIN
   SELECT max(r.assignment_seq) INTO last_seq FROM greenhouse_commercial.quoter_quote_recipients r WHERE r.quote_id = NEW.quote_id;
 
   NEW.assignment_seq := COALESCE(last_seq, 0) + 1;
+  NEW.assigned_at := pg_catalog.now();
 
   RETURN NEW;
 END
@@ -918,7 +940,13 @@ CREATE VIEW greenhouse_commercial.quoter_quote_current AS
          i.document_seq AS issued_document_seq,
          i.document_digest AS issued_document_digest,
          i.occurred_at AS issued_at,
-         i.valid_until
+         i.valid_until,
+         -- La aceptación vigente, leída contra la vigencia de la emisión a la que respondió. Derivado, no guardado:
+         -- aceptar fuera de vigencia se permite y aquí queda dicho, con los días de atraso.
+         a.occurred_at AS accepted_at,
+         a.answered_valid_until AS accepted_valid_until,
+         a.days_after_validity > 0 AS accepted_after_validity,
+         GREATEST(a.days_after_validity, 0) AS accepted_days_after_validity
     FROM greenhouse_commercial.quoter_quotes q
     LEFT JOIN LATERAL (
       SELECT t.to_state, t.occurred_at
@@ -950,25 +978,45 @@ CREATE VIEW greenhouse_commercial.quoter_quote_current AS
        WHERE e.quote_id = q.quote_id AND e.to_state = 'issued'
        ORDER BY e.transition_seq DESC
        LIMIT 1
-    ) i ON true;
+    ) i ON true
+    -- Sólo cuando el estado vigente es `accepted`: su fila es la última del historial, y la emisión a la que
+    -- respondió es la última anterior a ella.
+    LEFT JOIN LATERAL (
+      SELECT c.occurred_at,
+             answered.valid_until AS answered_valid_until,
+             greenhouse_commercial.quoter_local_day(c.occurred_at) - answered.valid_until AS days_after_validity
+        FROM greenhouse_commercial.quoter_state_transitions c
+        JOIN LATERAL (
+          SELECT p.valid_until
+            FROM greenhouse_commercial.quoter_state_transitions p
+           WHERE p.quote_id = c.quote_id AND p.to_state = 'issued' AND p.transition_seq < c.transition_seq
+           ORDER BY p.transition_seq DESC
+           LIMIT 1
+        ) answered ON true
+       WHERE c.quote_id = q.quote_id AND c.to_state = 'accepted' AND s.to_state = 'accepted'
+       ORDER BY c.transition_seq DESC
+       LIMIT 1
+    ) a ON true;
 
 ALTER VIEW greenhouse_commercial.quoter_quote_current OWNER TO greenhouse_ops;
 
 -- ── Permisos: el runtime lee y agrega; nunca actualiza ni borra ──────────────────────────────────────────────
 
 -- El esquema tiene privilegios por defecto que le dan SELECT, INSERT, UPDATE y DELETE al runtime en toda tabla
--- nueva (task-345). Se quitan todos y se concede lo justo.
-REVOKE ALL ON greenhouse_commercial.quoter_quotes FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_versions FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_version_index FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_state_matrix FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_state_transitions FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_recipients FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_number_counters FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_numbers FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_exception_approvals FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_version_documents FROM greenhouse_runtime, greenhouse_app;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_current FROM greenhouse_runtime, greenhouse_app;
+-- nueva, y ALL a greenhouse_migrator (task-345). Se quitan todos y se concede lo justo. El de migraciones es un
+-- perfil de DDL: con INSERT en los números podría darle uno a un borrador y dejar sin salida toda emisión real
+-- posterior, en una tabla de la que nada se borra.
+REVOKE ALL ON greenhouse_commercial.quoter_quotes FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_versions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_version_index FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_state_matrix FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_state_transitions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_recipients FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_number_counters FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_numbers FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_exception_approvals FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_version_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_current FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
 
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quotes TO greenhouse_runtime;
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quote_versions TO greenhouse_runtime;
@@ -986,6 +1034,13 @@ GRANT SELECT ON greenhouse_commercial.quoter_quote_current TO greenhouse_runtime
 GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_lock_quote(text) TO greenhouse_runtime;
 GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_quote_state(text) TO greenhouse_runtime;
 GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_today() TO greenhouse_runtime;
+GRANT EXECUTE ON FUNCTION greenhouse_commercial.quoter_local_day(timestamptz) TO greenhouse_runtime;
+GRANT SELECT ON greenhouse_commercial.quoter_quotes, greenhouse_commercial.quoter_quote_versions,
+  greenhouse_commercial.quoter_quote_version_index, greenhouse_commercial.quoter_state_matrix,
+  greenhouse_commercial.quoter_state_transitions, greenhouse_commercial.quoter_quote_recipients,
+  greenhouse_commercial.quoter_quote_number_counters, greenhouse_commercial.quoter_quote_numbers,
+  greenhouse_commercial.quoter_exception_approvals, greenhouse_commercial.quoter_version_documents,
+  greenhouse_commercial.quoter_quote_current TO greenhouse_migrator;
 
 -- ── Verificación: aborta si algo de lo anterior no quedó creado ──────────────────────────────────────────────
 
@@ -995,6 +1050,7 @@ DECLARE
   relation text;
   trigger_name text;
   privilege text;
+  grantee text;
 BEGIN
   FOR relation IN SELECT unnest(ARRAY[
     'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_matrix',
@@ -1062,9 +1118,30 @@ BEGIN
     END LOOP;
   END LOOP;
 
-  IF has_table_privilege('greenhouse_runtime', 'greenhouse_commercial.quoter_quote_numbers', 'INSERT') THEN
-    missing := missing || ' runtime_has_INSERT_on_quoter_quote_numbers';
-  END IF;
+  -- Nadie más que el dueño escribe en los números, el contador o la matriz; el de lectura y el de migraciones no
+  -- escriben en ninguna tabla del agregado.
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator']) LOOP
+    FOR relation IN SELECT unnest(ARRAY['quoter_quote_numbers', 'quoter_quote_number_counters', 'quoter_state_matrix']) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+  END LOOP;
+
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_app', 'greenhouse_migrator']) LOOP
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_transitions',
+      'quoter_quote_recipients', 'quoter_exception_approvals', 'quoter_version_documents'
+    ]) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+  END LOOP;
 
   IF has_function_privilege('greenhouse_runtime', 'greenhouse_commercial.quoter_assign_number_on_first_issue()', 'EXECUTE') THEN
     missing := missing || ' runtime_can_execute_number_assignment';
@@ -1078,13 +1155,29 @@ $$;
 
 -- Down Migration
 
--- SÓLO deshacer. Existe para una base sin cotizaciones reales. Con la primera cotización real registrada no se
--- baja: la corrección es una migración nueva hacia adelante.
+-- SÓLO deshacer. Existe para una base sin cotizaciones reales.
+-- Guarda: con una cotización real registrada esta bajada no corre. Un comentario no protege una tabla de la que nada
+-- se borra; esto sí. El carril local sólo crea cotizaciones sintéticas y sigue pudiendo bajar y subir.
+DO $$
+DECLARE
+  real_quotes bigint := 0;
+BEGIN
+  IF to_regclass('greenhouse_commercial.quoter_quotes') IS NOT NULL THEN
+    EXECUTE 'SELECT count(*) FROM greenhouse_commercial.quoter_quotes WHERE data_origin = ''real''' INTO real_quotes;
+  END IF;
+
+  IF real_quotes > 0 THEN
+    RAISE EXCEPTION 'TASK-2025: hay % cotización(es) real(es) registrada(s); esta migración no se baja. La corrección es una migración nueva hacia adelante.', real_quotes;
+  END IF;
+END
+$$;
+
 DROP VIEW IF EXISTS greenhouse_commercial.quoter_quote_current;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_numbers;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_number_counters;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_quote_recipients;
 DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_quote_state(text);
+DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_local_day(timestamptz);
 DROP FUNCTION IF EXISTS greenhouse_commercial.quoter_today();
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_state_transitions;
 DROP TABLE IF EXISTS greenhouse_commercial.quoter_exception_approvals;

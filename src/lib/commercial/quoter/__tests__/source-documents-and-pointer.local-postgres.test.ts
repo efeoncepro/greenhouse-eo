@@ -45,7 +45,7 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     inTransaction(runtime, () =>
       storeSourceDocument(runtime, {
         role,
-        document: JSON.parse(text),
+        text,
         origin: 'repo_import',
         sourcePath: document(role).path,
         sourceCommitSha: FIXTURE_COMMIT,
@@ -84,15 +84,17 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
       origin: 'repo_import',
       sourceCommitSha: FIXTURE_COMMIT
     })
-    expect(textDigest(stored.text)).toBe(corpus.pointer.catalog.digest)
+    // As it was written: not a rendering of it.
+    expect(stored.text).toBe(document('catalog').text)
 
     // The database computed the same digest over the same bytes.
     const { rows } = await runtime.query<{ digest: string }>(
-      `SELECT greenhouse_commercial.quoter_text_digest(canonical_text) AS digest
-         FROM greenhouse_commercial.quoter_source_documents WHERE role = 'catalog'`
+      `SELECT greenhouse_commercial.quoter_text_digest(document_text) AS digest
+         FROM greenhouse_commercial.quoter_source_documents
+        WHERE role = 'catalog' AND document_text_digest = greenhouse_commercial.quoter_text_digest(document_text)`
     )
 
-    expect(rows[0].digest).toBe(corpus.pointer.catalog.digest)
+    expect(rows[0].digest).toBe(textDigest(document('catalog').text))
   })
 
   it('publishes one event per stored document, in the same transaction, with no content in it', async () => {
@@ -115,6 +117,9 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
 
     other.evidence = [...other.evidence].reverse()
     expect(await quoterCode(store('catalog', JSON.stringify(other)))).toBe('source_document_exists')
+
+    // The same document written another way (no indentation) is still the same document: same identity, refused.
+    expect(await quoterCode(store('catalog', JSON.stringify(JSON.parse(document('catalog').text))))).toBe('source_document_exists')
 
     // The refused write left nothing behind: its event rolled back with it.
     const { rows } = await runtime.query<{ documents: string; events: string }>(
@@ -141,9 +146,9 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     const insert = (client: Client) =>
       client.query(
         `INSERT INTO greenhouse_commercial.quoter_source_documents
-           (role, version, document_digest, canonical_text, origin, source_path, source_commit_sha,
-            stored_by_actor_kind, stored_by_principal_id, reason)
-         VALUES ('policy', 'forged-v1', $1, '{"forged":true}', 'repo_import', 'x.json', $2, 'service', 'forger',
+           (role, version, document_digest, document_text, document_text_digest, origin, source_path,
+            source_commit_sha, stored_by_actor_kind, stored_by_principal_id, reason)
+         VALUES ('policy', 'forged-v1', $1, '{"forged":true}', $1, 'repo_import', 'x.json', $2, 'service', 'forger',
                  'forged digest')`,
         ['0'.repeat(64), FIXTURE_COMMIT]
       )
@@ -156,7 +161,7 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     const withoutCommit = inTransaction(runtime, () =>
       storeSourceDocument(runtime, {
         role: 'policy',
-        document: JSON.parse(document('policy').text),
+        text: document('policy').text,
         origin: 'repo_import',
         sourcePath: document('policy').path,
         actor: JOB,
@@ -170,8 +175,9 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
     const raw = (columns: string, values: string) =>
       runtime.query(
         `INSERT INTO greenhouse_commercial.quoter_source_documents
-           (role, version, document_digest, canonical_text, origin, stored_by_actor_kind, reason${columns})
-         VALUES ('policy', 'raw-v1', greenhouse_commercial.quoter_text_digest('{}'), '{}', 'repo_import', 'service',
+           (role, version, document_digest, document_text, document_text_digest, origin, stored_by_actor_kind, reason${columns})
+         VALUES ('policy', 'raw-v1', greenhouse_commercial.quoter_text_digest('{}'), '{}',
+                 greenhouse_commercial.quoter_text_digest('{}'), 'repo_import', 'service',
                  'raw insert'${values})`
       )
 
@@ -363,8 +369,9 @@ describe('what is read from the registry is believed only after its digests are 
           {
             role: 'credits',
             version: 'v1',
-            document_digest: '0'.repeat(64),
-            canonical_text: '{"tampered":true}',
+            document_digest: '1'.repeat(64),
+            document_text: '{"tampered":true}',
+            document_text_digest: '0'.repeat(64),
             schema_version: null,
             parent_digest: null,
             origin: 'repo_import',

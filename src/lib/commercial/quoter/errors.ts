@@ -24,6 +24,8 @@ export const QUOTER_ERROR_CODES = [
   'stored_digest_mismatch',
   // A row of the history was asked to change: never a caller error
   'immutable_record',
+  // The transaction is not READ COMMITTED: the rules that read what is in force would read a stale snapshot
+  'isolation_not_supported',
   // Quote aggregate
   'quote_not_found',
   'version_not_found',
@@ -35,7 +37,6 @@ export const QUOTER_ERROR_CODES = [
   'not_last_issued_version',
   'validity_required',
   'validity_in_the_past',
-  'quote_expired',
   'invalid_transition',
   'state_conflict',
   'recipient_required',
@@ -89,6 +90,7 @@ export const isQuoterError = (error: unknown): error is QuoterError => error ins
 export const QUOTER_CONSTRAINT_CODES: Readonly<Record<string, QuoterErrorCode>> = {
   // Shared
   quoter_append_only: 'immutable_record',
+  quoter_requires_read_committed: 'isolation_not_supported',
   // Source documents
   quoter_source_documents_pkey: 'source_document_exists',
   quoter_source_documents_version_unique: 'source_document_exists',
@@ -134,7 +136,6 @@ export const QUOTER_CONSTRAINT_CODES: Readonly<Record<string, QuoterErrorCode>> 
   quoter_state_transitions_issue_names_its_validity: 'validity_required',
   quoter_state_transitions_validity_not_past: 'validity_in_the_past',
   quoter_state_transitions_responds_to_last_issued: 'not_last_issued_version',
-  quoter_quote_expired: 'quote_expired',
   quoter_state_transitions_version_fk: 'version_not_found',
   quoter_state_transitions_document_fk: 'document_conflict',
   quoter_state_transitions_issues_last_or_issued_version: 'version_not_issuable',

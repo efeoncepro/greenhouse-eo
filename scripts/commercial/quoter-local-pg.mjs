@@ -155,6 +155,8 @@ const prepare = () => {
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_ops') THEN CREATE ROLE greenhouse_ops LOGIN; END IF;
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_runtime') THEN CREATE ROLE greenhouse_runtime LOGIN; END IF;
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_app') THEN CREATE ROLE greenhouse_app; END IF;
+       IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_migrator') THEN CREATE ROLE greenhouse_migrator LOGIN; END IF;
+       ALTER ROLE greenhouse_migrator LOGIN;
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_migrator_user') THEN CREATE ROLE greenhouse_migrator_user; END IF;
      END $$;`
   )
