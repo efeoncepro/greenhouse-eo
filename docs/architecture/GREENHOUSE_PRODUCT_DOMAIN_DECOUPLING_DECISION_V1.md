@@ -75,7 +75,7 @@ y consume lo ajeno por contrato. Greenhouse conserva el portal cliente y el back
 
 | # | Dominio | Destino | Qué se va | Qué queda en Greenhouse |
 | --- | --- | --- | --- | --- |
-| 1 | **Knowledge** | Retiro | Páginas, rutas, retrieval de Nexa, lane de API Platform, ingest por webhook de Notion | El schema `greenhouse_knowledge` y sus datos, sin lectores |
+| 1 | **Knowledge** | **Aplazado sin fecha** (operador, 2026-10-12, tras ver la medición de uso). La intención de retirarlo no se revirtió; no entra en el orden | Nada por ahora | Todo, como está |
 | 2a | **Design System Lab** | AXIS (`axis.efeonce.org`, destino declarado por el operador) | Las 43 páginas y 15 rutas de `/design-system` | Nada; Greenhouse deja de hospedar el design system |
 | 2b | **Composición de marca**: catálogos `graphic-line-*`, `deck-axis`, `brand-packs/axis`, `brand-surfaces`, Glitch, Manzanitas | AXIS, junto a `axis-graphic-line` | Catálogos, recetas y sus baselines visuales | Nada |
 | 2c | **Motor del Artifact Composer** | Paquete versionado en el workspace de AXIS | `src/lib/artifact-composer/*.ts` (motor) | `services/artifact-worker` sigue aquí como Cloud Run Job y consume el paquete por versión |
@@ -88,9 +88,8 @@ operador pese a su frecuencia de cambio), Agencia, Personas, Organizaciones.
 
 ### Orden
 
-`1 → 2a → 2b → 2c → 3 → 4`; el 5 no tiene fecha. El orden es de dependencia, no de preferencia:
+`2a → 2b → 2c → 3 → 4`; el 1 y el 5 no tienen fecha. El orden es de dependencia, no de preferencia:
 
-- **Knowledge primero**: no depende de ningún producto nuevo.
 - **El cierre del Lab se mide**: build del portal antes y después de retirar las 43 páginas. Es el primer número real
   de cuánto compra sacar páginas y reemplaza al piloto que `TASK-1382` ya no puede correr.
 - **Insights sale último** porque consume Growth, ICO y el compositor. Antes de los cortes 2c y 3 tendría que cruzar
@@ -104,8 +103,22 @@ Vercel Production. En uso, casi nada es de personas. De 1.196 turnos que llamaro
 workflow `nexa-knowledge-qa-nightly.yml`. Las personas la usaron **cuatro veces en cuatro meses** (tres usuarios).
 El corpus tiene 113 documentos y 1.546 chunks, y no recibe una publicación desde el 2026-08-24.
 
-Consecuencia para el corte 1: retirar Knowledge incluye apagar ese workflow nocturno, que hoy es quien sostiene la
-apariencia de uso, y quitar la tool del catálogo de Nexa para que no ofrezca una capacidad sin respaldo.
+Dónde vive y de dónde sale el contenido:
+
+- **Almacén**: schema `greenhouse_knowledge` en la instancia PostgreSQL compartida, 17 MB en total (16 MB son
+  `knowledge_chunks`, con texto, índice de búsqueda y embeddings de Vertex). Código: 5,8k LOC en
+  `src/lib/knowledge` y 3,3k en sus vistas.
+- **Fuente 1, documentos de este repositorio** (79 de 113): una lista fija en
+  `src/lib/knowledge/ingestion/pilot-corpus.ts` que apunta a archivos de `docs/context`, `docs/documentation` y
+  `docs/manual-de-uso`. Se cargan a mano con `scripts/knowledge/ingest.ts`; no se actualizan solos cuando el
+  documento cambia.
+- **Fuente 2, Notion** (22): el árbol de páginas «Greenhouse Knowledge — Notion», con su propia integración. Un
+  webhook de Notion dispara un consumer en `ops-worker` que vuelve a leer la página cambiada.
+- **Residuo** (12): doce fuentes «Live test source» con un documento cada una, restos de pruebas en la base
+  compartida.
+
+Para cuando se retome: retirar Knowledge incluye apagar ese workflow nocturno, que hoy sostiene la apariencia de
+uso, y quitar la tool del catálogo de Nexa para que no ofrezca una capacidad sin respaldo.
 
 ### Prerrequisitos que ya se conocen
 
@@ -122,8 +135,8 @@ apariencia de uso, y quitar la tool del catálogo de Nexa para que no ofrezca un
 - **Build units**: la cláusula «retaining one repository» deja de ser la regla. La unidad de corte pasa a ser el
   producto con su repositorio. Sigue vigente todo lo demás: sin big-bang, datos y transacciones sin dividir por
   anticipado, evidencia por frontera, y la regla de trabajo nuevo extraction-ready.
-- **Knowledge Platform** (`GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md`): su retiro queda decidido. El ADR pasa a
-  `Deprecated` cuando la task de retiro cierre; hasta entonces el runtime y sus invariantes siguen en pie.
+- **Knowledge Platform** (`GREENHOUSE_KNOWLEDGE_PLATFORM_DECISION_V1.md`): sin cambio. El operador declaró la
+  intención de retirarlo y el mismo día lo aplazó; el ADR sigue `Accepted` y el runtime y sus invariantes en pie.
 - **Efeonce Insights** (`EFEONCE_INSIGHTS_PLATFORM_DECISION_V1.md`): deja de ser «dominio Greenhouse» como destino
   final. Su contrato (ventanas, idempotencia, snapshots inmutables, gate humano) no cambia.
 - **Rooms**: sin cambio hoy. Si la interfaz de Commercial o del cotizador nace allí, su ADR debe enmendarse primero:
@@ -199,6 +212,7 @@ apariencia de uso, y quitar la tool del catálogo de Nexa para que no ofrezca un
 - Si Insights nace en repositorio propio o dentro de uno existente; se decidió el dominio, no su hospedaje.
 - Destino de Nexa, de Admin (328 rutas), de los lanes de API Platform y de las superficies públicas de AEO. No se
   discutieron.
+- Cuándo y cómo se retira Knowledge, y si su contenido se conserva en otro lugar.
 - Si Manzanitas es marca propia: se asignó a AXIS por analogía con Glitch, sin verificar.
 - El nuevo sujeto formal de `TASK-1382`; aquí sólo se propone la medición del cierre del Lab.
 

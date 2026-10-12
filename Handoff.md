@@ -7,9 +7,11 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 ## 2026-10-12 — Arquitectura: desacople de Greenhouse por dominios de producto (decisión, nada ejecutado)
 
 El operador aprobó [a dónde va cada dominio y en qué orden](docs/architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md):
-Knowledge se retira; el Design System Lab, los catálogos de marca, `brand-surfaces` y el motor del compositor van a
+el Design System Lab, los catálogos de marca, `brand-surfaces` y el motor del compositor van a
 AXIS (`artifact-worker` se queda y consume el paquete); Growth y Search Visibility 360 van enteros a Marketing
-Studio; Insights pasa a dominio propio y sale último; Commercial queda diferido con su API aquí; Hiring se queda.
+Studio; Insights pasa a dominio propio y sale último; Commercial queda diferido con su API aquí; Hiring se queda. **Knowledge
+queda como está, aplazado sin fecha**: casi nadie lo usa (4 llamadas de personas en 4 meses; el resto es el QA
+nocturno), pero el operador decidió no tocarlo ahora.
 Enmienda la cláusula «un repositorio» del ADR de build units. **Sólo documentos**: no hay tasks, repositorios ni
 código movido, y el trabajo nuevo sigue naciendo donde vive hoy su dominio. Para quien toque esos dominios: un
 dominio se mueve con su API y sus procesos asíncronos o no se mueve, y no se agregan lecturas SQL cruzadas (Insights

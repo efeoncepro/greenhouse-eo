@@ -53,9 +53,9 @@ forma del programa, no su objetivo:
 
 - La unidad de corte es el producto con su repositorio. La cláusula «un repositorio» del ADR de build units queda
   enmendada; el resto sigue vigente.
-- Orden aprobado: Knowledge (retiro) → Design System Lab a AXIS → catálogos de marca y `brand-surfaces` a AXIS →
+- Orden aprobado: Design System Lab a AXIS → catálogos de marca y `brand-surfaces` a AXIS →
   motor del compositor como paquete de AXIS → Growth y Search Visibility 360 a Marketing Studio → Insights como
-  dominio propio. Commercial queda diferido; Hiring se queda.
+  dominio propio. Knowledge y Commercial quedan diferidos; Hiring se queda.
 - **Ningún corte tiene task todavía.** Cada uno se registra como hija de esta épica al prepararlo y trae la
   evidencia de siempre: costo, routing/auth, rollback y ownership del runtime.
 - `TASK-1382` sigue sin sujeto formal. Lo que la reemplaza en la práctica es medir el build del portal antes y
