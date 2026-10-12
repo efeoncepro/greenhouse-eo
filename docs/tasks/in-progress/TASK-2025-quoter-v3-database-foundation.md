@@ -115,7 +115,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Slices 1 a 5 escritos y verdes en PostgreSQL 16 local (2026-10-12): 109 pruebas, batería de conformidad incluida; tres migraciones pendientes, ninguna aplicada; el catálogo del repo no está empujado y el importador lo exige; falta el Slice 6 (visto bueno, aplicar, importar)`
+- Status real: `Código completo, rollout pendiente (2026-10-12): 117 pruebas verdes en PostgreSQL 16 local y suite completa verde (20.231); las tres migraciones ya viven en migrations/ pero NO están aplicadas; develop sin empujar (el push quedó bloqueado por permisos de la sesión); el build local se cortó y no se repitió; falta aplicar, importar y cerrar`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
@@ -1204,6 +1204,10 @@ visto bueno y la importación del catálogo.
 
 - [ ] El visto bueno del operador para aplicar migraciones y para importar con escritura quedó registrado en la task
       (fecha y alcance) antes de cada acción sobre la base compartida.
+      2026-10-12: el operador respondió «Ok, termina lo pendiente» al pedido de empujar `develop`, aplicar las tres
+      migraciones y correr la suite y el build. La suite corrió. El push y la lectura de estado de migraciones
+      quedaron bloqueados por los permisos de la sesión, así que **no se aplicó nada**; antes de aplicar se pide una
+      confirmación explícita para ese acto.
 - [ ] Hasta el visto bueno las tres migraciones viven en `docs/tasks/pending-migrations/` y ninguna en `migrations/`.
       Al cierre viven en `migrations/`, nacidas con `pnpm migrate:create`.
 - [ ] Las tres migraciones empiezan con `-- Up Migration`, llevan bloque `DO` de verificación, no tienen `CREATE` bajo
