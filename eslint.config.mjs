@@ -800,7 +800,11 @@ export default [
   // mano que esto reemplaza ya había derivado: 10 códigos lanzados y no reportados.
   // Relanzar una excepción ajena (`throw error`) sigue permitido: eso sí es un caso sin clasificar.
   {
-    files: ['src/lib/finance/pricing-v3/**/*.ts', 'scripts/commercial/pricing-v3.ts'],
+    files: [
+      'src/lib/finance/pricing-v3/**/*.ts',
+      'scripts/commercial/pricing-v3.ts',
+      'scripts/commercial/pricing-v3-storage-file.ts'
+    ],
     ignores: ['**/__tests__/**'],
     rules: {
       'no-restricted-syntax': [

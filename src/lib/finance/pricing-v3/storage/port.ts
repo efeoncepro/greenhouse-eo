@@ -168,12 +168,13 @@ export const assertPointerConfirmed = (held: StoredText | null, confirmDigest: s
   if ((held ? pointerDigest(held.value) : null) !== confirmDigest) throw new PricingV3Error('CURRENT_VERSIONS_CONFLICT')
 }
 
+// A conflict over the pointer is not among them: what the caller corrects there is the digest it confirmed with, and
+// only the transport knows what it called that.
 const STORAGE_CODES: readonly PricingV3ErrorCode[] = [
   'INPUT_NOT_FOUND',
   'INPUT_NOT_JSON',
   'OUTPUT_EXISTS',
-  'OUTPUT_NOT_WRITABLE',
-  'CURRENT_VERSIONS_CONFLICT'
+  'OUTPUT_NOT_WRITABLE'
 ]
 
 /**

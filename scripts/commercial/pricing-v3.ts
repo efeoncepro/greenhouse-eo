@@ -1,5 +1,4 @@
-import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
-import { dirname, isAbsolute, join, relative, resolve, sep } from 'node:path'
+import { isAbsolute, relative, resolve, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
 
@@ -62,12 +61,16 @@ import {
 import {
   CURRENT_SOURCE_ROLES,
   buildCurrentVersions,
-  currentVersionsDigest,
-  currentVersionsSchema,
-  resolveCurrentSource,
-  verifyCurrentVersions
+  currentVersionsDigest
 } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
-import type { CurrentSourceRole, CurrentVersions } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
+import type { CurrentSourceRole } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
+import {
+  createCurrentSourceResolver,
+  namingOption,
+  readCurrentVersions,
+  verifyPointedSources
+} from '../../src/lib/finance/pricing-v3/storage'
+import type { SourceRole } from '../../src/lib/finance/pricing-v3/storage'
 
 import {
   PRICING_V3_UNCLASSIFIED_ERROR_CODE,
@@ -85,6 +88,8 @@ import {
   replayPricingV3,
   runPricingV3
 } from '../../src/lib/finance/pricing-v3/adapters/local-snapshot'
+
+import { createFileStorage, readArgumentFile, writeOutputFile } from './pricing-v3-storage-file'
 
 const json = (value: unknown) => `${JSON.stringify(value, null, 2)}\n`
 
@@ -163,61 +168,26 @@ const parseCli = () => {
   return { positionals, values, repeated }
 }
 
-// Only the option name leaves here: a path or a parser message could quote what the caller keeps private.
-const readJson = (option: ValueOption | 'current', path: string): unknown => {
-  let text: string
-
-  try {
-    text = readFileSync(path, 'utf8')
-  } catch {
-    throw new PricingV3Error('INPUT_NOT_FOUND', { option })
-  }
-
-  try {
-    return JSON.parse(text)
-  } catch {
-    throw new PricingV3Error('INPUT_NOT_JSON', { option })
-  }
-}
-
-// The one writer for JSON and text alike: exclusive and private, so nothing this tool freezes is ever overwritten.
-const writeNew = (path: string, body: string) => {
-  try {
-    writeFileSync(path, body, { flag: 'wx', mode: 0o600 })
-  } catch (error) {
-    // Either way the caller fixes `--out`; the system reason (missing folder, permissions) is not echoed.
-    const exists = (error as NodeJS.ErrnoException).code === 'EEXIST'
-
-    throw new PricingV3Error(exists ? 'OUTPUT_EXISTS' : 'OUTPUT_NOT_WRITABLE', { option: 'out' })
-  }
-}
-
+// This file holds no `node:fs`. Source documents, the pointer and frozen artifacts are read and written through the
+// storage port, by its file adapter; what a caller hands over for one run and what a reading leaves in `--out` are
+// arguments and outputs of the command line, read and written by the two helpers next to that adapter.
 const repositoryRoot = fileURLToPath(new URL('../../', import.meta.url))
-const currentPointerPath = join(repositoryRoot, 'data/pricing/v3-operating/current.json')
 
-// A source the pointer names may be gone or broken; that is a verdict for the verifier, not a failure to raise here.
-const readIfPossible = (path: string): unknown => {
-  try {
-    return JSON.parse(readFileSync(path, 'utf8'))
-  } catch {
-    return undefined
-  }
-}
+const storage = createFileStorage({ root: repositoryRoot, pointerPath: 'data/pricing/v3-operating/current.json' })
 
-// The pointer is the one file this tool replaces. A sibling temp file plus rename means a reader sees the old pointer
-// or the new one, never half of either. Not private like the other outputs: it is a tracked file with no amounts.
-const replacePointer = (path: string, body: string) => {
-  const staging = join(dirname(path), `.current.${process.pid}.tmp`)
+// Only the option name leaves here: a path or a parser message could quote what the caller keeps private.
+const readJson = (option: ValueOption | 'current', path: string): unknown => readArgumentFile(option, path)
 
-  try {
-    writeFileSync(staging, body, { flag: 'wx', mode: 0o644 })
-    renameSync(staging, path)
-  } catch {
-    rmSync(staging, { force: true })
+// The one writer for the JSON and text of a reading: exclusive and private, like everything this tool writes.
+const writeNew = (path: string, body: string) => writeOutputFile(path, body)
 
-    throw new PricingV3Error('OUTPUT_NOT_WRITABLE', { option: 'out' })
-  }
-}
+// A path of a flag is relative to where the command runs; a relative locator of the storage is relative to the
+// repository. Resolved here, the flag names the same file it always did.
+const readArtifact = async (option: string, path: string): Promise<unknown> =>
+  (await namingOption(option, storage.readArtifact({ locator: resolve(path) }))).value
+
+const readSource = async (option: string, role: SourceRole, path: string): Promise<unknown> =>
+  (await namingOption(option, storage.readDocument({ role, locator: resolve(path) }))).value
 
 const ISSUE_LIMIT = 20
 
@@ -252,7 +222,9 @@ const classify = (error: unknown) =>
 const exitFor = (result: ReturnType<typeof calculatePricingV3>) =>
   result.calculationStatus !== 'calculated' ? 2 : result.reviewStatus === 'requires_review' ? 3 : 0
 
-try {
+// Asynchronous because storage is: the file adapter answers at once, the platform one will not. Nothing here exits
+// the process; the exit code is set and the process ends on its own once stdout has drained.
+const run = async () => {
   const { positionals, values, repeated } = parseCli()
 
   const [command, subcommand] = positionals
@@ -332,7 +304,7 @@ try {
    * stays reachable, by request: `--keep-blocked` writes it, and the notice says what the file is. Returns the
    * notice to print under `runNotices.output`, or nothing when `--out` holds what it always holds.
    */
-  const freezeQuote = (artifact: unknown, calculated: boolean) => {
+  const freezeQuote = async (artifact: unknown, calculated: boolean) => {
     if (!values.out) return undefined
 
     if (!calculated && !values['keep-blocked'])
@@ -344,7 +316,7 @@ try {
           'Nothing was written to --out: the quote did not calculate, and --out only ever holds a calculated quote. Resolve what this output reports and run again with the same --out. To keep the blocked artifact for explain, replay, compose assess or compose commitments, add --keep-blocked and give it a path of its own.'
       }
 
-    writeNew(values.out, json(artifact))
+    await namingOption('out', storage.writeArtifact({ text: json(artifact), locator: resolve(values.out) }))
 
     return calculated
       ? undefined
@@ -360,24 +332,27 @@ try {
   const catalogPath =
     values.catalog ?? fileURLToPath(new URL('../../data/pricing/v3-catalog/catalog.review-v1.json', import.meta.url))
 
-  let pointer: CurrentVersions | undefined
+  // `resources budget` takes the credit catalog through `--catalog`; everywhere else a flag names its own source.
+  const roleOf = (option: CurrentSourceRole): SourceRole =>
+    command === 'resources' && subcommand === 'budget' ? 'credits' : option
 
-  // Opt-in (`--current`): a source the caller did not name comes from the pointer, and only once the file read
-  // here is the one the pointer vouches for. An explicit flag never reaches this, so it always wins.
-  const fromCurrent = (option: CurrentSourceRole) => {
-    // `resources budget` takes the credit catalog through `--catalog`; everywhere else a flag names its own source.
-    const role = command === 'resources' && subcommand === 'budget' ? 'credits' : option
-
-    pointer ??= currentVersionsSchema.parse(readJson('current', currentPointerPath))
-
-    return resolveCurrentSource(pointer, role, readIfPossible(join(repositoryRoot, pointer[role].path)))
-  }
+  // Opt-in (`--current`): a source the caller did not name comes from the pointer, and only once the document read
+  // is the one the pointer vouches for. The pointer is read once per run. An explicit flag never reaches this, so
+  // it always wins.
+  const currentSource = createCurrentSourceResolver(storage)
+  const fromCurrent = (option: CurrentSourceRole) => currentSource(roleOf(option))
 
   const pointed = (option: ValueOption): option is CurrentSourceRole =>
     Boolean(values.current) && values[option] === undefined && CURRENT_SOURCE_ROLES.some(role => role === option)
 
-  const load = (option: ValueOption) => (pointed(option) ? fromCurrent(option) : readJson(option, required(option)))
-  const loadCatalog = () => (pointed('catalog') ? fromCurrent('catalog') : readJson('catalog', catalogPath))
+  // Three kinds of file a flag can name. A source (catalog, policy, credits) and a frozen artifact are storage and
+  // come through the port; what the caller wrote for this run (a brief, a demand, a change) is an argument.
+  const sourceOf = (option: CurrentSourceRole) =>
+    pointed(option) ? fromCurrent(option) : readSource(option, roleOf(option), required(option))
+
+  const loadCatalog = () => (pointed('catalog') ? fromCurrent('catalog') : readSource('catalog', 'catalog', catalogPath))
+  const artifactOf = (option: 'input' | 'left' | 'right' | 'base') => readArtifact(option, required(option))
+  const load = (option: ValueOption) => readJson(option, required(option))
 
   const impacts = () => {
     if (!values.impact) return []
@@ -512,17 +487,11 @@ try {
 
     if (action === 'show') {
       // `--input` inspects a pointer that is not the committed one, e.g. the one `set --out` just wrote for review.
-      const shown = currentVersionsSchema.parse(
-        values.input ? readJson('input', values.input) : readJson('current', currentPointerPath)
-      )
+      const shown = values.input
+        ? await readCurrentVersions(storage, 'input', { locator: resolve(values.input) })
+        : await readCurrentVersions(storage, 'current')
 
-      const read = (role: CurrentSourceRole) => readIfPossible(join(repositoryRoot, shown[role].path))
-
-      const verification = verifyCurrentVersions(shown, {
-        catalog: read('catalog'),
-        policy: read('policy'),
-        credits: read('credits')
-      })
+      const verification = await verifyPointedSources(storage, shown)
 
       process.stdout.write(
         json({ binding: false, pointerDigest: currentVersionsDigest(shown), ...verification, pointer: shown })
@@ -550,24 +519,36 @@ try {
           policy: repositoryPath('policy'),
           credits: repositoryPath('credits')
         },
-        documents: { catalog: load('catalog'), policy: load('policy'), credits: load('credits') },
+        documents: {
+          catalog: await sourceOf('catalog'),
+          policy: await sourceOf('policy'),
+          credits: await sourceOf('credits')
+        },
         reason,
         // The operator's calendar day, not UTC: near midnight they differ and this field is read by people.
         updatedAt: `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
       })
 
-      const target = values.out ?? currentPointerPath
-
-      const replaced = existsSync(target)
-        ? currentVersionsDigest(readJson(values.out ? 'out' : 'current', target))
-        : null
+      // `--out` writes a pointer of its own, e.g. one to review before it replaces the committed one.
+      const target = values.out ? { locator: resolve(values.out) } : undefined
+      const held = await namingOption(values.out ? 'out' : 'current', storage.readPointer(target))
+      const replaced = held ? currentVersionsDigest(held.value) : null
 
       // Same lock as `catalog apply`: replacing requires having read exactly what is being replaced. A first
       // pointer has nothing to confirm, so a digest offered for one means the caller expected a file that is gone.
       if (replaced === null ? values.confirm !== undefined : required('confirm') !== replaced)
         throw new PricingV3Error('CURRENT_VERSIONS_CONFLICT', { option: 'confirm' })
 
-      replacePointer(target, json(next))
+      try {
+        // The storage checks again, over the pointer it holds at the moment it writes: read and replace are one act.
+        await namingOption('out', storage.replacePointer({ text: json(next), confirmDigest: replaced, ...target }))
+      } catch (error) {
+        if (isPricingV3Error(error) && error.code === 'CURRENT_VERSIONS_CONFLICT')
+          throw new PricingV3Error('CURRENT_VERSIONS_CONFLICT', { option: 'confirm' })
+
+        throw error
+      }
+
       process.stdout.write(
         json({ updated: true, binding: false, replaced, pointerDigest: currentVersionsDigest(next), pointer: next })
       )
@@ -631,13 +612,18 @@ try {
       process.stdout.write(json(result))
       process.exitCode = result.status === 'prepared' ? 0 : 2
     } else if (subcommand === 'scaffold') {
-      const result = scaffoldResourceDemand(loadCatalog(), load('policy'), load('input'))
+      const result = scaffoldResourceDemand(await loadCatalog(), await sourceOf('policy'), load('input'))
 
       if (values.out) writeNew(values.out, json(result.demand))
       process.stdout.write(json(result))
       process.exitCode = 2
     } else if (subcommand === 'plan') {
-      const result = prepareOperatingPlan(loadCatalog(), load('policy'), load('credits'), load('input'))
+      const result = prepareOperatingPlan(
+        await loadCatalog(),
+        await sourceOf('policy'),
+        await sourceOf('credits'),
+        load('input')
+      )
 
       if (values.out) {
         if (!result.demand) throw new PricingV3Error('PLAN_REQUIRES_VALID_ALLOCATION')
@@ -647,7 +633,7 @@ try {
       process.stdout.write(json(result))
       process.exitCode = result.status === 'calculated' ? 3 : 2
     } else if (subcommand === 'assess' || subcommand === 'preview') {
-      const artifact = replayResourceComposition(load('input'))
+      const artifact = replayResourceComposition(await artifactOf('input'))
 
       const result =
         subcommand === 'assess'
@@ -682,7 +668,7 @@ try {
         throw new PricingV3Error('INVALID_ARGUMENT', { option: 'label' })
 
       // Same check as `replay`: nothing is derived from an artifact that does not reproduce its own digest.
-      const artifact = replayResourceComposition(load('input'))
+      const artifact = replayResourceComposition(await artifactOf('input'))
 
       const result = splitQuotedPrice(artifact.semantic.result, artifact, {
         tools: requested[0] === 'all' ? 'all' : requested,
@@ -695,7 +681,7 @@ try {
       process.exitCode = 3
     } else if (subcommand === 'schedule' || subcommand === 'cash') {
       // Readings of a frozen quote, like `split`: verified by replay first, the total never changes.
-      const artifact = replayResourceComposition(load('input'))
+      const artifact = replayResourceComposition(await artifactOf('input'))
 
       const outcome =
         subcommand === 'schedule'
@@ -719,7 +705,7 @@ try {
     } else if (subcommand === 'document') {
       // A reading of a frozen quote, like `split` and `schedule`: verified by replay first, and every figure of the
       // document comes from the verified result. The brief only brings the texts and the presentation of the lines.
-      const artifact = replayResourceComposition(load('input'))
+      const artifact = replayResourceComposition(await artifactOf('input'))
 
       // The flag an option of the document was passed with, from the place the reader gave it in the list: an
       // option rejected by the document is corrected under `--option` or under `--increment`.
@@ -749,46 +735,52 @@ try {
       // of the service with the add-on in it, and the price is what it adds to the quote of the document. Whether
       // the two can be subtracted is the rule of the increment reader; a pair that cannot is rejected here with its
       // code, under the place the flag has in the same list.
-      const optionQuotes: (QuoteDocumentOption | QuoteDocumentIncrement)[] = repeated.map(
-        ({ flag, value: argument }, index) => {
-          const separator = argument.indexOf('=')
-          const key = argument.slice(0, separator)
-          const path = argument.slice(separator + 1)
+      const optionQuote = async (
+        { flag, value: argument }: (typeof repeated)[number],
+        index: number
+      ): Promise<QuoteDocumentOption | QuoteDocumentIncrement> => {
+        const separator = argument.indexOf('=')
+        const key = argument.slice(0, separator)
+        const path = argument.slice(separator + 1)
 
-          if (
-            separator < 1 ||
-            !path ||
-            !/^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/.test(key) ||
-            repeated.findIndex(other => other.value.startsWith(`${key}=`)) !== index
-          )
-            throw new PricingV3Error('INVALID_ARGUMENT', { option: flag })
+        if (
+          separator < 1 ||
+          !path ||
+          !/^[A-Za-z0-9][A-Za-z0-9_-]{0,39}$/.test(key) ||
+          repeated.findIndex(other => other.value.startsWith(`${key}=`)) !== index
+        )
+          throw new PricingV3Error('INVALID_ARGUMENT', { option: flag })
 
-          let frozen: ReturnType<typeof replayResourceComposition>
+        let frozen: ReturnType<typeof replayResourceComposition>
 
-          try {
-            frozen = replayResourceComposition(readJson(flag, path))
-          } catch (error) {
-            // With several artifacts in one run, the report says which flag holds the one that failed.
-            const failure = classify(error)
+        try {
+          frozen = replayResourceComposition(await readArtifact(flag, path))
+        } catch (error) {
+          // With several artifacts in one run, the report says which flag holds the one that failed.
+          const failure = classify(error)
 
-            if (!failure) throw error
+          if (!failure) throw error
 
-            throw new PricingV3Error(failure.code, { ...failure.detail, option: flag })
-          }
-
-          if (flag === 'option') return { key, result: frozen.semantic.result, identity: frozen }
-
-          const outcome = readQuoteIncrement(artifact, frozen)
-
-          if (!outcome.ok)
-            throw new PricingV3Error(outcome.code, {
-              option: flag,
-              issues: outcome.issues.map(issue => ({ path: `options.${index}.${issue.path}`, rule: issue.rule }))
-            })
-
-          return { key, increment: outcome.reading }
+          throw new PricingV3Error(failure.code, { ...failure.detail, option: flag })
         }
-      )
+
+        if (flag === 'option') return { key, result: frozen.semantic.result, identity: frozen }
+
+        const outcome = readQuoteIncrement(artifact, frozen)
+
+        if (!outcome.ok)
+          throw new PricingV3Error(outcome.code, {
+            option: flag,
+            issues: outcome.issues.map(issue => ({ path: `options.${index}.${issue.path}`, rule: issue.rule }))
+          })
+
+        return { key, increment: outcome.reading }
+      }
+
+      // One at a time and in the order given: the first option at fault is the one reported.
+      const optionQuotes: (QuoteDocumentOption | QuoteDocumentIncrement)[] = []
+
+      for (const [index, entry] of repeated.entries()) optionQuotes.push(await optionQuote(entry, index))
 
       if (values.brief) {
         const outcome = composeQuoteDocument(
@@ -818,9 +810,9 @@ try {
     } else if (subcommand === 'increment') {
       // A reading of two frozen quotes: the base, and the base with an add-on in it. Each is verified by replay
       // before anything is subtracted, and the report of a failure says which of the two flags holds the artifact.
-      const verified = (option: 'input' | 'base') => {
+      const verified = async (option: 'input' | 'base') => {
         try {
-          return replayResourceComposition(readJson(option, required(option)))
+          return replayResourceComposition(await artifactOf(option))
         } catch (error) {
           const failure = classify(error)
 
@@ -830,8 +822,8 @@ try {
         }
       }
 
-      const withAddOn = verified('input')
-      const outcome = readQuoteIncrement(verified('base'), withAddOn)
+      const withAddOn = await verified('input')
+      const outcome = readQuoteIncrement(await verified('base'), withAddOn)
 
       // What the caller corrects is the quote with the add-on, which is built to extend the base; the base only
       // when nothing but the base is at fault.
@@ -848,16 +840,21 @@ try {
     } else if (subcommand === 'commitments') {
       // Needs the frozen policy, demand and catalog besides the result: alternatives and declared contract terms
       // live there. It reports; whether a commitment is acceptable is the operator's call.
-      const reading = commitmentExposure(replayResourceComposition(load('input')))
+      const reading = commitmentExposure(replayResourceComposition(await artifactOf('input')))
 
       if (values.out) writeNew(values.out, json(reading))
       process.stdout.write(json(reading))
       process.exitCode = reading.calculationStatus === 'calculated' ? 3 : 2
     } else {
-      const artifact = runResourceComposition(loadCatalog(), load('policy'), load('credits'), load('input'))
+      const artifact = runResourceComposition(
+        await loadCatalog(),
+        await sourceOf('policy'),
+        await sourceOf('credits'),
+        load('input')
+      )
 
       const result = artifact.semantic.result
-      const output = freezeQuote(artifact, result.quote.calculationStatus === 'calculated')
+      const output = await freezeQuote(artifact, result.quote.calculationStatus === 'calculated')
 
       // A demand that kept an old date quotes with the values of that date and nothing fails. The catalog is in hand
       // here, so say it; this notice is about the run, not part of the frozen result.
@@ -921,21 +918,37 @@ try {
     permit(allowed[subcommand])
 
     if (subcommand === 'preview' || subcommand === 'apply') {
-      const args = [loadCatalog(), load('policy'), load('credits'), load('input')] as const
+      const args = [await loadCatalog(), await sourceOf('policy'), await sourceOf('credits'), load('input')] as const
 
       const result =
         subcommand === 'preview'
           ? previewResourceChange(...args, impacts())
           : applyResourceChange(...args, required('confirm'), impacts())
 
-      if (subcommand === 'apply') writeNew(required('out'), json(result.successor))
+      // The successor is a new version of a source: it is stored as one, and never over an existing file.
+      if (subcommand === 'apply')
+        await namingOption(
+          'out',
+          storage.writeDocument({
+            role: result.kind,
+            text: json(result.successor),
+            locator: resolve(required('out'))
+          })
+        )
       else if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
     } else if (subcommand === 'inspect') {
-      const policy = compositionPolicySchema.parse(load('policy'))
+      const policy = compositionPolicySchema.parse(await sourceOf('policy'))
       const withCredits = Boolean(values.credits || values.current)
-      const credits = withCredits ? creditCatalogSchema.parse(load('credits')) : undefined
-      const discovery = inspectOperatingResources(loadCatalog(), policy, required('date'), values.query, credits)
+      const credits = withCredits ? creditCatalogSchema.parse(await sourceOf('credits')) : undefined
+
+      const discovery = inspectOperatingResources(
+        await loadCatalog(),
+        policy,
+        required('date'),
+        values.query,
+        credits
+      )
 
       const result = {
         ...discovery,
@@ -946,14 +959,19 @@ try {
       if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
     } else if (subcommand === 'portfolio') {
-      const result = allocateResourcePortfolio(load('input'), load('policy'), loadCatalog(), values.date)
+      const result = allocateResourcePortfolio(
+        load('input'),
+        await sourceOf('policy'),
+        await loadCatalog(),
+        values.date
+      )
 
       if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
       process.exitCode = result.status === 'prepared' ? 3 : 2
     } else {
       if (subcommand !== 'budget') throw new PricingV3Error('INVALID_ARGUMENT')
-      const result = planCreditBudget(load('catalog'), load('input'))
+      const result = planCreditBudget(await sourceOf('catalog'), load('input'))
 
       if (values.out) writeNew(values.out, json(result))
       process.stdout.write(json(result))
@@ -972,7 +990,7 @@ try {
     }
 
     permit(permittedSub[subcommand])
-    const catalog = validateCatalog(loadCatalog())
+    const catalog = validateCatalog(await loadCatalog())
 
     if (subcommand === 'validate')
       process.stdout.write(
@@ -989,7 +1007,10 @@ try {
     else if (subcommand === 'apply') {
       const next = applyCatalogChange(catalog, load('input'), required('confirm'), impacts())
 
-      writeNew(required('out'), json(next))
+      await namingOption(
+        'out',
+        storage.writeDocument({ role: 'catalog', text: json(next), locator: resolve(required('out')) })
+      )
       process.stdout.write(json({ updated: true, version: next.version, digest: catalogDigest(next), binding: false }))
     } else {
       if (values.date && !briefSchema.shape.quoteDate.safeParse(values.date).success)
@@ -1031,7 +1052,7 @@ try {
     }
   } else if (command === 'prepare' || command === 'quote') {
     if (positionals.length !== 1) throw new PricingV3Error('INVALID_ARGUMENT')
-    const catalog = validateCatalog(loadCatalog())
+    const catalog = validateCatalog(await loadCatalog())
     const brief = load('input')
 
     if (command === 'prepare') {
@@ -1044,7 +1065,7 @@ try {
     } else {
       const artifact = runCatalogQuote(catalog, brief)
       const result = artifact.semantic.result
-      const output = freezeQuote(artifact, result.calculationStatus === 'calculated')
+      const output = await freezeQuote(artifact, result.calculationStatus === 'calculated')
       const agreedTotals = describeAgreedTotals(result.resolution)
 
       process.stdout.write(
@@ -1076,7 +1097,9 @@ try {
 
     // An input the contract rejects yields no artifact at all, with or without `--keep-blocked`.
     const output =
-      command === 'calculate' && artifact ? freezeQuote(artifact, result.calculationStatus === 'calculated') : undefined
+      command === 'calculate' && artifact
+        ? await freezeQuote(artifact, result.calculationStatus === 'calculated')
+        : undefined
 
     process.stdout.write(
       json({
@@ -1091,8 +1114,8 @@ try {
     if (positionals.length !== 1) throw new PricingV3Error('INVALID_ARGUMENT')
 
     if (command === 'compare') {
-      const left = load('left')
-      const right = load('right')
+      const left = await artifactOf('left')
+      const right = await artifactOf('right')
 
       const catalogQuote = (value: unknown) =>
         (value as { artifactVersion?: string })?.artifactVersion === QUOTE_VERSION
@@ -1100,7 +1123,7 @@ try {
       if (catalogQuote(left) !== catalogQuote(right)) throw new PricingV3Error('INVALID_COMPARISON')
       process.stdout.write(json(catalogQuote(left) ? compareCatalogQuotes(left, right) : comparePricingV3(left, right)))
     } else {
-      const raw = load('input')
+      const raw = await artifactOf('input')
 
       if ((raw as { artifactVersion?: string })?.artifactVersion === COMPOSITION_VERSION) {
         if (command === 'export') throw new PricingV3Error('EXPORT_REQUIRES_COMPLETE_WITHIN_POLICY')
@@ -1182,7 +1205,9 @@ try {
       }
     }
   } else throw new PricingV3Error('UNKNOWN_COMMAND')
-} catch (error) {
+}
+
+run().catch((error: unknown) => {
   const failure = classify(error)
   const { option, allowed, issues } = failure?.detail ?? {}
 
@@ -1201,4 +1226,4 @@ try {
     })
   )
   process.exitCode = 1
-}
+})
