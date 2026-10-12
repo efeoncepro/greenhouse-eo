@@ -148,6 +148,13 @@ export const compositionDemandSchema = z
             contractSeatCount: z.number().int().min(1).max(10000).optional(),
             driver: z.object({ unit: id, totalUnits: positive, allocatedUnits: positive }).strict(),
             reason: z.string().min(1).max(1000),
+            // Where the allocation comes from (the plan held, its seats, the share this account carries) and whether
+            // that is confirmed or an estimate: the source shape of every other evidence. `reason` explains the
+            // allocation to a reader and is never read for what it says; this is the declared fact the assessment
+            // reads. An allocation without it, or with one that is not confirmed and in force on the quote date, is
+            // a declaration nobody evidenced and the assessment says so (ALLOCATION_EVIDENCE_REQUIRED). It never
+            // reaches the kernel and blocks nothing. No default: the parsed demand is inside every frozen artifact.
+            evidence: sourceSchema.optional(),
             // Seats of a named tool that are paid in the period and that nobody uses: a seat bought for the year
             // whose person works some months only. A paid seat is used, shared or declared here; the composition
             // accepts no other. The cost of an idle seat stays in the quote, on the lines that use the tool.
@@ -215,6 +222,13 @@ export const compositionDemandSchema = z
       .optional()
   })
   .strict()
+
+/**
+ * How `work[].assigneeIds` names a person nobody is assigned to yet: a planning slot, as the scaffold of a demand
+ * writes it (`planned-<lineId>-<n>`). A slot stays while nobody is assigned, and the assessment says so; it becomes
+ * a stable anonymous id only when a specific person is assigned.
+ */
+export const PLANNING_SLOT_PREFIX = 'planned-'
 
 export type CompositionDemand = z.infer<typeof compositionDemandSchema>
 export type CompositionPolicy = z.infer<typeof compositionPolicySchema>

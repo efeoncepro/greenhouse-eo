@@ -1746,10 +1746,11 @@ describe('summary, assess, explain and the client-shaped views of a 1.2.0 compos
     const quiet = assessCompositionReadiness(followed)
     const loud = assessCompositionReadiness(flagged)
 
+    // A gap names the row once and the periods it is flagged in: each of them is a row the kernel flagged.
     const gaps = (a: typeof quiet) =>
       a.gaps
         .filter(g => g.code === 'MARGIN_BELOW_POLICY_FLOOR')
-        .map(g => g.path)
+        .flatMap(g => g.periodIds!.map(periodId => `periods.${periodId}.${g.path}`))
         .sort()
 
     expect(gaps(quiet)).toEqual([])

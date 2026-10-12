@@ -1,5 +1,6 @@
 import type { z } from 'zod'
 
+import { catalogSelectionKey } from '../catalog/catalog'
 import type { Catalog } from '../catalog/contracts'
 import { pricingV3RequestSchema } from '../schemas'
 import type { composeResourceQuote } from './composition'
@@ -39,9 +40,15 @@ export type PriceDateNotice = {
   blocksWith: string | null
   /**
    * What a quote dated after a hard `date` gets when it is not a blocking diagnostic. Present only then: a catalog
-   * record whose absence resolution accepts in silence.
+   * record whose absence resolution accepts in silence, or one another record answers for (`supersededBy`).
    */
   consequence?: string
+  /**
+   * Only for a catalog record whose selection another record answers once this one has ended: the ids of the
+   * records in force then (on the reading date for a validity already passed, on the day after `date` otherwise).
+   * A quote selects one of those and is not blocked by the end of this one, so `blocksWith` is null.
+   */
+  supersededBy?: string[]
 }
 
 export type PriceReview = {
@@ -54,6 +61,11 @@ export type PriceReview = {
   dueSoon: PriceDateNotice[]
   /** Hard validities already passed: a quote dated `asOf` cannot use these. */
   expired: PriceDateNotice[]
+  /**
+   * Catalog records whose validity has passed and whose selection another record in force on `asOf` answers
+   * (`supersededBy`): history, not an expiry. They block no quote and are never listed under `expired`.
+   */
+  superseded: PriceDateNotice[]
 }
 
 const DAY = 86_400_000
@@ -70,6 +82,22 @@ const RESERVE_EXPIRY_CONSEQUENCE =
 
 const WAIVER_WITHOUT_RESERVE = 'CONTINGENCY_WAIVER_WITHOUT_RESERVE'
 
+/**
+ * A catalog record is one value of a selection (the rate of a currency pair, the cost of a profile in a country).
+ * When it ends and another record answers the same selection, nothing a quote needs has gone missing: resolution
+ * selects by what the record states, never by its id. Only a declaration that names the record itself is touched.
+ */
+const SUPERSEDED_CONSEQUENCE =
+  'Another record in force answers the same selection (`supersededBy`): a quote selects that one and is not blocked. A demand or a brief that names this record by its id has to name the one that replaced it.'
+
+const dayAfter = (date: string) => {
+  const time = new Date(`${date}T00:00:00Z`)
+
+  time.setUTCDate(time.getUTCDate() + 1)
+
+  return time.toISOString().slice(0, 10)
+}
+
 const ordered = (notices: PriceDateNotice[]) =>
   [...notices].sort(
     (a, b) => a.date.localeCompare(b.date) || a.ref.localeCompare(b.ref) || a.kind.localeCompare(b.kind)
@@ -79,7 +107,10 @@ const ordered = (notices: PriceDateNotice[]) =>
  * Dates of the resource policy worth acting on, read at `asOf`. Pure and derived: it changes no price, no validity
  * and no calculation. With `catalog` or `credits` it also reads the other hard dates that can block a quote.
  *
- * A catalog record that ends because its next revision starts is not an expiry and is not listed.
+ * A catalog record that ends because its next revision starts is not an expiry and is not listed. One that ends
+ * while another record answers the same selection (`catalogSelectionKey`: another record id for the same currency
+ * pair, the same cost, the same rule) is not an expiry either: once its validity has passed it is listed under
+ * `superseded`, with the records that replaced it, and before that it stays under `dueSoon` without a blocker.
  */
 export function reviewResourcePrices(
   policy: CompositionPolicy,
@@ -107,14 +138,16 @@ function readDates(
     withinDays,
     reviewDue: [],
     dueSoon: [],
-    expired: []
+    expired: [],
+    superseded: []
   }
 
   const read = (notice: Omit<PriceDateNotice, 'daysLeft'>) => {
     const daysLeft = daysBetween(asOf, notice.date)
     const row = { ...notice, daysLeft }
 
-    if (daysLeft < 0) (notice.kind === 'review' ? review.reviewDue : review.expired).push(row)
+    if (daysLeft < 0)
+      (notice.kind === 'review' ? review.reviewDue : notice.supersededBy ? review.superseded : review.expired).push(row)
     else if (daysLeft <= withinDays) review.dueSoon.push(row)
   }
 
@@ -160,6 +193,28 @@ function readDates(
     // Ended by its own next revision, or retired on purpose: neither is a value about to go missing.
     if (latestStart.get(record.recordId)! > record.source.effectiveUntil || record.retiredAt) continue
 
+    // Whether a quote dated after the end of this record still finds its value: the records of other ids that
+    // answer the same selection and are in force then. "Then" is the reading date once the validity has passed
+    // (what a quote of today gets) and the day after the end before that (what the first quote without it gets).
+    const until = record.source.effectiveUntil
+    const then = until < asOf ? asOf : dayAfter(until)
+    const selection = catalogSelectionKey(record)
+
+    const supersededBy = [
+      ...new Set(
+        (options.catalog?.records ?? [])
+          .filter(
+            other =>
+              other.recordId !== record.recordId &&
+              other.kind === record.kind &&
+              catalogSelectionKey(other) === selection &&
+              other.source.effectiveFrom <= then &&
+              then <= other.source.effectiveUntil
+          )
+          .map(other => other.recordId)
+      )
+    ].sort()
+
     read({
       kind: 'hard_expiry',
       subject: 'catalog_record',
@@ -167,11 +222,13 @@ function readDates(
       toolId: null,
       priceId: null,
       label: `${record.kind} revision ${record.revision}`,
-      date: record.source.effectiveUntil,
-      // Every other kind is a value a quote that needs it cannot be resolved without.
-      ...(record.kind === 'contingency_reserve'
-        ? { blocksWith: null, consequence: RESERVE_EXPIRY_CONSEQUENCE }
-        : { blocksWith: 'MISSING_CATALOG_SELECTION' })
+      date: until,
+      ...(supersededBy.length
+        ? { blocksWith: null, consequence: SUPERSEDED_CONSEQUENCE, supersededBy }
+        : // Every other kind is a value a quote that needs it cannot be resolved without.
+          record.kind === 'contingency_reserve'
+          ? { blocksWith: null, consequence: RESERVE_EXPIRY_CONSEQUENCE }
+          : { blocksWith: 'MISSING_CATALOG_SELECTION' })
     })
   }
 
@@ -194,7 +251,8 @@ function readDates(
     ...review,
     reviewDue: ordered(review.reviewDue),
     dueSoon: ordered(review.dueSoon),
-    expired: ordered(review.expired)
+    expired: ordered(review.expired),
+    superseded: ordered(review.superseded)
   }
 }
 
@@ -288,6 +346,7 @@ export function quotePriceNotices(
     reviewDue: all.reviewDue.filter(applies).map(forThisQuote),
     dueSoon: all.dueSoon.filter(applies).map(forThisQuote),
     expired: all.expired.filter(applies).map(forThisQuote),
+    superseded: all.superseded.filter(applies),
     notInPolicy: used.filter(ref => !known.has(ref))
   }
 }

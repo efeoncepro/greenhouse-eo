@@ -149,6 +149,9 @@ export const quoteDocumentBriefSchema = z
         name: line,
         // The area or team the document is addressed to. Optional: a buyer with none is not given its own name twice.
         unit: line.optional(),
+        // The person the document is addressed to, printed on the cover after «Atención:». Optional, and a text of
+        // its own: a person is not an area, so it never goes in `unit`.
+        contact: line.optional(),
         taxId: line,
         // The template never downloads a logo: a local file and the official source it was taken from.
         logo: z
@@ -197,8 +200,9 @@ export const quoteDocumentBriefSchema = z
     // `courtesy: true` to be printed with its reference value: a choice of presentation, never a figure.
     lines: z.unknown().optional(),
     // Keys printed together as one line, a price for the whole of them («1 programa»): a list of
-    // { keys, label, unit, detail?, group? }. Checked against the quote, below, like `lines`. A choice of presentation:
-    // the net of the line is the sum the quote froze for those keys, and this block has no place for one.
+    // { keys, label, unit, detail?, group?, per? }. Checked against the quote, below, like `lines`. A choice of
+    // presentation: the net of the line is the sum the quote froze for those keys, and this block has no place for
+    // one. With `per: "period"` the keys are added up month by month instead and print as months («6 meses»).
     combine: z.unknown().optional(),
     // Name, detail and unit of each optional add-on, by the key its frozen quote was passed under. Checked against
     // the options of the run, below: like the keys of the lines, they are data of one run and not of this schema.
@@ -298,10 +302,17 @@ const readOverrides = (
   return { overrides, issues }
 }
 
-/** Keys the brief prints together as one line, with the texts of that line. */
-type Combination = { keys: string[]; label: string; detail?: string; group?: string; unit: string }
+/**
+ * Keys the brief prints together, with the texts of their line. Over the whole term (`per: 'term'`) they are one
+ * line of the unit the brief names; month by month (`per: 'period'`) they are counted in months and name no unit.
+ */
+type Combination = { keys: string[]; label: string; detail?: string; group?: string } & (
+  | { per: 'term'; unit: string }
+  | { per: 'period' }
+)
 
-const COMBINATION_FIELDS: readonly string[] = ['keys', 'label', 'detail', 'group', 'unit']
+const COMBINATION_FIELDS: readonly string[] = ['keys', 'label', 'detail', 'group', 'unit', 'per']
+const COMBINATION_BASES: readonly unknown[] = ['term', 'period']
 
 /**
  * Combinations of the brief, checked against the keys of this quote. A combination is one printed line for several
@@ -317,6 +328,16 @@ const COMBINATION_FIELDS: readonly string[] = ['keys', 'label', 'detail', 'group
  * - `duplicate_key`: the key is already in this combination or in an earlier one.
  *
  * A key printed in a combination has no line of its own; `readOverrides` rejects an entry of `lines` for it.
+ *
+ * `per` says what the keys are added up over, and with it what the line is counted in:
+ *
+ * - `"term"`, or no `per`: one sum for the whole term, printed as a quantity of one of `unit`, which the entry must
+ *   name (`missing_unit`);
+ * - `"period"`: one sum for each month, folded like a single key (`presentLines`). The line is counted in months, so
+ *   the entry names no unit: one that does is rejected (`unit_not_allowed_per_period`) instead of being read past,
+ *   because the text it carries would never be printed.
+ *
+ * Anything else in `per` is `invalid_per`.
  *
  * An entry is reported by its position in the list, and a key by its position in the entry: never by its name or
  * content. `combined` are the keys that found their place, whatever else of their entry was wrong.
@@ -364,12 +385,23 @@ const readCombinations = (declared: unknown, charged: ReadonlySet<string>, waive
         }
       })
 
-    for (const field of ['label', 'unit'] as const) {
+    // What the keys are added up over. Unknown, the entry is rejected for that alone: whether it owes a unit
+    // depends on the answer.
+    const per = value.per === undefined ? 'term' : COMBINATION_BASES.includes(value.per) ? value.per : null
+
+    if (per === null) issues.push({ path: `${path}.per`, rule: 'invalid_per' })
+
+    const perPeriod = per === 'period'
+
+    for (const field of per === 'term' ? (['label', 'unit'] as const) : (['label'] as const)) {
       const text = value[field]
 
       if (!isLine(text))
         issues.push({ path: `${path}.${field}`, rule: text === undefined ? `missing_${field}` : `invalid_${field}` })
     }
+
+    if (perPeriod && value.unit !== undefined)
+      issues.push({ path: `${path}.unit`, rule: 'unit_not_allowed_per_period' })
 
     for (const field of ['detail', 'group'] as const)
       if (value[field] !== undefined && !isLine(value[field]))
@@ -381,7 +413,7 @@ const readCombinations = (declared: unknown, charged: ReadonlySet<string>, waive
         label: value.label as string,
         ...(value.detail !== undefined ? { detail: value.detail as string } : {}),
         ...(value.group !== undefined ? { group: value.group as string } : {}),
-        unit: value.unit as string
+        ...(perPeriod ? { per: 'period' as const } : { per: 'term' as const, unit: value.unit as string })
       })
   })
 
@@ -572,9 +604,15 @@ type DocumentLine = {
  */
 type LineEntry = { key: string; kind: ClientSafeItemKind; courtesy: boolean; net: Decimal; line: DocumentLine }
 
-/** Months a run covers, and how a line counts them: a one-off payment or a number of months. */
-const quantityOfRun = (kind: ClientSafeItemKind, run: { from: number; periods: number }) => {
-  const once = kind !== 'fee' && kind !== 'line' && run.periods === 1
+/** A kind counted in months whatever its run: the fee of a managed service and a line sold by dedication. */
+const recurring = (kind: ClientSafeItemKind) => kind === 'fee' || kind === 'line'
+
+/**
+ * Months a run covers, and how a line counts them: a number of months, or a one-off payment when what it prices is
+ * not `monthly` by nature (a setup, a third-party cost) and falls in a single period.
+ */
+const quantityOfRun = (monthly: boolean, run: { from: number; periods: number }) => {
+  const once = !monthly && run.periods === 1
 
   return {
     once,
@@ -597,10 +635,17 @@ const quantityOfRun = (kind: ClientSafeItemKind, run: { from: number; periods: n
  * the line it replaces and sits where that line would be; it adds nothing to any sum.
  *
  * `combinations` are the keys the brief prints together (`readCombinations`, which already holds each key to one
- * place). Each is one line: a quantity of one of the unit the brief names, no unit value, and for net the exact sum
- * of every run of every key it names, over the whole term. Those keys print no line of their own, so the lines add
+ * place). Over the whole term, each is one line: a quantity of one of the unit the brief names, no unit value, and
+ * for net the exact sum of every run of every key it names. Those keys print no line of their own, so the lines add
  * up to the same net whatever is combined. The line sits where the first of its keys appears in the quote and, with
  * no group of its own, under the default group of the first key the brief lists.
+ *
+ * A combination `per: 'period'` adds its keys up inside each month instead, and the sums are folded exactly like the
+ * nets of a single key: consecutive months with the same sum are one line, that many months at the sum of one month
+ * (always counted in months and with its unit value: it is a price per month, whatever kinds it adds up), and a
+ * month where the sum differs, or where none of its keys is charged, starts another line, each saying its months
+ * unless the brief gives a detail. What is sold as one amount a month, its start-up included, prints as «6 meses»
+ * at that amount. Every month of every key is in exactly one of those sums, so the lines add up as before.
  */
 const presentLines = (
   concepts: KeyedConcept[],
@@ -615,31 +660,70 @@ const presentLines = (
 
   const combined = combinations.map(combination => {
     const members = combination.keys.map(key => byKey.get(key)!)
+    const group = combination.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[members[0].kind]
 
-    const net = members
-      .flatMap(concept => concept.runs)
-      .reduce((total, run) => total.plus(run.unitNet.mul(run.periods)), new Wide(0))
-
-    const entry: LineEntry = {
+    // A line of the combination, its keys in the order every line of the data has. Kept of it and never printed:
+    // the key and the kind of the first key it names.
+    const entryOf = (
+      net: Decimal,
+      detail: string | undefined,
+      quantity: DocumentLine['quantity'],
+      unitNet?: Decimal
+    ): LineEntry => ({
       key: members[0].key,
       kind: members[0].kind,
       courtesy: false,
       net,
       line: {
         label: combination.label,
-        ...(combination.detail !== undefined ? { detail: combination.detail } : {}),
-        group: combination.group ?? QUOTE_DOCUMENT_DEFAULT_GROUPS[members[0].kind],
-        quantity: { value: 1, unit: combination.unit },
+        ...(detail !== undefined ? { detail } : {}),
+        group,
+        quantity,
+        ...(unitNet !== undefined ? { unitNet: money(unitNet) } : {}),
         net: money(net)
       }
+    })
+
+    // Where the earliest of its keys first appears in the quote.
+    const rank = members
+      .map(concept => concept.rank)
+      .reduce((first, rank) => ((rank[0] - first[0] || rank[1] - first[1]) < 0 ? rank : first))
+
+    if (combination.per === 'term') {
+      const net = members
+        .flatMap(concept => concept.runs)
+        .reduce((total, run) => total.plus(run.unitNet.mul(run.periods)), new Wide(0))
+
+      return { rank, lines: [entryOf(net, combination.detail, { value: 1, unit: combination.unit })] }
+    }
+
+    // The sum of its keys in each month they are charged in, then the same fold a single key gets: consecutive
+    // months with the same sum are one run. A month none of them is charged in has no sum and ends a run.
+    const sums = new Map<number, Decimal>()
+
+    for (const run of members.flatMap(concept => concept.runs))
+      for (let periodId = run.from; periodId <= run.to; periodId++)
+        sums.set(periodId, (sums.get(periodId) ?? new Wide(0)).plus(run.unitNet))
+
+    const runs: Run[] = []
+
+    for (const [periodId, sum] of [...sums].sort(([a], [b]) => a - b)) {
+      const open = runs[runs.length - 1]
+
+      if (open && open.to === periodId - 1 && open.unitNet.eq(sum)) {
+        open.to = periodId
+        open.periods += 1
+      } else runs.push({ from: periodId, to: periodId, periods: 1, unitNet: sum })
     }
 
     return {
-      // Where the earliest of its keys first appears in the quote.
-      rank: members
-        .map(concept => concept.rank)
-        .reduce((first, rank) => ((rank[0] - first[0] || rank[1] - first[1]) < 0 ? rank : first)),
-      lines: [entry]
+      rank,
+      lines: runs.map(run => {
+        const { months, quantity } = quantityOfRun(true, run)
+        const detail = combination.detail ?? (runs.length > 1 ? monthsLabel(months) : undefined)
+
+        return entryOf(run.unitNet.mul(run.periods), detail, quantity, run.unitNet)
+      })
     }
   })
 
@@ -651,7 +735,7 @@ const presentLines = (
       return {
         rank: concept.rank,
         lines: concept.runs.map((run): LineEntry => {
-          const { once, months, quantity } = quantityOfRun(concept.kind, run)
+          const { once, months, quantity } = quantityOfRun(recurring(concept.kind), run)
           const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
 
           return {
@@ -678,7 +762,7 @@ const presentLines = (
     return {
       rank: concept.rank,
       lines: concept.runs.map((run): LineEntry => {
-        const { months, quantity } = quantityOfRun(concept.kind, run)
+        const { months, quantity } = quantityOfRun(recurring(concept.kind), run)
         const detail = override?.detail ?? (concept.runs.length > 1 ? monthsLabel(months) : undefined)
 
         return {
@@ -1103,7 +1187,8 @@ const engineOf = (result: Composition) =>
  *   the price section, conditions) and the presentation of the lines (label, detail and group per key, and which
  *   keys are printed together). Its schema has no amount, currency, tax rate or date, so it cannot contradict the
  *   quote. A text that would only state what any quote implies is left out: the area of the buyer, the note of the
- *   calendar of the work and the label of the net on the cover are optional.
+ *   calendar of the work and the label of the net on the cover are optional. So is the person the document is
+ *   addressed to (`buyer.contact`), which the cover prints only when the brief names one.
  *
  * What a client may see is decided by one function, `clientSafePeriodItems` in readiness.ts, which the preview
  * prints period by period and this reading folds over the term. Nothing else of the result is read for a line: no
@@ -1134,7 +1219,9 @@ const engineOf = (result: Composition) =>
  *   brief may `combine` keys into one line, a price for the whole of them («1 programa»): quantity one of the unit it
  *   names, no unit value, and for net the exact sum the quote froze for those keys over the whole term. Each key is
  *   printed once: in one combination at most, and then in no line of its own (`readCombinations`). The lines add up
- *   to the same net either way.
+ *   to the same net either way. A combination `per: "period"` is the price of a month instead: its keys are added
+ *   up inside each month and print as months at that sum («6 meses»), which is how a quote agreed as one amount a
+ *   month, its start-up included, is printed as it was sold.
  * - **Milestones with their tax.** When the quote has an exclusive rate, each milestone of the payment calendar
  *   carries the part of the frozen tax `presentPaymentSchedule` gives it and its total; the parts add up to the tax
  *   and the total of the quote. Without a resolved tax, or with one that does not apply, a milestone is its net.
@@ -1483,7 +1570,9 @@ export function scaffoldQuoteDocumentBrief(
       optional: {
         locale: 'BCP 47 locale the template formats with. Absent, the template chooses it from the currency.',
         'buyer.unit':
-          'The area or team of the buyer the document is addressed to. Leave it out when there is none: never the name of the buyer again.',
+          'The area or team of the buyer the document is addressed to. Leave it out when there is none: never the name of the buyer again, and never a person.',
+        'buyer.contact':
+          'The person the document is addressed to, printed on the cover as «Atención: …»: a name, with a role if it helps. Leave it out when there is none.',
         'buyer.logo': '{ path, source }: a local image file and the official HTTPS source it was taken from.',
         'cover.netLabel':
           'Name of the net printed on the cover, in place of the one of the template: «Valor neto del proyecto», «Valor neto del programa». A text, never an amount.',
@@ -1497,7 +1586,7 @@ export function scaffoldQuoteDocumentBrief(
         'lines.<key>.courtesy':
           'true prints a line the quote waives completely as a courtesy: net zero and its reference value. Only for the keys listed under `waived`, with their label, detail and group like any line; a waived key that is not marked prints nothing.',
         combine:
-          '[{ keys, label, unit, detail?, group? }]: prints the keys of `keys` as one line, a price for the whole of them («1 programa», «1 proyecto», «1 servicio»): quantity 1 of `unit`, no unit value, and for net the sum the quote froze for those keys over the whole term. One key alone may be combined (a fee printed as a programme price instead of months). A key goes in one combination at most and then has no entry in `lines`; a key the quote waives cannot be combined. Without it every key prints folded by months, as listed under `lines`.',
+          '[{ keys, label, unit, detail?, group?, per? }]: prints the keys of `keys` as one line, a price for the whole of them («1 programa», «1 proyecto», «1 servicio»): quantity 1 of `unit`, no unit value, and for net the sum the quote froze for those keys over the whole term. One key alone may be combined (a fee printed as a programme price instead of months). A key goes in one combination at most and then has no entry in `lines`; a key the quote waives cannot be combined. Without it every key prints folded by months, as listed under `lines`. With `per: "period"` (default `"term"`) the keys are added up inside each month instead, and the months fold like a single key: «6 meses» at the sum of one month, with a line per stretch of months when that sum changes. For a price agreed as one amount a month with everything in it (a start-up included). The unit is the month, so such an entry gives no `unit`.',
         options:
           '{ <key>: { label, unit, detail? } } for each option passed with `--option <key>=<artifact.json>`: its name, the unit its price is read in («al mes», «por campaña») and an optional second line. Exactly the options passed; the price of each is the net of one period of its own frozen quote.',
         // Said only of a run that prices an option as an increment; every other scaffold keeps the entries it had.
@@ -1517,8 +1606,8 @@ export function scaffoldQuoteDocumentBrief(
         schemaVersion: QUOTE_DOCUMENT_BRIEF_VERSION,
         reference: '',
         supplier: { name: '', taxId: '', contact: '', email: '', phone: '' },
-        // No slot for `buyer.unit`, `schedule.note` or `cover.netLabel`: they are optional (above), and an empty slot
-        // asks to be filled with something.
+        // No slot for `buyer.unit`, `buyer.contact`, `schedule.note` or `cover.netLabel`: they are optional (above),
+        // and an empty slot asks to be filled with something.
         buyer: { name: '', taxId: '' },
         cover: { label: '', title: [''], subtitle: '' },
         service: { name: '' },

@@ -983,23 +983,22 @@ describe('readings of a quote with several holdings, shared seats and idle seats
   })
 
   it('readiness: a declared idle seat and a declared shared seat are each a gap somebody owns, once per period', () => {
+    // A gap names the tool once and the periods it is raised in.
     const gaps = (artifact: ReturnType<typeof freeze>, code: string) =>
       assessCompositionReadiness(artifact.semantic.result)
         .gaps.filter(g => g.code === code)
-        .map(g => [g.path, g.owner])
+        .map(g => [g.path, g.owner, g.periodIds])
 
-    expect(gaps(withIdle(), 'IDLE_SEAT_COST_REVIEW')).toEqual([
-      [`1:${INBOX}`, 'Operations/Commercial'],
-      [`3:${INBOX}`, 'Operations/Commercial']
-    ])
-    expect(gaps(withSharing(), 'SHARED_SEAT_TERMS_REVIEW')).toEqual([[`2:${INBOX}`, 'Operations/Legal']])
+    expect(gaps(withIdle(), 'IDLE_SEAT_COST_REVIEW')).toEqual([[`tools.${INBOX}`, 'Operations/Commercial', [1, 3]]])
+    expect(gaps(withSharing(), 'SHARED_SEAT_TERMS_REVIEW')).toEqual([[`tools.${INBOX}`, 'Operations/Legal', [2]]])
     // Neither is raised for a quote that declares neither, several holdings or not.
     expect(gaps(mixed(), 'IDLE_SEAT_COST_REVIEW')).toEqual([])
     expect(gaps(mixed(), 'SHARED_SEAT_TERMS_REVIEW')).toEqual([])
     expect(gaps(withIdle(), 'SHARED_SEAT_TERMS_REVIEW')).toEqual([])
-    // Access is still to be verified for the tool in each period, whatever it is held as.
+    // Access is still to be verified for the tool in each period, whatever it is held as: once per period, and
+    // never once per holding.
     expect(
-      gaps(mixed(), 'RESOURCE_ACCESS_AND_CAPACITY_REQUIRED').filter(([path]) => path.endsWith(INBOX))
-    ).toHaveLength(3)
+      gaps(mixed(), 'RESOURCE_ACCESS_AND_CAPACITY_REQUIRED').filter(([path]) => path === `tools.${INBOX}`)
+    ).toEqual([[`tools.${INBOX}`, 'Operations', [1, 2, 3]]])
   })
 })

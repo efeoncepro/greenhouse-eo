@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { catalogDigest } from '../adapters/catalog-local'
 import { replayResourceComposition, runResourceComposition } from '../adapters/resource-composition'
 import { applyResourceChange, previewResourceChange } from '../adapters/resource-maintenance'
-import { validateCatalog } from '../catalog/catalog'
+import { catalogSelectionKey, validateCatalog } from '../catalog/catalog'
 import { composeResourceQuote } from '../resources/composition'
 import { compositionPolicySchema } from '../resources/composition-contracts'
 import type { CompositionPolicy } from '../resources/composition-contracts'
@@ -528,6 +528,196 @@ describe('an FX rate the composition brought for the currency of a tool', () => 
   })
 })
 
+describe('a record another record answers for is history, not an expiry', () => {
+  // The catalog in force holds a rate of a currency pair read on one day, under a record id of its own, and a later
+  // record of the same pair under another id. The first ended; nothing a quote needs went missing.
+  const rawCurrent = operating('catalog.review-v11')
+  const current = validateCatalog(rawCurrent)
+  const currentPolicy = compositionPolicySchema.parse(operating('resources.review-v11'))
+  const person = operating('designer-three-months-iva.demand')
+  const DATE: string = person.brief.quoteDate
+
+  type Fx = Extract<(typeof current.records)[number], { kind: 'fx' }>
+
+  const rates = current.records.filter((r): r is Fx => r.kind === 'fx')
+
+  /** Other records that state the rate of the same pair and are in force on a date: read from the catalog. */
+  const answering = (record: Fx, date: string) =>
+    rates
+      .filter(
+        other =>
+          other.recordId !== record.recordId &&
+          other.value.from === record.value.from &&
+          other.value.to === record.value.to &&
+          other.source.effectiveFrom <= date &&
+          date <= other.source.effectiveUntil
+      )
+      .map(other => other.recordId)
+      .sort()
+
+  // Rates that have ended on the date, with no later revision of their own.
+  const ended = rates.filter(
+    r =>
+      !r.retiredAt &&
+      r.source.effectiveUntil < DATE &&
+      !rates.some(next => next.recordId === r.recordId && next.source.effectiveFrom > r.source.effectiveUntil)
+  )
+
+  const [replaced] = ended.filter(r => answering(r, DATE).length)
+  const review = (date: string, catalog = current) => reviewResourcePrices(currentPolicy, date, { catalog })
+
+  it('the fixture: a rate that ended, another record of the same pair in force, and a day between them', () => {
+    expect(replaced).toBeDefined()
+    expect(answering(replaced, addDays(replaced.source.effectiveUntil, 1))).toEqual([])
+    expect(addDays(replaced.source.effectiveUntil, 1) < DATE).toBe(true)
+  })
+
+  it('on a date another record answers for it, it is listed as superseded, by whom, and never as a blocker', () => {
+    const read = review(DATE)
+
+    expect(read.superseded.filter(n => n.ref === replaced.recordId)).toEqual([
+      expect.objectContaining({
+        kind: 'hard_expiry',
+        subject: 'catalog_record',
+        date: replaced.source.effectiveUntil,
+        blocksWith: null,
+        supersededBy: answering(replaced, DATE)
+      })
+    ])
+    expect(refs(read.expired)).not.toContain(replaced.recordId)
+
+    // Every ended rate is in one list or the other, by whether another record answers for its pair on the date.
+    for (const record of ended) {
+      expect(refs(read.superseded).includes(record.recordId)).toBe(answering(record, DATE).length > 0)
+      expect(refs(read.expired).includes(record.recordId)).toBe(answering(record, DATE).length === 0)
+    }
+
+    // Nothing under `expired` is answered for, and nothing under `superseded` blocks.
+    expect(read.expired.every(n => n.supersededBy === undefined)).toBe(true)
+    expect(read.superseded.every(n => n.blocksWith === null && n.supersededBy!.length > 0)).toBe(true)
+  })
+
+  it('which is what a quote of that date gets: it calculates, on the rate of the record in force', () => {
+    const composed = composeResourceQuote(rawCurrent, currentPolicy, rawCredits, person)
+    const pair = (f: { from: string; to: string }) => f.from === replaced.value.from && f.to === replaced.value.to
+
+    const [inForce] = answering(replaced, DATE).map(
+      id => rates.find(r => r.recordId === id && r.source.effectiveFrom <= DATE)!
+    )
+
+    expect(composed.quote.calculationStatus).toBe('calculated')
+    // The quote needed that pair, and the rate it froze is the one of the record that replaced the ended one.
+    expect(composed.quote.resolution.inputs[0].input.snapshot.fx.filter(pair).map(f => f.source.reference)).toEqual([
+      inForce.source.reference
+    ])
+
+    // Only a demand that names the ended record by its id is touched, as the notice says.
+    const naming = clone(person)
+
+    naming.fxRecordIds = naming.fxRecordIds.map((id: string) => (id === inForce.recordId ? replaced.recordId : id))
+    expect(naming.fxRecordIds).toContain(replaced.recordId)
+    expect(
+      composeResourceQuote(rawCurrent, currentPolicy, rawCredits, naming).quote.diagnostics.map(d => d.code)
+    ).toContain('RESOURCE_FX_SELECTION_REQUIRED')
+  })
+
+  it('on a date nothing answers for it, it is an expiry that blocks, as it always was', () => {
+    const between = addDays(replaced.source.effectiveUntil, 1)
+    const read = review(between)
+
+    expect(read.expired.filter(n => n.ref === replaced.recordId)).toEqual([
+      expect.objectContaining({ blocksWith: 'MISSING_CATALOG_SELECTION', daysLeft: -1 })
+    ])
+    expect(read.expired.find(n => n.ref === replaced.recordId)).not.toHaveProperty('supersededBy')
+    expect(refs(read.superseded)).not.toContain(replaced.recordId)
+  })
+
+  it('a record about to end that another one answers for from the next day is still due, without a blocker', () => {
+    const [open] = rates.filter(r => r.source.effectiveUntil === OPEN_ENDED && answering(r, DATE).length === 0)
+    const until = addDays(DATE, 5)
+
+    const edited = (successorFrom: string | null) => {
+      const next = clone(rawCurrent)
+      const record = next.records.find((r: Fx) => r.recordId === open.recordId && r.revision === open.revision)
+
+      record.source.effectiveUntil = until
+
+      if (successorFrom)
+        next.records.push({
+          ...clone(record),
+          recordId: `${open.recordId}:successor-under-test`,
+          revision: 1,
+          source: { ...record.source, effectiveFrom: successorFrom, effectiveUntil: OPEN_ENDED }
+        })
+
+      return review(DATE, validateCatalog(next)).dueSoon.filter(n => n.ref === open.recordId)
+    }
+
+    expect(open).toBeDefined()
+    // Alone, its end is the end of the rate.
+    expect(edited(null)).toEqual([expect.objectContaining({ daysLeft: 5, blocksWith: 'MISSING_CATALOG_SELECTION' })])
+    expect(edited(null)[0]).not.toHaveProperty('supersededBy')
+    // With another record of the pair from the day after, no quote loses the rate.
+    expect(edited(addDays(until, 1))).toEqual([
+      expect.objectContaining({
+        daysLeft: 5,
+        blocksWith: null,
+        supersededBy: [`${open.recordId}:successor-under-test`]
+      })
+    ])
+    // One that starts later leaves days with no rate: the end still blocks.
+    expect(edited(addDays(until, 3))).toEqual([expect.objectContaining({ blocksWith: 'MISSING_CATALOG_SELECTION' })])
+  })
+
+  it('what answers for a record is a record of the same selection, not any record of its kind', () => {
+    // A rate is its pair: two records answer the same selection exactly when they state the same pair.
+    for (const a of rates)
+      for (const b of rates)
+        expect(catalogSelectionKey(a) === catalogSelectionKey(b)).toBe(
+          a.value.from === b.value.from && a.value.to === b.value.to
+        )
+
+    // A cost is also where it is localized: the cost of a profile in one country does not answer for another.
+    const costs = current.records.filter(r => r.kind === 'cost')
+
+    const [here, there] = costs.flatMap(a =>
+      costs
+        .filter(
+          b =>
+            a.kind === 'cost' &&
+            b.kind === 'cost' &&
+            a.value.profileId === b.value.profileId &&
+            a.value.seniorityCode === b.value.seniorityCode &&
+            JSON.stringify(a.value.localization) !== JSON.stringify(b.value.localization)
+        )
+        .slice(0, 1)
+        .flatMap(b => [a, b])
+    )
+
+    expect(here).toBeDefined()
+    expect(catalogSelectionKey(here)).not.toBe(catalogSelectionKey(there))
+  })
+
+  it('`resources inspect` and the notices of a quote read it the same way', () => {
+    const inspected = inspectOperatingResources(rawCurrent, currentPolicy, DATE)
+
+    const notices = quotePriceNotices(
+      composeResourceQuote(rawCurrent, currentPolicy, rawCredits, person),
+      currentPolicy,
+      DATE,
+      {
+        catalog: current
+      }
+    )
+
+    expect(refs(inspected.priceReview.superseded)).toContain(replaced.recordId)
+    expect(refs(inspected.priceReview.expired)).not.toContain(replaced.recordId)
+    // A quote binds records in force on its own date, so on that date none of its own is history.
+    expect(notices.superseded).toEqual([])
+    expect(notices.expired).toEqual([])
+  })
+})
+
 describe('resources inspect lists both, next to everything it already returned', () => {
   it('keeps its fields and adds the dates to act on, read at the date asked', () => {
     const r = inspectOperatingResources(rawCatalog, rawPolicy, QUOTE_DATE)
@@ -551,7 +741,8 @@ describe('resources inspect lists both, next to everything it already returned',
       withinDays: PRICE_REVIEW_WINDOW_DAYS,
       reviewDue: review.reviewDue,
       dueSoon: review.dueSoon,
-      expired: review.expired
+      expired: review.expired,
+      superseded: review.superseded
     })
     expect(r.priceReview.dueSoon.length).toBeGreaterThan(0)
     // A price is offered as `reference_only` on its last valid day and is in the list of what ends soon.

@@ -141,6 +141,91 @@ describe('a tool without a usable allocation names the prices an allocation can 
   })
 })
 
+describe('seat diagnostics say how many seats are needed and how many are provided', () => {
+  // A managed service of two people on the first composition fixtures: a package of a named tool that seats both,
+  // and a tool priced per seat whose plan is sold under a contract of a minimum of seats.
+  const catalog = read('data/pricing/v3-catalog/catalog.review-v1.json')
+  const policy = compositionPolicySchema.parse(read('data/pricing/v3-composition/resources.review-v1.json'))
+  const service = () => compositionDemandSchema.parse(read('data/pricing/v3-composition/seo-service.demand.json'))
+  const run = (demand: ReturnType<typeof service>) => composeResourceQuote(catalog, policy, credits, demand)
+
+  const PACKAGE = 'notion'
+  const SEATS = 'claude-team'
+  // Everybody uses the package (a common tool), and the people who asked for the seat tool use it.
+  const people = [...new Set(service().work.flatMap(w => w.assigneeIds))]
+  const seatUsers = [...new Set(service().work.flatMap(w => (w.aiToolIds.includes(SEATS) ? w.assigneeIds : [])))]
+
+  const minimum = (demand: ReturnType<typeof service>) =>
+    policy.tools
+      .find(t => t.toolId === SEATS)!
+      .prices.find(price => price.priceId === demand.allocations.find(a => a.toolId === SEATS)!.priceId)!
+      .minimumContractSeats!
+
+  it('the fixture calculates, seats several people in a package and holds a plan with a contract minimum', () => {
+    expect(run(service()).quote.calculationStatus).toBe('calculated')
+    expect(people.length).toBeGreaterThan(1)
+    expect(policy.commonToolIds).toContain(PACKAGE)
+    expect(minimum(service())).toBeGreaterThan(1)
+  })
+
+  it('INSUFFICIENT_NAMED_SEAT_CAPACITY: the seats the period needs against the seats the demand provides', () => {
+    const demand = service()
+
+    demand.allocations.find(a => a.toolId === PACKAGE)!.seatCapacity = people.length - 1
+
+    const [diagnostic] = of(run(demand), 'INSUFFICIENT_NAMED_SEAT_CAPACITY')
+
+    expect(diagnostic.path).toBe(`1:${PACKAGE}`)
+    expect(diagnostic.detail).toContain(`${people.length} seats are needed`)
+    expect(diagnostic.detail).toContain(`the demand provides ${people.length - 1}`)
+    // Counts only: nobody is named.
+    for (const person of people) expect(diagnostic.detail).not.toContain(person)
+  })
+
+  it('INSUFFICIENT_NAMED_SEAT_CAPACITY: a package that does not say how many people it seats is another statement', () => {
+    const short = service()
+    const silent = service()
+
+    short.allocations.find(a => a.toolId === PACKAGE)!.seatCapacity = people.length - 1
+    delete silent.allocations.find(a => a.toolId === PACKAGE)!.seatCapacity
+
+    const [diagnostic] = of(run(silent), 'INSUFFICIENT_NAMED_SEAT_CAPACITY')
+
+    expect(diagnostic.path).toBe(`1:${PACKAGE}`)
+    expect(diagnostic.detail).toMatch(/seatCapacity/)
+    expect(diagnostic.detail).not.toBe(of(run(short), 'INSUFFICIENT_NAMED_SEAT_CAPACITY')[0].detail)
+  })
+
+  it('TEAM_CONTRACT_CAPACITY_REQUIRED: the minimum of the plan, the seats to hold and the least count that satisfies both', () => {
+    const undeclared = service()
+    const under = service()
+    // What the contract has to hold: the minimum the policy states for the plan, and no fewer than the seats paid.
+    const required = Math.max(minimum(service()), seatUsers.length)
+
+    delete undeclared.allocations.find(a => a.toolId === SEATS)!.contractSeatCount
+    under.allocations.find(a => a.toolId === SEATS)!.contractSeatCount = required - 1
+
+    const [missing] = of(run(undeclared), 'TEAM_CONTRACT_CAPACITY_REQUIRED')
+    const [low] = of(run(under), 'TEAM_CONTRACT_CAPACITY_REQUIRED')
+
+    for (const diagnostic of [missing, low]) {
+      expect(diagnostic.path).toBe(`1:${SEATS}`)
+      expect(diagnostic.detail).toContain(`at least ${minimum(service())} seats`)
+      expect(diagnostic.detail).toContain(`at least ${required}.`)
+    }
+
+    // Not declared and declared too low are told apart.
+    expect(missing.detail).toMatch(/declares no contractSeatCount/)
+    expect(low.detail).not.toMatch(/declares no contractSeatCount/)
+
+    // A count that satisfies both is accepted.
+    const enough = service()
+
+    enough.allocations.find(a => a.toolId === SEATS)!.contractSeatCount = required
+    expect(of(run(enough), 'TEAM_CONTRACT_CAPACITY_REQUIRED')).toEqual([])
+  })
+})
+
 describe('a quote dated before its catalog is in force says so once, with the date', () => {
   const catalog = operating('catalog.review-v10')
   const policy = compositionPolicySchema.parse(operating('resources.review-v11'))

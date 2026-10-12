@@ -53,10 +53,11 @@ const summaryFloor = (r: Composition) =>
     l.periodIds.map(periodId => `periods.${periodId}.result.lines.${l.lineId}`)
   )
 
+// A gap names the row once and the periods it is flagged in: each of them is a row the kernel flagged.
 const floorGaps = (r: Composition) =>
   assessCompositionReadiness(r)
     .gaps.filter(g => g.code === 'MARGIN_BELOW_POLICY_FLOOR')
-    .map(g => g.path)
+    .flatMap(g => g.periodIds!.map(periodId => `periods.${periodId}.${g.path}`))
 
 const offerPricing = (catalog: ReturnType<typeof managedCatalog>, offerId: string) =>
   catalog.records.filter(

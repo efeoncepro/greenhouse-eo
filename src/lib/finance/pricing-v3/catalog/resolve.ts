@@ -4,7 +4,7 @@ import { PRICING_V3_MARKET_FLOOR_BASIS, PRICING_V3_THIRD_PARTY_BILLING } from '.
 import type { PricingV3AnyInput, PricingV3ContractVersion, PricingV3InputV14 } from '../schemas'
 import { activeRecords, validateCatalog } from './catalog'
 import { AGREED_TOTAL_BILLING_CLASSES, briefSchema } from './contracts'
-import type { Brief, CatalogRecord, Diagnostic } from './contracts'
+import type { AGREED_TOTAL_BASES, Brief, CatalogRecord, Diagnostic } from './contracts'
 
 const D = Decimal.clone({ precision: 80 })
 
@@ -29,11 +29,18 @@ const isAgreedTotal = (adjustment: Adjustment): adjustment is AgreedTotal => adj
 /**
  * An agreed total as resolution carries it. `distribution` is null until the second pass settles it
  * (`settleAgreedTotals`): then it holds, per period and billing class, the policy net the first pass read and the
- * agreed net handed to the kernel, which add up to `amount` to the unit.
+ * agreed net handed to the kernel. Those add up to `amount` to the unit: over the whole term, or within each period
+ * when `per` is `period`.
  */
 export type ResolvedAgreedTotal = {
   adjustmentId: string
   amount: string
+  /**
+   * What `amount` is the price of, as the brief declares it: the whole term (`term`) or each period (`period`).
+   * Absent when the brief does not say, which is the whole term; the key exists only for a brief that declares it,
+   * so every total frozen before the declaration existed keeps the keys it had.
+   */
+  per?: (typeof AGREED_TOTAL_BASES)[number]
   currency: string
   lineIds: string[]
   reason: string
@@ -186,8 +193,9 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   )
     diagnostics.push({ code: 'INVALID_ADJUSTMENT_LINE', path: 'adjustments' })
 
-  // An agreed total is the price of everything it names, in every period and billing class: nothing else may adjust
-  // a line or a cost it names, whatever the class, and it names each once. The kernel would refuse the rows that
+  // An agreed total is the price of everything it names, in every period and billing class, whether its amount is
+  // for the whole term or for each period: nothing else may adjust a line or a cost it names, whatever the class,
+  // and it names each once. The kernel would refuse the rows that
   // overlap (`OVERLAPPING_ADJUSTMENTS`) without saying which declaration to drop; this names it.
   const agreedTotals = brief.adjustments.filter(isAgreedTotal)
 
@@ -202,7 +210,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
         code: 'AGREED_TOTAL_OVERLAPS_ADJUSTMENT',
         path: `adjustments.${total.adjustmentId}`,
         detail:
-          'An agreed total is the price of the lines and re-invoiced costs it names, for the whole term: none of them may be named twice in it or by another adjustment (discount, agreed net or agreed total).'
+          'An agreed total is the price of the lines and re-invoiced costs it names, for the whole term or for each period: none of them may be named twice in it or by another adjustment (discount, agreed net or agreed total).'
       })
   }
 
@@ -902,6 +910,7 @@ export function resolveBrief(catalogRaw: unknown, briefRaw: unknown) {
   const declaredTotals: ResolvedAgreedTotal[] = agreedTotals.map(total => ({
     adjustmentId: total.adjustmentId,
     amount: total.amount,
+    ...(total.per ? { per: total.per } : {}),
     currency: brief.outputCurrency,
     lineIds: total.lineIds,
     reason: total.reason,

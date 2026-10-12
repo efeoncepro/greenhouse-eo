@@ -79,6 +79,61 @@ export function activeRecords(catalog: Catalog, asOf: string) {
 }
 
 /**
+ * What a selection looks a record of its kind up by: two records with the same key answer the same question of a
+ * quote (the rate of a currency pair, the cost of a profile in a country, the price rule of a category for an
+ * offer), whatever their record ids. It is finer than what a revision may not change (`changeCatalog`): a cost is
+ * also its localization and an allocation policy also its mode, because a selection tells those apart.
+ */
+export function catalogSelectionKey(r: CatalogRecord): string {
+  switch (r.kind) {
+    case 'profile':
+      return `${r.value.profileId}:${r.value.seniorityCode}`
+
+    case 'cost': {
+      const where = r.value.localization
+
+      return `${r.value.profileId}:${r.value.seniorityCode}:${
+        where ? `${where.kind}:${where.kind === 'specific' ? where.country : where.referenceCountry}` : 'unlocalized'
+      }`
+    }
+
+    case 'resource':
+      return r.value.resourceId
+    case 'kit':
+      return r.value.kitId
+    case 'allocation':
+      return `${r.value.policyId}:${r.value.mode}`
+    case 'pricing':
+      return `${r.value.profileId}:${r.value.tierCode}:${r.value.offerId}:${r.value.engagementCode}`
+    case 'talent_factor':
+      return `${r.value.country}:${r.value.referenceCountry}`
+    case 'market_factor':
+      return r.value.country
+    case 'fx':
+      return `${r.value.from}:${r.value.to}`
+    case 'price_rounding':
+      return `${r.value.currency}:${r.value.offerId ?? '*'}`
+    case 'engagement_factor':
+      return `${r.value.form}:${r.value.offerId ?? '*'}`
+    case 'third_party_policy':
+      return `${r.value.category}:${r.value.offerId ?? '*'}`
+    case 'contingency_reserve':
+      return `${r.value.offerId ?? '*'}:${r.value.engagementForm ?? '*'}`
+    case 'offer':
+      return r.value.offerId
+
+    default: {
+      // A kind added to the record union without a case here stops compiling at this assignment.
+      const unhandled: never = r
+
+      void unhandled
+
+      throw new PricingV3Error('CATALOG_IDENTITY_CONFLICT')
+    }
+  }
+}
+
+/**
  * Catalog values that start AFTER a quote date. A quote dated earlier resolves the values of its own date: right for
  * a quote of that day, silently wrong for one written today from a demand that kept an old date.
  */

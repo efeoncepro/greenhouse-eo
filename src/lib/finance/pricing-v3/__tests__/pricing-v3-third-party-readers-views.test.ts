@@ -731,14 +731,14 @@ describe('compose assess: the verdict is the floor of each row, and what supplie
     const supplier = floor.filter(g => g.path.endsWith(':third_party'))
     const team = floor.filter(g => !g.path.endsWith(':third_party'))
 
-    // One gap per row the kernel flagged, each on the floor that row is judged on.
-    expect(floor.map(g => g.path).sort()).toEqual(
+    // One gap per row the kernel flagged, each on the floor that row is judged on, in the period it is flagged in.
+    expect(floor.flatMap(g => g.periodIds!.map(periodId => `periods.${periodId}.${g.path}`)).sort()).toEqual(
       kernelCodes(under)
         .filter(code => code.startsWith('MARGIN_BELOW_FLOOR@'))
         .map(code => `periods.1.${code.split('@')[1]}`)
         .sort()
     )
-    expect(supplier.map(g => g.path)).toEqual([`periods.1.result.lines.${rowIdOf(PROD)}`])
+    expect(supplier.map(g => [g.path, g.periodIds])).toEqual([[`result.lines.${rowIdOf(PROD)}`, [1]]])
     expect(team.length).toBeGreaterThan(0)
     expect(supplier[0].action).toContain(`category ${CATEGORY.production}`)
     expect(supplier[0].action).toContain(POLICIES[0].recordId)

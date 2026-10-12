@@ -424,6 +424,8 @@ try {
         agreedTotal: {
           declaration:
             'One price for the whole quote is declared in `brief.adjustments` as { adjustmentId, kind: "agreed_total", amount, lineIds, reason }: the net of the named lines for the whole term, every period and every billing class together (fee and start-up). `lineIds` may also name re-invoiced third-party costs by costId, which brings them into the price; unnamed, they stay outside it. An `agreed_net` remains an amount per period and per billing class.',
+          perPeriod:
+            'An all-in price per period is the same declaration with `per: "period"`: `amount` is then the net of the named lines in EACH period they are billed in, every billing class of the period together. A monthly value that includes the start-up is declared this way: every month nets exactly the amount, the start-up of the first month carries its part of it, and nothing is declared as waived. `per: "term"` is the default and is what an absent `per` means. With `per: "period"` each period shares the amount among its own billing classes in proportion to their policy price, in the same distribution unit, and the last one takes what is left; with every row of a period inside the total, the tax of each period is the tax of the rate on the amount. The summary reports `per`, `agreedNetOverTerm` (the amount once per period billed) and reads `differenceFromPolicyNet` against that sum. A period in which the named lines have rows and none has a price is rejected, by period (AGREED_TOTAL_WITHOUT_BASE).',
           resolution:
             'The quote is priced once without the agreement to read the policy net of each period and billing class; the total is distributed in proportion to it, each share cut down to a multiple of the distribution unit, and the last group with a price takes what is left, so the groups add up to the total exactly. The kernel receives one `agreed_net` per period and class, named `<adjustmentId>:<billing class>`. The summary reports it under `agreedTotals`: amount, policy net, the unit and the distribution.',
           tax: 'With an exclusive tax rate p/q in lowest terms, the distribution unit is q minor units of the currency (100 pesos or 1.00 dollar at 19 %; 400 pesos at 19.25 %): a share of that many units has a tax with nothing to round, so the taxes of the periods add up to the tax of the rate on the total, rounded once (`distributionUnitBasis: tax_exact`). It holds for a quote whose rows are all inside one agreed total. When that unit is larger than the part of some group, the distribution falls back to the minor unit instead of handing the group nothing (`currency_precision_fallback`), and the tax may then differ from the tax of the total by a unit per period. With a tax that is not resolved or does not apply the unit is the minor unit (`currency_precision`).',
@@ -435,6 +437,32 @@ try {
             '`brief.lines[].dedicationEvidence` says where the dedication of a line comes from and whether it is confirmed or an estimate: { reference, effectiveFrom, effectiveUntil, status }. `compose workload --brief` writes it from the sources of the workload. It must be in force on the quote date and never pending.',
           readings:
             'A line whose dedication is an estimate counts as an estimated input in `estimateExposure.costInputs` (kind `dedication`) with the cost it governs. A line with no evidence is listed under `estimateExposure.dedicationNotEvidenced`: that cost is in neither `estimatedCost` nor `confirmedCost`.'
+        },
+        allocationEvidence: {
+          declaration:
+            '`allocations[].evidence` of a demand says where an allocation comes from (the plan held, its seats, the share the account carries) and whether that is confirmed: { reference, effectiveFrom, effectiveUntil, status }, the shape of every other evidence. A resource of a portfolio (`compose plan`) takes the same `evidence` and hands it to the allocations it yields. It blocks nothing and never reaches a calculation.',
+          assessment:
+            '`compose assess` raises ALLOCATION_EVIDENCE_REQUIRED for an allocation that declares no evidence, one that is not confirmed, or one that is not in force on the quote date; the action says which. The wording of `reason` is never read. A tool bought in credits has no allocation and raises none.'
+        },
+        assessment: {
+          gaps: '`compose assess` lists one entry per gap. A gap about one period is raised under a path without it (`tools.<toolId>`; `result.lines.<lineId>`, the row `periods.<periodId>.result.lines.<lineId>` of the frozen quote) and entries that differ only in their period are one entry with `periodIds`. `gapOccurrences` counts every entry once per period it holds: the size of the list before folding. The blockers of a quote that did not calculate keep the path the quote reported them under. Planning slots are one gap for the quote (USER_ASSIGNMENT_REQUIRED at `work.assigneeIds`), with how many there are.',
+          marginFloor:
+            'The summary of a quote (`compose quote`, `replay`) folds the flagged rows by period under `marginFloor.lines`, each with the `netShortOfFloor` of ONE period. `marginFloor.netShortOfFloor` is the total over every flagged line-period (`flaggedLinePeriods` of them). It is present when a line is flagged and the kernel states the floor net of its rows (contract 1.2.0 on).'
+        },
+        scaffold: {
+          tasks:
+            '`compose scaffold` leaves `work[].tasks` empty. The composition always applies the recipe of the profile of a line and adds `work[].tasks` to it: they are tasks beyond the recipe, so writing the recipe there changes nothing and emptying it removes nothing. The recipe is listed in the question of the line (`profileTasks`); a task of it is left out only with `excludedProfileTasks` ({ task, reason }).',
+          slots:
+            '`work[].assigneeIds` are planning slots (`planned-<lineId>-<n>`). A slot stays while nobody is assigned, and the assessment then says so once; it becomes a stable anonymous id only when a specific person is assigned.',
+          prices:
+            'The question of each tool lists under `candidates` the prices an allocation can name on the quote date, read as the composition reads them, and under `unavailablePrices` the others: { priceId, blocksWith, reason }, the diagnostic naming one gets (RESOURCE_PRICE_PENDING, RESOURCE_PRICE_NOT_EFFECTIVE, CATALOG_RESOURCE_PRICE_REQUIRED, UNSUPPORTED_TOOL_PRICE_UNIT) and why. The candidates of RESOURCE_ALLOCATION_REQUIRED and RESOURCE_PRICE_SELECTION_REQUIRED follow the same reading.'
+        },
+        seatDiagnostics: {
+          rule: 'INSUFFICIENT_NAMED_SEAT_CAPACITY says in `detail` how many seats the period needs and how many the demand provides (paid one by one and in use, and of package capacity), or that a package declares no seatCapacity. TEAM_CONTRACT_CAPACITY_REQUIRED says the minimum seats the plan is sold with, the seats the holding has to seat and the least `contractSeatCount` that satisfies both. Counts only.'
+        },
+        priceReview: {
+          superseded:
+            '`resources inspect` reads the dates to act on under `priceReview`. A catalog record whose validity has passed is listed under `expired`, with the diagnostic it blocks with, only when nothing answers for it. When another record in force on the date answers the same selection (another record id for the same currency pair, cost or rule) it is history: it is listed under `superseded` with `supersededBy`, and `blocksWith` is null. A quote selects the record in force; only a demand or a brief that names the ended record by its id has to name the other. A record still in force that another one will answer for from the day after it ends stays under `dueSoon`, also without a blocker.'
         },
         commercialUnit: {
           rule: 'What an offer is sold as is a fact of the catalog (record kind `offer`): `managed_service` or `role_capacity`. `compose scaffold` reads it; when the catalog does not state it the scaffold leaves `commercialUnit` null and asks (COMMERCIAL_UNIT_REQUIRED). A demand that declares another unit than its offer is rejected (COMMERCIAL_UNIT_CONTRADICTS_OFFER).'

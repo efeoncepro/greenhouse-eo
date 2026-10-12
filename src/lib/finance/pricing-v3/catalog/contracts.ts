@@ -202,16 +202,24 @@ const thirdPartyCost = pricingV3ThirdPartyCostSchemaV14
 /** Billing classes of the kernel rows an agreed total is distributed over, by the suffix of the adjustment each gets. */
 export const AGREED_TOTAL_BILLING_CLASSES = ['monthly', 'setup', PRICING_V3_THIRD_PARTY_BILLING] as const
 
-// The agreed price of the whole quote: the net of the rows of `lineIds` over the whole term, every period and every
-// billing class together, in the output currency. `lineIds` names lines and, to bring them into the price,
+// The agreed price of what `lineIds` names, in the output currency: by default the net of those rows over the whole
+// term, every period and every billing class together. `lineIds` names lines and, to bring them into the price,
 // re-invoiced third-party costs by `costId`. The kernel never receives it: resolution turns it into the kernel's own
 // agreed nets, one per period and billing class (`agreed-total.ts`), each named `<adjustmentId>:<billing class>`.
 // The id is bounded so that name always fits the id of the kernel (120 characters).
+//
+// `per` says what `amount` is the price of. `term` (also when absent): the whole term, as above. `period`: an all-in
+// price per period, the net of the named rows in EACH period they are billed in, every billing class of the period
+// together (a monthly value that includes the start-up of the first month). No default, for the reason
+// `thirdPartyCosts` has none: the parsed brief is inside every frozen result.
+export const AGREED_TOTAL_BASES = ['term', 'period'] as const
+
 const agreedTotalAdjustment = z
   .object({
     adjustmentId: z.string().min(1).max(100),
     kind: z.literal('agreed_total'),
     amount: decimal,
+    per: z.enum(AGREED_TOTAL_BASES).optional(),
     lineIds: z.array(id).min(1),
     reason: z.string().min(1)
   })

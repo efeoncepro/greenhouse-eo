@@ -4,8 +4,15 @@ import { z } from 'zod'
 import { activeRecords, validateCatalog } from '../catalog/catalog'
 import { COMMERCIAL_UNITS, briefSchema } from '../catalog/contracts'
 import { PricingV3Error } from '../errors'
-import { compositionDemandSchema, compositionPolicySchema, declaredOnce, periodsOf } from './composition-contracts'
-import { composeResourceQuote } from './composition'
+import { sourceSchema } from '../schemas'
+import {
+  PLANNING_SLOT_PREFIX,
+  compositionDemandSchema,
+  compositionPolicySchema,
+  declaredOnce,
+  periodsOf
+} from './composition-contracts'
+import { composeResourceQuote, readToolPrice } from './composition'
 import { creditCatalogSchema } from './credit-budget'
 import { reviewResourcePrices } from './price-review'
 
@@ -37,7 +44,10 @@ export const portfolioSchema = z
               .array(z.object({ accountId: id, units: positive }).strict())
               .min(1)
               .max(1000),
-            reason: z.string().min(1).max(1000)
+            reason: z.string().min(1).max(1000),
+            // Evidence of the holding and of the units declared for it, handed as it is to every allocation the
+            // portfolio yields (`allocations[].evidence` of a demand). Absent, those allocations carry none.
+            evidence: sourceSchema.optional()
           })
           .strict()
       )
@@ -116,7 +126,8 @@ export function allocateResourcePortfolio(raw: unknown, policyRaw: unknown, cata
           ...(r.contractSeatCount ? { contractSeatCount: r.contractSeatCount } : {}),
           serviceShare: serviceShare.toString(),
           driver: { unit: r.driverUnit, totalUnits: r.totalUnits, allocatedUnits: a.units },
-          reason: `Portfolio ${portfolio.version} (${portfolio.mode}): ${r.reason}`
+          reason: `Portfolio ${portfolio.version} (${portfolio.mode}): ${r.reason}`,
+          ...(r.evidence ? { evidence: r.evidence } : {})
         }
       })
     }
@@ -237,34 +248,58 @@ export function inspectOperatingResources(
           return {
             ...p,
             resolved: p.price ?? (r?.kind === 'resource' ? { ...r.value, source: r.source } : null),
-            availability:
-              p.pendingReason ||
-              (p.price && !(p.price.source.effectiveFrom <= asOf && asOf <= p.price.source.effectiveUntil)) ||
-              (p.catalogResourceId && (r?.kind !== 'resource' || r.value.amount === null))
-                ? 'needs_input'
-                : 'reference_only'
+            // The reading of the composition: `needs_input` is a price an allocation cannot name on this date.
+            availability: readToolPrice(p, live, asOf).usable ? 'reference_only' : 'needs_input'
           }
         })
       }))
       .filter(matches),
-    // Dates to act on, read at `asOf`. A review date never blocks; a hard validity does once it has passed.
+    // Dates to act on, read at `asOf`. A review date never blocks; a hard validity does once it has passed, unless
+    // another record in force answers for the one that ended: that one is history, listed under `superseded`.
     priceReview: {
       withinDays: review.withinDays,
       reviewDue: review.reviewDue.filter(matches),
       dueSoon: review.dueSoon.filter(matches),
-      expired: review.expired.filter(matches)
+      expired: review.expired.filter(matches),
+      superseded: review.superseded.filter(matches)
     },
     instructions:
       'Choose profile, tasks, plan and allocations explicitly. References do not establish purchased seats or operational readiness.'
   }
 }
 
-/** Generate an editable demand and questions. Never choose a plan or invent an allocation denominator. */
+/**
+ * Generate an editable demand and questions. Never choose a plan or invent an allocation denominator.
+ *
+ * What the scaffold writes is what the composition reads, and nothing it would read otherwise:
+ * - `work[].tasks` is left empty. The composition always applies the recipe of the profile of a line
+ *   (`policy.profileTasks`) and adds `work[].tasks` to it: they are the tasks of this engagement BEYOND the recipe.
+ *   Writing the recipe there would change nothing, and emptying it would not remove a task. The recipe is listed in
+ *   the question of the line (`profileTasks`), and a task of it is left out only through `excludedProfileTasks`.
+ * - `work[].assigneeIds` are planning slots, one per person of the line. A slot stays while nobody is assigned.
+ * - The prices an allocation can name are the ones the composition would accept on the quote date (`candidates`).
+ *   A price it would refuse is listed apart (`unavailablePrices`), with the diagnostic naming it gets and the reason.
+ */
 export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, briefRaw: unknown) {
   const brief = briefSchema.parse(briefRaw)
   const discovery = inspectOperatingResources(catalogRaw, policyRaw, brief.quoteDate)
   const policy = compositionPolicySchema.parse(policyRaw)
-  const questions: { code: string; path: string; prompt: string; candidates?: string[] }[] = []
+  const live = activeRecords(validateCatalog(catalogRaw), brief.quoteDate)
+
+  const questions: {
+    code: string
+    path: string
+    prompt: string
+    candidates?: string[]
+    /** Tasks the recipe of the profile of the line already applies; never written to `work[].tasks`. */
+    profileTasks?: string[]
+    /** Prices of the tool an allocation cannot name on the quote date: what naming one gets, and why. */
+    unavailablePrices?: { priceId: string; blocksWith: string; reason: string }[]
+  }[] = []
+
+  // The recipe of each line, by the profile the scaffold could identify. It selects tools below exactly as the
+  // composition will, and it is told to the caller; the demand itself carries none of it.
+  const recipes = new Map<string, string[]>()
 
   const work = brief.lines.map(line => {
     const candidates = discovery.profiles.filter(
@@ -272,6 +307,8 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     )
 
     const profile = candidates.length === 1 ? candidates[0] : null
+
+    recipes.set(line.lineId, profile?.tasks ?? [])
 
     if (!profile)
       questions.push({
@@ -283,14 +320,14 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     questions.push({
       code: 'WORK_TASKS_AND_USERS_REQUIRED',
       path: line.lineId,
-      prompt:
-        'Confirm work tasks and replace planning slots with stable anonymous user IDs. Select AI only if justified.'
+      prompt: `The recipe of the profile (profileTasks) is applied to this line without being written in the demand. Add to tasks only the tasks of this engagement beyond the recipe, and leave it empty when there are none; to leave a task of the recipe out, declare it in excludedProfileTasks with its reason. Each assigneeId is a planning slot (${PLANNING_SLOT_PREFIX}…): keep it while nobody is assigned, which the assessment then reports, and replace it with a stable anonymous id only when a specific person is assigned. Select AI tools only if justified.`,
+      profileTasks: profile?.tasks ?? []
     })
 
     return {
       lineId: line.lineId,
-      assigneeIds: Array.from({ length: line.headcount }, (_, i) => `planned-${line.lineId}-${i + 1}`),
-      tasks: profile?.tasks ?? [],
+      assigneeIds: Array.from({ length: line.headcount }, (_, i) => `${PLANNING_SLOT_PREFIX}${line.lineId}-${i + 1}`),
+      tasks: [],
       aiToolIds: [],
       creditDemand: []
     }
@@ -300,9 +337,7 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
   // managed service scaffolded as role capacity calculates and is then presented as a team with prices. When the
   // catalog states it, the demand carries it; when it does not, or two records in force cannot be ranked, the demand
   // carries no unit (`null`, which no quote accepts) and the question says who decides.
-  const offers = activeRecords(validateCatalog(catalogRaw), brief.quoteDate).flatMap(r =>
-    r.kind === 'offer' && r.value.offerId === brief.offerId ? [r] : []
-  )
+  const offers = live.flatMap(r => (r.kind === 'offer' && r.value.offerId === brief.offerId ? [r] : []))
 
   const commercialUnit = offers.length === 1 ? offers[0].value.commercialUnit : null
 
@@ -334,19 +369,30 @@ export function scaffoldResourceDemand(catalogRaw: unknown, policyRaw: unknown, 
     ...new Set(
       work.flatMap(w => [
         ...policy.commonToolIds,
-        ...policy.tools.filter(t => t.tasks.some(task => w.tasks.includes(task))).map(t => t.toolId)
+        ...policy.tools.filter(t => t.tasks.some(task => recipes.get(w.lineId)!.includes(task))).map(t => t.toolId)
       ])
     )
   ]
 
-  for (const toolId of toolIds)
+  for (const toolId of toolIds) {
+    const prices = (policy.tools.find(t => t.toolId === toolId)?.prices ?? []).map(price => ({
+      priceId: price.priceId,
+      read: readToolPrice(price, live, brief.quoteDate)
+    }))
+
+    const unavailablePrices = prices.flatMap(({ priceId, read }) =>
+      read.usable ? [] : [{ priceId, blocksWith: read.blocksWith, reason: read.reason }]
+    )
+
     questions.push({
       code: 'TOOL_PLAN_AND_ALLOCATION_REQUIRED',
       path: toolId,
       prompt:
-        'Select priceId, quantity, named access/capacity and declared allocation for every active period. Declare identical periods once with periodIds. A named tool priced per seat accounts for every paid seat: used, shared (seatSharing) or idle (idleSeats with idleReason).',
-      candidates: policy.tools.find(t => t.toolId === toolId)?.prices.map(p => p.priceId)
+        'Select priceId, quantity, named access/capacity and declared allocation for every active period. `candidates` are the prices an allocation can name on the quote date; a price under `unavailablePrices` blocks the quote with the diagnostic listed there. Declare identical periods once with periodIds. A named tool priced per seat accounts for every paid seat: used, shared (seatSharing) or idle (idleSeats with idleReason). Declare in `evidence` where the allocation comes from; without confirmed evidence in force the assessment reports it.',
+      candidates: prices.filter(({ read }) => read.usable).map(({ priceId }) => priceId),
+      ...(unavailablePrices.length ? { unavailablePrices } : {})
     })
+  }
 
   return {
     status: 'needs_input',

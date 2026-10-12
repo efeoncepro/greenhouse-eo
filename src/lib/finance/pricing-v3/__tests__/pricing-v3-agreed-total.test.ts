@@ -24,6 +24,7 @@ import { calculateCatalogQuote } from '../catalog/quote'
 import { resolveBrief } from '../catalog/resolve'
 import { calculatePricingV3 } from '../calculate'
 import { composeResourceQuote } from '../resources/composition'
+import { clientSafeWaivedItems } from '../resources/readiness'
 import { linesBelowPolicyFloor, summarizeComposition } from '../resources/summary'
 import { PRICING_V3_MAX_ADJUSTMENTS_V11 } from '../schemas'
 
@@ -717,6 +718,333 @@ describe('the tax of a quote sold at one price is the tax of that price', () => 
     const [reported] = summarizeComposition(compose(managedCatalog, next), { calculationId: 'test' }).agreedTotals!
 
     expect(reported).toMatchObject({ distributionUnit: '100', distributionUnitBasis: 'tax_exact' })
+  })
+})
+
+describe('an all-in price per period: every period nets the amount, whatever it bills', () => {
+  // `per: 'period'` makes the amount the price of EACH period instead of the price of the term. What must hold is
+  // read from the same places as above: the declaration (each period nets it), the same quote without the agreement
+  // (the policy price each period shares the amount by) and the kernel run again on what resolution handed it.
+  const iva = (rate: string) => ({
+    kind: 'exclusive',
+    rate,
+    policyRef: 'test:tax',
+    source: { reference: 'test:tax', effectiveFrom: '2026-01-01', effectiveUntil: '9999-12-31', status: 'confirmed' }
+  })
+
+  // A person in pesos: three months, a fee in each and a start-up in the first.
+  const personCatalog = operating('catalog.review-v10')
+  const personPolicy = operating('resources.review-v11')
+  const person = operating('designer-three-months-iva.demand')
+  const [personLine]: string[] = person.brief.lines.map((l: { lineId: string }) => l.lineId)
+  const months: number = person.brief.periods
+
+  const personWith = (adjustments: unknown[], taxTreatment: unknown = iva('0.19')) => {
+    const next = clone(person)
+
+    next.brief.adjustments = adjustments
+    next.brief.taxTreatment = taxTreatment
+
+    return composeResourceQuote(personCatalog, personPolicy, credits, next)
+  }
+
+  const perPeriod = (amount: string, lineIds: string[]) => total(amount, lineIds, { per: 'period' })
+  const base = personWith([]).quote
+
+  const policyOf = (periodId: number, billing: string) =>
+    rowsOf(base)
+      .filter(row => row.periodId === periodId && row.line.kind === billing)
+      .reduce((sum, { line }) => sum.plus(line.net), new D(0))
+
+  // Under the policy price of a month and over it; neither is a multiple of the 100 pesos a 19 % rate needs.
+  const amounts = ['1900000', '1234567', policyOf(1, 'monthly').plus(policyOf(1, 'setup')).plus(700033).toFixed(0)]
+
+  it('the fixture bills a fee in every month and a start-up in the first', () => {
+    expect(base.calculationStatus).toBe('calculated')
+    expect(base.periods.map(p => p.result.lines.map(l => l.kind))).toEqual([
+      ['monthly', 'setup'],
+      ...Array(months - 1).fill(['monthly'])
+    ])
+    expect(policyOf(1, 'setup').gt(0)).toBe(true)
+  })
+
+  it.each(amounts)('%s a month: each month nets it, and the start-up carries its part of the first', amount => {
+    const r = personWith([perPeriod(amount, [personLine])])
+    const [entry] = settled(r.quote)
+
+    // The declaration is kept as written, and the frozen total says which basis it was read on.
+    expect(r.quote.resolution.brief!.adjustments).toEqual([perPeriod(amount, [personLine])])
+    expect(entry).toMatchObject({ amount, per: 'period', distributionUnit: '100', distributionUnitBasis: 'tax_exact' })
+
+    // Every period nets exactly the amount, so the term nets it once per month.
+    expect(r.quote.periods.map(p => p.result.totals!.net)).toEqual(Array(months).fill(amount))
+    expect(r.quote.totals!.net).toBe(new D(amount).mul(months).toFixed(0))
+
+    // The first month shares the amount between fee and start-up in proportion to the policy price of each, the fee
+    // cut down to the unit and the start-up, last of the month, taking what is left. Nothing is waived.
+    const fee = new D(amount)
+      .mul(policyOf(1, 'monthly'))
+      .div(policyOf(1, 'monthly').plus(policyOf(1, 'setup')))
+      .divToInt(100)
+      .mul(100)
+
+    expect(entry.distribution.map(g => [g.periodId, g.billing, g.policyNet, g.agreedNet])).toEqual([
+      [1, 'monthly', policyOf(1, 'monthly').toFixed(0), fee.toFixed(0)],
+      [1, 'setup', policyOf(1, 'setup').toFixed(0), new D(amount).minus(fee).toFixed(0)],
+      ...Array.from({ length: months - 1 }, (_, i) => [i + 2, 'monthly', policyOf(i + 2, 'monthly').toFixed(0), amount])
+    ])
+    expect(new D(amount).minus(fee).gt(0)).toBe(true)
+    expect(clientSafeWaivedItems(r).flatMap(p => p.items)).toEqual([])
+
+    // The kernel priced each group at what resolution handed it, and its frozen inputs alone give the same periods.
+    for (const group of entry.distribution)
+      expect(
+        rowsOf(r.quote)
+          .filter(row => row.periodId === group.periodId && row.line.kind === group.billing)
+          .reduce((sum, { line }) => sum.plus(line.net), new D(0))
+          .toFixed(0)
+      ).toBe(group.agreedNet)
+
+    for (const period of r.quote.resolution.inputs) expect(calculatePricingV3(period.input).totals!.net).toBe(amount)
+
+    // The policy net it stands against is the one of the whole term, and cost never moves with a price.
+    expect(entry.policyNet).toBe(base.totals!.net)
+    expect(r.quote.totals!.cost).toBe(base.totals!.cost)
+  })
+
+  it('the tax of each month is the tax of the amount, rounded once, and the quote adds one per month', () => {
+    for (const [amount, rate] of [
+      ['1900000', '0.19'],
+      ['1234567', '0.19'],
+      ['1234567', '0.1925']
+    ]) {
+      const { quote } = personWith([perPeriod(amount, [personLine])], iva(rate))
+      const monthly = new D(amount).mul(rate).toFixed(0, D.ROUND_HALF_UP)
+
+      expect(quote.periods.map(p => p.result.totals!.tax)).toEqual(Array(months).fill(monthly))
+      expect(quote.totals!.tax).toBe(new D(monthly).mul(months).toFixed(0))
+      expect(quote.totals!.grandTotal).toBe(new D(amount).plus(monthly).mul(months).toFixed(0))
+    }
+
+    // 1,900,000 a month at 19 %: 361,000 of tax each month.
+    expect(personWith([perPeriod('1900000', [personLine])]).quote.periods[0].result.totals!.tax).toBe('361000')
+  })
+
+  it('`per: term` is what an absent `per` already meant: the same quote, with the basis said', () => {
+    const amount = '6000001'
+    const implicit = personWith([total(amount, [personLine])]).quote
+    const explicit = personWith([total(amount, [personLine], { per: 'term' })]).quote
+    const [declared] = settled(explicit)
+    const [undeclared] = settled(implicit)
+
+    expect(explicit.totals).toEqual(implicit.totals)
+    expect(explicit.periods.map(p => p.result.totals)).toEqual(implicit.periods.map(p => p.result.totals))
+    expect(declared).toEqual({ ...undeclared, per: 'term' })
+    // A brief that does not say keeps the keys it had, in the frozen total and in its description.
+    expect(undeclared).not.toHaveProperty('per')
+    expect(describeAgreedTotals(implicit.resolution)![0]).not.toHaveProperty('per')
+    expect(describeAgreedTotals(implicit.resolution)![0]).not.toHaveProperty('agreedNetOverTerm')
+    expect(
+      briefSchema.safeParse({ ...designerBrief, adjustments: [total('1', [designLine], { per: 'week' })] }).success
+    ).toBe(false)
+  })
+
+  it('the summary says the basis, what the months add up to and the difference against the policy price', () => {
+    const amount = '1900000'
+    const r = personWith([perPeriod(amount, [personLine])])
+    const [reported] = summarizeComposition(r, { calculationId: 'test' }).agreedTotals!
+    const overTerm = new D(amount).mul(months)
+
+    expect(reported).toMatchObject({
+      amount,
+      per: 'period',
+      agreedNetOverTerm: overTerm.toFixed(0),
+      policyNet: base.totals!.net,
+      // Read against the price of the term, never against the price of one month.
+      differenceFromPolicyNet: overTerm.minus(base.totals!.net).toFixed(0)
+    })
+    // The first month is fee and start-up; the others are one entry, with the months that carry it.
+    expect(reported.distribution!.map(g => [g.billing, g.periodIds])).toEqual([
+      ['monthly', [1]],
+      ['setup', [1]],
+      ['monthly', Array.from({ length: months - 1 }, (_, i) => i + 2)]
+    ])
+    expect(
+      reported
+        .distribution!.reduce((sum, g) => sum.plus(new D(g.agreedNet).mul(g.periodIds.length)), new D(0))
+        .toFixed(0)
+    ).toBe(overTerm.toFixed(0))
+  })
+
+  it('a period the named line is not billed in has nothing to net, and the lines it does not name do not move', () => {
+    // Two people in dollars: one for the whole term and one for the first two months only.
+    const [stay, leave] = ['person-stays', 'person-leaves']
+
+    const brief = {
+      ...designerBrief,
+      lines: [
+        { ...designerBrief.lines[0], lineId: stay, teamId: `team-${stay}` },
+        { ...designerBrief.lines[0], lineId: leave, teamId: `team-${leave}`, activePeriods: [1, 2] }
+      ]
+    }
+
+    const without = quoteWith([], brief)
+    const quote = quoteWith([perPeriod('1500.01', [leave])], brief)
+    const [entry] = settled(quote)
+
+    const netIn = (of: Quote, periodId: number, lineId: string) =>
+      rowsOf(of)
+        .filter(row => row.periodId === periodId && row.line.parentLineId === lineId)
+        .reduce((sum, { line }) => sum.plus(line.net), new D(0))
+        .toFixed(2)
+
+    expect(without.calculationStatus).toBe('calculated')
+    expect([1, 2, 3].map(periodId => netIn(quote, periodId, leave))).toEqual(['1500.01', '1500.01', '0.00'])
+    expect([...new Set(entry.distribution.map(g => g.periodId))]).toEqual([1, 2])
+    expect(quote.resolution.inputs.find(p => p.periodId === 3)!.input.request.adjustments).toEqual([])
+
+    for (const periodId of [1, 2, 3]) expect(netIn(quote, periodId, stay)).toBe(netIn(without, periodId, stay))
+  })
+
+  it('a re-invoiced cost named by the price is inside the month it falls in', () => {
+    const category = 'cat-produccion-7003'
+
+    const withCategory = {
+      ...personCatalog,
+      records: [
+        ...personCatalog.records,
+        {
+          recordId: `third-party:${category}`,
+          revision: 1,
+          kind: 'third_party_policy',
+          source: {
+            reference: 'agreed-total-test',
+            effectiveFrom: '2026-01-01',
+            effectiveUntil: '9999-12-31',
+            status: 'confirmed'
+          },
+          note: 'Price rule of a category of third-party cost, declared for the test.',
+          value: {
+            category,
+            label: 'Producción',
+            method: 'markup',
+            rate: '0.2',
+            minimumMargin: '0.1',
+            rounding: 'none'
+          }
+        }
+      ]
+    }
+
+    const next = clone(person)
+
+    next.brief.thirdPartyCosts = [
+      {
+        costId: 'tp-rodaje',
+        category,
+        label: 'Rodaje',
+        supplier: 'Proveedor de prueba',
+        settlement: 'reinvoiced',
+        amount: '1234567',
+        currency: 'CLP',
+        quantity: '1',
+        periodIds: [2],
+        evidence: {
+          reference: 'supplier-quote:test',
+          effectiveFrom: '2026-10-01',
+          effectiveUntil: '2026-12-31',
+          status: 'confirmed'
+        }
+      }
+    ]
+    next.brief.adjustments = [perPeriod('3000050', [personLine, 'tp-rodaje'])]
+    next.brief.taxTreatment = iva('0.19')
+
+    const quote = composeResourceQuote(withCategory, personPolicy, credits, next).quote
+    const [entry] = settled(quote)
+
+    expect(quote.periods.map(p => p.result.totals!.net)).toEqual(Array(months).fill('3000050'))
+    expect(entry.distribution.map(g => [g.periodId, g.billing])).toEqual([
+      [1, 'monthly'],
+      [1, 'setup'],
+      [2, 'monthly'],
+      [2, 'third_party'],
+      [3, 'monthly']
+    ])
+
+    // In each month every share but the last is a whole number of units, and the shares are the amount.
+    for (const periodId of [1, 2, 3]) {
+      const groups = entry.distribution.filter(g => g.periodId === periodId)
+
+      for (const group of groups.slice(0, -1)) expect(new D(group.agreedNet).mod(100).isZero()).toBe(true)
+      expect(groups.reduce((sum, g) => sum.plus(g.agreedNet), new D(0)).toFixed(0)).toBe('3000050')
+    }
+  })
+
+  it('a composed programme of equal months is the same price every month', () => {
+    const r = compose(managedCatalog, withAdjustments(managed, [perPeriod('4700050', managedLineIds)], 3))
+    const [entry] = settled(r.quote)
+
+    expect(r.quote.periods.map(p => p.result.totals!.net)).toEqual(['4700050', '4700050', '4700050'])
+    expect(entry.distribution.map(g => g.agreedNet)).toEqual(['4700050', '4700050', '4700050'])
+  })
+
+  it('a part smaller than the unit is not zeroed in any month: every month falls back, and says so', () => {
+    // 100 pesos a month: the fee of the first month would take the whole unit and leave the start-up nothing to be
+    // a part of; at the minor unit each takes its part.
+    const tiny = personWith([perPeriod('100', [personLine])]).quote
+    const [entry] = settled(tiny)
+    const first = entry.distribution.filter(g => g.periodId === 1)
+
+    expect(entry).toMatchObject({ distributionUnit: '1', distributionUnitBasis: 'currency_precision_fallback' })
+    expect(first.every(g => new D(g.agreedNet).gt(0))).toBe(true)
+    expect(tiny.periods.map(p => p.result.totals!.net)).toEqual(Array(months).fill('100'))
+    // A price of nothing hands every group nothing by its own amount, not by the unit.
+    expect(settled(personWith([perPeriod('0', [personLine])]).quote)[0].distributionUnitBasis).toBe('tax_exact')
+  })
+
+  it('a price above zero needs a row with a price in every period it reaches, and names the periods without one', () => {
+    const free = clone(designerCatalog)
+
+    for (const record of free.records) {
+      if (record.kind === 'cost') for (const component of record.value.components) component.amount = '0'
+      if (record.kind === 'resource') record.value.amount = '0'
+      if (record.kind === 'cost' || record.kind === 'resource')
+        record.source.zeroReason = 'Costed at zero for the test.'
+    }
+
+    const quote = calculateCatalogQuote(free, { ...designerBrief, adjustments: [perPeriod('100', [designLine])] })
+    const blocker = quote.diagnostics.find(d => d.code === 'AGREED_TOTAL_WITHOUT_BASE')!
+
+    expect(quote.totals).toBeNull()
+    expect(blocker.path).toBe('adjustments.whole-price')
+    for (let periodId = 1; periodId <= designerBrief.periods; periodId++)
+      expect(blocker.detail).toContain(String(periodId))
+    expect(blocker.detail).not.toContain('100')
+  })
+
+  it('the rules of an agreed total hold: no overlap, an amount the currency holds', () => {
+    const overlap = personWith([
+      perPeriod('1900000', [personLine]),
+      { adjustmentId: 'n', kind: 'agreed_net', amount: '0', billing: 'setup', lineIds: [personLine], reason: 'Net.' }
+    ])
+
+    expect(codes(overlap.quote)).toContain('AGREED_TOTAL_OVERLAPS_ADJUSTMENT')
+    expect(codes(personWith([perPeriod('1900000.5', [personLine])]).quote)).toContain('AGREED_TOTAL_NOT_REPRESENTABLE')
+  })
+
+  it('a frozen quote with a price per period replays to the digest it was signed with', () => {
+    const next = clone(person)
+
+    next.brief.adjustments = [perPeriod('1900000', [personLine])]
+    next.brief.taxTreatment = iva('0.19')
+
+    const artifact = runResourceComposition(personCatalog, personPolicy, credits, next)
+    const frozen = clone(artifact)
+
+    expect(artifact.semantic.result.quote.calculationStatus).toBe('calculated')
+    expect(replayResourceComposition(frozen).replayDigest).toBe(artifact.replayDigest)
+    expect(frozen.semantic.result.quote.resolution.agreedTotals![0].per).toBe('period')
   })
 })
 

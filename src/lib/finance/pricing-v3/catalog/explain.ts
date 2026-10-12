@@ -301,6 +301,11 @@ export function describeContingencyReserve(resolution: Quote['resolution']) {
  * tax of the quote is then the tax of the rate on the total), `currency_precision` when the tax is not resolved or
  * does not apply, and `currency_precision_fallback` when the tax-exact unit was larger than the part of some group,
  * in which case the tax of the quote may differ from the tax of the total by a unit per period.
+ *
+ * A total the brief declares with `per` carries it. With `per: 'period'`, `amount` is the price of each period, so
+ * the agreed nets of each period add up to it and `agreedNetOverTerm` is what they add up to over the whole term:
+ * `differenceFromPolicyNet` is read against that sum, never against the price of one period. A total that does not
+ * declare `per` is described with exactly the keys it always had.
  */
 export function describeAgreedTotals(resolution: Quote['resolution']) {
   const totals = 'agreedTotals' in resolution ? resolution.agreedTotals : undefined
@@ -321,16 +326,24 @@ export function describeAgreedTotals(resolution: Quote['resolution']) {
       else groups.set(key, { ...row, periodIds: [periodId] })
     }
 
+    // What the agreement sells the named rows for over the whole term: the amount itself, or, for a price per period,
+    // the sum of what each period was handed (the amount, once per period the rows are billed in).
+    const overTerm =
+      total.per === 'period' && total.distribution
+        ? total.distribution.reduce((sum, group) => sum.plus(group.agreedNet), new D(0))
+        : new D(total.amount)
+
+    const scale = total.policyNet?.split('.')[1]?.length ?? 0
+
     return {
       adjustmentId: total.adjustmentId,
       currency: total.currency,
       amount: total.amount,
+      ...(total.per ? { per: total.per } : {}),
+      ...(total.per === 'period' ? { agreedNetOverTerm: total.distribution ? overTerm.toFixed(scale) : null } : {}),
       policyNet: total.policyNet,
       // What the agreement moved against the policy price of the same rows: negative when it sells under it.
-      differenceFromPolicyNet:
-        total.policyNet === null
-          ? null
-          : new D(total.amount).minus(total.policyNet).toFixed(total.policyNet.split('.')[1]?.length ?? 0),
+      differenceFromPolicyNet: total.policyNet === null ? null : overTerm.minus(total.policyNet).toFixed(scale),
       distributionUnit: total.distributionUnit,
       distributionUnitBasis: total.distributionUnitBasis,
       distribution: total.distribution ? [...groups.values()] : null

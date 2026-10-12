@@ -2093,7 +2093,10 @@ describe('summary, assess, explain and the client-shaped views of a 1.3.0 compos
       priceRatio: '0.90',
       recordId: COMMITTED.recordId
     })
-    expect(gaps.map(g => g.path).sort()).toEqual(flaggedPaths(committed))
+    // A gap names the row once and the periods it is flagged in: each of them is a row the kernel flagged.
+    expect(gaps.flatMap(g => g.periodIds!.map(periodId => `periods.${periodId}.${g.path}`)).sort()).toEqual(
+      flaggedPaths(committed)
+    )
     expect(gaps.length).toBeGreaterThan(0)
     expect(assessment.margin!.modeledRate).toBe(committed.quote.totals!.marginRate)
     expect(assessCompositionReadiness(plain).margin!.policyFloor).not.toHaveProperty('engagementForm')

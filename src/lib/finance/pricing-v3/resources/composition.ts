@@ -6,6 +6,7 @@ import { calculateResolvedQuote } from '../catalog/quote'
 import { resolveBrief } from '../catalog/resolve'
 import type { PricingV3Input } from '../schemas'
 import { compositionDemandSchema, compositionPolicySchema, eachPeriod } from './composition-contracts'
+import type { CompositionPolicy } from './composition-contracts'
 import { creditBudgetRequestSchema, creditCatalogSchema, planCreditBudget } from './credit-budget'
 
 const D = Decimal.clone({ precision: 80 })
@@ -18,6 +19,77 @@ type Consumer = { lineId: string; assignees: string[]; credits: number }
 
 /** Longest id the kernel accepts for a resource, a coverage or an allocation (`id` in schemas.ts). */
 const KERNEL_ID_LENGTH = 120
+
+type ToolPrice = CompositionPolicy['tools'][number]['prices'][number]
+
+/**
+ * What a price of a tool holds on a date: its value, or the diagnostic an allocation that names it gets, with the
+ * reason. One reading for the composition, which prices with it, and for every list of the prices an allocation can
+ * name (the candidates of a diagnostic, the scaffold of a demand, `resources inspect`), so none of them offers a
+ * price the composition would then refuse.
+ *
+ * `live` are the catalog records in force on `asOf`. A price is usable when the policy states its value and that
+ * value is in force, or when it reads a catalog resource that has exactly one record in force, with an amount, charged
+ * by the month or by the year. `reason` is a rule, or the reason the policy itself declares for a pending price.
+ */
+export function readToolPrice(
+  price: ToolPrice,
+  live: readonly CatalogRecord[],
+  asOf: string
+):
+  | { usable: true; value: NonNullable<ToolPrice['price']> }
+  | {
+      usable: false
+      blocksWith:
+        | 'RESOURCE_PRICE_PENDING'
+        | 'CATALOG_RESOURCE_PRICE_REQUIRED'
+        | 'UNSUPPORTED_TOOL_PRICE_UNIT'
+        | 'RESOURCE_PRICE_NOT_EFFECTIVE'
+      reason: string
+    } {
+  if (price.pendingReason) return { usable: false, blocksWith: 'RESOURCE_PRICE_PENDING', reason: price.pendingReason }
+
+  let value = price.price
+
+  if (price.catalogResourceId) {
+    const candidates = live.filter(
+      (r): r is PriceRecord => r.kind === 'resource' && r.value.resourceId === price.catalogResourceId
+    )
+
+    if (candidates.length !== 1 || candidates[0].value.amount === null)
+      return {
+        usable: false,
+        blocksWith: 'CATALOG_RESOURCE_PRICE_REQUIRED',
+        reason:
+          'The price reads a catalog resource, and the catalog does not hold exactly one record of it in force on the date with an amount.'
+      }
+
+    const record = candidates[0]
+
+    if (record.value.unit === 'once')
+      return {
+        usable: false,
+        blocksWith: 'UNSUPPORTED_TOOL_PRICE_UNIT',
+        reason: 'The catalog resource the price reads is charged once; a tool is priced by the month or by the year.'
+      }
+
+    value = {
+      amount: record.value.amount!,
+      currency: record.value.currency,
+      unit: record.value.unit,
+      source: record.source
+    }
+  }
+
+  if (!value || !(value.source.effectiveFrom <= asOf && asOf <= value.source.effectiveUntil))
+    return {
+      usable: false,
+      blocksWith: 'RESOURCE_PRICE_NOT_EFFECTIVE',
+      reason: 'The value the policy states for the price is not in force on the date.'
+    }
+
+  return { usable: true, value }
+}
 
 /** Select and attribute work resources; the existing kernel remains the only selling-price calculator. */
 export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, creditsRaw: unknown, demandRaw: unknown) {
@@ -223,6 +295,8 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
     idle?: { seats: number; reason: string; attributedMonthlyCost: string }
     /** Only when nobody uses the tool in the period: the lines the demand names to bear the cost of its seats. */
     bornByLineIds?: string[]
+    /** Evidence of the allocation, as the demand declares it. Present only when it does. */
+    evidence?: Resource['source']
   }[] = []
 
   const budgets: { periodId: number; toolId: string; result: ReturnType<typeof planCreditBudget> }[] = []
@@ -373,7 +447,7 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
         reason: string
         driver: unknown
         bearers: { lineId: string; weight: Decimal }[]
-        described: Pick<(typeof attributions)[number], 'seats' | 'idle' | 'bornByLineIds'>
+        described: Pick<(typeof attributions)[number], 'seats' | 'idle' | 'bornByLineIds' | 'evidence'>
       }[] = []
 
       if (groups.length) {
@@ -471,8 +545,9 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
           a => consumers.length || a.idleSeats !== undefined || a.bornByLineIds !== undefined
         )
 
-        // Prices of the tool an allocation can name: the ones that hold a value, by the id the policy gives them.
-        const usablePrices = tool.prices.filter(p => !p.pendingReason).map(p => p.priceId)
+        // Prices of the tool an allocation can name: the ones that hold a value in force on the quote date, by the
+        // id the policy gives them.
+        const usablePrices = tool.prices.filter(p => readToolPrice(p, live, asOf).usable).map(p => p.priceId)
 
         if (!declared.length) {
           issue(
@@ -543,42 +618,14 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
             continue
           }
 
-          if (price.pendingReason) {
-            issue('RESOURCE_PRICE_PENDING', path, price.pendingReason)
+          const read = readToolPrice(price, live, asOf)
+
+          if (!read.usable) {
+            issue(read.blocksWith, path, read.reason)
             continue
           }
 
-          let value = price.price
-
-          if (price.catalogResourceId) {
-            const candidates = live.filter(
-              (r): r is PriceRecord => r.kind === 'resource' && r.value.resourceId === price.catalogResourceId
-            )
-
-            if (candidates.length !== 1 || candidates[0].value.amount === null) {
-              issue('CATALOG_RESOURCE_PRICE_REQUIRED', path)
-              continue
-            }
-
-            const record = candidates[0]
-
-            if (record.value.unit === 'once') {
-              issue('UNSUPPORTED_TOOL_PRICE_UNIT', path)
-              continue
-            }
-
-            value = {
-              amount: record.value.amount!,
-              currency: record.value.currency,
-              unit: record.value.unit,
-              source: record.source
-            }
-          }
-
-          if (!value || !effective(value.source)) {
-            issue('RESOURCE_PRICE_NOT_EFFECTIVE', path)
-            continue
-          }
+          const { value } = read
 
           // An idle seat is a seat: only a named tool sold by the seat has one to declare, and no more than it pays.
           if (
@@ -640,8 +687,22 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
         // does not account for. A package is capacity: it has to reach, with the seats in use, the people who need
         // one. An idle seat is nobody's, so it is never counted as capacity for somebody.
         if (tool.access === 'named') {
-          if (packaged.some(h => !h.allocation.seatCapacity) || inUse.plus(capacity).lt(needed)) {
-            issue('INSUFFICIENT_NAMED_SEAT_CAPACITY', key)
+          // Counts only: how many people need a seat and how many seats the demand provides, never who they are.
+          if (packaged.some(h => !h.allocation.seatCapacity)) {
+            issue(
+              'INSUFFICIENT_NAMED_SEAT_CAPACITY',
+              key,
+              'A holding of this tool priced as a package declares no seatCapacity, so the people it seats cannot be counted: declare how many people the package seats.'
+            )
+            continue
+          }
+
+          if (inUse.plus(capacity).lt(needed)) {
+            issue(
+              'INSUFFICIENT_NAMED_SEAT_CAPACITY',
+              key,
+              `${needed} seats are needed in the period (one per person who uses the tool, a group that shares a seat counted once) and the demand provides ${inUse.plus(capacity)}: ${inUse} paid one by one and in use, ${capacity} of package capacity (seatCapacity). Declare the seats that are missing.`
+            )
             continue
           }
 
@@ -717,15 +778,25 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
               ? new D(h.allocation.quantity)
               : D.max(0, new D(needed).minus(inUse).minus(capacity - (h.allocation.seatCapacity ?? 0)))
 
-        const capacityIssue = held.flatMap(h => {
+        const capacityIssue = held.flatMap((h): { code: string; path: string; detail?: string }[] => {
           const { allocation, price, path } = h
 
-          if (
-            price.minimumContractSeats &&
-            (!allocation.contractSeatCount ||
-              new D(allocation.contractSeatCount).lt(D.max(price.minimumContractSeats, contractSeats(h))))
-          )
-            return [{ code: 'TEAM_CONTRACT_CAPACITY_REQUIRED', path }]
+          // The seats the contract of this price has to hold: the minimum the plan is sold with, and no fewer than
+          // the seats this holding has to seat. Both are counts the policy and the demand state.
+          const required = price.minimumContractSeats ? D.max(price.minimumContractSeats, contractSeats(h)) : null
+
+          if (required && (!allocation.contractSeatCount || new D(allocation.contractSeatCount).lt(required)))
+            return [
+              {
+                code: 'TEAM_CONTRACT_CAPACITY_REQUIRED',
+                path,
+                detail: `This price is sold under a contract of at least ${price.minimumContractSeats} seats (minimumContractSeats of the policy) and the holding has to seat ${contractSeats(h)} in the period: ${
+                  allocation.contractSeatCount
+                    ? 'the contractSeatCount the allocation declares is under that'
+                    : 'the allocation declares no contractSeatCount'
+                }. Declare contractSeatCount with the seats the contract holds, at least ${required}.`
+              }
+            ]
 
           if (
             price.includedSeats &&
@@ -737,7 +808,7 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
         })
 
         if (capacityIssue.length) {
-          capacityIssue.forEach(i => issue(i.code, i.path))
+          capacityIssue.forEach(i => issue(i.code, i.path, i.detail))
           continue
         }
 
@@ -798,7 +869,8 @@ export function composeResourceQuote(catalogRaw: unknown, policyRaw: unknown, cr
                     }
                   }
                 : {}),
-              ...(consumers.length ? {} : { bornByLineIds: [...allocation.bornByLineIds!] })
+              ...(consumers.length ? {} : { bornByLineIds: [...allocation.bornByLineIds!] }),
+              ...(allocation.evidence ? { evidence: allocation.evidence } : {})
             }
           })
 

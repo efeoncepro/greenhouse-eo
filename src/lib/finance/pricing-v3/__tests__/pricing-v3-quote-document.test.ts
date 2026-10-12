@@ -186,6 +186,32 @@ const designerWithGap = calculated(
   })
 )
 
+/** What a person is sold for each month in `sixMonthsAllIn`, everything in it. */
+const ALL_IN_A_MONTH = '1900000'
+
+/**
+ * A person sold at one amount a month for six months, the start-up included: the three-month example over six
+ * months with an `agreed_total` `per: "period"`. Every month nets the amount; the first shares it between the fee
+ * and the start-up. Without its AI credit tools, whose budgets are tied to calendar months (`withoutCreditTools`).
+ */
+const sixMonthsAllIn = calculated(
+  recompose(THREE_MONTHS, demand => {
+    withoutCreditTools(demand)
+    demand.allocations = demand.allocations.filter(allocation => allocation.periodId === 1)
+    over(demand, 6)
+    demand.brief.adjustments = [
+      {
+        adjustmentId: 'all-in-a-month',
+        kind: 'agreed_total',
+        amount: ALL_IN_A_MONTH,
+        per: 'period',
+        lineIds: demand.brief.lines.map(line => line.lineId),
+        reason: 'One amount a month agreed for the person, start-up included.'
+      }
+    ]
+  })
+)
+
 /** The managed service over three months, with its third-party costs and the cost the client pays in the first. */
 const managedThreeMonths = calculated(recompose(MANAGED, demand => over(demand, 3)))
 
@@ -2568,6 +2594,186 @@ describe('a price printed as what it is: keys combined into one line', () => {
     ])
   })
 
+  /** What the firewall charges for `keys` in each month any of them is charged in: the verifier of a price a month. */
+  const chargedByMonth = (result: Composition, keys: string[]) => {
+    const months = new Map<number, Decimal>()
+
+    for (const key of keys)
+      for (const { periodId, net } of chargedByKey(result).get(key) ?? [])
+        months.set(periodId, (months.get(periodId) ?? new D(0)).plus(net))
+
+    return [...months].sort(([a], [b]) => a - b)
+  }
+
+  it('per period: what was sold as one amount a month prints as that many months at that amount', () => {
+    const keys = ['design', 'design:setup']
+    const totals = totalsOf(sixMonthsAllIn)
+
+    // Premise, read from the quote: every month nets the amount, and the first shares it between the fee and a
+    // start-up that is charged, not waived.
+    const [firstFee, ...laterFees] = chargedByKey(sixMonthsAllIn).get('design')!
+    const startUps = chargedByKey(sixMonthsAllIn).get('design:setup')!
+
+    expect(sixMonthsAllIn.quote.periods.map(period => period.result.totals!.net)).toEqual(Array(6).fill(ALL_IN_A_MONTH))
+    expect(laterFees.map(period => period.net)).toEqual(Array(5).fill(ALL_IN_A_MONTH))
+    expect(startUps.map(period => period.periodId)).toEqual([1])
+    expect(new D(startUps[0].net).gt(0) && new D(firstFee.net).gt(0)).toBe(true)
+    expect(new D(firstFee.net).plus(startUps[0].net).toFixed(0)).toBe(ALL_IN_A_MONTH)
+    expect(totals).toMatchObject({ net: '11400000', tax: '2166000', grandTotal: '13566000' })
+
+    // Folded key by key it is correct and not what was sold: a first month apart, five more and a start-up.
+    expect(emitted(sixMonthsAllIn).lines.map(line => [line.quantity, line.unitNet, line.net, line.detail])).toEqual([
+      [{ value: 1, unit: 'mes' }, firstFee.net, firstFee.net, 'Mes 1'],
+      [{ value: 5, unit: 'meses' }, ALL_IN_A_MONTH, '9500000', 'Meses 2 a 6'],
+      [{ value: 1, unit: 'pago único' }, undefined, startUps[0].net, undefined]
+    ])
+
+    const data = emitted(sixMonthsAllIn, combining([{ keys, label: 'Diseño visual, todo incluido', per: 'period' }]))
+
+    expect(data.lines).toEqual([
+      {
+        label: 'Diseño visual, todo incluido',
+        group: 'Servicio',
+        quantity: { value: 6, unit: 'meses' },
+        unitNet: ALL_IN_A_MONTH,
+        net: '11400000'
+      }
+    ])
+    // The line is the months the firewall charges, each at the same sum, and the net of the quote.
+    expect(chargedByMonth(sixMonthsAllIn, keys).map(([periodId, net]) => [periodId, net.toFixed(0)])).toEqual(
+      Array.from({ length: 6 }, (_, index) => [index + 1, ALL_IN_A_MONTH])
+    )
+    expect(data.lines[0].net).toBe(totals.net)
+
+    // It moves the lines and nothing else: net, tax, its count of periods, total and every text are the quote's.
+    expect({ ...data, lines: undefined }).toEqual({ ...emitted(sixMonthsAllIn), lines: undefined })
+    expect(data).toMatchObject({ net: totals.net, taxAmount: totals.tax, taxPeriods: 6 })
+  })
+
+  it('per term is what a combination has always been: said or not, the data is the same', () => {
+    const entry = { keys: ['design', 'design:setup'], label: 'Diseño visual, todo incluido', unit: 'servicio' }
+
+    for (const result of [threeMonthsWithTax, sixMonthsAllIn]) {
+      const unsaid = emitted(result, combining([entry]))
+
+      expect(emitted(result, combining([{ ...entry, per: 'term' }]))).toEqual(unsaid)
+      expect(unsaid.lines).toEqual([
+        {
+          label: entry.label,
+          group: 'Servicio',
+          quantity: { value: 1, unit: 'servicio' },
+          net: totalsOf(result).net
+        }
+      ])
+    }
+  })
+
+  it('per period: a month where the sum differs, or a month off, starts another line that says its months', () => {
+    const keys = ['design', 'design:setup']
+    const entry = { keys, label: 'Diseño visual', per: 'period' }
+
+    // The three-month example with no agreement: the first month is the fee and the start-up, the others the fee.
+    const months = chargedByMonth(threeMonthsWithTax, keys)
+
+    expect(months.map(([periodId]) => periodId)).toEqual([1, 2, 3])
+    expect(months[0][1].gt(months[1][1]) && months[1][1].eq(months[2][1])).toBe(true)
+
+    const uneven = emitted(threeMonthsWithTax, combining([entry]))
+
+    expect(uneven.lines).toEqual([
+      {
+        label: 'Diseño visual',
+        detail: 'Mes 1',
+        group: 'Servicio',
+        quantity: { value: 1, unit: 'mes' },
+        unitNet: months[0][1].toFixed(0),
+        net: months[0][1].toFixed(0)
+      },
+      {
+        label: 'Diseño visual',
+        detail: 'Meses 2 a 3',
+        group: 'Servicio',
+        quantity: { value: 2, unit: 'meses' },
+        unitNet: months[1][1].toFixed(0),
+        net: months[1][1].mul(2).toFixed(0)
+      }
+    ])
+    expect(sum(uneven.lines.map(line => line.net)).toFixed(0)).toBe(totalsOf(threeMonthsWithTax).net)
+    expect({ ...uneven, lines: undefined }).toEqual({ ...emitted(threeMonthsWithTax), lines: undefined })
+
+    // A detail of the brief replaces the months on every line, as it does for a single key; so does a group.
+    expect(
+      emitted(
+        threeMonthsWithTax,
+        combining([{ ...entry, detail: 'Con su puesta en marcha', group: 'Equipo' }])
+      ).lines.map(line => [line.detail, line.group, line.quantity.value])
+    ).toEqual([
+      ['Con su puesta en marcha', 'Equipo', 1],
+      ['Con su puesta en marcha', 'Equipo', 2]
+    ])
+
+    // Months 1 and 3 only: the month off ends the run, though nothing else changed. Each is one month, counted
+    // in months and with its unit value whatever kinds it adds up (the first holds a start-up).
+    const gapKeys = [...chargedByKey(designerWithGap).keys()]
+    const gapMonths = chargedByMonth(designerWithGap, gapKeys)
+    const withGap = emitted(designerWithGap, combining([{ keys: gapKeys, label: 'Diseño', per: 'period' }]))
+
+    expect(gapMonths.map(([periodId]) => periodId)).toEqual([1, 3])
+    expect(withGap.lines.map(line => [line.detail, line.quantity, line.unitNet, line.net])).toEqual(
+      gapMonths.map(([periodId, net]) => [`Mes ${periodId}`, { value: 1, unit: 'mes' }, net.toFixed(0), net.toFixed(0)])
+    )
+    expect(sum(withGap.lines.map(line => line.net)).toFixed()).toBe(new D(totalsOf(designerWithGap).net).toFixed())
+
+    // One key alone folds exactly as it does with no combination: the same lines, under the label of the brief.
+    const fee = emitted(managedFeeChanges, combining([{ keys: ['fee'], label: 'Programa', per: 'period' }]))
+    const plain = emitted(managedFeeChanges)
+
+    expect(plain.lines.filter(line => line.group === 'Servicio').length).toBe(2)
+    expect(fee.lines).toEqual(
+      plain.lines.map(line => (line.group === 'Servicio' ? { ...line, label: 'Programa' } : line))
+    )
+  })
+
+  it('per period: the unit is the month, so an entry that names one is rejected; the other rules hold', () => {
+    const entry = { keys: ['design'], label: 'Diseño', per: 'period' }
+
+    const cases: [Json, { path: string; rule: string }[]][] = [
+      [combining([{ ...entry, unit: 'servicio' }]), [{ path: 'combine.0.unit', rule: 'unit_not_allowed_per_period' }]],
+      [combining([{ ...entry, unit: '' }]), [{ path: 'combine.0.unit', rule: 'unit_not_allowed_per_period' }]],
+      [combining([{ ...entry, per: 'week', unit: 'servicio' }]), [{ path: 'combine.0.per', rule: 'invalid_per' }]],
+      [combining([{ ...entry, per: null }]), [{ path: 'combine.0.per', rule: 'invalid_per' }]],
+      [combining([{ keys: ['design'], per: 'period' }]), [{ path: 'combine.0.label', rule: 'missing_label' }]],
+      // Said or not, a price for the whole term names what it is one of.
+      [combining([{ ...entry, per: 'term' }]), [{ path: 'combine.0.unit', rule: 'missing_unit' }]],
+      [combining([{ ...entry, net: '1000' }]), [{ path: 'combine.0', rule: 'unknown_field' }]],
+      // A key in one combination at most, never one the quote waives, and with no line of its own.
+      [combining([{ ...entry, keys: ['design', 'design'] }]), [{ path: 'combine.0.keys.1', rule: 'duplicate_key' }]],
+      [
+        combining([entry, { keys: ['design'], label: 'Diseño', unit: 'servicio' }]),
+        [{ path: 'combine.1.keys.0', rule: 'duplicate_key' }]
+      ],
+      [combining([{ ...entry, keys: ['design:setup'] }]), [{ path: 'combine.0.keys.0', rule: 'key_not_charged' }]],
+      [combining([{ ...entry, keys: ['other'] }]), [{ path: 'combine.0.keys.0', rule: 'unknown_key' }]],
+      [
+        combining([entry], { lines: { design: { label: 'Diseñador' } } }),
+        [{ path: 'lines.0', rule: 'key_is_combined' }]
+      ]
+    ]
+
+    for (const [brief, issues] of cases) {
+      const outcome = rejection(startupWaived, brief)
+
+      expect(outcome.code).toBe('QUOTE_DOCUMENT_BRIEF_INVALID')
+      expect(outcome.issues).toEqual(issues)
+    }
+
+    // Premise of the cases above: the entry they break is one the reading takes.
+    expect(emitted(startupWaived, combining([entry])).lines[0]).toMatchObject({
+      label: 'Diseño',
+      quantity: { unit: 'meses' }
+    })
+  })
+
   it('a key is printed once: unknown, waived, repeated or also dressed in `lines`, it is rejected by position', () => {
     const sentinel = `leak-probe-${process.pid}`
     const entry = { label: 'Diseño', unit: 'servicio' }
@@ -2819,11 +3025,33 @@ describe('a text that would only state the obvious is optional', () => {
     ])
   })
 
+  it('the person the document is addressed to is a text of its own, apart from the area of the buyer', () => {
+    const buyer = texts().buyer as Json
+    const data = emitted(managed, { ...texts(), buyer: { ...buyer, contact: 'María Pérez, Gerencia de Marketing' } })
+
+    // As written, next to the area and not in place of it.
+    expect(data.buyer).toEqual({ ...buyer, contact: 'María Pérez, Gerencia de Marketing' })
+    expect(data.buyer.unit).toBe('Equipo de marketing')
+
+    // Absent, the data has no key for it, and nothing else of the document depends on it.
+    expect(emitted(managed).buyer).toEqual(buyer)
+    expect(Object.keys(emitted(managed).buyer)).not.toContain('contact')
+    expect({ ...data, buyer: undefined }).toEqual({ ...emitted(managed), buyer: undefined })
+
+    // A misspelt key is not read past: the block is strict.
+    expect(rejection(managed, { ...texts(), buyer: { ...buyer, contacto: 'María Pérez' } }).issues).toEqual([
+      { path: 'buyer', rule: 'unrecognized_keys' }
+    ])
+  })
+
   it('present, each is a text like any other: empty or malformed is rejected', () => {
     const base = texts() as { buyer: Json; schedule: Json; cover: Json } & Json
 
     const cases: [Json, { path: string; rule: string }][] = [
       [{ buyer: { ...base.buyer, unit: '   ' } }, { path: 'buyer.unit', rule: 'custom' }],
+      [{ buyer: { ...base.buyer, contact: '' } }, { path: 'buyer.contact', rule: 'custom' }],
+      [{ buyer: { ...base.buyer, contact: 'Uno\nDos' } }, { path: 'buyer.contact', rule: 'custom' }],
+      [{ buyer: { ...base.buyer, contact: ['María Pérez'] } }, { path: 'buyer.contact', rule: 'invalid_type' }],
       [{ schedule: { ...base.schedule, note: '' } }, { path: 'schedule.note', rule: 'custom' }],
       [{ cover: { ...base.cover, netLabel: 'Uno\nDos' } }, { path: 'cover.netLabel', rule: 'custom' }],
       [{ cover: { ...base.cover, netLabel: 1000 } }, { path: 'cover.netLabel', rule: 'invalid_type' }]
@@ -2838,9 +3066,13 @@ describe('a text that would only state the obvious is optional', () => {
   })
 
   it('the scaffold leaves no empty slot for them: what is not asked for is not filled in', () => {
-    const { brief } = scaffold(managed)
+    const { brief, optional } = scaffold(managed)
 
     expect(brief.buyer).toEqual({ name: '', taxId: '' })
+    // Each is listed as optional instead, the person apart from the area.
+    expect(Object.keys(optional)).toEqual(
+      expect.arrayContaining(['buyer.unit', 'buyer.contact', 'cover.netLabel', 'schedule.note'])
+    )
     expect(brief.cover).toEqual({ label: '', title: [''], subtitle: '' })
     expect(brief.schedule).toEqual({ title: '', phases: [{ label: '', title: '', text: '' }] })
 
@@ -2968,9 +3200,38 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
     await expectTotalsOfTheQuote(result, data)
   })
 
+  // A price a month for keys combined (`per: "period"`): lines counted in months with a unit value, which the
+  // template multiplies out and adds up like the lines of a single key.
+  const aMonth = (result: Composition): Json => ({
+    ...texts(),
+    combine: [{ keys: [...chargedByKey(result).keys()], label: 'Precio mensual', per: 'period' }]
+  })
+
+  it.each([
+    ['six months at one amount a month, start-up included', sixMonthsAllIn, [6]],
+    [
+      'the three-month example with IVA: the first month apart',
+      frozen(`${THREE_MONTHS}.artifact.json`).semantic.result,
+      [1, 2]
+    ],
+    ['a quote with a month off', designerWithGap, [1, 1]],
+    ['a quote in dollars', designerInDollars, null]
+  ] as const)(
+    'keys combined per period, %s: the template accepts the data and computes the totals of the quote',
+    async (_, result, months) => {
+      const data = emitted(result, aMonth(result))
+
+      // Premise: every line is a number of months with its unit value, and they are the runs the case is about.
+      expect(data.lines.every(line => /^mes(es)?$/.test(line.quantity.unit) && line.unitNet !== undefined)).toBe(true)
+      if (months) expect(data.lines.map(line => line.quantity.value)).toEqual(months)
+      await expectTotalsOfTheQuote(result, data)
+    }
+  )
+
   // Keys of version 2 that the reading emits and the template takes: the tax and the total of each payment
-  // milestone, a document with no area of the buyer and no note of the calendar of the work, and the label of the
-  // net on the cover.
+  // milestone, a document with no area of the buyer and no note of the calendar of the work, the label of the
+  // net on the cover, and the person the document is addressed to. That the cover prints that person, and the
+  // name of the buyer once, is tested where it is composed: scripts/documents/render-cotizacion-a4.test.mjs.
   const withoutOptionalTexts = (): Json => {
     const { buyer, schedule } = texts() as { buyer: Json; schedule: Json }
 
@@ -2995,10 +3256,16 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
       { ...texts(), cover: { ...(texts().cover as Json), netLabel: 'Valor neto del proyecto' } }
     ],
     [
+      'a person the document is addressed to',
+      managed,
+      { ...texts(), buyer: { ...(texts().buyer as Json), contact: 'María Pérez, Gerencia de Marketing' } }
+    ],
+    [
       'all of them at once',
       taxRoundedByMonth,
       {
         ...withoutOptionalTexts(),
+        buyer: { ...(withoutOptionalTexts().buyer as Json), contact: 'María Pérez' },
         cover: { ...(texts().cover as Json), netLabel: 'Valor neto del programa' },
         combine: [{ keys: ['fee'], label: 'Programa', unit: 'programa' }],
         paymentMilestones: milestones
@@ -3013,6 +3280,7 @@ describe('conformance with the A4 quote template (scripts/documents/render-cotiz
         milestone => milestone.tax !== undefined && milestone.total !== undefined
       ) ||
         data.buyer.unit === undefined ||
+        data.buyer.contact !== undefined ||
         data.cover.netLabel !== undefined
     ).toBe(true)
     await expectTotalsOfTheQuote(result, data)

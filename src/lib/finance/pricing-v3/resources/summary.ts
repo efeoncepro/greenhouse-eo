@@ -907,6 +907,21 @@ export function summarizeComposition(result: Composition, identity: { calculatio
   })
 
   const floorLines = linesBelowPolicyFloor(result)
+
+  // Net missing to reach the floor, over every flagged line-period. `marginFloor.lines` folds the rows that differ
+  // only by period, so adding up its `netShortOfFloor` by hand counts one month of each; this is the whole of it.
+  // The kernel states the floor net of a row from contract 1.2.0 on: a quote of an earlier contract has none to
+  // measure against, reports no total and keeps the keys it had. A quote is of one contract, so its flagged rows
+  // either all carry it or none does; should some not, no total is given rather than the sum of the rest.
+  const sizedFloorLines = floorLines.flatMap(line => (line.netShortOfFloor === undefined ? [] : [line.netShortOfFloor]))
+
+  const netShortOfFloor =
+    floorLines.length && sizedFloorLines.length === floorLines.length
+      ? sizedFloorLines
+          .reduce((sum, short) => sum.plus(short), new D(0))
+          .toFixed(Math.max(...sizedFloorLines.map(scaleOf)))
+      : null
+
   const marketFactor = describeMarketFactor(quote.resolution)
   const engagementForm = describeEngagementForm(quote.resolution)
   const ownWork = readOwnWork(result)
@@ -981,6 +996,8 @@ export function summarizeComposition(result: Composition, identity: { calculatio
     marginFloor: {
       source: 'kernel:MARGIN_BELOW_FLOOR',
       flaggedLinePeriods: floorLines.length,
+      // Only when a line is flagged and the kernel sized its floor; every other quote keeps the keys it had.
+      ...(netShortOfFloor === null ? {} : { netShortOfFloor }),
       lines: acrossPeriods(floorLines.map(({ periodId, ...row }) => ({ periodId, row })))
     },
     toolSelections: {

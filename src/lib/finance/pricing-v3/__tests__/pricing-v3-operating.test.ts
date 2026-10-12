@@ -7,8 +7,13 @@ import { runResourceComposition, replayResourceComposition } from '../adapters/r
 import { catalogDigest } from '../adapters/catalog-local'
 import { previewResourceChange, applyResourceChange } from '../adapters/resource-maintenance'
 
-import { composeResourceQuote } from '../resources/composition'
-import { compositionDemandSchema, compositionPolicySchema } from '../resources/composition-contracts'
+import { activeRecords, validateCatalog } from '../catalog/catalog'
+import { composeResourceQuote, readToolPrice } from '../resources/composition'
+import {
+  PLANNING_SLOT_PREFIX,
+  compositionDemandSchema,
+  compositionPolicySchema
+} from '../resources/composition-contracts'
 import {
   allocateResourcePortfolio,
   inspectOperatingResources,
@@ -99,6 +104,165 @@ describe('operating discovery and planning', () => {
   })
 })
 
+describe('the scaffold of a demand writes what the composition reads', () => {
+  // The person of the committed example, on the catalog and policy in force: the scaffold is read against the
+  // composition of the same demand, which is what says whether a task, a slot or a price means what the scaffold says.
+  const liveCatalog = operating('catalog.review-v11')
+  const livePolicy = compositionPolicySchema.parse(operating('resources.review-v11'))
+  const person = () => compositionDemandSchema.parse(operating('designer-three-months-iva.demand'))
+  const compose = (d: ReturnType<typeof person>) => composeResourceQuote(liveCatalog, livePolicy, credits, d)
+  const scaffold = () => scaffoldResourceDemand(liveCatalog, livePolicy, person().brief)
+  const [line] = person().brief.lines
+
+  const recipe = livePolicy.profileTasks.find(p => p.profileId === line.profile)!.tasks
+
+  const included = (r: ReturnType<typeof compose>) =>
+    r.selections.filter(s => s.included).map(s => `${s.periodId}:${s.toolId}`)
+
+  it('the fixture calculates on a profile whose recipe selects tools', () => {
+    expect(compose(person()).quote.calculationStatus).toBe('calculated')
+    expect(recipe.length).toBeGreaterThan(0)
+  })
+
+  it('`work[].tasks` is left empty and the recipe of the profile is told in the question of the line', () => {
+    const r = scaffold()
+    const question = r.questions.find(q => q.code === 'WORK_TASKS_AND_USERS_REQUIRED' && q.path === line.lineId)!
+
+    expect(r.demand.work.map(w => w.tasks)).toEqual(r.demand.work.map(() => []))
+    expect(question.profileTasks).toEqual(recipe)
+    // The tools the recipe selects are still asked for, exactly as before.
+    for (const tool of livePolicy.tools.filter(t => t.tasks.some(task => recipe.includes(task))))
+      expect(r.questions.map(q => q.path)).toContain(tool.toolId)
+  })
+
+  it('which is what the composition reads: the recipe applies whether or not it is written in `tasks`', () => {
+    const empty = person()
+    const written = person()
+
+    empty.work[0].tasks = []
+    written.work[0].tasks = [...recipe]
+
+    // Writing the recipe in `tasks` selects nothing more, and emptying it removes nothing.
+    expect(included(compose(written))).toEqual(included(compose(empty)))
+    expect(compose(written).quote.totals).toEqual(compose(empty).quote.totals)
+
+    // A task of the recipe is left out only by excluding it, and then it may not also be written in `tasks`.
+    const excluded = person()
+
+    excluded.work[0].tasks = []
+    excluded.work[0].excludedProfileTasks = [{ task: recipe[0], reason: 'Out of the scope of this engagement.' }]
+    expect(included(compose(excluded))).not.toEqual(included(compose(empty)))
+
+    const both = person()
+
+    both.work[0].tasks = [...recipe]
+    both.work[0].excludedProfileTasks = [{ task: recipe[0], reason: 'Out of the scope of this engagement.' }]
+    expect(codes(compose(both))).toContain('CONFLICTING_PROFILE_TASK_EXCLUSION')
+  })
+
+  it('a planning slot left as the scaffold wrote it is reported once by the assessment', () => {
+    const r = scaffold()
+    const slots = r.demand.work.flatMap(w => w.assigneeIds)
+    const demand = person()
+
+    expect(slots.every(id => id.startsWith(PLANNING_SLOT_PREFIX))).toBe(true)
+
+    demand.work.forEach((w, i) => (w.assigneeIds = r.demand.work[i].assigneeIds))
+
+    const composed = compose(demand)
+
+    expect(composed.quote.calculationStatus).toBe('calculated')
+    expect(assessCompositionReadiness(composed).gaps.filter(g => g.code === 'USER_ASSIGNMENT_REQUIRED')).toHaveLength(1)
+  })
+
+  // A managed service on an earlier policy, where a tool the demand allocates has a price nobody has yet.
+  const pricedCatalog = operating('catalog.review-v4')
+  const pricedPolicy = compositionPolicySchema.parse(operating('resources.review-v5'))
+  const managed = () => compositionDemandSchema.parse(operating('managed-care.demand'))
+
+  const composeManaged = (d: ReturnType<typeof managed>) =>
+    composeResourceQuote(pricedCatalog, pricedPolicy, credits, d)
+
+  const toolQuestions = () =>
+    scaffoldResourceDemand(pricedCatalog, pricedPolicy, managed().brief).questions.filter(
+      q => q.code === 'TOOL_PLAN_AND_ALLOCATION_REQUIRED'
+    )
+
+  it('lists the prices an allocation can name, and apart the ones it cannot, with what naming one gets', () => {
+    const live = activeRecords(validateCatalog(pricedCatalog), managed().brief.quoteDate)
+    const questions = toolQuestions()
+    const allocated = [...new Set(managed().allocations.map(a => a.toolId))]
+
+    expect(composeManaged(managed()).quote.calculationStatus).toBe('calculated')
+
+    for (const question of questions) {
+      const tool = pricedPolicy.tools.find(t => t.toolId === question.path)!
+      const unavailable = question.unavailablePrices ?? []
+
+      // Every price of the tool is in exactly one of the two lists, by the reading of the composition.
+      expect([...question.candidates!, ...unavailable.map(u => u.priceId)].sort()).toEqual(
+        tool.prices.map(price => price.priceId).sort()
+      )
+
+      for (const price of tool.prices)
+        expect(question.candidates!.includes(price.priceId)).toBe(
+          readToolPrice(price, live, managed().brief.quoteDate).usable
+        )
+    }
+
+    // The verifier is the composition itself: an allocation that names a listed candidate is not refused for its
+    // price, and one that names an unavailable price gets exactly the diagnostic the scaffold announced.
+    const priceCodes = [
+      'RESOURCE_PRICE_PENDING',
+      'RESOURCE_PRICE_NOT_EFFECTIVE',
+      'CATALOG_RESOURCE_PRICE_REQUIRED',
+      'UNSUPPORTED_TOOL_PRICE_UNIT',
+      'RESOURCE_PRICE_SELECTION_REQUIRED'
+    ]
+
+    let refused = 0
+
+    for (const question of questions.filter(q => allocated.includes(q.path))) {
+      const naming = (priceId: string) => {
+        const demand = managed()
+
+        demand.allocations.forEach(a => {
+          if (a.toolId === question.path) a.priceId = priceId
+        })
+
+        return composeManaged(demand).quote.diagnostics.filter(
+          d => priceCodes.includes(d.code) && d.path.split(':')[1] === question.path
+        )
+      }
+
+      for (const priceId of question.candidates!) expect(naming(priceId)).toEqual([])
+
+      for (const { priceId, blocksWith, reason } of question.unavailablePrices ?? []) {
+        expect([...new Set(naming(priceId).map(d => `${d.code}|${d.detail}`))]).toEqual([`${blocksWith}|${reason}`])
+        refused += 1
+      }
+    }
+
+    // The fixture has a price to refuse on a tool the demand allocates; without one this test would verify nothing.
+    expect(refused).toBeGreaterThan(0)
+  })
+
+  it('the candidates of a missing allocation are the same reading', () => {
+    const question = toolQuestions().find(
+      q => q.unavailablePrices?.length && managed().allocations.some(a => a.toolId === q.path)
+    )!
+
+    const demand = managed()
+
+    demand.allocations = demand.allocations.filter(a => a.toolId !== question.path)
+
+    const [blocker] = composeManaged(demand).quote.diagnostics.filter(d => d.code === 'RESOURCE_ALLOCATION_REQUIRED')
+
+    expect(blocker.path).toBe(`1:${question.path}`)
+    expect(blocker.candidates).toEqual(question.candidates)
+  })
+})
+
 describe('declared capacity portfolio', () => {
   it('reconciles client, internal and unallocated costs in the original currency', () => {
     const r = allocateResourcePortfolio(portfolio(), policy, catalog, '2026-10-09')
@@ -113,6 +277,31 @@ describe('declared capacity portfolio', () => {
       unallocated: '45',
       roundingResidual: '0'
     })
+  })
+  it('hands the evidence of a holding to the allocations it yields, and none when it declares none', () => {
+    const declared = portfolio()
+
+    const evidence = {
+      reference: 'supplier-invoice:7790',
+      effectiveFrom: '2026-10-01',
+      effectiveUntil: '2026-12-31',
+      status: 'confirmed'
+    }
+
+    declared.resources[0].evidence = evidence
+
+    const withEvidence = allocateResourcePortfolio(declared, policy, catalog, '2026-10-09')
+    const without = allocateResourcePortfolio(portfolio(), policy, catalog, '2026-10-09')
+
+    expect(withEvidence.status).toBe('prepared')
+    expect(withEvidence.allocations.map(a => a.allocation.evidence)).toEqual(
+      withEvidence.allocations.map(() => evidence)
+    )
+    expect(without.allocations.some(a => 'evidence' in a.allocation)).toBe(false)
+    // An allocation it yields is a demand allocation: the evidence is in the place the assessment reads it.
+    expect(
+      compositionDemandSchema.shape.allocations.element.safeParse(withEvidence.allocations[0].allocation).success
+    ).toBe(true)
   })
   it.each(['oversubscribed', 'undersubscribed'])('blocks %s units instead of assigning a default percentage', mode => {
     const p = portfolio()

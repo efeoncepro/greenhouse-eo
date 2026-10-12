@@ -39,6 +39,16 @@ type Resolution = ReturnType<typeof resolveBrief>
  * frozen catalog and brief runs the same two passes and reaches the same inputs; what the first pass read and what
  * each group was handed is frozen with the result under `resolution.agreedTotals`.
  *
+ * A total declared `per: 'period'` is an all-in price of each period instead of one of the whole term: the same
+ * distribution is made once per period, over the groups of that period alone (its fee, its start-up, the costs it
+ * re-invoices), in the same unit, and the last group of the period that has a price takes what is left. Every period
+ * the named rows are billed in nets exactly the amount, whatever the billing classes it holds, so a start-up charged
+ * in the first month is part of that month's price and never a row waived to make the month add up. A period in
+ * which none of the named rows is billed has no group and is handed nothing. One unit serves the whole total: when
+ * the tax-exact unit would hand nothing to a group of any period, every period is distributed at the minor unit.
+ * With every row of a period inside the total, the tax of the period is the tax of the rate on the amount, rounded
+ * once, and the quote adds one of those per period.
+ *
  * A resolution that declares no agreed total, that is not resolved, or that was settled already is returned as it is.
  */
 export function settleAgreedTotals<R extends Resolution>(resolution: R): R {
@@ -110,47 +120,71 @@ export function settleAgreedTotals<R extends Resolution>(resolution: R): R {
       })
     )
 
-    const withPrice = groups.filter(group => group.policyNet.gt(0))
-    const policyNet = withPrice.reduce((sum, group) => sum.plus(group.policyNet), new D(0))
+    // What one amount is shared by. A total of the whole term is one pool, every group of the quote; a price per
+    // period is one pool per period, the groups of that period alone. A period with no row of the total has no pool.
+    const pools = (
+      total.per === 'period' ? priced.map(({ period }) => groups.filter(group => group.period === period)) : [groups]
+    )
+      .filter(pool => pool.length)
+      .map(pool => {
+        const withPrice = pool.filter(group => group.policyNet.gt(0))
 
-    if (!withPrice.length && amount.gt(0)) {
+        return {
+          periodId: pool[0].period.periodId,
+          withPrice,
+          policyNet: withPrice.reduce((sum, group) => sum.plus(group.policyNet), new D(0))
+        }
+      })
+
+    const withoutBase = pools.filter(pool => !pool.withPrice.length)
+
+    if (amount.gt(0) && (!pools.length || withoutBase.length)) {
       block(
         'AGREED_TOTAL_WITHOUT_BASE',
         path,
-        'No row the agreed total names has a price above zero in any period, so a total above zero has nothing to be distributed over.'
+        total.per === 'period' && pools.length
+          ? `No row the agreed total names has a price above zero in period ${withoutBase
+              .map(pool => pool.periodId)
+              .join(', ')}, so a price per period above zero has nothing to be distributed over there.`
+          : 'No row the agreed total names has a price above zero in any period, so a total above zero has nothing to be distributed over.'
       )
       continue
     }
 
-    // Every group but the last gets its proportional part, cut down to a multiple of `unit`; the last takes the rest.
+    // In each pool every group but the last gets its proportional part, cut down to a multiple of `unit`; the last
+    // takes the rest. A group with a price has a part of any amount above zero: cut to nothing by the unit, it is
+    // `starved`, which is what the fallback below is for.
     const distribute = (unit: Decimal) => {
-      let distributed = new D(0)
+      const shares = new Map<(typeof groups)[number], Decimal>()
+      let starved = false
 
-      return new Map(
-        withPrice.map((group, index) => {
-          const share =
-            index === withPrice.length - 1
-              ? amount.minus(distributed)
-              : amount.mul(group.policyNet).div(policyNet).divToInt(unit).mul(unit)
+      for (const pool of pools) {
+        let distributed = new D(0)
+
+        pool.withPrice.forEach((group, index) => {
+          const last = index === pool.withPrice.length - 1
+
+          const share = last
+            ? amount.minus(distributed)
+            : amount.mul(group.policyNet).div(pool.policyNet).divToInt(unit).mul(unit)
 
           distributed = distributed.plus(share)
-
-          return [group, share] as const
+          shares.set(group, share)
+          if (!last && share.isZero()) starved = true
         })
-      )
+      }
+
+      return { shares, starved }
     }
 
     const taxExact = taxExactUnit ? distribute(taxExactUnit) : null
 
-    // A group with a price has a part of any total above zero. Cut to nothing by the tax-exact unit, it would be
-    // sold for free so that a tax rounds well: the distribution is made at the minor unit instead, and says so.
-    const starved =
-      taxExact !== null &&
-      amount.gt(0) &&
-      [...taxExact.values()].slice(0, -1).some(share => share.isZero()) &&
-      taxExactUnit!.gt(minorUnit)
+    // Cut to nothing by the tax-exact unit, a group would be sold for free so that a tax rounds well: the
+    // distribution is made at the minor unit instead, for every pool of the total, and says so.
+    const starved = taxExact !== null && amount.gt(0) && taxExact.starved && taxExactUnit!.gt(minorUnit)
 
-    const shares = taxExact && !starved ? taxExact : distribute(minorUnit)
+    const shares = taxExact && !starved ? taxExact.shares : distribute(minorUnit).shares
+    const policyNet = pools.reduce((sum, pool) => sum.plus(pool.policyNet), new D(0))
 
     for (const [group, share] of shares) {
       // Built as the widest contract, like the rest of the request: the kernel parses it as the one it declares.

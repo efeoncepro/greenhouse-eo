@@ -5,14 +5,29 @@ import { describeEngagementForm, describeMarketFactor, describeThirdPartyPolicie
 import { PricingV3Error } from '../errors'
 import { PRICING_V3_THIRD_PARTY_BILLING } from '../schemas'
 import type { composeResourceQuote } from './composition'
+import { PLANNING_SLOT_PREFIX } from './composition-contracts'
 import { estimateExposure, linesBelowPolicyFloor } from './summary'
 
 type Composition = ReturnType<typeof composeResourceQuote>
 
-/** Economic evidence gaps are separate from mathematical completion and never grant commercial authority. */
+/** What stands between a calculated quote and one that can be issued: where, who owns it and what to do. */
+type ReadinessGap = { code: string; path: string; owner: string; action: string }
+
+/**
+ * Economic evidence gaps are separate from mathematical completion and never grant commercial authority.
+ *
+ * `gaps` holds one entry per gap. A gap about one period (a tool in a month, a row under its floor) is raised with
+ * that period and names its place without it (`tools.<toolId>`, `result.lines.<lineId>`): entries that differ only
+ * in their period are one entry with its `periodIds`, where the first of them stood, so a quote of twelve months
+ * reads like a quote of one. `gapOccurrences` is the size of the list before that: every entry once per period it
+ * holds, and once when it holds none. The blockers of a quote that did not calculate are listed as the quote
+ * reported them, each under its own path.
+ */
 export function assessCompositionReadiness(result: Composition) {
-  const gaps: { code: string; path: string; owner: string; action: string }[] = []
-  const gap = (code: string, path: string, owner: string, action: string) => gaps.push({ code, path, owner, action })
+  const raised: (ReadinessGap & { periodId?: number })[] = []
+
+  const gap = (code: string, path: string, owner: string, action: string, periodId?: number) =>
+    raised.push({ code, path, owner, action, ...(periodId === undefined ? {} : { periodId }) })
 
   gap(
     'COMMERCIAL_APPROVAL_REQUIRED',
@@ -42,52 +57,79 @@ export function assessCompositionReadiness(result: Composition) {
       )
   }
 
+  // A tool bought in credits is a pooled budget of its provider, planned by the credit catalog: the demand declares
+  // no allocation of it, so there is none to evidence.
+  const budgeted = new Set(result.creditBudgets.map(b => `${b.periodId}:${b.toolId}`))
+  const quoteDate = result.quote.resolution.brief?.quoteDate
+
   for (const a of result.attributions) {
+    const path = `tools.${a.toolId}`
+
     gap(
       'RESOURCE_ACCESS_AND_CAPACITY_REQUIRED',
-      `${a.periodId}:${a.toolId}`,
+      path,
       'Operations',
-      'Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.'
+      'Verify actual subscriptions, named-user access or permitted shared capacity; a price reference alone does not prove access or reserve inventory.',
+      a.periodId
     )
     if (a.resource.source.status !== 'confirmed')
       gap(
         'TOOL_COST_EVIDENCE_REVIEW',
-        `${a.periodId}:${a.toolId}`,
+        path,
         'Operations/Finance',
-        'Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable.'
+        'Confirm source, plan, billing, term and access. Public/operator/historical references remain distinguishable.',
+        a.periodId
       )
-    if (/simulat|hypothet|prototype|example/i.test(a.reason))
-      gap(
-        'ALLOCATION_EVIDENCE_REQUIRED',
-        `${a.periodId}:${a.toolId}`,
-        'Operations',
-        'Replace the simulated denominator and assignments with declared operational capacity.'
-      )
-    if (a.consumerIds.some(id => id.startsWith('planned-')))
-      gap(
-        'USER_ASSIGNMENT_REQUIRED',
-        `${a.periodId}:${a.toolId}`,
-        'Operations',
-        'Confirm stable user IDs and licensed access.'
-      )
+
+    // An allocation is what the demand declares about a tool: the plan held, its seats and the share this account
+    // carries. Whether that is evidenced is the fact the demand declares in `evidence`, held to what every other
+    // evidence is: confirmed, and in force on the quote date. The wording of `reason` is never read.
+    if (!budgeted.has(`${a.periodId}:${a.toolId}`)) {
+      const failed = !a.evidence
+        ? 'The allocation of this tool carries no evidence: the plan held, its seats and the share this account carries are a declaration nobody evidenced. Declare `evidence` on the allocation (reference, validity and status) from the invoice or the console of the supplier and the register of seats.'
+        : a.evidence.status !== 'confirmed'
+          ? 'The evidence of the allocation of this tool is not confirmed. Confirm the plan held, its seats and the share this account carries against the invoice or the console of the supplier before issuing.'
+          : quoteDate !== undefined && (a.evidence.effectiveFrom > quoteDate || a.evidence.effectiveUntil < quoteDate)
+            ? 'The evidence of the allocation of this tool is not in force on the quote date. Declare evidence whose validity covers the quote date.'
+            : null
+
+      if (failed) gap('ALLOCATION_EVIDENCE_REQUIRED', path, 'Operations', failed, a.periodId)
+    }
 
     // What the demand declares about seats is a declaration, like every allocation: it accounts for the seats, it
     // does not prove them. A tool held under several prices raises each gap once per period, whatever the holding.
     if (a.idle)
       gap(
         'IDLE_SEAT_COST_REVIEW',
-        `${a.periodId}:${a.toolId}`,
+        path,
         'Operations/Commercial',
-        'The demand declares paid seats of this tool that nobody uses in the period, and the quote carries their cost. Confirm the seats cannot be released, paused or reassigned for the period, and that the client is to bear them.'
+        'The demand declares paid seats of this tool that nobody uses in the period, and the quote carries their cost. Confirm the seats cannot be released, paused or reassigned for the period, and that the client is to bear them.',
+        a.periodId
       )
     if (a.seats?.shared.length)
       gap(
         'SHARED_SEAT_TERMS_REVIEW',
-        `${a.periodId}:${a.toolId}`,
+        path,
         'Operations/Legal',
-        'The demand declares people who use one named seat between them in the period. Confirm the terms of the supplier allow it; a declared share is not a licence, and without it each person needs a seat.'
+        'The demand declares people who use one named seat between them in the period. Confirm the terms of the supplier allow it; a declared share is not a licence, and without it each person needs a seat.',
+        a.periodId
       )
   }
+
+  // A planning slot is a person nobody is assigned to yet. That is one fact about the people of the quote, whatever
+  // the tools and the months they appear in, so it is said once: with how many slots, and with what turns one into
+  // an id.
+  const planningSlots = new Set(
+    result.attributions.flatMap(a => a.consumerIds.filter(id => id.startsWith(PLANNING_SLOT_PREFIX)))
+  )
+
+  if (planningSlots.size)
+    gap(
+      'USER_ASSIGNMENT_REQUIRED',
+      'work.assigneeIds',
+      'Operations',
+      `${planningSlots.size} of the people the tools of this quote are attributed to are planning slots (ids that start with ${PLANNING_SLOT_PREFIX}): nobody is assigned to them yet. A slot stays as it is until a specific person is assigned; then replace it with a stable anonymous id and confirm the licensed access of that person to each tool.`
+    )
 
   // The dedication of a line governs what the line is charged by its capacity. The brief the quote froze says where
   // each one comes from, or says nothing: a dedication without evidence is named as such, never taken as confirmed.
@@ -200,14 +242,16 @@ export function assessCompositionReadiness(result: Composition) {
       : 'the third_party_policy record selected for it'
   }
 
+  // The row is `periods.<periodId>.result.lines.<lineId>` of the frozen quote, once per period of `periodIds`.
   for (const line of belowPolicyFloor)
     gap(
       'MARGIN_BELOW_POLICY_FLOOR',
-      `periods.${line.periodId}.result.lines.${line.lineId}`,
+      `result.lines.${line.lineId}`,
       'Commercial/Finance',
       line.kind === PRICING_V3_THIRD_PARTY_BILLING
         ? `The price of this re-invoiced third-party cost is under the margin floor of the price rule of its category (${categoryRule(line.parentLineId)}), not of a pricing policy. Decide: raise its price, have the client pay the supplier directly or approve an exception. The system does not raise the price.`
-        : 'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.'
+        : 'The price of this line is under the margin floor of the selected pricing policy. Decide: raise the price, change the scope or approve an exception. The system does not raise the price.',
+      line.periodId
     )
 
   // The ranking is the summary's (`estimateExposure`); readiness only points at where the evidence matters most.
@@ -263,11 +307,37 @@ export function assessCompositionReadiness(result: Composition) {
     costIds: policy.costIds
   }))
 
+  // A gap is raised once per place and period, whatever raised it twice (a tool held under several prices).
+  const once = raised.filter(
+    (g, i) => raised.findIndex(x => x.code === g.code && x.path === g.path && x.periodId === g.periodId) === i
+  )
+
+  const gaps: (ReadinessGap & { periodIds?: number[] })[] = []
+
+  for (const { periodId, ...entry } of once) {
+    const folded =
+      periodId === undefined
+        ? undefined
+        : gaps.find(
+            g =>
+              g.periodIds &&
+              g.code === entry.code &&
+              g.path === entry.path &&
+              g.owner === entry.owner &&
+              g.action === entry.action
+          )
+
+    if (folded) folded.periodIds!.push(periodId!)
+    else gaps.push(periodId === undefined ? entry : { ...entry, periodIds: [periodId] })
+  }
+
   return {
     calculationStatus: result.quote.calculationStatus,
     commercialStatus: 'requires_review',
     binding: false,
-    gaps: gaps.filter((g, i) => gaps.findIndex(x => x.code === g.code && x.path === g.path) === i),
+    // What `gaps` counted before the entries that differ only in their period were folded into one.
+    gapOccurrences: once.length,
+    gaps,
     // Evidence gaps above all read alike; this is the order to close the cost ones in, largest cost first.
     costEvidencePriority: exposure
       ? {
