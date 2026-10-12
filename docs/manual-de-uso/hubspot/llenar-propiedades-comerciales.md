@@ -62,9 +62,10 @@ actividad nativa y `hs_current_customer` tienen writers propios; prospecting no 
 
 Un Lead se crea sólo tras una interacción real de una persona registrable: respuesta con interés, reunión
 aceptada o solicitud entrante. Investigar y registrar una cuenta no lo crea, ni una señal pública de alguien
-sin correo. Primero comprobar si ya existe o lo crea una automatización; al 2026-10-12 el workflow «Create Lead
-Upon Contact LCS Update» había creado 2.222 de los 2.251 Leads del portal, así que un Lead existente no prueba
-calificación. Un Lead nuevo sigue el gate de correo del
+sin correo. Primero comprobar si ya existe. Hasta el 2026-10-12 una automatización del pipeline de Leads creaba
+uno cada vez que un contacto pasaba a la etapa `Lead` (origen «Create Lead Upon Contact LCS Update»): generó
+2.222 de los 2.251 Leads del portal, así que un Lead existente no prueba calificación. Se apagó ese día;
+desde entonces un Lead sólo existe si alguien lo crea. Un Lead nuevo sigue el gate de correo del
 Contact asociado, aunque el canal permita asociarlo sólo a Company. No usar Company-only para eludirlo.
 
 | Uso | Campos | Cuándo poblar |

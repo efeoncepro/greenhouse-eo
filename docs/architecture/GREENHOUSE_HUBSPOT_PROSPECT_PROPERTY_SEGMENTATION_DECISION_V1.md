@@ -231,7 +231,21 @@ Tres vacíos que salieron al probar la skill de prospección bajo Claude; el ope
 - Un Lead se crea sólo tras una interacción real de una persona registrable: respuesta con interés, reunión
   aceptada o solicitud entrante. Investigar y registrar no lo crea. Lectura del portal `48713323` ese día:
   2.251 Leads, 2.222 creados por el workflow «Create Lead Upon Contact LCS Update», 28 por integración y 1
-  por interfaz. El operador pidió apagar ese workflow; el cambio en el portal se registra aparte cuando ocurra.
+  por interfaz. El operador pidió apagarla y se apagó ese mismo día.
+
+Estado del portal tras el cambio, leído en la interfaz con la sesión del operador:
+
+- La creación automática era una automatización con plantilla del pipeline de Leads (Objetos → Leads →
+  Pipelines → Lead pipeline → Automatizar → «Crea un lead»), no un workflow de la lista. Creaba un Lead de
+  tipo «Nueva empresa» cuando un contacto pasaba a la etapa de ciclo de vida `Lead`. Quedó desactivada, con
+  confirmación del operador y relectura tras recargar. Las dos reglas de progresión de etapa del Lead
+  (a «Intentando contactar» y a «Conectado») siguen activas.
+- `Lead` no discriminaba: 3.187 de 4.240 contactos estaban en esa etapa. De los 2.251 Leads, 2.233 seguían
+  en «New»; 11 en «Attempting», 3 en «Connected», 1 calificado y 3 descalificados.
+- Hallazgo sin acción: en Contactos → Etapa del ciclo de vida → Reglas del pipeline, la regla «Limitar la
+  creación de objetos a etapas específicas» está activa con `Sales Qualified Lead` como etapa predeterminada
+  de un contacto creado por un usuario; 2.733 registros están en esa etapa. Cambiarla es decisión del
+  operador. Los Leads ya creados no se depuraron.
 
 Sin cambio de schema ni de segmentos. [Origen](../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
 

@@ -104,8 +104,9 @@ por el agente principal; los evals pasan a versión 7 con 49 escenarios.
 - Resueltos el mismo día con aprobación del operador y escritos en `hubspot-as-a-service`, su manual y la
   [decisión CRM](../../architecture/GREENHOUSE_HUBSPOT_PROSPECT_PROPERTY_SEGMENTATION_DECISION_V1.md): la
   fecha de investigación es la de verificación, el encaje de un adyacente sale de su propia función y un
-  Lead exige una interacción real. Queda abierto ampliar el enum de encaje y apagar en el portal el workflow
-  que creó 2.222 de los 2.251 Leads.
+  Lead exige una interacción real. La automatización que creó 2.222 de los 2.251 Leads se apagó en el portal
+  ese día con confirmación del operador. Queda abierto ampliar el enum de encaje, depurar los Leads ya
+  creados y decidir la etapa predeterminada de un contacto nuevo, hoy `Sales Qualified Lead`.
 - `references/message-and-contextual-proof.md`, «Identidad de la oferta»: dos agentes señalaron que el
   bloque sobre logos en superficies de la app no ayuda a redactar un mensaje de prospección.
 - El comportamiento de reinscripción en secuencias aparece afirmado en respuestas sin que los hechos lo den;

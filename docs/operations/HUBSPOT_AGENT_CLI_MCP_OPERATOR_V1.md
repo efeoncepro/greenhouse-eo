@@ -117,6 +117,20 @@ empresa principal con `ASSOCIATION(object = '0-2', association = 1) { ... }` y 1
 [snapshot con valores previos](HUBSPOT_INDUSTRY_SEGMENTS_2026-10-12.json) ·
 [manual](../manual-de-uso/hubspot/segmentar-prospeccion-por-cohorte.md#9-agrupar-por-industria-de-la-empresa--vigente-desde-el-12102026).
 
+## Creación automática de Leads apagada — corte 2026-10-12
+
+- Diagnóstico por Agent CLI, sólo lectura: `objects search --type leads` con `hs_object_source_label` y
+  `hs_object_source_detail_1` mostró 2.222 de 2.251 Leads con origen `AUTOMATION_PLATFORM` / «Create Lead Upon
+  Contact LCS Update», 28 `INTEGRATION` y 1 `CRM_UI`.
+- `workflows list` devolvió 403 por falta del scope `automation`; la automatización tampoco aparece en la
+  lista de workflows de la interfaz. Vive en Configuración → Objetos → Leads → Pipelines → Lead pipeline →
+  Automatizar, como automatización con plantilla «Crea un lead» (contacto pasa a etapa `Lead`).
+- Cambio: interruptor apagado en la interfaz con la sesión del operador y su confirmación expresa. Readback
+  tras recargar: «Crea un lead» `DESACTIVADA`; las dos reglas de progresión de etapa siguen `ACTIVADA`. Al
+  apagarla la fila deja de mostrar etapa y tipo: reactivarla exige volver a configurarla.
+- No se tocó: Leads existentes, etapas de ciclo de vida ni la regla de creación de contactos, cuya etapa
+  predeterminada es `Sales Qualified Lead` (Contactos → Etapa del ciclo de vida → Reglas del pipeline).
+
 ## Procedimiento por operación
 
 Corte anterior, sustituido el 12/10 — aplicación bancaria verificada el 2026-10-11: ACTIVE **188**, 28 Contact de 14 cuentas Primary. Dos creates CLI

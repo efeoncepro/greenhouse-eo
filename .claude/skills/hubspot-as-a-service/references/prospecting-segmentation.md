@@ -126,7 +126,9 @@ If scope is already explicit, proceed within it; ask only when a material ambigu
   an accepted meeting or an inbound request. Researching and registering an account does not create a Lead,
   and neither does a public signal from someone without a verified individual email. An existing Lead is not
   proof of qualification: on 2026-10-12, 2,222 of the 2,251 Leads in portal `48713323` had been created by
-  the workflow «Create Lead Upon Contact LCS Update», not by a qualifying event.
+  the Lead pipeline's templated automation (source «Create Lead Upon Contact LCS Update»), which fired on
+  every contact reaching lifecycle stage `Lead`. The operator had it switched off that day, so from then on
+  no Lead appears unless someone creates it; re-read the setting before assuming it is still off.
 
 ## Research and enrichment contract
 
