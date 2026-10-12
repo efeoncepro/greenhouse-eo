@@ -49,7 +49,7 @@
       "code": "CANONICAL_PROMOTION",
       "owner": "Platform/Finance",
       "required": "Accepted integrationunit, V2/V3 parity, tenant/auth/audience/snapshot/lifecycle and rollout verification",
-      "known": "Promotion handoff prepared; no API/UI/MCP migration or deploy."
+      "known": "Promotion approved by the CEO on 2026-10-12 as its own program (EPIC-053; decision GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1): a V3-owned registry and API, then the CLI over that API, MCP and the interface last. Approved, not implemented: no API, database, UI or MCP exists yet and the CLI is still local."
     },
     {
       "code": "MANAGED_SERVICE_PROVISIONS_UNMEASURED",
@@ -186,7 +186,7 @@
     {
       "code": "QUOTE_REGISTRY_IN_GREENHOUSE",
       "owner": "Platform/Finance",
-      "required": "The agreed next step: the Greenhouse quoter adopts this document design and provides what it lacks. Not started",
+      "required": "Delivered by EPIC-053 (registry API: TASK-2027; interface and production render: epic unit without a task yet). Not started",
       "known": "As of 2026-10-11 the document produced by compose document is a draft: it has no quote number, versions, QR verification, signatures or approval, which exist only in the Greenhouse quoter. Related: CANONICAL_PROMOTION. Outside the quoter by the CEO’s decision of 2026-10-11, and not a pending item: the start date of the service and the length of the contract, because a quote is not a contract"
     },
     {

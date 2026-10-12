@@ -1,5 +1,13 @@
 # Task Index
 
+- `TASK-2030` — [Quoter V3 MCP tools and gateway federation](to-do/TASK-2030-quoter-v3-mcp-tools.md), to-do; `EPIC-053`.
+- `TASK-2029` — [Quoter V3 catalog authority on the platform](to-do/TASK-2029-quoter-v3-catalog-authority.md), to-do; `EPIC-053`.
+- `TASK-2028` — [Pricing V3 CLI platform transport and parity gate](to-do/TASK-2028-pricing-v3-cli-platform-transport.md), to-do; `EPIC-053`.
+- `TASK-2027` — [Quoter V3 registry API: quotes, versions, lifecycle and numbering](to-do/TASK-2027-quoter-v3-registry-api.md), to-do; `EPIC-053`.
+- `TASK-2026` — [Quoter V3 compute API: catalog reads, simulation and readings](to-do/TASK-2026-quoter-v3-compute-api.md), to-do; `EPIC-053`.
+- `TASK-2025` — [Quoter V3 database foundation: catalog by digest and quote aggregate](to-do/TASK-2025-quoter-v3-database-foundation.md), to-do; `EPIC-053`.
+- `TASK-2024` — [Pricing V3 storage port and filesystem-free engine](to-do/TASK-2024-pricing-v3-storage-port.md), to-do; `EPIC-053`.
+- `TASK-2023` — [Legacy quoter write-door containment](to-do/TASK-2023-legacy-quoter-write-containment.md), to-do; `EPIC-053`.
 - `TASK-2022` — [flujo operativo V3](complete/TASK-2022-pricing-v3-operational-agent-workflow.md), completa local; catálogo, reparto/mantenimiento/readiness y agentes; economía y canon pendientes; [contratos y adopción documental](../documentation/finance/cotizador-v3-superficie-implementada.md).
 - `TASK-2021` — [composición de recursos V3](complete/TASK-2021-pricing-v3-demand-resource-composition.md), completa local; selección/asignación/IA al quote, explain/replay y108 tests verdes.
 

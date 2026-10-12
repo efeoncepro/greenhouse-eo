@@ -1,7 +1,8 @@
 # Cotizador V3 como plataforma — plan del programa
 
-> **Estado:** Propuesto el 2026-10-12. Pendiente de aprobación del CEO. No autoriza cambios en producción, migraciones
-> ni cutover: es el plan que se pidió antes de tocar nada.
+> **Estado:** Aprobado por el CEO el 2026-10-12. Formalizado en la
+> [decisión de promoción](GREENHOUSE_PRICING_V3_PLATFORM_PROMOTION_DECISION_V1.md) y coordinado por `EPIC-053`
+> (tareas `TASK-2023` a `TASK-2030`). Aprobar el plan no ejecuta nada: cada fase se entrega con su tarea y sus puertas.
 > **Dueño de la decisión:** CEO. **Preparado por:** agente, con tres auditorías y dos levantamientos de hechos.
 > **Base:** [auditoría del cotizador actual](../audits/commercial/2026-10-12-cotizador-actual-auditoria.md), [frontera de promoción de V3](../documentation/finance/cotizador-v3-promocion-canonica.md),
 > [contrato operativo de V3](GREENHOUSE_PRICING_V3_OPERATIONAL_WORKFLOW_DECISION_V1.md),
@@ -202,6 +203,10 @@ Evaluación contra los cuatro pilares:
 
 ## 9. Decisiones que necesito de ti
 
+> **Resueltas el 2026-10-12.** 1: plan aprobado. 2: se cierran las puertas de escritura del cotizador actual
+> (`TASK-2023`). 3: excepción bajo el piso, sólo administración; puntero del catálogo, administración y finanzas.
+> 4 y 5 siguen abiertas y no bloquean. El texto de abajo queda como se presentó.
+
 1. **Aprobar este plan** y que se escriba el ADR que lo formaliza. Sin eso no empieza la fase 1.
 2. **Contención del cotizador actual, ahora.** Nadie lo usa, pero sigue abierto: publica borradores en HubSpot como
    cotizaciones publicadas y permite marcar una cotización como emitida sin aprobación. Propongo cerrar sus puertas de
@@ -224,5 +229,6 @@ Evaluación contra los cuatro pilares:
 
 ## 11. Siguiente paso
 
-Con tu aprobación: escribir el ADR, abrir la épica y sus tareas (primero las de datos y API, después las de interfaz),
-y empezar por la fase 1, que no cambia nada visible.
+Hecho el 2026-10-12: ADR aceptado, épica `EPIC-053` y tareas `TASK-2023` a `TASK-2030` escritas. Sigue la ejecución,
+que empieza por `TASK-2024` (cimientos, sin cambio visible) y `TASK-2023` (contención del cotizador actual), que son
+independientes entre sí. La interfaz y el retiro del cotizador actual son unidades de la épica todavía sin tarea.

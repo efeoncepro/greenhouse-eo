@@ -25,6 +25,14 @@ criterios de cliente, entrega y retorno. TASK-1759/1774 conservan transporte/baj
 
 | Task ID | Lifecycle actual | Legacy ID / brief | Archivo actual |
 | ---------- | ---------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `TASK-2030` | `to-do` | Quoter V3 MCP tools and gateway federation | `docs/tasks/to-do/TASK-2030-quoter-v3-mcp-tools.md` |
+| `TASK-2029` | `to-do` | Quoter V3 catalog authority on the platform | `docs/tasks/to-do/TASK-2029-quoter-v3-catalog-authority.md` |
+| `TASK-2028` | `to-do` | Pricing V3 CLI platform transport and parity gate | `docs/tasks/to-do/TASK-2028-pricing-v3-cli-platform-transport.md` |
+| `TASK-2027` | `to-do` | Quoter V3 registry API: quotes, versions, lifecycle and numbering | `docs/tasks/to-do/TASK-2027-quoter-v3-registry-api.md` |
+| `TASK-2026` | `to-do` | Quoter V3 compute API: catalog reads, simulation and readings | `docs/tasks/to-do/TASK-2026-quoter-v3-compute-api.md` |
+| `TASK-2025` | `to-do` | Quoter V3 database foundation: catalog by digest and quote aggregate | `docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md` |
+| `TASK-2024` | `to-do` | Pricing V3 storage port and filesystem-free engine | `docs/tasks/to-do/TASK-2024-pricing-v3-storage-port.md` |
+| `TASK-2023` | `to-do` | Legacy quoter write-door containment | `docs/tasks/to-do/TASK-2023-legacy-quoter-write-containment.md` |
 | `TASK-2022` | `complete` | Pricing V3 operational catalog and agent workflow | `docs/tasks/complete/TASK-2022-pricing-v3-operational-agent-workflow.md` |
 | `TASK-2021` | `complete` | Pricing V3 demand-based resource composition | `docs/tasks/complete/TASK-2021-pricing-v3-demand-resource-composition.md` |
 | `TASK-2020` | `complete` | Pricing V3 AI subscription and top-up budgeting | `docs/tasks/complete/TASK-2020-pricing-v3-ai-credit-budget.md` |
@@ -2609,3 +2617,5 @@ Al crear una task nueva o bootstrapear una legacy adicional:
 > Registro Codex2026-10-09: TASK-2022 completa catálogo/reglas/plan/reparto/readiness local; dueño económico TASK-2017, canonTASK-1211/1212. Siguiente ID libre TASK-2023.
 
 > Consolidación documental Codex 2026-10-09: TASK-2016/2018/2019/2020/2021/2022 conservan cierre local y TASK-2017 conserva in-progress/Parcial. [Mapa de cobertura de docs y skills](../audits/commercial/2026-10-09-pricing-v3-docs-skills-consolidation.md); no nueva task, ID reservado, tarifa aprobada ni promoción runtime.
+
+> Registro 2026-10-12: `EPIC-053` reserva TASK-2023–2030 para llevar el cotizador V3 a la plataforma (contención del cotizador actual, puerto de almacenamiento, base de datos, API de cálculo y de registro, CLI sobre la API, catálogo en la plataforma y MCP); sólo planificación. Interfaz y retiro del cotizador actual quedan como unidades de la épica sin tarea. Siguiente ID libre TASK-2031.
