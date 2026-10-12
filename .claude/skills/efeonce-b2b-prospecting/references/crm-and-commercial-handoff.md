@@ -3,10 +3,12 @@
 La fase de enrichment entrega evidencia y propuesta; las mutaciones pertenecen a HubSpot y requieren el
 alcance autorizado. Sales enrichment no ejecuta CRM/outreach: cambiar de fase explícitamente con su owner.
 Approval vigente para un lote se reutiliza; no pedir confirmación por segunda vez para sus mismos cambios.
-Autorizar «registrar contactos» cubre crear el Contact y asociarlo a una Company que ya existe. Company nueva,
-nota de Company, Lead o Deal son escrituras aparte: listarlas en el changeset y pedir su confirmación en esa
-misma entrega, sin retener por ello el changeset de los contactos elegibles. Si no se sabe si la Company
-existe, declararlo como dependencia a verificar al leer CRM, en una línea y sin desarrollar las dos ramas.
+Autorizar «registrar contactos» cubre crear el Contact y dejarlo asociado a su Company: reutilizar la que
+exista o, si no existe y la entidad está verificada, crearla con los datos confirmados como parte del mismo
+registro, porque un contacto que entra sin su empresa queda mal asociado. La nota de Company entra en esa
+autorización sólo si el pedido la nombra, a ella o a la señal que llevaría (un «todo» genérico no basta); si no, proponerla y pedir su confirmación en la misma entrega, sin
+retener el changeset. Lead y Deal son siempre escrituras aparte. Si no se sabe si la Company existe, se
+resuelve al leer CRM (reutilizar o crear), dicho en una línea.
 
 ## Registro o reutilización autorizado
 

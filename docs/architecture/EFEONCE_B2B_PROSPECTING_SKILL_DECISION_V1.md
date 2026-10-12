@@ -126,13 +126,14 @@ carriles no pedidos. Se incorporan:
 - Proporcionalidad como parte del método: la respuesta contesta primero lo pedido; la entrega completa
   aplica a dossier o handoff y el plan de captura CRM a pedidos de registro.
 - Veinte decisiones (D1–D20) que cierran ambigüedades halladas al aplicar el método, escritas en los módulos.
-  Las tomó el agente bajo el mandato general, con la lectura que no amplía su autoridad; D2 (investigación
-  bajo HOLD), D3 (alcance de «registrar contactos») y D6 (mensaje manual del operador) quedan a revisión
-  expresa del operador.
+  Las tomó el agente bajo el mandato general, con la lectura que no amplía su autoridad. El operador revisó
+  ese día las tres que tocaban autoridad o canal: aprobó D2 (investigación bajo HOLD) y D6 (mensaje manual
+  del operador) y modificó D3: autorizar «registrar contactos» cubre crear la Company si no existe y la
+  entidad está verificada; la nota de Company sólo si el pedido la nombra; Lead y Deal siempre aparte.
 - Módulo de sesión Claude: costos de los tools de Apollo según sus descripciones a esa fecha y radar personal
   ausente fuera de Codex. El punto 8 se precisa: la harness `deep-research` se comprueba por sesión; faltó en
   el preflight de Codex del 2026-10-11 y aparecía listada en Claude el 2026-10-12.
-- Evals versión 6: 48 escenarios y una comprobación de proporcionalidad; la extensión no es mérito.
+- Evals versión 7: 49 escenarios y una comprobación de proporcionalidad; la extensión no es mérito.
 
 Tras corregir, la skill mantuvo 20 de 20 aprobadas sin fallos críticos, bajó el ruido de 1,55 a 0,60 y quedó
 8 % por debajo del brazo sin skill en extensión. Es extensión del método aprobado, sin runtime, schema,

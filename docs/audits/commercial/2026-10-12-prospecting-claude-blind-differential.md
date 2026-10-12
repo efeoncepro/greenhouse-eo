@@ -58,7 +58,7 @@ un criterio de rúbrica limítrofe, ya ajustado (ver abajo).
 3. **Módulo `references/claude-session-tools.md`.** Qué tools de Apollo gastan créditos según sus propias
    descripciones leídas ese día, el carril de HubSpot y Outlook por referencia a sus dueños, y el radar
    personal ausente fuera de Codex. La harness `deep-research` pasa a comprobarse por sesión.
-4. **Evals versión 6.** 48 escenarios (40 intactos + P41–P48) y una comprobación transversal de
+4. **Evals versión 6**, luego 7 al sumar P49. 48 escenarios (40 intactos + P41–P48) y una comprobación transversal de
    proporcionalidad; la extensión deja de contar como mérito.
 
 Después de la segunda ronda, y por tanto **sin volver a medir**, se aplicaron seis aclaraciones de una
@@ -67,17 +67,22 @@ un rebote, Company de existencia desconocida, borrador con contexto no leído, p
 excepción de ICP, cuándo aplica el plan de captura CRM) y dos arreglos al banco: P43 delataba su respuesta
 en los hechos y P46 penalizaba descartar un distractor en una línea.
 
-## Decisiones que conviene que el operador revise
+## Decisiones revisadas por el operador
 
-Se tomaron bajo el mandato general de corregir, con lectura conservadora, pero tocan autoridad o canal:
+Las tres que tocaban autoridad o canal se le presentaron el mismo día y quedaron así:
 
-- **D2:** bajo HOLD la investigación offline ya autorizada puede seguir sólo como cobertura lista, sin
-  créditos ni escrituras nuevas, y no habilita contacto.
-- **D3:** autorizar «registrar contactos» no cubre crear la Company ni escribir su nota; se piden en la
-  misma entrega. Queda abierto si un pedido que nombra la señal expresamente («incluida la señal de la
-  autora») ya autoriza esa nota; hoy la skill pide confirmación.
-- **D6:** un mensaje manual que el operador envía desde su propio perfil es una ruta que se puede proponer;
-  la skill prepara el borrador y no lo envía.
+- **D2, aprobada:** bajo HOLD la investigación offline ya autorizada puede seguir sólo como cobertura lista,
+  sin créditos ni escrituras nuevas, y no habilita contacto.
+- **D3, modificada por el operador:** autorizar «registrar contactos» cubre también crear la Company cuando
+  no existe y la entidad está verificada. La nota de Company entra sólo si el pedido la nombra; si no, se
+  propone y se confirma en la misma entrega. Lead y Deal siguen siendo siempre escrituras aparte. La lectura
+  inicial del agente exigía confirmar Company y nota por separado; el archivo de [decisiones](prospecting-claude-differential-2026-10-12/decisiones.md)
+  conserva esa versión como evidencia y anota el cambio.
+- **D6, aprobada sin cambios:** un mensaje manual que el operador envía desde su propio perfil es una ruta
+  que se puede proponer; la skill prepara el borrador y no lo envía.
+
+El cambio de D3 se midió con una corrida de P42 y del caso nuevo P49 (pedido que no nombra la nota), leída
+por el agente principal; los evals pasan a versión 7 con 49 escenarios.
 
 ## Límites
 
@@ -97,7 +102,8 @@ Se tomaron bajo el mandato general de corregir, con lectura conservadora, pero t
 ## Pendientes fuera de alcance
 
 - `hubspot-as-a-service`: qué fecha escribe `efeonce_prospecting_researched_on` (corte de evidencia o día de
-  escritura) y qué hacer con `efeonce_prospecting_service_fit` cuando ningún valor aplica.
+  escritura); qué hacer con `efeonce_prospecting_service_fit` cuando ningún valor aplica o cuando el único
+  indicio del servicio es la señal de otra persona; y qué evento mínimo justifica crear el objeto Lead.
 - `references/message-and-contextual-proof.md`, «Identidad de la oferta»: dos agentes señalaron que el
   bloque sobre logos en superficies de la app no ayuda a redactar un mensaje de prospección.
 - El comportamiento de reinscripción en secuencias aparece afirmado en respuestas sin que los hechos lo den;
@@ -117,5 +123,5 @@ reemplazó por un marcador.
 
 - `pnpm skills:mirrors`: espejo Codex/Claude byte-identical tras sincronizar.
 - Enlaces locales del bundle: 146, ninguno roto.
-- `evals/scenarios.json`: versión 6, 48 IDs únicos; el diff contra la v5 sólo cambia la línea de versión y
+- `evals/scenarios.json`: versión 7, 49 IDs únicos; el diff contra la v5 sólo cambia la línea de versión y
   agrega casos.

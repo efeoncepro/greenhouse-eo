@@ -32,3 +32,7 @@ hacer sin que el operador lo diga, no la escribas y repórtalo.
 | D18 | Bots de warm-up, dominios alternos o parecidos, rotación de remitentes | No se adoptan ni de forma preventiva ni para rodear restricciones. Todo cambio de infraestructura de envío es decisión del owner del canal con su propia aprobación. Un correo verificado no garantiza llegada a inbox. |
 | D19 | Dirección de registro CCO frente a «sin emails reales» | La regla de no versionar emails reales protege direcciones de personas. Las direcciones operativas definidas en una política (el CCO de registro) se citan por referencia a esa política; el literal va en una respuesta sólo cuando el operador lo necesita para corregir o preparar ese envío. |
 | D20 | Proporcionalidad de la respuesta | La respuesta contesta primero lo pedido. No abre carriles que el pedido no planteó (créditos, CRM, otra cuenta, protocolo de envío) salvo que bloqueen el siguiente paso. Las brechas que se listan son las que cambian la decisión siguiente. Las plantillas son para el documento de entrega al siguiente owner, no la forma del mensaje en el chat. |
+
+> **Revisión del operador, 2026-10-12.** D2 y D6 aprobadas. D3 modificada: la autorización de registrar
+> contactos cubre crear la Company cuando no existe y la entidad está verificada; la nota de Company sólo si
+> el pedido la nombra; Lead y Deal siempre aparte. La fila D3 de arriba es la lectura inicial, no la vigente.

@@ -93,7 +93,7 @@ actualizan el método; la autorización para crearlas no inicia piloto, campaña
 | Opens sin respuesta | Diagnóstico limitado, no calidez; no repetir mensaje por un scanner |
 | La respuesta trae más de lo pedido | Pedir sólo la decisión y su brecha; la entrega completa es para dossier o handoff |
 | Se trabaja desde Claude | Radar HSP no disponible; créditos de Apollo según el módulo de sesión Claude; conectores se comprueban al iniciar |
-| «Registrar contactos» y la Company no existe | La Company y su nota se confirman aparte en la misma entrega; los contactos elegibles no se retienen |
+| «Registrar contactos» y la Company no existe | La autorización cubre crear la Company si la entidad está verificada; su nota sólo si el pedido la nombra; Lead y Deal siempre aparte |
 
 ## Verificar y mantener
 
