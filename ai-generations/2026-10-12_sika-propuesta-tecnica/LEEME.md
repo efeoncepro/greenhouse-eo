@@ -106,3 +106,12 @@ Pendiente: llevar cuadros del reel nuevo a la lámina 13 del deck y al storyboar
 **v2.2 (12/10), línea gráfica:** la capa de motion se genera con `reel/v2/build-overlay.py` (escribe `overlay.html`). Etiquetas de lugar en caja amarilla con texto negro y corte a 13°, «UNO solo.» como campo amarillo con cortes negros, el sello de lanzamiento aprobado (`gen.sello_lanz` del manual, no redibujado) y los titulares sobre panel amarillo. No se usó el triángulo rojo suelto: el manual lo reserva para la firma y el logo.
 
 **Reel v2.2 aprobado por el operador el 12/10** («Bien, vamos con ese»). Copia en OneDrive: `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` (carpeta de la licitación). `reel/v2/tableros-reel.py` llevó sus cuadros al storyboard del anexo (`Storyboard.dc.html`, 8 cuadros) y al tablero `Reel.dc.html` del lienzo; las láminas 9 y 13 del deck usan `img/story-v2.jpg`. **El PDF del anexo en OneDrive sigue con el storyboard anterior**: hay que reexportarlo (el operador pidió no exportar PDF hasta nuevo aviso).
+
+## Exportación a PDF (12/10, con el visto bueno del operador)
+
+En OneDrive, carpeta de la licitación:
+- `Efeonce-Propuesta-Tecnica-Sika-1164.pdf` — deck técnico, 21 láminas (`node render.mjs && node pdf.mjs`). sha256 `42a7781930237c04…`.
+- `Efeonce-Propuesta-Sika-POSIBLE-v2.pdf` — anexo gráfico, 21 páginas (`node anexo-pdf.cjs <v1> out/canvas/project <salida>`). sha256 `3613ea89795cf3c9…`.
+  Parte del PDF del 06/10 y cambia tres páginas: la 17 (storyboard del reel aprobado) y, en la 3 y la 13, el texto que hablaba de
+  Sika en tercera persona (se pega sólo la franja del texto nuevo sobre la página original). El v1 (`Efeonce-Propuesta-Sika-POSIBLE.pdf`) se conserva.
+- `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` — el reel aprobado.

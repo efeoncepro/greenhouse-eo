@@ -8,9 +8,9 @@ Deck 16:9 de 21 láminas, **documento separado** del anexo gráfico [POSIBLE](pr
 
 - Fuentes y cómo regenerarlo: [`ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`](../../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md).
 - Lienzo (privado): <https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5>, página «3 · Propuesta técnica (documento aparte)».
-- PDF: OneDrive, carpeta de la licitación, `Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf` (19 páginas).
+- PDF (exportados el 12/10 con el visto bueno del operador), en la carpeta OneDrive de la licitación: `Efeonce-Propuesta-Tecnica-Sika-1164.pdf` (21 láminas), `Efeonce-Propuesta-Sika-POSIBLE-v2.pdf` (anexo gráfico con el storyboard nuevo) y `Efeonce-Reel-SikaSeal-170-POSIBLE.mp4`.
 
-Secuencia: portada · la idea · cumplimiento · punto de partida · evolución · el sistema · el brief, punto por punto · audiencias · las tres muestras · alcance del sistema · método · lanzamiento tipo · reel · plazo · control · equipo · trabajo con México · caso Sky · continuidad · insumos para empezar · cierre. El PDF de OneDrive sigue en la v2: el operador pidió no exportar hasta nuevo aviso.
+Secuencia: portada · la idea · cumplimiento · punto de partida · evolución · el sistema · el brief, punto por punto · audiencias · las tres muestras · alcance del sistema · método · lanzamiento tipo · reel · plazo · control · equipo · trabajo con México · caso Sky · continuidad · insumos para empezar · cierre.
 
 ## Por confirmar antes de enviar
 
@@ -24,7 +24,7 @@ Secuencia: portada · la idea · cumplimiento · punto de partida · evolución 
 
 ## Contra la ficha de Wherex (12/10)
 
-Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Facebook, imagen para Instagram y tiempos de entrega. Cubierto desde el 12/10: el «video tipo reel no mayor a 30 seg» es un video de 25 s con locución y música, aprobado por el operador (`Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` en OneDrive; guion «El agua siempre busca una entrada»). El storyboard del anexo ya refleja ese guion en el lienzo, pero el PDF del anexo falta reexportarlo. Falta: la propuesta económica desglosada. Cierre: 16/10/2026 a las 16:00 de Ciudad de México (19:00 de Santiago); licitación de una sola ronda.
+Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Facebook, imagen para Instagram y tiempos de entrega. Cubierto desde el 12/10: el «video tipo reel no mayor a 30 seg» es un video de 25 s con locución y música, aprobado por el operador (`Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` en OneDrive; guion «El agua siempre busca una entrada»). El storyboard del anexo ya refleja ese guion en el lienzo; el anexo v2 ya lo trae. Falta: la propuesta económica desglosada. Cierre: 16/10/2026 a las 16:00 de Ciudad de México (19:00 de Santiago); licitación de una sola ronda.
 
 ## Historial
 
