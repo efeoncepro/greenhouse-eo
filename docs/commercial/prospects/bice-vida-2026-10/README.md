@@ -47,6 +47,11 @@ Apollo, enriquecimiento estándar por ID del 12-10-2026: nueve personas, **9 cr�
 sin correo; más **1 crédito** por Gisela Maass, con correo de su empleador anterior. Sin waterfall, teléfonos ni correos personales. No hubo segundo validador: un correo verificado no
 es permiso de envío ni prueba de entregabilidad.
 
+Apollo marca `bicevida.cl` como dominio catch-all: acepta cualquier dirección, de modo que `verified` no confirma
+por sí solo que cada casilla exista y un verificador técnico tampoco puede distinguir una dirección correcta de
+una equivocada. Los ocho correos devueltos siguen el patrón nombre.apellido, primer apellido y sin tildes. Una
+dirección armada con ese patrón para quien no tiene correo es una suposición, no un dato verificable.
+
 ## Señales y criterio de abordaje
 
 - **Creativo.** El aviso abierto de [Content Specialist Marketing](https://www.getonbrd.com/jobs/digital-marketing/content-specialist-marketing-bice-vida-santiago)
