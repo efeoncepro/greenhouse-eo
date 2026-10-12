@@ -100,3 +100,5 @@ el agua como antagonista. Todo vive en `reel/v2/`:
   se quedó detenido dos veces: por eso va por segmentos, y todos con `-nostdin`.
 
 Pendiente: llevar cuadros del reel nuevo a la lámina 13 del deck y al storyboard del anexo (página 17), que siguen con el guion anterior.
+
+**v2.1 (12/10), tras la revisión del operador:** la gota se regeneró (`s1b-gota`) para que caiga a velocidad real y la cámara lenta empiece en el impacto (estirar el plano la hacía caer «extrañamente lenta»); la música va en un solo tramo continuo de 25 s (17,45–42,45 de la pista de 43 s), porque los empalmes de la reedición se notaban.
