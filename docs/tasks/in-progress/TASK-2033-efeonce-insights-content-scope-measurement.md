@@ -19,7 +19,7 @@
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-045`
-- Status real: `Slices 1–5 en develop local (sin push ni release); migración aplicada y alcance v1 de Berel fijado el 2026-10-12; producción sigue midiendo el sitio completo hasta el release; Slice 6 (lectura por MCP) pendiente`
+- Status real: `Slices 1–5 en develop y desplegados en Vercel staging y en el ops-worker (2026-10-12, commit d9a1c6a2d); Vercel Production sin release; alcance v1, logos oficiales y portada blanca de Berel fijados; Slice 6 (lectura por MCP) pendiente`
 - Rank: `TBD`
 - Domain: `insights|growth`
 - Blocked by: `none`
@@ -489,3 +489,11 @@ efecto en la siguiente edición, sin deploy.
 - Pendiente de diseño, no de esta task: la portada navy no dice qué mide el informe. Cualquier organización con alcance y portada navy pierde esa línea en el PDF (el deck tampoco la tiene).
 - `scripts/insights/preview-edition.ts` acepta `--cover=light|dark` para ver la otra portada sin tocar la preferencia.
 - En prueba, sin commit y a la espera del operador: la línea semanal dibuja sólo semanas completas y la lectura nombra el bloque que queda fuera.
+
+## Delta 2026-10-12 (cierre del día) — push a develop y deploy del ops-worker
+
+- Por instrucción del operador: push `b11d6572f..d9a1c6a2d` a `develop`. CI verde (incluye el build condicional), Vercel staging desplegado, `ops-worker` en la revisión `ops-worker-00773-z98` con 100 % del tráfico y `GIT_SHA=d9a1c6a2d`. Los demás workers del push (artifact, ICO, commercial cost, auth) también desplegaron en verde.
+- La línea semanal de clics con sólo semanas completas entró en ese push (commit `d9a1c6a2d`).
+- Lo que esto cambia: las ediciones que arme el `ops-worker` (ocurrencias programadas) y las creadas desde staging ya miden el alcance de Berel. Las creadas desde Vercel Production siguen midiendo el sitio completo hasta el release a `main`.
+- Sin ejercitar en el runtime desplegado: no se generó ninguna edición nueva después del deploy, así que el alcance en staging y en el worker está desplegado pero no observado en una edición real.
+- `CLAUDE.md governance` quedó rojo en este push por 37 tokens sobre el presupuesto. Ya estaba rojo en el push anterior (`b11d6572f`); ningún commit de este rango toca `CLAUDE.md`.

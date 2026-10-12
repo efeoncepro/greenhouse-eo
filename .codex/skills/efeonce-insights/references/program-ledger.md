@@ -24,7 +24,7 @@ One section per task. Update yours at closure (Skill Maintenance Contract); appe
 | TASK-1975 | Páginas A4/deck y Think de cifra, cascada, waffle, dona y apiladas | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; revisión Berel/Sky, promoción de fixes posteriores y decisión de color pendientes | — |
 | TASK-1990 | Contrato de tarjeta por canal | **in-progress — base en producción; Slice 1 local** | `36a73e7b7e19`; 19 plataformas, `channelForDomain`, metricIcon y tableros en producción desde `9a906a164677` (2026-10-04, según el `Status real` de TASK-1990); 22 plataformas y dominios de Facebook, Threads y X en `develop` (`7877dfe89`, `d4f1149b5`, 2026-10-12, sin release) | — |
 | TASK-1996 | Render de tarjeta con isotipo y glifos Trazo | **in-progress — base en producción** | `36a73e7b7e19`; Think `0c5701a`; cifra única adaptable local en `03e19f3ee`; glifos y 10 isotipos sin productor pendientes | — |
-| TASK-2033 | Alcance de contenido por organización: el informe SEO mide sólo lo que Efeonce trabaja | **in-progress — Slices 1–5 en develop local, sin release** | Cloud SQL: migración aplicada y alcance v1 de Berel fijado el 2026-10-12; el código que lo lee no está desplegado | — |
+| TASK-2033 | Alcance de contenido por organización: el informe SEO mide sólo lo que Efeonce trabaja | **in-progress — Slices 1–5 en staging y `ops-worker`; Production sin release** | Cloud SQL: migración y alcance v1 de Berel (2026-10-12); Vercel staging y `ops-worker-00773-z98` con `d9a1c6a2d` | — |
 
 ## Auditoría técnica SEO — ownership y residual (2026-10-04)
 
@@ -704,11 +704,13 @@ página por página.
 | --- | --- | --- | --- |
 | Cloud SQL (instancia única) | tabla `seo_content_scope_versions` | aplicada 2026-10-12 | `pgmigrations` + `to_regclass` |
 | Cloud SQL | alcance de Berel v1 | fijado 2026-10-12 por CLI | fila única, `operator_cli` |
-| Vercel staging / Production | adapter y plan con alcance | NO desplegado | código sólo en develop local |
-| `ops-worker` | tick de schedules con alcance | NO desplegado | idem |
+| Vercel staging | adapter y plan con alcance | desplegado 2026-10-12 | commit `d9a1c6a2d`, CI verde, status Vercel `success` |
+| `ops-worker` | tick de schedules con alcance | desplegado 2026-10-12 | revisión `ops-worker-00773-z98`, 100 %, `GIT_SHA=d9a1c6a2d` |
+| Vercel Production | adapter y plan con alcance | NO desplegado | falta el release a `main` |
 
-Hasta el release, producción sigue midiendo la propiedad completa de Berel aunque el alcance ya esté fijado: el código
-desplegado no lo lee.
+Las ediciones que arme el `ops-worker` y las creadas desde staging ya miden el alcance de Berel; las creadas desde
+Vercel Production siguen midiendo la propiedad completa hasta el release. No se generó ninguna edición después del
+deploy: el alcance está desplegado, no observado todavía en una edición real de esos runtimes.
 
 **Fuera, a propósito:** capítulo AEO (la marca no se mide por URL; las visitas desde asistentes de IA siguen siendo
 del sitio completo), ETV por ruta (no hay captura), escribir el alcance por API o MCP, UI en el portal, alcance por
