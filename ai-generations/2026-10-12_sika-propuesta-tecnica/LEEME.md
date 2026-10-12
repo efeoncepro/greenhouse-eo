@@ -120,8 +120,8 @@ En OneDrive, carpeta de la licitación:
 
 - Página: `https://think.efeoncepro.com/muestras/sika-posible-dde148ea051c` (repo `efeonce-think`, `src/pages/muestras/sika-posible-dde148ea051c.astro`
   + `public/muestras/sika-posible-dde148ea051c/`). Reproductor canónico de AXIS (`AxisVideoPlayer`, skin Cinema, 9:16, subtítulos VTT), firma POSIBLE
-  de la campaña (render de `gen.firma(200, 'negro')`), `noindex` y sin analítica. Commit local `9a36dac` en Think; **sin push** hasta que el operador lo autorice
-  (el push a `main` despliega a producción y arrastra el commit local `cf78762` de otra sesión).
+  de la campaña (render de `gen.firma(200, 'negro')`), `noindex` y sin analítica. Commit `9a36dac` en Think, **en producción desde el 12/10** (push autorizado por el operador; llevó también el commit `cf78762` de otra sesión).
+  Readback: página 200 con `noindex, nofollow`, MP4 con rangos (206), VTT y póster 200, y reproducción comprobada en navegador.
 - El token de la URL es discreción, no seguridad: el MP4 queda público por URL directa.
 - QR: `img/qr-reel.png` (`qrcode`, nivel M). Va en la lámina 13 del deck y en el storyboard del anexo (página 17); ambos PDF llevan además un enlace clicable sobre el QR.
 - Caso Sky (lámina 18): recompuesto con la foto del avión de Sky (`ai-generations/2026-10-09_deck-contenidos/sky/caso-sky-avion.png`).
