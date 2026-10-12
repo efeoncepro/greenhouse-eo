@@ -126,8 +126,15 @@ Reglas obligatorias:
   y se reporta.
 - **NUNCA** una aprobación de persona nueva. Los únicos actos de persona siguen siendo la excepción bajo el piso y
   activar una versión del catálogo.
-- **NUNCA** alterar una tabla inmutable de `TASK-2025`. Lo nuevo vive en tablas de lectura reconstruibles desde el
-  texto guardado, que nunca son fuente de un resultado.
+- **NUNCA** alterar una tabla inmutable de `TASK-2025`, con **una sola excepción deliberada**: la columna
+  `product_identity_declared` en `quoter_quote_versions` y su regla (sección 7, «Guarda de registro»). Se agrega con
+  la tabla vacía, antes de que exista una sola cotización —real o sintética— en la base compartida; la migración lo
+  comprueba y aborta si encuentra una fila. Todo lo demás vive en tablas de lectura reconstruibles desde el texto
+  guardado, que nunca son fuente de un resultado.
+- **NUNCA** editar las tres migraciones ya aplicadas de `TASK-2025`. Todo cambio de esquema de esta task es una
+  migración nueva, hacia adelante.
+- **NUNCA** decidir una regla desde una tabla de lectura. La regla de emisión sigue leyendo `below_floor` de la fila
+  inmutable de la versión, y la guarda de identidad lee `product_identity_declared` de esa misma fila.
 - **NUNCA** SKU, costo, margen ni categoría de custom item en la proyección del cliente: `clientSafePeriodItems` no
   cambia.
 - **NUNCA** escribir en `greenhouse_commercial.quotations*`, en `product_catalog*` ni en las tablas fuente de
@@ -175,8 +182,9 @@ Reglas obligatorias:
 
 ### Blocks / Impacts
 
-- `TASK-2027` — no registra una cotización real antes de que esta task cierre; hereda la escritura de las lecturas
-  nuevas por la puerta única de `quote-store.ts` y la guarda de identidad de una versión real.
+- `TASK-2027` — no registra **ninguna** cotización, real ni sintética, en la base compartida antes de que la
+  migración de esta task esté aplicada (la columna nueva exige la tabla de versiones vacía); hereda la escritura de
+  las lecturas nuevas por la puerta única de `quote-store.ts` y la guarda de identidad de una versión real.
 - `TASK-2026` — sus rutas de `catalog search`, `compose scaffold` y `compose assess` devuelven lo que el motor
   devuelva: heredan candidatos, compuestos y señales sin código propio. Suma la lectura `compose items`.
 - `TASK-2028` — el corpus de paridad suma las lecturas nuevas.
@@ -201,12 +209,15 @@ Reglas obligatorias:
   compuesto en `compose scaffold`).
 - `data/pricing/v3-operating/**` (el change-set, la versión nueva del catálogo, el puntero y ejemplos sintéticos).
 - `src/lib/commercial/quoter/{line-index,catalog-product-index,product-conformance,product-intelligence}.ts`
-  (nuevos propuestos) y edición acotada de `quote-store.ts`, `artifact-index.ts`, `importer.ts` y `errors.ts`.
+  (nuevos propuestos) y edición acotada de `quote-store.ts` (`prepareArtifact`, `insertVersion`, `createQuote`,
+  `addQuoteVersion`, `rebuildVersionIndex`), `source-documents-store.ts` (`storeSourceDocument`), `artifact-index.ts`,
+  `importer.ts` y `errors.ts` (`QUOTER_CONSTRAINT_CODES`).
 - `src/lib/commercial/quoter/__tests__/**` (incluido `boundary-domain.test.ts`).
 - `src/lib/commercial/pricing-catalog-impact-analysis.ts` (guarda inversa; sólo agrega un bloque de lectura).
 - `src/lib/reliability/queries/commercial-quoter-product-identity-drift.ts` (nuevo propuesto) y su registro.
 - `scripts/commercial/quoter-products.ts` (nuevo propuesto) y `package.json` (script `quoter:products`).
-- `migrations/**` (una migración que sólo agrega, creada con `pnpm migrate:create`).
+- `docs/tasks/pending-migrations/TASK-2031-*.sql.pending` mientras no haya visto bueno; después `migrations/**`, en
+  un archivo creado con `pnpm migrate:create`. Las tres migraciones aplicadas de `TASK-2025` no se tocan.
 - `docs/documentation/finance/cotizador-v3-identidad-de-producto.md` (nuevo propuesto; incluye la hoja de curación).
 - `docs/architecture/GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md`, manuales y skill `efeonce-pricing-operator` (con espejo).
 
@@ -278,7 +289,7 @@ Reglas obligatorias:
 
 ### Data model and invariants
 
-- Entidades/tablas/views afectadas: cuatro tablas nuevas `greenhouse_commercial.quoter_*` (lecturas reconstruibles) y una vista de lectura; sólo lectura sobre `sellable_roles`, `greenhouse_ai.tool_catalog`, `overhead_addons`, `service_pricing`, `service_role_recipe`, `service_tool_recipe`, `product_catalog` y `greenhouse_core.service_modules`.
+- Entidades/tablas/views afectadas: cuatro tablas nuevas `greenhouse_commercial.quoter_*` (lecturas reconstruibles) y una vista de lectura; una columna nueva, `product_identity_declared`, en la tabla inmutable `quoter_quote_versions`, con un disparador propio; sólo lectura sobre `sellable_roles`, `greenhouse_ai.tool_catalog`, `overhead_addons`, `service_pricing`, `service_role_recipe`, `service_tool_recipe`, `product_catalog` y `greenhouse_core.service_modules`.
 - Invariantes que no se pueden romper:
   - Cada artefacto congelado del repo se reproduce con su misma huella.
   - Ninguna cifra de ninguna demanda declarada cambia entre la versión vigente del catálogo y la nueva.
@@ -286,23 +297,25 @@ Reglas obligatorias:
   - El SKU de un compuesto identifica el servicio y nunca la cotización.
   - Una lectura por línea se puede borrar y reconstruir desde `artifact_text` y da el mismo contenido.
   - Ningún lector construye un resultado desde una columna de lectura.
-- Write-target allowlist: las cuatro tablas nuevas se declaran, con su único escritor y su justificación, en `src/lib/commercial/quoter/__tests__/boundary-domain.test.ts`, en el mismo cambio.
+  - Una versión de una cotización real tiene `product_identity_declared = true`. Lo hace cumplir el código y, además, la base.
+  - La regla de emisión lee `below_floor` de la fila de la versión, nunca de `quoter_quote_version_line_index`.
+- Write-target allowlist: el mapa exacto tabla → escritor de `src/lib/commercial/quoter/__tests__/boundary-domain.test.ts` se extiende en el mismo cambio. Las tres lecturas por versión tienen un solo escritor, `quote-store.ts`; `quoter_catalog_product_index` tiene un solo escritor, `source-documents-store.ts`. Se declaran como reconstruibles (admiten `UPDATE` y `DELETE`); las tablas de historia no se relajan.
 - Tenant/space boundary: catálogo y cotizaciones son de Efeonce; las lecturas por línea no llevan organización destinataria; la identidad sale de la sesión o del binding.
-- Idempotency/concurrency: la escritura de las lecturas ocurre en la transacción de `addQuoteVersion`; reconstruir es idempotente (reemplazo por llave); el importador ya es idempotente por huella.
+- Idempotency/concurrency: la escritura de las lecturas ocurre en `insertVersion`, que comparten `createQuote` (versión 1) y `addQuoteVersion` (versión 2 en adelante), dentro de la transacción de cada uno; reconstruir es idempotente (borra y reescribe las filas de la versión); el importador ya es idempotente por huella.
 - Audit/outbox/history: sin evento nuevo. Las versiones del catálogo conservan su auditoría propia; la deriva se lee por señal.
 
 ### Migration, backfill and rollout
 
-- Migration posture: additive. Cuatro tablas y una vista nuevas, con bloque de verificación; ninguna columna en tablas existentes.
+- Migration posture: additive, en una migración nueva hacia adelante. Cuatro tablas y una vista nuevas; una columna `product_identity_declared boolean NOT NULL`, sin valor por defecto, en `quoter_quote_versions`, y un disparador propio. Bloque de verificación. La columna sólo se puede agregar con la tabla vacía: la migración lo comprueba primero y aborta si hay una fila.
 - Default state: sin bandera. El contrato es inerte hasta que una versión del catálogo declara identidad; el corte es la activación de esa versión por una persona.
-- Backfill plan: `quoter_catalog_product_index` se reconstruye desde los 24 documentos ya importados; las lecturas por versión parten vacías porque no hay cotizaciones.
-- Rollback path: activar de nuevo la versión anterior del catálogo con una fila nueva de puntero; revertir el código; las tablas quedan sin uso.
+- Backfill plan: los 24 documentos fuente ya importados entraron antes de que existiera `quoter_catalog_product_index`, así que la task incluye un paso de reconstrucción (`pnpm quoter:products rebuild-catalog-index`) que la llena desde `document_text`, se puede repetir y se corre después de aplicar la migración. Las lecturas por versión parten vacías porque no hay cotizaciones; la columna nueva no necesita relleno por la misma razón.
+- Rollback path: activar de nuevo la versión anterior del catálogo con una fila nueva de puntero; revertir el código; las tablas quedan sin uso. La bajada de la migración quita la columna sólo mientras no exista una cotización real (la misma guarda que la bajada de `TASK-2025`); con una real registrada, la corrección es otra migración hacia adelante.
 - External coordination: visto bueno del operador antes de aplicar la migración; decisiones de curación del dueño; una persona con `efeonce_admin` o `finance_admin` acuña los SKU en Productos y activa la versión.
 
 ### Security and access
 
 - Auth/access gate: `assertQuoterAccess` de `src/lib/commercial/quoter/authz.ts`; lecturas con costo y margen sólo para identidad interna con `commercial.quoter.quote:read`; conformidad con `commercial.quoter.catalog:read`. Ninguna capacidad nueva.
-- Sensitive data posture: costo objetivo y margen por línea; audiencia interna; sin datos de nómina; sin organización en las lecturas por línea.
+- Sensitive data posture: costo objetivo y margen por línea; audiencia interna; sin datos de nómina; sin organización en las lecturas por línea. Costo y margen de las tablas nuevas no salen de la audiencia interna por ninguna ruta, herramienta ni documento: quién más los ve se decide en `TASK-2030`, no aquí.
 - Error contract: códigos del registro cerrado de `PricingV3Error` para el motor y de `QuoterError` para el almacén; `captureWithDomain`; nunca el valor recibido en un mensaje.
 - Abuse/rate-limit posture: lecturas con tope de filas y paginación por keyset en bytes (`COLLATE "C"`); la señal lee el índice del catálogo y no abre el documento.
 
@@ -387,10 +400,15 @@ Reglas obligatorias:
 
 ### Slice 5 — Lecturas reconstruibles del registro
 
-- Migración con las cuatro tablas y la vista; extractor que llama a `readQuoteItems`; escritura dentro de
-  `addQuoteVersion`; `rebuildVersionIndex` las reconstruye; índice del catálogo escrito al guardar un documento
-  fuente.
-- Guarda de registro: una versión de una cotización real exige que su artefacto declare identidad de producto.
+- Migración nueva (archivo en `docs/tasks/pending-migrations/` hasta el visto bueno) con las cuatro tablas, la vista,
+  la columna `product_identity_declared` en `quoter_quote_versions` y su disparador.
+- Extractor que llama a `readQuoteItems`. La escritura de las lecturas va en `insertVersion`, el punto que comparten
+  `createQuote` y `addQuoteVersion`: una versión 1 entra por `createQuote`, y ponerla sólo en `addQuoteVersion` la
+  dejaría fuera. `rebuildVersionIndex` las reconstruye.
+- Índice del catálogo escrito por `storeSourceDocument` al guardar un documento fuente, y paso de reconstrucción para
+  los 24 documentos que ya estaban importados.
+- Guarda de registro en dos capas: en `prepareArtifact`, que pasa a recibir el origen de la cotización, y en la base.
+- Mapa de `boundary-domain.test.ts` extendido con las cuatro tablas y su escritor.
 
 ### Slice 6 — Conformidad y guarda inversa
 
@@ -553,6 +571,9 @@ cotiza no la escribe, así que no puede contradecir a la fila.
 
 - **Line item:** la fila tiene producto, propio o genérico.
 - **Custom item:** la fila no tiene producto. Lleva su categoría y un motivo.
+- Un custom item **no es una línea libre**: en V3 no existe una fila con un monto tecleado. Toda fila, con producto o
+  sin él, sale del motor con su costo, su margen y su piso. «Custom» sólo dice que a esa fila le falta producto; nunca
+  que alguien escribió su precio. Esta task no agrega esa posibilidad.
 - La lista de terceros la cierra el catálogo: una categoría `third_party_<categoría>` por cada `third_party_policy`
   en vigor. Una categoría nueva sin vínculo es custom hasta que tenga su producto genérico.
 - Con sus vínculos en vigor, la puesta en marcha y los terceros son line items con SKU genérico, y el custom item
@@ -609,6 +630,24 @@ No se llama MRR ni ARR: el cotizador no conoce la duración del contrato.
 Todas reconstruibles desde texto guardado; el runtime puede insertar, reemplazar y borrar; ninguna es inmutable ni
 fuente. Llave foránea a la versión o al documento que leen. Cada una guarda `extractor_version` e `indexed_at`.
 
+Permisos, con el modelo real de roles de la base (los mismos cuatro nombres que usa `TASK-2025`):
+
+- `REVOKE ALL` de `greenhouse_runtime`, `greenhouse_app`, `greenhouse_migrator` y `greenhouse_migrator_user` antes de
+  conceder nada: los privilegios por defecto del esquema le dan de todo a una tabla nueva.
+- `GRANT SELECT, INSERT, UPDATE, DELETE` al grupo `greenhouse_runtime`. A diferencia de `quoter_quote_version_index`,
+  que se reconstruye por reemplazo y no tiene `DELETE`, estas tablas tienen varias filas por versión: reconstruir
+  exige borrar las que el extractor ya no produce.
+- El bloque de verificación comprueba el privilegio **efectivo** de `greenhouse_app` (que hereda de
+  `greenhouse_runtime`) y de `greenhouse_migrator_user` (que hereda de `greenhouse_migrator`) con
+  `has_table_privilege`, no el del grupo. En `quoter_quote_versions` comprueba que siguen sin `UPDATE`, `DELETE` ni
+  `TRUNCATE`.
+- `SET LOCAL lock_timeout = '5s'` al inicio: el `ALTER TABLE` y las llaves foráneas toman bloqueo y no deben hacer
+  cola detrás de un escritor largo.
+- Cada `RAISE` lleva `USING ERRCODE` y `CONSTRAINT = '<nombre estable>'`, y `errors.ts` lo mapea a su código en
+  `QUOTER_CONSTRAINT_CODES`, con la prueba de paridad que ya existe.
+- El archivo se queda en `docs/tasks/pending-migrations/` hasta el visto bueno del operador; al moverlo, `-- Up
+  Migration` es su primera línea.
+
 **`quoter_quote_version_line_index`** — llave `(quote_id, version_number, item_key)`.
 
 | Columna | Contenido |
@@ -644,10 +683,33 @@ retiro. Se escribe al guardar un documento fuente y se reconstruye desde `docume
 
 Ninguna lleva organización destinataria ni negocio de HubSpot.
 
-**Guarda de registro.** `addQuoteVersion` rechaza con un código propio (`product_identity_required`) una versión de
-una cotización con `data_origin` real cuyo artefacto no declara identidad de producto. Una sintética no la exige. Es
-lo que hace verdadera la regla «ninguna cotización real se registra antes de que esto exista»: una cotización hecha
-en local con una versión anterior del catálogo se vuelve a cotizar con la vigente antes de registrarla.
+**Guarda de registro.** Una versión de una cotización con `data_origin` real cuyo artefacto no declara identidad de
+producto se rechaza con un código propio, `product_identity_required`. Una sintética no la exige. Vive en dos capas:
+
+1. **En el código, en `prepareArtifact`.** Es la función por la que pasan `createQuote` (versión 1) y
+   `addQuoteVersion` (versión 2 en adelante); hoy recibe sólo el texto del artefacto y pasa a recibir también el
+   origen de la cotización: `createQuote` le entrega el que declara su entrada y `addQuoteVersion` el de la cotización
+   que ya leyó bajo su bloqueo. Ponerla sólo en `addQuoteVersion` dejaría sin guarda a toda versión 1, que es por
+   donde nace una cotización. `prepareArtifact` obtiene el hecho de `readQuoteItems(...).productIdentityDeclared`, la
+   misma lectura del motor que usa la CLI.
+2. **En la base.** `quoter_quote_versions` gana `product_identity_declared boolean NOT NULL`, sin valor por defecto:
+   lo escribe `insertVersion` desde ese mismo hecho, igual que `below_floor`. Un disparador nuevo y propio sobre la
+   inserción de versiones (no reemplaza la función de `TASK-2025`) lee el `data_origin` de la cotización y rechaza una
+   versión real con `false`, con un `CONSTRAINT` con nombre que `errors.ts` mapea a `product_identity_required`. Una
+   sintética puede llevar `false`.
+
+Es la única columna que esta task agrega a una tabla inmutable. Se puede porque la tabla está vacía: la migración
+comprueba que `quoter_quote_versions` no tiene filas antes del `ALTER TABLE` y aborta si las tiene. Por eso ninguna
+cotización, real ni sintética, entra a la base compartida antes de aplicarla; el carril local sigue creando sintéticas
+en su propio clúster.
+
+La base no puede comprobar que el booleano corresponde al texto, igual que con `below_floor`: lo que garantiza es que
+ningún escritor registra una versión real sin declararlo, y la prueba estática de frontera garantiza que el único
+escritor es `quote-store.ts`.
+
+Es lo que hace verdadera la regla «ninguna cotización real se registra antes de que esto exista». Una cotización hecha
+en local con la versión 11 del catálogo, o con cualquier versión que no declare identidad, se vuelve a cotizar con la
+versión 12 antes de registrarla como real: no se registra tal cual ni se le agrega identidad a mano.
 
 ### 8. Conformidad con Productos y guarda inversa
 
@@ -717,7 +779,8 @@ No cambia. Ver Open Questions.
 - Slice 6 necesita Slice 4 (versión con vínculos importada) y Slice 5 (índice del catálogo).
 - Slice 7 necesita Slice 5. Slice 8 al final.
 - El código del Slice 1 está en producción antes de que el puntero de la plataforma nombre la versión nueva.
-- `TASK-2027` no registra una cotización real hasta que los Slices 4 y 5 estén cerrados.
+- `TASK-2027` no registra una cotización real hasta que los Slices 4 y 5 estén cerrados, y no registra ninguna,
+  tampoco sintética, en la base compartida hasta que la migración del Slice 5 esté aplicada.
 
 ### Risk matrix
 
@@ -730,7 +793,9 @@ No cambia. Ver Open Questions.
 | El catálogo y Productos se desalinean después | Productos | medium | Señal de conformidad; guarda inversa en el análisis de impacto | `commercial.quoter.product_identity_drift` |
 | Acuñar un SKU crea un producto en HubSpot sin que nadie lo espere | HubSpot | medium | La persona que acuña confirma antes el estado vivo de las banderas `GREENHOUSE_PRODUCT_SYNC_*` | producto nuevo en `product_catalog` con intento de sync |
 | Una lectura por línea contradice al artefacto | registro | low | Una sola función del motor; prueba que corrompe la lectura y comprueba que el lector responde lo que dice el texto; reconstrucción | diferencia al reconstruir |
-| Se registra una cotización real sin identidad | registro | medium | Guarda `product_identity_required` en la puerta única | rechazo de registro |
+| Se registra una cotización real sin identidad | registro | medium | Guarda `product_identity_required` en `prepareArtifact` (cubre `createQuote` y `addQuoteVersion`) y regla en la base sobre la fila de la versión | rechazo de registro |
+| Alguien registra una cotización en la base compartida antes de la migración | base | medium | La migración aborta si `quoter_quote_versions` tiene filas; `TASK-2027` espera a que esté aplicada; aviso en `Handoff.md` | conteo de filas antes de aplicar |
+| La migración le deja a runtime privilegios de más o de menos | base | low | `REVOKE ALL` de los cuatro roles y comprobación del privilegio efectivo de `greenhouse_app` y `greenhouse_migrator_user` en el bloque de verificación | la migración aborta |
 | Migración aplicada en la base compartida antes de tiempo | base | medium | Archivo en `docs/tasks/pending-migrations/` hasta el visto bueno del operador | `pnpm migrate:status` |
 | El runtime desplegado no conoce las clases nuevas cuando el puntero ya las nombra | plataforma | low | Regla de orden: release del Slice 1 antes de importar la versión | error de validación al leer el catálogo |
 
@@ -738,8 +803,8 @@ No cambia. Ver Open Questions.
 
 Sin bandera nueva. El contrato es inerte: un catálogo sin los registros nuevos no dice nada de productos y nada
 cambia. El corte es un acto ya existente y de persona: activar la versión nueva del catálogo (`current set` con su
-huella de confirmación y su motivo) y reflejarla con `pnpm quoter:import`. Las tablas nuevas sólo agregan y la guarda
-de registro opera sobre una tabla sin filas reales.
+huella de confirmación y su motivo) y reflejarla con `pnpm quoter:import`. Las tablas nuevas sólo agregan, y la
+columna de la guarda de registro se agrega sobre una tabla sin ninguna fila.
 
 ### Rollback plan per slice
 
@@ -749,7 +814,7 @@ de registro opera sobre una tabla sin filas reales.
 | Slice 2 | Revertir el código; son lecturas | minutos | sí |
 | Slice 3 | La hoja es un documento; un SKU acuñado no se borra (inmutable): se deja sin vínculo | sin retorno para el SKU | parcial |
 | Slice 4 | Activar de nuevo la versión anterior con una fila nueva de puntero y su motivo; la versión nueva se conserva | menos de 10 minutos | sí, sin borrar historia |
-| Slice 5 | Revertir el código; las tablas quedan vacías y sin uso | minutos | sí |
+| Slice 5 | Revertir el código; las tablas quedan vacías y sin uso. La columna se quita con la bajada sólo mientras no exista una cotización real; después, con otra migración hacia adelante | minutos | sí, hasta la primera cotización real |
 | Slice 6 | Revertir el código; la señal deja de evaluarse | minutos | sí |
 | Slice 7 | Revertir el código; son lecturas | minutos | sí |
 | Slice 8 | Revertir documentos | minutos | sí |
@@ -761,11 +826,14 @@ de registro opera sobre una tabla sin filas reales.
 3. Hoja de curación cerrada por su dueño; SKU acuñados y anotados.
 4. `catalog preview` de la versión nueva con todas las demandas declaradas: ninguna cifra distinta. `catalog apply`.
 5. Una persona activa la versión; `pnpm quoter:import` la refleja; segunda corrida sin escrituras.
-6. Migración aplicada con el visto bueno del operador y verificada con su bloque; `pnpm db:generate-types`.
+6. Antes de aplicar: `quoter_quote_versions` tiene cero filas (lectura de sólo lectura contra la base). Migración
+   aplicada con el visto bueno del operador y verificada con su bloque; `pnpm db:generate-types`; reconstrucción del
+   índice del catálogo desde los documentos ya importados.
 7. `pnpm quoter:products conformance` contra la base: cero errores, o cada error con dueño en la hoja.
 8. La señal aparece en el plano de confiabilidad en estado sano.
-9. Lectura de vuelta: las cuatro tablas existen, vacías, con sus permisos; el índice del catálogo tiene las filas de
-   la versión vigente.
+9. Lectura de vuelta: las tres lecturas por versión existen, vacías, con sus permisos; el índice del catálogo tiene
+   las filas de los documentos importados, incluida la versión vigente; `quoter_quote_versions` tiene la columna
+   nueva y su disparador, y `greenhouse_app` sigue sin poder actualizar ni borrar en ella.
 
 ### Out-of-band coordination required
 
@@ -813,14 +881,32 @@ de registro opera sobre una tabla sin filas reales.
       hay umbral escrito en el código (prueba con dos valores).
 - [ ] Sobre un artefacto cuyo catálogo no declara identidad, `compose assess` devuelve lo mismo que antes.
 - [ ] `clientSafePeriodItems` y el documento del cliente no cambian (prueba sobre los ejemplos del repo).
-- [ ] La migración sólo agrega, tiene bloque de verificación y pasa `pnpm migration-marker-gate`.
+- [ ] La migración es un archivo nuevo, sólo agrega, tiene bloque de verificación y pasa `pnpm migration-marker-gate`;
+      las tres migraciones aplicadas de `TASK-2025` no tienen diferencias.
+- [ ] La migración aborta si `quoter_quote_versions` tiene alguna fila, y su bajada se niega con una cotización real
+      registrada (ambas probadas en el clúster local).
+- [ ] El bloque de verificación comprueba el privilegio efectivo de `greenhouse_app` y de `greenhouse_migrator_user`
+      sobre cada tabla nueva y sobre `quoter_quote_versions`.
+- [ ] Cada rechazo nuevo de la base tiene un `CONSTRAINT` con nombre mapeado en `QUOTER_CONSTRAINT_CODES`, y la
+      prueba de paridad lo cubre.
+- [ ] `quoter_catalog_product_index` tiene filas de los 24 documentos que ya estaban importados, y repetir la
+      reconstrucción no cambia nada.
 - [ ] Las cuatro tablas se pueden vaciar y reconstruir desde el texto guardado y quedan idénticas (prueba contra
       PostgreSQL real).
 - [ ] Una versión cuya lectura por línea se corrompe a propósito sigue respondiendo lo que dice su artefacto.
-- [ ] Una versión de una cotización real cuyo artefacto no declara identidad se rechaza con
-      `product_identity_required`; la misma como sintética se registra.
+- [ ] Crear una cotización **real** por `createQuote` con un artefacto que no declara identidad se rechaza con
+      `product_identity_required`; lo mismo al agregarle una versión por `addQuoteVersion`; la misma como sintética
+      se registra por los dos caminos.
+- [ ] Una inserción directa en `quoter_quote_versions` de una versión real con `product_identity_declared = false`
+      la rechaza la base, sin pasar por el código (prueba contra PostgreSQL real).
+- [ ] La regla de emisión sigue leyendo `below_floor` de la fila de la versión: con la lectura por línea corrompida
+      a propósito, una versión bajo el piso sigue sin poder emitirse sin su aprobación.
 - [ ] Ninguna tabla nueva tiene columna de organización, de cliente ni de negocio de HubSpot.
-- [ ] Las cuatro tablas están declaradas con su escritor en `boundary-domain.test.ts`.
+- [ ] Las cuatro tablas están en el mapa exacto de `boundary-domain.test.ts` con su único escritor
+      (`quote-store.ts` para las tres por versión, `source-documents-store.ts` para el índice del catálogo), y
+      ninguna tabla de historia cambió de trato en esa prueba.
+- [ ] Ninguna ruta, herramienta ni documento nuevo entrega costo o margen de las tablas nuevas fuera de la audiencia
+      interna.
 - [ ] `readProductConformance` devuelve cada hallazgo de la tabla sobre casos construidos, y contra la base
       compartida no deja ningún error sin dueño en la hoja.
 - [ ] La señal `commercial.quoter.product_identity_drift` está registrada y se vio en error con un caso construido.
