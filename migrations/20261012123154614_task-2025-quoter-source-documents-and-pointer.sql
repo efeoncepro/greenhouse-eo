@@ -1,8 +1,3 @@
--- Owner: operador (CEO), TASK-2025 (EPIC-053). Migración 1 de 3.
--- Condición: visto bueno explícito del operador para aplicar a la base compartida (una sola instancia para
--- desarrollo, staging y producción). Antes: `pnpm quoter:test:local` en verde sobre PostgreSQL 16 (sube, baja y
--- vuelve a subir). Para ejecutar: `pnpm migrate:create task-2025-quoter-source-documents-and-pointer`, copiar desde
--- `-- Up Migration`, borrar este archivo en el mismo commit, `pnpm migration-marker-gate`, `pnpm pg:connect:migrate`.
 -- Up Migration
 
 -- TASK-2025 — Cotizador V3 en la plataforma: documentos fuente por huella y puntero de versiones vigentes.

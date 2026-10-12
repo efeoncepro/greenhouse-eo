@@ -1,10 +1,3 @@
--- Owner: operador (CEO), TASK-2025 (EPIC-053). Migración 3 de 3. Independiente de las otras dos.
--- Condición: visto bueno explícito del operador para aplicar a la base compartida. El catálogo de TypeScript
--- (src/config/entitlements-catalog.ts) y los permisos (src/lib/entitlements/runtime.ts) ya viajan en el código: hasta
--- que esta migración se aplique, la prueba de paridad registro ↔ catálogo contra la base real
--- (parity.live.test.ts) queda en rojo, y así se reporta. Para ejecutar:
--- `pnpm migrate:create task-2025-quoter-capabilities`, copiar desde `-- Up Migration`, borrar este archivo en el
--- mismo commit, `pnpm migration-marker-gate`, `pnpm pg:connect:migrate`.
 -- Up Migration
 
 -- TASK-2025 — Cotizador V3 en la plataforma: capacidades `commercial.quoter.*`.
