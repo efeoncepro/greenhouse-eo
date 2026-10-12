@@ -41,7 +41,7 @@ hasta diciembre de 2027).
 ## El reel como video
 
 `reel/animatic-sin-audio.mp4` es el animatic de 25 s del 06/10 (activo `6e04eb5d…` del lienzo). `reel/mezcla.sh` le monta
-la locución (`vo-1.mp3`, voz «Marco», español de México, ElevenLabs multilingual v2, una toma cortada por sus silencios)
+la locución (`vo-v4.mp3`, voz «Marco», locutor mexicano, **Eleven v4** por indicación del operador del 12/10: voz mexicana, no coloquial, con el motor más avanzado; una toma cortada por sus silencios)
 y la música (`musica.mp3`, ElevenLabs Music v2.5, instrumental) y escribe `reel-sikaseal-170.mp4`. Los dos servidores
 MCP locales de ElevenLabs tienen mal la clave (usan el id de la clave, no la `sk_`): la generación salió por el conector
 de claude.ai (`creative_generate_speech` y `creative_generate_in_flow` con nodo `music`).
