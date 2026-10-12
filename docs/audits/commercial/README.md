@@ -1,5 +1,7 @@
 # Commercial Audits
 
+- [Cotizador actual del portal — auditoría 12/10/2026](2026-10-12-cotizador-actual-auditoria.md): no se usa para cotizar (110 cotizaciones: 64 espejos de HubSpot, 16 de Nubox, 30 del portal que son pruebas o borradores vacíos); cálculo y control con defectos verificados en código; sin historia real que migrar; gobierno rescatable. Anexos: [dominio, motor y API](2026-10-12-cotizador-actual-anexo-a-dominio-api.md), [base de datos](2026-10-12-cotizador-actual-anexo-b-base-de-datos.md), [interfaz y documento al cliente](2026-10-12-cotizador-actual-anexo-c-interfaz.md). Audita el cotizador vigente, no el motor V3.
+
 - [Composición local V3 — 09/10/2026](2026-10-09-pricing-v3-resource-composition.md): herramientas por trabajo, pools/créditos integrados, 108 tests y tres simulaciones reproducibles.
 - Otros registros del Cotizador V3 del 09/10/2026: [prototipo local](2026-10-09-pricing-v3-local-prototype.md), [selección y mantenimiento](2026-10-09-pricing-v3-catalog-selection-maintenance.md), [presupuesto IA](2026-10-09-pricing-v3-ai-credit-budget.md), [política económica](2026-10-09-pricing-v3-economic-policy-preparation.md), [flujo operativo](2026-10-09-pricing-v3-operating-workflow.md) y [consolidación documental](2026-10-09-pricing-v3-docs-skills-consolidation.md).
 - Las auditorías V3 son registros fechados: sus versiones de catálogo, conteos de tests, tipos de cambio y márgenes propuestos son los de ese día. El estado vigente está en el [manual de agentes](../../manual-de-uso/finance/operar-cotizador-v3-con-agentes.md).

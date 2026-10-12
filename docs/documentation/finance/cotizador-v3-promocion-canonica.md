@@ -12,6 +12,13 @@ una dirección, no una migración hecha ni una autorización de cutover: la fron
 `pnpm pricing:v3` sigue siendo un prototipo local, sin base de datos, API ni escritura en el CRM. Una simulación
 calculada no es un costo validado, un precio aprobado ni una cotización emitida.
 
+Nota 2026-10-12: el CEO pidió auditar el cotizador de Greenhouse y un plan para llevar V3 a la plataforma en el
+orden API → CLI sobre la API → MCP → interfaz, con la CLI operativa en todo momento. El
+[plan](../../architecture/GREENHOUSE_PRICING_V3_PLATFORM_PROGRAM_PLAN_V1.md) está **propuesto, sin aprobar**. Propone
+un registro y una API propios de V3, lo que cambia la línea de este documento que pide promover el motor debajo de
+los primitives vigentes y no crear otra API de cotizaciones. Mientras el plan no se apruebe y su ADR no exista, la
+frontera de este documento sigue vigente tal como está escrita.
+
 Nota 2026-10-11 (noche): el CEO comparó sobre renders reales los dos documentos de cotización que existen —el PDF
 del cotizador de Greenhouse (`src/lib/finance/pdf/`, alimentado por las tablas de cotizaciones) y la
 [plantilla A4](../../commercial/templates/cotizacion-a4/README.md)— y decidió que el documento para el cliente de una
