@@ -46,8 +46,9 @@ API → MCP → interfaz**, y con una regla que manda sobre las demás: **la CLI
    empieza en 15001: la primera cotización real es `EO-QTE-15001` y sigue correlativa (`EO-QTE-15002`…). Las cotizaciones de prueba son sintéticas y llevan numeración aparte.
    **Ciclo de vida de una cotización** (decidido por el CEO el 2026-10-12): `borrador → emitida → aceptada | rechazada`,
    con `en revisión` cuando se prepara una versión nueva y `retirada` como salida. Al emitir se fija una **fecha de
-   vigencia**. **Vencida** no es un estado guardado: se deriva de esa fecha, en un único lugar de lectura, y la base
-   impide aceptar una cotización vencida (se vuelve a emitir con vigencia nueva y conserva su número). Aceptada y
+   vigencia**. **Vencida** no es un estado guardado: se deriva de esa fecha, en un único lugar de lectura. Una cotización vencida
+   se puede aceptar, y queda legible que se aceptó fuera de vigencia y con cuántos días de atraso; renovar la
+   vigencia es volver a emitir, y el número se conserva. Aceptada y
    rechazada nombran la versión emitida a la que se refieren y las registra un agente o una persona, sin aprobación.
    Ningún estado es un callejón sin salida salvo `retirada`: desde aceptada o rechazada se puede abrir una versión
    nueva. *Enviada* y *vista* son hechos que se registrarán con el envío y la interfaz; *ganada* y *perdida*
@@ -168,4 +169,6 @@ antes y el después.
   tiene ese bloqueo.
 - **Ciclo de vida.** La primera versión del diseño terminaba en «emitida». El CEO preguntó por el ciclo completo y
   aprobó sumar aceptada, rechazada y vencida con una fecha de vigencia fijada al emitir; enviada y vista después, y
-  ganada o perdida con HubSpot.
+  ganada o perdida con HubSpot. Todos los estados los aplica un agente sin aprobación. Aceptar una cotización vencida
+  está permitido: impedirlo no protegía (el agente podía volver a emitir y aceptar) y borraba el dato de que se aceptó
+  tarde. Un tope de antigüedad, si alguna vez se quiere, será una regla del catálogo decidida por el CEO.
