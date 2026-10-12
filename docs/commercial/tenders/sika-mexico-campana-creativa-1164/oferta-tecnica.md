@@ -1,16 +1,16 @@
 # Oferta técnica · Sika México · LIC-1164
 
-**Estado al 12/10/2026:** borrador v1 de la propuesta técnica, hecho de nuevo, en revisión del operador. **Owner:** Julio Reyes. Sin propuesta técnica aprobada para enviar; nada se ha cargado en Wherex.
+**Estado al 12/10/2026:** borrador v2 de la propuesta técnica, hecho de nuevo, en revisión del operador. **Owner:** Julio Reyes. Sin propuesta técnica aprobada para enviar; nada se ha cargado en Wherex.
 
 ## Borrador vigente (12/10/2026)
 
-Deck 16:9 de 14 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
+Deck 16:9 de 19 láminas, **documento separado** del anexo gráfico [POSIBLE](propuesta-grafica-creativa.md) (decisión del operador: no se presentan como una sola propuesta). Línea Brand, Efeonce Creative Studio; títulos directos, sin pregunta y respuesta; registro formal.
 
 - Fuentes y cómo regenerarlo: [`ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`](../../../../ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md).
 - Lienzo (privado): <https://claude.ai/artifact/ES3QGcjSiLViUcSW3AG2o5>, página «3 · Propuesta técnica (documento aparte)».
-- PDF: OneDrive, carpeta de la licitación, `Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v1.pdf` (14 páginas).
+- PDF: OneDrive, carpeta de la licitación, `Efeonce-Propuesta-Tecnica-Sika-1164-BORRADOR-v2.pdf` (19 páginas).
 
-Secuencia: portada · resumen (tres documentos) · punto de partida · el sistema · las tres muestras · alcance del sistema · método en cinco etapas · lanzamiento tipo · plazo · control · equipo · experiencia · insumos para empezar · cierre.
+Secuencia: portada · resumen (tres documentos) · matriz de cumplimiento · punto de partida · el sistema · audiencias · las tres muestras · alcance del sistema · método en cinco etapas · lanzamiento tipo · reel · piezas adicionales · plazo · control · equipo · trabajo con México · experiencia · insumos para empezar · cierre.
 
 ## Por confirmar antes de enviar
 
@@ -20,6 +20,7 @@ Secuencia: portada · resumen (tres documentos) · punto de partida · el sistem
 4. Uso del logo y del material de Sika en el deck (TASK-1937).
 5. Sentido de «no AI/PSD» en la respuesta de Sika del 06/10; la lámina de control no promete archivos editables.
 6. Berel no se menciona: conflicto de interés sin decidir.
+7. Propuestas propias de las láminas nuevas: qué incluye el reel base, qué queda fuera del servicio (impresión, instalación, pauta), seis horas de jornada en común con México y la frase sobre lo que queda a disposición de Sika. Lista completa en el LEEME.
 
 ## Historial
 

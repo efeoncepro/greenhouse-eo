@@ -165,6 +165,21 @@ def tag(text):
 
 
 S = []
+N = {}  # clave → número de lámina, para las referencias cruzadas
+
+
+def ref(key):
+    return str(N[key])
+
+
+def callout(text, extra='; margin-top: 26px; max-width: 540px'):
+    return f'<div style="border-left: 3px solid {ACC}; padding: 4px 0 4px 16px; font-size: 18px; font-weight: 400; line-height: 1.45; color: {INK}{extra}">{text}</div>'
+
+
+def bullets(xs, on=True):
+    dot = f'background: {ACC}' if on else 'box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.6)'
+    return ''.join(f'<div style="display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: start; padding: 11px 0; border-top: 1px solid {RULE}"><span style="width: 10px; height: 10px; border-radius: 50%; margin-top: 8px; {dot}"></span>'
+                   f'<div style="font-size: 17px; font-weight: 400; line-height: 1.4">{x}</div></div>' for x in xs)
 
 
 def add(key, title, fn):
@@ -177,7 +192,7 @@ add('portada', 'Portada', lambda: img_page('Sika · Propuesta técnica', 'portad
 
 # ── 02 · Resumen ───────────────────────────────────────────────────────────────────────────────────────────────
 def s_resumen():
-    docs = [('Este documento', 'Propuesta técnica', 'Método, plazo, control y equipo para producir cada lanzamiento.', '14 láminas', False),
+    docs = [('Este documento', 'Propuesta técnica', 'Método, plazo, control y equipo para producir cada lanzamiento.', str(len(S)) + ' láminas', False),
             ('Documento adjunto', 'Anexo gráfico', 'La campaña «POSIBLE»: manual de identidad, Master Graphic y las tres muestras del concurso.', '21 páginas', True),
             ('En Wherex', 'Oferta económica', 'El valor de un lanzamiento tipo y de las piezas adicionales.', 'Documento aparte', False)]
     cards = ''.join(obj(okicker(k) + otitle(t, 34 if hero else 30) + otext(x) +
@@ -191,6 +206,27 @@ def s_resumen():
 
 
 add('resumen', 'Resumen', s_resumen)
+
+
+# ── Cumplimiento ───────────────────────────────────────────────────────────────────────────────────────────────
+def s_matriz():
+    rows = [('Metodología', 'Cinco etapas de trabajo, con dos aprobaciones de Sika.', f'Láminas {ref("metodo")} y {ref("control")}'),
+            ('Abordaje', 'Un sistema de campaña: firma, fórmula de titular y pieza madre, con ajustes por audiencia.', f'Láminas {ref("partida")} a {ref("alcance")}'),
+            ('Muestra', 'Publicación para Facebook, publicación para Instagram y storyboard del reel, para SikaSeal®-170.', f'Lámina {ref("muestras")} · Anexo gráfico, páginas 15 a 17'),
+            ('Tiempos', 'Diez días hábiles por lanzamiento, desde la entrega del brief.', f'Lámina {ref("plazo")}'),
+            ('Propuesta económica', 'Valor del lanzamiento tipo y de las piezas adicionales.', 'Documento aparte, en Wherex'),
+            ('Además', 'Equipo con nombre y función, forma de trabajo con México y experiencia.', f'Láminas {ref("equipo")} a {ref("experiencia")}')]
+    tpl = 'display: grid; grid-template-columns: 210px minmax(0, 1fr) 250px; column-gap: 28px'
+    head = f'<div style="{tpl}; padding-bottom: 14px">{label("Lo que pide la ficha")}{label("Nuestra respuesta")}{label("Dónde está")}</div>'
+    body_rows = ''.join(f'<div style="{tpl}; align-items: start; padding: 18px 0; border-top: 1px solid {RULE}"><div style="font-family: {ID}; font-size: 24px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1">{a}</div>'
+                        f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}">{b}</div><div style="font-size: 17px; font-weight: 500; line-height: 1.4">{c}</div></div>' for a, b, c in rows)
+    return page('Sika · Cumplimiento', halo(1300, 470, None) + obj(head + body_rows, 820, 196, 960, True, '; padding: 30px 32px 22px') +
+                left('Cumplimiento', ['Cada punto', 'de la ficha', 'tiene su', 'respuesta'], 'La ficha de la licitación pide cinco contenidos. Esta tabla indica dónde está cada uno, en este documento o en los que lo acompañan.') +
+                means('El comité puede ir directamente al punto que evalúa.', 'Ficha de la licitación N.º 1164 en Wherex, consultada el 7 de octubre de 2026.'))
+
+
+add('matriz', 'Cumplimiento', s_matriz)
+
 
 
 # ── 03 · Punto de partida ──────────────────────────────────────────────────────────────────────────────────────
@@ -222,6 +258,27 @@ def s_sistema():
 
 
 add('sistema', 'El sistema', s_sistema)
+
+
+# ── Audiencias ─────────────────────────────────────────────────────────────────────────────────────────────────
+def s_audiencias():
+    aud = [('aud-hogar.jpg', 'Hogar', 'Quien arregla su casa', 'Innovar para simplificar.', 'Cercano, resuelve en una frase.', 'Un beneficio principal, máximo tres.'),
+           ('aud-pro.jpg', 'Profesional', 'Contratistas, aplicadores e instaladores', 'Innovar para rendir más en obra.', 'Directo, de colega a colega.', 'Tiempos, rendimiento y compatibilidad.'),
+           ('aud-industria.jpg', 'Industria y proyecto', 'Constructoras, especificadores y concreteras', 'Innovar para construir con confianza.', 'Técnico y sobrio.', 'Ficha técnica, normas y caso de obra.')]
+    def note(k, v):
+        return f'<div style="font-size: 15px; line-height: 1.4; margin-top: 8px"><span style="font-weight: 600">{k}</span> <span style="font-weight: 300; color: {SOFT}">{v}</span></div>'
+    cards = ''.join(obj(f'<img src="{A(im)}" alt="Escena de la campaña para la audiencia {t}" style="display: block; width: 100%; height: 150px; object-fit: cover; border-radius: 12px">' +
+                        otitle(t, 26, '; margin-top: 16px') + f'<div style="font-size: 15px; font-weight: 300; line-height: 1.35; color: {SOFT}; margin-top: 6px; min-height: 40px">{w}</div>' +
+                        f'<div style="font-family: {ID}; font-size: 25px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; margin-top: 16px; padding-top: 16px; border-top: 1px solid {RULE}; min-height: 84px">{h}</div>' +
+                        note('Tono.', tn) + note('Información.', inf), 820 + i * 330, 216, 300, i == 0, '; height: 520px; padding: 20px 22px 24px') for i, (im, t, w, h, tn, inf) in enumerate(aud))
+    return page('Sika · Audiencias', halo(1300, 470, 772, 560, 40) + cards +
+                left('La propuesta · Abordaje', ['Una idea,', 'tres', 'audiencias'], 'Sika habla con quien arregla su casa, con quien aplica en obra y con quien especifica un proyecto. La firma, el color y la composición no cambian. Cambian la foto, el tono y la cantidad de dato técnico.') +
+                means('Un solo aspecto para toda la campaña, con ajustes por público, como Sika lo pidió en la ronda de preguntas.',
+                      'Anexo gráfico, página 13. Respuesta de Sika en Wherex del 6 de octubre de 2026.'), section=1)
+
+
+add('audiencias', 'Audiencias', s_audiencias)
+
 
 
 # ── 05 · Muestras del concurso ─────────────────────────────────────────────────────────────────────────────────
@@ -294,6 +351,34 @@ def s_entregables():
 add('entregables', 'Lanzamiento tipo', s_entregables)
 
 
+# ── Reel ───────────────────────────────────────────────────────────────────────────────────────────────────────
+def s_reel():
+    base = obj(okicker('Incluido en el reel base') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con aprobación de Sika", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso", "Formato vertical para Instagram"])}</div>', 820, 462, 465, True, '; height: 334px')
+    extra = obj(okicker('Producción adicional, a pedido') + f'<div style="margin-top: 12px">{bullets(["Rodaje en locación o en obra", "Talento en cámara", "Voz de marca en exclusiva", "Versiones del reel para otras redes"], False)}</div>', 1315, 462, 465, False, '; height: 334px')
+    return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
+                left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Sika confirmó que el reel puede animar imágenes. El reel base se construye con las escenas y el envase de la pieza madre, sin rodaje. Lo que requiere grabación se valora aparte.') +
+                means('Sika sabe qué incluye el reel base y qué se decide como producción adicional.',
+                      'Respuestas de Sika en Wherex del 5 y 6 de octubre de 2026. Storyboard completo en el anexo gráfico, página 17.'), section=2)
+
+
+add('reel', 'Reel', s_reel)
+
+
+# ── Piezas adicionales ─────────────────────────────────────────────────────────────────────────────────────────
+def s_adicionales():
+    a = obj(okicker('Piezas adicionales') + otitle('Se piden por pieza', 30) + f'<div style="margin-top: 16px">{bullets(["Carruseles", "Stopper y otros materiales de punto de venta", "Banners y formatos para medios", "Versiones del reel para otras redes"])}</div>', 820, 236, 300, True, '; height: 480px')
+    b = obj(okicker('Impresos') + otitle('Artes finales listos para imprenta', 26) + otext('En las medidas que Sika indique. Las muestras del concurso usan medidas estándar.'), 1150, 300, 300, False, '; height: 350px')
+    c = obj(okicker('Fuera del servicio') + f'<div style="margin-top: 14px">{bullets(["Impresión, producción e instalación de materiales", "Pauta y compra de medios"], False)}</div>', 1480, 300, 300, False, '; height: 350px')
+    return page('Sika · Piezas adicionales', halo(1300, 480, 760, 560, 46) + a + b + c +
+                left('La producción · Piezas adicionales', ['Lo adicional', 'se pide por', 'pieza'], 'Sika indicó que las piezas fuera del lanzamiento tipo son opcionales. Se solicitan por pieza, salen de la misma pieza madre y se valoran en la oferta económica.') +
+                means('El lanzamiento tipo tiene un alcance cerrado. Lo demás se decide caso a caso.',
+                      'Respuestas de Sika en Wherex del 5 y 6 de octubre de 2026: recursos existentes y producción adicional, por separado.'), section=2)
+
+
+add('adicionales', 'Piezas adicionales', s_adicionales)
+
+
+
 # ── 09 · Plazo ─────────────────────────────────────────────────────────────────────────────────────────────────
 def s_plazo():
     LW, DW = 210, 70  # columna de etiquetas y ancho de un día hábil (10 días)
@@ -310,7 +395,7 @@ def s_plazo():
     legend = (f'<div style="position: absolute; left: {LW}px; top: 498px; display: flex; align-items: center; gap: 10px; font-size: 15px; color: {SOFT}"><span style="width: 16px; height: 16px; border-radius: 50%; background: {ACC}"></span>Aprobación de Sika</div>')
     gantt = obj(f'<div style="position: relative; height: 524px">{weeks}{rws}{legend}</div>', 820, 200, 960, True, '; padding: 30px 26px 26px 30px')
     return page('Sika · Plazo', halo(1300, 470, None) + gantt +
-                left('La producción · Plazo', ['Diez días', 'hábiles por', 'lanzamiento'], 'El plazo corre desde que Sika entrega el brief, la ficha técnica y los renders del producto. La pieza madre llega a su aprobación el cuarto día. El tiempo de revisión de Sika se agrega al calendario.') +
+                left('La producción · Plazo', ['Diez días', 'hábiles por', 'lanzamiento'], 'El plazo corre desde que Sika entrega el brief, la ficha técnica y los renders del producto. La pieza madre llega a su aprobación el cuarto día. El tiempo de revisión de Sika se agrega al calendario.', extra=callout('Sika nombró dos productos, Sikaflex®-119 y SikaSeal®-170. El segundo lanzamiento parte con el sistema ya construido.')) +
                 means('El calendario definitivo se acuerda en la reunión de inicio, según el número de lanzamientos y sus fechas.',
                       'Plazo propuesto por Efeonce para un lanzamiento tipo, con hasta dos rondas de ajustes. Se confirma al inicio.'), section=2)
 
@@ -362,6 +447,24 @@ def s_equipo():
 add('equipo', 'Equipo', s_equipo)
 
 
+# ── Trabajo con México ─────────────────────────────────────────────────────────────────────────────────────────
+def s_mexico():
+    def card(g, t, x, l, tp, hero=False):
+        return obj(icon(g, 44) + otitle(t, 28, '; margin-top: 12px') + otext(x, 17), l, tp, 465, hero, '; height: 262px')
+    cards = (card('reloj', 'Horario compartido', 'Al menos seis horas de jornada en común con Ciudad de México, todos los días hábiles.', 820, 196, True) +
+             card('contenido', 'Español de México', 'Los titulares y los textos se escriben y se revisan en español de México, con los términos que Sika usa en sus fichas.', 1315, 196) +
+             card('reunion', 'Un solo interlocutor', 'El Responsable de Cuenta atiende a Sika y coordina al equipo. Los comentarios llegan por un solo canal.', 820, 488) +
+             card('integracion', 'Herramientas a la vista', 'Reuniones por Microsoft Teams, seguimiento del proyecto en Notion y revisión de las piezas en Frame.io.', 1315, 488))
+    return page('Sika · Trabajo con México', halo(1300, 480, None) + cards +
+                left('El equipo · Trabajo con México', ['Desde Chile,', 'en el horario', 'de México'], 'Efeonce atiende a Sika Mexicana desde Santiago, con la mayor parte de la jornada en común y los textos en español de México. La moneda y la facturación se tratan en la oferta económica.', 80) +
+                means('La distancia no cambia la forma de trabajar: horario útil en común, mismo idioma y una persona responsable.',
+                      'Efeonce opera en Chile, Estados Unidos, Colombia, México y Perú.'), section=3)
+
+
+add('mexico', 'Trabajo con México', s_mexico)
+
+
+
 # ── 12 · Experiencia ───────────────────────────────────────────────────────────────────────────────────────────
 def s_experiencia():
     hero = obj(okicker('SKY Airline · doce meses') + fig('+2.000', 136, '; margin-top: 26px') + otitle('piezas aprobadas', 30, '; margin-top: 14px') + otext('Producidas por el mismo equipo creativo que atenderá a Sika.'), 820, 200, 440, True, '; height: 340px')
@@ -390,7 +493,7 @@ def s_inicio():
                    f'<div><div style="font-family: {ID}; font-size: 30px; font-weight: 740; letter-spacing: -0.02em; line-height: 1.1">{t}</div>'
                    f'<div style="font-size: 18px; font-weight: 300; line-height: 1.4; color: {SOFT}; margin-top: 6px">{x}</div></div></div>' for g, t, x in needs)
     return page('Sika · Inicio', halo(1320, 470, None, op=0.18) + zone(rows, 820, 190, 960) +
-                left('El inicio', ['Cinco', 'insumos de', 'Sika para', 'empezar'], 'Con la adjudicación, una reunión de inicio fija el calendario de lanzamientos y la persona que aprueba. Estos son los insumos que necesitamos para producir el primero.') +
+                left('El inicio', ['Cinco', 'insumos de', 'Sika para', 'empezar'], 'Con la adjudicación, una reunión de inicio fija el calendario de lanzamientos y la persona que aprueba. Estos son los insumos que necesitamos para producir el primero.', extra=callout('El manual de identidad de la campaña y la pieza madre de cada lanzamiento quedan a disposición de Sika, para que cualquier equipo los use.')) +
                 means('Los puntos por validar del anexo gráfico se resuelven en la primera semana, antes de producir.',
                       'Puntos por validar con Sika declarados en el anexo gráfico.'), section=4)
 
@@ -399,6 +502,9 @@ add('inicio', 'Inicio', s_inicio)
 
 # ── 14 · Cierre (compositor: close-proposal · Brand, plate BR4) ────────────────────────────────────────────────
 add('cierre', 'Cierre', lambda: img_page('Sika · Cierre', 'cierre.png', 'Cierre de la propuesta: Empower your Brand, con los datos de contacto de Efeonce.'))
+
+for _i, (_k, _, _) in enumerate(S, 1):
+    N[_k] = _i
 
 # ── Escritura ──────────────────────────────────────────────────────────────────────────────────────────────────
 if MODE == 'local':

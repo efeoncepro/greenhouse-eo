@@ -14,7 +14,8 @@ const GROUPS = {
   metodo: ['objetivo', 'composer', 'multimedia', 'checklist', 'enviar'],
   control: ['contrato', 'republicar', 'seguridad', 'ia', 'assets'],
   insumos: ['presentacion', 'base-de-datos', 'calendario', 'reunion', 'informe'],
-  piezas: ['social', 'swipe', 'prensa', 'ubicacion', 'medicion']
+  piezas: ['social', 'swipe', 'prensa', 'ubicacion', 'medicion'],
+  mexico: ['reloj', 'contenido', 'reunion', 'integracion']
 }
 for (const [group, glyphs] of Object.entries(GROUPS)) {
   const items = glyphs.map(glyph => ({ glyph, line: LINE, surface: 'dark', size: 52 }))
