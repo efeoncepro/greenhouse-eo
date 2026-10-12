@@ -336,7 +336,7 @@ def s_muestras():
                 frame('fb.jpg', 'Muestra para Facebook, SikaSeal-170 Sanisil, formato 1:1', 820, 190, 340, 340, hero=True) +
                 frame('ig.jpg', 'Muestra para Instagram, SikaSeal-170 Sanisil, formato 4:5', 1184, 190, 272, 340) +
                 zone(lst, 1486, 186, 294) +
-                frame('story.jpg', 'Storyboard del reel en siete cuadros', 820, 560, 960, 232) +
+                frame('story-v2.jpg', 'Ocho cuadros del reel de SikaSeal-170: la gota, baño, cocina, cancelería, UNO solo, la aplicación, el envase y la firma POSIBLE', 820, 566, 960, 206) +
                 left('La propuesta · Muestras del concurso', ['Las tres', 'muestras ya', 'aplican el', 'sistema'], 'Las bases piden tres muestras. Las desarrollamos para SikaSeal®-170 Sanisil, uno de los dos productos que ustedes indicaron, y las tres salen de la misma pieza madre.') +
                 means('Pueden revisar las tres piezas a tamaño completo en el anexo gráfico. Aquí van en miniatura.',
                       'Sus respuestas en Wherex del 2, 5, 6 y 9 de octubre de 2026: un solo producto admitido, storyboard con locución admitido y trabajo sobre los elementos visuales de sus materiales.'), section=1)
@@ -401,7 +401,7 @@ add('entregables', 'Lanzamiento tipo', s_entregables)
 def s_reel():
     base = obj(okicker('Qué incluye el reel') + f'<div style="margin-top: 12px">{bullets(["Guion y storyboard, con su aprobación", "Animación de las escenas y del envase de la pieza madre", "Titulares en pantalla", "Locución y música con licencia de uso"])}</div>', 820, 456, 465, True, '; height: 364px')
     extra = obj(okicker('Formatos de salida') + f'<div style="margin-top: 12px">{bullets(["Vertical 9:16 para Instagram", "Adaptación para TikTok, con las prácticas de esa plataforma", "Las mismas escenas sirven para las historias"])}</div>', 1315, 456, 465, False, '; height: 364px')
-    return page('Sika · Reel', halo(1300, 460, None) + frame('story.jpg', 'Storyboard del reel de SikaSeal-170 en siete cuadros', 820, 196, 960, 232) + base + extra +
+    return page('Sika · Reel', halo(1300, 460, None) + frame('story-v2.jpg', 'Ocho cuadros del reel de SikaSeal-170', 820, 204, 960, 206) + base + extra +
                 left('La producción · Reel', ['El reel se', 'anima desde', 'la pieza', 'madre'], 'Como confirmaron, el reel puede animar imágenes. El reel se construye con las escenas y el envase de la pieza madre, sin rodaje.', extra=callout('El reel de muestra va como video de 25 segundos, con locución y música, junto a esta propuesta.')) +
                 means('El reel sale de la misma pieza madre que el resto del lanzamiento, y se ve como la campaña.',
                       'Sus respuestas en Wherex del 5, 6 y 9 de octubre de 2026: el reel puede animar imágenes y contempla su adaptación para TikTok. Storyboard en el anexo gráfico, página 17.'), section=2)

@@ -24,7 +24,7 @@ Secuencia: portada · la idea · cumplimiento · punto de partida · evolución 
 
 ## Contra la ficha de Wherex (12/10)
 
-Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Facebook, imagen para Instagram y tiempos de entrega. A medias: el «video tipo reel no mayor a 30 seg» va como storyboard de 25 s con locución (admitido por Sika el 06/10); hay un animatic MP4 sin audio por terminar. Falta: la propuesta económica desglosada. Cierre: 16/10/2026 a las 16:00 de Ciudad de México (19:00 de Santiago); licitación de una sola ronda.
+Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Facebook, imagen para Instagram y tiempos de entrega. Cubierto desde el 12/10: el «video tipo reel no mayor a 30 seg» es un video de 25 s con locución y música, aprobado por el operador (`Efeonce-Reel-SikaSeal-170-POSIBLE.mp4` en OneDrive; guion «El agua siempre busca una entrada»). El storyboard del anexo ya refleja ese guion en el lienzo, pero el PDF del anexo falta reexportarlo. Falta: la propuesta económica desglosada. Cierre: 16/10/2026 a las 16:00 de Ciudad de México (19:00 de Santiago); licitación de una sola ronda.
 
 ## Historial
 
