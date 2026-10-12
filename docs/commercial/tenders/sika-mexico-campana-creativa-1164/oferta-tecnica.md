@@ -32,6 +32,6 @@ La propuesta que hizo Codex se descartó y se eliminó por instrucción del oper
 
 ## Pendientes
 
-La económica está en borrador desde el 12/10: MXN 64.000 netos por lanzamiento tipo, desglosada por entregable ([oferta-economica.md](oferta-economica.md)). Falta confirmar moneda, impuestos y facturación, forma de pago y validez. Presentar en Wherex exige la confirmación expresa del operador en ese momento.
+La económica está en borrador desde el 12/10: MXN 64.000 netos por lanzamiento tipo, desglosada en evolución gráfica, conceptualización creativa y entregables ([oferta-economica.md](oferta-economica.md)). Falta confirmar el reparto, el tratamiento del IVA y la validez. Pendiente en este deck: Sika espera una propuesta de SLA por niveles de complejidad (respuesta del 09/10 en Wherex). Presentar en Wherex exige la confirmación expresa del operador en ese momento.
 
 [Estado del workspace](README.md) · [Evidencia de fuentes y registro histórico](research/2026-10-07-propuesta-tecnica-INTERNO.md).

@@ -16,7 +16,7 @@
   },
   "buyer": {
     "name": "Sika Mexicana, S.A. de C.V.",
-    "taxId": "México",
+    "taxId": "RFC SME7811306Z7",
     "logo": null
   },
   "cover": {
@@ -26,7 +26,7 @@
       "por cada",
       "lanzamiento."
     ],
-    "subtitle": "Master Graphic y sus adaptaciones para redes sociales y punto de venta, dentro de su campaña «Innovar es hacerlo posible, innovar es hacerlo Sika».",
+    "subtitle": "Evolución gráfica, concepto creativo y entregables de un lanzamiento dentro de su campaña «Innovar es hacerlo posible, innovar es hacerlo Sika».",
     "netLabel": "Valor neto por lanzamiento tipo"
   },
   "service": {
@@ -34,34 +34,34 @@
   },
   "scope": {
     "title": [
-      "Una pieza madre",
-      "y sus adaptaciones."
+      "De la línea gráfica",
+      "a cada pieza."
     ],
-    "intro": "El alcance de un lanzamiento tipo es el que ustedes definieron en la ronda de preguntas: un Master Graphic y sus adaptaciones para redes sociales y para el punto de venta.",
+    "intro": "Un lanzamiento tipo reúne tres trabajos: evolucionar la línea gráfica de la campaña, crear el concepto del lanzamiento y producir los entregables que ustedes definieron en la ronda de preguntas.",
     "rows": [
       {
-        "title": "Master Graphic",
-        "text": "La pieza madre del lanzamiento: concepto, titular, sello de lanzamiento, firma de campaña y su render oficial del producto. Todas las demás piezas se derivan de ella."
+        "title": "Evolución gráfica de la campaña",
+        "text": "La línea gráfica de la campaña, fortalecida y ordenada como sistema: firma, sello de lanzamiento, reglas gráficas y un mismo estilo para sus dos audiencias."
+      },
+      {
+        "title": "Concepto creativo y Master Graphic",
+        "text": "El concepto del lanzamiento para el producto: idea, titular y pieza madre con su render oficial. Todas las demás piezas se derivan de ella."
       },
       {
         "title": "Redes sociales",
-        "text": "Cinco publicaciones para Facebook e Instagram, con su titular y su texto de publicación, y seis historias: tres para Instagram y tres para Facebook."
+        "text": "Cinco publicaciones estáticas y seis historias: tres para Instagram y tres para Facebook."
       },
       {
         "title": "Reel",
-        "text": "Un reel vertical de hasta 30 segundos: guion y storyboard, animación, titulares, locución en español de México y música con licencia de uso. Incluye la adaptación para TikTok."
+        "text": "Un reel de hasta 30 segundos, animado a partir de la pieza madre, con locución y música. Contempla su adaptación para TikTok."
       },
       {
         "title": "Punto de venta e impresos",
-        "text": "Cartel tamaño tabloide, cenefa de anaquel, colgante y anuncio tamaño carta, listos para imprenta."
+        "text": "Diseño de póster tamaño tabloide, cenefa para anaquel, colgante para tienda y anuncio tamaño carta, listos para imprenta."
       },
       {
-        "title": "Equipo",
-        "text": "Dirección creativa, diseño, contenido y un Responsable de Cuenta que los atiende durante todo el lanzamiento."
-      },
-      {
-        "title": "Aprobaciones y ajustes",
-        "text": "Dos aprobaciones suyas, la del Master Graphic y la del conjunto final, con hasta dos rondas de ajuste consolidadas por pieza."
+        "title": "Equipo y aprobaciones",
+        "text": "Dirección creativa, diseño, contenido y un Responsable de Cuenta. Dos aprobaciones suyas, con hasta dos rondas de ajuste consolidadas por pieza."
       },
       {
         "title": "Archivos",
@@ -91,89 +91,63 @@
   },
   "pricing": {
     "title": [
-      "Un valor por",
-      "lanzamiento tipo."
+      "Un valor por lanzamiento tipo."
     ],
-    "intro": "El valor de cada entregable de un lanzamiento tipo, en pesos mexicanos (MXN).",
+    "intro": "El valor de un lanzamiento tipo, desglosado por componente, en pesos mexicanos (MXN).",
     "summary": "Por lanzamiento tipo · Pesos mexicanos · Valor neto",
     "taxLabel": "IVA",
-    "taxNote": "Valores netos. Los impuestos y las retenciones que correspondan a cada parte se aplican conforme a la normativa vigente."
+    "taxNote": "Valores netos. Impuestos y retenciones de cada parte, conforme a la normativa vigente."
   },
   "lines": [
     {
-      "group": "Pieza madre",
-      "label": "Master Graphic",
+      "group": "Estrategia y concepto",
+      "label": "Evolución gráfica de la campaña",
+      "detail": "Firma, sello de lanzamiento y reglas gráficas de la campaña.",
       "quantity": {
         "value": 1,
-        "unit": "pieza"
+        "unit": "sistema"
       },
-      "net": "14200"
+      "net": "16000"
     },
     {
-      "group": "Adaptaciones digitales",
-      "label": "Publicaciones para redes sociales",
-      "detail": "Facebook e Instagram, con titular y texto de publicación.",
+      "group": "Estrategia y concepto",
+      "label": "Conceptualización creativa y Master Graphic",
+      "detail": "Concepto del lanzamiento, titular y pieza madre.",
       "quantity": {
-        "value": 5,
+        "value": 1,
+        "unit": "concepto"
+      },
+      "net": "14000"
+    },
+    {
+      "group": "Entregables",
+      "label": "Adaptaciones para redes sociales",
+      "detail": "Cinco publicaciones estáticas y seis historias.",
+      "quantity": {
+        "value": 11,
         "unit": "piezas"
       },
-      "net": "8000"
+      "net": "11000"
     },
     {
-      "group": "Adaptaciones digitales",
-      "label": "Historias",
-      "detail": "Tres para Instagram y tres para Facebook.",
-      "quantity": {
-        "value": 6,
-        "unit": "piezas"
-      },
-      "net": "6200"
-    },
-    {
-      "group": "Adaptaciones digitales",
+      "group": "Entregables",
       "label": "Reel de hasta 30 segundos",
       "detail": "Con locución, música y adaptación para TikTok.",
       "quantity": {
         "value": 1,
         "unit": "pieza"
       },
-      "net": "19200"
+      "net": "14000"
     },
     {
-      "group": "Punto de venta e impresos",
-      "label": "Cartel tamaño tabloide",
+      "group": "Entregables",
+      "label": "Punto de venta e impresos",
+      "detail": "Póster tabloide, cenefa, colgante y anuncio tamaño carta.",
       "quantity": {
-        "value": 1,
-        "unit": "pieza"
+        "value": 4,
+        "unit": "diseños"
       },
-      "net": "4600"
-    },
-    {
-      "group": "Punto de venta e impresos",
-      "label": "Cenefa de anaquel",
-      "quantity": {
-        "value": 1,
-        "unit": "pieza"
-      },
-      "net": "3800"
-    },
-    {
-      "group": "Punto de venta e impresos",
-      "label": "Colgante",
-      "quantity": {
-        "value": 1,
-        "unit": "pieza"
-      },
-      "net": "4200"
-    },
-    {
-      "group": "Punto de venta e impresos",
-      "label": "Anuncio tamaño carta",
-      "quantity": {
-        "value": 1,
-        "unit": "pieza"
-      },
-      "net": "3800"
+      "net": "9000"
     }
   ],
   "net": "64000",
@@ -185,23 +159,19 @@
     "rows": [
       {
         "title": "Facturación y pago",
-        "text": "Una factura por lanzamiento, con la entrega del conjunto final. Pago a 30 días calendario desde la recepción de la factura."
+        "text": "Una factura por lanzamiento, con la entrega del conjunto final. Las condiciones de pago se acuerdan con ustedes al formalizar el servicio."
       },
       {
         "title": "Formatos y cantidades",
-        "text": "Los valores de las adaptaciones consideran el Master Graphic del mismo lanzamiento. Si los formatos o las cantidades cambian al inicio, el valor se ajusta sobre este desglose."
+        "text": "Si los formatos o las cantidades de un lanzamiento cambian, el valor de los entregables se ajusta sobre este desglose."
       },
       {
         "title": "Plazo y aprobaciones",
-        "text": "El plazo corre desde que recibimos el brief, la ficha técnica y los renders del producto. Su tiempo de revisión se agrega al calendario."
+        "text": "Diez días hábiles desde que recibimos el brief, la ficha técnica y los renders del producto. Su tiempo de revisión se agrega al calendario."
       },
       {
         "title": "Derechos y archivos",
         "text": "Canales, territorio y plazo de uso se definen antes de producir. La entrega incluye los archivos finales en los formatos que ustedes indiquen."
-      },
-      {
-        "title": "Sistema de campaña",
-        "text": "Cada lanzamiento usa la firma, el sello de lanzamiento y las reglas gráficas presentadas en nuestra propuesta."
       },
       {
         "title": "Vigencia",

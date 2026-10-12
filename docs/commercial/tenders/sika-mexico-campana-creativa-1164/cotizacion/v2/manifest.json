@@ -15,9 +15,9 @@
       "sha256": "17bf450749b18317675a51ddd2a58843a58501dd4736a234c8ea51a965fcdb9e"
     }
   ],
-  "generatedAt": "2026-10-12T23:08:11.092Z",
+  "generatedAt": "2026-10-12T23:15:38.261Z",
   "dataVersion": 2,
-  "pageCount": 5,
+  "pageCount": 4,
   "status": "draft",
   "signed": false,
   "submitted": false,
@@ -38,7 +38,7 @@
     "taxSource": "not_applicable"
   },
   "dataSource": "docs/commercial/tenders/sika-mexico-campana-creativa-1164/cotizacion/cotizacion.json",
-  "dataSha256": "9d2eabec645754e6236b1e7e4c916fc0734dceb00d2f346d144bc56da3541403",
+  "dataSha256": "8dd0d809b1c45892b10e947bbaedb6d79bcfe04fb240d1641e723f16167747dc",
   "brand": {
     "line": "engine",
     "assets": [
@@ -183,37 +183,30 @@
     "layout": [
       {
         "page": 1,
-        "gapPx": 60.78125,
+        "gapPx": 91.703125,
         "headerGapPx": 64,
-        "contentPx": 747.96875,
+        "contentPx": 717.046875,
         "overflow": []
       },
       {
         "page": 2,
-        "gapPx": 68.78125,
+        "gapPx": 46.8125,
         "headerGapPx": 22.265625,
-        "contentPx": 819.78125,
+        "contentPx": 841.75,
         "overflow": []
       },
       {
         "page": 3,
-        "gapPx": 54.421875,
+        "gapPx": 24.546875,
         "headerGapPx": 22.265625,
-        "contentPx": 834.140625,
+        "contentPx": 864.015625,
         "overflow": []
       },
       {
         "page": 4,
-        "gapPx": 578.3125,
+        "gapPx": 259.1875,
         "headerGapPx": 22.265625,
-        "contentPx": 310.25,
-        "overflow": []
-      },
-      {
-        "page": 5,
-        "gapPx": 170.84375,
-        "headerGapPx": 22.265625,
-        "contentPx": 717.71875,
+        "contentPx": 629.375,
         "overflow": []
       }
     ],
@@ -221,7 +214,7 @@
       {
         "page": 1,
         "name": "portada",
-        "estimatedPx": 748.05,
+        "estimatedPx": 717.12,
         "capacityPx": 802.75,
         "blocks": [
           {
@@ -237,7 +230,7 @@
           {
             "key": "subtitle",
             "gapPx": 22,
-            "heightPx": 123.73
+            "heightPx": 92.8
           },
           {
             "key": "client",
@@ -255,12 +248,12 @@
             "heightPx": 57
           }
         ],
-        "measuredPx": 747.97
+        "measuredPx": 717.05
       },
       {
         "page": 2,
         "name": "alcance",
-        "estimatedPx": 820.03,
+        "estimatedPx": 842,
         "capacityPx": 882.56,
         "blocks": [
           {
@@ -276,7 +269,7 @@
           {
             "key": "intro",
             "gapPx": 14,
-            "heightPx": 43.95
+            "heightPx": 65.92
           },
           {
             "key": "rows",
@@ -294,12 +287,12 @@
             "heightPx": 113.28
           }
         ],
-        "measuredPx": 819.78
+        "measuredPx": 841.75
       },
       {
-        "page": 5,
+        "page": 4,
         "name": "condiciones",
-        "estimatedPx": 717.75,
+        "estimatedPx": 629.4,
         "capacityPx": 882.56,
         "blocks": [
           {
@@ -315,7 +308,7 @@
           {
             "key": "rows",
             "gapPx": 22,
-            "heightPx": 530.08
+            "heightPx": 441.73
           },
           {
             "key": "contact",
@@ -323,7 +316,7 @@
             "heightPx": 32.6
           }
         ],
-        "measuredPx": 717.72
+        "measuredPx": 629.38
       }
     ],
     "interiorHeader": {
@@ -335,7 +328,7 @@
     "pagination": [
       {
         "page": 3,
-        "estimatedPx": 834.36,
+        "estimatedPx": 864.17,
         "capacityPx": 870,
         "blocks": [
           {
@@ -346,7 +339,7 @@
           {
             "key": "title",
             "gapPx": 10,
-            "heightPx": 85.07
+            "heightPx": 42.53
           },
           {
             "key": "intro",
@@ -356,46 +349,29 @@
           {
             "key": "lines",
             "gapPx": 20,
-            "heightPx": 667.32,
+            "heightPx": 453.53,
             "rowsPx": [
               35,
-              63.4,
-              35,
-              69.11,
               69.11,
               69.11,
               35,
-              63.4,
-              63.4,
-              63.4,
-              63.4
+              69.11,
+              69.11,
+              69.11
             ]
-          }
-        ],
-        "measuredPx": 834.14
-      },
-      {
-        "page": 4,
-        "estimatedPx": 310.27,
-        "capacityPx": 870,
-        "blocks": [
-          {
-            "key": "overline",
-            "gapPx": 0,
-            "heightPx": 16
           },
           {
             "key": "totals",
-            "gapPx": 12,
+            "gapPx": 22,
             "heightPx": 232
           },
           {
             "key": "taxNote",
             "gapPx": 14,
-            "heightPx": 36.27
+            "heightPx": 18.13
           }
         ],
-        "measuredPx": 310.25
+        "measuredPx": 864.02
       }
     ],
     "mobile": {
@@ -409,11 +385,11 @@
   "files": [
     {
       "name": "cotizacion.html",
-      "sha256": "9f57add5a65f636a6c7c850e71f5ea58f94295adc157cbb3ce56eaa8c9c128cf"
+      "sha256": "aed66957c03a40387a99e2aa439e753dc2757e6679753f56a9e9e194a7776d44"
     },
     {
       "name": "cotizacion.pdf",
-      "sha256": "59779e4c9d47caaa2563098668658beba5aff2ee6b768022263e741dbcca66cd"
+      "sha256": "dc86d35e2d8c496a2921010ed83804348be12b440328c1143baac859bf88a535"
     }
   ]
 }

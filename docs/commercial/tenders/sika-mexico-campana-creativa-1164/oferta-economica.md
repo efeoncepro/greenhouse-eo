@@ -2,54 +2,48 @@
 
 ## Campaña creativa de lanzamientos «Innovar es hacerlo posible»
 
-**Cliente:** Sika Mexicana
+**Cliente:** Sika Mexicana, S.A. de C.V. (RFC SME7811306Z7, dato de facturación de la ficha Wherex)
 **Licitación:** N.º 1164 · Wherex
 **Oferente:** Efeonce Group SpA
 **Fecha:** octubre de 2026
 **Vigencia:** 60 días calendario desde el cierre de la licitación
 
-**Estado:** borrador para revisión del operador (12/10/2026). No presentada en Wherex. Documento: [PDF de cinco páginas](cotizacion/v1/cotizacion.pdf), compuesto con la [plantilla A4 de Efeonce](../../templates/cotizacion-a4/README.md) (versión de varias líneas) desde [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json): `node scripts/documents/render-cotizacion-a4.mjs --data <json> --out <carpeta nueva>`. Revisión del 12/10: las cinco páginas del PDF, montos por extracción de texto, fuentes incrustadas. Copia en OneDrive: `Efeonce-Propuesta-Economica-Sika-1164.pdf`. Una primera versión en Excel (`economica:build`) se descartó el mismo día por indicación del operador: la oferta va con el render de Efeonce.
+**Estado:** borrador para revisión del operador (12/10/2026). No presentada en Wherex. Documento vigente: [PDF de cuatro páginas](cotizacion/v2/cotizacion.pdf), compuesto con la [plantilla A4 de Efeonce](../../templates/cotizacion-a4/README.md) (versión de varias líneas) desde [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json): `node scripts/documents/render-cotizacion-a4.mjs --data <json> --out <carpeta nueva>`. Revisión del 12/10: las cuatro páginas del PDF, montos por extracción de texto, fuentes incrustadas. Copia en OneDrive: `Efeonce-Propuesta-Economica-Sika-1164.pdf`.
+
+Versiones descartadas el mismo día por indicación del operador: una planilla Excel (`economica:build`; la oferta va con el render de Efeonce) y un desglose por pieza suelta (v1; «más que cotizar por pieza se cobra el refresh de marca, la conceptualización creativa y luego los entregables»).
 
 ## Valor de un lanzamiento tipo
 
-| Entregable | Qué incluye | Valor (MXN, sin IVA) |
+| Componente | Qué incluye | Valor (MXN, neto) |
 |---|---|---:|
-| Master Graphic | Pieza madre del lanzamiento: concepto, titular, sello de lanzamiento, firma de campaña y render oficial. Primera de las dos aprobaciones. | **14.200** |
-| 5 publicaciones para redes sociales | Facebook e Instagram, derivadas del Master Graphic, con titular y texto de publicación. | 8.000 |
-| 6 historias | Tres para Instagram y tres para Facebook. | 6.200 |
-| Reel de hasta 30 segundos | Guion y storyboard, animación, titulares, locución en español de México y música con licencia. Con adaptación para TikTok. | 19.200 |
-| Cartel tamaño tabloide | Punto de venta, listo para imprenta. | 4.600 |
-| Cenefa de anaquel | Punto de venta, lista para imprenta. | 3.800 |
-| Colgante | Punto de venta, listo para imprenta. | 4.200 |
-| Anuncio tamaño carta | Medios impresos o punto de venta, listo para imprenta. | 3.800 |
+| Evolución gráfica de la campaña | Línea gráfica fortalecida y ordenada como sistema: firma, sello de lanzamiento, reglas gráficas. | 16.000 |
+| Conceptualización creativa y Master Graphic | Concepto del lanzamiento, titular y pieza madre. | 14.000 |
+| Adaptaciones para redes sociales | 5 publicaciones estáticas y 6 historias (3 Instagram, 3 Facebook). | 11.000 |
+| Reel de hasta 30 segundos | Con locución, música y adaptación para TikTok. | 14.000 |
+| Punto de venta e impresos | Diseño de póster tabloide, cenefa, colgante y anuncio tamaño carta. | 9.000 |
+| **Total por lanzamiento tipo** | | **64.000** |
 
-## Resumen por bloque
+Estrategia y concepto: 30.000. Entregables: 34.000.
 
-| Bloque | Monto (MXN) |
-|---|---:|
-| Master Graphic | 14.200 |
-| Adaptaciones digitales | 33.400 |
-| Punto de venta e impresos | 16.400 |
-| **Valor total por lanzamiento tipo** | **64.000** |
+## Lo que pide Sika (ficha y Centro de mensajes de Wherex, leídos el 12/10/2026)
 
-## Qué incluye el valor
+- La ficha tiene **un solo servicio** a ofertar («Adaptación y desarrollo de materiales para campaña de productos de lanzamiento», cantidad 1), con **un monto total**; el selector de moneda incluye MXN y el total «NO considera IVA». Pide «propuesta económica con desglose de costos».
+- Respuestas del 05/10 (20:04 y 20:09): cotizar un **lanzamiento tipo** con 5 posts estáticos, 1 reel para Instagram, 3 historias por red social, 1 póster tabloide, 1 cenefa, 1 colgante y 1 anuncio carta.
+- Respuesta del 06/10 (12:22): la económica contempla «el desarrollo del Master Graphic y las adaptaciones indicadas en el brief»; un tarifario de referencia para piezas extraordinarias es opcional. Se espera «fortalecer, refinar y evolucionar visualmente la propuesta existente».
+- Respuestas del 09/10: historias en Instagram y Facebook; el reel contempla su adaptación para TikTok; la volumetría es una referencia para comparar ofertas; para punto de venta piden sólo el diseño, no la impresión; condiciones de contratación y pago se revisan con quienes avancen; **esperan una propuesta de SLA por niveles de complejidad de los entregables**.
 
-- Dirección creativa, diseño, contenido y un Responsable de Cuenta.
-- Dos aprobaciones (Master Graphic y conjunto final), con hasta dos rondas de ajuste consolidadas por pieza.
-- Plazo de diez días hábiles desde la recepción del brief; el tiempo de revisión de Sika se agrega al calendario.
-- Archivos finales en los formatos que Sika indique.
-- Uso del sistema de campaña presentado en la propuesta (firma, sello de lanzamiento y reglas gráficas).
+## Condiciones comerciales del documento
 
-## Condiciones comerciales
-
-- Valores en pesos mexicanos (MXN), netos. El documento muestra «IVA: No aplica» y el total igual al neto (`taxStatus: not_applicable`); los impuestos y las retenciones de cada parte, conforme a la normativa vigente.
-- Una factura por lanzamiento, con la entrega del conjunto final. Pago a 30 días calendario desde la recepción de la factura.
-- Los valores de las adaptaciones consideran el Master Graphic del mismo lanzamiento. Si formatos o cantidades cambian al inicio, el valor se ajusta sobre este desglose.
+- Valores en pesos mexicanos (MXN), netos. El documento muestra «IVA: No aplica» y el total igual al neto (`taxStatus: not_applicable`).
+- Una factura por lanzamiento, con la entrega del conjunto final; las condiciones de pago se acuerdan al formalizar el servicio.
+- Si formatos o cantidades cambian, el valor de los entregables se ajusta sobre el desglose.
+- Diez días hábiles desde la recepción del brief, la ficha técnica y los renders.
 
 ## Supuestos por confirmar antes de presentar
 
-1. **Moneda.** Sika no ha respondido si cotiza en MXN o USD (respuesta del 09/10: «lo reviso»). La oferta va en MXN por decisión del operador.
-2. **Impuestos y facturación.** El documento dice «IVA: No aplica», que supone una factura de exportación de servicios desde Chile. Si Finance define otra cosa, se cambia `vatRate`/`taxStatus` en el JSON y se vuelve a emitir. Falta el RFC de Sika Mexicana: bajo su razón social el documento dice «México».
-3. **Forma de pago (30 días) y validez (60 días).** Propuestos por el agente; la ficha dice «pago por definir».
-4. **Sistema de campaña.** El documento lo muestra como parte de cada lanzamiento, sin valor aparte.
-5. **Varios lanzamientos.** No hay precio por volumen ni tarifa para el segundo lanzamiento.
+1. **Reparto de los 64.000.** Lo hizo el agente; el cotizador entrega filas por rol, no por componente.
+2. **Evolución gráfica en cada lanzamiento.** El documento la cobra como parte del lanzamiento tipo, no como pago único. Si fuera único, los lanzamientos siguientes quedarían en 48.000, bajo el piso de margen (≈ 57.650) calculado para un lanzamiento.
+3. **IVA.** «No aplica» supone factura de exportación de servicios desde Chile. Finance decide; se cambia `vatRate`/`taxStatus` en el JSON y se vuelve a emitir.
+4. **Validez (60 días).** Propuesta por el agente.
+5. **Tarifario de piezas extraordinarias.** Sika lo admite como opcional; no se incluyó.
+6. **SLA por niveles de complejidad.** El deck técnico propone diez días hábiles por lanzamiento, sin niveles.

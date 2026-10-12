@@ -1,0 +1,182 @@
+{
+  "version": 2,
+  "status": "draft",
+  "date": "2026-10-12",
+  "reference": "Licitación N.º 1164 · Wherex",
+  "currency": "MXN",
+  "locale": "es-MX",
+  "vatRate": null,
+  "taxStatus": "not_applicable",
+  "supplier": {
+    "name": "Efeonce Group SpA",
+    "taxId": "RUT 77.357.182-1",
+    "contact": "Julio Reyes",
+    "email": "jreyes@efeoncepro.com",
+    "phone": "+56 9 3480 2860"
+  },
+  "buyer": {
+    "name": "Sika Mexicana, S.A. de C.V.",
+    "taxId": "RFC SME7811306Z7",
+    "logo": null
+  },
+  "cover": {
+    "label": "Oferta económica",
+    "title": [
+      "Un precio fijo",
+      "por cada",
+      "lanzamiento."
+    ],
+    "subtitle": "Evolución gráfica, concepto creativo y entregables de un lanzamiento dentro de su campaña «Innovar es hacerlo posible, innovar es hacerlo Sika».",
+    "netLabel": "Valor neto por lanzamiento tipo"
+  },
+  "service": {
+    "name": "Campaña creativa de lanzamientos · Lanzamiento tipo"
+  },
+  "scope": {
+    "title": [
+      "De la línea gráfica",
+      "a cada pieza."
+    ],
+    "intro": "Un lanzamiento tipo reúne tres trabajos: evolucionar la línea gráfica de la campaña, crear el concepto del lanzamiento y producir los entregables que ustedes definieron en la ronda de preguntas.",
+    "rows": [
+      {
+        "title": "Evolución gráfica de la campaña",
+        "text": "La línea gráfica de la campaña, fortalecida y ordenada como sistema: firma, sello de lanzamiento, reglas gráficas y un mismo estilo para sus dos audiencias."
+      },
+      {
+        "title": "Concepto creativo y Master Graphic",
+        "text": "El concepto del lanzamiento para el producto: idea, titular y pieza madre con su render oficial. Todas las demás piezas se derivan de ella."
+      },
+      {
+        "title": "Redes sociales",
+        "text": "Cinco publicaciones estáticas y seis historias: tres para Instagram y tres para Facebook."
+      },
+      {
+        "title": "Reel",
+        "text": "Un reel de hasta 30 segundos, animado a partir de la pieza madre, con locución y música. Contempla su adaptación para TikTok."
+      },
+      {
+        "title": "Punto de venta e impresos",
+        "text": "Diseño de póster tamaño tabloide, cenefa para anaquel, colgante para tienda y anuncio tamaño carta, listos para imprenta."
+      },
+      {
+        "title": "Equipo y aprobaciones",
+        "text": "Dirección creativa, diseño, contenido y un Responsable de Cuenta. Dos aprobaciones suyas, con hasta dos rondas de ajuste consolidadas por pieza."
+      },
+      {
+        "title": "Archivos",
+        "text": "Archivos finales de cada pieza en los formatos que ustedes indiquen."
+      }
+    ]
+  },
+  "schedule": {
+    "title": "Plazo: diez días hábiles por lanzamiento",
+    "phases": [
+      {
+        "label": "Días 1 a 4",
+        "title": "Pieza madre",
+        "text": "Inmersión en el brief y Master Graphic, que llega a su aprobación el cuarto día."
+      },
+      {
+        "label": "Días 5 a 9",
+        "title": "Adaptación y ajustes",
+        "text": "Publicaciones, historias, reel y piezas de punto de venta; revisión y ajustes con su aprobación del conjunto."
+      },
+      {
+        "label": "Día 10",
+        "title": "Entrega",
+        "text": "Archivos finales de todas las piezas del lanzamiento."
+      }
+    ]
+  },
+  "pricing": {
+    "title": [
+      "Un valor por lanzamiento tipo."
+    ],
+    "intro": "El valor de un lanzamiento tipo, desglosado por componente, en pesos mexicanos (MXN).",
+    "summary": "Por lanzamiento tipo · Pesos mexicanos · Valor neto",
+    "taxLabel": "IVA",
+    "taxNote": "Valores netos. Impuestos y retenciones de cada parte, conforme a la normativa vigente."
+  },
+  "lines": [
+    {
+      "group": "Estrategia y concepto",
+      "label": "Evolución gráfica de la campaña",
+      "detail": "Firma, sello de lanzamiento y reglas gráficas de la campaña.",
+      "quantity": {
+        "value": 1,
+        "unit": "sistema"
+      },
+      "net": "16000"
+    },
+    {
+      "group": "Estrategia y concepto",
+      "label": "Conceptualización creativa y Master Graphic",
+      "detail": "Concepto del lanzamiento, titular y pieza madre.",
+      "quantity": {
+        "value": 1,
+        "unit": "concepto"
+      },
+      "net": "14000"
+    },
+    {
+      "group": "Entregables",
+      "label": "Adaptaciones para redes sociales",
+      "detail": "Cinco publicaciones estáticas y seis historias.",
+      "quantity": {
+        "value": 11,
+        "unit": "piezas"
+      },
+      "net": "11000"
+    },
+    {
+      "group": "Entregables",
+      "label": "Reel de hasta 30 segundos",
+      "detail": "Con locución, música y adaptación para TikTok.",
+      "quantity": {
+        "value": 1,
+        "unit": "pieza"
+      },
+      "net": "14000"
+    },
+    {
+      "group": "Entregables",
+      "label": "Punto de venta e impresos",
+      "detail": "Póster tabloide, cenefa, colgante y anuncio tamaño carta.",
+      "quantity": {
+        "value": 4,
+        "unit": "diseños"
+      },
+      "net": "9000"
+    }
+  ],
+  "net": "64000",
+  "conditions": {
+    "title": [
+      "Condiciones para",
+      "cada lanzamiento."
+    ],
+    "rows": [
+      {
+        "title": "Facturación y pago",
+        "text": "Una factura por lanzamiento, con la entrega del conjunto final. Las condiciones de pago se acuerdan con ustedes al formalizar el servicio."
+      },
+      {
+        "title": "Formatos y cantidades",
+        "text": "Si los formatos o las cantidades de un lanzamiento cambian, el valor de los entregables se ajusta sobre este desglose."
+      },
+      {
+        "title": "Plazo y aprobaciones",
+        "text": "Diez días hábiles desde que recibimos el brief, la ficha técnica y los renders del producto. Su tiempo de revisión se agrega al calendario."
+      },
+      {
+        "title": "Derechos y archivos",
+        "text": "Canales, territorio y plazo de uso se definen antes de producir. La entrega incluye los archivos finales en los formatos que ustedes indiquen."
+      },
+      {
+        "title": "Vigencia",
+        "text": "Esta oferta es válida por 60 días calendario desde el cierre de la licitación. La complementan la propuesta técnica y el anexo gráfico."
+      }
+    ]
+  }
+}
