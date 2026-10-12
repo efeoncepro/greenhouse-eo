@@ -116,7 +116,7 @@ Reglas obligatorias:
 
 ## Normative Docs
 
-- `docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md` — esquema, matriz sembrada, número,
+- `docs/tasks/in-progress/TASK-2025-quoter-v3-database-foundation.md` — esquema, matriz sembrada, número,
   aprobaciones de excepción, `data_origin`, capacidades. **Manda sobre este documento en todo lo que es estructura
   de datos**: aquí no se repite su matriz ni sus columnas, se referencian.
 - `docs/tasks/to-do/TASK-2026-quoter-v3-compute-api.md` — tabla de traducción, forma de `data`/`meta`, versiones.

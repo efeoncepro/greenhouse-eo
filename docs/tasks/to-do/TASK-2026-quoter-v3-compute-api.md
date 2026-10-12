@@ -135,7 +135,7 @@ Reglas obligatorias:
 
 - `TASK-2024` (`docs/tasks/complete/TASK-2024-pricing-v3-storage-port.md`) — puerto de almacenamiento y motor ejecutable
   sin acceso a disco. Esta task necesita que cada operación reciba sus fuentes por el puerto y no por una ruta.
-- `TASK-2025` (`docs/tasks/to-do/TASK-2025-quoter-v3-database-foundation.md`) — tablas `quoter_*` del catálogo por
+- `TASK-2025` (`docs/tasks/in-progress/TASK-2025-quoter-v3-database-foundation.md`) — tablas `quoter_*` del catálogo por
   huella y del puntero, adaptador PostgreSQL del puerto, capacidades con su permiso otorgado, importador repo → base.
 - Corpus del exit gate ya importado: las versiones de catálogo, política y créditos que nombran los artefactos de
   `data/pricing/v3-operating/` deben existir en la base por huella. Si el importador de TASK-2025 cargó sólo las

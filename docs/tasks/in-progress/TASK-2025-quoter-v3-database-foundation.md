@@ -43,7 +43,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 
 ## Status
 
-- Lifecycle: `to-do`
+- Lifecycle: `in-progress`
 - Priority: `P1`
 - Impact: `Muy alto`
 - Effort: `Alto`
@@ -56,7 +56,7 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
 - Motion: `none`
 - Backend impact: `migration`
 - Epic: `EPIC-053`
-- Status real: `Diseno`
+- Status real: `Discovery y plan (2026-10-12); sin código ni migraciones todavía`
 - Rank: `EPIC-053-02 (fase 2 del programa)`
 - Domain: `finance`
 - Blocked by: `none`
