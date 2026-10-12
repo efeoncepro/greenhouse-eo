@@ -128,8 +128,21 @@ empresa principal con `ASSOCIATION(object = '0-2', association = 1) { ... }` y 1
 - Cambio: interruptor apagado en la interfaz con la sesión del operador y su confirmación expresa. Readback
   tras recargar: «Crea un lead» `DESACTIVADA`; las dos reglas de progresión de etapa siguen `ACTIVADA`. Al
   apagarla la fila deja de mostrar etapa y tipo: reactivarla exige volver a configurarla.
-- No se tocó: Leads existentes, etapas de ciclo de vida ni la regla de creación de contactos, cuya etapa
-  predeterminada es `Sales Qualified Lead` (Contactos → Etapa del ciclo de vida → Reglas del pipeline).
+- Regla de creación, mismo día: Empresas y Contactos tienen cada uno su regla «Limitar la creación de objetos a
+  etapas específicas», ambas activas con `Sales Qualified Lead` como etapa predeterminada. Con aprobación del
+  operador se cambió la de **Empresas** a `Lead` (readback: «Predeterminado: Lead», regla activa). La de
+  **Contactos** sigue en `Sales Qualified Lead`: el control de permisos de la sesión del agente bloqueó el
+  segundo cambio de configuración y quedó para el operador.
+- Análisis de sólo lectura para la depuración, sin modificar datos (campos no identificatorios):
+  - Leads: 2.210 creados por la automatización siguen en «New» sin actividad propia ni negocio; 275 de ellos
+    traen fecha de última actividad pese a contadores en cero y se revisan antes de incluirlos. 2.053 del
+    total nacieron en abril de 2026. Por integración hay 23 en «New» sin actividad, 19 del 2026-10-08.
+  - `Sales Qualified Lead`: 954 contactos y 1.778 empresas. 1.760 empresas las creó el ajuste «Crea y asocia
+    empresas con contactos»; ninguna tiene negocio y 1.741 no tienen negocio ni contacto registrado. 730
+    contactos los creó la integración de correo: tener una respuesta registrada ahí es correspondencia, no
+    calificación. 79 contactos no tienen negocio, respuesta, formulario ni contacto registrado.
+  - Segmentos: de 96, sólo dos de empresas mencionan `lifecyclestage` y ambos sólo excluyen `customer`.
+    Informes y workflows no se pudieron leer por alcance.
 
 ## Procedimiento por operación
 

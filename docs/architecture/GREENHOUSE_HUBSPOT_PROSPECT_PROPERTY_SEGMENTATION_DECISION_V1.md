@@ -244,8 +244,10 @@ Estado del portal tras el cambio, leído en la interfaz con la sesión del opera
   en «New»; 11 en «Attempting», 3 en «Connected», 1 calificado y 3 descalificados.
 - Hallazgo sin acción: en Contactos → Etapa del ciclo de vida → Reglas del pipeline, la regla «Limitar la
   creación de objetos a etapas específicas» está activa con `Sales Qualified Lead` como etapa predeterminada
-  de un contacto creado por un usuario; 2.733 registros están en esa etapa. Cambiarla es decisión del
-  operador. Los Leads ya creados no se depuraron.
+  de un contacto creado por un usuario; 2.733 registros están en esa etapa (954 contactos, 1.778 empresas).
+  El operador aprobó pasarla a `Lead`: quedó aplicada en Empresas y pendiente en Contactos. Los Leads y
+  las etapas ya asignadas no se depuraron; el análisis previo está en el
+  [manual de operación](../operations/HUBSPOT_AGENT_CLI_MCP_OPERATOR_V1.md).
 
 Sin cambio de schema ni de segmentos. [Origen](../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
 
