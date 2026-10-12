@@ -148,6 +148,9 @@ const readSeed = (path: string) => {
   }
 }
 
+/** What each case printed, as printed: stdout, or stderr for a rejection. Read by the round-trip test below. */
+const printed = new Map<string, string>()
+
 const execute = (definition: Case): Outcome => {
   const tmp = workspace()
   const context = { tmp }
@@ -156,6 +159,8 @@ const execute = (definition: Case): Outcome => {
 
   const args = definition.args(context)
   const result = run(args)
+
+  printed.set(definition.id, result.stdout || result.stderr)
 
   // The tool never echoes a path: an output that named the workspace would need a normalization nobody declared.
   expect(result.stdout.includes(tmp), 'stdout names the workspace').toBe(false)
@@ -881,6 +886,25 @@ describe('Pricing V3 CLI: every command answers what it answered when the baseli
     },
     TIMEOUT
   )
+
+  it('what a command prints is JSON that reads the same after being parsed and printed again', () => {
+    // The platform transport (TASK-2028) carries what a command answers as a JSON object and the CLI prints it
+    // again. That is only faithful if parsing loses nothing: JSON.parse keeps the order keys were written in, except
+    // for keys that look like integers ("15", "2027"), which JavaScript moves to the front. An output listed in
+    // `moved` would have to travel as text instead, like the frozen artifact does. The one output that is not JSON
+    // at all is the markdown preview.
+    const NOT_JSON = ['compose-preview-markdown']
+    const reprinted = (text: string) => `${JSON.stringify(JSON.parse(text), null, 2)}\n`
+
+    const moved = [...printed]
+      .filter(([id]) => !NOT_JSON.includes(id))
+      .filter(([, text]) => reprinted(text) !== text)
+      .map(([id]) => id)
+
+    expect(printed.size).toBe(GOLDEN.length)
+    expect(() => JSON.parse(printed.get(NOT_JSON[0])!)).toThrow()
+    expect(moved).toEqual([])
+  })
 
   it('the fixtures on disk are exactly the cases of the matrix', () => {
     const onDisk = readdirSync(FIXTURES)
