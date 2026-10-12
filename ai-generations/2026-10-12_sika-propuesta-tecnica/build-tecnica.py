@@ -479,7 +479,9 @@ def s_experiencia():
                       'Servicio creativo de Efeonce para SKY Airline, doce meses. Métricas de entrega medidas por Efeonce.'), section=3)
 
 
-add('experiencia', 'Experiencia', s_experiencia)
+# Lámina de caso de éxito aprobada (receta decision-case, compositor oficial): composer/caso.json. La lámina hecha a mano
+# (s_experiencia) quedó fuera por indicación del operador del 12/10: «esta no es la lámina de caso de éxito nuestra».
+add('experiencia', 'Caso de éxito · Sky', lambda: img_page('Sika · Caso de éxito', 'caso-sky.png', 'Caso Sky, 12 meses. ¿Qué cambió con Sky? Más rápido: más de 2.000 piezas aprobadas, 39 campañas, 88 % de entregas a tiempo y 25 % menos de tiempo de producción. Fuente: caso publicado de Sky Airlines, métricas de entrega de 12 meses.'))
 
 
 # ── 13 · Inicio ────────────────────────────────────────────────────────────────────────────────────────────────

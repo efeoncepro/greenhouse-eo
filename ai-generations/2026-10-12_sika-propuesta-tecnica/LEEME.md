@@ -14,6 +14,7 @@
 node ai-generations/2026-10-12_sika-propuesta-tecnica/axis-assets.mjs > ai-generations/2026-10-12_sika-propuesta-tecnica/axis-assets.json   # navegación e íconos Trazo desde AXIS
 pnpm brand:compose -- --intent ai-generations/2026-10-12_sika-propuesta-tecnica/composer/cover.json --out ai-generations/2026-10-12_sika-propuesta-tecnica/composer/out-cover
 pnpm brand:compose -- --intent ai-generations/2026-10-12_sika-propuesta-tecnica/composer/close.json --out ai-generations/2026-10-12_sika-propuesta-tecnica/composer/out-close
+pnpm brand:compose -- --intent ai-generations/2026-10-12_sika-propuesta-tecnica/composer/caso.json --out ai-generations/2026-10-12_sika-propuesta-tecnica/composer/out-caso   # → img/caso-sky.png
 cd ai-generations/2026-10-12_sika-propuesta-tecnica
 node quitar-seleccion-dawn.mjs composer/out-cover/01-deck-cover-proposal.png img/portada.png   # quita «Cliente» y el cursor
 python3 build-tecnica.py local && node render.mjs && node pdf.mjs out/<nombre>.pdf             # HTML → PNG → PDF
@@ -37,7 +38,7 @@ oficial extraído del PDF de las bases (activo `e9c0d61c…` del lienzo). `rende
 | 14 | Rondas, aprobación, IA, derechos | Modelo operativo de servicios creativos y brochure «Agencia Creativa» aprobado, pasados a usted |
 | 15 | Nombres y cargos | `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`; fotos reales del catálogo del compositor |
 | 16 | Personas en Chile y en México; Teams, Notion y Frame.io | Indicación del operador del 12/10 (pidió quitar «desde Chile» y las horas en común: «nos puede jugar en contra»); herramientas del brochure «Agencia Creativa» |
-| 17 | +2.000 piezas, 39 campañas, 88 %, 0,12, 5 mercados | Caso SKY creativo, 12 meses (`.claude/skills/creative-practice/efeonce/ESTADO_ACTUAL.md`); autorización para citarlo fuera, sin verificar |
+| 17 | Caso Sky: +2.000 piezas, 39 campañas, 88 %, −25 % | Lámina aprobada `decision-case` del compositor (`composer/caso.json`, foto `SK1-vuelo-amanecer` del brochure «Agencia Creativa»; se compone como lámina clara de Efeonce, línea growth: el contrato rechaza Brand en claro). El operador rechazó la lámina hecha a mano el 12/10. Autorización de Sky para citarlo fuera, sin verificar |
 
 ## Por confirmar antes de enviar
 
