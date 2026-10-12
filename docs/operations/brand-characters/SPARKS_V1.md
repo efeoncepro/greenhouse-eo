@@ -196,7 +196,7 @@ son historia: regenerarlas con Sparks es una decisión aparte (§11).
 | Fuentes editadas para recortar | `fuente-recorte/` |
 | Escenas con Nexa | `escenas/` |
 | Plantel con fondo de estudio · transparente | `plantel/` · `plantel-transparente/` (masters de 1600 px) |
-| **Fuente del catálogo de `foto:prompt`** (desde 2026-10-01) | Paquete versionado y sellado `@efeoncepro/axis-brand-assets` 0.4.10, fijado en Greenhouse: `node_modules/@efeoncepro/axis-brand-assets/assets/sparks/` (recortes de 1024 px, mismos nombres). Lab: [axis.efeonce.org/references/sparks/](https://axis.efeonce.org/references/sparks/) · masters en el bucket `sparks/v1/` |
+| **Fuente del catálogo de `foto:prompt`** (desde 2026-10-01) | Paquete versionado y sellado `@efeoncepro/axis-brand-assets` (desde 0.4.10; Greenhouse fija 0.4.25): `node_modules/@efeoncepro/axis-brand-assets/assets/sparks/` (recortes de 1024 px, mismos nombres). Lab: [axis.efeonce.org/references/sparks/](https://axis.efeonce.org/references/sparks/) · masters en el bucket `sparks/v1/` |
 | Direcciones de diseño y vistas base de la v01 | `direcciones/` · `base/` |
 | Copia del equipo, Spark base | OneDrive `Alineación/5. Contenidos/13- Branding/Sparks/2026-10 Spark base/v02/`: 59 archivos en «Fondo de estudio», «Transparente», «Con Nexa» y «Diseño», con LEEME y manifiesto |
 | Copia del equipo, plantel | OneDrive `…/Sparks/2026-10 Plantel/v01/`, con LEEME y manifiesto |
@@ -311,4 +311,4 @@ La task nombraba también Adobe Spark (hoy Adobe Express); no está entre los re
 | 4 | Revisión de Legal si se decide registrar el nombre | Legal |
 | 5 | ¿Las cinco familias calzan con lo que Agent Ops vende hoy? (pregunta abierta de la task) | Operador |
 | 6 | Prueba de reconocimiento: son un sistema consistente, no un activo distintivo medido | Operador |
-| 7 | ~~Exportar el Spark 2D a SVG y publicarlo en AXIS~~ — hecho el 2026-10-01 (`axis-brand-assets` 0.4.11). Queda: que Greenhouse fije 0.4.11 cuando una pieza lo use | Greenhouse |
+| 7 | ~~Exportar el Spark 2D a SVG y publicarlo en AXIS~~ — hecho el 2026-10-01 (`axis-brand-assets` 0.4.11). Greenhouse ya fija una versión que lo trae (0.4.25) | Greenhouse |

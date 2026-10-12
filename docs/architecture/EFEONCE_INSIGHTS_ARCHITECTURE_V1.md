@@ -381,7 +381,7 @@ archivos oficiales en `@efeoncepro/axis-brand-assets` 0.4.0 (`insights-logo-*`, 
 | Favicon de Think | Falta: favicon genérico del hub | `efeonce-think/src/layouts/BaseLayout.astro` |
 | Receta de deck «resultados en vivo» | Usa el isotipo de Efeonce para la ficha de Insights | `deck-recipes/EFEONCE_DECK_SLIDE_RECIPES_V1.json` |
 | Portal (S1–S5) y MCP | Sin marca de producto | TASK-1849 (diseño); MCP sin superficie visual |
-| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.3.5: no trae los assets de Insights | `package.json:419` |
+| Dependencia en Greenhouse | Fija `@efeoncepro/axis-brand-assets` 0.4.25 (desde el 2026-10-06): trae los assets de Insights; las portadas del PDF y el deck siguen con la composición tipográfica | `package.json` |
 
 **Pendiente de decisión (gaps, sin regla aprobada):** si el lockup oficial (aprobado el 2026-09-28 en el canvas
 «Insights en vivo») reemplaza la composición tipográfica de las portadas PDF/deck; marca en correo, favicon, portal y
@@ -1682,9 +1682,11 @@ cual; nunca calcula la variación, su tono ni el período. La resolución es `st
 la misma para PDF, deck y web.
 
 **Isotipo de canal en la tarjeta (TASK-1990/1996, aditivo en 1.4).** La plataforma de una cifra sale del hecho sellado
-(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 19 ids de
-`INSIGHT_CHANNEL_IDS`, igual a `AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain`
-traduce un dominio citado a su plataforma. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
+(la fuente manda: Search Console, GA4 e ICO tienen su isotipo; si no, el `channelId`), con el vocabulario de 22 ids de
+`INSIGHT_CHANNEL_IDS` (19 del contrato 0.2.0 más `facebook`, `threads` y `x` desde `axis-brand-assets` 0.4.25), igual a
+`AXIS_PLATFORM_ASSETS` (test de drift contra el paquete instalado); `channelForDomain` traduce un dominio citado a su
+plataforma (YouTube, Reddit, Wikipedia, LinkedIn, Instagram, TikTok, Facebook, Threads y X; `meta` nunca sale de un
+dominio) y sólo marca las filas de tabla del PDF y el deck: el modelo web envía el `channelId` propio del hecho. Tablero de las mismas plataformas: `stats[].titlePlatforms` (hasta 3,
 Search Console primero) y cada celda conserva su ícono. Tablero que mezcla motores de respuesta: cada celda trae
 `channel {platform, name}` y `context` (la métrica bajo la cifra). Isotipo o ícono, nunca los dos; título o celdas,
 nunca los dos: lo garantiza el resolver y lo prueban `stat-card-channels.test.ts` y `figure-slots.test.ts`. Cada cifra

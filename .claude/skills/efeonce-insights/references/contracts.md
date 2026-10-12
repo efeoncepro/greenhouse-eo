@@ -258,8 +258,9 @@ With the flag OFF the adapters return v1 evidence and the planner emits a v1 pla
   `validateChartSpecValues(spec, values)` in `editorial/chart-values.ts`, which calls `chart-geometry.ts` (rule codes
   `geometry_<reason>`, e.g. `geometry_stage_grows`, `geometry_empty_set`). It cannot live in `contracts/`: the
   composer's `pure` entry pulls Node crypto.
-- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` = `google`, `google_ai_overview`, `chatgpt`, `gemini`,
-  `claude`, `perplexity`; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
+- **Channels** — `contracts/channels.ts`: `INSIGHT_CHANNEL_IDS` — six ids when this contract shipped (`google`,
+  `google_ai_overview`, `chatgpt`, `gemini`, `claude`, `perplexity`); today the 22 AXIS platforms, see § Glifos, isotipos y
+  tableros por plataforma; `channelForAeoProvider` (`openai→chatgpt`, `anthropic→claude`, `gemini`, `perplexity`,
   `google_ai_overview`); unknown provider ⇒ field ABSENT (not null). On `EvidenceFactV1.channelId`,
   `ChartSeriesV1.channelId`, `ChartSpecV1.dimensionChannelIds` (parallel to `dimensionLabels`, null = not a channel) and
   the channel fields of bullet/waffle/venn/upset data. Rule (2026-09-25): `dimensionChannelIds` ONLY when the dimensions
@@ -563,7 +564,11 @@ gráficos llegan ordenados por su pregunta. Un consumer 1.x anterior ignora `sta
   instagram.com, tiktok.com; desde el 2026-10-12 facebook.com → `facebook`, threads.net/threads.com → `threads` y
   x.com/twitter.com → `x`; `meta` ya no sale de un dominio: es la empresa y su pauta). Los isotipos están copiados en
   `catalogs/insights-*/assets/channels/`
-  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`).
+  (verificados byte a byte) y en Think `public/logos/platforms/` (`@lib/insights-platforms`). **Alcance de
+  `channelForDomain`:** sólo lo usa la marca de fila de las tablas del PDF y el deck (`rowMarkOf` en
+  `render/report-mapper.ts`, para hechos `cited_source.*`). El modelo web envía únicamente el `channelId` propio del hecho
+  (`sharing/web-model.ts`), así que una fuente citada no llega a Think con canal: los isotipos de Think cubren el
+  vocabulario, no este mapeo.
 - **`metricIcon`:** glifo Trazo de la métrica (`presentation/metric-glyphs.ts`, `metricGlyphOf`), resuelto por
   `statItemView` y aditivo en el modelo web 1.4. Nunca junto a `channel`. Catálogo: campo `metricIcon` con resolver
   `*-metric-icon` en cifras, comparación, metas (A4 y deck) y tabla (A4); trazos sellados en

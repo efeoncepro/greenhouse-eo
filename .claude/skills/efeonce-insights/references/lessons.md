@@ -1,5 +1,14 @@
 # Efeonce Insights — lessons (append; newest first; each with date, symptom, rule)
 
+- **2026-10-12 · Afirmé que un canal «llega a Think» sin leer el modelo web.** Síntoma: tras llevar facebook.com a
+  `facebook`, el Handoff, el changelog, la task y el mensaje al operador decían que había que publicar Think antes que
+  Greenhouse para que la web no mostrara la fuente sin isotipo. Era falso: `channelForDomain` sólo lo llama `rowMarkOf`
+  (`render/report-mapper.ts`) para las filas de tabla del PDF y el deck; `sharing/web-model.ts` proyecta únicamente el
+  `channelId` que el hecho ya trae sellado. Lo encontró un subagente de barrido, no quien escribió el cambio. Regla: antes
+  de decir en qué superficies se ve un cambio de canal, `grep` de quién llama a la función y lectura de la proyección de
+  cada superficie (PDF/deck: `report-mapper`; web: `sharing/web-model.ts`); «el vocabulario lo admite» no es «la superficie
+  lo recibe».
+
 - **2026-10-12 · Subir `axis-brand-assets` sin regenerar lo que depende del paquete dejó tres tests rojos seis días.**
   Síntoma: `pnpm test` con tres fallas ajenas a la task en curso (sello de Manzanitas, vocabulario de canales, sello de
   los lockups del PDF del AI Visibility Report). Causa: `596bfab90` (TASK-1943, 2026-10-06) subió el pin de 0.4.15 a

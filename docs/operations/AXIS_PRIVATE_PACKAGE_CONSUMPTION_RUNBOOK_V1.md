@@ -206,7 +206,12 @@ source control.
 
 ## Current state — 2026-09-14
 
-> **Actualizado 2026-09-29 (noche) — estado vigente:** Greenhouse fija `axis-tokens` `0.3.37`, `axis-ui-contracts`
+> **Actualizado 2026-10-12 — estado vigente:** Greenhouse fija `axis-tokens` `0.3.41`, `axis-ui-contracts` `0.3.40`,
+> `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.25` (desde `596bfab90`, 2026-10-06) y `axis-ui-registry` `0.3.1`
+> (`package.json`). Los dependientes de `axis-brand-assets` quedaron regenerados el 2026-10-12; ver **Delta 2026-10-12**.
+> La adopción del juego publicado es TASK-2014. Las notas siguientes quedan como historia.
+
+> **Actualizado 2026-09-29 (noche) — superado por la nota de arriba:** Greenhouse fija `axis-tokens` `0.3.37`, `axis-ui-contracts`
 > `0.3.37`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` y `axis-ui-registry` `0.3.1` (`package.json`,
 > bump `bacd6a4ea`, tag `v0.3.37`). AXIS ya publicó `v0.3.38` (`main` `c92160b`), que Greenhouse **todavía no fija**, y
 > el adapter de la órbita está rojo con el juego actual. Ver **Delta 2026-09-29 (i)**. La nota siguiente queda como
@@ -306,6 +311,25 @@ source control.
   La evidencia del piloto pasa de **local** a **CI**.
 - El rollback interno de `globe-studio-internal` y `globe-api-internal` fue ejercitado al 100%, verificado y
   restaurado correctamente durante la promoción productiva.
+
+## Delta 2026-10-12 — todo cambio de versión de `axis-brand-assets` regenera sus dependientes
+
+- **Qué pasó:** el pin pasó de `0.4.15` a `0.4.25` el 2026-10-06 (`596bfab90`, para traer las marcas de HubSpot) sin
+  regenerar lo que depende del paquete. Entre esas versiones AXIS sumó Facebook y Threads (0.4.19) y X (0.4.21) a
+  `AXIS_PLATFORM_ASSETS` y redibujó los lockups de las submarcas con terminación concéntrica (`2651192`). Quedaron tres
+  tests rojos hasta el 2026-10-12 (`7877dfe89`, `d4f1149b5`).
+- **Regla:** todo cambio de versión de `@efeoncepro/axis-brand-assets` corre, antes del commit:
+  1. `pnpm manzanitas:tokens` (el snapshot sella la versión de los cuatro paquetes AXIS, no sólo la de `axis-tokens`).
+  2. `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` (re-sella los PNG del PDF del AI Visibility
+     Report y `public/branding/pdf/ai-visibility-assets.manifest.json`; lo vigila `report-pdf-assets.test.ts`).
+  3. Los tests de deriva de canales `src/lib/efeonce-insights/contracts/channels.test.ts` y
+     `src/config/insights-channel-isotypes.test.ts`: si AXIS sumó una plataforma, se agrega el id a
+     `INSIGHT_CHANNEL_IDS`, su nombre a `GH_INSIGHTS.channels`, su entrada a `CHANNEL_ISOTYPES` y el SVG en color a
+     `assets/channels/` de `insights-report` e `insights-deck`.
+  4. `pnpm brand:tokens --check`, `pnpm glitch:tokens --check` y `src/config/efeonce-brand-assets.test.ts`, que también
+     copian o comparan archivos del paquete.
+- Un lockup re-sellado cambia un PDF que está en producción: se mira el antes y el después y se avisa al operador.
+- Se suma a la regla de `axis-tokens` del Delta 2026-09-28 (g); no la reemplaza.
 
 ## Delta 2026-09-29 (i) — `v0.3.38` publicado, no fijado: módulos de correo y recorrido de la medida
 

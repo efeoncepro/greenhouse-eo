@@ -45,6 +45,12 @@ Invoca la skill `efeonce-insights` (+ `efeonce-mcp-platform` si vas a federar un
   producción desde 2026-09-26. Compara `=== 'true'`: cargarlo con `printf %s true`, redeploy DESPUÉS de la var y
   verificar con una canary (plan con `scopeLines`/`cover`), no con el listado de vars. Rollback = OFF en los dos
   runtimes. Registrar todo flip en `docs/operations/FEATURE_FLAG_STATE_LEDGER.md`.
+- **Vocabulario de canales = `AXIS_PLATFORM_ASSETS`** (`contracts/channels.ts`, 22 ids desde `axis-brand-assets` 0.4.25).
+  **NUNCA** agregar ni quitar un id a mano sin el paquete: todo cambio de versión de `axis-brand-assets` corre
+  `contracts/channels.test.ts` y `src/config/insights-channel-isotypes.test.ts`, y un id nuevo lleva nombre en
+  `GH_INSIGHTS.channels`, entrada en `CHANNEL_ISOTYPES` y su SVG en color en los dos catálogos. `channelForDomain` sólo
+  mapea dominios que identifican la red (facebook.com → `facebook`; `meta` nunca sale de un dominio) y sólo marca filas
+  de tabla del PDF y el deck: el modelo web envía el `channelId` propio del hecho.
 - **Selección de figuras (TASK-1974/1975, plan editorial v2)**: la pregunta del lector elige la familia
   (`ChartSpecV1.question` + `QUESTION_FAMILIES`); un hecho del período alimenta UNA figura del capítulo (`duplicated_fact`;
   sólo los totales de la cascada son ancla); la tarjeta de cifra vive en `chapter.stats`, fuera de las 15 familias. Valor,

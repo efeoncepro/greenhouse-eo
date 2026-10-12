@@ -301,6 +301,7 @@ Detalle en [applications.md §L](applications.md), «Componer el deck hoy» y «
 | Componer una receta aprobada o un documento (`pages`) | Greenhouse | `pnpm brand:compose -- --intent <intent.json> [--artifact-id <id>] [--out <dir>]` |
 | Gate visual de las plantillas de La órbita | Greenhouse | `pnpm composer:visual-gate --catalog=graphic-line` |
 | Tras subir `axis-tokens`: generados de La órbita **y** de Glitch sin drift (los dos, siempre; lessons.md 2026-09-28) | Greenhouse | `pnpm brand:tokens --check` + `pnpm glitch:tokens --check` |
+| Tras subir `axis-brand-assets`: sello de Manzanitas, recursos del PDF del AI Visibility Report y vocabulario de canales de Insights (2026-10-12) | Greenhouse | `pnpm manzanitas:tokens` + `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` + `pnpm exec vitest run src/lib/efeonce-insights/contracts/channels.test.ts src/config/insights-channel-isotypes.test.ts` |
 | Componer una edición de Glitch o un Glitch Flash (QA propio en [glitch.md](glitch.md) §10 y §14.5) | Greenhouse | `pnpm glitch:compose -- --manifest <edicion-o-flash.json>` + `pnpm composer:visual-gate --catalog=glitch` |
 | Firma de correo | AXIS | `pnpm signature:resolve -- --input intent.json` |
 | Módulos de correo (pie, CTA, bloque de marca) | AXIS | `pnpm email:resolve -- --input intent.json [--out manifest.json]` |

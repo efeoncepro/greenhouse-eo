@@ -13,8 +13,9 @@
   Ahora los tokens de Manzanitas registran la versión instalada, el vocabulario de canales de Insights tiene las 22
   plataformas de AXIS (se suman Facebook, Threads y X, con su isotipo en el PDF, el deck y Think) y los cuatro lockups
   del PDF del AI Visibility Report llevan el dibujo vigente, con la terminación concéntrica del anillo.
-- Una fuente citada de facebook.com muestra el isotipo de Facebook en vez del de Meta; los dominios de Threads y X
-  también tienen canal. Rige para lo que se renderice después del próximo release.
+- En las tablas del PDF y del deck, una fuente citada de facebook.com muestra el isotipo de Facebook en vez del de
+  Meta, y los dominios de Threads y X también tienen el suyo. Rige para lo que se renderice después del próximo
+  release. El informe web no cambia: no recibe canal por dominio citado.
 
 ## 2026-10-12 — HubSpot: los segmentos de industria leen la empresa, y Bancos queda dentro de Finanzas
 

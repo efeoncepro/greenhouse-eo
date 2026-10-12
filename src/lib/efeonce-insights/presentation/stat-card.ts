@@ -85,7 +85,8 @@ export interface StatItemView {
 /**
  * Plataforma de la que sale una cifra: la marca cuyo isotipo la identifica (`AXIS_PLATFORM_ASSETS` de
  * @efeoncepro/axis-brand-assets). La fuente manda sobre el canal: Search Console y GA4 miden Google pero tienen su
- * propio isotipo, e ICO lo mide Greenhouse. Es el vocabulario de canales (TASK-1990: los 19 ids de AXIS).
+ * propio isotipo, e ICO lo mide Greenhouse. Es el vocabulario de canales (TASK-1990: los ids de `AXIS_PLATFORM_ASSETS`, 22 desde
+ * axis-brand-assets 0.4.25).
  */
 export type StatPlatform = InsightChannelId
 

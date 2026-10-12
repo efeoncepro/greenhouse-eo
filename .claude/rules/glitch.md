@@ -21,9 +21,10 @@ Glitch (el magazine semanal de Efeonce: portadas, carrusel, blog, vlog/reel) tie
 `docs/operations/brand-graphic-line/glitch/GLITCH_GRAPHIC_LINE_V1.md` (motion en §13) + ADR
 `docs/architecture/GLITCH_GRAPHIC_LINE_DECISION_V1.md`. AXIS `/references/glitch/` y `/references/glitch.json`:
 publicados (2026-09-27); el token `glitchLine` y el contrato `efeonce.glitch-line` están publicados en AXIS (TASK-1922,
-`v0.3.12`; el Glitch Flash en `v0.3.24`: Greenhouse fija `axis-tokens` 0.3.24 y `axis-ui-contracts` 0.3.22). **Todo bump
-de `axis-tokens` corre `pnpm glitch:tokens` y `pnpm brand:tokens`, los dos con `--check`, antes del commit** (el CI de
-`53002b352` falló por regenerar sólo uno).
+`v0.3.12`; el Glitch Flash en `v0.3.24`; Greenhouse fija hoy `axis-tokens` 0.3.41 y `axis-ui-contracts` 0.3.40). **Todo bump
+de `axis-tokens` corre `pnpm glitch:tokens`, `pnpm brand:tokens` y `pnpm manzanitas:tokens`, los tres con `--check`, antes
+del commit** (el CI de `53002b352` falló por regenerar sólo uno). Un cambio de versión de `axis-brand-assets` tiene su
+propia lista: runbook de AXIS, Delta 2026-10-12.
 
 **Componer una edición (TASK-1923, taller local):** `pnpm glitch:compose -- --manifest <edicion.json>` (manifiesto
 `GlitchEditionManifest`, ejemplo en `src/lib/glitch-composition/examples/`; manual

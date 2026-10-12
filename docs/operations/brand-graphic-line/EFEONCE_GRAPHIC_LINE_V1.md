@@ -493,7 +493,7 @@ de 24 px». Cambiarlo toca el contrato de fidelidad de TASK-1889. Los pies de ca
 tipográfica de las portadas PDF y deck; marca en el correo de entrega (hoy plantilla Efeonce), favicon del hub (hoy el
 genérico), portal y MCP (sin marca de producto); la receta de deck «resultados en vivo» usa el isotipo de Efeonce para
 la ficha de Insights y «herramientas del día» tiene el ícono y la nota desalineados; el color de «INSIGHTS» en las
-portadas PDF (decisión abierta, arriba); Greenhouse fija `axis-brand-assets` 0.3.5 y no trae los archivos; las copias de Think son
+portadas PDF (decisión abierta, arriba); Greenhouse fija `axis-brand-assets` 0.4.25 y ya trae los archivos; las copias de Think son
 manuales. Mapa técnico: [arquitectura de Insights §6.3](../../architecture/EFEONCE_INSIGHTS_ARCHITECTURE_V1.md).
 
 ### 7.2 Submarcas de producto SEO/AEO: «la órbita vive en la O» (aprobadas el 2026-09-29)
@@ -540,7 +540,7 @@ Engine quedó aprobada con la portada del informe aprobada en el canvas.
 **Archivos.** `@efeoncepro/axis-brand-assets` **0.4.2** (tag `v0.4.2`, **publicado el 2026-09-29, AXIS `main` `7f9c8bb`**): 33 SVG nuevos
 (58 en total), export `AXIS_SEO_AEO_BRANDS` y la variante nueva `white`. Referencia visual en el Lab de AXIS:
 `/references/seo-aeo/` y `/references/seo-aeo.json`, con la guía `docs/agent-composition/seo-aeo.md` (publicados el
-2026-09-29; responden 200). Greenhouse fija `axis-brand-assets` 0.4.1: los archivos llegan cuando se implemente TASK-1938.
+2026-09-29; responden 200). Greenhouse fija `axis-brand-assets` 0.4.25: el PDF del AI Visibility Report (TASK-1938) lee los lockups del paquete, rasterizados y sellados en `public/branding/pdf/` (`ai-visibility-assets.manifest.json`); se re-sellan en cada cambio de versión del paquete.
 **Desde 0.4.3** (tag `v0.3.30`, AXIS `main` `26097c5`, 2026-09-29) el paquete re-sella las órbitas estáticas sin cambiar el
 dibujo. El AI Visibility Report tiene canon propio en AXIS: token `aiVisibilityReport` (`axis-tokens` 0.3.30), contrato
 `efeonce.ai-visibility-report` 0.1.0 (`candidate`, `axis-ui-contracts` 0.3.30), receta `@efeoncepro/axis-graphic-line/report`

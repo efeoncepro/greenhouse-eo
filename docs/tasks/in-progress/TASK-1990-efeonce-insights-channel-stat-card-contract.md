@@ -4,10 +4,12 @@
 
 - `INSIGHT_CHANNEL_IDS` suma `facebook`, `threads` y `x`, que AXIS publicó en `axis-brand-assets` 0.4.19 y 0.4.21 y que
   Greenhouse instaló al subir el pin a 0.4.25 (`596bfab90`) sin alinear la lista. Nombre visible en `GH_INSIGHTS.channels`,
-  isotipo en color en los dos catálogos y en Think (commit local en `efeonce-think`).
+  isotipo en color en los dos catálogos y en Think (`efeonce-think` `236d549`, en producción desde el 2026-10-12).
 - `channelForDomain`: facebook.com → `facebook` (antes `meta`), threads.net/threads.com → `threads`, x.com/twitter.com →
-  `x`. `meta` ya no sale de un dominio. Una fuente citada de Facebook mostrará el isotipo de Facebook en las ediciones
-  que se rendericen después del próximo release.
+  `x`. `meta` ya no sale de un dominio. Alcance: `channelForDomain` sólo lo usa la marca de fila de las tablas del PDF y
+  el deck (`rowMarkOf`, `render/report-mapper.ts`); el modelo web envía únicamente el `channelId` propio del hecho, así
+  que el informe de Think no cambia. Una fuente citada de Facebook mostrará su isotipo en los PDF y decks que se
+  rendericen después del próximo release.
 - Ningún adapter sella todavía esos tres canales por su cuenta; sólo llegan por dominio citado. — por trabajo de deriva
   del pin AXIS (commit `7877dfe89` y siguiente)
 
@@ -66,7 +68,7 @@
 - Motion: `none`
 - Backend impact: `reader`
 - Epic: `EPIC-045`
-- Status real: `En producción desde el release 9a906a164677 (2026-10-04): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. Canary interno de Berel verde en producción (2026-10-04, revisión `insed-edd1f0b0…`, release 7182af769): el plan trae los dos tableros y A4 y deck renderizan`
+- Status real: `En producción desde el release 9a906a164677 (2026-10-04): vocabulario de 19 plataformas, channelForDomain, metricIcon y tableros por motor y por asistente. Canary interno de Berel verde en producción (2026-10-04, revisión `insed-edd1f0b0…`, release 7182af769): el plan trae los dos tableros y A4 y deck renderizan. En develop desde 2026-10-12 (7877dfe89, d4f1149b5; sin release): 22 plataformas (suma facebook, threads, x) y facebook.com → facebook en vez de meta`
 - Rank: `TBD`
 - Domain: `data`
 - Blocked by: `none`
@@ -385,8 +387,8 @@ Reglas de colocación (espejo de `efeonceInsights.statCard.channel.placement`):
 
 ## Acceptance Criteria
 
-- [x] `INSIGHT_CHANNEL_IDS` contiene las 19 plataformas de AXIS y un test falla si las listas difieren. Evidencia: `contracts/channels.test.ts` contra `AXIS_PLATFORM_ASSETS` del paquete instalado.
-- [x] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test). Evidencia: `contracts/channels.test.ts`.
+- [x] `INSIGHT_CHANNEL_IDS` contiene las 19 plataformas de AXIS y un test falla si las listas difieren. Evidencia: `contracts/channels.test.ts` contra `AXIS_PLATFORM_ASSETS` del paquete instalado. Desde 2026-10-12 son 22 (suma `facebook`, `threads`, `x`); el mismo test.
+- [x] `channelForDomain` mapea youtube.com, reddit.com, es.wikipedia.org, linkedin.com, instagram.com, tiktok.com y facebook.com a su plataforma y devuelve `undefined` para cualquier otro dominio (test). Evidencia: `contracts/channels.test.ts`. Desde 2026-10-12 facebook.com → `facebook` (antes `meta`), threads.net/threads.com → `threads` y x.com/twitter.com → `x`.
 - [x] Un plan con canal y glifo en la misma celda, canal sin `label` igual al nombre, `context` sin canal, canal en título y celda, o todas las celdas de una plataforma sin canal en el título es rechazado por `plan-validation.ts` (test por cada código). Cambio de decisión (Delta 2026-10-03 noche): el canal lo resuelve `statItemView` y no es campo autorado; las reglas se prueban sobre el resolver (`stat-card-channels.test.ts`, todas las mezclas de hasta 6 cifras) y las páginas (`figure-slots.test.ts`).
 - [x] El capítulo SEO de Berel sale con Search Console en el título y glifo por celda; un capítulo ICO sale con Greenhouse en el título (vista previa). Evidencia: `docs/ui/reviews/TASK-1996-efeonce-insights-channel-stat-card/berel-2026-09-a4-cifras-seo.png` (Search Console y Google) y `sky-2026-09-deck-cifras-ico.png` (Greenhouse).
 - [x] El modelo web 1.5 trae `channel`, `context` y `metricIcon` resueltos por `statItemView`; un modelo 1.4 sellado sigue validando (test). Cambio de decisión: el modelo 1.4 aún no está publicado, así que `titlePlatforms`, `items[].channel` y `context` entran como aditivos en 1.4 (resueltos por `statItemView` y `statBoardChannelsOf`); falta `metricIcon` (depende de los glifos Trazo de TASK-1996). Evidencia (2026-10-04): `metricIcon` aditivo en 1.4 junto a `channel`/`context` (sin 1.5, decisión registrada); `sharing/web-model.ts`; tests de `stat-card-channels.test.ts`.

@@ -1,5 +1,13 @@
 # TASK-2004 — AXIS: isotipos de plataforma en negativo y Facebook, Threads y Microsoft Advertising en `axis-brand-assets`
 
+## Delta 2026-10-12 — Greenhouse Insights adopta Facebook, Threads y X
+
+- Al subir el pin de Greenhouse a `axis-brand-assets` 0.4.25 (`596bfab90`, 2026-10-06) los tres ids nuevos rompieron la
+  paridad de `INSIGHT_CHANNEL_IDS` con `AXIS_PLATFORM_ASSETS`: el riesgo previsto en esta task se cumplió y estuvo seis
+  días sin atender. Se alineó el 2026-10-12 (`7877dfe89`, `d4f1149b5`): 22 plataformas, isotipo en color en
+  `insights-report` e `insights-deck`, y en Think (`236d549`). Greenhouse: develop, sin release. — por trabajo de deriva
+  del pin AXIS
+
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
      "Que task es y puedo tomarla?"
@@ -281,7 +289,7 @@ Reglas obligatorias:
 - [ ] Ningún archivo nuevo contiene `<style>`, `<image>`, `foreignObject` ni animación.
 - [ ] El tipo distingue la variante para fondo oscuro sin ambigüedad y los consumidores existentes compilan.
 - [ ] El Lab muestra cada plataforma en color y en negativo, y el test `brand-assets` byte a byte pasa.
-- [ ] La paridad de isotipos de Insights en Greenhouse sigue en verde con la versión nueva.
+- [x] La paridad de isotipos de Insights en Greenhouse sigue en verde con la versión nueva. Evidencia (2026-10-12): rota del 2026-10-06 al 2026-10-12 con el pin 0.4.25; verde tras alinear el vocabulario (`7877dfe89`): `contracts/channels.test.ts` y `src/config/insights-channel-isotypes.test.ts`.
 - [ ] TASK-2002 tiene un Delta con los ids publicados.
 
 ## Verification

@@ -235,7 +235,7 @@ own this contract; the `.codex/` mirror is the same file, so edit `.claude/` and
 
 ## Verification that counts
 
-- Unit: `pnpm vitest run src/lib/efeonce-insights src/lib/api-platform/resources` (+ MCP tests
+- Unit: `pnpm vitest run src/lib/efeonce-insights src/lib/api-platform/resources src/config/insights-channel-isotypes.test.ts` (+ MCP tests
   `src/mcp/greenhouse`) — states/matrix parity, windows (DST, Feb 29, custom overlap), adapters
   (unsupported_window, no_data ≠ 0, RpA suppressed, OTD denominator), editorial (figure guard),
   commands (idempotency, authz, three planes), lanes (same error table), manifest/skill leak tests.

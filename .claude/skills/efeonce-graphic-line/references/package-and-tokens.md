@@ -805,7 +805,7 @@ fragmentado y son públicas en «Logotipos», como Rooms y Creative Studio. Gree
 
 **Insights (0.4.0, tag `v0.4.0`):** marca `insights` en `AXIS_BRAND_ASSET_BRANDS`; `kind: 'lockup'` es nuevo y sólo lo usa
 `insights-lockup-*`. Se generan en Greenhouse con `scripts/brand/build-insights-logo.mjs` y se re-sellan con
-`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fijaba 0.3.5** al 2026-09-28; hoy fija 0.4.1, que ya los trae. Dónde se
+`scripts/seal.mjs`; nunca se editan a mano. **Greenhouse fijaba 0.3.5** al 2026-09-28; hoy fija 0.4.25, que ya los trae. Dónde se
 aplican y dónde no: [applications.md](applications.md) §B3b.
 
 **Submarcas SEO/AEO (0.4.2, tag `v0.4.2`, publicado el 2026-09-29, AXIS `main` `7f9c8bb`):** export nuevo `AXIS_SEO_AEO_BRANDS` y variante nueva `white` (todo blanco, esfera y logo de Efeonce
@@ -813,12 +813,12 @@ incluidos, para fotos y fondos de color). 33 SVG: `{sv360,aeo,aeo-assessment,ai-
 `{sv360,aeo}-isotype-{positive,negative,white}`, los cuatro `*-lockup-{positive,negative,white}` y
 `sv360-name-lockup-{positive,negative,white}`. Se generan en Greenhouse con `scripts/brand/build-seo-aeo-logos.mjs`
 (contornos de Poppins con fontkit; colores de `@efeoncepro/axis-tokens`, esfera en el acento de Engine `#0375db`) y se
-re-sellan; nunca se editan a mano. Greenhouse fija 0.4.1 y los recibe con TASK-1938. Lab: `/references/seo-aeo/` y
+re-sellan; nunca se editan a mano. Greenhouse fija 0.4.25 y los usa en el PDF del AI Visibility Report (TASK-1938), rasterizados y sellados en `public/branding/pdf/`. Lab: `/references/seo-aeo/` y
 `/references/seo-aeo.json`, guía `docs/agent-composition/seo-aeo.md` (publicados el 2026-09-29; responden 200). Criterio:
 [criteria.md](criteria.md) («Submarcas de producto SEO/AEO»); aplicaciones: [applications.md](applications.md) §B3c.
 
-**PNG para correo: `AXIS_EMAIL_ASSETS` (0.4.6, tag `v0.3.38`, 2026-09-29; Greenhouse fija 0.4.5 y todavía no los
-usa).** `assets/email/`, @2x, RGBA con fondo transparente (se apoyan en el `#001a33` declarado en la celda), generados
+**PNG para correo: `AXIS_EMAIL_ASSETS` (0.4.6, tag `v0.3.38`, 2026-09-29; Greenhouse fija 0.4.25 y sólo el PDF del AI
+Visibility Report usa las cuatro redes; los correos todavía no).** `assets/email/`, @2x, RGBA con fondo transparente (se apoyan en el `#001a33` declarado en la celda), generados
 con `pnpm email:assets` (`scripts/generate-email-assets.mjs`, nunca a mano) y sellados en `src/email-manifest.ts`;
 `findEmailAsset(id)` y `emailAssetUrl(id)`.
 
@@ -838,7 +838,7 @@ necesita su propio eslogan generado, nunca uno escalado.
 acento, no medidas, así que no llevan camino recorrido).
 
 **0.4.3 (tag `v0.3.30`, 2026-09-29):** las 48 órbitas estáticas se re-sellaron con el contrato de la órbita 0.4.0
-(cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.1.
+(cambia el sello `data-axis-graphic-line`, no el dibujo); ningún SVG de marca nuevo. Greenhouse fija 0.4.25.
 
 **Marcas de terceros: `AXIS_PARTNER_ASSETS` (0.4.4, tag `v0.3.31`, 2026-09-29; Greenhouse la fija desde `9289cab0c`).**
 `assets/partners/` guarda las marcas de terceros del deck Salesforce aprobado, **selladas aparte** en
@@ -1118,6 +1118,8 @@ inválidos).
 | `pnpm brand:compose -- --intent <intent.json> [--out <dir>] [--artifact-id <id>]` (`scripts/brand-surfaces/compose.ts`, TASK-1919) | compone una receta **aprobada** por superficie en el Artifact Composer: exige receta aprobada → `resolveSurfaceComposition` (con `issues`, no compone) → builder de la receta → plan + assets (plate de `photo.plateRef` recortado, íconos `resolveIcon`, capas SVG de `paintGraphicLine`) → PDF (deck) o PNG (resto; capas de video con alfa). Salida por defecto `.captures/brand-surfaces/<id>/` más `<id>.surface-manifest.json`. Errores (`SurfacePieceError.code`): `recipe-not-approved`, `recipe-outside-composer` (`audiovisual.close-reveal`), `surface-issues` (lista los issues de AXIS), `recipe-without-template`, `missing-photo`, `invalid-intent`. Ejemplos por receta: `src/lib/brand-surfaces/examples/*-intent.json` |
 | `pnpm brand:tokens [--check]` (`scripts/brand-surfaces/compile-tokens.ts`) | compila `efeonceGraphicLine` a `graphic-line-tokens.{json,css}` de cada catálogo `graphic-line-*` y copia byte a byte los archivos de marca desde `axis-brand-assets`; `--check` falla si lo commiteado no coincide con la versión instalada |
 | `pnpm glitch:tokens [--check]` (`scripts/glitch/compile-tokens.ts`; sólo Glitch) | compila `glitchLine` a `catalogs/glitch/glitch-tokens.{css,json}` (desde 0.3.24 con `editions`), escribe la estela del Flash `assets/flash-trail.svg` y las variables `--gx-flash-trail-*`; `--check` falla si hay drift. **Se corre junto a `pnpm brand:tokens` en todo bump de `axis-tokens`** (detalle en [glitch.md](glitch.md) §9.1) |
+| `pnpm manzanitas:tokens [--check]` (`scripts/manzanitas/compile-tokens.ts`; sólo Marketing con Manzanitas) | compila `manzanitasRegister` y sus assets precoloreados por línea; su JSON sella las versiones de `axis-tokens`, `axis-brand-assets`, `axis-graphic-line` y `axis-ui-contracts`: **se corre en todo bump de cualquiera de los cuatro** |
+| `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` | re-sella los recursos del PDF del AI Visibility Report en `public/branding/pdf/` (lockups, motores, redes, glifos) y su `ai-visibility-assets.manifest.json` desde los paquetes instalados; sólo cambian los archivos cuya fuente cambió; **se corre en todo bump de `axis-brand-assets`** (guarda: `report-pdf-assets.test.ts`) |
 | `pnpm composer:visual-gate --catalog=graphic-line [--selftest\|--freeze]` | gate visual a 0 px de los 66 frames (desde TASK-1928; 32 tras TASK-1927) de los catálogos de La órbita (runbook `docs/operations/runbooks/composer-visual-gate.md`; altas declaradas en `BASELINE_DELTAS.md`: (b)–(e) de TASK-1927, (f) y (h)…(n) de TASK-1928; la (g) es Glitch; estas letras no son las del ADR de AXIS) |
 | `pnpm brand:deck-recipes [-- --check]` | reescribe (o verifica) el índice del README del catálogo de recetas del deck, con la columna «Plantilla» leída de `graphic-line-deck/registry.json`, **y** el catálogo de runtime `src/lib/brand-surfaces/deck-recipes/catalog.generated.json` (TASK-1929; recetas + intents de ejemplo de `recipe-map.json`). Córrelo siempre tras editar `EFEONCE_DECK_SLIDE_RECIPES_V1.json`: `--check` falla si el README **o** el catálogo difieren, y el test `catalog-drift` lo corre en CI |
 | `pnpm brand:deck-plan -- --plan <plan.json>` · `-- --propose --context <context.json> [--out <plan.json>]` (`scripts/brand-surfaces/deck-plan.ts`, TASK-1929) | valida el plan de un deck (ids de receta en orden) con `validateDeckPlan` (exit 1 si hay error, 2 si no se lee la entrada) o pide al agente que lo proponga (`proposeDeckPlan`, `server-only`: sólo ids del enum del documento, un reintento, fail-closed; imprime tokens y costo estimado). Local: `ANTHROPIC_API_KEY_SECRET_REF=greenhouse-anthropic-api-key` y `GCP_PROJECT=efeonce-group` con ADC si `.env.local` no las trae. Códigos y arreglos: skill `deck-studio` §«Plan del deck» |

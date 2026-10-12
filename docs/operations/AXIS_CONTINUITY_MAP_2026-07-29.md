@@ -8,6 +8,15 @@
 > [`EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1`](../architecture/EFEONCE_SHARED_PRODUCT_UI_PLATFORM_DECISION_V1.md);
 > el runbook operativo en [`AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1`](./AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md).
 
+## Actualización — 2026-10-12: `axis-brand-assets` 0.4.25 y sus dependientes
+
+**Pines vigentes** (`package.json`): `axis-tokens` `0.3.41`, `axis-ui-contracts` `0.3.40`, `axis-graphic-line` `0.11.0`,
+`axis-brand-assets` `0.4.25` y `axis-ui-registry` `0.3.1`. El pin de brand-assets subió el 2026-10-06 (`596bfab90`) y sus
+dependientes se regeneraron seis días después: tokens de Manzanitas, vocabulario de canales de Insights (22 plataformas)
+y los cuatro lockups del PDF del AI Visibility Report. La regla para el próximo cambio de versión está en el
+[runbook](AXIS_PRIVATE_PACKAGE_CONSUMPTION_RUNBOOK_V1.md), Delta 2026-10-12. Este mapa no autoriza bumps nuevos; la
+adopción del juego publicado es TASK-2014.
+
 ## Fuente aprobada — producto, scheduler y Growth CTA, 2026-10-05
 
 El operador aprobó visualmente la entrega AXIS y autorizó documentación/skills y push.

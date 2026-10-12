@@ -279,6 +279,10 @@ Rules for agents:
   change means changing the token and its test in AXIS, signed through the Greenhouse ADR, not editing a document.
 - Before pinning a consumer, confirm which **published** package version contains the export; do not assume the
   workspace source is released.
+- **Current Greenhouse pins (read from `package.json`, 2026-10-12):** `axis-tokens` `0.3.41`, `axis-ui-contracts`
+  `0.3.40`, `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.25` (since `596bfab90`, 2026-10-06) and
+  `axis-ui-registry` `0.3.1`. Moving to the published set is Greenhouse TASK-2014. The 2026-09-29 snapshot that follows
+  is history: read it for what each version carried, not for the pin.
 - **Greenhouse consumption (verified 2026-09-29, night, with `grep '"@efeoncepro/axis' package.json`):** `develop`
   pins `axis-tokens` `0.3.37`, `axis-ui-contracts` `0.3.37` (AXIS tag `v0.3.37`: Glitch and Marketing con Manzanitas
   stable), `axis-graphic-line` `0.11.0`, `axis-brand-assets` `0.4.5` and `axis-ui-registry` `0.3.1`. **AXIS is at the
@@ -315,14 +319,19 @@ Rules for agents:
   (`src/lib/efeonce-insights/contracts/channels.test.ts`, `src/config/insights-channel-isotypes.test.ts`): a platform
   added to `AXIS_PLATFORM_ASSETS` must be added to `INSIGHT_CHANNEL_IDS`, its copy and `CHANNEL_ISOTYPES`, with its
   colour isotype copied into both Insights catalogs. A re-sealed lockup is a visible change in a PDF that is in
-  production: look at the before and after and tell the operator.
+  production: look at the before and after and tell the operator. The same package also feeds, byte for byte,
+  `pnpm brand:tokens` and `pnpm glitch:tokens` (logos, bubbles and partner marks copied into the Composer catalogs; run
+  both with `--check`), `src/config/efeonce-brand-assets.test.ts` (the `public/branding` copies) and the 182 entries of
+  `scripts/foto/assets.lock.json` hashed under `node_modules/@efeoncepro/axis-brand-assets/` (`pnpm foto:doctor`); all
+  four were in sync with `0.4.25` on 2026-10-12. Think keeps manual copies (it does not install the package): product
+  lockups via `pnpm insights:think-icons`, platform isotypes in `public/logos/platforms/` with `src/lib/insights-platforms.ts`.
 - **Signature rule (operator, 2026-09-26):** the Efeonce logo, centered. The URL bubble signs instead ONLY when the
   logo already appears in the image (`signature.brandInScene: true`), centered, luminosity-blended on the real pixels
   at opacity 1, ≥ 4.5:1 measured (passes only on very dark beds); never beside the logo. Footer uses keep the baked
   variants. Threshold 4.5 vs 3:1 pending the operator.
 - **The orbit never replaces the photographic composition** and never crosses subject, text reserves, bed or
   signature (`orbit-never-over-subject-or-reserves`).
-- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` published 2026-09-29, AXIS `main` `7f9c8bb`; `0.4.3`, tag `v0.3.30`, only re-stamps the 48 static orbits with orbit contract `0.4.0`; `0.4.4`/`0.4.5` add `AXIS_PARTNER_ASSETS`; `0.4.6`, tag `v0.3.38`, adds the email PNGs `AXIS_EMAIL_ASSETS` and re-stamps the orbits with contract `0.5.0`; Greenhouse pins `0.4.5`): 58 brand SVG since
+- **Official files:** `@efeoncepro/axis-brand-assets` (first sealed in `0.3.0`; `0.4.2` published 2026-09-29, AXIS `main` `7f9c8bb`; `0.4.3`, tag `v0.3.30`, only re-stamps the 48 static orbits with orbit contract `0.4.0`; `0.4.4`/`0.4.5` add `AXIS_PARTNER_ASSETS`; `0.4.6`, tag `v0.3.38`, adds the email PNGs `AXIS_EMAIL_ASSETS` and re-stamps the orbits with contract `0.5.0`; Greenhouse pins `0.4.25` since 2026-10-06): 58 brand SVG since
   `0.4.2` (19 until `0.3.6`: logo/isotype per brand, URL bubble source and baked variants; `0.4.0` adds the Insights
   logo/isotype and the `lockup` kind, see «Efeonce Insights in AXIS»; `0.4.2` adds 33 SEO/AEO sub-brand files and the `white` variant, see «SEO/AEO product sub-brands in AXIS») plus the 48 static orbits, SHA-256 sealed; `findBrandAsset`, `brandAssetUrl`,
   `findOrbitAsset`. Consumers read the package, never a hand copy (Greenhouse guards its local copies with
@@ -626,7 +635,7 @@ cover A; 9 charts computed from data; 3 dense-text slides. It is a sibling of th
   (`glitchLine.scope.sharedWithEditorialFamily`).
 - **Greenhouse pins that set and composes with it**: the Artifact Composer catalog `manzanitas` (TASK-1939,
   `pnpm manzanitas:compose`, `pnpm manzanitas:tokens --check`, visual gate `--catalog=manzanitas`). Every `axis-tokens`
-  bump also runs `pnpm manzanitas:tokens --check`. The governing docs stay the Greenhouse norm
+  or `axis-brand-assets` bump also runs `pnpm manzanitas:tokens` and its `--check` (the JSON stamps both versions). The governing docs stay the Greenhouse norm
   `docs/operations/brand-graphic-line/manzanitas/MANZANITAS_REGISTER_V1.md`, the ADR
   `docs/architecture/MANZANITAS_REGISTER_DECISION_V1.md` and `efeonce-graphic-line` → `references/manzanitas.md`; the team
   roster is `docs/operations/brand-photography/EFEONCE_TEAM_ROSTER_V1.md`. A value change goes through the token and its

@@ -10,8 +10,9 @@ Sesiones anteriores (continuidad del 2026-10-08 incluida): [Handoff.archive.md](
 `7877dfe89` y el commit siguiente: tokens de Manzanitas, `INSIGHT_CHANNEL_IDS` de 19 a 22 (Facebook, Threads, X, con
 isotipo en los dos catálogos) y los cuatro lockups del PDF del AI Visibility Report re-sellados (terminación
 concéntrica del anillo: **cambio visible en un PDF en producción**, sale con el próximo release). `channelForDomain`
-lleva facebook.com a `facebook` y suma los dominios de Threads y X. Think tiene los tres isotipos en un commit local
-de `efeonce-think` sin push: publicarlo antes del release de Greenhouse. Verificado: suites de Insights, Composer,
+lleva facebook.com a `facebook` y suma los dominios de Threads y X. Think tiene los tres isotipos en producción
+(`236d549`). El mapeo por dominio sólo marca filas de tabla del PDF y el deck: el modelo web no lo usa, así que no hay
+orden obligado entre Think y el release de Greenhouse (`develop` lleva 283 commits sin push desde el 2026-10-05). Verificado: suites de Insights, Composer,
 config y PDF; gate visual de Insights 37 frames a 0 px; export real del PDF (10); lint y typecheck. No se corrió
 `pnpm test` completo ni `pnpm build`. Lección y comandos en las skills `axis-design-system` y `efeonce-insights`.
 

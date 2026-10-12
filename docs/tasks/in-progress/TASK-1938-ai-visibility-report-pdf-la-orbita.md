@@ -1,6 +1,15 @@
 # TASK-1938 — Informe PDF del Grader de visibilidad en IA con «La órbita»
 
 
+## Delta 2026-10-12 — lockups re-sellados contra `axis-brand-assets` 0.4.25
+
+- `ai-visibility-report-lockup-{positive,negative}` y `aeo-lockup-{positive,negative}` de `public/branding/pdf/` se
+  re-sellaron (`pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report`): llevan la terminación del
+  anillo concéntrica a la esfera (AXIS `2651192`) en vez del corte recto. Mismas dimensiones; los otros 43 recursos
+  salieron idénticos. El manifest cambió de hash (nota en el README del dossier de revisión). Verificado con el export
+  real (`report-pdf-export.qa.test.ts`, 10 exports). En develop, sin release: producción sigue con el dibujo anterior.
+  — por trabajo de deriva del pin AXIS (`7877dfe89`)
+
 ## Delta 2026-10-08
 
 - La anatomía editorial que el PDF lee de `ai-visibility-layout.generated.json` se publicó en `@efeoncepro/axis-tokens` 0.6.2 (AXIS `dd22aa4`, digest `484a0729…`, idéntico a la copia), con `axis-ui-contracts` 0.7.1 (salida del contrato 0.1.0 sin cambios); la proyección local de AXIS se retiró. Publicado en el release `v0.4.27` el 2026-10-08 (readback en GitHub Packages: tokens 0.6.2, contracts 0.7.1). Importar el paquete exige subir Greenhouse de `axis-tokens` 0.3.41 a 0.6.2: el retiro de la copia generada pasa a [TASK-2014](../to-do/TASK-2014-axis-packages-adoption-and-report-projection-retirement.md).
@@ -546,7 +555,7 @@ página se corrompe), y usar colores opacos premezclados para trazos translúcid
 - [x] Estela, esfera, halo y punto de la etiqueta de la portada toman el color de la gravedad del puntaje, con los umbrales de `recommendations.ts` y los colores `axisRamp.error[400]`, `axisRamp.warning[500]` y `axisRamp.success[400]`. El anillo, la marca de partida y la cifra no cambian, y la etiqueta en texto siempre acompaña al color. Cada estado coincide con `portada-estados-de-la-orbita.png`.
 - [x] Ningún nivel ni dimensión sin dato se muestra como 0.
 - [x] `report-pdf-tokens.ts` toma fondo y acento de la línea Engine (`efeonceGraphicLine.lines.engine`) y la gravedad de `efeonceGraphicLine.measureSeverity`; ningún HEX escrito a mano.
-- [x] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.15`; el cierre dice «Empower your Engine».
+- [x] Portadas y encabezados usan el lockup oficial `ai-visibility-report-lockup-*` y la línea del AEO Assessment el `aeo-lockup-*`, leídos de `@efeoncepro/axis-brand-assets` `0.4.15` (re-sellados contra `0.4.25` el 2026-10-12); el cierre dice «Empower your Engine».
 - [x] El documento no usa el lockup de Efeonce Insights.
 - [x] La contraportada toma las redes de `EFEONCE_SOCIAL_LINKS` y el logo y la burbuja de `axis-brand-assets`.
 - [x] El eslogan va en bloque debajo del logo de Efeonce, al 64 % de su ancho (cuerpo = 0,64 × logo ÷ 11,263 em (Engine)), separado 1,35 veces su cuerpo; nunca como texto a cuerpo fijo.

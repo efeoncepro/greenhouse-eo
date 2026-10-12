@@ -83,5 +83,9 @@ Las seis piezas existen en `positive`, `negative` y `white` (18 SVG). Las genera
   en su variante blanca, para no sumar un segundo acento.
 - **Riesgo conocido:** «Factory» connota volumen y producción en serie; lo compensan el descriptor «On-Demand» y la
   ficha comercial.
-- **Pendiente:** las copias de los SVG de la familia en otros lugares (decks del composer, `efeonce-think`, Marketing
-  Studio) siguen con el corte recto hasta que se actualicen; el deck exige rebaseline del visual gate.
+- **Pendiente:** las copias de los SVG de la familia en Marketing Studio siguen con el corte recto hasta que se
+  actualicen (sin verificar desde el 2026-10-05). **Resuelto:** los lockups del deck del composer (`59f4ff008`,
+  2026-10-05) y las copias de `efeonce-think` (`6c4fefd`, 2026-10-05) son idénticos al paquete; los cuatro PNG de
+  lockup del PDF del AI Visibility Report (`public/branding/pdf/`) llevaron el corte recto hasta el 2026-10-12, cuando
+  se re-sellaron con `pnpm exec tsx scripts/build-pdf-brand-assets.ts --ai-visibility-report` (`7877dfe89`, en develop
+  sin release: producción sigue con el dibujo anterior).

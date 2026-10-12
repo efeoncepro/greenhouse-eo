@@ -44,7 +44,8 @@ export const SEO_SEARCH_CHANNEL: InsightChannelId = 'google'
  * TASK-1990 — dominio citado → plataforma con isotipo. Sólo las plataformas cuyo dominio identifica sin ambigüedad a la
  * fuente (una página de YouTube, un hilo de Reddit, un artículo de Wikipedia en cualquier idioma, un perfil de LinkedIn,
  * Instagram o TikTok, una página de Facebook, un hilo de Threads, una publicación de X). Cualquier otro dominio queda sin
- * canal: la cifra lleva su glifo. `meta` no sale de un dominio: es la empresa y su pauta, no la red; Facebook llevó su
+ * canal: la cifra lleva su glifo. Sólo lo usa la marca de fila de las tablas del PDF y el deck (`rowMarkOf`); el modelo web
+ * envía el `channelId` propio del hecho. `meta` no sale de un dominio: es la empresa y su pauta, no la red; Facebook llevó su
  * isotipo como sustituto hasta que AXIS publicó el propio (axis-brand-assets 0.4.19).
  */
 const DOMAIN_CHANNELS: ReadonlyArray<readonly [string, InsightChannelId]> = [
