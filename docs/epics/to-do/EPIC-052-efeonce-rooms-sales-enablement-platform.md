@@ -200,3 +200,14 @@ Aclaración explícita del operador: Rooms debe servir a ambos servicios. Se act
 ## Delta 2026-10-08 — marca aceptada
 
 El operador aceptó la marca de Rooms («eslabón leve»): las dos «o» como órbitas enlazadas, esfera Growth a la 1:30, lockup Efeonce | Rooms por defecto. Decisión, piezas y revisión de parecido en el [ADR de marca](../../architecture/rooms/EFEONCE_ROOMS_MARK_DECISION_V1.md); 18 SVG `rooms-*` en `@efeoncepro/axis-brand-assets` 0.4.27 (release `v0.4.27` en curso: verificar el tag). Cubre la condición «sin diseño AXIS» de Non-goals para el logo. No cambia lifecycle, unidades ni go: las composiciones de la sala siguen sujetas a R02 y a los contratos de UI.
+
+## Delta 2026-10-12 — destino futuro de la interfaz de Commercial (diferido)
+
+El operador aprobó desacoplar Greenhouse por dominios de producto ([decisión](../../architecture/GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), [`EPIC-054`](EPIC-054-greenhouse-product-domain-decoupling.md)). Para Commercial declaró su intención: la API se queda en Greenhouse y la interfaz pasaría a Rooms — Sample Sprints, Cotizaciones, Contratos, Productos, MSA y SOW, y Pipeline. Lo dejó **para después**: sin fecha, sin task y sin go.
+
+- **Esta épica no cambia.** R01–R15, sus dependencias y sus Exit Criteria quedan como están; la interfaz de Commercial no es una unidad de esta épica ni condición del piloto.
+- **Cuando llegue su turno** se registra como trabajo propio y exige primero enmendar el ADR de Rooms, que hoy difiere CPQ y deja el pipeline en HubSpot. Detalle en su [addendum del 2026-10-12](../../architecture/rooms/EFEONCE_ROOMS_PRODUCT_AND_PLATFORM_DECISION_V1.md).
+- **Para no cerrarle el camino desde ahora**: R03 y R04 ya separan autoría interna de audiencia externa por contrato; conviene que esa separación no asuma que el único autor interno es quien arma una sala.
+- **Cotizador V3** (`EPIC-053`): su interfaz sigue sin hogar decidido, portal o Rooms.
+- Del mismo plan, sin efecto en el diseño de Rooms: el motor del Artifact Composer pasa a paquete de AXIS e Insights a dominio propio; R14 los sigue consumiendo por contrato.
+

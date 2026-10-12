@@ -99,3 +99,18 @@ El operador aclara: «rooms debe servir para las dos», producción creativa y S
 ## Addendum 2026-10-07 — versiones actuales con compatibilidad comprobada
 
 El operador solicita el último Next.js, ESLint, TypeScript, Tailwind y herramientas asociadas, y documentar la viabilidad. Se registra como requisito de selección **últimas versiones estables compatibles**, con pins y actualizaciones verificadas, sin heredar versiones de Greenhouse. La [política y baseline](EFEONCE_ROOMS_STACK_BASELINE_V1.md) conserva fuentes, límites y pruebas de R01. La matriz fechada es candidata: convivencia TS7/TS6, configuración ESLint10 o fallback temporal 9.39.5 y Node24 LTS deben concretarse con evidencia. Documentar este requisito no acepta por inferencia la configuración pendiente ni autoriza implementación, instalación o rollout. Reabrir ante nuevas versiones, cambio de soporte upstream/hosting o regresión del consumidor AXIS.
+
+## Addendum 2026-10-12 — Rooms como destino futuro de la interfaz de Commercial (diferido, sin go)
+
+El operador decidió desacoplar Greenhouse por dominios de producto: [decisión](../GREENHOUSE_PRODUCT_DOMAIN_DECOUPLING_DECISION_V1.md), ejecutada por [`EPIC-054`](../../epics/to-do/EPIC-054-greenhouse-product-domain-decoupling.md). Dentro de ese plan declaró su intención para Commercial: **la API se queda en Greenhouse y la interfaz pasaría a Rooms** — Sample Sprints, Cotizaciones, Contratos, Productos, MSA y SOW, y Pipeline. Su razón es de pertenencia: lo comercial vive con la experiencia de venta. El mismo día lo dejó **para después, no ahora**; no tiene fecha, task ni go, y no forma parte de `EPIC-054`.
+
+Qué significa para este ADR:
+
+- **El alcance de V1 no cambia.** R01–R15 siguen siendo la sala, la experiencia del comprador y del champion. Nada de esto es prerrequisito ni entregable del piloto.
+- **Hoy este ADR dice lo contrario** y por eso habrá que enmendarlo antes de ejecutar: la fila «CRM, CPQ, firma… Diferidos» de las alternativas, el rol de Proposal Studio / CPQ («documentos enlazados; publicar una sala no aprueba precios») y el de HubSpot («sin pipeline paralelo»). Una interfaz de Pipeline en Rooms sería una vista sobre el dueño del dato, no un segundo pipeline.
+- **La regla de frontera se conserva**: Rooms consumiría la API de Commercial por contrato versionado, con sus grants; nunca tablas, sesiones ni secretos de Greenhouse.
+- **Es otro usuario.** La autoría comercial es de vendedor y finanzas, internos; la sala es del comprador y su comité, externos. Si ambas viven en Rooms, sus accesos y proyecciones se separan desde el contrato, no en la pantalla.
+- **Cotizador V3**: su interfaz es la última fase de `EPIC-053` y sigue sin hogar decidido (portal o Rooms). Como aún no existe, no hay nada que migrar: nace donde se decida.
+
+Efectos del mismo plan que sí tocan a Rooms, sin cambiar su diseño: el motor del Artifact Composer pasa a ser un paquete versionado distribuido por AXIS, e Insights pasa a dominio propio. Rooms los sigue consumiendo como ya estaba previsto, por paquete y por referencia a una edición autorizada.
+
