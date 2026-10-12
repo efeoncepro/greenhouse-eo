@@ -276,9 +276,11 @@ ALTER VIEW greenhouse_commercial.quoter_current_pointer OWNER TO greenhouse_ops;
 -- El esquema tiene privilegios por defecto que le dan SELECT, INSERT, UPDATE y DELETE al runtime en toda tabla
 -- nueva (task-345). Los disparadores rechazan igual; quitarlos deja dos guardas en vez de una.
 -- greenhouse_migrator recibe ALL por defecto en este esquema y es un perfil de DDL: aquí no escribe filas.
-REVOKE ALL ON greenhouse_commercial.quoter_source_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_pointer_history FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_current_pointer FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+-- greenhouse_app es el usuario con que entra la aplicación y hereda de greenhouse_runtime: lo que se concede al
+-- grupo es lo que la aplicación puede hacer. Se le quita lo que tuviera a título propio y se concede sólo al grupo.
+REVOKE ALL ON greenhouse_commercial.quoter_source_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_pointer_history FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_current_pointer FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
 
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_source_documents TO greenhouse_runtime;
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_pointer_history TO greenhouse_runtime;
@@ -314,20 +316,26 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- El runtime lee y agrega. Los privilegios por defecto del esquema le dan UPDATE y DELETE a toda tabla nueva:
-  -- el REVOKE va antes de este bloque, y aquí se comprueba que surtió efecto.
+  -- Los roles como son en la instancia: la aplicación entra como greenhouse_app, que hereda del grupo
+  -- greenhouse_runtime; las herramientas de migración entran como greenhouse_migrator_user, que hereda del grupo
+  -- greenhouse_migrator. Se comprueba el privilegio EFECTIVO del usuario que entra, no sólo el del grupo: lo que
+  -- cuenta es lo que una conexión real puede hacer. Los privilegios por defecto del esquema le dan UPDATE y DELETE a
+  -- toda tabla nueva: el REVOKE va antes de este bloque, y aquí se comprueba que surtió efecto.
   FOR relation IN SELECT unnest(ARRAY['quoter_source_documents', 'quoter_pointer_history']) LOOP
-    FOR privilege IN SELECT unnest(ARRAY['UPDATE', 'DELETE', 'TRUNCATE']) LOOP
-      IF has_table_privilege('greenhouse_runtime', 'greenhouse_commercial.' || relation, privilege) THEN
-        missing := missing || ' runtime_has_' || privilege || '_on_' || relation;
+    -- La aplicación lee y agrega; nunca actualiza, borra ni trunca.
+    FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app']) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+      IF NOT has_table_privilege(grantee, 'greenhouse_commercial.' || relation, 'INSERT') THEN
+        missing := missing || ' ' || grantee || '_lacks_INSERT_on_' || relation;
       END IF;
     END LOOP;
-    IF NOT has_table_privilege('greenhouse_runtime', 'greenhouse_commercial.' || relation, 'INSERT') THEN
-      missing := missing || ' runtime_lacks_INSERT_on_' || relation;
-    END IF;
 
-    -- Nadie más escribe aquí: ni el rol de lectura ni el de migraciones.
-    FOR grantee IN SELECT unnest(ARRAY['greenhouse_app', 'greenhouse_migrator']) LOOP
+    -- Las herramientas de migración no escriben filas aquí.
+    FOR grantee IN SELECT unnest(ARRAY['greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
       FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
         IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
           missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;

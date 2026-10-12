@@ -33,7 +33,7 @@ const empty = async () => {
 
   databases.push(database)
 
-  const client = await database.connect('greenhouse_runtime')
+  const client = await database.connect('greenhouse_app')
 
   const storage = createPostgresStorage(client, {
     // A person: through the port the pointer is activated on the platform, which only a person does.
@@ -59,7 +59,7 @@ const empty = async () => {
 
 if (localPgEnabled)
   runStorageConformance({
-    name: 'PostgreSQL, over the quoter registry (local cluster, as greenhouse_runtime)',
+    name: 'PostgreSQL, over the quoter registry (local cluster, as greenhouse_app)',
     empty,
     acceptsOnlyCalculated: true,
     pointerNamesOnlyHeldDocuments: true

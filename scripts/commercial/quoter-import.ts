@@ -26,6 +26,7 @@ import { join } from 'node:path'
 import { identifyCurrentSource } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
 import { importSourceDocuments, mirrorRepositoryPointer } from '../../src/lib/commercial/quoter/importer'
 import { closeGreenhousePostgres, withGreenhousePostgresTransaction } from '../../src/lib/postgres/client'
+import { applyGreenhousePostgresProfile, loadGreenhouseToolEnv } from '../lib/load-greenhouse-tool-env'
 import type { ImportCandidate } from '../../src/lib/commercial/quoter/importer'
 import type { CurrentSourceRole } from '../../src/lib/finance/pricing-v3/adapters/current-versions'
 import type { QuoterActor } from '../../src/lib/commercial/quoter/types'
@@ -191,6 +192,10 @@ const main = async () => {
   }
 
   if (!reason || reason.trim().length < 5) throw new ImportRefused('MISSING_ARGUMENT', { option: '--reason' })
+
+  // As the runtime: the role the platform writes these tables as. If the import works, so do its grants.
+  loadGreenhouseToolEnv()
+  applyGreenhousePostgresProfile('runtime')
 
   if (command === 'documents') {
     const candidates = candidatesOrRefuse()

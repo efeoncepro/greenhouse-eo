@@ -1,6 +1,6 @@
 // The quote aggregate against the local cluster (TASK-2025, Slice 3).
 //
-// Connects as `greenhouse_runtime`, the role the platform runs as. Every rule is exercised twice: through the store
+// Connects as `greenhouse_app`, the user the platform logs in as (it inherits from the group `greenhouse_runtime`). Every rule is exercised twice: through the store
 // (`quote-store.ts`), which answers with a `QuoterError`, and with raw SQL that skips the store, which the database
 // must refuse by a NAMED constraint. Assertions read the SQLSTATE and that name, never the text of a message.
 //
@@ -97,7 +97,7 @@ const classify = () => {
   return { inPolicy: inPolicy.sort(bySize), belowFloor: belowFloor.sort(bySize), notCalculated }
 }
 
-describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as greenhouse_runtime)', () => {
+describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as greenhouse_app)', () => {
   // Sorted on first use, inside a test or a hook: a skipped run never parses the 38 MB of the corpus.
   let classified: ReturnType<typeof classify> | undefined
   const corpus = () => (classified ??= classify())
@@ -123,8 +123,8 @@ describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as gree
 
     return {
       database,
-      runtime: await database.connect('greenhouse_runtime'),
-      other: await database.connect('greenhouse_runtime'),
+      runtime: await database.connect('greenhouse_app'),
+      other: await database.connect('greenhouse_app'),
       ops: await database.connect('greenhouse_ops')
     }
   }
@@ -1333,7 +1333,7 @@ describe.skipIf(!localPgEnabled)('quoter quote aggregate (local cluster, as gree
     })
 
     it('the migrations role writes no row here: it cannot hand a number to a draft, move the counter or add a pair', async () => {
-      const migrator = await database.connect('greenhouse_migrator')
+      const migrator = await database.connect('greenhouse_migrator_user')
       const { quoteId } = await create(runtime, fresh(), { origin: 'synthetic' })
 
       for (const statement of [

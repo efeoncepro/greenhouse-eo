@@ -6,7 +6,7 @@
 // quoter tests a database that looks like the real one where it matters:
 //
 //   - PostgreSQL 16, the major version of the shared instance;
-//   - `greenhouse_ops` owns the objects and is NOT a superuser; the tests connect as `greenhouse_runtime`, so the
+//   - `greenhouse_ops` owns the objects and is NOT a superuser; the tests connect as `greenhouse_app` (member of `greenhouse_runtime`), so the
 //     GRANTs of the migrations are exercised, not bypassed;
 //   - the quoter migrations themselves are applied (their `Up` half), then taken down, checked to leave nothing
 //     behind, and applied again.
@@ -152,12 +152,22 @@ const prepare = () => {
     'postgres',
     `DO $$
      BEGIN
+       -- The roles and their memberships as the shared instance has them (read from pg_roles and pg_auth_members on
+       -- 2026-10-12): the application logs in as greenhouse_app, which inherits from the group greenhouse_runtime;
+       -- migrations tooling logs in as greenhouse_migrator_user, which inherits from the group greenhouse_migrator;
+       -- greenhouse_ops owns everything and is a member of the three. The two groups do not log in.
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_ops') THEN CREATE ROLE greenhouse_ops LOGIN; END IF;
-       IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_runtime') THEN CREATE ROLE greenhouse_runtime LOGIN; END IF;
+       IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_runtime') THEN CREATE ROLE greenhouse_runtime; END IF;
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_app') THEN CREATE ROLE greenhouse_app; END IF;
-       IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_migrator') THEN CREATE ROLE greenhouse_migrator LOGIN; END IF;
-       ALTER ROLE greenhouse_migrator LOGIN;
+       IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_migrator') THEN CREATE ROLE greenhouse_migrator; END IF;
        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'greenhouse_migrator_user') THEN CREATE ROLE greenhouse_migrator_user; END IF;
+       ALTER ROLE greenhouse_runtime NOLOGIN;
+       ALTER ROLE greenhouse_migrator NOLOGIN;
+       ALTER ROLE greenhouse_app LOGIN;
+       ALTER ROLE greenhouse_migrator_user LOGIN;
+       GRANT greenhouse_runtime TO greenhouse_app;
+       GRANT greenhouse_migrator TO greenhouse_migrator_user;
+       GRANT greenhouse_app, greenhouse_migrator, greenhouse_migrator_user TO greenhouse_ops;
      END $$;`
   )
 

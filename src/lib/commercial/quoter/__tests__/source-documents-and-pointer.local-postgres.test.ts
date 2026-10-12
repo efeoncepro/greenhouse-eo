@@ -1,6 +1,6 @@
 // Source documents by digest and the pointer history, against the local cluster (TASK-2025, Slice 2).
 //
-// Connects as `greenhouse_runtime`, the role the platform runs as, so what is exercised is the migration with its
+// Connects as `greenhouse_app`, the user the platform logs in as (it inherits from the group `greenhouse_runtime`), so what is exercised is the migration with its
 // GRANTs and its triggers, not a superuser walking around them. Runs only through `pnpm quoter:test:local`.
 // Skipped otherwise, and skipped is not green.
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -33,7 +33,7 @@ const quoterCode = async (operation: Promise<unknown>) => {
   return 'resolved'
 }
 
-describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local cluster, as greenhouse_runtime)', () => {
+describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local cluster, as greenhouse_app)', () => {
   const corpus = loadStorageCorpus()
   const document = (role: 'catalog' | 'policy' | 'credits') => corpus.documents.find(candidate => candidate.digest === corpus.pointer[role].digest)!
 
@@ -68,7 +68,7 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
 
   beforeAll(async () => {
     database = await createLocalDatabase()
-    runtime = await database.connect('greenhouse_runtime')
+    runtime = await database.connect('greenhouse_app')
     ops = await database.connect('greenhouse_ops')
   })
 
@@ -249,7 +249,7 @@ describe.skipIf(!localPgEnabled)('quoter source documents and pointer (local clu
   })
 
   it('two activations over the same pointer: exactly one enters', async () => {
-    const other = await database.connect('greenhouse_runtime')
+    const other = await database.connect('greenhouse_app')
     const inForce = (await readCurrentPointer(runtime))!
     const base = corpus.pointer
 

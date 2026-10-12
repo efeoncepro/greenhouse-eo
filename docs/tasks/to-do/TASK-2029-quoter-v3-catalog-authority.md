@@ -6,6 +6,16 @@
      Un agente lee esto primero. Si Lifecycle = complete, STOP.
      ═══════════════════════════════════════════════════════════ -->
 
+
+## Delta 2026-10-12
+
+- **`TASK-2025`: un documento fuente se guarda como se recibió.** El registro guarda el texto de un catálogo, una
+  política o un catálogo de créditos tal cual llegó (`document_text`), con una huella del texto para la base y la
+  huella de identidad que nombra el puntero. La exportación al repo escribe **ese mismo texto**, sin reformatear ni
+  reordenar claves: una cotización lleva dentro los documentos con que se calculó, y sólo con los mismos bytes el
+  artefacto de la plataforma es igual al de la CLI. Al leer se verifica la huella del texto; no se revalida con el
+  validador de hoy.
+
 ## Status
 
 - Lifecycle: `to-do`

@@ -120,6 +120,24 @@ en la plataforma puede alcanzar un sistema de archivos a través del motor. Un `
 del repositorio (así nombra el puntero sus fuentes, y se lee igual en cualquier máquina); la CLI entrega la ruta de un
 flag ya resuelta contra su directorio de trabajo.
 
+### Adaptador PostgreSQL (`TASK-2025`)
+
+`src/lib/commercial/quoter/storage-postgres.ts` implementa el puerto sobre el
+[registro del cotizador](GREENHOUSE_QUOTER_V3_DATA_MODEL_V1.md), dentro de la transacción que recibe. No escribe SQL
+propio: llama a los almacenes del registro. Pasa la misma batería, con dos diferencias que el sujeto declara y la
+batería prueba como rechazos:
+
+- `acceptsOnlyCalculated`: guarda sólo artefactos que calcularon; uno que no calculó se rechaza y no deja nada.
+- `pointerNamesOnlyHeldDocuments`: un puntero entra sólo si los tres documentos que nombra ya están guardados; si no,
+  `CURRENT_VERSIONS_MISMATCH`.
+
+No direcciona por ruta: un documento se pide por rol con versión o huella, y un artefacto por su huella de
+reproducción. El `locator` de un artefacto es una cotización (`<quoteId>` o `<quoteId>@<n>`).
+
+Lo que la batería enseñó al escribirlo: un documento fuente se guarda **como se recibió**, no canónico. Un artefacto
+lleva dentro los documentos con que se calculó, con su orden de claves; con el documento reserializado el artefacto
+de la plataforma tenía otros bytes que el de la CLI (caso 8).
+
 ## Cómo se comprueba
 
 | Qué | Dónde | Qué prueba |

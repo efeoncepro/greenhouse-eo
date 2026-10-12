@@ -47,7 +47,7 @@ const withOtherContent = (text: string) => {
   return JSON.stringify(value)
 }
 
-describe.skipIf(!localPgEnabled)('quoter importer (local cluster, as greenhouse_runtime)', () => {
+describe.skipIf(!localPgEnabled)('quoter importer (local cluster, as greenhouse_app)', () => {
   const corpus = loadStorageCorpus()
 
   const candidates: ImportCandidate[] = corpus.documents.map(document => ({
@@ -71,7 +71,7 @@ describe.skipIf(!localPgEnabled)('quoter importer (local cluster, as greenhouse_
 
   beforeAll(async () => {
     database = await createLocalDatabase()
-    runtime = await database.connect('greenhouse_runtime')
+    runtime = await database.connect('greenhouse_app')
   })
 
   afterAll(async () => database?.drop())
@@ -125,7 +125,7 @@ describe.skipIf(!localPgEnabled)('quoter importer (local cluster, as greenhouse_
 
   it('the same version offered twice with two contents is a conflict among the candidates, and nothing of the run is stored', async () => {
     const fresh = await createLocalDatabase()
-    const client = await fresh.connect('greenhouse_runtime')
+    const client = await fresh.connect('greenhouse_app')
 
     try {
       const catalog = corpus.documents.find(document => document.role === 'catalog')!

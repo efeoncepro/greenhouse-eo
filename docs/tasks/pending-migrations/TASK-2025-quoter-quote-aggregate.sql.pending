@@ -1006,17 +1006,17 @@ ALTER VIEW greenhouse_commercial.quoter_quote_current OWNER TO greenhouse_ops;
 -- nueva, y ALL a greenhouse_migrator (task-345). Se quitan todos y se concede lo justo. El de migraciones es un
 -- perfil de DDL: con INSERT en los números podría darle uno a un borrador y dejar sin salida toda emisión real
 -- posterior, en una tabla de la que nada se borra.
-REVOKE ALL ON greenhouse_commercial.quoter_quotes FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_versions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_version_index FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_state_matrix FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_state_transitions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_recipients FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_number_counters FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_numbers FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_exception_approvals FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_version_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
-REVOKE ALL ON greenhouse_commercial.quoter_quote_current FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator;
+REVOKE ALL ON greenhouse_commercial.quoter_quotes FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_versions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_version_index FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_state_matrix FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_state_transitions FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_recipients FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_number_counters FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_numbers FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_exception_approvals FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_version_documents FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
+REVOKE ALL ON greenhouse_commercial.quoter_quote_current FROM greenhouse_runtime, greenhouse_app, greenhouse_migrator, greenhouse_migrator_user;
 
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quotes TO greenhouse_runtime;
 GRANT SELECT, INSERT ON greenhouse_commercial.quoter_quote_versions TO greenhouse_runtime;
@@ -1106,21 +1106,36 @@ BEGIN
     END IF;
   END LOOP;
 
-  -- El runtime no puede actualizar, borrar ni truncar el historial, ni insertar un número ni mover el contador.
-  FOR relation IN SELECT unnest(ARRAY[
-    'quoter_quotes', 'quoter_quote_versions', 'quoter_state_transitions', 'quoter_quote_recipients',
-    'quoter_quote_numbers', 'quoter_exception_approvals', 'quoter_version_documents', 'quoter_quote_number_counters'
-  ]) LOOP
-    FOR privilege IN SELECT unnest(ARRAY['UPDATE', 'DELETE', 'TRUNCATE']) LOOP
-      IF has_table_privilege('greenhouse_runtime', 'greenhouse_commercial.' || relation, privilege) THEN
-        missing := missing || ' runtime_has_' || privilege || '_on_' || relation;
+  -- Los roles como son en la instancia: la aplicación entra como greenhouse_app, que hereda del grupo
+  -- greenhouse_runtime; las herramientas de migración entran como greenhouse_migrator_user, que hereda del grupo
+  -- greenhouse_migrator. Se comprueba el privilegio EFECTIVO de quien entra, no sólo el del grupo.
+  --
+  -- La aplicación no puede actualizar, borrar ni truncar el historial, y sí agregarle filas.
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app']) LOOP
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_state_transitions', 'quoter_quote_recipients',
+      'quoter_quote_numbers', 'quoter_exception_approvals', 'quoter_version_documents', 'quoter_quote_number_counters'
+    ]) LOOP
+      FOR privilege IN SELECT unnest(ARRAY['UPDATE', 'DELETE', 'TRUNCATE']) LOOP
+        IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
+          missing := missing || ' ' || grantee || '_has_' || privilege || '_on_' || relation;
+        END IF;
+      END LOOP;
+    END LOOP;
+
+    FOR relation IN SELECT unnest(ARRAY[
+      'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_transitions',
+      'quoter_quote_recipients', 'quoter_exception_approvals', 'quoter_version_documents'
+    ]) LOOP
+      IF NOT has_table_privilege(grantee, 'greenhouse_commercial.' || relation, 'INSERT') THEN
+        missing := missing || ' ' || grantee || '_lacks_INSERT_on_' || relation;
       END IF;
     END LOOP;
   END LOOP;
 
-  -- Nadie más que el dueño escribe en los números, el contador o la matriz; el de lectura y el de migraciones no
+  -- Nadie más que el dueño escribe en los números, el contador o la matriz; las herramientas de migración no
   -- escriben en ninguna tabla del agregado.
-  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator']) LOOP
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
     FOR relation IN SELECT unnest(ARRAY['quoter_quote_numbers', 'quoter_quote_number_counters', 'quoter_state_matrix']) LOOP
       FOR privilege IN SELECT unnest(ARRAY['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE']) LOOP
         IF has_table_privilege(grantee, 'greenhouse_commercial.' || relation, privilege) THEN
@@ -1130,7 +1145,7 @@ BEGIN
     END LOOP;
   END LOOP;
 
-  FOR grantee IN SELECT unnest(ARRAY['greenhouse_app', 'greenhouse_migrator']) LOOP
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
     FOR relation IN SELECT unnest(ARRAY[
       'quoter_quotes', 'quoter_quote_versions', 'quoter_quote_version_index', 'quoter_state_transitions',
       'quoter_quote_recipients', 'quoter_exception_approvals', 'quoter_version_documents'
@@ -1143,9 +1158,11 @@ BEGIN
     END LOOP;
   END LOOP;
 
-  IF has_function_privilege('greenhouse_runtime', 'greenhouse_commercial.quoter_assign_number_on_first_issue()', 'EXECUTE') THEN
-    missing := missing || ' runtime_can_execute_number_assignment';
-  END IF;
+  FOR grantee IN SELECT unnest(ARRAY['greenhouse_runtime', 'greenhouse_app', 'greenhouse_migrator', 'greenhouse_migrator_user']) LOOP
+    IF has_function_privilege(grantee, 'greenhouse_commercial.quoter_assign_number_on_first_issue()', 'EXECUTE') THEN
+      missing := missing || ' ' || grantee || '_can_execute_number_assignment';
+    END IF;
+  END LOOP;
 
   IF missing <> '' THEN
     RAISE EXCEPTION 'TASK-2025 anti pre-up-marker check (agregado de cotización): faltan objetos o sobran permisos:%', missing;

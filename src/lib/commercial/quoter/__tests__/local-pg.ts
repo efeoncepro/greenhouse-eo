@@ -23,7 +23,12 @@ const DATA_SUFFIX = '/.captures/task-2025/pg16-data'
 /** Whether the local cluster was handed to this run. Use with `describe.skipIf(!localPgEnabled)`. */
 export const localPgEnabled = Boolean(socket)
 
-export type LocalRole = 'postgres' | 'greenhouse_ops' | 'greenhouse_runtime' | 'greenhouse_migrator'
+/**
+ * The roles that LOG IN, as on the shared instance: the application is `greenhouse_app` (it inherits from the group
+ * `greenhouse_runtime`) and migrations tooling is `greenhouse_migrator_user` (it inherits from `greenhouse_migrator`).
+ * The two groups do not log in, there or here.
+ */
+export type LocalRole = 'postgres' | 'greenhouse_ops' | 'greenhouse_app' | 'greenhouse_migrator_user'
 
 const connect = async (role: LocalRole, database: string) => {
   if (!socket || !socket.startsWith('/') || !socket.endsWith(SOCKET_SUFFIX))

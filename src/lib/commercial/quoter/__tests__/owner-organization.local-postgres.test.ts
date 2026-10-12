@@ -28,7 +28,7 @@ describe.skipIf(!localPgEnabled)('the owner of every quote (local cluster)', () 
 
   beforeAll(async () => {
     database = await createLocalDatabase()
-    runtime = await database.connect('greenhouse_runtime')
+    runtime = await database.connect('greenhouse_app')
     ops = await database.connect('greenhouse_ops')
   })
 

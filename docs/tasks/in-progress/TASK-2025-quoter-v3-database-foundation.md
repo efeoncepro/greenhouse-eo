@@ -84,6 +84,15 @@ difiere de lo que esta task suponía, y que el Slice 5 debe respetar para pasar 
   `quoter_requires_read_committed`); un miembro vacío (`''`) pasaba por identificado; la hora de cada fila la fija el
   reloj de la base; la bajada de una migración aborta si hay una cotización real; `search_path` de la función
   `SECURITY DEFINER` con `pg_temp` explícito; una transacción escribe una sola cotización.
+- **Lectura de la base compartida antes de pedir el visto bueno (sólo lectura, 2026-10-12).** PostgreSQL 16.14,
+  UTF8, `READ COMMITTED` por defecto; `sha256` inmutable y `convert_to` estable, igual que en local; `EO-ORG-0007` es
+  la entidad operativa activa y es la única; ninguna tabla `quoter_*` ni capacidad `commercial.quoter.*` todavía;
+  `pnpm migrate:status` sin migraciones pendientes de otra sesión. **Y un defecto que habría abortado la migración
+  en producción:** la aplicación entra como `greenhouse_app`, que **hereda** de `greenhouse_runtime` (un grupo que no
+  inicia sesión), y el bloque de verificación exigía que `greenhouse_app` no tuviera `INSERT`. Corregido: se concede
+  al grupo, se comprueba el privilegio efectivo de los usuarios que entran (`greenhouse_app`,
+  `greenhouse_migrator_user`), y el carril local reproduce esos roles y membresías; las pruebas conectan como
+  `greenhouse_app`.
 
 <!-- ═══════════════════════════════════════════════════════════
      ZONE 0 — IDENTITY & TRIAGE
