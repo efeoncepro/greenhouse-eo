@@ -1,5 +1,15 @@
 # Handoff
 
+## 2026-10-13 — Outreach personalizado y seguimiento HubSpot
+
+[Registro](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md): Paula, Nicol, Fiorella,
+Sergio, Hernán y Jesús; Outlook web, firma gráfica, brochure contextual y seis EMAIL `SENT` en HubSpot.
+Rafael excluido; Paula conserva correo deducido sin verificación de entrega. Revisar hilos antes de
+seguimiento. [Procedimiento reusable](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md#prospección-personalizada--criterio-confirmado-el-13102026);
+sin renovación del corte global del pipeline. Mandato posterior: [seis secuencias HubSpot](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md),
+18 correos para 16/22/29 octubre; seis `Programado`, firma Julio y parada por respuesta verificados.
+Apollo detenido: seis borradores inactivos, cero inscritos. No duplicar ni ampliar este lote autorizado.
+
 ## 2026-10-12 — Propuesta de campaña creativa: aprendizajes documentados (caso Sika N.º 1164)
 
 Paquete del caso terminado y **no presentado** en Wherex (cierre 16/10, 16:00 de Ciudad de México): anexo gráfico v2, deck técnico de 22 láminas,

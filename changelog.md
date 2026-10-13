@@ -7,6 +7,18 @@
 > Techo operativo: 60 entradas, 2.000 líneas y ~60.000 tokens. Rotación:
 > `pnpm docs:context-rotate --apply`.
 
+## 2026-10-13 — Prospección personalizada: Outlook y seguimiento HubSpot
+
+- [Política y ruta gráfica](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md): contexto individual,
+  empatía, motivo para elegir Efeonce, brochure explicado y firma instalada en Outlook web; Enviados,
+  adjuntos y EMAIL de HubSpot comprobados por separado. Criterio enlazado desde las skills espejo de HubSpot.
+- [Registro de seis envíos](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md),
+  estado focalizado y continuidad de WIN actualizados; Rafael excluido y salvedad de Paula conservada.
+  No renueva el corte global del pipeline ni concede autonomía recurrente de envío.
+- Mandato posterior: [seis secuencias HubSpot, 18 seguimientos](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md)
+  para 16/22/29 octubre en horas locales laborales. Inscripciones `Programado`, firma global Julio y
+  parada por respuesta verificados. Apollo inactivo, cero inscritos. Preferencia y alcance documentados.
+
 ## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
 
 - [Playbook de punta a punta](docs/operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md) (caso fuente Sika N.º 1164): cinco piezas, secuencia,
@@ -545,10 +557,3 @@ Select/Combobox con opciones enriquecidas y grupos, recuperación remota y reset
   `MEDIA_WORKER_UPLOAD_VERIFY_ENABLED` ON. 33 piezas de CMP-004 cargadas en producción, pendientes de revisión.
   Capability en Greenhouse y sync del gateway quedan pendientes.
   [Task](docs/tasks/in-progress/TASK-1894-marketing-studio-write-commands-authority-cutover.md).
-
-## 2026-10-02 — Kortex profundamente hibernado y forecast GCP reconciliado
-
-- Kortex queda reversible y sin compute productivo: Vercel pausado, Cloud Run internal/IAM/min0, Cloud Tasks
-  pausado/vacío y SQL `STOPPED/NEVER`. Septiembre registró CLP 10.480,64 netos; el residual ~CLP 3.500/mes y el
-  forecast consolidado CLP 237.068,14/mes (rango 230k–245k) siguen modelados hasta contar con ventanas completas
-  post-corte. [Estado, método y evidencia](docs/audits/cloud-cost/CLOUD_COST_AND_KORTEX_HIBERNATION_2026-10-02.md).

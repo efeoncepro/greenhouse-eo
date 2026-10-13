@@ -24,6 +24,7 @@ Greenhouse: Next.js 16/MUI 7/Vuexy/TS. Estado: `Handoff.md`. Historia:
 
 [Comercial](docs/commercial/README.md). [Prospección por cuenta: recorridos](.codex/skills/efeonce-b2b-prospecting/SKILL.md).
 [CRM](docs/context/11_hubspot-bowtie.md).
+Outlook de Julio: [envíos](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND_POLICY_V1.md).
 
 Reingresos: [contrato](docs/architecture/GREENHOUSE_WORKFORCE_REENTRY_RECOVERY_DECISION_V1.md).
 
