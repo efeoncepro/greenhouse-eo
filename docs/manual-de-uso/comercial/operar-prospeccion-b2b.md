@@ -78,6 +78,17 @@ El piloto del informe es propuesta y requiere parámetros/capacidad aprobados an
 Usar sólo las plantillas del paso actual y enlazar expediente/HSP/seguimiento existente. Las cinco mejoras
 actualizan el método; la autorización para crearlas no inicia piloto, campañas, pausas, DNS ni registros CRM.
 
+## Programar seguimientos personalizados en HubSpot
+
+Cargar el [módulo de secuencias](../../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
+y HubSpot. Para Julio, la plataforma es HubSpot; no reemplazarla por Apollo. Reutilizar autorización del
+lote sin repetir confirmaciones; definir textos, aporte nuevo, brochure explicado y calendario finito.
+Verificar mailbox/firma, días laborables y zona local, respuesta a cualquier correo y reunión desactivada
+si el mandato exige seguir hasta respuesta. Seleccionar **Enviar más tarde**, comprobar las fechas de todos
+los pasos e iniciar dentro del permiso. «Procesando» no es cierre: releer contacto, Programado y fecha.
+No duplicar desde el heartbeat, ampliar destinatarios ni reiniciar a quien respondió. El logging nativo CRM
+se distingue del CCO de Outlook. [Caso real y límites](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+
 ## Problemas frecuentes
 
 | Observación | Acción |
@@ -91,6 +102,9 @@ actualizan el método; la autorización para crearlas no inicia piloto, campaña
 | Reply/baja/OOO/bounce | Clasificar alcance y proponer parada/revisión; settings no se presumen sincronizados |
 | Falta Sales/provider/harness | Descubrir capability real, usar contexto equivalente o declarar carril pendiente; no fingir ejecución |
 | Opens sin respuesta | Diagnóstico limitado, no calidez; no repetir mensaje por un scanner |
+| Secuencia futura ofrece Enviar ahora | Elegir Enviar más tarde y verificar fechas de todos los pasos antes de iniciar |
+| Apollo lista el mailbox pero el operador pidió HubSpot | Mantener HubSpot; comprobar conexión/firma allí, sin fallback de envío |
+| HubSpot dice Procesando inscripciones | Estado intermedio: reconciliar Programado/contacto/fecha antes de reportar éxito o reintentar |
 | La respuesta trae más de lo pedido | Pedir sólo la decisión y su brecha; la entrega completa es para dossier o handoff |
 | Se trabaja desde Claude | Radar HSP no disponible; créditos de Apollo según el módulo de sesión Claude; conectores se comprueban al iniciar |
 | «Registrar contactos» y la Company no existe | La autorización cubre crear la Company si la entidad está verificada; su nota sólo si el pedido la nombra; Lead y Deal siempre aparte |

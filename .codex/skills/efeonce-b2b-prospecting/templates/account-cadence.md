@@ -27,9 +27,14 @@ Reactivación: <nueva razón y revisión de permisos/restricciones; sin reinicio
 
 Remitente/destinatario verificados: <evidencia privada, email individual y canal accionable>.
 Configuración de pasos/paradas: <provider, portal, comprobación; no asumir defaults>.
+Si hay secuencia autorizada: <HubSpot, ID/owner/inscrito; mailbox y firma predeterminada comprobados>.
+Calendario calculado: <inicio Enviar más tarde; fechas de todos los pasos, zona horaria, ventana vs hora exacta>.
+Contenido por paso: <aporte nuevo, razón para elegir Efeonce, brochure y explicación, respuesta nativa o hilo nuevo>.
+Paradas guardadas: <respuesta a cualquier correo; alcance Contact/Company; reunión; protecciones nativas>.
 Cambios concretos pendientes de aprobación o ejecución: <acción/owner, autorización faltante si procede>.
 Resultado/readback: <acciones efectivas, paradas propuestas vs aplicadas, pasos pendientes, duplicados>.
 Métricas por cuenta: <conversación útil / siguiente paso bilateral / resultado; denominador y ventana>.
 Siguiente revisión: <acción, owner, fecha/evento>. Datos a revalidar: <fuente y condición>.
 
 Plantilla de método, no scheduler. Un plan preparado no está inscrito, enviado ni pausado.
+Para programar, aplicar [ejecución y readback HubSpot](../references/hubspot-follow-up-sequences.md).

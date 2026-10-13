@@ -51,7 +51,8 @@ una exclusión definitiva de toda la organización.
 
 Antes de enrollment o ejecución, HubSpot/owner del canal comprueban destinatario, remitente, permisos,
 acciones concretas, horarios, pasos existentes y configuración de paradas. El enrollment no es sólo guardar
-un plan. En HubSpot inicia el primer paso inmediatamente; las bajas por reply/reunión tienen configuración
+un plan. En HubSpot el primer paso ofrece envío inmediato por defecto: para inicio futuro elegir y verificar
+**Enviar más tarde** antes de iniciar. Las bajas por reply/reunión tienen configuración
 y alcance Contact/Company. Las tareas de email/llamada son recordatorios manuales, no envíos o llamadas
 efectuados. Estas capacidades documentadas no certifican la configuración de nuestro portal.
 
@@ -63,6 +64,10 @@ que está suspendida. El remitente de Julio conserva [firma y CCO](../../../../d
 Antes de retomar, leer último paso efectuado, respuesta y próximos programados; actualizar el plan y verificar
 ausencia de duplicados. Mantener preparados/aprobados/ejecutados/verificados separados. El seguimiento usa
 el expediente y scheduler existentes; esta plantilla no crea automatización.
+
+Para una secuencia explícitamente autorizada, cargar [ejecución HubSpot](hubspot-follow-up-sequences.md):
+aporte distinto por paso, brochure explicado, firma/mailbox, calendario local, parada por cualquier respuesta
+y lectura nueva de Programado. Una regla por reunión no sustituye el mandato de parar por respuesta.
 
 ## Fuentes y límites
 

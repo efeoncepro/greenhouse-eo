@@ -20,14 +20,9 @@ Casos y evidencia: `docs/commercial/follow-up-agent/runs/2026-10-08-outreach-man
 
 ## Secuencias autorizadas explícitamente
 
-Preferencia confirmada 13/10: **HubSpot, no Apollo**. El mandato puede autorizar un lote finito sin
-ampliar el heartbeat general. Caso: `docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md`.
-Preparar cada paso con un aporte contextual distinto y un brochure explicado; usar Insertar → Documentos
-para generar enlaces nativos. Verificar correo conectado, firma global del usuario y una sola firma.
-Configurar días laborables, zona horaria del destinatario, retrasos y **Enviar más tarde** para el primer paso.
-Automatizar: respuesta a cualquier correo → desinscribir el contacto; reunión desactivada si el mandato
-exige seguir hasta respuesta. Mantener protecciones nativas de bajas/rebotes. Tras iniciar, leer de nuevo
-`Programado`, contacto, fecha y reglas guardadas. Inscripción no es envío ni prueba de entrega. El registro
-de secuencias es nativo CRM: no inferir CCO ni declarar una firma renderizada si sólo se verificó su HTML.
-No duplicar con correos manuales ni retomar borradores Apollo detenidos. El siguiente lote requiere su
-propio alcance autorizado; la preferencia de plataforma se conserva.
+Preferencia confirmada 13/10: **HubSpot, no Apollo**. Método reusable dueño de Prospecting:
+[seguimientos personalizados programados](../../efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md).
+HubSpot ejecuta dentro del lote autorizado: mailbox/firma, documentos nativos, fechas de todos los pasos,
+Enviar más tarde, reglas de respuesta y lectura independiente de Programado. No duplicar desde el heartbeat,
+no inferir CCO ni delivery/rendering. El siguiente lote necesita su propio alcance; conservar la plataforma.
+Caso y límites: `docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md`.

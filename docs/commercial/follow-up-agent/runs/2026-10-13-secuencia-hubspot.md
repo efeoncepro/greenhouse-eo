@@ -63,6 +63,14 @@ Apollo o la inscripción no constituyen validación independiente ni confirmaci�
 
 Canon de autoridad: [decisión de seguimiento y mandato acotado](../../../architecture/GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md).
 Contexto inicial: [ronda de seis enviados](2026-10-13-outreach-personalizado.md).
+Procedimiento reusable incorporado a [Prospecting](../../../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
+y su [manual](../../../manual-de-uso/comercial/operar-prospeccion-b2b.md#programar-seguimientos-personalizados-en-hubspot).
+
+Actualización documental solicitada después: módulo cargable desde SKILL.md, cadencia, mensaje,
+entregabilidad y respuesta; plantilla con campos de ejecución; adapter HubSpot y radar personal enlazados
+al mismo canon. Fixtures v9 añaden P51–P55; los cincuenta escenarios anteriores se conservan. Validación
+estructural de frontmatter, enlaces, rúbrica y espejos; no se ejecutó una nueva evaluación ciega del modelo
+ni se modificaron las seis secuencias externas como consecuencia de esta actualización de docs/skills.
 
 Evidencia privada fuera de Git: `~/.codex/agent-data/hubspot-saas-prospecting/envios-contextuales-2026-10-13/`:
 `hubspot-secuencias.json`, `hubspot-readback-<sequenceId>.txt`, `hubspot-previo-<sequenceId>.txt`,

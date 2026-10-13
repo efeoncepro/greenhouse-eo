@@ -9,6 +9,8 @@ seguimiento. [Procedimiento reusable](docs/operations/EFEONCE_OUTLOOK_AGENT_SEND
 sin renovación del corte global del pipeline. Mandato posterior: [seis secuencias HubSpot](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md),
 18 correos para 16/22/29 octubre; seis `Programado`, firma Julio y parada por respuesta verificados.
 Apollo detenido: seis borradores inactivos, cero inscritos. No duplicar ni ampliar este lote autorizado.
+Método incorporado a la [skill de prospección](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
+y manual; espejos Codex/Claude y fixtures de secuencias. Actualización documental, sin nuevos envíos.
 
 ## 2026-10-12 — Propuesta de campaña creativa: aprendizajes documentados (caso Sika N.º 1164)
 

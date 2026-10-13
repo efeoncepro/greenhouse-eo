@@ -54,3 +54,8 @@ Si se autoriza envío desde Outlook de Julio, cargar la [política de firma/CCO]
 y verificar el canal real. Borrador, envío, Enviados e ingestión HubSpot son estados separados.
 
 Para concretar pasos por persona/canal y coordinación de cuenta, usar [cadencia](account-cadence.md); ante respuesta, [tratamiento](response-handling.md). Antes de ejecución por email autorizada, comprobar [entregabilidad](deliverability-operations.md).
+
+Para varios correos programados, cargar [seguimientos HubSpot](hubspot-follow-up-sequences.md).
+Cada paso necesita un aporte nuevo ligado a su contexto, empatía y una razón concreta para elegir Efeonce.
+Si se pidió brochure en cada mensaje, explicar su utilidad antes del enlace nativo; no reutilizar tracking
+ajeno ni repetir la presentación. Personalización completa por persona, no sólo nombres/empresas.

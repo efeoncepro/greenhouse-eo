@@ -47,6 +47,11 @@ investigación/borradores. Si el pedido dice «campaña» y los hechos describen
 lectura y responderla. Nunca convertir falta de telemetría en permiso para escalar. Cambios correctivos se
 entregan como propuesta concreta al owner con su autoridad propia.
 
+En [seguimientos nativos HubSpot](hubspot-follow-up-sequences.md), verificar mailbox, firma predeterminada,
+calendario local, reglas de parada y logging nativo. No sustituir el transporte por Apollo por tener un
+mailbox listado allí; no inferir CCO ni rendering de firma a partir de la configuración. Programado no es
+enviado y el lote autorizado no amplía el volumen de otras iniciativas.
+
 ## Autenticación: qué verificar y qué no inferir
 
 SPF evalúa la fuente autorizada para el dominio del envelope; DKIM verifica una firma del dominio firmante.

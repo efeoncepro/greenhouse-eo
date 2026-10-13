@@ -18,6 +18,9 @@
 - Mandato posterior: [seis secuencias HubSpot, 18 seguimientos](docs/commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md)
   para 16/22/29 octubre en horas locales laborales. Inscripciones `Programado`, firma global Julio y
   parada por respuesta verificados. Apollo inactivo, cero inscritos. Preferencia y alcance documentados.
+- [Módulo de secuencias en Prospecting](.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md),
+  routing, cadencia/mensaje/respuesta/entregabilidad, template, manual y adapter HubSpot espejados.
+  Fixtures v9 P51–P55 cubren plataforma, autorización, programación, personalización y evidencia; sin nueva ejecución externa.
 
 ## 2026-10-12 — Propuesta de campaña creativa: playbook y skills
 

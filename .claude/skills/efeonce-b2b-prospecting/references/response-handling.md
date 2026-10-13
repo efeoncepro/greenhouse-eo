@@ -58,6 +58,12 @@ Reply y reunión pueden detener secuencias según configuración; Company puede 
 quedar inscrito o salir según cliente. Unenroll detiene pasos futuros, sin retirar emails enviados; re-enrollment
 puede duplicar mensajes. Revisar estado/pasos del destinatario y canales paralelos antes de retomar.
 
+Para el mandato de seguir hasta respuesta, comprobar la [regla nativa](hubspot-follow-up-sequences.md):
+**respuesta a cualquier correo → desinscribir el contacto**, incluyendo el primer mensaje de Outlook;
+reunión desactivada si ésa es la condición pedida. Conservar protecciones de bajas/rebotes y tratamiento
+separado de OOO. Al responder, conciliar pendientes en el proveedor; no reinstalar la cadencia ni duplicar
+desde el heartbeat. La revisión documental no verifica que hoy se haya recibido una respuesta.
+
 ## Fuentes y límites
 
 - Consulta **2026-10-11**, [HubSpot: Unenroll contacts from a sequence](https://knowledge.hubspot.com/sequences/unenroll-from-sequence), actualizado 2026-08-26: condiciones de parada, OOO y reinicio. No certifica la configuración efectiva, la sincronización con Apollo/Outlook ni acceso por API/CLI en nuestro portal.

@@ -71,18 +71,27 @@ no garantiza inbox ni cambia configuración. La pausa diseñada y aplicada, env�
 ingestión HubSpot se informan separadas. Commercial conserva venta/objeciones; HubSpot/proveedor las acciones.
 [Manual del recorrido](../../manual-de-uso/comercial/operar-prospeccion-b2b.md#se%C3%B1al-entrada-cadencia-respuesta-y-entrega).
 
+## Seguimientos programados
+
+Con mandato explícito, el [módulo de secuencias HubSpot](../../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
+convierte el plan en pasos personalizados, brochures con contexto, firma predeterminada y calendario
+laboral local. Para Julio se conserva HubSpot, no Apollo. Comprobar respuesta a cualquier correo, inicio
+futuro y estado Programado por persona; no confundir inscripción, envío, entrega o eficacia. La autorización
+es por lote, sin ampliar el heartbeat. [Caso del 13/10](../../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md).
+
 ## Roles y continuidad
 
 Commercial dirige avance de venta; Customer Model el ICP/grupo comprador; prácticas oferta/capacidad/proof;
 Copywriting mensajes; HubSpot CRM/dedupe/asociaciones/readback. Sales opcional apoya la fase adecuada cuando
 se encuentra instalado o se invoca; no sustituye reglas Efeonce. El radar personal conserva HSP, reporte,
-datos privados y scheduler. No se crea una segunda lista operativa ni automatización.
+datos privados y scheduler. La investigación no crea una segunda lista ni automatización; una secuencia
+requiere su mandato concreto y readback.
 
 ## Límites y verificación
 
 No son resultados comerciales: opens, intent score, etapa/Lead automático, cargo, fee propuesto o brochure
 aprobado. Medir conversaciones útiles y pasos acordados por cuenta, con costo y denominador.
-La skill no fija tarifas ni modifica ICP, provider settings, lifecycle/schema o permisos. Gate económico
+La invocación de la skill no fija tarifas ni autoriza cambios de ICP, provider settings, lifecycle/schema o permisos. Gate económico
 ICP y estado propuesto del plan outbound tienen discrepancia visible; decisiones del caso van al operador.
 Una dependencia ausente afecta el carril concreto; no equivale a ausencia de demanda.
 Evaluación offline y espejos validan método/archivos; eficacia, deliverability y ejecución live requieren

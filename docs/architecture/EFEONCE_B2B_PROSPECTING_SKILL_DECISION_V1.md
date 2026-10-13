@@ -142,6 +142,19 @@ Tras corregir, la skill mantuvo 20 de 20 aprobadas sin fallos críticos, bajó e
 8 % por debajo del brazo sin skill en extensión. Es extensión del método aprobado, sin runtime, schema,
 créditos, CRM ni envíos. [Evidencia, límites y pendientes](../audits/commercial/2026-10-12-prospecting-claude-blind-differential.md).
 
+### Delta aceptado 2026-10-13 — seguimientos nativos en HubSpot
+
+Tras ejecutar el lote de seis secuencias, Julio pidió incorporar el procedimiento a docs y skills de
+prospección. El [módulo](../../.codex/skills/efeonce-b2b-prospecting/references/hubspot-follow-up-sequences.md)
+conserva HubSpot como plataforma de sus secuencias; Apollo no es fallback de envío. Prospecting posee
+texto/contexto/cadencia, HubSpot mailbox/firma/inscripción/readback. Cada paso aporta valor distinto y
+explica el brochure; la programación verifica fechas locales, Enviar más tarde y regla por cualquier
+respuesta. Registro nativo y CCO Outlook se distinguen; Programado no es envío ni evidencia de rendering.
+Se agrega routing, plantilla y escenarios sintéticos; espejos idénticos. La aprobación actualiza método,
+sin nuevo runtime, scheduler, schema, inscripción ni autorización de lotes adicionales. El
+[mandato de ejecución](GREENHOUSE_COMMERCIAL_FOLLOWUP_AGENT_DECISION_V1.md#mandato-separado-y-acotado--2026-10-13)
+y la [evidencia del caso](../commercial/follow-up-agent/runs/2026-10-13-secuencia-hubspot.md) conservan su alcance separado.
+
 ## Alternatives Considered
 
 - **Ampliar sólo la skill personal:** no comparte método ni corrige routing/deriva entre agentes.

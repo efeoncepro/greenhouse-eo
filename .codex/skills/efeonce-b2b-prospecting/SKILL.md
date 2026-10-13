@@ -1,6 +1,6 @@
 ---
 name: efeonce-b2b-prospecting
-description: Investiga cuentas B2B para Efeonce, identifica compradores y contactos relacionados con correo accionable y prepara rutas de acceso, mensajes y entregas a Commercial/HubSpot. Úsala para prospección fría, tibia, cálida, referidos, reactivación, expansión y coordinación ABM/ABS, señales, cadencias, respuestas y entregabilidad por cuenta; el radar personal conserva su ejecución recurrente.
+description: Investiga cuentas B2B para Efeonce, identifica compradores y contactos relacionados con correo accionable y prepara rutas de acceso, mensajes y entregas a Commercial/HubSpot. Úsala para prospección fría, tibia, cálida, referidos, reactivación, expansión y coordinación ABM/ABS, señales, cadencias, seguimientos personalizados programados en HubSpot, respuestas y entregabilidad por cuenta; el radar personal conserva su ejecución recurrente.
 ---
 
 # Prospección B2B Efeonce
@@ -63,6 +63,7 @@ Ownership y modo degradado: [decisión del método](../../../docs/architecture/E
 | Convertir una señal en validación y siguiente acción | [signal-to-action](references/signal-to-action.md) |
 | Elegir entrada por proveedor/equipo/proyecto/transformación/operación | [situation-entry-playbooks](references/situation-entry-playbooks.md) + Commercial/práctica |
 | Coordinar personas, canales, pasos y pausas de una cuenta | [account-cadence](references/account-cadence.md) |
+| Programar seguimientos personalizados por email | [hubspot-follow-up-sequences](references/hubspot-follow-up-sequences.md) + HubSpot; preferencia de Julio: HubSpot, no Apollo |
 | Clasificar respuesta y preparar revisión o handoff | [response-handling](references/response-handling.md) + Commercial |
 | Comprobar preparación de entrega antes de envío autorizado | [deliverability-operations](references/deliverability-operations.md) + owner del canal |
 | Diseñar un piloto o revisar resultados | [experiments-and-learning](references/experiments-and-learning.md) |
