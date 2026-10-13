@@ -6,7 +6,7 @@
 
 [Deal 65771827631](https://app.hubspot.com/contacts/48713323/record/0-3/65771827631?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1164) · [Company 59084984648](https://app.hubspot.com/contacts/48713323/record/0-2/59084984648?utm_source=codex&utm_medium=ai_agent&utm_campaign=sika1164). Contact individual y nota asociados; datos personales permanecen en CRM y OneDrive. La empresa es Sika Mexicana, S.A. de C.V., distinta de Sika Chile; dominio web oficial mex.sika.com.
 
-`default/qualifiedtobuy`, Julio 75788512; `Core Pipeline/newbusiness` live por automatización (propuesta Strategic Bets). Lifecycle de Company/Contact elevado automáticamente a opportunity. Amount y closedate vacíos; presupuesto y precio no informados. No equivale a cliente existente.
+`default/qualifiedtobuy` al 06/10 → `default/presentationscheduled` desde el 13/10 (lo actualizó el operador tras presentar; monto y cierre siguen vacíos), Julio 75788512; `Core Pipeline/newbusiness` live por automatización (propuesta Strategic Bets). Lifecycle de Company/Contact elevado automáticamente a opportunity. Amount y closedate vacíos; presupuesto y precio no informados. No equivale a cliente existente.
 
 ## Fuentes y alcance
 

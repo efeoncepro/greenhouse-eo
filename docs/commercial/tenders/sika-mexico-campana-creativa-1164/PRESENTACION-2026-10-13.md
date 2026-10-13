@@ -46,7 +46,10 @@ y en la página 17 del anexo).
 - **El video no figura entre los adjuntos.** El MP4 pesa 23 MB y el límite es de 20 MB; el comprador llega al reel
   por el QR o el enlace. La lámina de cumplimiento del deck dice «Archivo de video» en la columna «Dónde está».
   Existe una copia de 9 MB; adjuntarla exige retirar y reenviar la oferta, decisión del operador.
-- **HubSpot.** El deal no se actualizó en esta operación.
+
+## HubSpot
+
+El operador actualizó el deal el 13/10/2026. Readback de ese día (sólo lectura): `default` / `presentationscheduled`, última modificación 13/10 a las 08:58 de Santiago, owner Julio `75788512`; monto, moneda y fecha de cierre siguen vacíos. El agente no escribió en el CRM.
 
 ## Lo que la oferta dejó propuesto sin validación interna
 
