@@ -288,8 +288,8 @@ jobs:
         # main and manual checkpoint gate to avoid paying for duplicate develop
         # builds while preserving pre-release evidence.
         if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
-        env:
-          NODE_OPTIONS: --max-old-space-size=6144
+        # Use the canonical 8 GiB heap from scripts/run-next-build.mjs.
+        # A lower 6 GiB override exhausted TypeScript after tests passed (PR #254).
         run: pnpm build
 
       - name: Vercel function size gate (ISSUE-177)
