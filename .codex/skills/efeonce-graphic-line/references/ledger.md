@@ -801,8 +801,8 @@ en blanco sobre oscuro). En 0.4.29 (AXIS `74bb2e7`, tag `v0.4.29`) el índice de
 
 ### 2026-10-12 — Propuesta técnica y reel para un cliente (Sika, Wherex N.º 1164): deck, caso, motion y página de muestra
 
-Sigue a la entrada del 2026-10-07 (mismo proceso; «LIC-1164» allá). Al corte del 2026-10-12 nada se había cargado en
-Wherex; el resultado no se conoce. Taller y procedimiento: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
+Sigue a la entrada del 2026-10-07 (mismo proceso; «LIC-1164» allá). El operador presentó la oferta en Wherex el
+2026-10-13; el resultado no se conoce. Taller y procedimiento: `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md`.
 
 - **Dos documentos, no uno** (operador): el deck técnico va separado del anexo gráfico «POSIBLE» del 07/10.
 - **Deck técnico:** 22 láminas 16:9 (21 hasta la tarde del 12/10; se sumó «Tiempos por nivel»), línea Brand (Efeonce Creative Studio), con generador propio. Del compositor sólo

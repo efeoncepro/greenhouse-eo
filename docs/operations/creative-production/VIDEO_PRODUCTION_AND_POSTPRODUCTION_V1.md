@@ -4,7 +4,7 @@
 
 - **Fuente:** reel de muestra de 25 s (9:16, 1080×1920, locución y música) para la propuesta a Sika Mexicana (Wherex
   N.º 1164). La v1 (animatic con fondo plano y audio) fue rechazada por el operador: «no se ve cinemático y profesional».
-  La v2.2 fue aprobada el 2026-10-12 tras tres correcciones. Al corte nada se había presentado al comprador. Hechos en
+  La v2.2 fue aprobada el 2026-10-12 tras tres correcciones. La propuesta se presentó el 2026-10-13, con el reel en su página y no como adjunto (límite de 20 MB del portal). Hechos en
   `ai-generations/2026-10-12_sika-propuesta-tecnica/LEEME.md` y `reel/v2/`.
 - **Qué cambia:** se suma una receta ejecutable para este tipo de pieza y cinco reglas: el nivel de producción lo fija
   dónde pauta la marca, no lo mínimo que admiten las bases; la capa gráfica es una aplicación del manual de la campaña;

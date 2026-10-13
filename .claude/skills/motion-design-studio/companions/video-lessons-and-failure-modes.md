@@ -430,7 +430,7 @@ expediente fuera de git (`09-XRay-Pibank/video/`). Costo aproximado: US$1,9 imag
 ## 13. Delta 2026-10-12 — reel de muestra de 25 s para una marca que pauta en TV
 
 **Estado del caso:** v2.2 aprobada por el operador el 2026-10-12 («Bien, vamos con ese») como muestra para la propuesta
-a Sika Mexicana (Wherex N.º 1164); la v1 fue rechazada. Al corte nada se había presentado al comprador. El agente no
+a Sika Mexicana (Wherex N.º 1164); la v1 fue rechazada. La propuesta se presentó el 2026-10-13, con el reel en su página y no como adjunto (límite de 20 MB del portal). El agente no
 oye: voz, golpes y música las juzgó el operador. Receta en
 [cuadros fijos → planos → capa de motion de campaña](../workflows/client-sample-reel-stills-to-clips-with-brand-motion-overlay.md);
 fuentes en `ai-generations/2026-10-12_sika-propuesta-tecnica/` (`LEEME.md` y `reel/v2/`).

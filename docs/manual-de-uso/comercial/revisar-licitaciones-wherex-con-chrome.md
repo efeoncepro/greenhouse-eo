@@ -147,8 +147,13 @@ saber dónde mirar y confirma cada dato en la ficha vigente.
 | Condiciones de pago | Pestaña «Información» | En el caso decían «Por definir»; el comprador respondió que se revisan con quienes avancen. La oferta no propone un plazo. |
 | Hora de cierre | Ficha | Wherex la muestra en **tu hora local**, sin indicar zona: 19:00 en Santiago era 16:00 en Ciudad de México. Anota las dos. |
 
-El límite de peso de los adjuntos no quedó comprobado en ese caso (el video pesaba 23 MB y se dejó lista una copia
-de 9 MB): revísalo en el paso 2 antes de exportar los archivos finales.
+En el paso 2 están los tres casilleros de adjuntos (administrativos, técnicos y económicos) y el límite de peso por
+archivo, que configura cada comprador: en ese caso eran 20 MB, y el video de 23 MB no se pudo adjuntar (se ve por el QR y
+el enlace de la propuesta). Revísalo antes de exportar los archivos finales.
+
+Cuando envíes la oferta, el estado pasa a «Enviada» con tu nombre, la fecha y la hora. Para corregirla después hay que
+retirarla y volver a enviarla. Pide al agente que lea el estado, el monto y los adjuntos y los deje en un registro de
+presentación del expediente.
 
 ### Releer antes de congelar cada documento
 

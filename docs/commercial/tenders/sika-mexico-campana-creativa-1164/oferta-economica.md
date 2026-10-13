@@ -8,7 +8,7 @@
 **Fecha:** octubre de 2026
 **Vigencia:** 60 días calendario desde el cierre de la licitación
 
-**Estado:** borrador para revisión del operador (12/10/2026). No presentada en Wherex. Documento vigente: [PDF de cuatro páginas](cotizacion/v2/cotizacion.pdf), compuesto con la [plantilla A4 de Efeonce](../../templates/cotizacion-a4/README.md) (versión de varias líneas) desde [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json): `node scripts/documents/render-cotizacion-a4.mjs --data <json> --out <carpeta nueva>`. Revisión del 12/10: las cuatro páginas del PDF, montos por extracción de texto, fuentes incrustadas. Copia en OneDrive: `Efeonce-Propuesta-Economica-Sika-1164.pdf`.
+**Estado:** presentada por el operador en Wherex el 13/10/2026 ([registro](PRESENTACION-2026-10-13.md)): un servicio, MXN 64.000, «NO considera IVA». Documento vigente: [PDF de cuatro páginas](cotizacion/v2/cotizacion.pdf), compuesto con la [plantilla A4 de Efeonce](../../templates/cotizacion-a4/README.md) (versión de varias líneas) desde [`cotizacion/cotizacion.json`](cotizacion/cotizacion.json): `node scripts/documents/render-cotizacion-a4.mjs --data <json> --out <carpeta nueva>`. Revisión del 12/10: las cuatro páginas del PDF, montos por extracción de texto, fuentes incrustadas. Copia en OneDrive: `Efeonce-Propuesta-Economica-Sika-1164.pdf`.
 
 Versiones descartadas el mismo día por indicación del operador: una planilla Excel (`economica:build`; la oferta va con el render de Efeonce) y un desglose por pieza suelta (v1; «más que cotizar por pieza se cobra el refresh de marca, la conceptualización creativa y luego los entregables»).
 

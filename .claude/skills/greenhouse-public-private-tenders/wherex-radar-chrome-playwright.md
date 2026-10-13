@@ -112,8 +112,17 @@ contrato del portal.
 - **La hora de cierre se muestra en la hora local del usuario**, sin zona visible: 19:00 en Santiago era 16:00 en
   Ciudad de México. Se confirmó preguntando. Registra el cierre con las dos zonas y nunca asumas que la hora
   visible es la del comprador.
-- **Adjuntos:** el límite de peso por archivo no quedó verificado en el caso (el reel pesaba 23 MB y se preparó
-  una copia de 9 MB). Compruébalo en el paso 2 antes de exportar los finales.
+- **Adjuntos (paso 2):** tres casilleros —administrativos, técnicos y económicos— y un límite de peso por archivo que
+  configura cada comprador: en el caso, **20 MB** (leído el 13/10/2026). El reel pesaba 23 MB y no se adjuntó; se ve por el
+  QR y el enlace del deck. Comprueba el límite antes de exportar los finales y ten lista la copia liviana.
+- **Condiciones (paso 2):** «Precio de oferta incluye traslado al lugar solicitado por el cliente», «Plazo de pago» y
+  «Comentario general». En el caso quedaron «Sí», «Sí, Por definir» y vacío.
+- **El monto (paso 1):** con un solo servicio de cantidad 1, «Precio unitario» y «Total Oferta» son la misma cifra; el
+  portal muestra además el nombre y el código del servicio del proveedor («Fee - Agencia Creativa (EF-10001)»).
+- **Después de enviar:** el estado pasa a «Enviada» con autor, fecha y hora. Mientras la licitación siga publicada, editar
+  exige «Retirar oferta» y reenviar: nunca lo pulses al leer. Tras el envío del operador, lee estado, monto, moneda y
+  adjuntos y déjalos en un registro de presentación del expediente (`PRESENTACION-<fecha>.md`), con lo que no pudiste
+  verificar (el portal trunca los nombres de archivo y no muestra su huella).
 
 ## De propuesta preparada a postulación en Wherex
 

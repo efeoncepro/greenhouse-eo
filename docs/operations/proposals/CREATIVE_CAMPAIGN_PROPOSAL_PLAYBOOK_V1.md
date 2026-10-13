@@ -3,7 +3,7 @@
 > **Tipo de documento:** Playbook operativo (para agentes y personas)
 > **Versión:** 1.0
 > **Creado:** 2026-10-12 por Claude, con Julio Reyes
-> **Caso fuente:** Sika Mexicana, licitación privada Wherex N.º 1164 («conceptualización y despliegue creativo» de una campaña de lanzamientos). Al corte del 12/10/2026 el paquete estaba terminado para la revisión final del operador y **nada se había presentado en el portal**. El resultado de la licitación se desconoce.
+> **Caso fuente:** Sika Mexicana, licitación privada Wherex N.º 1164 («conceptualización y despliegue creativo» de una campaña de lanzamientos). El paquete se terminó el 12/10/2026 y **el operador presentó la oferta en el portal el 13/10/2026**. El resultado de la licitación se desconoce: no citar el caso como ganado.
 > **Alcance de la evidencia:** un solo caso. Las reglas de este documento son las que el operador fijó o lo que se midió en ese caso; no son todavía un estándar probado en varias propuestas.
 > **Skills:** [`greenhouse-public-private-tenders`](../../../.claude/skills/greenhouse-public-private-tenders/SKILL.md) · [`creative-practice`](../../../.claude/skills/creative-practice/SKILL.md) · [`deck-studio`](../../../.claude/skills/deck-studio/SKILL.md) · [`motion-design-studio`](../../../.claude/skills/motion-design-studio/SKILL.md) · [`audio-studio`](../../../.claude/skills/audio-studio/SKILL.md)
 
@@ -212,6 +212,8 @@ La plantilla no decide precio, margen ni impuestos, y un PDF aprobado por el ope
 | Económica | Media hoja vacía y una página de más | Los totales son un bloque entero: si no caben bajo la tabla, pasan a otra página | Detalles, título y nota tributaria de una línea; `checks.pagination` del manifiesto trae las alturas |
 | Económica | El generador rechaza los datos | `buyer.taxId` es obligatorio; `buyer.logo.source` exige una URL HTTPS de fuente oficial | Tomar el identificador fiscal de la ficha del portal; sin fuente oficial del logo, `logo: null` |
 | Deck y económica | El deck anuncia un desglose que la económica ya no tiene (en el caso, «el valor de cada pieza» en las láminas de cumplimiento y de lanzamiento tipo, con la económica ya desglosada por componente) **[medido]** | La económica se cerró después del deck y cambió de estructura | Tras cerrar la económica, buscar en el deck y en el anexo toda frase que la describa, corregirla, volver a exportar y reemplazar las copias |
+| Portal | El video no se puede adjuntar | En el caso, el límite era de 20 MB por archivo (lo configura cada comprador) y el MP4 pesaba 23 MB **[medido el 13/10]** | Ver el límite en el paso «2. Condiciones y archivos adjuntos» antes de exportar; tener la copia liviana lista y que el deck diga dónde se ve el video (QR y enlace), no «archivo de video», si no se va a adjuntar |
+| Portal | No se puede corregir una oferta enviada | Mientras la licitación siga publicada, editar exige «Retirar oferta» y volver a enviarla | Revisar adjuntos y monto antes de enviar; después, sólo leer |
 | Económica | Una versión nueva no puede salir sobre la anterior | El generador exige una carpeta de salida nueva o vacía | Una carpeta por versión |
 
 Moneda: la plantilla A4 funciona en pesos mexicanos (`currency: "MXN"`, `locale: "es-MX"`) **[medido]**.
@@ -263,7 +265,8 @@ Exportación y presentación
 
 - [ ] El operador dio el aviso de exportar.
 - [ ] Deck, anexo, económica y MP4 en la carpeta de la licitación, con sus versiones anteriores conservadas.
-- [ ] Peso de los archivos revisado contra los límites del portal; copia liviana del video disponible.
+- [ ] Peso de los archivos revisado contra el límite del portal (paso 2; en el caso, 20 MB por archivo); copia liviana del video disponible.
+- [ ] Después de enviar: estado «Enviada», monto, moneda y lista de adjuntos leídos en el portal y anotados en un registro de presentación del expediente, con lo que no se pudo verificar.
 - [ ] Expediente actualizado: qué está aprobado, qué es propuesta propia y qué sigue pendiente.
 - [ ] **Nada cargado ni enviado en el portal sin la confirmación expresa del operador en ese momento.**
 
@@ -301,7 +304,7 @@ Es el caso del que salen las reglas, no una plantilla para copiar: el concepto, 
 |---|---|
 | Comprador y proceso | Sika Mexicana, S.A. de C.V. · licitación privada de una ronda en Wherex, N.º 1164 |
 | Cierre | 16/10/2026, 16:00 de Ciudad de México (19:00 de Santiago) |
-| Estado al 12/10/2026 | Paquete terminado para la revisión final del operador; nada presentado |
+| Estado | Paquete terminado el 12/10/2026; oferta presentada por el operador en Wherex el 13/10/2026 a las 08:56 (un servicio, MXN 64.000, tres archivos técnicos y uno económico). Resultado pendiente |
 | Anexo gráfico | «POSIBLE», 21 páginas |
 | Deck técnico | 22 láminas, línea Brand |
 | Reel | «El agua siempre busca una entrada», 25 s, aprobado por el operador el 12/10 |

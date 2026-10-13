@@ -30,6 +30,10 @@ Cubierto: metodología, abordaje sobre los materiales de Sika, imagen para Faceb
 
 La propuesta que hizo Codex se descartó y se eliminó por instrucción del operador el 07/10/2026 (Word/Markdown v0.1, decks PDF v0.2/v0.3 y ZIP de fuentes, a la Papelera). No usar esas versiones como base ni como evidencia de entrega.
 
+## Presentación
+
+Presentada por el operador en Wherex el 13/10/2026 a las 08:56 ([registro](PRESENTACION-2026-10-13.md)). Los adjuntos técnicos del portal son el deck, la económica y el anexo; el video no se adjuntó (límite de 20 MB) y se ve por el QR o el enlace.
+
 ## Pendientes
 
 La económica está en borrador desde el 12/10: MXN 64.000 netos por lanzamiento tipo, desglosada en evolución gráfica, conceptualización creativa y entregables ([oferta-economica.md](oferta-economica.md)). Falta confirmar el reparto, el tratamiento del IVA y la validez. El 12/10 por la noche se sumó la lámina 15, «Tiempos por nivel» (2, 3 y 4 días hábiles según complejidad, urgencias y cumplimiento a la vista), que responde al SLA por niveles que Sika espera (respuesta del 09/10 en Wherex), y la lámina 10 perdió el texto que limitaba el alcance. Los plazos son propuesta propia, sin visto bueno de operaciones. Presentar en Wherex exige la confirmación expresa del operador en ese momento.

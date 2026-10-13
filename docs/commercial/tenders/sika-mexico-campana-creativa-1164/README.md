@@ -1,6 +1,6 @@
 # Sika México — LIC-1164 — Campaña creativa de lanzamientos
 
-**Estado:** paquete terminado el 12-10-2026 (anexo gráfico v2, deck técnico de 22 láminas, reel de muestra con su página y QR, oferta económica); pendiente de la revisión final del operador y de sus decisiones abiertas. No presentado en Wherex: no demuestra oferta enviada ni adjudicación. Cierre 16-10-2026 16:00 de Ciudad de México (19:00 de Santiago). Aprendizajes generalizados en el [playbook de propuesta de campaña creativa](../../../operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md). **Owner:** Julio Reyes. **Origen:** private_rfp / Wherex.
+**Estado:** **oferta presentada** por Julio Reyes en Wherex el 13-10-2026 a las 08:56 (estado «Enviada», leído ese día): un servicio, MXN 64.000 netos, con el deck técnico, el anexo gráfico y la oferta económica adjuntos. Evaluación y resultado pendientes; no demuestra adjudicación. [Registro de la presentación](PRESENTACION-2026-10-13.md). Cierre 16-10-2026 16:00 de Ciudad de México (19:00 de Santiago). Aprendizajes generalizados en el [playbook de propuesta de campaña creativa](../../../operations/proposals/CREATIVE_CAMPAIGN_PROPOSAL_PLAYBOOK_V1.md). **Owner:** Julio Reyes. **Origen:** private_rfp / Wherex.
 
 ## Estado CRM verificado
 

@@ -3,8 +3,8 @@
 > **Estado:** referencia de oficio escrita el 2026-10-12 desde un solo caso: la propuesta técnica de
 > «conceptualización y despliegue creativo» para Sika Mexicana (licitación privada, Wherex N.º 1164), deck 16:9 de
 > 22 láminas, línea Brand (Efeonce Creative Studio). El operador la revisó lámina por lámina en el lienzo y sus
-> correcciones son las reglas de abajo. **El paquete quedó terminado y exportado; no consta que se haya cargado en el
-> portal y el resultado de la licitación se desconoce.** No cites este caso como propuesta presentada ni ganada.
+> correcciones son las reglas de abajo. **El operador presentó la oferta en el portal el 13/10/2026; el resultado de la licitación se
+> desconoce.** No cites este caso como propuesta ganada.
 >
 > Es el molde hermano de [propuesta-tecnica-seo-sin-presentador.md](propuesta-tecnica-seo-sin-presentador.md): misma
 > técnica (láminas HTML con tokens + láminas del compositor, PDF 16:9), otro argumento. Lo que aquí no se repite
@@ -243,7 +243,7 @@ catálogo y nombres del roster (`docs/operations/brand-photography/EFEONCE_TEAM_
 11. **Video:** el QR y el enlace abren la página desde el PDF final; la anotación se cuenta por API
     (`page.node.Annots()`), no con grep sobre los bytes; escanear el QR con un teléfono real.
 12. **Lienzo y PDF dicen lo mismo:** misma cantidad de láminas, mismas imágenes.
-13. **Peso del PDF** contra el límite de adjuntos de las bases (el del caso pesó 11 MB).
+13. **Peso del PDF** contra el límite de adjuntos del portal (el del caso pesó 11,5 MB con un límite de 20 MB por archivo; el video de 23 MB no se pudo adjuntar: si el video no va adjunto, la lámina de cumplimiento remite al QR y al enlace, no a un «archivo de video»).
 14. **Lo que es propuesta propia**, listado para el operador (el `LEEME.md` del caso lo trae como «Por confirmar antes
     de enviar»). Ninguna lámina lo presenta como compromiso validado.
 15. **Gate de licitación:** `pnpm tender:canonical-gate <slug>`. En el caso fuente el cierre de Proposal Studio estaba

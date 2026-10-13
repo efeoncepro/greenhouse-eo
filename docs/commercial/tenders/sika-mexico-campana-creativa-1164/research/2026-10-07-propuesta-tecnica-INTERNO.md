@@ -102,3 +102,7 @@ Efecto en el deck técnico (12/10): la lámina de cumplimiento usa las palabras 
 - **Wherex, leído el 12/10 (sólo lectura):** un servicio, un monto total, MXN disponible, total sin IVA; RFC de facturación SME7811306Z7. Sika espera además una propuesta de SLA por niveles de complejidad (respuesta del 09/10 16:32 a otro proveedor); se incorporó al deck esa noche como lámina 15, «Tiempos por nivel» (2, 3 y 4 días hábiles; urgencia de nivel 1 en 24 horas; cumplimiento a la vista), con plazos propuestos por el agente y sin visto bueno de operaciones.
 - **Evolución gráfica como pago único:** si se presentara así, los lanzamientos siguientes quedarían en MXN 48.000, bajo el piso (≈ 57.650) calculado para un lanzamiento. En el documento va como parte de cada lanzamiento; decide el operador.
 - **Riesgo de horas:** entre 64.000 y el piso hay ≈ MXN 6.350; un desvío cercano al 10 % de las horas lo consume.
+
+## Presentación · 13/10/2026
+
+El operador presentó la oferta en Wherex el 13/10/2026 a las 08:56. Lectura del portal ese día, sin tocar campos: estado «Enviada»; oferta «Fee - Agencia Creativa (EF-10001)», 1 servicio, $64.000 MXN, sin IVA; traslado incluido «Sí»; plazo de pago «Sí, Por definir»; tres archivos técnicos y uno económico; límite de 20 MB por archivo. No se verificó la versión de cada adjunto ni se actualizó HubSpot. Detalle en [PRESENTACION-2026-10-13.md](../PRESENTACION-2026-10-13.md).

@@ -311,7 +311,7 @@ cotización no es un contrato) y se resuelven en el contrato.
 
 **Cuándo aplica:** un comprador que ya tiene concepto de campaña busca una agencia que lo evolucione y produzca cada
 lanzamiento, fija una canasta de referencia («lanzamiento tipo») y exige el precio desglosado. Caso fuente: Sika
-Mexicana, Wherex N.º 1164 (2026-10-12; paquete terminado, **no presentado**, resultado desconocido).
+Mexicana, Wherex N.º 1164 (paquete terminado el 2026-10-12 y **presentado por el operador el 2026-10-13**; resultado desconocido).
 
 **Cómo se costea.** Igual que (b): squad dimensionado para la ventana de un lanzamiento, oferta
 `creative-managed-service`, On-Demand, un período, tres escenarios y piso computado

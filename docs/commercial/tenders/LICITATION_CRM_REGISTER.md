@@ -107,6 +107,8 @@ Origen Wherex, evolución de campaña «Innovar es hacerlo posible, innovar es h
 
 Cohorte `research_2026_10_06`: nuevo contacto en ACTIVE 174/176; nueva empresa en ACTIVE **177 Química y materiales**, por atributos. Readback de conjuntos exactos: 81 empresas, 81 contactos, 63 individuales con email, 51 creativos, CRM 26 y 177 con una empresa. Sin inscripción manual en listas estáticas.
 
+**Delta 13/10/2026:** oferta **presentada** por el operador en Wherex a las 08:56 (estado «Enviada», leído ese día): un servicio, MXN 64.000 netos, sin IVA; cierre 16/10 a las 16:00 de Ciudad de México (19:00 de Santiago). Estado local **Presentada**; evaluación y resultado pendientes. El deal de HubSpot no se actualizó en esta operación (sigue en `default/qualifiedtobuy`, sin monto). [Registro de la presentación](sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md).
+
 ## Criterio de clasificación y priorización — 2026-10-05
 
 - **Factory:** encargos On-Demand, con alcance y término definidos. Un proyecto de varios meses o pagado por hitos puede seguir siendo Factory.

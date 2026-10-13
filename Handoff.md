@@ -1,5 +1,12 @@
 # Handoff
 
+## 2026-10-13 — Sika N.º 1164: oferta presentada en Wherex
+
+El operador presentó la oferta el 13/10 a las 08:56 (estado «Enviada», leído en el portal sin tocar campos): un servicio, MXN 64.000 netos, tres archivos
+técnicos y uno económico; el video no se adjuntó (límite de 20 MB) y se ve por QR. [Registro](docs/commercial/tenders/sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md).
+Sin verificar: versión de cada adjunto. HubSpot sin actualizar. Resultado pendiente; cierre 16/10 a las 16:00 de Ciudad de México.
+Playbook, manual de Wherex y skills actualizados con el estado y con lo nuevo del portal (límite de adjuntos, condiciones, retirar para editar).
+
 ## 2026-10-13 — Outreach personalizado y seguimiento HubSpot
 
 [Registro](docs/commercial/follow-up-agent/runs/2026-10-13-outreach-personalizado.md): Paula, Nicol, Fiorella,

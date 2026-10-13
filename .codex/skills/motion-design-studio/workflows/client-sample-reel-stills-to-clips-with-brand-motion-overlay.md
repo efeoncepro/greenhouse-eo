@@ -2,7 +2,7 @@
 
 > **Estado:** validado — 2026-10-12 · reel v2.2 de 25 s (9:16, 1080×1920, 30 fps, locución y música) aprobado por el
 > operador («Bien, vamos con ese») como muestra para la propuesta a Sika Mexicana (Wherex N.º 1164). La v1 (animatic con
-> fondo plano + audio) fue rechazada. Al corte nada se había presentado al comprador.
+> fondo plano + audio) fue rechazada. La propuesta se presentó el 2026-10-13; el MP4 (23 MB) no se adjuntó porque el portal admitía 20 MB por archivo: el comprador lo ve por la página con QR.
 > **Evidencia y receta:** `ai-generations/2026-10-12_sika-propuesta-tecnica/reel/v2/` (`stills.batch.json`, `planos.sh`,
 > `*.motion.txt`, `build-overlay.py`, `overlay-render.mjs`, `montaje.sh`) y su `LEEME.md` (§«Reel v2»).
 > **Límite de verificación:** el agente no oye. Sincronía de voz, golpes y música las juzgó el operador; aquí sólo hay

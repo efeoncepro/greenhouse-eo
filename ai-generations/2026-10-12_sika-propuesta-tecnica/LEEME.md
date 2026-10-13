@@ -1,6 +1,6 @@
 # Sika Mexicana · Wherex N.º 1164 · Propuesta técnica (deck 16:9)
 
-**Estado al 12/10/2026:** v3 (22 láminas) para revisión del operador. No se ha enviado ni cargado en Wherex. Documento
+**Estado al 12/10/2026:** v3 (22 láminas). **Presentada por el operador en Wherex el 13/10/2026 a las 08:56** (registro en `docs/commercial/tenders/sika-mexico-campana-creativa-1164/PRESENTACION-2026-10-13.md`). Documento
 **separado** del anexo gráfico «POSIBLE» (decisión del operador: no se presentan como una sola propuesta).
 
 - 22 láminas, línea Brand (el 12/10 salió «Piezas adicionales» y todo lo que limitaba alcance: el operador no le vio aporte) (Efeonce Creative Studio), molde «propuesta técnica para leer sin presentador» (Pibank/UTEM).
